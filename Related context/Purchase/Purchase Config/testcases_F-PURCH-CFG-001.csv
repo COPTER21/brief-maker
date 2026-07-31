@@ -1,0 +1,36 @@
+﻿case_id,case_name,priority,step_order,step_description,expected_result
+TC-001,อ่าน/แสดง config ครบทุกกลุ่ม,High,1,เปิดหน้าตั้งค่าการจัดซื้อ,แสดง 2 แท็บ + การ์ด config ครบ
+TC-001,อ่าน/แสดง config ครบทุกกลุ่ม,High,2,ตรวจค่า general (ข้อมูล: DATA-001),comparison/flow/payment/PR/vendor ตรง config
+TC-001,อ่าน/แสดง config ครบทุกกลุ่ม,High,3,ดู badge สถานะ,'บันทึกแล้ว'
+TC-002,แก้ค่า → สถานะยังไม่บันทึก,High,1,ปรับ toggle ใด ๆ,badge เปลี่ยนเป็น 'ยังไม่บันทึก'
+TC-002,แก้ค่า → สถานะยังไม่บันทึก,High,2,ดูปุ่ม,ปุ่มบันทึก + คืนค่า เปิดใช้งาน
+TC-003,บันทึก config + audit,High,1,กดบันทึก,toast สำเร็จ + badge 'บันทึกแล้ว'
+TC-003,บันทึก config + audit,High,2,ดู audit log,มีแถวบันทึก field/old→new/ผู้แก้/เวลา
+TC-004,คืนค่า,Medium,1,กดคืนค่า,ค่ากลับเป็นที่บันทึกล่าสุด + badge 'บันทึกแล้ว'
+TC-005,ปิดเปรียบเทียบ → ลูก disable,High,1,ปิด toggle 'เปิดใช้การเปรียบเทียบราคา',required/min/threshold/award disabled (VAL-01)
+TC-005,ปิดเปรียบเทียบ → ลูก disable,High,2,ดู award rule (ข้อมูล: DATA-007),ตัวเลือก lowest/manual ถูก disable ด้วย
+TC-006,Flow Preview เปลี่ยนสด,Medium,1,ปิด comparison,แผนภาพ: CP กลายเป็น 'ข้าม' เส้นประจาง · PR→PO ตรง
+TC-006,Flow Preview เปลี่ยนสด,Medium,2,เปิดคืน,CP กลับมาเป็นขั้นปกติ
+TC-007,Payment Types ดึงจาก Payment Term,High,1,ดูการ์ดประเภทการชำระ,checklist 6 ประเภท + โน้ต 'ดึงจาก Payment Term'
+TC-007,Payment Types ดึงจาก Payment Term,High,2,ตรวจรายการ (ข้อมูล: DATA-002),ตรงกับ Payment Term master
+TC-008,เปิดประเภท + ตั้งค่าเริ่มต้น inherit,High,1,เปิด Deposit แล้วตั้ง %มัดจำ=30 (ข้อมูล: DATA-002),deposit_default_pct=30 บันทึกได้
+TC-008,เปิดประเภท + ตั้งค่าเริ่มต้น inherit,High,2,เปิด Installment ตั้งงวด=3,installment_default_terms=3
+TC-008,เปิดประเภท + ตั้งค่าเริ่มต้น inherit,High,3,ตรวจ inherit,ค่าเหล่านี้เป็นค่าเริ่มต้นตอนเปิด PO (D08/D09)
+TC-009,ปิดทุกประเภท → block,Medium,1,ปิดทุก payment type,กดบันทึกไม่ผ่าน + แจ้งต้องเปิด ≥1 (VAL-05)
+TC-010,default ไม่อยู่ในที่เปิด,Medium,1,ปิด postpay (ที่เป็น default),block save / reset default เป็นตัวแรกที่เปิด (VAL-02)
+TC-011,PR mandatory ไม่มีศูนย์ต้นทุน/รหัสงบ,High,1,ดูฟิลด์บังคับ PR (ข้อมูล: DATA-003),มี item/qty/need_by/quote เท่านั้น
+TC-011,PR mandatory ไม่มีศูนย์ต้นทุน/รหัสงบ,High,2,ตรวจว่าไม่มี cost center/รหัสงบ (ข้อมูล: DATA-003),ไม่มี + โน้ต 'มากับใบปลดอายัด (UNLK) · บังคับที่ Budget Config'
+TC-012,Vendor sourcing,Medium,1,เปิด 'ใช้เฉพาะผู้ขายที่อนุมัติ' (ข้อมูล: DATA-004),require_approved_vendor_only=true
+TC-012,Vendor sourcing,Medium,2,เปิด autofill ราคา,ดึงจาก Vendor Price List
+TC-013,ตั้งเลขเอกสาร + ตัวอย่างสด,High,1,แก้ prefix=PR digits=4 next=232 (ข้อมูล: DATA-005),ตัวอย่างอัปเดตสด
+TC-013,ตั้งเลขเอกสาร + ตัวอย่างสด,High,2,ดูตัวอย่าง (ข้อมูล: DATA-005),PR-2569-0232
+TC-014,prefix ว่าง/หลัก 0 → block,Medium,1,ลบ prefix แล้วบันทึก,block + inline error (VAL-03)
+TC-014,prefix ว่าง/หลัก 0 → block,Medium,2,ตั้ง digits=0,block + error
+TC-015,Numbering engine issue + format,High,1,สร้างเอกสาร PR (consumer เรียก engine) (ข้อมูล: DATA-005),ได้เลข PR-2569-0232
+TC-015,Numbering engine issue + format,High,2,ตรวจ next_no,เพิ่มเป็น 233 (atomic)
+TC-016,Numbering reset ตามรอบ,Medium,1,ขึ้นปี 2569 แล้ว issue (ข้อมูล: DATA-006),next_no รีเซ็ตเป็น 1
+TC-016,Numbering reset ตามรอบ,Medium,2,issue อีกครั้งในปีเดียวกัน,ไม่รีเซ็ตซ้ำ (last_reset_period=2569)
+TC-019,Audit log ทุกการเปลี่ยน,High,1,เปลี่ยน comparison_required แล้วบันทึก,"audit 1 แถว: field=comparison_required, old→new, ผู้แก้, เวลา"
+TC-020,Boundary + Locked views,Medium,1,ดูการ์ด 'ตั้งค่าที่เกี่ยวข้อง' (ข้อมูล: DATA-008),ชี้ Budget/DOA/Finance/Inventory/Direct-Payment
+TC-020,Boundary + Locked views,Medium,2,ดูการ์ด 'กติกาที่ระบบกำหนดตายตัว',D-series แสดง read-only ปรับไม่ได้
+TC-022,next_no ≤ ที่ออกแล้ว → เตือน,Low,1,ตั้ง next_no ย้อนหลัง,เตือนเสี่ยงเลขซ้ำ (VAL-04)

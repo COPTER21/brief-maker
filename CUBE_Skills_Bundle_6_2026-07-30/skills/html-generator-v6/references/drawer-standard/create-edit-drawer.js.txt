@@ -1,0 +1,1236 @@
+    // ============================================================
+    //  CREATE DRAWER (4-step Wizard)
+    // ============================================================
+    const createWizard = {
+      step: 1,
+      expandedLineId: null,  // ← NEW: which line row is expanded
+      data: {
+        pr_date: new Date().toISOString().slice(0, 10),
+        need_date: '',
+        dept: 'พัฒนาธุรกิจ',
+        requester: 'Tadswan Chanyarakskul',
+        br_no: null,
+        ucp_no: null,
+        purpose: '',
+        notes: '',
+        lines: [],
+        wht_enabled: false,
+        wht_pct: 3,                    // ← NEW: WHT percent (1/2/3/5)
+        endbill_discount_enabled: false,
+        endbill_discount_mode: 'amount',  // ← NEW: 'amount' or 'percent'
+        endbill_discount_value: 0,        // ← NEW: numeric value
+        attachments: [],
+      },
+    };
+    const brSearchState = { query: '', open: false, highlight: 0 };
+    const ucpSearchState = { query: '', open: false, highlight: 0 };
+    const itemSearchState = { open: false, highlight: 0, lineId: null };
+
+    function openCreateDrawer() {
+      createWizard.step = 1;
+      createWizard.expandedLineId = null;
+      createWizard.data = {
+        pr_date: new Date().toISOString().slice(0, 10),
+        need_date: '',
+        dept: 'พัฒนาธุรกิจ',
+        requester: 'Tadswan Chanyarakskul',
+        br_no: null,
+        ucp_no: null,
+        purpose: '',
+        notes: '',
+        lines: [createBlankLine()],
+        wht_enabled: false,
+        wht_pct: 3,
+        endbill_discount_enabled: false,
+        endbill_discount_mode: 'amount',
+        endbill_discount_value: 0,
+        attachments: [],
+      };
+      brSearchState.query = ''; brSearchState.open = false; brSearchState.highlight = 0;
+      ucpSearchState.query = ''; ucpSearchState.open = false; ucpSearchState.highlight = 0;
+
+      const overlay = document.getElementById('overlay-root');
+      overlay.innerHTML = `
+        <div class="overlay-wrap">
+          <div class="backdrop" onclick="closeCreateDrawer()"></div>
+          <div id="create-drawer" class="drawer-panel drawer-enter">
+            <div id="create-drawer-content" style="display: flex; flex-direction: column; height: 100%;"></div>
+          </div>
+        </div>
+      `;
+      const drawer = document.getElementById('create-drawer');
+      requestAnimationFrame(() => drawer.classList.add('drawer-active'));
+      renderCreateDrawer();
+    }
+
+    function closeCreateDrawer() {
+      const drawer = document.getElementById('create-drawer');
+      if (drawer) {
+        drawer.classList.remove('drawer-active');
+        drawer.classList.add('drawer-enter');
+      }
+      setTimeout(() => {
+        document.getElementById('overlay-root').innerHTML = '';
+        if (getRoute().name === 'create') navigate('list');
+      }, 200);
+    }
+
+    function createBlankLine() {
+      return {
+        id: 'L' + Date.now() + Math.random().toString(36).slice(2, 5),
+        item_code: '',
+        item_name: '',
+        qty: 1,
+        unit: '-',
+        unit_price: 0,
+        discount_pct: 0,
+        vat_mode: 'none',     // 'none' | 'add' | 'included' — mutually exclusive
+        vat_pct: 7,
+        note: '',
+      };
+    }
+
+    // Migrate legacy lines (vat_enabled/net_enabled) to vat_mode
+    function migrateLine(l) {
+      if (l.vat_mode) return l;  // already migrated
+      let mode = 'none';
+      if (l.vat_enabled && l.net_enabled) mode = 'included';
+      else if (l.vat_enabled) mode = 'add';
+      l.vat_mode = mode;
+      return l;
+    }
+
+    // Calculate VAT for a line based on vat_mode
+    // Returns { vatAmount, lineTotal }
+    //   none      → no VAT, line = subtotal after discount
+    //   add       → VAT added on top, line = subtotal × (1 + vat%)
+    //   included  → VAT included in price, line = subtotal; VAT base = subtotal / (1 + vat%)
+    function calcLineVat(l) {
+      migrateLine(l);
+      const subtotal = l.qty * l.unit_price;
+      const discount = subtotal * (l.discount_pct / 100);
+      const netAmount = subtotal - discount;
+      let vatAmount = 0;
+      let lineTotal = netAmount;
+      if (l.vat_mode === 'add') {
+        vatAmount = netAmount * (l.vat_pct / 100);
+        lineTotal = netAmount + vatAmount;
+      } else if (l.vat_mode === 'included') {
+        vatAmount = netAmount * (l.vat_pct / 100) / (1 + l.vat_pct / 100);
+        lineTotal = netAmount;  // line total stays same; VAT is back-calculated
+      }
+      return { netAmount, vatAmount, lineTotal };
+    }
+
+    function renderCreateDrawer() {
+      const c = document.getElementById('create-drawer-content');
+      const { step } = createWizard;
+      c.innerHTML = `
+        <!-- Drawer Header -->
+        <div style="padding: 18px 24px 16px; border-bottom: 1px solid var(--c-border-soft); flex-shrink: 0;">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-text-mute); margin-bottom: 4px;">
+                <i data-lucide="file-plus" class="w-3.5 h-3.5"></i> สร้างเอกสารใหม่
+              </div>
+              <h2 style="font-size: 20px; font-weight: 700; color: var(--c-navy);">สร้างคำร้องขอซื้อใหม่</h2>
+            </div>
+            <button onclick="closeCreateDrawer()" class="top-icon-btn" style="background: transparent; border: none; width: 32px; height: 32px;">
+              <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+          </div>
+
+          <div class="stepper" style="margin-top: 18px;">
+            ${renderStepperItem(1, 'ข้อมูลคำร้องขอซื้อ')}
+            ${renderStepperItem(2, 'รายการสินค้า')}
+            ${renderStepperItem(3, 'เอกสารแนบ')}
+            ${renderStepperItem(4, 'ตรวจสอบและยืนยัน')}
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div style="flex: 1; overflow-y: auto; padding: 22px 24px;">
+          ${step === 1 ? renderStep1() : ''}
+          ${step === 2 ? renderStep2() : ''}
+          ${step === 3 ? renderStep3() : ''}
+          ${step === 4 ? renderStep4() : ''}
+        </div>
+
+        <!-- Footer -->
+        <div style="padding: 14px 24px; border-top: 1px solid var(--c-border-soft); background: var(--c-off-white); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            ${step > 1 ? `
+              <button onclick="wizardBack()" class="btn btn-secondary">
+                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                <span>ย้อนกลับ</span>
+              </button>` : ''}
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button onclick="closeCreateDrawer()" class="btn btn-ghost">ยกเลิก</button>
+            ${step < 4 ? `
+              <button onclick="wizardNext()" class="btn btn-primary">
+                <span>ถัดไป</span>
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </button>` : `
+              <button onclick="saveDraft()" class="btn btn-secondary">
+                <i data-lucide="save" class="w-4 h-4"></i>
+                <span>บันทึกแบบร่าง</span>
+              </button>
+              <button onclick="submitForApproval()" class="btn btn-primary">
+                <i data-lucide="send" class="w-4 h-4"></i>
+                <span>บันทึกและส่งอนุมัติ</span>
+              </button>`}
+          </div>
+        </div>
+      `;
+      renderIcons();
+      // Re-render comboboxes if step 1 + open
+      if (step === 1) {
+        if (brSearchState.open) {
+          const list = document.getElementById('brSuggestList');
+          if (list) { list.classList.remove('hidden'); list.innerHTML = renderBrSuggestions(); renderIcons(); }
+        }
+        if (ucpSearchState.open) {
+          const list = document.getElementById('ucpSuggestList');
+          if (list) { list.classList.remove('hidden'); list.innerHTML = renderUcpSuggestions(); renderIcons(); }
+        }
+      }
+    }
+
+    function renderStepperItem(n, label) {
+      const { step } = createWizard;
+      const cls = step === n ? 'active' : (step > n ? 'done' : '');
+      return `
+        <div class="stepper-item ${cls}">
+          <div class="stepper-circle">${n}</div>
+          <div class="stepper-label">${label}</div>
+        </div>
+      `;
+    }
+
+    // -----------------------------------------------------------
+    //  Step 1 — General Info + Budget Release + UCP
+    // -----------------------------------------------------------
+    function renderStep1() {
+      const d = createWizard.data;
+      const selectedBr = mockBudgets.find(b => b.br_no === d.br_no);
+      const selectedUcp = mockUCPs.find(u => u.ucp_no === d.ucp_no);
+      return `
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+          <i data-lucide="file-text" class="w-4 h-4" style="color: var(--c-text-mute);"></i>
+          <div style="font-size: 13px; font-weight: 600; color: var(--c-navy);">ข้อมูลทั่วไป</div>
+        </div>
+
+        <div class="form-grp" style="margin-bottom: 22px;">
+          <div class="form-field">
+            <label class="required"><i data-lucide="calendar" class="w-3.5 h-3.5"></i>วันที่ขอซื้อ</label>
+            <input type="date" value="${d.pr_date}" oninput="createWizard.data.pr_date=this.value" class="input">
+          </div>
+          <div class="form-field">
+            <label class="required"><i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i>วันที่ต้องการสินค้า</label>
+            <input type="date" value="${d.need_date}" oninput="createWizard.data.need_date=this.value" class="input" placeholder="mm/dd/yyyy">
+          </div>
+          <div class="form-field">
+            <label class="required">แผนกที่ขอ</label>
+            <select onchange="createWizard.data.dept=this.value" class="select">
+              ${mockDepts.map(dept => `<option value="${dept.name}" ${d.dept === dept.name ? 'selected' : ''}>${dept.name}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="required"><i data-lucide="user" class="w-3.5 h-3.5"></i>ผู้ขอ</label>
+            <input type="text" value="${d.requester}" oninput="createWizard.data.requester=this.value" class="input">
+          </div>
+        </div>
+
+        <!-- Budget Release Section -->
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+          <i data-lucide="wallet" class="w-4 h-4" style="color: var(--c-primary);"></i>
+          <div style="font-size: 13px; font-weight: 600; color: var(--c-navy);">การอ้างอิงงบปลดอายัด (Budget Release)</div>
+        </div>
+        <div style="margin-bottom: 22px;">
+          <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px; color: var(--c-navy);">เลขปลดอายัด</label>
+          <div style="position: relative;" id="brCombobox">
+            <i data-lucide="search" class="w-4 h-4" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--c-text-soft);"></i>
+            <input type="text" id="brSearchInput" autocomplete="off"
+              value="${selectedBr ? selectedBr.br_no + ' — ' + selectedBr.name : brSearchState.query}"
+              placeholder="ค้นหาเลขปลดอายัด..."
+              oninput="onBrSearchInput(event)"
+              onfocus="onBrSearchFocus()"
+              onkeydown="onBrSearchKey(event)"
+              class="input" style="padding-left: 36px; padding-right: 36px;">
+            ${selectedBr ? `
+              <button onclick="clearBrSelection()" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: transparent; border: none; padding: 4px; cursor: pointer; color: var(--c-text-soft);" title="ล้างการเลือก">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            ` : `
+              <i data-lucide="chevron-down" class="w-4 h-4" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--c-text-soft); pointer-events: none;"></i>
+            `}
+            <div id="brSuggestList" class="${brSearchState.open ? '' : 'hidden'}"
+                 style="position: absolute; z-index: 30; left: 0; right: 0; margin-top: 4px; background: white; border: 1px solid var(--c-border); border-radius: var(--r); box-shadow: var(--sh-lg); max-height: 280px; overflow-y: auto;">
+              ${renderBrSuggestions()}
+            </div>
+          </div>
+          ${selectedBr ? `
+            <div class="card" style="margin-top: 10px; background: linear-gradient(135deg, rgba(255,59,48,0.04), white);">
+              <div class="card-body" style="padding: 12px 14px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                <div>
+                  <div style="font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-text-mute);">รหัสงบประมาณ</div>
+                  <div class="tbl-mono" style="color: var(--c-primary); font-weight: 600;">${selectedBr.code}</div>
+                </div>
+                <div>
+                  <div style="font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-text-mute);">ชื่องบประมาณ</div>
+                  <div style="font-weight: 600;">${selectedBr.name}</div>
+                </div>
+                <div>
+                  <div style="font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-text-mute);">งบคงเหลือ</div>
+                  <div style="font-weight: 700; color: var(--c-primary); font-size: 16px;" class="num">฿${formatMoney(selectedBr.remaining)}</div>
+                </div>
+              </div>
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- UCP Section -->
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+          <i data-lucide="shuffle" class="w-4 h-4" style="color: var(--c-purple);"></i>
+          <div style="font-size: 13px; font-weight: 600; color: var(--c-navy);">การอ้างอิงใบเปลี่ยนหน่วยขายเพื่อสั่งผลิต</div>
+        </div>
+        <div style="margin-bottom: 22px;">
+          <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px; color: var(--c-navy);">เลขที่ใบเปลี่ยนหน่วย</label>
+          <div style="position: relative;" id="ucpCombobox">
+            <i data-lucide="search" class="w-4 h-4" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--c-text-soft);"></i>
+            <input type="text" id="ucpSearchInput" autocomplete="off"
+              value="${selectedUcp ? selectedUcp.ucp_no : ucpSearchState.query}"
+              placeholder="ค้นหาใบเปลี่ยนหน่วย..."
+              oninput="onUcpSearchInput(event)"
+              onfocus="onUcpSearchFocus()"
+              onkeydown="onUcpSearchKey(event)"
+              class="input" style="padding-left: 36px; padding-right: 36px;">
+            ${selectedUcp ? `
+              <button onclick="clearUcpSelection()" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: transparent; border: none; padding: 4px; cursor: pointer; color: var(--c-text-soft);" title="ล้างการเลือก">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            ` : `
+              <i data-lucide="chevron-down" class="w-4 h-4" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--c-text-soft); pointer-events: none;"></i>
+            `}
+            <div id="ucpSuggestList" class="${ucpSearchState.open ? '' : 'hidden'}"
+                 style="position: absolute; z-index: 30; left: 0; right: 0; margin-top: 4px; background: white; border: 1px solid var(--c-border); border-radius: var(--r); box-shadow: var(--sh-lg); max-height: 280px; overflow-y: auto;">
+              ${renderUcpSuggestions()}
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Info -->
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+          <i data-lucide="info" class="w-4 h-4" style="color: var(--c-text-mute);"></i>
+          <div style="font-size: 13px; font-weight: 600; color: var(--c-navy);">รายละเอียดเพิ่มเติม</div>
+        </div>
+        <div class="form-field" style="margin-bottom: 14px;">
+          <label>วัตถุประสงค์</label>
+          <textarea rows="3" oninput="createWizard.data.purpose=this.value" placeholder="ระบุวัตถุประสงค์ในการจัดซื้อ"
+            class="input" style="height: auto; padding: 10px 12px; resize: vertical;">${d.purpose}</textarea>
+        </div>
+        <div class="form-field">
+          <label>หมายเหตุ</label>
+          <textarea rows="2" oninput="createWizard.data.notes=this.value" placeholder="หมายเหตุเพิ่มเติม (ถ้ามี)"
+            class="input" style="height: auto; padding: 10px 12px; resize: vertical;">${d.notes}</textarea>
+        </div>
+      `;
+    }
+
+    function renderBrSuggestions() {
+      const q = (brSearchState.query || '').toLowerCase().trim();
+      const filtered = mockBudgets.filter(b => !q || b.br_no.toLowerCase().includes(q) || b.name.toLowerCase().includes(q) || b.code.toLowerCase().includes(q));
+      if (filtered.length === 0) return `<div style="padding: 24px 16px; text-align: center; font-size: 13px; color: var(--c-text-mute);">ไม่พบงบประมาณที่ตรงกับ "<strong>${q}</strong>"</div>`;
+      return filtered.map((b, i) => {
+        const active = i === brSearchState.highlight;
+        const hl = (text) => q ? text.replace(new RegExp(`(${escapeReg(q)})`, 'gi'), '<mark>$1</mark>') : text;
+        return `
+          <button type="button" onmousedown="event.preventDefault()" onclick="selectBr('${b.br_no}')"
+            style="width: 100%; text-align: left; padding: 10px 14px; background: ${active ? 'var(--c-primary-08)' : 'transparent'}; border: none; cursor: pointer; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--c-border-soft);">
+            <div style="width: 32px; height: 32px; border-radius: var(--r-sm); background: var(--c-primary-08); display: grid; place-items: center; flex-shrink: 0;">
+              <i data-lucide="wallet" class="w-4 h-4" style="color: var(--c-primary);"></i>
+            </div>
+            <div style="flex: 1; min-width: 0;">
+              <div class="tbl-mono" style="font-weight: 600; color: var(--c-primary);">${hl(b.br_no)}</div>
+              <div style="font-size: 11.5px; color: var(--c-text-mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${hl(b.name)}</div>
+            </div>
+            <div style="text-align: right; flex-shrink: 0;">
+              <div class="num" style="font-size: 13px; font-weight: 700; color: var(--c-navy);">฿${formatMoney(b.remaining)}</div>
+              <div style="font-size: 10px; color: var(--c-text-soft);">คงเหลือ</div>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderUcpSuggestions() {
+      const q = (ucpSearchState.query || '').toLowerCase().trim();
+      const filtered = mockUCPs.filter(u => !q || u.ucp_no.toLowerCase().includes(q) || u.desc.toLowerCase().includes(q));
+      if (filtered.length === 0) return `<div style="padding: 24px 16px; text-align: center; font-size: 13px; color: var(--c-text-mute);">ไม่พบใบเปลี่ยนหน่วยที่ตรงกับ "<strong>${q}</strong>"</div>`;
+      return filtered.map((u, i) => {
+        const active = i === ucpSearchState.highlight;
+        const hl = (text) => q ? text.replace(new RegExp(`(${escapeReg(q)})`, 'gi'), '<mark>$1</mark>') : text;
+        return `
+          <button type="button" onmousedown="event.preventDefault()" onclick="selectUcp('${u.ucp_no}')"
+            style="width: 100%; text-align: left; padding: 10px 14px; background: ${active ? 'var(--c-primary-08)' : 'transparent'}; border: none; cursor: pointer; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--c-border-soft);">
+            <div style="width: 32px; height: 32px; border-radius: var(--r-sm); background: rgba(124,58,237,0.08); display: grid; place-items: center; flex-shrink: 0;">
+              <i data-lucide="shuffle" class="w-4 h-4" style="color: var(--c-purple);"></i>
+            </div>
+            <div style="flex: 1; min-width: 0;">
+              <div class="tbl-mono" style="font-weight: 600; color: var(--c-purple);">${hl(u.ucp_no)}</div>
+              <div style="font-size: 11.5px; color: var(--c-text-mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${hl(u.desc)}</div>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function escapeReg(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+    function onBrSearchInput(e) {
+      brSearchState.query = e.target.value;
+      brSearchState.open = true; brSearchState.highlight = 0;
+      if (createWizard.data.br_no) createWizard.data.br_no = null;
+      const list = document.getElementById('brSuggestList');
+      if (list) { list.classList.remove('hidden'); list.innerHTML = renderBrSuggestions(); renderIcons(); }
+    }
+    function onBrSearchFocus() {
+      brSearchState.open = true;
+      const list = document.getElementById('brSuggestList');
+      if (list) { list.classList.remove('hidden'); list.innerHTML = renderBrSuggestions(); renderIcons(); }
+    }
+    function onBrSearchKey(e) {
+      const list = document.getElementById('brSuggestList');
+      if (!list) return;
+      const filtered = mockBudgets.filter(b => {
+        const q = (brSearchState.query || '').toLowerCase().trim();
+        return !q || b.br_no.toLowerCase().includes(q) || b.name.toLowerCase().includes(q);
+      });
+      if (e.key === 'ArrowDown') { e.preventDefault(); brSearchState.highlight = Math.min(filtered.length - 1, brSearchState.highlight + 1); list.innerHTML = renderBrSuggestions(); renderIcons(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); brSearchState.highlight = Math.max(0, brSearchState.highlight - 1); list.innerHTML = renderBrSuggestions(); renderIcons(); }
+      else if (e.key === 'Enter') { e.preventDefault(); if (filtered[brSearchState.highlight]) selectBr(filtered[brSearchState.highlight].br_no); }
+      else if (e.key === 'Escape') { brSearchState.open = false; list.classList.add('hidden'); }
+    }
+    function selectBr(br_no) {
+      createWizard.data.br_no = br_no;
+      brSearchState.open = false; brSearchState.query = '';
+      renderCreateDrawer();
+    }
+    function clearBrSelection() {
+      createWizard.data.br_no = null; brSearchState.query = ''; brSearchState.open = true;
+      renderCreateDrawer();
+      setTimeout(() => document.getElementById('brSearchInput')?.focus(), 0);
+    }
+
+    function onUcpSearchInput(e) {
+      ucpSearchState.query = e.target.value;
+      ucpSearchState.open = true; ucpSearchState.highlight = 0;
+      if (createWizard.data.ucp_no) createWizard.data.ucp_no = null;
+      const list = document.getElementById('ucpSuggestList');
+      if (list) { list.classList.remove('hidden'); list.innerHTML = renderUcpSuggestions(); renderIcons(); }
+    }
+    function onUcpSearchFocus() {
+      ucpSearchState.open = true;
+      const list = document.getElementById('ucpSuggestList');
+      if (list) { list.classList.remove('hidden'); list.innerHTML = renderUcpSuggestions(); renderIcons(); }
+    }
+    function onUcpSearchKey(e) {
+      const list = document.getElementById('ucpSuggestList');
+      if (!list) return;
+      const filtered = mockUCPs.filter(u => {
+        const q = (ucpSearchState.query || '').toLowerCase().trim();
+        return !q || u.ucp_no.toLowerCase().includes(q) || u.desc.toLowerCase().includes(q);
+      });
+      if (e.key === 'ArrowDown') { e.preventDefault(); ucpSearchState.highlight = Math.min(filtered.length - 1, ucpSearchState.highlight + 1); list.innerHTML = renderUcpSuggestions(); renderIcons(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); ucpSearchState.highlight = Math.max(0, ucpSearchState.highlight - 1); list.innerHTML = renderUcpSuggestions(); renderIcons(); }
+      else if (e.key === 'Enter') { e.preventDefault(); if (filtered[ucpSearchState.highlight]) selectUcp(filtered[ucpSearchState.highlight].ucp_no); }
+      else if (e.key === 'Escape') { ucpSearchState.open = false; list.classList.add('hidden'); }
+    }
+    function selectUcp(ucp_no) {
+      createWizard.data.ucp_no = ucp_no;
+      ucpSearchState.open = false; ucpSearchState.query = '';
+      renderCreateDrawer();
+    }
+    function clearUcpSelection() {
+      createWizard.data.ucp_no = null; ucpSearchState.query = ''; ucpSearchState.open = true;
+      renderCreateDrawer();
+      setTimeout(() => document.getElementById('ucpSearchInput')?.focus(), 0);
+    }
+
+    document.addEventListener('mousedown', (e) => {
+      const br = document.getElementById('brCombobox');
+      if (br && !br.contains(e.target)) {
+        brSearchState.open = false;
+        document.getElementById('brSuggestList')?.classList.add('hidden');
+      }
+      const ucp = document.getElementById('ucpCombobox');
+      if (ucp && !ucp.contains(e.target)) {
+        ucpSearchState.open = false;
+        document.getElementById('ucpSuggestList')?.classList.add('hidden');
+      }
+    });
+
+    // -----------------------------------------------------------
+    //  Step 2 — Item Lines
+    // -----------------------------------------------------------
+    function renderStep2() {
+      const d = createWizard.data;
+      return `
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-wrap: wrap;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <i data-lucide="list" class="w-4 h-4" style="color: var(--c-text-mute);"></i>
+              <div style="font-size: 13px; font-weight: 600; color: var(--c-navy);">รายการสินค้า</div>
+            </div>
+            <div style="font-size: 11.5px; margin-top: 2px; margin-left: 24px; color: var(--c-text-mute);">คลิกแถวเพื่อเปิดตัวเลือกขั้นสูง (Net price · VAT · หมายเหตุ)</div>
+          </div>
+          <button onclick="addLine()" class="btn btn-primary sm">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>เพิ่มรายการ</span>
+          </button>
+        </div>
+
+        <!-- Items Table — Compact 6-col + Expandable rows -->
+        <div class="card" style="margin-bottom: 14px;">
+          <table class="tbl" style="font-size: 12.5px;">
+            <thead>
+              <tr>
+                <th style="width: 32px; text-align: center; padding-left: 8px;">#</th>
+                <th>สินค้า</th>
+                <th style="width: 70px; text-align: right;">จำนวน</th>
+                <th style="width: 56px;">หน่วย</th>
+                <th style="width: 110px; text-align: right;">ราคาต่อหน่วย</th>
+                <th style="width: 80px; text-align: right;">ส่วนลด %</th>
+                <th style="width: 96px; text-align: center;">ภาษี</th>
+                <th style="width: 130px; text-align: right;">จำนวนเงิน</th>
+                <th style="width: 76px; text-align: center;"></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${d.lines.map((l, idx) => renderLineRow(l, idx)).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- WHT (ภาษีหัก ณ ที่จ่าย) -->
+        <div class="card" style="margin-bottom: 10px;">
+          <div style="padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; ${d.wht_enabled ? 'border-bottom: 1px solid var(--c-border-soft);' : ''}">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 32px; height: 32px; border-radius: var(--r-sm); background: ${d.wht_enabled ? 'var(--c-warning-08)' : 'var(--c-off-white)'}; display: grid; place-items: center;">
+                <i data-lucide="receipt" class="w-4 h-4" style="color: ${d.wht_enabled ? 'var(--c-warning)' : 'var(--c-text-mute)'};"></i>
+              </div>
+              <div>
+                <div style="font-size: 13px; font-weight: 600; color: var(--c-navy);">ภาษีหัก ณ ที่จ่าย (WHT)</div>
+                <div style="font-size: 11.5px; color: var(--c-text-mute);">หักจากยอดที่ยังไม่รวม VAT ตามอัตราที่กำหนด</div>
+              </div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" ${d.wht_enabled ? 'checked' : ''} onchange="createWizard.data.wht_enabled=this.checked; renderCreateDrawer();">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          ${d.wht_enabled ? `
+            <div style="padding: 12px 16px; background: var(--c-off-white);">
+              <div style="font-size: 11.5px; font-weight: 500; color: var(--c-text-mute); margin-bottom: 8px;">เลือกอัตราภาษีหัก ณ ที่จ่าย</div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                ${[1, 2, 3, 5].map(pct => `
+                  <button onclick="createWizard.data.wht_pct=${pct}; renderCreateDrawer();"
+                    class="btn ${d.wht_pct === pct ? 'btn-primary' : 'btn-secondary'} sm"
+                    style="min-width: 64px;">
+                    ${pct}%
+                  </button>
+                `).join('')}
+                <div style="display: flex; align-items: center; gap: 6px; margin-left: 8px;">
+                  <span style="font-size: 12px; color: var(--c-text-mute);">หรือกำหนดเอง:</span>
+                  <input type="number" min="0" max="100" step="0.01" value="${d.wht_pct}"
+                    oninput="createWizard.data.wht_pct=parseFloat(this.value)||0; updateLineSummaryOnly();"
+                    class="input num" style="height: 28px; width: 76px; font-size: 12px; text-align: right; padding: 0 8px;">
+                  <span style="font-size: 12px; color: var(--c-text-mute);">%</span>
+                </div>
+              </div>
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- End-bill discount (ส่วนลดท้ายบิล) -->
+        <div class="card" style="margin-bottom: 14px;">
+          <div style="padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; ${d.endbill_discount_enabled ? 'border-bottom: 1px solid var(--c-border-soft);' : ''}">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 32px; height: 32px; border-radius: var(--r-sm); background: ${d.endbill_discount_enabled ? 'var(--c-primary-08)' : 'var(--c-off-white)'}; display: grid; place-items: center;">
+                <i data-lucide="percent" class="w-4 h-4" style="color: ${d.endbill_discount_enabled ? 'var(--c-primary)' : 'var(--c-text-mute)'};"></i>
+              </div>
+              <div>
+                <div style="font-size: 13px; font-weight: 600; color: var(--c-navy);">ส่วนลดท้ายบิล</div>
+                <div style="font-size: 11.5px; color: var(--c-text-mute);">หักลดราคาเพิ่มจากยอดรวมทั้งใบ — เลือกเป็นจำนวนเงินหรือเปอร์เซ็นต์</div>
+              </div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" ${d.endbill_discount_enabled ? 'checked' : ''} onchange="createWizard.data.endbill_discount_enabled=this.checked; renderCreateDrawer();">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          ${d.endbill_discount_enabled ? `
+            <div style="padding: 12px 16px; background: var(--c-off-white);">
+              <div style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+                <!-- Mode toggle -->
+                <div>
+                  <div style="font-size: 11.5px; font-weight: 500; color: var(--c-text-mute); margin-bottom: 6px;">ประเภทส่วนลด</div>
+                  <div style="display: inline-flex; background: white; border: 1px solid var(--c-border); border-radius: var(--r); padding: 2px;">
+                    <button onclick="createWizard.data.endbill_discount_mode='amount'; renderCreateDrawer();"
+                      style="padding: 4px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 12px; font-weight: 500;
+                             background: ${d.endbill_discount_mode === 'amount' ? 'var(--c-primary)' : 'transparent'};
+                             color: ${d.endbill_discount_mode === 'amount' ? 'white' : 'var(--c-text-mute)'};">
+                      จำนวนเงิน (฿)
+                    </button>
+                    <button onclick="createWizard.data.endbill_discount_mode='percent'; renderCreateDrawer();"
+                      style="padding: 4px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 12px; font-weight: 500;
+                             background: ${d.endbill_discount_mode === 'percent' ? 'var(--c-primary)' : 'transparent'};
+                             color: ${d.endbill_discount_mode === 'percent' ? 'white' : 'var(--c-text-mute)'};">
+                      เปอร์เซ็นต์ (%)
+                    </button>
+                  </div>
+                </div>
+                <!-- Value input -->
+                <div style="flex: 1; min-width: 200px;">
+                  <div style="font-size: 11.5px; font-weight: 500; color: var(--c-text-mute); margin-bottom: 6px;">${d.endbill_discount_mode === 'amount' ? 'จำนวนเงินที่ลด' : 'อัตราส่วนลด'}</div>
+                  <div style="position: relative;">
+                    <input type="number" min="0" step="0.01" value="${d.endbill_discount_value}"
+                      oninput="createWizard.data.endbill_discount_value=parseFloat(this.value)||0; updateLineSummaryOnly();"
+                      class="input num" style="text-align: right; padding-right: 36px;">
+                    <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--c-text-mute); pointer-events: none;">${d.endbill_discount_mode === 'amount' ? '฿' : '%'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- Summary (live updated) -->
+        <div id="line-summary-wrap">
+          ${renderLineSummary()}
+        </div>
+      `;
+    }
+
+    function renderLineRow(l, idx) {
+      migrateLine(l);
+      const itemMatch = mockItems.find(i => i.code === l.item_code);
+      const itemName = itemMatch ? itemMatch.name : (l.item_name || '');
+      const { vatAmount, lineTotal: lineTotalDisplay } = calcLineVat(l);
+      const isExpanded = createWizard.expandedLineId === l.id;
+
+      // ภาษี column — single mutually-exclusive badge based on vat_mode
+      //   'none'     → "ไม่คิด"   (gray)
+      //   'add'      → "VAT 7%"  (purple — price excludes VAT, will be added)
+      //   'included' → "NET 7%"  (primary blue — price includes VAT, calculated backwards)
+      let taxBadge;
+      if (l.vat_mode === 'none') {
+        taxBadge = `<span style="display: inline-flex; align-items: center; gap: 3px; font-size: 11px; padding: 3px 8px; border-radius: 999px; background: rgba(100,116,139,0.10); color: var(--c-text-mute); font-weight: 600; line-height: 1.4; white-space: nowrap;"><span style="width: 4px; height: 4px; border-radius: 50%; background: var(--c-text-mute);"></span>ไม่คิด</span>`;
+      } else if (l.vat_mode === 'included') {
+        taxBadge = `<span style="display: inline-flex; align-items: center; gap: 3px; font-size: 11px; padding: 3px 8px; border-radius: 999px; background: rgba(255,59,48,0.10); color: var(--c-primary); font-weight: 600; line-height: 1.4; white-space: nowrap;" title="ราคา/หน่วย รวม VAT แล้ว — VAT คำนวณย้อน"><span style="width: 4px; height: 4px; border-radius: 50%; background: var(--c-primary);"></span>NET ${l.vat_pct}%</span>`;
+      } else {
+        taxBadge = `<span style="display: inline-flex; align-items: center; gap: 3px; font-size: 11px; padding: 3px 8px; border-radius: 999px; background: rgba(124,58,237,0.10); color: var(--c-purple); font-weight: 600; line-height: 1.4; white-space: nowrap;" title="VAT ${l.vat_pct}% (จะคำนวณเพิ่มจากราคา)"><span style="width: 4px; height: 4px; border-radius: 50%; background: var(--c-purple);"></span>VAT ${l.vat_pct}%</span>`;
+      }
+
+      // Note indicator — small icon-only badge under item name (note is text, not toggleable)
+      const noteIndicator = l.note
+        ? `<span title="${l.note.replace(/"/g, '&quot;')}" style="display: inline-flex; align-items: center; gap: 3px; font-size: 10px; padding: 1px 6px; border-radius: 999px; background: rgba(245,158,11,0.10); color: var(--c-warning); font-weight: 600; line-height: 1.4; cursor: help; margin-top: 4px;"><i data-lucide="message-square" style="width:10px;height:10px;"></i>หมายเหตุ</span>`
+        : '';
+
+      return `
+        <!-- Compact main row -->
+        <tr style="background: ${isExpanded ? 'var(--c-primary-08)' : 'transparent'}; cursor: default;">
+          <td style="text-align: center; color: var(--c-text-mute); padding-left: 8px; vertical-align: middle;">${idx + 1}</td>
+          <td style="padding-right: 12px;">
+            <div style="position: relative;" class="item-combo" data-line-id="${l.id}">
+              <input type="text" id="item-input-${l.id}" autocomplete="off"
+                value="${itemName ? l.item_code + (itemName ? ' — ' + itemName : '') : l.item_code}"
+                placeholder="ค้นหารหัสหรือชื่อสินค้า..."
+                oninput="onItemInput(event, '${l.id}')"
+                onfocus="onItemFocus('${l.id}')"
+                class="input" style="height: 32px; font-size: 12.5px; padding: 0 10px;">
+            </div>
+            ${noteIndicator ? `<div>${noteIndicator}</div>` : ''}
+          </td>
+          <td style="text-align: right; vertical-align: middle;">
+            <input type="number" min="1" step="1" value="${l.qty}"
+              oninput="updateLine('${l.id}','qty',this.value)"
+              class="input num" style="height: 30px; font-size: 12.5px; text-align: right; padding: 0 8px;">
+          </td>
+          <td style="vertical-align: middle; font-size: 12px; color: var(--c-text-mute);">${l.unit || '-'}</td>
+          <td style="vertical-align: middle;">
+            <input type="number" min="0" step="0.01" value="${l.unit_price || ''}"
+              oninput="updateLine('${l.id}','unit_price',this.value)"
+              class="input num" style="height: 30px; font-size: 12.5px; text-align: right; padding: 0 8px;">
+          </td>
+          <td style="vertical-align: middle;">
+            <div style="position: relative;">
+              <input type="number" min="0" max="100" step="0.01" value="${l.discount_pct || 0}"
+                oninput="updateLine('${l.id}','discount_pct',this.value)"
+                class="input num" style="height: 30px; font-size: 12.5px; text-align: right; padding: 0 22px 0 8px;">
+              <span style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 11px; color: var(--c-text-soft); pointer-events: none;">%</span>
+            </div>
+          </td>
+          <td style="text-align: center; vertical-align: middle;">${taxBadge}</td>
+          <td style="text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; color: var(--c-navy); font-size: 13px; vertical-align: middle;">
+            ฿${formatMoney(lineTotalDisplay)}
+          </td>
+          <td style="text-align: center; padding-right: 8px; vertical-align: middle;">
+            <div style="display: inline-flex; gap: 2px;">
+              <button onclick="toggleLineExpand('${l.id}')" class="btn btn-ghost sm" style="padding: 0 6px; ${isExpanded ? 'background: var(--c-primary); color: white;' : ''}" title="${isExpanded ? 'ปิดตัวเลือกขั้นสูง' : 'เปิดตัวเลือกขั้นสูง (Net / VAT / หมายเหตุ)'}">
+                <i data-lucide="${isExpanded ? 'chevron-up' : 'chevron-down'}" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="removeLine('${l.id}')" class="btn btn-ghost sm" style="padding: 0 6px; color: var(--c-danger);" title="ลบรายการ">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        ${isExpanded ? `
+        <!-- Expanded advanced row -->
+        <tr class="line-expand-panel-anchor" data-line-id="${l.id}" style="background: var(--c-primary-08);">
+          <td colspan="9" style="padding: 0 16px 14px 16px; border-bottom: 1px solid var(--c-primary-12);">
+            <div class="line-expand-panel-inner ${createWizard._justOpenedLineId === l.id ? 'line-expand-panel' : ''}" style="background: white; border: 1px solid var(--c-primary-12); border-radius: var(--r); padding: 14px;">
+              <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 10px; font-size: 11.5px; color: var(--c-primary); font-weight: 600;">
+                <i data-lucide="settings-2" class="w-3.5 h-3.5"></i>
+                <span>ตัวเลือกขั้นสูง — รายการ #${idx + 1}</span>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                <!-- 3-mode VAT picker — lean radio cards (single row, no description) -->
+                <div>
+                  <label style="display: block; font-size: 11.5px; font-weight: 500; color: var(--c-navy); margin-bottom: 6px;">
+                    การคิด VAT
+                    <span style="color: var(--c-text-mute); font-weight: 400; font-size: 11px;">— เลือกได้แค่ 1 แบบเท่านั้น</span>
+                  </label>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                    <!-- Mode 1: none -->
+                    <button onclick="updateLine('${l.id}','vat_mode','none')"
+                      title="สินค้ายกเว้น / ไม่มีภาษี"
+                      style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: var(--r); cursor: pointer; text-align: left;
+                             border: ${l.vat_mode === 'none' ? '2px solid var(--c-text-mute)' : '1px solid var(--c-border)'};
+                             background: ${l.vat_mode === 'none' ? 'rgba(100,116,139,0.08)' : 'white'};
+                             transition: all 150ms ease-out;">
+                      <span style="flex-shrink: 0; width: 16px; height: 16px; border-radius: 50%; border: 2px solid ${l.vat_mode === 'none' ? 'var(--c-text-mute)' : 'var(--c-border)'}; display: grid; place-items: center;">
+                        ${l.vat_mode === 'none' ? '<span style="width: 8px; height: 8px; border-radius: 50%; background: var(--c-text-mute);"></span>' : ''}
+                      </span>
+                      <span style="font-size: 13px; font-weight: 600; color: var(--c-navy);">ไม่คิด VAT</span>
+                    </button>
+
+                    <!-- Mode 2: add -->
+                    <button onclick="updateLine('${l.id}','vat_mode','add')"
+                      title="ราคายังไม่รวม VAT — ระบบจะคิด VAT บวกเพิ่ม"
+                      style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: var(--r); cursor: pointer; text-align: left;
+                             border: ${l.vat_mode === 'add' ? '2px solid var(--c-purple)' : '1px solid var(--c-border)'};
+                             background: ${l.vat_mode === 'add' ? 'rgba(124,58,237,0.06)' : 'white'};
+                             transition: all 150ms ease-out;">
+                      <span style="flex-shrink: 0; width: 16px; height: 16px; border-radius: 50%; border: 2px solid ${l.vat_mode === 'add' ? 'var(--c-purple)' : 'var(--c-border)'}; display: grid; place-items: center;">
+                        ${l.vat_mode === 'add' ? '<span style="width: 8px; height: 8px; border-radius: 50%; background: var(--c-purple);"></span>' : ''}
+                      </span>
+                      <span style="font-size: 13px; font-weight: 600; color: var(--c-navy);">VAT (ปกติ)</span>
+                    </button>
+
+                    <!-- Mode 3: included -->
+                    <button onclick="updateLine('${l.id}','vat_mode','included')"
+                      title="ราคารวม VAT แล้ว — ระบบจะคำนวณ VAT ย้อนกลับ"
+                      style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: var(--r); cursor: pointer; text-align: left;
+                             border: ${l.vat_mode === 'included' ? '2px solid var(--c-primary)' : '1px solid var(--c-border)'};
+                             background: ${l.vat_mode === 'included' ? 'var(--c-primary-08)' : 'white'};
+                             transition: all 150ms ease-out;">
+                      <span style="flex-shrink: 0; width: 16px; height: 16px; border-radius: 50%; border: 2px solid ${l.vat_mode === 'included' ? 'var(--c-primary)' : 'var(--c-border)'}; display: grid; place-items: center;">
+                        ${l.vat_mode === 'included' ? '<span style="width: 8px; height: 8px; border-radius: 50%; background: var(--c-primary);"></span>' : ''}
+                      </span>
+                      <span style="font-size: 13px; font-weight: 600; color: var(--c-navy);">NET (รวม VAT)</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- VAT % rate + computed amount (only when vat_mode != 'none') -->
+                ${l.vat_mode !== 'none' ? `
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                      <label style="display: block; font-size: 11.5px; font-weight: 500; color: var(--c-navy); margin-bottom: 4px;">อัตรา VAT (%)</label>
+                      <div style="display: flex; gap: 6px;">
+                        ${[0, 7, 10].map(p => `
+                          <button onclick="updateLine('${l.id}','vat_pct',${p})"
+                            class="btn ${l.vat_pct === p ? 'btn-primary' : 'btn-secondary'} sm">${p}%</button>
+                        `).join('')}
+                        <input type="number" min="0" max="100" step="0.01" value="${l.vat_pct}"
+                          oninput="updateLine('${l.id}','vat_pct',this.value)"
+                          class="input num" style="height: 28px; flex: 1; font-size: 12px; text-align: right; padding: 0 8px;">
+                      </div>
+                    </div>
+                    <div>
+                      <label style="display: block; font-size: 11.5px; font-weight: 500; color: var(--c-navy); margin-bottom: 4px;">
+                        จำนวน VAT (คำนวณ)
+                        ${l.vat_mode === 'included' ? '<span style="color: var(--c-text-soft); font-weight: 400;">— จากราคารวม</span>' : ''}
+                      </label>
+                      <div class="input num" style="background: var(--c-off-white); display: flex; align-items: center; justify-content: flex-end; height: 30px; font-weight: 600; color: var(--c-purple);">
+                        ฿${formatMoney(vatAmount)}
+                      </div>
+                    </div>
+                  </div>
+                ` : ''}
+
+                <!-- Note (full width) -->
+                <div>
+                  <label style="display: block; font-size: 11.5px; font-weight: 500; color: var(--c-navy); margin-bottom: 4px;">หมายเหตุรายการ</label>
+                  <input type="text" value="${l.note || ''}"
+                    oninput="updateLine('${l.id}','note',this.value)"
+                    placeholder="เช่น สี, ขนาด, สเปคเพิ่มเติม"
+                    class="input" style="height: 32px; font-size: 12.5px;">
+                </div>
+              </div>
+              <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                <button onclick="toggleLineExpand('${l.id}')" class="btn btn-ghost sm">
+                  <i data-lucide="chevron-up" class="w-3.5 h-3.5"></i>
+                  <span>ปิดตัวเลือกขั้นสูง</span>
+                </button>
+              </div>
+            </div>
+          </td>
+        </tr>
+        ` : ''}
+      `;
+    }
+
+    function toggleLineExpand(lineId) {
+      const wasOpen = createWizard.expandedLineId === lineId;
+
+      if (wasOpen) {
+        // Collapse: find the existing panel, apply collapse animation, then remove after animation
+        const existingPanel = document.querySelector(`.line-expand-panel-anchor[data-line-id="${lineId}"] .line-expand-panel-inner`);
+        if (existingPanel) {
+          existingPanel.classList.add('line-collapse-panel');
+          setTimeout(() => {
+            createWizard.expandedLineId = null;
+            createWizard._justOpenedLineId = null;
+            renderCreateDrawer();
+          }, 200);
+          return;
+        }
+        // Fallback if panel not found
+        createWizard.expandedLineId = null;
+        createWizard._justOpenedLineId = null;
+        renderCreateDrawer();
+      } else {
+        // Open: if another line was open, collapse it first (instantly), then open this one with animation
+        createWizard.expandedLineId = lineId;
+        createWizard._justOpenedLineId = lineId;
+        renderCreateDrawer();
+        createWizard._justOpenedLineId = null;
+      }
+    }
+
+    // Lightweight summary updater — only re-renders the summary card (avoids losing focus)
+    function updateLineSummaryOnly() {
+      const wrap = document.getElementById('line-summary-wrap');
+      if (wrap) wrap.innerHTML = renderLineSummary();
+    }
+
+    function renderLineSummary() {
+      const lines = createWizard.data.lines;
+      const wht = createWizard.data.wht_enabled;
+      const whtPct = createWizard.data.wht_pct || 0;
+      const endbillEnabled = createWizard.data.endbill_discount_enabled;
+      const endbillMode = createWizard.data.endbill_discount_mode;
+      const endbillValue = createWizard.data.endbill_discount_value || 0;
+
+      let priceBeforeVat = 0;
+      let totalVat = 0;
+      lines.forEach(l => {
+        migrateLine(l);
+        const { netAmount, vatAmount } = calcLineVat(l);
+        // priceBeforeVat = revenue net of VAT
+        //   'none'     → no VAT, base = netAmount
+        //   'add'      → price excludes VAT, base = netAmount
+        //   'included' → price includes VAT, base = netAmount - vatAmount
+        if (l.vat_mode === 'included') {
+          priceBeforeVat += netAmount - vatAmount;
+        } else {
+          priceBeforeVat += netAmount;
+        }
+        totalVat += vatAmount;
+      });
+
+      const subtotalAfterVat = priceBeforeVat + totalVat;
+      const whtAmount = wht ? priceBeforeVat * (whtPct / 100) : 0;
+      let endbillAmount = 0;
+      if (endbillEnabled) {
+        if (endbillMode === 'amount') endbillAmount = endbillValue;
+        else endbillAmount = subtotalAfterVat * (endbillValue / 100);
+      }
+      const grandTotal = subtotalAfterVat - whtAmount - endbillAmount;
+
+      return `
+        <div class="card">
+          <div class="card-head" style="padding: 12px 18px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <i data-lucide="calculator" class="w-4 h-4" style="color: var(--c-primary);"></i>
+              <div class="card-title">สรุปยอด (${lines.length} รายการ)</div>
+            </div>
+            <span class="pill" style="background: rgba(124,58,237,0.10); color: var(--c-purple); padding: 1px 7px; font-size: 10px; letter-spacing: 0.04em;">BY_LINE</span>
+          </div>
+          <div class="card-body" style="padding: 12px 18px;">
+            <table style="width: 100%; font-size: 13px;">
+              <tbody>
+                <tr><td style="padding: 4px 0;">ราคาก่อน VAT</td><td style="text-align: right; font-variant-numeric: tabular-nums; padding: 4px 0; font-weight: 600;">฿${formatMoney(priceBeforeVat)}</td></tr>
+                <tr><td style="padding: 4px 0; color: var(--c-purple);">ภาษีมูลค่าเพิ่ม (VAT)</td><td style="text-align: right; font-variant-numeric: tabular-nums; padding: 4px 0; color: var(--c-purple);">+฿${formatMoney(totalVat)}</td></tr>
+                <tr style="border-top: 1px solid var(--c-border-soft);"><td style="padding: 6px 0;">ยอดรวมหลัง VAT</td><td style="text-align: right; font-variant-numeric: tabular-nums; padding: 6px 0; font-weight: 600;">฿${formatMoney(subtotalAfterVat)}</td></tr>
+                ${wht ? `<tr><td style="padding: 4px 0; color: var(--c-warning);">หัก ภาษี ณ ที่จ่าย ${whtPct}%</td><td style="text-align: right; font-variant-numeric: tabular-nums; padding: 4px 0; color: var(--c-warning);">-฿${formatMoney(whtAmount)}</td></tr>` : ''}
+                ${endbillEnabled ? `<tr><td style="padding: 4px 0; color: var(--c-text-mute);">ส่วนลดท้ายบิล${endbillMode === 'percent' ? ' (' + endbillValue + '%)' : ''}</td><td style="text-align: right; font-variant-numeric: tabular-nums; padding: 4px 0; color: var(--c-text-mute);">-฿${formatMoney(endbillAmount)}</td></tr>` : ''}
+                <tr style="border-top: 2px solid var(--c-border);"><td style="padding: 8px 0 0; font-weight: 700; font-size: 14px;">ยอดสุทธิทั้งหมด</td><td style="text-align: right; font-variant-numeric: tabular-nums; padding: 8px 0 0; font-weight: 700; font-size: 16px; color: var(--c-primary);">฿${formatMoney(grandTotal)}</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function addLine() {
+      createWizard.data.lines.push(createBlankLine());
+      renderCreateDrawer();
+    }
+    function removeLine(id) {
+      const idx = createWizard.data.lines.findIndex(l => l.id === id);
+      if (idx >= 0) createWizard.data.lines.splice(idx, 1);
+      if (createWizard.data.lines.length === 0) createWizard.data.lines.push(createBlankLine());
+      renderCreateDrawer();
+    }
+    function updateLine(id, field, val) {
+      const line = createWizard.data.lines.find(l => l.id === id);
+      if (!line) return;
+      // Save focus
+      const focused = document.activeElement;
+      const focusInfo = focused && focused.tagName === 'INPUT' ? {
+        oninput: focused.getAttribute('oninput'),
+        selStart: focused.selectionStart,
+      } : null;
+
+      if (field === 'qty' || field === 'unit_price' || field === 'discount_pct' || field === 'vat_pct') {
+        line[field] = parseFloat(val) || 0;
+      } else if (field === 'vat_mode') {
+        // Mutually exclusive: 'none' | 'add' | 'included'
+        line.vat_mode = val;
+        // Cleanup legacy fields if present
+        delete line.net_enabled;
+        delete line.vat_enabled;
+      } else {
+        line[field] = val;
+      }
+      renderCreateDrawer();
+
+      // Restore focus
+      if (focusInfo) {
+        const inputs = document.querySelectorAll('input');
+        for (const inp of inputs) {
+          if (inp.getAttribute('oninput') === focusInfo.oninput) {
+            inp.focus();
+            try { inp.setSelectionRange(focusInfo.selStart, focusInfo.selStart); } catch(e) {}
+            break;
+          }
+        }
+      }
+    }
+
+    function onItemInput(e, lineId) {
+      const val = e.target.value;
+      const line = createWizard.data.lines.find(l => l.id === lineId);
+      if (!line) return;
+      line.item_code = val;
+      // Auto-fill if exact match
+      const match = mockItems.find(i => i.code === val);
+      if (match) {
+        line.item_name = match.name;
+        line.unit = match.uom;
+      } else {
+        line.item_name = '';
+        line.unit = '-';
+      }
+      // Show suggestions popover (lightweight — just on focus)
+      showItemSuggestions(lineId, val);
+    }
+    function onItemFocus(lineId) {
+      const line = createWizard.data.lines.find(l => l.id === lineId);
+      showItemSuggestions(lineId, line?.item_code || '');
+    }
+    function showItemSuggestions(lineId, query) {
+      // Simple click-to-fill popover — built fresh per call
+      document.querySelectorAll('.item-suggest-popover').forEach(n => n.remove());
+      const input = document.getElementById(`item-input-${lineId}`);
+      if (!input) return;
+      const q = (query || '').toLowerCase().trim();
+      const filtered = mockItems.filter(i => !q || i.code.toLowerCase().includes(q) || i.name.toLowerCase().includes(q)).slice(0, 6);
+      if (filtered.length === 0) return;
+      const rect = input.getBoundingClientRect();
+      const pop = document.createElement('div');
+      pop.className = 'item-suggest-popover';
+      pop.style.cssText = `position: fixed; left: ${rect.left}px; top: ${rect.bottom + 2}px; min-width: 320px; background: white; border: 1px solid var(--c-border); border-radius: var(--r); box-shadow: var(--sh-lg); z-index: 70; max-height: 240px; overflow-y: auto;`;
+      pop.innerHTML = filtered.map(i => `
+        <button type="button" onmousedown="event.preventDefault()" onclick="pickItem('${lineId}','${i.code}')"
+          style="width: 100%; text-align: left; padding: 8px 12px; background: transparent; border: none; cursor: pointer; border-bottom: 1px solid var(--c-border-soft); display: flex; align-items: center; gap: 10px;">
+          <i data-lucide="package" class="w-3.5 h-3.5" style="color: var(--c-text-soft); flex-shrink: 0;"></i>
+          <div style="flex: 1; min-width: 0;">
+            <div class="tbl-mono" style="font-size: 11.5px; color: var(--c-text-mute);">${i.code}</div>
+            <div style="font-size: 12.5px; font-weight: 600; color: var(--c-navy);">${i.name}</div>
+          </div>
+          <span style="font-size: 10.5px; color: var(--c-text-soft);">${i.uom}</span>
+        </button>
+      `).join('');
+      document.body.appendChild(pop);
+      renderIcons();
+      const close = (ev) => { if (!pop.contains(ev.target) && ev.target !== input) { pop.remove(); document.removeEventListener('click', close); } };
+      setTimeout(() => document.addEventListener('click', close), 0);
+    }
+    function pickItem(lineId, code) {
+      const item = mockItems.find(i => i.code === code);
+      const line = createWizard.data.lines.find(l => l.id === lineId);
+      if (item && line) {
+        line.item_code = item.code;
+        line.item_name = item.name;
+        line.unit = item.uom;
+      }
+      document.querySelectorAll('.item-suggest-popover').forEach(n => n.remove());
+      renderCreateDrawer();
+    }
+
+    // -----------------------------------------------------------
+    //  Step 3 — Attachments
+    // -----------------------------------------------------------
+    function renderStep3() {
+      const atts = createWizard.data.attachments;
+      return `
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+          <i data-lucide="paperclip" class="w-4 h-4" style="color: var(--c-text-mute);"></i>
+          <div style="font-size: 13px; font-weight: 600; color: var(--c-navy);">แนบเอกสารประกอบ (ถ้ามี)</div>
+        </div>
+        <div style="font-size: 11.5px; margin-bottom: 14px; margin-left: 24px; color: var(--c-text-mute);">
+          <i data-lucide="upload" class="w-3 h-3 inline"></i> แนบเอกสารประกอบ (ไม่บังคับ)
+        </div>
+
+        <div class="upload-zone ${atts.length ? 'has-files' : ''}" onclick="mockUpload()">
+          ${atts.length === 0 ? `
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+              <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--c-off-white); display: grid; place-items: center;">
+                <i data-lucide="upload" class="w-6 h-6" style="color: var(--c-text-soft);"></i>
+              </div>
+              <div style="font-size: 13px; color: var(--c-text-mute);">ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์</div>
+              <button onclick="event.stopPropagation(); mockUpload();" class="btn btn-secondary sm" style="margin-top: 4px;">เลือกไฟล์</button>
+            </div>
+          ` : `
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              ${atts.map((f, i) => `
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: white; border: 1px solid var(--c-border); border-radius: var(--r);" onclick="event.stopPropagation()">
+                  <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                    <div style="width: 32px; height: 32px; border-radius: var(--r-sm); background: var(--c-primary-08); display: grid; place-items: center; flex-shrink: 0;">
+                      <i data-lucide="file" class="w-4 h-4" style="color: var(--c-primary);"></i>
+                    </div>
+                    <div style="min-width: 0;">
+                      <div style="font-size: 13px; font-weight: 600; color: var(--c-navy); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${f.name}</div>
+                      <div style="font-size: 11px; color: var(--c-text-soft);">${f.size}</div>
+                    </div>
+                  </div>
+                  <button onclick="event.stopPropagation(); removeAttachment(${i});" class="btn btn-ghost sm" style="padding: 0 6px; color: var(--c-danger);" title="ลบ">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              `).join('')}
+              <button onclick="event.stopPropagation(); mockUpload();" class="btn btn-secondary sm" style="margin-top: 6px; align-self: center;">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i><span>แนบไฟล์เพิ่ม</span>
+              </button>
+            </div>
+          `}
+        </div>
+      `;
+    }
+
+    function mockUpload() {
+      const samples = [
+        { name: 'quotation_vendor1.pdf', size: '124 KB' },
+        { name: 'spec-sheet.pdf', size: '512 KB' },
+        { name: 'approval-memo.docx', size: '32 KB' },
+        { name: 'comparison_summary.xlsx', size: '88 KB' },
+      ];
+      const next = samples[createWizard.data.attachments.length % samples.length];
+      createWizard.data.attachments.push(next);
+      renderCreateDrawer();
+    }
+    function removeAttachment(i) {
+      createWizard.data.attachments.splice(i, 1);
+      renderCreateDrawer();
+    }
+
+    // -----------------------------------------------------------
+    //  Step 4 — Review
+    // -----------------------------------------------------------
+    function renderStep4() {
+      const d = createWizard.data;
+      const lines = d.lines;
+      let priceBeforeVat = 0;
+      let totalVat = 0;
+      lines.forEach(l => {
+        migrateLine(l);
+        const { netAmount, vatAmount } = calcLineVat(l);
+        if (l.vat_mode === 'included') priceBeforeVat += netAmount - vatAmount;
+        else priceBeforeVat += netAmount;
+        totalVat += vatAmount;
+      });
+      const subtotalAfterVat = priceBeforeVat + totalVat;
+      const whtAmount = d.wht_enabled ? priceBeforeVat * ((d.wht_pct || 0) / 100) : 0;
+      let endbillAmount = 0;
+      if (d.endbill_discount_enabled) {
+        if (d.endbill_discount_mode === 'amount') endbillAmount = d.endbill_discount_value || 0;
+        else endbillAmount = subtotalAfterVat * ((d.endbill_discount_value || 0) / 100);
+      }
+      const grandTotal = subtotalAfterVat - whtAmount - endbillAmount;
+      const dept = mockDepts.find(x => x.name === d.dept);
+      const selectedBr = mockBudgets.find(b => b.br_no === d.br_no);
+
+      return `
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+          <i data-lucide="check-circle-2" class="w-4 h-4" style="color: var(--c-text-mute);"></i>
+          <div style="font-size: 13px; font-weight: 600; color: var(--c-navy);">ตรวจสอบข้อมูลก่อนบันทึก</div>
+        </div>
+        <div style="font-size: 11.5px; margin-bottom: 18px; margin-left: 24px; color: var(--c-danger); display: flex; align-items: center; gap: 4px;">
+          <i data-lucide="alert-circle" class="w-3 h-3"></i>
+          ตรวจสอบข้อมูลก่อนบันทึก
+        </div>
+
+        <!-- General Info Card -->
+        <div class="card" style="margin-bottom: 14px;">
+          <div class="card-head"><div class="card-title">ข้อมูลคำร้องขอซื้อ</div></div>
+          <div class="card-body">
+            <dl style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; font-size: 13px;">
+              <div><dt style="color: var(--c-text-mute); font-size: 11.5px;">ปีงบประมาณ</dt><dd style="font-weight: 600;">${parseInt(d.pr_date.slice(0,4)) + 543}</dd></div>
+              <div><dt style="color: var(--c-text-mute); font-size: 11.5px;">ประเภท</dt><dd style="font-weight: 600;">สินค้า</dd></div>
+              <div><dt style="color: var(--c-text-mute); font-size: 11.5px;">วันที่ขอ</dt><dd style="font-weight: 600;">${formatThaiDate(d.pr_date)}</dd></div>
+              <div><dt style="color: var(--c-text-mute); font-size: 11.5px;">วันที่ต้องการ</dt><dd style="font-weight: 600;">${d.need_date ? formatThaiDate(d.need_date) : '—'}</dd></div>
+              <div><dt style="color: var(--c-text-mute); font-size: 11.5px;">ผู้ขอ</dt><dd style="font-weight: 600;">${d.requester}</dd></div>
+              <div><dt style="color: var(--c-text-mute); font-size: 11.5px;">แผนก</dt><dd style="font-weight: 600;">${d.dept}</dd></div>
+              ${d.br_no ? `<div style="grid-column: 1/3;"><dt style="color: var(--c-text-mute); font-size: 11.5px;">งบประมาณ</dt><dd style="font-weight: 600;"><span class="tbl-mono" style="color: var(--c-primary);">${d.br_no}</span> · ${selectedBr?.name || ''}</dd></div>` : ''}
+              ${d.ucp_no ? `<div style="grid-column: 1/3;"><dt style="color: var(--c-text-mute); font-size: 11.5px;">ใบเปลี่ยนหน่วย</dt><dd style="font-weight: 600;"><span class="tbl-mono" style="color: var(--c-purple);">${d.ucp_no}</span></dd></div>` : ''}
+              ${d.purpose ? `<div style="grid-column: 1/3;"><dt style="color: var(--c-text-mute); font-size: 11.5px;">วัตถุประสงค์</dt><dd>${d.purpose}</dd></div>` : ''}
+            </dl>
+          </div>
+        </div>
+
+        <!-- Lines Card -->
+        <div class="card" style="margin-bottom: 14px;">
+          <div class="card-head"><div class="card-title">รายการสินค้า (${lines.length} รายการ)</div></div>
+          <div class="card-body" style="padding: 0;">
+            ${lines.map((l, i) => {
+              migrateLine(l);
+              const { lineTotal: lineTotalDisplay } = calcLineVat(l);
+              const taxLabel = l.vat_mode === 'none' ? 'ไม่คิด VAT' : (l.vat_mode === 'included' ? `NET ${l.vat_pct}%` : `VAT ${l.vat_pct}%`);
+              return `
+                <div style="padding: 12px 18px; ${i < lines.length - 1 ? 'border-bottom: 1px solid var(--c-border-soft);' : ''} display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                  <div style="min-width: 0;">
+                    <div style="font-weight: 600;">${i + 1}. ${l.item_name || '(ยังไม่ได้เลือกสินค้า)'}</div>
+                    <div style="font-size: 11.5px; color: var(--c-text-mute); margin-top: 2px;">(${l.qty} ${l.unit} × ฿${formatMoney(l.unit_price)})${l.discount_pct ? ` · ส่วนลด ${l.discount_pct}%` : ''} · ${taxLabel}</div>
+                  </div>
+                  <div class="num" style="font-size: 14px; font-weight: 600; flex-shrink: 0;">฿${formatMoney(lineTotalDisplay)}</div>
+                </div>
+              `;
+            }).join('')}
+            <div style="padding: 10px 18px; border-top: 2px solid var(--c-border); background: var(--c-off-white);">
+              <table style="width: 100%; font-size: 12.5px;">
+                <tbody>
+                  <tr><td style="padding: 3px 0;">ราคาก่อน VAT</td><td style="text-align: right; font-variant-numeric: tabular-nums; font-weight: 600;">฿${formatMoney(priceBeforeVat)}</td></tr>
+                  <tr><td style="padding: 3px 0; color: var(--c-purple);">ภาษีมูลค่าเพิ่ม (VAT)</td><td style="text-align: right; font-variant-numeric: tabular-nums; color: var(--c-purple);">+฿${formatMoney(totalVat)}</td></tr>
+                  <tr style="border-top: 1px solid var(--c-border-soft);"><td style="padding: 6px 0;">ยอดรวมหลัง VAT</td><td style="text-align: right; font-variant-numeric: tabular-nums; padding: 6px 0; font-weight: 600;">฿${formatMoney(subtotalAfterVat)}</td></tr>
+                  ${d.wht_enabled ? `<tr><td style="padding: 3px 0; color: var(--c-warning);">หัก ภาษี ณ ที่จ่าย ${d.wht_pct}%</td><td style="text-align: right; font-variant-numeric: tabular-nums; color: var(--c-warning);">-฿${formatMoney(whtAmount)}</td></tr>` : ''}
+                  ${d.endbill_discount_enabled ? `<tr><td style="padding: 3px 0; color: var(--c-text-mute);">ส่วนลดท้ายบิล${d.endbill_discount_mode === 'percent' ? ' (' + d.endbill_discount_value + '%)' : ''}</td><td style="text-align: right; font-variant-numeric: tabular-nums; color: var(--c-text-mute);">-฿${formatMoney(endbillAmount)}</td></tr>` : ''}
+                  <tr style="border-top: 1px solid var(--c-border);"><td style="padding: 6px 0 0; font-weight: 700; font-size: 14px;">ยอดสุทธิทั้งหมด</td><td style="text-align: right; font-variant-numeric: tabular-nums; padding: 6px 0 0; font-weight: 700; font-size: 16px; color: var(--c-primary);">฿${formatMoney(grandTotal)}</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        ${d.attachments.length > 0 ? `
+          <div class="card">
+            <div class="card-head"><div class="card-title">เอกสารแนบ (${d.attachments.length} ไฟล์)</div></div>
+            <div class="card-body" style="padding: 0;">
+              ${d.attachments.map((f, i) => `
+                <div style="padding: 10px 18px; ${i < d.attachments.length - 1 ? 'border-bottom: 1px solid var(--c-border-soft);' : ''} display: flex; align-items: center; gap: 10px; font-size: 13px;">
+                  <i data-lucide="paperclip" class="w-4 h-4" style="color: var(--c-text-mute);"></i>
+                  <span style="flex: 1;">${f.name}</span>
+                  <span style="color: var(--c-text-soft); font-size: 11.5px;">${f.size}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+      `;
+    }
+
+    // Wizard nav
+    function wizardNext() {
+      const s = createWizard.step;
+      if (s === 1) {
+        if (!createWizard.data.pr_date) return showToast('กรุณาระบุวันที่ขอซื้อ', 'warning');
+        if (!createWizard.data.need_date) return showToast('กรุณาระบุวันที่ต้องการสินค้า', 'warning');
+      }
+      if (s === 2) {
+        const validLines = createWizard.data.lines.filter(l => l.item_code && l.qty > 0 && l.unit_price > 0);
+        if (validLines.length === 0) return showToast('กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ', 'warning');
+      }
+      createWizard.step++;
+      renderCreateDrawer();
+    }
+    function wizardBack() {
+      createWizard.step = Math.max(1, createWizard.step - 1);
+      renderCreateDrawer();
+    }
+    function saveDraft() {
+      const next = createNewRecord('draft');
+      state.records.unshift(next);
+      showToast(`บันทึกแบบร่าง ${next.pr_no} เรียบร้อย`, 'success');
+      closeCreateDrawer();
+    }
+    function submitForApproval() {
+      const next = createNewRecord('pending');
+      state.records.unshift(next);
+      showToast(`ส่ง ${next.pr_no} เพื่อขออนุมัติแล้ว`, 'success');
+      closeCreateDrawer();
+    }
+    function createNewRecord(status) {
+      const d = createWizard.data;
+      const today = new Date();
+      const buddhistShort = (today.getFullYear() + 543).toString().slice(-2);
+      const seq = String(state.records.length + 1).padStart(5, '0');
+      let priceBeforeVat = 0, totalVat = 0;
+      d.lines.forEach(l => {
+        migrateLine(l);
+        const { netAmount, vatAmount } = calcLineVat(l);
+        if (l.vat_mode === 'included') priceBeforeVat += netAmount - vatAmount;
+        else priceBeforeVat += netAmount;
+        totalVat += vatAmount;
+      });
+      const subtotalAfterVat = priceBeforeVat + totalVat;
+      const whtAmount = d.wht_enabled ? priceBeforeVat * ((d.wht_pct || 0) / 100) : 0;
+      let endbillAmount = 0;
+      if (d.endbill_discount_enabled) {
+        if (d.endbill_discount_mode === 'amount') endbillAmount = d.endbill_discount_value || 0;
+        else endbillAmount = subtotalAfterVat * ((d.endbill_discount_value || 0) / 100);
+      }
+      const grandTotal = subtotalAfterVat - whtAmount - endbillAmount;
+      return {
+        id: 'new-' + Date.now(),
+        pr_no: `PR-${buddhistShort}${String(today.getMonth() + 1).padStart(2, '0')}-${seq}`,
+        pr_date: d.pr_date,
+        need_date: d.need_date,
+        requester: d.requester,
+        dept: d.dept,
+        type: 'สินค้า',
+        br_no: d.br_no,
+        br_code: d.br_no ? mockBudgets.find(b => b.br_no === d.br_no)?.code : null,
+        ucp_no: d.ucp_no,
+        status,
+        order_status: 'NONE',
+        ordered_pct: 0,
+        grand_total: grandTotal,
+        updated_at: today.toISOString().slice(0, 10),
+      };
+    }
+

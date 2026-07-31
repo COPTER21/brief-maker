@@ -1,0 +1,147 @@
+﻿case_id,case_name,priority,step_order,step_description,expected_result
+TC-001,List vendors with status+type filter,High,1,เปิดหน้า Vendor List (Pattern A),เห็นตาราง vendors พร้อม filter bar + count badge
+TC-001,List vendors with status+type filter,High,2,เลือก dropdown 'ประเภท' = MN | input: type=MN,"filter applied, ตารางแสดงเฉพาะ vendor type=MN"
+TC-001,List vendors with status+type filter,High,3,เลือก dropdown 'สถานะ' = ใช้งาน (active) | input: status=active,filter cumulative — ตารางแสดงเฉพาะ MN + active
+TC-001,List vendors with status+type filter,High,4,ตรวจ field 'เลขภาษี' (Officer role),tax_id แสดง masked format '0105••••••67'
+TC-001,List vendors with status+type filter,High,5,กด 'รีเซ็ต',filters ถูกล้าง ตารางแสดงทั้งหมด
+TC-002,Create MN vendor — full happy path,High,1,กดปุ่ม '+ เพิ่มคู่ค้า' ที่หัวหน้า list,"Drawer Pattern B 540px slide-in, Step 1"
+TC-002,Create MN vendor — full happy path,High,2,"เลือก ประเภท=MN และ ประเทศ=TH | input: type=MN, country=TH",code preview แสดง 'V-TH-MN-NNNNN' (next running)
+TC-002,Create MN vendor — full happy path,High,3,"กรอกชื่อ + เลขภาษี + currency จาก DATA-001 | input: name='บริษัท เคมีภัณฑ์ไทย', tax='0105551234567'",all valid; ไม่มี error
+TC-002,Create MN vendor — full happy path,High,4,กดปุ่ม 'ถัดไป' → Step 2,drawer step→2 'ติดต่อ & ธนาคาร'
+TC-002,Create MN vendor — full happy path,High,5,เพิ่ม contact (name+email+phone) + address + bank | input: DATA-001 contact/address/bank,cards added ใน drawer
+TC-002,Create MN vendor — full happy path,High,6,กดปุ่ม 'ถัดไป' → Step 3,drawer step→3 'เอกสารแนบ & ชำระ'
+TC-002,Create MN vendor — full happy path,High,7,"เลือก term=NET30, ใส่ creditLimit=1000000, แนบเอกสาร | input: term=NET30, credit=1M",values บันทึก
+TC-002,Create MN vendor — full happy path,High,8,กดปุ่ม 'บันทึก',POST /vendors → 201; toast 'บันทึกสำเร็จ'; drawer ปิด; vendor ใหม่ปรากฏใน list status='ผู้สนใจ'
+TC-003,Create OT vendor without tax_id,Medium,1,เปิด create drawer,Step 1 แสดง
+TC-003,Create OT vendor without tax_id,Medium,2,เลือก type=OT | input: type=OT,ช่องเลขภาษีไม่มีดอกจัน * (optional)
+TC-003,Create OT vendor without tax_id,Medium,3,"เว้นเลขภาษีว่าง + กรอก name, country=TH | input: DATA-002",ไม่มี error
+TC-003,Create OT vendor without tax_id,Medium,4,ถัดไป → Step 2 → กรอก contact (≥1) → Step 3 → เลือก term,all valid
+TC-003,Create OT vendor without tax_id,Medium,5,กดบันทึก,201 success; list แสดง field 'เลขภาษี' = 'ยกเว้น'
+TC-004,Submit vendor prospect → pending_kyc,High,1,เปิด list → คลิก row ที่ status=ผู้สนใจ,View drawer (Pattern C) เปิด
+TC-004,Submit vendor prospect → pending_kyc,High,2,ในแถบ action bar — สังเกตปุ่ม 'ส่ง KYC',ปุ่มแสดง (canSubmit=true)
+TC-004,Submit vendor prospect → pending_kyc,High,3,กดปุ่ม 'ส่ง KYC',POST /submit-kyc → 200; toast 'ส่งเข้า KYC แล้ว'; drawer refresh
+TC-004,Submit vendor prospect → pending_kyc,High,4,ตรวจ status pill ใน drawer header,เปลี่ยนเป็น 'รอ KYC' (pill dot=amber)
+TC-005,"KYC review — passed, tax locked",High,1,เปลี่ยน role เป็น Compliance (top-right user chip → role switch),UI re-render with Compliance permissions
+TC-005,"KYC review — passed, tax locked",High,2,เปิด list → คลิก vendor pending_kyc → drawer,drawer แสดง; action bar มีปุ่ม 'ตรวจ KYC'
+TC-005,"KYC review — passed, tax locked",High,3,กดปุ่ม 'ตรวจ KYC',"M-01 modal เปิด, แสดง checklist: เอกสารแนบ, รูปแบบเลขภาษี, sanctions"
+TC-005,"KYC review — passed, tax locked",High,4,"Tick checkboxes (ไม่ tick sanctions hit) → กด 'ผ่าน' | input: result=passed, sanctions_hit=false","POST /kyc-review → 200; kyc=passed, kycAt now"
+TC-005,"KYC review — passed, tax locked",High,5,กลับมา drawer overview tab,เห็น icon 🔒 ข้างช่องเลขภาษี (IR-01 locked)
+TC-005,"KYC review — passed, tax locked",High,6,Switch role กลับเป็น Officer → กด 'แก้ไข',edit drawer เปิด
+TC-005,"KYC review — passed, tax locked",High,7,พยายามแก้ tax_id,"input disabled, label 'ล็อก — ผ่าน KYC แล้ว แก้ไขไม่ได้ (IR-01)'"
+TC-006,Submit pending_kyc → pending_approval (2-step chain for high credit),High,1,Officer เปิด drawer ของ vendor ที่พร้อม,action bar มีปุ่ม 'ส่งอนุมัติ'
+TC-006,Submit pending_kyc → pending_approval (2-step chain for high credit),High,2,กด 'ส่งอนุมัติ',POST /submit-approval → 200; toast 'ส่งอนุมัติแล้ว — รอ ผจก.จัดซื้อ'
+TC-006,Submit pending_kyc → pending_approval (2-step chain for high credit),High,3,เปิด tab 'การอนุมัติ' ใน drawer,"เห็นสายอนุมัติ 2 ขั้น: 1) Manager (pending), 2) Director (pending)"
+TC-006,Submit pending_kyc → pending_approval (2-step chain for high credit),High,4,ตรวจ summary box ในแถบบน,แสดง '0 / 2 ขั้น'
+TC-007,OT vendor auto-approve (skip approval),Medium,1,Officer เปิด OT vendor drawer,action bar มี 'ส่งอนุมัติ'
+TC-007,OT vendor auto-approve (skip approval),Medium,2,กด 'ส่งอนุมัติ',POST /submit-approval → 200; toast 'OT vendor — อนุมัติอัตโนมัติ'
+TC-007,OT vendor auto-approve (skip approval),Medium,3,status pill ใน header,เปลี่ยนตรงจาก 'รอ KYC' → 'ใช้งาน' (active) ทันที (skip pending_approval)
+TC-007,OT vendor auto-approve (skip approval),Medium,4,ตรวจ tab การอนุมัติ,แสดง info box 'OT — อนุมัติอัตโนมัติ ไม่มีสายอนุมัติ'
+TC-008,Approve single-step chain (credit ≤ 1M),High,1,"login as Officer (manop, not creator)",—
+TC-008,Approve single-step chain (credit ≤ 1M),High,2,เปิด vendor pending_approval,tab 'การอนุมัติ' แสดง chain step 1 (Officer)
+TC-008,Approve single-step chain (credit ≤ 1M),High,3,กด 'อนุมัติ (ขั้น 1)' ใน action bar,"M-02 modal เปิด, guards section แสดง ✓ ทุกข้อ"
+TC-008,Approve single-step chain (credit ≤ 1M),High,4,กดยืนยัน,POST /approve → 200; toast 'อนุมัติสำเร็จ vendor พร้อมใช้งาน'
+TC-008,Approve single-step chain (credit ≤ 1M),High,5,ตรวจ status pill,เปลี่ยนเป็น 'ใช้งาน' (active dot=green halo)
+TC-008,Approve single-step chain (credit ≤ 1M),High,6,ตรวจ tab การอนุมัติ,"node step 1 = teal/check icon, summary '1 / 1 ขั้น'"
+TC-009,Approve 2-step chain — Manager then Director,High,1,login as Manager (manop),—
+TC-009,Approve 2-step chain — Manager then Director,High,2,เปิด vendor pending_approval,action bar แสดงปุ่ม 'อนุมัติ (ขั้น 1)' (Mgr role match step 1)
+TC-009,Approve 2-step chain — Manager then Director,High,3,กดอนุมัติขั้น 1 + comment 'OK' + ยืนยัน | input: comment='OK',POST /approve → 200; toast 'อนุมัติขั้น 1 — รอ ผอ.จัดซื้อ'
+TC-009,Approve 2-step chain — Manager then Director,High,4,ตรวจ status pill,ยังเป็น 'รออนุมัติ' (chain ยังไม่ complete)
+TC-009,Approve 2-step chain — Manager then Director,High,5,ตรวจ tab การอนุมัติ,node 1 teal/check; node 2 'รออนุมัติขั้นนี้' (blue/halo)
+TC-009,Approve 2-step chain — Manager then Director,High,6,logout → login as Director (wichai),—
+TC-009,Approve 2-step chain — Manager then Director,High,7,เปิด vendor — action bar แสดงปุ่ม 'อนุมัติ (ขั้น 2)',—
+TC-009,Approve 2-step chain — Manager then Director,High,8,กดอนุมัติขั้น 2 + ยืนยัน,POST /approve → 200; toast 'อนุมัติครบทุกขั้น — vendor พร้อมใช้งาน'
+TC-009,Approve 2-step chain — Manager then Director,High,9,ตรวจ status pill + tab อนุมัติ,status=active; ทั้ง 2 nodes teal/check; summary '2 / 2 ขั้น (ครบ)'
+TC-010,Finance verify bank account,High,1,login as Finance (napha),—
+TC-010,Finance verify bank account,High,2,เปิด vendor drawer → tab 'ธนาคาร & ติดต่อ',bank cards แสดง; ยังไม่ verified มีปุ่ม 'ยืนยัน'
+TC-010,Finance verify bank account,High,3,กด 'ยืนยัน' ใน bank card,POST /banks/0/verify → 200; toast 'ยืนยันสำเร็จ'
+TC-010,Finance verify bank account,High,4,refresh,bank card เปลี่ยนเป็น badge 'ยืนยันแล้ว' (teal); ปุ่ม 'ยืนยัน' หายไป
+TC-011,Block active vendor with reason,High,1,Procurement Officer เปิด active vendor drawer,action bar มี 'บล็อก'
+TC-011,Block active vendor with reason,High,2,กด 'บล็อก',"M-04 modal เปิด, textarea เหตุผล"
+TC-011,Block active vendor with reason,High,3,ทดสอบกด 'ยืนยัน' โดยไม่กรอกเหตุผล | input: reason='',validation error 'กรุณาระบุเหตุผล' (REASON_REQUIRED)
+TC-011,Block active vendor with reason,High,4,กรอกเหตุผล 'ระงับชั่วคราว — รอตรวจสอบ' + ยืนยัน | input: reason='ระงับชั่วคราว — รอตรวจสอบ',POST /block → 200; toast 'บล็อกแล้ว'; status pill = 'บล็อก'
+TC-012,Unblock blocked vendor with reason,Medium,1,เปิด blocked vendor drawer,action bar มี 'ปลดบล็อก'; เห็น reason เดิม
+TC-012,Unblock blocked vendor with reason,Medium,2,กด 'ปลดบล็อก',"M-06 modal เปิด, แสดง reason เดิม (read-only) + textarea reason ปลด"
+TC-012,Unblock blocked vendor with reason,Medium,3,กรอกเหตุผล 'ผ่านการตรวจสอบแล้ว' + ยืนยัน | input: reason='ผ่านการตรวจสอบแล้ว',POST /unblock → 200; status=active; block_reason cleared
+TC-013,Duplicate tax_id rejected,High,1,Officer เปิด create drawer,Step 1
+TC-013,Duplicate tax_id rejected,High,2,"เลือก type=MN, country=TH, name='ทดสอบบริษัท', tax=0105551234567 | input: tax_id ซ้ำ V001",ผ่าน UI validation (frontend ไม่ทราบ DB constraint)
+TC-013,Duplicate tax_id rejected,High,3,ผ่าน Step 2 + Step 3 (กรอกครบ) → กดบันทึก,POST /vendors → 409 DUPLICATE_TAX_ID; toast 'เลขภาษีนี้มีคู่ค้าอื่นใช้แล้วในประเทศนี้'
+TC-013,Duplicate tax_id rejected,High,4,ตรวจ list,ไม่มี vendor ใหม่ปรากฏ
+TC-014,Submit approval blocked when KYC not passed,High,1,Officer เปิด vendor pending_kyc (kyc=pending),drawer แสดง
+TC-014,Submit approval blocked when KYC not passed,High,2,กด 'ส่งอนุมัติ' ใน action bar,POST /submit-approval → 422 KYC_NOT_PASSED; toast 'ต้องผ่าน KYC ก่อนส่งอนุมัติ'
+TC-014,Submit approval blocked when KYC not passed,High,3,ตรวจ status pill,ยังคงเป็น 'รอ KYC' (ไม่เปลี่ยน)
+TC-015,SoD violation — creator approves own vendor,High,1,Officer (somsri = creator) เปิด vendor,tab อนุมัติแสดง chain step 1 pending
+TC-015,SoD violation — creator approves own vendor,High,2,กด 'อนุมัติ (ขั้น 1)' ใน action bar,"M-02 modal เปิด, guards แสดง: 'ผู้อนุมัติ ≠ ผู้สร้าง: ✗' (red ✗)"
+TC-015,SoD violation — creator approves own vendor,High,3,กดยืนยัน,POST /approve → 422 SOD_VIOLATION; toast 'ผู้อนุมัติต้องไม่ใช่ผู้สร้าง'
+TC-015,SoD violation — creator approves own vendor,High,4,ตรวจ chain,step 1 ยังคง pending
+TC-016,Wrong approver role rejected,High,1,"Officer login, เปิด vendor ที่ chain step 1 = Director",action bar — ปุ่ม 'อนุมัติ' ไม่แสดง (role mismatch); แสดง badge '🔒 รอ ผอ.จัดซื้อ'
+TC-016,Wrong approver role rejected,High,2,(ทดสอบ via direct API call เพื่อ verify backend guard) | input: POST /approve as Officer,422 WRONG_APPROVER ระบุ 'ขั้นนี้ต้อง ผู้อำนวยการจัดซื้อ'
+TC-017,Sanctions hit triggers auto-block,High,1,Compliance เปิด vendor (จาก DATA-009 ที่ชื่อ match sanctions list),—
+TC-017,Sanctions hit triggers auto-block,High,2,กด 'ตรวจ KYC' → M-01 modal,modal เปิด
+TC-017,Sanctions hit triggers auto-block,High,3,Tick checkbox 'พบในรายชื่อต้องห้าม (sanctions hit)' → กด 'ยืนยัน' | input: sanctions_hit=true,POST /kyc-review → 200; toast 'พบรายชื่อต้องห้าม — บล็อก vendor อัตโนมัติ'
+TC-017,Sanctions hit triggers auto-block,High,4,ตรวจ status pill,เปลี่ยนเป็น 'บล็อก' (red); kyc=failed
+TC-017,Sanctions hit triggers auto-block,High,5,ตรวจ block reason ใน drawer,แสดง 'พบรายชื่อต้องห้าม (sanctions hit)'
+TC-017,Sanctions hit triggers auto-block,High,6,ตรวจ audit log,entry variant=danger 'พบ sanctions hit — บล็อกอัตโนมัติ'
+TC-018,Reject mid-chain clears approval chain,High,1,"Director login, เปิด vendor",action bar มี 'ตีกลับ' + 'อนุมัติ (ขั้น 2)'
+TC-018,Reject mid-chain clears approval chain,High,2,กด 'ตีกลับ' → M-03 modal,textarea เหตุผล required
+TC-018,Reject mid-chain clears approval chain,High,3,กรอก 'ข้อมูลธนาคารไม่ครบ' + ยืนยัน | input: reason='ข้อมูลธนาคารไม่ครบ',POST /reject → 200; toast 'ตีกลับแล้ว — vendor กลับสู่ pending_kyc'
+TC-018,Reject mid-chain clears approval chain,High,4,ตรวจ status pill + tab อนุมัติ,status='รอ KYC'; tab อนุมัติ → empty state (chain cleared)
+TC-018,Reject mid-chain clears approval chain,High,5,ตรวจ audit log,เห็น entry 'ตีกลับ — ข้อมูลธนาคารไม่ครบ'
+TC-019,Blacklist requires Director role,High,1,"Officer/Manager login, เปิด active vendor",action bar — ปุ่ม 'แบล็คลิสต์' ไม่แสดง (role-gated)
+TC-019,Blacklist requires Director role,High,2,(ทดสอบ direct API as Manager) | input: POST /blacklist,403 BLACKLIST_REQUIRES_DIRECTOR
+TC-019,Blacklist requires Director role,High,3,login as Director,ปุ่ม 'แบล็คลิสต์' แสดงใน action bar
+TC-020,Cannot unblock blacklisted vendor (terminal),High,1,เปิด blacklisted vendor drawer,action bar empty (no actions) — terminal state
+TC-020,Cannot unblock blacklisted vendor (terminal),High,2,(ทดสอบ direct API call) | input: POST /unblock,409 TERMINAL_STATE; toast 'สถานะนี้เป็น terminal — แก้ไขไม่ได้'
+TC-021,Finance verify bank — SoD violation when Finance=creator,High,1,login as Finance (napha = creator),—
+TC-021,Finance verify bank — SoD violation when Finance=creator,High,2,เปิด vendor → tab ธนาคาร,bank card แสดงปุ่ม 'ยืนยัน' (UI ไม่ทราบ SoD)
+TC-021,Finance verify bank — SoD violation when Finance=creator,High,3,กด 'ยืนยัน',POST /banks/0/verify → 422 SOD_VIOLATION; toast 'Finance ที่ verify bank ต้องไม่ใช่ผู้สร้าง vendor'
+TC-022,Mask tax_id for Procurement roles,High,1,"Procurement Officer login, GET /vendors/V001 | input: role=procurement_officer",response.tax = '0105••••••67' (masked: 4 prefix + 6 dots + 2 suffix)
+TC-022,Mask tax_id for Procurement roles,High,2,"Procurement Manager login, GET | input: role=procurement_manager",same masked
+TC-022,Mask tax_id for Procurement roles,High,3,"Procurement Director login, GET | input: role=procurement_director",same masked
+TC-023,Finance/Compliance/Admin sees full tax_id,High,1,"Finance login, GET /vendors/V001 | input: role=finance",response.tax = '0105551234567' (full)
+TC-023,Finance/Compliance/Admin sees full tax_id,High,2,"Compliance login, GET | input: role=compliance",response.tax = '0105551234567' (full)
+TC-023,Finance/Compliance/Admin sees full tax_id,High,3,"Admin login, GET | input: role=admin",response.tax = '0105551234567' (full)
+TC-024,Mask bank.acct (Restricted) for non-Finance,High,1,"Procurement Officer, GET vendor | input: role=procurement_officer",banks[0].acct = '0123••••89' (masked: 3 prefix + 4 dots + 2 suffix)
+TC-024,Mask bank.acct (Restricted) for non-Finance,High,2,"Compliance, GET vendor | input: role=compliance",banks[0].acct = '0123••••89' (still masked — Restricted level)
+TC-024,Mask bank.acct (Restricted) for non-Finance,High,3,"Finance, GET vendor | input: role=finance",banks[0].acct = '0123456789' (full)
+TC-024,Mask bank.acct (Restricted) for non-Finance,High,4,"Admin, GET vendor | input: role=admin",banks[0].acct = '0123456789' (full)
+TC-025,Optimistic locking STALE_VERSION conflict,High,1,user A: PATCH /vendors/V001 with If-Match: 5 + valid body | input: v=5,"200, version becomes 6"
+TC-025,Optimistic locking STALE_VERSION conflict,High,2,user B: PATCH /vendors/V001 with If-Match: 5 (stale) | input: v=5 stale,409 STALE_VERSION; toast 'ข้อมูลถูกแก้โดยผู้อื่น — โปรด refresh'
+TC-025,Optimistic locking STALE_VERSION conflict,High,3,user B refresh + retry with If-Match: 6 | input: v=6,200 success
+TC-026,Boundary — vendor name exactly 255 chars,Medium,1,"เปิด create drawer, ใส่ name = 'ก' × 255 chars | input: len=255",Step 1 valid
+TC-026,Boundary — vendor name exactly 255 chars,Medium,2,ครบ Step 2-3 + บันทึก,201 success — vendor created
+TC-026,Boundary — vendor name exactly 255 chars,Medium,3,ทดสอบ name = 'ก' × 256 chars | input: len=256,Step 1 validation error; ปุ่มถัดไป disabled OR 422 VALIDATION_FAILED
+TC-027,Boundary — creditLimit 0 vs negative,Medium,1,"create drawer Step 3, creditLimit=0 | input: credit=0",valid (≥0); ส่งบันทึก → 201
+TC-027,Boundary — creditLimit 0 vs negative,Medium,2,"edit drawer, ใส่ creditLimit=-1 | input: credit=-1",422 VALIDATION_FAILED; field-error 'ค่าต้อง ≥ 0'
+TC-028,Invalid state transition — submit-kyc on blocked,Medium,1,Officer เปิด blocked vendor,action bar — ไม่มีปุ่ม 'ส่ง KYC'
+TC-028,Invalid state transition — submit-kyc on blocked,Medium,2,(direct API) | input: POST /submit-kyc on blocked vendor,409 INVALID_TRANSITION; toast 'สถานะปัจจุบันไม่อนุญาตการดำเนินการนี้'
+TC-029,View Price List Tab 5 — vendor with items,High,1,เปิด list → คลิก row vendor V001 → view drawer เปิด,Pattern C drawer 540px slide-in
+TC-029,View Price List Tab 5 — vendor with items,High,2,ตรวจ tab row ใน drawer header,เห็น 5 tabs (overflow-x scroll ถ้าจำเป็น) — tab สุดท้าย 'สินค้า/บริการ'
+TC-029,View Price List Tab 5 — vendor with items,High,3,คลิก tab 'สินค้า/บริการ',GET /vendors/V001/price-list-summary → 200; tab content render
+TC-029,View Price List Tab 5 — vendor with items,High,4,ตรวจ summary box ด้านบน,แสดง '5 รายการ' + 'อัพเดต DD MMM YYYY' + sub-note 'ข้อมูลจาก Vendor Price List · view-only'
+TC-029,View Price List Tab 5 — vendor with items,High,5,ตรวจ table structure,compact 3-col table: 'สินค้า / บริการ' (flex) | 'ราคา / หน่วย' (~120px right) | 'สถานะ' (~32px center)
+TC-029,View Price List Tab 5 — vendor with items,High,6,ตรวจ row แรก (P-STL-001),name='เหล็กเส้นกลม SR24 ø12mm' (bold) + code='P-STL-001' (mono gray); ราคา='฿185.00' (bold) + unit='/ เส้น 10m' (gray); status dot=green
+TC-029,View Price List Tab 5 — vendor with items,High,7,ตรวจ 5 rows ครบ + ไม่มี edit/add/delete buttons,เห็น 5 rows; **NO edit/add/delete buttons visible anywhere in tab** (BR-X02 enforcement)
+TC-029,View Price List Tab 5 — vendor with items,High,8,ตรวจ footer,"ปุ่ม 'ดู Price List เต็ม →' (btn-secondary-sm, right-aligned)"
+TC-029,View Price List Tab 5 — vendor with items,High,9,กด 'ดู Price List เต็ม →',Phase 1: toast 'Feature Vendor Price List ยังไม่เปิดให้บริการ — Phase 2'; Phase 2: navigate ไป F-VENDOR-PRICE-LIST
+TC-030,View Price List Tab 5 — empty state (vendor without items),Medium,1,เปิด drawer ของ V007 (นายสมชาย),view drawer เปิด
+TC-030,View Price List Tab 5 — empty state (vendor without items),Medium,2,คลิก tab 'สินค้า/บริการ',API-16 → 200 items=[]; tab render empty state
+TC-030,View Price List Tab 5 — empty state (vendor without items),Medium,3,ตรวจ empty state visual,info-box แสดง icon 'package-x' + title 'ยังไม่มี Price List สำหรับคู่ค้านี้' + sub-text 'เพิ่ม items + ราคาผ่าน feature Vendor Price List (F-VENDOR-PRICE-LIST)'
+TC-030,View Price List Tab 5 — empty state (vendor without items),Medium,4,ตรวจ ไม่มี table เลย,ไม่มี table element; ไม่มี summary box ('5 รายการ...') แสดง
+TC-030,View Price List Tab 5 — empty state (vendor without items),Medium,5,ตรวจ ไม่มี edit/add buttons,**NO mutation UI** — แม้แต่ empty state ก็ไม่มีปุ่ม 'เพิ่ม Price List ที่นี่'
+TC-030,View Price List Tab 5 — empty state (vendor without items),Medium,6,ตรวจ centered nav button,"ปุ่ม 'ไปที่ Price List feature →' (centered, btn-secondary-sm)"
+TC-030,View Price List Tab 5 — empty state (vendor without items),Medium,7,กด nav button,Phase 1: toast 'Phase 2'; Phase 2: navigate ไป F-VENDOR-PRICE-LIST/create?vendor=V007
+TC-030,View Price List Tab 5 — empty state (vendor without items),Medium,8,ทดสอบกับ V014 (blacklisted) — empty state เดียวกัน,เห็น empty state เหมือน V007 (blacklisted vendors ไม่มี price list)
+TC-031,Tab 5 — mix of active + expired items (visual differentiation),Medium,1,เปิด V003 drawer → คลิก tab 'สินค้า/บริการ',"API-16 → 200 active_count=3, expired_count=1"
+TC-031,Tab 5 — mix of active + expired items (visual differentiation),Medium,2,ตรวจ summary box,แสดง '4 รายการ (3 active · 1 expired) · อัพเดต DD MMM YYYY'
+TC-031,Tab 5 — mix of active + expired items (visual differentiation),Medium,3,"ตรวจ row 1-3 (Notebook, Monitor, M365)",render ปกติ; opacity=1 (full); name no strikethrough; status dot=green active
+TC-031,Tab 5 — mix of active + expired items (visual differentiation),Medium,4,ตรวจ row 4 (Cisco Catalyst — expired),**class='is-inactive'** → opacity 0.55 + **strikethrough บน name** + status dot=brown/blocked
+TC-031,Tab 5 — mix of active + expired items (visual differentiation),Medium,5,hover row expired,tooltip บน status dot แสดง 'expired'
+TC-031,Tab 5 — mix of active + expired items (visual differentiation),Medium,6,ตรวจว่า expired row ยังคงแสดง price + code,ข้อมูลครบ (ไม่ลบ) แต่ visually dimmed
+TC-032,Tab 5 resilience — F-VENDOR-PRICE-LIST API unavailable,High,1,Simulate API down (Phase 2 test) | input: F-VENDOR-PRICE-LIST returns 502,API-16 ของ Vendor Master proxy ได้รับ error
+TC-032,Tab 5 resilience — F-VENDOR-PRICE-LIST API unavailable,High,2,User เปิด V001 drawer → คลิก tab 'สินค้า/บริการ',API-16 → 502 Bad Gateway
+TC-032,Tab 5 resilience — F-VENDOR-PRICE-LIST API unavailable,High,3,ตรวจ fallback message,UI แสดง 'ไม่สามารถดึง Price List ได้ — ลองใหม่ภายหลัง' + retry button
+TC-032,Tab 5 resilience — F-VENDOR-PRICE-LIST API unavailable,High,4,ทดสอบ tab อื่นไม่กระทบ | input: switch ไป tab 'ภาพรวม',tab 1 render ปกติ (vendor data ปกติ)
+TC-032,Tab 5 resilience — F-VENDOR-PRICE-LIST API unavailable,High,5,ทดสอบ tab 'ธนาคาร & ติดต่อ',render ปกติ
+TC-032,Tab 5 resilience — F-VENDOR-PRICE-LIST API unavailable,High,6,ทดสอบ tab 'การอนุมัติ',render ปกติ
+TC-032,Tab 5 resilience — F-VENDOR-PRICE-LIST API unavailable,High,7,กลับมา tab 5 → กด retry | input: F-VENDOR-PRICE-LIST recovers,API-16 → 200; tab 5 render normally
+TC-032,Tab 5 resilience — F-VENDOR-PRICE-LIST API unavailable,High,8,ทดสอบ action bar (edit/block) ยังใช้ได้,vendor mutations ปกติ — ไม่ block จาก price list failure
