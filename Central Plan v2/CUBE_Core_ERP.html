@@ -1,0 +1,1357 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CUBE 4.0 — Core ERP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ivory:#FAF8F5;--ink:#111;--line:#E8E2DA;--mute:#7A736B;--red:#FF3B30}
+html,body{height:100%}
+body{background:var(--ivory);color:var(--ink);font:14px/1.55 'Noto Sans Thai',system-ui,sans-serif;overflow:hidden}
+#top{position:fixed;inset:0 0 auto 0;background:#fff;border-bottom:1px solid var(--line);z-index:30}
+.hd{display:flex;align-items:center;gap:12px;padding:10px 16px 0}
+h1{font-size:15.5px;font-weight:700;white-space:nowrap}
+h1 b{color:var(--mute);font-weight:400;font-size:12px;margin-left:8px}
+#q{border:1px solid var(--line);border-radius:16px;padding:6px 12px;font:400 12px 'Noto Sans Thai',sans-serif;
+width:190px;outline:none;background:var(--ivory);margin-left:auto}
+#q:focus{border-color:var(--ink);background:#fff}
+.zm{display:flex;gap:4px}
+.zm button{width:28px;height:28px;border:1px solid var(--line);background:#fff;border-radius:7px;
+cursor:pointer;font-size:14px;line-height:1;color:#4a443d}
+.zm button:hover{border-color:var(--ink)}
+.modes{display:flex;gap:2px;padding:9px 14px 0}
+.md{background:none;border:0;border-bottom:3px solid transparent;padding:6px 16px 9px;cursor:pointer;
+font:700 14px 'Noto Sans Thai',sans-serif;color:#a8a099}
+.md.on{color:var(--ink);border-bottom-color:var(--red)}
+.bar{display:flex;gap:6px;align-items:center;padding:8px 16px;border-top:1px solid #F3EEE8;
+background:#FDFCFA;flex-wrap:wrap;min-height:44px}
+.bar.hide{display:none}
+.ch{background:var(--ivory);border:1px solid var(--line);border-radius:16px;padding:5px 12px;cursor:pointer;
+font:600 12px 'Noto Sans Thai',sans-serif;color:#8f877f}
+.ch.on{background:#fff;border-color:var(--c);color:var(--c);box-shadow:inset 0 -2px 0 var(--c)}
+.sub{font-size:12px;color:var(--mute);margin-left:8px}
+.sub b{color:#111;font-weight:600}
+#stage{position:fixed;inset:150px 0 0 0;overflow:hidden;cursor:grab}
+#stage.drag{cursor:grabbing}
+#stage.sum{overflow:auto;cursor:default}
+.pane{display:none;position:absolute;inset:0} .pane.on{display:block}
+.pane.sm{position:relative;inset:auto;padding:26px 30px 70px;max-width:1180px;margin:0 auto}
+svg.mp{display:block;transform-origin:0 0}
+.nb{stroke-width:1.4}
+.nm{font:600 10.5px 'Noto Sans Thai',sans-serif;fill:#8f877f}
+.nt{font-family:'Noto Sans Thai',sans-serif;font-weight:700;fill:#141110;text-anchor:middle}
+.ne{font:400 10.2px sans-serif;fill:#B3ABA1;text-anchor:middle}
+.mf{font-family:'Noto Sans Thai',sans-serif;font-weight:600;fill:#171310;text-anchor:middle}
+.nd.bk .nb{stroke-width:2.2}
+.zl{font:700 14px sans-serif;letter-spacing:.3px}
+.sh{font:700 12px 'Noto Sans Thai',sans-serif;letter-spacing:.5px}
+.zd{font:400 11px 'Noto Sans Thai',sans-serif;fill:#B3ABA1}
+.pn{stroke-width:1.4} .mi{font:700 11.5px sans-serif;fill:#fff;text-anchor:middle}
+.mt{font:700 21px 'Noto Sans Thai',sans-serif} .me{font:700 16px sans-serif;text-anchor:end}
+.ep{fill:none;stroke:#C9C0B6;stroke-width:2.4;stroke-linecap:round}
+.lb{fill:#FAF8F5;stroke:#E8E2DA;stroke-width:1}
+.lt{font:500 11.6px 'Noto Sans Thai',sans-serif;fill:#8a827a;text-anchor:middle}
+svg.dense .lb,svg.dense .lt{opacity:0}
+svg.dense .ed:hover .lb,svg.dense .ed:hover .lt,svg.dense .ed.hi .lb,svg.dense .ed.hi .lt{opacity:1}
+.ep{pointer-events:stroke}
+.med{fill:none;stroke-width:1.6;opacity:.07;stroke-linecap:round}
+.med.act{opacity:.85;stroke-width:3.2}
+.nd,.mb{cursor:pointer}
+.nd:hover .nb,.nd.sel .nb{stroke:#111;stroke-width:2.8}
+svg.focus .ed,svg.focus .med{opacity:.06}
+svg.focus .ed.hi{opacity:1} svg.focus .med.hi{opacity:1;stroke-width:3.4}
+svg.focus .ed.hi .ep{stroke:#111;stroke-width:3.2}
+svg.focus .ed.hi .lt{fill:#111;font-weight:700}
+svg.focus .nd{opacity:.2} svg.focus .nd.hi,svg.focus .nd.sel{opacity:1}
+svg.focus .mb,svg.focus .zn{opacity:.45}
+.nd.dim{opacity:.13} .nd.mark .nb{stroke:#111;stroke-width:3.2}
+/* summary */
+.sm h2{font-size:20px;font-weight:700;margin:30px 0 4px}
+.sm h2:first-child{margin-top:0}
+.sm p.lead{color:var(--mute);font-size:13px;margin-bottom:14px}
+.big{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.bcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 18px;flex:1;min-width:150px}
+.bcard b{display:block;font-size:30px;font-weight:700;line-height:1.15}
+.bcard span{font-size:12px;color:var(--mute)}
+.bcard.hl{border-color:#111;border-width:2px}
+.bcard.hl b{color:#0F9D58}
+.sbar{display:flex;gap:16px;flex-wrap:wrap;margin:12px 0 4px}
+.sb{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#5d564e}
+.sb i{width:10px;height:10px;border-radius:3px} .sb b{font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:11px}
+.fcard{text-align:left;background:#fff;border:1px solid var(--line);border-left:5px solid var(--c);
+border-radius:12px;padding:13px 15px;cursor:pointer;font-family:inherit}
+.fcard:hover{border-color:var(--c);box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.fcard b{display:block;font-size:15.5px;font-weight:700;color:var(--c);margin-bottom:3px}
+.fcard span{display:block;font-size:12px;color:#5d564e;line-height:1.5}
+.fcard em{display:block;font-style:normal;font-size:11px;color:#B3ABA1;margin-top:6px}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);
+border-radius:12px;overflow:hidden;font-size:13px}
+th{background:#F5F0E9;text-align:left;padding:9px 12px;font-size:11.5px;font-weight:700;color:#4a443d}
+td{padding:9px 12px;border-top:1px solid #F2EDE6;vertical-align:top}
+code{background:#F2EDE6;border-radius:4px;padding:1px 5px;font-size:11px}
+.mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.mrow{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);
+border-left:5px solid hsl(var(--h) 60% 55%);border-radius:10px;padding:9px 11px;cursor:pointer;
+font-family:inherit;font-size:13px;text-align:left}
+.mrow:hover{border-color:#111}
+.mrow b{font-weight:600} .mrow span{color:var(--mute);font-size:11px;flex:1}
+.mrow u{text-decoration:none;font-weight:700;background:#F2EDE6;border-radius:6px;padding:1px 8px;font-size:12px}
+#pnl{position:fixed;top:150px;right:0;bottom:0;width:386px;background:#fff;border-left:1px solid var(--line);
+transform:translateX(100%);transition:transform .18s ease;z-index:29;display:flex;flex-direction:column}
+#pnl.open{transform:none}
+.ph{padding:15px 18px 13px;border-bottom:1px solid var(--line);position:relative}
+.ph .mid{font:700 10px sans-serif;color:#fff;border-radius:4px;padding:2px 6px}
+.ph h2{font-size:18px;font-weight:700;margin:8px 0 2px}
+.ph p{font-size:11.5px;color:var(--mute)}
+.ph .n2{font-size:11.5px;color:#C0871F;margin-top:4px}
+.cl{position:absolute;top:12px;right:12px;width:28px;height:28px;border:1px solid var(--line);
+background:#fff;border-radius:7px;cursor:pointer;font-size:16px;line-height:1;color:#6b645c}
+.pb{flex:1;overflow:auto;padding:12px 18px 30px}
+.pb h3{font-size:11px;font-weight:700;color:var(--mute);letter-spacing:.5px;margin:15px 0 6px}
+.pb h3:first-child{margin-top:2px}
+.rel{padding:7px 0;border-bottom:1px dashed #F2EDE6;cursor:pointer}
+.rel:hover{background:#FCFAF7}
+.rel b{font-size:13.5px;font-weight:600}
+.rel span{color:var(--mute);font-size:11px;display:block}
+.rel em{font-style:normal;font-size:10px;color:#B3ABA1}
+.fl{font-size:9.5px;font-weight:700;border-radius:5px;padding:1px 6px;color:#fff}
+#hint{position:fixed;left:14px;bottom:14px;background:#fff;border:1px solid var(--line);border-radius:9px;
+padding:9px 13px;font-size:11.5px;color:#5d564e;z-index:28;line-height:1.75}
+#hint.hide{display:none} #hint b{color:#111}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-thumb{background:rgba(17,17,17,.22);border-radius:3px}
+::-webkit-scrollbar-track{background:transparent}
+</style></head><body>
+<div id="top">
+ <div class="hd"><h1>CUBE 4.0 · Core ERP<b>21 module · 85 feature · 151 เส้นเชื่อม</b></h1>
+  <input id="q" placeholder="ค้นหา feature…" autocomplete="off">
+  <div class="zm"><button id="zo">&#8722;</button><button id="zi">&#43;</button><button id="zf">&#9633;</button></div></div>
+ <div class="modes">
+  <button class="md on" data-md="sum">สรุป</button>
+  <button class="md" data-md="flow">สายงาน</button>
+  <button class="md" data-md="map">ภาพรวม</button></div>
+ <div class="bar hide" id="bar"><button class="ch" data-f="p2p" style="--c:#C62B22">ขาซื้อ</button><button class="ch" data-f="o2c" style="--c:#E07B00">ขาขาย</button><button class="ch" data-f="stock" style="--c:#0F7C4A">สต็อก</button><button class="ch" data-f="gl" style="--c:#3B6EF5">ปิดบัญชี</button><button class="ch" data-f="hr" style="--c:#7C3AED">คน–เงินเดือน</button><button class="ch" data-f="gov" style="--c:#B0447A">อนุมัติ–สิทธิ์</button><button class="ch" data-f="master" style="--c:#8A7A55">ข้อมูลหลัก</button><button class="ch" data-f="plat" style="--c:#0E7490">แพลตฟอร์ม</button><span class="sub" id="sub"></span></div>
+</div>
+<div id="stage" class="sum">
+ <div class="pane sm on" data-v="sum">
+  <h2>Core ERP — 71 feature ที่ต้องทำจริง</h2>
+  <p class="lead">กลั่นจากขอบเขต ERP เต็ม 472 feature ด้วยเกณฑ์ 4 ข้อ: อยู่บนเส้นเลือดหลัก · เป็น master ที่เอกสารต้องอ้าง · บังคับตามกฎหมายไทย · เป็น engine กลางที่หลาย module เรียก</p>
+  <div class="big">
+   <div class="bcard hl"><b>71</b><span>แกน — ทำก่อน</span></div>
+   <div class="bcard"><b>89</b><span>ยุบรวม — เป็นแท็บ/ฟิลด์ของตัวอื่น</span></div>
+   <div class="bcard"><b>233</b><span>เฟส 2 — รอของเฟส 1</span></div>
+   <div class="bcard"><b>79</b><span>ตัดออก — ไม่ใช่งาน ERP</span></div>
+  </div>
+  <div class="sbar"><div class="sb"><i style="background:#0F9D58"></i><b>21</b>เสร็จครบ pipeline</div><div class="sb"><i style="background:#FF9A1F"></i><b>6</b>มี HTML/บางส่วน</div><div class="sb"><i style="background:#3B6EF5"></i><b>24</b>อยู่ใน Central Plan</div><div class="sb"><i style="background:#8A8A8A"></i><b>10</b>อยู่ใน Registry</div><div class="sb"><i style="background:#FF3B30"></i><b>10</b>ยังไม่เคยนับ (GAP)</div></div>
+  <h2>8 สายงาน</h2>
+  <p class="lead">คลิกเพื่อดูแผนภาพซ้าย→ขวาของสายนั้น</p>
+  <div class="grid"><button class="fcard" data-go="p2p" style="--c:#C62B22"><b>ขาซื้อ</b><span>ใบขอซื้อ → เทียบราคา → สั่งซื้อ → รับของ → ตั้งหนี้ → จ่ายเงิน</span><em>10 feature · 11 เส้น</em></button><button class="fcard" data-go="o2c" style="--c:#E07B00"><b>ขาขาย</b><span>ลูกค้ามุ่งหวัง → ใบเสนอราคา → คำสั่งขาย → หยิบ-แพ็ค-ส่ง → วางบิล → รับเงิน</span><em>12 feature · 13 เส้น</em></button><button class="fcard" data-go="stock" style="--c:#0F7C4A"><b>สต็อก</b><span>ทุกการเคลื่อนไหว → ยอดคงคลัง → ต้นทุน → บัญชี</span><em>8 feature · 8 เส้น</em></button><button class="fcard" data-go="gl" style="--c:#3B6EF5"><b>ปิดบัญชี</b><span>เอกสารทุกใบ → สมุดรายวัน → งบทดลอง → ปิดงวด → งบการเงิน + ภาษี</span><em>14 feature · 16 เส้น</em></button><button class="fcard" data-go="hr" style="--c:#7C3AED"><b>คน–เงินเดือน</b><span>พนักงาน → ลงเวลา/ลา → เงินเดือน → บัญชี + ประกันสังคม</span><em>10 feature · 11 เส้น</em></button><button class="fcard" data-go="gov" style="--c:#B0447A"><b>อนุมัติ–สิทธิ์</b><span>นโยบาย → DOA → เอกสารที่ต้องอนุมัติ + สิทธิ์ผู้ใช้</span><em>26 feature · 25 เส้น</em></button><button class="fcard" data-go="master" style="--c:#8A7A55"><b>ข้อมูลหลัก</b><span>master ตัวไหน ป้อนให้เอกสารใบไหน</span><em>35 feature · 37 เส้น</em></button><button class="fcard" data-go="plat" style="--c:#0E7490"><b>แพลตฟอร์ม</b><span>แจ้งเตือน · log · แนบไฟล์</span><em>12 feature · 10 เส้น</em></button></div>
+  <h2>5 ตัวที่บล็อกทุกอย่าง</h2>
+  <p class="lead">ยังไม่เคยนับใน registry แต่มี feature อื่นรออยู่ — ควรขึ้นก่อน feature ธุรกิจตัวถัดไป</p>
+  <table><thead><tr><th>Feature</th><th>อยู่ที่</th><th>ทำไมถึงบล็อก</th></tr></thead><tbody><tr><td><b>Approval Workflow</b></td><td>Policy &amp; Approval</td><td>40+ feature วาง placeholder รออยู่ แต่ engine จริงยังไม่มี</td></tr><tr><td><b>Inventory Costing</b></td><td>Warehouse</td><td>ไม่มีวิธีคิดต้นทุน = ลง GL ไม่ได้ · งบการเงินออกไม่ได้</td></tr><tr><td><b>Number Series</b></td><td>Platform</td><td>ทุกเอกสารต้องมีเลขรัน แต่ไม่มีเจ้าภาพ</td></tr><tr><td><b>Period Close</b></td><td>Accounting</td><td>ไม่มี = แก้เอกสารย้อนหลังได้ไม่จำกัด ปิดบัญชีไม่ได้</td></tr><tr><td><b>Document Center</b></td><td>Platform</td><td>ทุก module แนบไฟล์ แต่ไม่มีที่เก็บกลาง</td></tr></tbody></table>
+  <h2>บังคับตามกฎหมายไทย</h2>
+  <p class="lead">ไม่มี = ขายระบบไม่ได้</p>
+  <table><thead><tr><th>Feature</th><th>Module</th></tr></thead><tbody><tr><td><b>VAT Return (PP.30) · ภ.พ.30</b></td><td>Accounting</td></tr><tr><td><b>Withholding Tax · ภ.ง.ด.3/53</b></td><td>Accounting</td></tr><tr><td><b>Social Security &amp; PND.1 · ประกันสังคม</b></td><td>HR</td></tr><tr><td><b>Financial Statements · งบการเงิน</b></td><td>Accounting</td></tr></tbody></table>
+  <h2>แกน 71 ตัว ใน 11 module (จัดตามโฟลเดอร์ระบบจริง)</h2>
+  <p class="lead">คลิกเพื่อเปิดภาพรวมแล้วซูมไปที่ module นั้น</p>
+  <div class="mods"><button class="mrow" data-m="acct" style="--h:150"><b>Accounting</b><span>บัญชี</span><u>15</u></button><button class="mrow" data-m="wh" style="--h:188"><b>Warehouse</b><span>คลังสินค้า</span><u>11</u></button><button class="mrow" data-m="sales" style="--h:25"><b>Sales</b><span>การขาย</span><u>10</u></button><button class="mrow" data-m="purchase" style="--h:355"><b>Purchase</b><span>การจัดซื้อ</span><u>6</u></button><button class="mrow" data-m="fin" style="--h:207"><b>Finance</b><span>การเงิน</span><u>5</u></button><button class="mrow" data-m="hr" style="--h:275"><b>HR</b><span>บุคคล</span><u>5</u></button><button class="mrow" data-m="product" style="--h:48"><b>Product</b><span>ข้อมูลสินค้า</span><u>4</u></button><button class="mrow" data-m="org" style="--h:82"><b>Organization</b><span>โครงสร้างองค์กร</span><u>4</u></button><button class="mrow" data-m="sec" style="--h:252"><b>System</b><span>ระบบและผู้ใช้</span><u>4</u></button><button class="mrow" data-m="policy" style="--h:322"><b>Policy &amp; Security</b><span>นโยบาย-สิทธิ์</span><u>4</u></button><button class="mrow" data-m="plat" style="--h:228"><b>Platform</b><span>แพลตฟอร์ม</span><u>3</u></button></div>
+ </div>
+ <div class="pane" data-v="p2p"><svg class="mp" id="s-p2p" width="2480" height="578" viewBox="0 0 2480 578" xmlns="http://www.w3.org/2000/svg"><g><g class="ed" data-a="M15|PR" data-b="M15|CP"><path class="ep" d="M 284 289 C 350 289 350 289 416 289" marker-end="url(#arw)"/><rect class="lb" x="304" y="278" width="91" height="20" rx="10"/><text class="lt" x="350" y="292">เทียบราคาผู้ขาย</text></g><g class="ed" data-a="M15|CP" data-b="M15|PO"><path class="ep" d="M 640 289 C 706 289 706 289 772 289" marker-end="url(#arw)"/><rect class="lb" x="645" y="278" width="123" height="20" rx="10"/><text class="lt" x="706" y="292">เลือกผู้ขาย → สั่งซื้อ</text></g><g class="ed" data-a="M15|PO" data-b="M17|Goods Receipt (GRN)"><path class="ep" d="M 996 289 C 1062 289 1062 289 1128 289" marker-end="url(#arw)"/><rect class="lb" x="1029" y="278" width="66" height="20" rx="10"/><text class="lt" x="1062" y="292">ของมาถึง</text></g><g class="ed" data-a="M17|Goods Receipt (GRN)" data-b="M17|Putaway"><path class="ep" d="M 1352 289 C 1418 289 1418 133 1484 133" marker-end="url(#arw)"/><rect class="lb" x="1368" y="200" width="100" height="20" rx="10"/><text class="lt" x="1418" y="214">เก็บเข้าตำแหน่ง</text></g><g class="ed" data-a="M17|Goods Receipt (GRN)" data-b="M22|GR/IR Accrual"><path class="ep" d="M 1352 289 C 1418 289 1418 289 1484 289" marker-end="url(#arw)"/><rect class="lb" x="1372" y="278" width="91" height="20" rx="10"/><text class="lt" x="1418" y="292">ตั้งพักรับของ</text></g><g class="ed" data-a="M17|Goods Receipt (GRN)" data-b="M22|AP Invoice"><path class="ep" d="M 1352 289 C 1596 289 1596 211 1840 211" marker-end="url(#arw)"/><rect class="lb" x="1551" y="239" width="91" height="20" rx="10"/><text class="lt" x="1596" y="254">3-way match</text></g><g class="ed" data-a="M15|PO" data-b="M22|AP Invoice"><path class="ep" d="M 996 289 C 1418 289 1418 211 1840 211" marker-end="url(#arw)"/><rect class="lb" x="1373" y="239" width="91" height="20" rx="10"/><text class="lt" x="1418" y="254">3-way match</text></g><g class="ed" data-a="M22|AP Invoice" data-b="M23|Payment Voucher"><path class="ep" d="M 2064 211 C 2130 211 2130 289 2196 289" marker-end="url(#arw)"/><rect class="lb" x="2089" y="239" width="83" height="20" rx="10"/><text class="lt" x="2130" y="254">ถึงกำหนดจ่าย</text></g><g class="ed" data-a="M22|GR/IR Accrual" data-b="M22|AP Invoice"><path class="ep" d="M 1708 289 C 1774 289 1774 211 1840 211" marker-end="url(#arw)"/><rect class="lb" x="1737" y="239" width="74" height="20" rx="10"/><text class="lt" x="1774" y="254">ล้างบัญชีพัก</text></g><g class="ed" data-a="M17|Goods Receipt (GRN)" data-b="M15|Return to Vendor"><path class="ep" d="M 1352 289 C 1418 289 1418 445 1484 445" marker-end="url(#arw)"/><rect class="lb" x="1372" y="356" width="92" height="20" rx="10"/><text class="lt" x="1418" y="370">ของไม่ผ่าน QC</text></g><g class="ed" data-a="M15|Return to Vendor" data-b="M22|Credit / Debit Note"><path class="ep" d="M 1708 445 C 1774 445 1774 367 1840 367" marker-end="url(#arw)"/><rect class="lb" x="1728" y="395" width="91" height="20" rx="10"/><text class="lt" x="1774" y="410">ขอลดหนี้ผู้ขาย</text></g></g><g><g class="nd" data-f="M15|PR" transform="translate(60,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 15px sans-serif" fill="#14603C">Purchase Requisition<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบขอซื้อ</text>
+<rect x="18" y="74" width="65" height="21" rx="10.5" fill="hsl(355 55% 92%)"/>
+<text x="50" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(355 45% 32%)">Purchase</text></g><g class="nd" data-f="M15|CP" transform="translate(416,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(355 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Quotation Comparison</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบเทียบราคา</text>
+<rect x="18" y="74" width="65" height="21" rx="10.5" fill="hsl(355 55% 92%)"/>
+<text x="50" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(355 45% 32%)">Purchase</text></g><g class="nd" data-f="M15|PO" transform="translate(772,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(355 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Purchase Order</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบสั่งซื้อ</text>
+<rect x="18" y="74" width="65" height="21" rx="10.5" fill="hsl(355 55% 92%)"/>
+<text x="50" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(355 45% 32%)">Purchase</text></g><g class="nd" data-f="M17|Goods Receipt (GRN)" transform="translate(1128,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(188 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Goods Receipt</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบรับสินค้า</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M17|Putaway" transform="translate(1484,75)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(188 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Put Away</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">จัดเก็บเข้าตำแหน่ง</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M22|GR/IR Accrual" transform="translate(1484,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">GR/IR Clearing</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">บัญชีพักรับของ</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M22|AP Invoice" transform="translate(1840,153)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">AP Invoice</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ตั้งหนี้เจ้าหนี้ (3-way)</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M23|Payment Voucher" transform="translate(2196,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(207 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Payment Voucher</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบสำคัญจ่าย</text>
+<rect x="18" y="74" width="57" height="21" rx="10.5" fill="hsl(207 55% 92%)"/>
+<text x="46" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(207 45% 32%)">Finance</text></g><g class="nd" data-f="M15|Return to Vendor" transform="translate(1484,387)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(188 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Return to Vendor</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">คืนของผู้ขาย</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M22|Credit / Debit Note" transform="translate(1840,309)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Credit / Debit Note</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบลดหนี้/เพิ่มหนี้</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g></g></svg></div><div class="pane" data-v="o2c"><svg class="mp" id="s-o2c" width="3192" height="578" viewBox="0 0 3192 578" xmlns="http://www.w3.org/2000/svg"><g><g class="ed" data-a="M13|Prospect" data-b="M14|Quotation"><path class="ep" d="M 284 289 C 884 289 884 289 1484 289" marker-end="url(#arw)"/><rect class="lb" x="810" y="278" width="148" height="20" rx="10"/><text class="lt" x="884" y="292">ลูกค้ามุ่งหวัง → เสนอราคา</text></g><g class="ed" data-a="M14|Quotation" data-b="M14|Sales Order"><path class="ep" d="M 1708 289 C 1774 289 1774 289 1840 289" marker-end="url(#arw)"/><rect class="lb" x="1733" y="278" width="83" height="20" rx="10"/><text class="lt" x="1774" y="292">ลูกค้าตอบรับ</text></g><g class="ed" data-a="M14|Sales Order" data-b="M17|Picking"><path class="ep" d="M 2064 289 C 2130 289 2130 289 2196 289" marker-end="url(#arw)"/><rect class="lb" x="2089" y="278" width="83" height="20" rx="10"/><text class="lt" x="2130" y="292">สั่งหยิบของ</text></g><g class="ed" data-a="M17|Picking" data-b="M17|Packing"><path class="ep" d="M 2420 289 C 2486 289 2486 289 2552 289" marker-end="url(#arw)"/><rect class="lb" x="2433" y="278" width="106" height="20" rx="10"/><text class="lt" x="2486" y="292">หยิบครบ → แพ็ค</text></g><g class="ed" data-a="M17|Packing" data-b="M17|Delivery Note"><path class="ep" d="M 2776 289 C 2842 289 2842 289 2908 289" marker-end="url(#arw)"/><rect class="lb" x="2792" y="278" width="100" height="20" rx="10"/><text class="lt" x="2842" y="292">ออกใบส่งของ</text></g><g class="ed" data-a="M17|Delivery Note" data-b="M22|AR Invoice"><path class="ep" d="M 3132 289 C 3192 289 712 211 772 211" marker-end="url(#arw)"/><rect class="lb" x="1898" y="239" width="108" height="20" rx="10"/><text class="lt" x="1952" y="254">วางบิลตามส่งจริง</text></g><g class="ed" data-a="M22|AR Invoice" data-b="M23|Receipt Voucher"><path class="ep" d="M 996 211 C 1062 211 1062 133 1128 133" marker-end="url(#arw)"/><rect class="lb" x="1037" y="161" width="49" height="20" rx="10"/><text class="lt" x="1062" y="176">รับชำระ</text></g><g class="ed" data-a="M17|Delivery Note" data-b="M14|Sales Return (RMA)"><path class="ep" d="M 3132 289 C 3192 289 712 367 772 367" marker-end="url(#arw)"/><rect class="lb" x="1911" y="317" width="83" height="20" rx="10"/><text class="lt" x="1952" y="332">ลูกค้าคืนของ</text></g><g class="ed" data-a="M14|Sales Return (RMA)" data-b="M22|Credit / Debit Note"><path class="ep" d="M 996 367 C 1062 367 1062 445 1128 445" marker-end="url(#arw)"/><rect class="lb" x="1016" y="395" width="91" height="20" rx="10"/><text class="lt" x="1062" y="410">ออกใบลดหนี้</text></g><g class="ed" data-a="M14|Sales Return (RMA)" data-b="M16|Inventory Balance"><path class="ep" d="M 996 367 C 1062 367 1062 289 1128 289" marker-end="url(#arw)"/><rect class="lb" x="1000" y="317" width="125" height="20" rx="10"/><text class="lt" x="1062" y="332">รับของกลับเข้าคลัง</text></g><g class="ed" data-a="M16|Inventory Balance" data-b="M14|Quotation"><path class="ep" d="M 1352 289 C 1418 289 1418 289 1484 289" marker-end="url(#arw)"/><rect class="lb" x="1347" y="278" width="141" height="20" rx="10"/><text class="lt" x="1418" y="292">เช็คของก่อนเสนอราคา</text></g><g class="ed" data-a="M16|Inventory Balance" data-b="M14|Sales Order"><path class="ep" d="M 1352 289 C 1596 289 1596 289 1840 289" marker-end="url(#arw)"/><rect class="lb" x="1531" y="278" width="129" height="20" rx="10"/><text class="lt" x="1596" y="292">เช็คสต็อก + กันยอด</text></g><g class="ed" data-a="M13|Prospect" data-b="M11|Customer Master"><path class="ep" d="M 284 289 C 350 289 350 289 416 289" marker-end="url(#arw)"/><rect class="lb" x="252" y="278" width="196" height="20" rx="10"/><text class="lt" x="350" y="292">ปิดการขายได้ → convert เป็นลูกค้า</text></g></g><g><g class="nd" data-f="M13|Prospect" transform="translate(60,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Prospect<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ผู้สนใจ (ลีด)</text>
+<rect x="18" y="74" width="45" height="21" rx="10.5" fill="hsl(25 55% 92%)"/>
+<text x="40" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(25 45% 32%)">Sales</text></g><g class="nd" data-f="M14|Quotation" transform="translate(1484,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(25 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF9A1F"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Sales Quotation</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบเสนอราคา</text>
+<rect x="18" y="74" width="45" height="21" rx="10.5" fill="hsl(25 55% 92%)"/>
+<text x="40" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(25 45% 32%)">Sales</text></g><g class="nd" data-f="M14|Sales Order" transform="translate(1840,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(25 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF9A1F"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Sales Order</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">คำสั่งขาย</text>
+<rect x="18" y="74" width="45" height="21" rx="10.5" fill="hsl(25 55% 92%)"/>
+<text x="40" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(25 45% 32%)">Sales</text></g><g class="nd" data-f="M17|Picking" transform="translate(2196,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(188 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Picking</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">หยิบสินค้า</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M17|Packing" transform="translate(2552,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(188 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Packing</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">แพ็คสินค้า</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M17|Delivery Note" transform="translate(2908,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(188 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Delivery Note</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบส่งของ</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M22|AR Invoice" transform="translate(772,153)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">AR Invoice</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบแจ้งหนี้/ใบกำกับภาษี</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M23|Receipt Voucher" transform="translate(1128,75)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(207 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Receipt Voucher</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบสำคัญรับ</text>
+<rect x="18" y="74" width="57" height="21" rx="10.5" fill="hsl(207 55% 92%)"/>
+<text x="46" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(207 45% 32%)">Finance</text></g><g class="nd" data-f="M14|Sales Return (RMA)" transform="translate(772,309)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(25 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Sales Return</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">รับคืนจากลูกค้า</text>
+<rect x="18" y="74" width="45" height="21" rx="10.5" fill="hsl(25 55% 92%)"/>
+<text x="40" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(25 45% 32%)">Sales</text></g><g class="nd" data-f="M22|Credit / Debit Note" transform="translate(1128,387)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Credit / Debit Note</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบลดหนี้/เพิ่มหนี้</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M16|Inventory Balance" transform="translate(1128,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Inventory<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ยอดคงคลังตามที่เก็บ</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M11|Customer Master" transform="translate(416,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(25 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF9A1F"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Customer Master</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ลูกค้า</text>
+<rect x="18" y="74" width="45" height="21" rx="10.5" fill="hsl(25 55% 92%)"/>
+<text x="40" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(25 45% 32%)">Sales</text></g></g></svg></div><div class="pane" data-v="stock"><svg class="mp" id="s-stock" width="1056" height="734" viewBox="0 0 1056 734" xmlns="http://www.w3.org/2000/svg"><g><g class="ed" data-a="M17|Putaway" data-b="M16|Inventory Balance"><path class="ep" d="M 284 133 C 528 133 528 211 772 211" marker-end="url(#arw)"/><rect class="lb" x="495" y="161" width="66" height="20" rx="10"/><text class="lt" x="528" y="176">เพิ่มยอด</text></g><g class="ed" data-a="M17|Picking" data-b="M16|Inventory Balance"><path class="ep" d="M 284 289 C 528 289 528 211 772 211" marker-end="url(#arw)"/><rect class="lb" x="499" y="239" width="58" height="20" rx="10"/><text class="lt" x="528" y="254">ตัดยอด</text></g><g class="ed" data-a="M16|Stock Adjustment" data-b="M16|Inventory Balance"><path class="ep" d="M 640 367 C 706 367 706 211 772 211" marker-end="url(#arw)"/><rect class="lb" x="673" y="278" width="66" height="20" rx="10"/><text class="lt" x="706" y="292">ปรับยอด</text></g><g class="ed" data-a="M16|Stock Transfer" data-b="M16|Inventory Balance"><path class="ep" d="M 284 445 C 528 445 528 211 772 211" marker-end="url(#arw)"/><rect class="lb" x="495" y="317" width="66" height="20" rx="10"/><text class="lt" x="528" y="332">ย้ายที่เก็บ</text></g><g class="ed" data-a="M16|Stock Count" data-b="M16|Stock Adjustment"><path class="ep" d="M 996 367 C 1056 367 356 367 416 367" marker-end="url(#arw)"/><rect class="lb" x="653" y="356" width="106" height="20" rx="10"/><text class="lt" x="706" y="370">ผลนับต่าง → ปรับ</text></g><g class="ed" data-a="M15|Return to Vendor" data-b="M16|Inventory Balance"><path class="ep" d="M 284 601 C 528 601 528 211 772 211" marker-end="url(#arw)"/><rect class="lb" x="471" y="395" width="114" height="20" rx="10"/><text class="lt" x="528" y="410">คืนผู้ขาย → ตัดยอด</text></g><g class="ed" data-a="M16|Inventory Balance" data-b="M16|Stock Count"><path class="ep" d="M 996 211 C 1056 211 712 367 772 367" marker-end="url(#arw)"/><rect class="lb" x="809" y="278" width="150" height="20" rx="10"/><text class="lt" x="884" y="292">ยอดตามระบบไว้เทียบนับ</text></g><g class="ed" data-a="M16|Inventory Balance" data-b="M22|Journal Entry"><path class="ep" d="M 996 211 C 1056 211 712 523 772 523" marker-end="url(#arw)"/><rect class="lb" x="832" y="356" width="104" height="20" rx="10"/><text class="lt" x="884" y="370">มูลค่าสต็อก → GL</text></g></g><g><g class="nd" data-f="M17|Putaway" transform="translate(60,75)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(188 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Put Away</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">จัดเก็บเข้าตำแหน่ง</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M16|Inventory Balance" transform="translate(772,153)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Inventory<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ยอดคงคลังตามที่เก็บ</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M17|Picking" transform="translate(60,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(188 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Picking</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">หยิบสินค้า</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M16|Stock Adjustment" transform="translate(416,309)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Stock Adjustment<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ปรับยอดคงคลัง</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M16|Stock Transfer" transform="translate(60,387)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(188 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Stock Transfer</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">การโอนย้าย</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M16|Stock Count" transform="translate(772,309)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(188 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Stocktake</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">การนับสินค้า</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M15|Return to Vendor" transform="translate(60,543)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(188 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Return to Vendor</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">คืนของผู้ขาย</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M22|Journal Entry" transform="translate(772,465)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#8A8A8A"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Journal Entry</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">สมุดรายวัน</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g></g></svg></div><div class="pane" data-v="gl"><svg class="mp dense" id="s-gl" width="1768" height="1202" viewBox="0 0 1768 1202" xmlns="http://www.w3.org/2000/svg"><g><g class="ed" data-a="M22|Opening Balance" data-b="M22|Journal Entry"><path class="ep" d="M 284 601 C 350 601 350 523 416 523" marker-end="url(#arw)"/><rect class="lb" x="317" y="551" width="66" height="20" rx="10"/><text class="lt" x="350" y="566">ยอดยกมา</text></g><g class="ed" data-a="M22|AR Invoice" data-b="M22|Journal Entry"><path class="ep" d="M 284 133 C 350 133 350 523 416 523" marker-end="url(#arw)"/><rect class="lb" x="304" y="317" width="91" height="20" rx="10"/><text class="lt" x="350" y="332">ลงบัญชีลูกหนี้</text></g><g class="ed" data-a="M22|AP Invoice" data-b="M22|Journal Entry"><path class="ep" d="M 284 289 C 350 289 350 523 416 523" marker-end="url(#arw)"/><rect class="lb" x="304" y="395" width="91" height="20" rx="10"/><text class="lt" x="350" y="410">ลงบัญชีเจ้าหนี้</text></g><g class="ed" data-a="M22|Credit / Debit Note" data-b="M22|Journal Entry"><path class="ep" d="M 284 757 C 350 757 350 523 416 523" marker-end="url(#arw)"/><rect class="lb" x="313" y="629" width="74" height="20" rx="10"/><text class="lt" x="350" y="644">กลับรายการ</text></g><g class="ed" data-a="M23|Receipt Voucher" data-b="M22|Journal Entry"><path class="ep" d="M 284 913 C 350 913 350 523 416 523" marker-end="url(#arw)"/><rect class="lb" x="321" y="707" width="58" height="20" rx="10"/><text class="lt" x="350" y="722">เงินเข้า</text></g><g class="ed" data-a="M23|Payment Voucher" data-b="M22|Journal Entry"><path class="ep" d="M 284 1069 C 350 1069 350 523 416 523" marker-end="url(#arw)"/><rect class="lb" x="317" y="785" width="66" height="20" rx="10"/><text class="lt" x="350" y="800">เงินออก</text></g><g class="ed" data-a="M22|Journal Entry" data-b="M22|Trial Balance"><path class="ep" d="M 640 523 C 706 523 706 601 772 601" marker-end="url(#arw)"/><rect class="lb" x="673" y="551" width="66" height="20" rx="10"/><text class="lt" x="706" y="566">รวมยอด</text></g><g class="ed" data-a="M09|Fiscal Year & Period" data-b="M22|Period Close"><path class="ep" d="M 284 445 C 706 445 706 601 1128 601" marker-end="url(#arw)"/><rect class="lb" x="673" y="512" width="66" height="20" rx="10"/><text class="lt" x="706" y="526">งวดบัญชี</text></g><g class="ed" data-a="M22|Trial Balance" data-b="M22|Period Close"><path class="ep" d="M 996 601 C 1062 601 1062 601 1128 601" marker-end="url(#arw)"/><rect class="lb" x="1016" y="590" width="91" height="20" rx="10"/><text class="lt" x="1062" y="604">ตรวจก่อนปิด</text></g><g class="ed" data-a="M22|Period Close" data-b="M22|Financial Statements"><path class="ep" d="M 1352 601 C 1418 601 1418 601 1484 601" marker-end="url(#arw)"/><rect class="lb" x="1389" y="590" width="58" height="20" rx="10"/><text class="lt" x="1418" y="604">ออกงบ</text></g><g class="ed" data-a="M22|AR Invoice" data-b="M25|VAT Report"><path class="ep" d="M 284 133 C 350 133 350 367 416 367" marker-end="url(#arw)"/><rect class="lb" x="325" y="239" width="49" height="20" rx="10"/><text class="lt" x="350" y="254">ภาษีขาย</text></g><g class="ed" data-a="M22|AP Invoice" data-b="M25|VAT Report"><path class="ep" d="M 284 289 C 350 289 350 367 416 367" marker-end="url(#arw)"/><rect class="lb" x="325" y="317" width="49" height="20" rx="10"/><text class="lt" x="350" y="332">ภาษีซื้อ</text></g><g class="ed" data-a="M23|Payment Voucher" data-b="M25|WHT"><path class="ep" d="M 284 1069 C 350 1069 350 835 416 835" marker-end="url(#arw)"/><rect class="lb" x="314" y="941" width="73" height="20" rx="10"/><text class="lt" x="350" y="956">หัก ณ ที่จ่าย</text></g><g class="ed" data-a="M23|Receipt Voucher" data-b="M23|Bank Reconciliation"><path class="ep" d="M 284 913 C 350 913 350 679 416 679" marker-end="url(#arw)"/><rect class="lb" x="313" y="785" width="74" height="20" rx="10"/><text class="lt" x="350" y="800">กระทบยอด</text></g><g class="ed" data-a="M23|Payment Voucher" data-b="M23|Bank Reconciliation"><path class="ep" d="M 284 1069 C 350 1069 350 679 416 679" marker-end="url(#arw)"/><rect class="lb" x="313" y="863" width="74" height="20" rx="10"/><text class="lt" x="350" y="878">กระทบยอด</text></g><g class="ed" data-a="M09|Fiscal Year & Period" data-b="M22|Journal Entry"><path class="ep" d="M 284 445 C 350 445 350 523 416 523" marker-end="url(#arw)"/><rect class="lb" x="288" y="473" width="125" height="20" rx="10"/><text class="lt" x="350" y="488">คุมงวดที่ลงบัญชีได้</text></g></g><g><g class="nd" data-f="M22|Opening Balance" transform="translate(60,543)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF3B30"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Opening Balance</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ยอดยกมา</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M22|Journal Entry" transform="translate(416,465)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#8A8A8A"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Journal Entry</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">สมุดรายวัน</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M22|AR Invoice" transform="translate(60,75)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">AR Invoice</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบแจ้งหนี้/ใบกำกับภาษี</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M22|AP Invoice" transform="translate(60,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">AP Invoice</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ตั้งหนี้เจ้าหนี้ (3-way)</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M22|Credit / Debit Note" transform="translate(60,699)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Credit / Debit Note</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบลดหนี้/เพิ่มหนี้</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M23|Receipt Voucher" transform="translate(60,855)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(207 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Receipt Voucher</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบสำคัญรับ</text>
+<rect x="18" y="74" width="57" height="21" rx="10.5" fill="hsl(207 55% 92%)"/>
+<text x="46" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(207 45% 32%)">Finance</text></g><g class="nd" data-f="M23|Payment Voucher" transform="translate(60,1011)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(207 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Payment Voucher</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบสำคัญจ่าย</text>
+<rect x="18" y="74" width="57" height="21" rx="10.5" fill="hsl(207 55% 92%)"/>
+<text x="46" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(207 45% 32%)">Finance</text></g><g class="nd" data-f="M22|Trial Balance" transform="translate(772,543)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF3B30"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Trial Balance</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">งบทดลอง</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M09|Fiscal Year & Period" transform="translate(60,387)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Fiscal Periods<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ปีบัญชีและงวด</text>
+<rect x="18" y="74" width="83" height="21" rx="10.5" fill="hsl(82 55% 92%)"/>
+<text x="59" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(82 45% 32%)">Organization</text></g><g class="nd" data-f="M22|Period Close" transform="translate(1128,543)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF3B30"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Period Close</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ปิดงวด/ล็อกงวด</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M22|Financial Statements" transform="translate(1484,543)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF3B30"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Financial Statements</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">งบการเงิน (PL/BS/CF)</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M25|VAT Report" transform="translate(416,309)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF3B30"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">VAT Return (PP.30)</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">รายงานภาษีมูลค่าเพิ่ม (ภ.พ.30)</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M25|WHT" transform="translate(416,777)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF3B30"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Withholding Tax</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ภาษีหัก ณ ที่จ่าย (ภ.ง.ด.3/53)</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M23|Bank Reconciliation" transform="translate(416,621)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(207 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#8A8A8A"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Bank Reconciliation</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">กระทบยอดธนาคาร</text>
+<rect x="18" y="74" width="57" height="21" rx="10.5" fill="hsl(207 55% 92%)"/>
+<text x="46" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(207 45% 32%)">Finance</text></g></g></svg></div><div class="pane" data-v="hr"><svg class="mp" id="s-hr" width="1768" height="734" viewBox="0 0 1768 734" xmlns="http://www.w3.org/2000/svg"><g><g class="ed" data-a="M09|Company Master" data-b="M26|Employee"><path class="ep" d="M 284 289 C 350 289 350 367 416 367" marker-end="url(#arw)"/><rect class="lb" x="284" y="317" width="131" height="20" rx="10"/><text class="lt" x="350" y="332">สังกัด สายงาน ตำแหน่ง</text></g><g class="ed" data-a="M26|Employee" data-b="M27|Attendance"><path class="ep" d="M 640 367 C 706 367 706 289 772 289" marker-end="url(#arw)"/><rect class="lb" x="665" y="317" width="83" height="20" rx="10"/><text class="lt" x="706" y="332">คนที่ลงเวลา</text></g><g class="ed" data-a="M26|Employee" data-b="M27|Leave"><path class="ep" d="M 640 367 C 706 367 706 133 772 133" marker-end="url(#arw)"/><rect class="lb" x="681" y="239" width="49" height="20" rx="10"/><text class="lt" x="706" y="254">สิทธิ์ลา</text></g><g class="ed" data-a="M26|Employee" data-b="M27|Payroll"><path class="ep" d="M 640 367 C 884 367 884 289 1128 289" marker-end="url(#arw)"/><rect class="lb" x="838" y="317" width="91" height="20" rx="10"/><text class="lt" x="884" y="332">ฐานเงินเดือน</text></g><g class="ed" data-a="M09|Calendar & Holiday" data-b="M27|Attendance"><path class="ep" d="M 284 445 C 528 445 528 289 772 289" marker-end="url(#arw)"/><rect class="lb" x="475" y="356" width="106" height="20" rx="10"/><text class="lt" x="528" y="370">วันทำงาน/วันหยุด</text></g><g class="ed" data-a="M27|Attendance" data-b="M27|Payroll"><path class="ep" d="M 996 289 C 1062 289 1062 289 1128 289" marker-end="url(#arw)"/><rect class="lb" x="1023" y="278" width="79" height="20" rx="10"/><text class="lt" x="1062" y="292">ชั่วโมง/OT</text></g><g class="ed" data-a="M27|Leave" data-b="M27|Payroll"><path class="ep" d="M 996 133 C 1062 133 1062 289 1128 289" marker-end="url(#arw)"/><rect class="lb" x="1012" y="200" width="100" height="20" rx="10"/><text class="lt" x="1062" y="214">หักลาไม่รับค่าจ้าง</text></g><g class="ed" data-a="M27|Payroll" data-b="M22|Journal Entry"><path class="ep" d="M 1352 289 C 1418 289 1418 367 1484 367" marker-end="url(#arw)"/><rect class="lb" x="1383" y="317" width="70" height="20" rx="10"/><text class="lt" x="1418" y="332">ค่าจ้าง → GL</text></g><g class="ed" data-a="M26|Employee" data-b="M27|Expense Claim"><path class="ep" d="M 640 367 C 706 367 706 445 772 445" marker-end="url(#arw)"/><rect class="lb" x="681" y="395" width="49" height="20" rx="10"/><text class="lt" x="706" y="410">ผู้เบิก</text></g><g class="ed" data-a="M27|Expense Claim" data-b="M22|AP Invoice"><path class="ep" d="M 996 445 C 1062 445 1062 445 1128 445" marker-end="url(#arw)"/><rect class="lb" x="1008" y="434" width="108" height="20" rx="10"/><text class="lt" x="1062" y="448">ตั้งหนี้คืนพนักงาน</text></g><g class="ed" data-a="M26|Employee" data-b="M08|User Management"><path class="ep" d="M 640 367 C 706 367 706 601 772 601" marker-end="url(#arw)"/><rect class="lb" x="657" y="473" width="98" height="20" rx="10"/><text class="lt" x="706" y="488">พนักงาน → ผู้ใช้</text></g></g><g><g class="nd" data-f="M09|Company Master" transform="translate(60,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Company<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">บริษัท</text>
+<rect x="18" y="74" width="83" height="21" rx="10.5" fill="hsl(82 55% 92%)"/>
+<text x="59" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(82 45% 32%)">Organization</text></g><g class="nd" data-f="M26|Employee" transform="translate(416,309)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Employee Master<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">พนักงาน</text>
+<rect x="18" y="74" width="31" height="21" rx="10.5" fill="hsl(275 55% 92%)"/>
+<text x="34" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(275 45% 32%)">HR</text></g><g class="nd" data-f="M27|Attendance" transform="translate(772,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(275 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#8A8A8A"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Time &amp; Attendance</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ลงเวลา</text>
+<rect x="18" y="74" width="31" height="21" rx="10.5" fill="hsl(275 55% 92%)"/>
+<text x="34" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(275 45% 32%)">HR</text></g><g class="nd" data-f="M27|Leave" transform="translate(772,75)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(275 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#8A8A8A"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Leave Management</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">วันลา</text>
+<rect x="18" y="74" width="31" height="21" rx="10.5" fill="hsl(275 55% 92%)"/>
+<text x="34" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(275 45% 32%)">HR</text></g><g class="nd" data-f="M27|Payroll" transform="translate(1128,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(275 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#8A8A8A"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Payroll</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">เงินเดือน</text>
+<rect x="18" y="74" width="31" height="21" rx="10.5" fill="hsl(275 55% 92%)"/>
+<text x="34" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(275 45% 32%)">HR</text></g><g class="nd" data-f="M09|Calendar & Holiday" transform="translate(60,387)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(82 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF3B30"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Working Calendar</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ปฏิทิน/วันหยุด</text>
+<rect x="18" y="74" width="83" height="21" rx="10.5" fill="hsl(82 55% 92%)"/>
+<text x="59" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(82 45% 32%)">Organization</text></g><g class="nd" data-f="M22|Journal Entry" transform="translate(1484,309)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#8A8A8A"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Journal Entry</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">สมุดรายวัน</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M27|Expense Claim" transform="translate(772,387)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(275 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF3B30"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Expense Claim</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">เบิกค่าใช้จ่าย</text>
+<rect x="18" y="74" width="31" height="21" rx="10.5" fill="hsl(275 55% 92%)"/>
+<text x="34" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(275 45% 32%)">HR</text></g><g class="nd" data-f="M22|AP Invoice" transform="translate(1128,387)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">AP Invoice</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ตั้งหนี้เจ้าหนี้ (3-way)</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M08|User Management" transform="translate(772,543)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">User Management<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ผู้ใช้</text>
+<rect x="18" y="74" width="57" height="21" rx="10.5" fill="hsl(252 55% 92%)"/>
+<text x="46" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(252 45% 32%)">System</text></g></g></svg></div><div class="pane" data-v="gov"><svg class="mp dense" id="s-gov" width="1916" height="1202" viewBox="0 0 1916 1202" xmlns="http://www.w3.org/2000/svg"><g><g class="ed" data-a="M07|Policy Document" data-b="M07|DOA"><path class="ep" d="M 284 601 C 350 601 350 679 416 679" marker-end="url(#arw)"/><rect class="lb" x="289" y="629" width="123" height="20" rx="10"/><text class="lt" x="350" y="644">นโยบาย → สายอนุมัติ</text></g><g class="ed" data-a="M07|DOA" data-b="M15|PR"><path class="ep" d="M 640 679 C 706 679 706 289 772 289" marker-end="url(#arw)"/><rect class="lb" x="665" y="473" width="83" height="20" rx="10"/><text class="lt" x="706" y="488">อนุมัติขอซื้อ</text></g><g class="ed" data-a="M07|DOA" data-b="M15|PO"><path class="ep" d="M 640 679 C 706 679 706 445 772 445" marker-end="url(#arw)"/><rect class="lb" x="665" y="551" width="83" height="20" rx="10"/><text class="lt" x="706" y="566">อนุมัติสั่งซื้อ</text></g><g class="ed" data-a="M07|DOA" data-b="M14|Sales Order"><path class="ep" d="M 640 679 C 706 679 706 601 772 601" marker-end="url(#arw)"/><rect class="lb" x="660" y="629" width="91" height="20" rx="10"/><text class="lt" x="706" y="644">อนุมัติส่วนลด</text></g><g class="ed" data-a="M07|DOA" data-b="M23|Payment Voucher"><path class="ep" d="M 640 679 C 706 679 706 757 772 757" marker-end="url(#arw)"/><rect class="lb" x="673" y="707" width="66" height="20" rx="10"/><text class="lt" x="706" y="722">อนุมัติจ่าย</text></g><g class="ed" data-a="M07|DOA" data-b="M22|Journal Entry"><path class="ep" d="M 640 679 C 706 679 706 913 772 913" marker-end="url(#arw)"/><rect class="lb" x="652" y="785" width="108" height="20" rx="10"/><text class="lt" x="706" y="800">อนุมัติรายการปรับ</text></g><g class="ed" data-a="M07|DOA" data-b="M27|Leave"><path class="ep" d="M 640 679 C 706 679 706 1069 772 1069" marker-end="url(#arw)"/><rect class="lb" x="677" y="863" width="58" height="20" rx="10"/><text class="lt" x="706" y="878">อนุมัติลา</text></g><g class="ed" data-a="M08|User Management" data-b="M08|User Role Access"><path class="ep" d="M 284 445 C 350 445 350 523 416 523" marker-end="url(#arw)"/><rect class="lb" x="305" y="473" width="89" height="20" rx="10"/><text class="lt" x="350" y="488">ผู้ใช้ ← บทบาท</text></g><g class="ed" data-a="M08|User Role Access" data-b="M08|Permission Matrix"><path class="ep" d="M 640 523 C 706 523 706 133 772 133" marker-end="url(#arw)"/><rect class="lb" x="648" y="317" width="116" height="20" rx="10"/><text class="lt" x="706" y="332">สรุปเป็นตารางสิทธิ์</text></g><g class="ed" data-a="M07|DOA" data-b="M14|Quotation"><path class="ep" d="M 640 679 C 832 679 832 133 1024 133" marker-end="url(#arw)"/><rect class="lb" x="758" y="395" width="148" height="20" rx="10"/><text class="lt" x="832" y="410">อนุมัติราคา/ส่วนลดเสนอ</text></g><g class="ed" data-a="M07|DOA" data-b="M15|CP"><path class="ep" d="M 640 679 C 832 679 832 289 1024 289" marker-end="url(#arw)"/><rect class="lb" x="774" y="473" width="116" height="20" rx="10"/><text class="lt" x="832" y="488">อนุมัติผลเทียบราคา</text></g><g class="ed" data-a="M07|DOA" data-b="M22|AP Invoice"><path class="ep" d="M 640 679 C 832 679 832 445 1024 445" marker-end="url(#arw)"/><rect class="lb" x="764" y="551" width="135" height="20" rx="10"/><text class="lt" x="832" y="566">อนุมัติตั้งหนี้ (3-way)</text></g><g class="ed" data-a="M07|DOA" data-b="M22|Credit / Debit Note"><path class="ep" d="M 640 679 C 832 679 832 601 1024 601" marker-end="url(#arw)"/><rect class="lb" x="775" y="629" width="114" height="20" rx="10"/><text class="lt" x="832" y="644">อนุมัติลด/เพิ่มหนี้</text></g><g class="ed" data-a="M07|DOA" data-b="M14|Sales Return (RMA)"><path class="ep" d="M 640 679 C 832 679 832 757 1024 757" marker-end="url(#arw)"/><rect class="lb" x="791" y="707" width="83" height="20" rx="10"/><text class="lt" x="832" y="722">อนุมัติรับคืน</text></g><g class="ed" data-a="M07|DOA" data-b="M15|Return to Vendor"><path class="ep" d="M 640 679 C 832 679 832 913 1024 913" marker-end="url(#arw)"/><rect class="lb" x="786" y="785" width="91" height="20" rx="10"/><text class="lt" x="832" y="800">อนุมัติคืนผู้ขาย</text></g><g class="ed" data-a="M07|DOA" data-b="M16|Stock Count"><path class="ep" d="M 640 679 C 832 679 832 1069 1024 1069" marker-end="url(#arw)"/><rect class="lb" x="774" y="863" width="116" height="20" rx="10"/><text class="lt" x="832" y="878">อนุมัติผลนับสต็อก</text></g><g class="ed" data-a="M07|DOA" data-b="M16|Stock Adjustment"><path class="ep" d="M 640 679 C 958 679 958 211 1276 211" marker-end="url(#arw)"/><rect class="lb" x="908" y="434" width="100" height="20" rx="10"/><text class="lt" x="958" y="448">อนุมัติปรับยอด</text></g><g class="ed" data-a="M07|DOA" data-b="M16|Stock Transfer"><path class="ep" d="M 640 679 C 958 679 958 367 1276 367" marker-end="url(#arw)"/><rect class="lb" x="908" y="512" width="100" height="20" rx="10"/><text class="lt" x="958" y="526">อนุมัติโอนคลัง</text></g><g class="ed" data-a="M07|DOA" data-b="M22|Opening Balance"><path class="ep" d="M 640 679 C 958 679 958 523 1276 523" marker-end="url(#arw)"/><rect class="lb" x="908" y="590" width="100" height="20" rx="10"/><text class="lt" x="958" y="604">อนุมัติยอดยกมา</text></g><g class="ed" data-a="M07|DOA" data-b="M22|Period Close"><path class="ep" d="M 640 679 C 958 679 958 679 1276 679" marker-end="url(#arw)"/><rect class="lb" x="912" y="668" width="91" height="20" rx="10"/><text class="lt" x="958" y="682">อนุมัติปิดงวด</text></g><g class="ed" data-a="M07|DOA" data-b="M27|Expense Claim"><path class="ep" d="M 640 679 C 958 679 958 835 1276 835" marker-end="url(#arw)"/><rect class="lb" x="921" y="746" width="74" height="20" rx="10"/><text class="lt" x="958" y="760">อนุมัติเบิก</text></g><g class="ed" data-a="M07|DOA" data-b="M27|Payroll"><path class="ep" d="M 640 679 C 958 679 958 991 1276 991" marker-end="url(#arw)"/><rect class="lb" x="892" y="824" width="133" height="20" rx="10"/><text class="lt" x="958" y="838">อนุมัติงวดเงินเดือน</text></g><g class="ed" data-a="M08|Permission Matrix" data-b="M01|Menu Registry"><path class="ep" d="M 996 133 C 1314 133 1314 601 1632 601" marker-end="url(#arw)"/><rect class="lb" x="1273" y="356" width="83" height="20" rx="10"/><text class="lt" x="1314" y="370">เมนูตามสิทธิ์</text></g><g class="ed" data-a="M09|Company Master" data-b="M07|DOA"><path class="ep" d="M 284 757 C 350 757 350 679 416 679" marker-end="url(#arw)"/><rect class="lb" x="264" y="707" width="173" height="20" rx="10"/><text class="lt" x="350" y="722">โครงตำแหน่ง → ตั้งสายอนุมัติ</text></g><g class="ed" data-a="M07|Policy Document" data-b="M08|User Role Access"><path class="ep" d="M 284 601 C 350 601 350 523 416 523" marker-end="url(#arw)"/><rect class="lb" x="284" y="551" width="131" height="20" rx="10"/><text class="lt" x="350" y="566">นโยบาย → กรอบสิทธิ์</text></g></g><g><g class="nd" data-f="M07|Policy Document" transform="translate(60,543)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Policy Document<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">เอกสารนโยบาย</text>
+<rect x="18" y="74" width="104" height="21" rx="10.5" fill="hsl(322 55% 92%)"/>
+<text x="70" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(322 45% 32%)">Policy &amp; Security</text></g><g class="nd" data-f="M07|DOA" transform="translate(416,621)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">DOA<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">สายอนุมัติ (DOA)</text>
+<rect x="18" y="74" width="104" height="21" rx="10.5" fill="hsl(322 55% 92%)"/>
+<text x="70" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(322 45% 32%)">Policy &amp; Security</text></g><g class="nd" data-f="M15|PR" transform="translate(772,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 15px sans-serif" fill="#14603C">Purchase Requisition<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบขอซื้อ</text>
+<rect x="18" y="74" width="65" height="21" rx="10.5" fill="hsl(355 55% 92%)"/>
+<text x="50" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(355 45% 32%)">Purchase</text></g><g class="nd" data-f="M15|PO" transform="translate(772,387)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(355 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Purchase Order</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบสั่งซื้อ</text>
+<rect x="18" y="74" width="65" height="21" rx="10.5" fill="hsl(355 55% 92%)"/>
+<text x="50" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(355 45% 32%)">Purchase</text></g><g class="nd" data-f="M14|Sales Order" transform="translate(772,543)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(25 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF9A1F"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Sales Order</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">คำสั่งขาย</text>
+<rect x="18" y="74" width="45" height="21" rx="10.5" fill="hsl(25 55% 92%)"/>
+<text x="40" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(25 45% 32%)">Sales</text></g><g class="nd" data-f="M23|Payment Voucher" transform="translate(772,699)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(207 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Payment Voucher</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบสำคัญจ่าย</text>
+<rect x="18" y="74" width="57" height="21" rx="10.5" fill="hsl(207 55% 92%)"/>
+<text x="46" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(207 45% 32%)">Finance</text></g><g class="nd" data-f="M22|Journal Entry" transform="translate(772,855)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#8A8A8A"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Journal Entry</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">สมุดรายวัน</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M27|Leave" transform="translate(772,1011)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(275 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#8A8A8A"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Leave Management</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">วันลา</text>
+<rect x="18" y="74" width="31" height="21" rx="10.5" fill="hsl(275 55% 92%)"/>
+<text x="34" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(275 45% 32%)">HR</text></g><g class="nd" data-f="M08|User Management" transform="translate(60,387)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">User Management<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ผู้ใช้</text>
+<rect x="18" y="74" width="57" height="21" rx="10.5" fill="hsl(252 55% 92%)"/>
+<text x="46" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(252 45% 32%)">System</text></g><g class="nd" data-f="M08|User Role Access" transform="translate(416,465)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Roles &amp; Permissions<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">บทบาท-สิทธิ์</text>
+<rect x="18" y="74" width="104" height="21" rx="10.5" fill="hsl(322 55% 92%)"/>
+<text x="70" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(322 45% 32%)">Policy &amp; Security</text></g><g class="nd" data-f="M08|Permission Matrix" transform="translate(772,75)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Permission Matrix<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ตารางสิทธิ์</text>
+<rect x="18" y="74" width="104" height="21" rx="10.5" fill="hsl(322 55% 92%)"/>
+<text x="70" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(322 45% 32%)">Policy &amp; Security</text></g><g class="nd" data-f="M14|Quotation" transform="translate(1024,75)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(25 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF9A1F"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Sales Quotation</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบเสนอราคา</text>
+<rect x="18" y="74" width="45" height="21" rx="10.5" fill="hsl(25 55% 92%)"/>
+<text x="40" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(25 45% 32%)">Sales</text></g><g class="nd" data-f="M15|CP" transform="translate(1024,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(355 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Quotation Comparison</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบเทียบราคา</text>
+<rect x="18" y="74" width="65" height="21" rx="10.5" fill="hsl(355 55% 92%)"/>
+<text x="50" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(355 45% 32%)">Purchase</text></g><g class="nd" data-f="M22|AP Invoice" transform="translate(1024,387)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">AP Invoice</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ตั้งหนี้เจ้าหนี้ (3-way)</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M22|Credit / Debit Note" transform="translate(1024,543)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Credit / Debit Note</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบลดหนี้/เพิ่มหนี้</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M14|Sales Return (RMA)" transform="translate(1024,699)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(25 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Sales Return</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">รับคืนจากลูกค้า</text>
+<rect x="18" y="74" width="45" height="21" rx="10.5" fill="hsl(25 55% 92%)"/>
+<text x="40" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(25 45% 32%)">Sales</text></g><g class="nd" data-f="M15|Return to Vendor" transform="translate(1024,855)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(188 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Return to Vendor</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">คืนของผู้ขาย</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M16|Stock Count" transform="translate(1024,1011)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(188 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Stocktake</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">การนับสินค้า</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M16|Stock Adjustment" transform="translate(1276,153)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Stock Adjustment<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ปรับยอดคงคลัง</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M16|Stock Transfer" transform="translate(1276,309)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(188 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Stock Transfer</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">การโอนย้าย</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M22|Opening Balance" transform="translate(1276,465)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF3B30"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Opening Balance</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ยอดยกมา</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M22|Period Close" transform="translate(1276,621)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF3B30"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Period Close</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ปิดงวด/ล็อกงวด</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M27|Expense Claim" transform="translate(1276,777)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(275 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF3B30"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Expense Claim</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">เบิกค่าใช้จ่าย</text>
+<rect x="18" y="74" width="31" height="21" rx="10.5" fill="hsl(275 55% 92%)"/>
+<text x="34" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(275 45% 32%)">HR</text></g><g class="nd" data-f="M27|Payroll" transform="translate(1276,933)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(275 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#8A8A8A"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Payroll</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">เงินเดือน</text>
+<rect x="18" y="74" width="31" height="21" rx="10.5" fill="hsl(275 55% 92%)"/>
+<text x="34" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(275 45% 32%)">HR</text></g><g class="nd" data-f="M01|Menu Registry" transform="translate(1632,543)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(252 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF3B30"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Menu Registry</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ทะเบียนเมนู</text>
+<rect x="18" y="74" width="57" height="21" rx="10.5" fill="hsl(252 55% 92%)"/>
+<text x="46" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(252 45% 32%)">System</text></g><g class="nd" data-f="M09|Company Master" transform="translate(60,699)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Company<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">บริษัท</text>
+<rect x="18" y="74" width="83" height="21" rx="10.5" fill="hsl(82 55% 92%)"/>
+<text x="59" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(82 45% 32%)">Organization</text></g></g></svg></div><div class="pane" data-v="master"><svg class="mp dense" id="s-master" width="2524" height="1046" viewBox="0 0 2524 1046" xmlns="http://www.w3.org/2000/svg"><g><g class="ed" data-a="M10|UOM" data-b="M10|Product"><path class="ep" d="M 284 679 C 602 679 602 445 920 445" marker-end="url(#arw)"/><rect class="lb" x="569" y="551" width="66" height="20" rx="10"/><text class="lt" x="602" y="566">หน่วยนับ</text></g><g class="ed" data-a="M10|BOM" data-b="M10|Product"><path class="ep" d="M 284 835 C 602 835 602 445 920 445" marker-end="url(#arw)"/><rect class="lb" x="570" y="629" width="64" height="20" rx="10"/><text class="lt" x="602" y="644">สูตร/ชุด</text></g><g class="ed" data-a="M10|Product" data-b="M10|Product Catalog"><path class="ep" d="M 1144 445 C 1336 445 1336 289 1528 289" marker-end="url(#arw)"/><rect class="lb" x="1282" y="356" width="108" height="20" rx="10"/><text class="lt" x="1336" y="370">จัดเข้าแค็ตตาล็อก</text></g><g class="ed" data-a="M10|Product Catalog" data-b="M14|Price List"><path class="ep" d="M 1752 289 C 1818 289 1818 523 1884 523" marker-end="url(#arw)"/><rect class="lb" x="1756" y="395" width="125" height="20" rx="10"/><text class="lt" x="1818" y="410">ตั้งราคาตามแค็ตตาล็อก</text></g><g class="ed" data-a="M11|Customer Segment" data-b="M14|Price List"><path class="ep" d="M 284 367 C 1084 367 1084 523 1884 523" marker-end="url(#arw)"/><rect class="lb" x="1034" y="434" width="100" height="20" rx="10"/><text class="lt" x="1084" y="448">ราคาต่อกลุ่มลูกค้า</text></g><g class="ed" data-a="M14|Price List" data-b="M14|Quotation"><path class="ep" d="M 2108 523 C 2174 523 2174 523 2240 523" marker-end="url(#arw)"/><rect class="lb" x="2149" y="512" width="49" height="20" rx="10"/><text class="lt" x="2174" y="526">ดึงราคา</text></g><g class="ed" data-a="M11|Customer Master" data-b="M14|Sales Order"><path class="ep" d="M 1144 289 C 1336 289 1336 601 1528 601" marker-end="url(#arw)"/><rect class="lb" x="1315" y="434" width="41" height="20" rx="10"/><text class="lt" x="1336" y="448">ลูกค้า</text></g><g class="ed" data-a="M11|Vendor" data-b="M15|PO"><path class="ep" d="M 536 523 C 1032 523 1032 757 1528 757" marker-end="url(#arw)"/><rect class="lb" x="1011" y="629" width="41" height="20" rx="10"/><text class="lt" x="1032" y="644">ผู้ขาย</text></g><g class="ed" data-a="M11|Vendor Price List" data-b="M15|CP"><path class="ep" d="M 1144 601 C 1336 601 1336 445 1528 445" marker-end="url(#arw)"/><rect class="lb" x="1303" y="512" width="66" height="20" rx="10"/><text class="lt" x="1336" y="526">ราคาอ้างอิง</text></g><g class="ed" data-a="M10|Product" data-b="M15|PO"><path class="ep" d="M 1144 445 C 1336 445 1336 757 1528 757" marker-end="url(#arw)"/><rect class="lb" x="1262" y="590" width="149" height="20" rx="10"/><text class="lt" x="1336" y="604">เฉพาะสินค้าที่ตั้งค่า &quot;ซื้อได้&quot;</text></g><g class="ed" data-a="M10|Product" data-b="M14|Sales Order"><path class="ep" d="M 1144 445 C 1336 445 1336 601 1528 601" marker-end="url(#arw)"/><rect class="lb" x="1262" y="512" width="149" height="20" rx="10"/><text class="lt" x="1336" y="526">เฉพาะสินค้าที่ตั้งค่า &quot;ขายได้&quot;</text></g><g class="ed" data-a="M14|Promotion" data-b="M14|Sales Order"><path class="ep" d="M 284 523 C 906 523 906 601 1528 601" marker-end="url(#arw)"/><rect class="lb" x="799" y="551" width="214" height="20" rx="10"/><text class="lt" x="906" y="566">โปรฯ/ส่วนลดผูกตอนเปิดออเดอร์</text></g><g class="ed" data-a="M14|Sales Channel" data-b="M14|Sales Order"><path class="ep" d="M 536 211 C 1032 211 1032 601 1528 601" marker-end="url(#arw)"/><rect class="lb" x="982" y="395" width="100" height="20" rx="10"/><text class="lt" x="1032" y="410">ระบุช่องทางที่ขาย</text></g><g class="ed" data-a="M09|Company Master" data-b="M17|Warehouse & Location"><path class="ep" d="M 284 211 C 602 211 602 133 920 133" marker-end="url(#arw)"/><rect class="lb" x="531" y="161" width="141" height="20" rx="10"/><text class="lt" x="602" y="176">คลังสังกัดสาขาในบริษัท</text></g><g class="ed" data-a="M17|Warehouse & Location" data-b="M16|Inventory Balance"><path class="ep" d="M 1144 133 C 1336 133 1336 133 1528 133" marker-end="url(#arw)"/><rect class="lb" x="1290" y="122" width="91" height="20" rx="10"/><text class="lt" x="1336" y="136">ยอดต่อที่เก็บ</text></g><g class="ed" data-a="M12|Payment Term" data-b="M22|AR Invoice"><path class="ep" d="M 536 679 C 728 679 728 757 920 757" marker-end="url(#arw)"/><rect class="lb" x="695" y="707" width="66" height="20" rx="10"/><text class="lt" x="728" y="722">กำหนดชำระ</text></g><g class="ed" data-a="M12|Payment Term" data-b="M15|PO"><path class="ep" d="M 536 679 C 1032 679 1032 757 1528 757" marker-end="url(#arw)"/><rect class="lb" x="986" y="707" width="91" height="20" rx="10"/><text class="lt" x="1032" y="722">เครดิตเทอม</text></g><g class="ed" data-a="M12|Tax Code" data-b="M22|AR Invoice"><path class="ep" d="M 536 835 C 728 835 728 757 920 757" marker-end="url(#arw)"/><rect class="lb" x="703" y="785" width="49" height="20" rx="10"/><text class="lt" x="728" y="800">ภาษีขาย</text></g><g class="ed" data-a="M12|Tax Code" data-b="M22|AP Invoice"><path class="ep" d="M 536 835 C 728 835 728 913 920 913" marker-end="url(#arw)"/><rect class="lb" x="703" y="863" width="49" height="20" rx="10"/><text class="lt" x="728" y="878">ภาษีซื้อ</text></g><g class="ed" data-a="M12|COA" data-b="M12|GL Posting Group"><path class="ep" d="M 788 211 C 980 211 980 133 1172 133" marker-end="url(#arw)"/><rect class="lb" x="943" y="161" width="74" height="20" rx="10"/><text class="lt" x="980" y="176">ผูกผังบัญชี</text></g><g class="ed" data-a="M12|GL Posting Group" data-b="M22|Journal Entry"><path class="ep" d="M 1396 133 C 1462 133 1462 913 1528 913" marker-end="url(#arw)"/><rect class="lb" x="1408" y="512" width="108" height="20" rx="10"/><text class="lt" x="1462" y="526">ลงบัญชีอัตโนมัติ</text></g><g class="ed" data-a="M12|Payment Method" data-b="M23|Payment Voucher"><path class="ep" d="M 788 367 C 980 367 980 445 1172 445" marker-end="url(#arw)"/><rect class="lb" x="955" y="395" width="49" height="20" rx="10"/><text class="lt" x="980" y="410">วิธีจ่าย</text></g><g class="ed" data-a="M12|Payment Method" data-b="M23|Receipt Voucher"><path class="ep" d="M 788 367 C 980 367 980 289 1172 289" marker-end="url(#arw)"/><rect class="lb" x="955" y="317" width="49" height="20" rx="10"/><text class="lt" x="980" y="332">วิธีรับ</text></g><g class="ed" data-a="M12|Bank Master" data-b="M23|Bank Reconciliation"><path class="ep" d="M 788 523 C 980 523 980 601 1172 601" marker-end="url(#arw)"/><rect class="lb" x="943" y="551" width="74" height="20" rx="10"/><text class="lt" x="980" y="566">บัญชีธนาคาร</text></g><g class="ed" data-a="M09|Cost Center" data-b="M22|Journal Entry"><path class="ep" d="M 788 679 C 1158 679 1158 913 1528 913" marker-end="url(#arw)"/><rect class="lb" x="1125" y="785" width="66" height="20" rx="10"/><text class="lt" x="1158" y="800">มิติต้นทุน</text></g><g class="ed" data-a="M10|Product" data-b="M16|Inventory Balance"><path class="ep" d="M 1144 445 C 1336 445 1336 133 1528 133" marker-end="url(#arw)"/><rect class="lb" x="1278" y="278" width="116" height="20" rx="10"/><text class="lt" x="1336" y="292">สินค้าที่ติดตามสต็อก</text></g><g class="ed" data-a="M11|Customer Master" data-b="M14|Quotation"><path class="ep" d="M 1144 289 C 1692 289 1692 523 2240 523" marker-end="url(#arw)"/><rect class="lb" x="1630" y="395" width="125" height="20" rx="10"/><text class="lt" x="1692" y="410">ลูกค้าในใบเสนอราคา</text></g><g class="ed" data-a="M14|Promotion" data-b="M14|Quotation"><path class="ep" d="M 284 523 C 1262 523 1262 523 2240 523" marker-end="url(#arw)"/><rect class="lb" x="1196" y="512" width="133" height="20" rx="10"/><text class="lt" x="1262" y="526">ส่วนลดตอนเสนอราคา</text></g><g class="ed" data-a="M09|Cost Center" data-b="M27|Expense Claim"><path class="ep" d="M 788 679 C 980 679 980 757 1172 757" marker-end="url(#arw)"/><rect class="lb" x="922" y="707" width="116" height="20" rx="10"/><text class="lt" x="980" y="722">เบิกลงศูนย์ต้นทุน</text></g><g class="ed" data-a="M14|Sales Configuration" data-b="M14|Sales Order"><path class="ep" d="M 536 367 C 1032 367 1032 601 1528 601" marker-end="url(#arw)"/><rect class="lb" x="995" y="473" width="74" height="20" rx="10"/><text class="lt" x="1032" y="488">กติกาการขาย</text></g><g class="ed" data-a="M11|Customer Segment" data-b="M11|Customer Master"><path class="ep" d="M 284 367 C 602 367 602 289 920 289" marker-end="url(#arw)"/><rect class="lb" x="561" y="317" width="83" height="20" rx="10"/><text class="lt" x="602" y="332">จัดกลุ่มลูกค้า</text></g><g class="ed" data-a="M10|Product" data-b="M14|Quotation"><path class="ep" d="M 1144 445 C 1692 445 1692 523 2240 523" marker-end="url(#arw)"/><rect class="lb" x="1630" y="473" width="124" height="20" rx="10"/><text class="lt" x="1692" y="488">สินค้าที่ตั้งค่า &quot;ขายได้&quot;</text></g><g class="ed" data-a="M15|Purchase Config" data-b="M15|PR"><path class="ep" d="M 788 835 C 980 835 980 913 1172 913" marker-end="url(#arw)"/><rect class="lb" x="943" y="863" width="74" height="20" rx="10"/><text class="lt" x="980" y="878">กติกาการซื้อ</text></g><g class="ed" data-a="M11|Vendor" data-b="M11|Vendor Price List"><path class="ep" d="M 536 523 C 728 523 728 601 920 601" marker-end="url(#arw)"/><rect class="lb" x="691" y="551" width="74" height="20" rx="10"/><text class="lt" x="728" y="566">ราคาต่อผู้ขาย</text></g><g class="ed" data-a="M09|Cost Center" data-b="M15|PR"><path class="ep" d="M 788 679 C 980 679 980 913 1172 913" marker-end="url(#arw)"/><rect class="lb" x="905" y="785" width="150" height="20" rx="10"/><text class="lt" x="980" y="800">ระบุศูนย์ต้นทุนตอนขอซื้อ</text></g><g class="ed" data-a="M12|Payment Term" data-b="M22|AP Invoice"><path class="ep" d="M 536 679 C 728 679 728 913 920 913" marker-end="url(#arw)"/><rect class="lb" x="678" y="785" width="100" height="20" rx="10"/><text class="lt" x="728" y="800">กำหนดจ่ายเจ้าหนี้</text></g><g class="ed" data-a="M12|Bank Master" data-b="M23|Payment Voucher"><path class="ep" d="M 788 523 C 980 523 980 445 1172 445" marker-end="url(#arw)"/><rect class="lb" x="926" y="473" width="108" height="20" rx="10"/><text class="lt" x="980" y="488">จ่ายจากบัญชีธนาคาร</text></g></g><g><g class="nd" data-f="M10|UOM" transform="translate(60,621)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Unit of Measure<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">หน่วยวัด</text>
+<rect x="18" y="74" width="59" height="21" rx="10.5" fill="hsl(48 55% 92%)"/>
+<text x="48" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(48 45% 32%)">Product</text></g><g class="nd" data-f="M10|Product" transform="translate(920,387)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Item Master<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">สินค้า/วัสดุ</text>
+<rect x="18" y="74" width="59" height="21" rx="10.5" fill="hsl(48 55% 92%)"/>
+<text x="48" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(48 45% 32%)">Product</text></g><g class="nd" data-f="M10|BOM" transform="translate(60,777)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Bill of Materials<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">สูตร/ชุดสินค้า</text>
+<rect x="18" y="74" width="59" height="21" rx="10.5" fill="hsl(48 55% 92%)"/>
+<text x="48" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(48 45% 32%)">Product</text></g><g class="nd" data-f="M10|Product Catalog" transform="translate(1528,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Product Catalog<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">แค็ตตาล็อกสินค้า</text>
+<rect x="18" y="74" width="59" height="21" rx="10.5" fill="hsl(48 55% 92%)"/>
+<text x="48" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(48 45% 32%)">Product</text></g><g class="nd" data-f="M14|Price List" transform="translate(1884,465)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(25 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Sales Price List</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">บัญชีราคาขาย</text>
+<rect x="18" y="74" width="45" height="21" rx="10.5" fill="hsl(25 55% 92%)"/>
+<text x="40" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(25 45% 32%)">Sales</text></g><g class="nd" data-f="M11|Customer Segment" transform="translate(60,309)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(25 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Customer Group</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">กลุ่มลูกค้า</text>
+<rect x="18" y="74" width="45" height="21" rx="10.5" fill="hsl(25 55% 92%)"/>
+<text x="40" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(25 45% 32%)">Sales</text></g><g class="nd" data-f="M14|Quotation" transform="translate(2240,465)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(25 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF9A1F"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Sales Quotation</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบเสนอราคา</text>
+<rect x="18" y="74" width="45" height="21" rx="10.5" fill="hsl(25 55% 92%)"/>
+<text x="40" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(25 45% 32%)">Sales</text></g><g class="nd" data-f="M11|Customer Master" transform="translate(920,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(25 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF9A1F"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Customer Master</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ลูกค้า</text>
+<rect x="18" y="74" width="45" height="21" rx="10.5" fill="hsl(25 55% 92%)"/>
+<text x="40" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(25 45% 32%)">Sales</text></g><g class="nd" data-f="M14|Sales Order" transform="translate(1528,543)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(25 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF9A1F"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Sales Order</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">คำสั่งขาย</text>
+<rect x="18" y="74" width="45" height="21" rx="10.5" fill="hsl(25 55% 92%)"/>
+<text x="40" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(25 45% 32%)">Sales</text></g><g class="nd" data-f="M11|Vendor" transform="translate(312,465)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Vendor Master<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ผู้ขาย</text>
+<rect x="18" y="74" width="65" height="21" rx="10.5" fill="hsl(355 55% 92%)"/>
+<text x="50" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(355 45% 32%)">Purchase</text></g><g class="nd" data-f="M15|PO" transform="translate(1528,699)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(355 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Purchase Order</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบสั่งซื้อ</text>
+<rect x="18" y="74" width="65" height="21" rx="10.5" fill="hsl(355 55% 92%)"/>
+<text x="50" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(355 45% 32%)">Purchase</text></g><g class="nd" data-f="M11|Vendor Price List" transform="translate(920,543)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Vendor Price List<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">บัญชีราคาผู้ขาย</text>
+<rect x="18" y="74" width="65" height="21" rx="10.5" fill="hsl(355 55% 92%)"/>
+<text x="50" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(355 45% 32%)">Purchase</text></g><g class="nd" data-f="M15|CP" transform="translate(1528,387)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(355 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Quotation Comparison</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบเทียบราคา</text>
+<rect x="18" y="74" width="65" height="21" rx="10.5" fill="hsl(355 55% 92%)"/>
+<text x="50" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(355 45% 32%)">Purchase</text></g><g class="nd" data-f="M14|Promotion" transform="translate(60,465)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(25 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF9A1F"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Promotion</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">โปรโมชัน</text>
+<rect x="18" y="74" width="45" height="21" rx="10.5" fill="hsl(25 55% 92%)"/>
+<text x="40" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(25 45% 32%)">Sales</text></g><g class="nd" data-f="M14|Sales Channel" transform="translate(312,153)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(25 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Sales Channel</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ช่องทางการขาย</text>
+<rect x="18" y="74" width="45" height="21" rx="10.5" fill="hsl(25 55% 92%)"/>
+<text x="40" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(25 45% 32%)">Sales</text></g><g class="nd" data-f="M09|Company Master" transform="translate(60,153)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Company<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">บริษัท</text>
+<rect x="18" y="74" width="83" height="21" rx="10.5" fill="hsl(82 55% 92%)"/>
+<text x="59" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(82 45% 32%)">Organization</text></g><g class="nd" data-f="M17|Warehouse & Location" transform="translate(920,75)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(188 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Warehouse &amp; Bin</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">คลังและตำแหน่ง</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M16|Inventory Balance" transform="translate(1528,75)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Inventory<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ยอดคงคลังตามที่เก็บ</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M12|Payment Term" transform="translate(312,621)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Payment Terms</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">เงื่อนไขชำระเงิน</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M22|AR Invoice" transform="translate(920,699)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">AR Invoice</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบแจ้งหนี้/ใบกำกับภาษี</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M12|Tax Code" transform="translate(312,777)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#8A8A8A"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Tax Code</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">รหัสภาษี</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M22|AP Invoice" transform="translate(920,855)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">AP Invoice</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ตั้งหนี้เจ้าหนี้ (3-way)</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M12|COA" transform="translate(564,153)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Chart of Accounts</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ผังบัญชี</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M12|GL Posting Group" transform="translate(1172,75)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF9A1F"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">GL Posting Group</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">กลุ่มการลงบัญชี</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M22|Journal Entry" transform="translate(1528,855)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#8A8A8A"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Journal Entry</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">สมุดรายวัน</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M12|Payment Method" transform="translate(564,309)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Payment Method<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">วิธีชำระเงิน</text>
+<rect x="18" y="74" width="57" height="21" rx="10.5" fill="hsl(207 55% 92%)"/>
+<text x="46" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(207 45% 32%)">Finance</text></g><g class="nd" data-f="M23|Payment Voucher" transform="translate(1172,387)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(207 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Payment Voucher</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบสำคัญจ่าย</text>
+<rect x="18" y="74" width="57" height="21" rx="10.5" fill="hsl(207 55% 92%)"/>
+<text x="46" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(207 45% 32%)">Finance</text></g><g class="nd" data-f="M23|Receipt Voucher" transform="translate(1172,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(207 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Receipt Voucher</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบสำคัญรับ</text>
+<rect x="18" y="74" width="57" height="21" rx="10.5" fill="hsl(207 55% 92%)"/>
+<text x="46" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(207 45% 32%)">Finance</text></g><g class="nd" data-f="M12|Bank Master" transform="translate(564,465)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(207 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#8A8A8A"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Bank Master</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ธนาคาร</text>
+<rect x="18" y="74" width="57" height="21" rx="10.5" fill="hsl(207 55% 92%)"/>
+<text x="46" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(207 45% 32%)">Finance</text></g><g class="nd" data-f="M23|Bank Reconciliation" transform="translate(1172,543)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(207 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#8A8A8A"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Bank Reconciliation</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">กระทบยอดธนาคาร</text>
+<rect x="18" y="74" width="57" height="21" rx="10.5" fill="hsl(207 55% 92%)"/>
+<text x="46" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(207 45% 32%)">Finance</text></g><g class="nd" data-f="M09|Cost Center" transform="translate(564,621)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Cost Center<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ศูนย์ต้นทุน</text>
+<rect x="18" y="74" width="83" height="21" rx="10.5" fill="hsl(82 55% 92%)"/>
+<text x="59" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(82 45% 32%)">Organization</text></g><g class="nd" data-f="M27|Expense Claim" transform="translate(1172,699)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(275 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF3B30"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Expense Claim</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">เบิกค่าใช้จ่าย</text>
+<rect x="18" y="74" width="31" height="21" rx="10.5" fill="hsl(275 55% 92%)"/>
+<text x="34" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(275 45% 32%)">HR</text></g><g class="nd" data-f="M14|Sales Configuration" transform="translate(312,309)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(25 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Sales Configuration</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ตั้งค่าการขาย</text>
+<rect x="18" y="74" width="45" height="21" rx="10.5" fill="hsl(25 55% 92%)"/>
+<text x="40" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(25 45% 32%)">Sales</text></g><g class="nd" data-f="M15|Purchase Config" transform="translate(564,777)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(355 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF9A1F"/>
+<text x="32" y="35" style="font:700 15px sans-serif" fill="#1c1a17">Purchase Configuration</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ตั้งค่าจัดซื้อ</text>
+<rect x="18" y="74" width="65" height="21" rx="10.5" fill="hsl(355 55% 92%)"/>
+<text x="50" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(355 45% 32%)">Purchase</text></g><g class="nd" data-f="M15|PR" transform="translate(1172,855)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 15px sans-serif" fill="#14603C">Purchase Requisition<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบขอซื้อ</text>
+<rect x="18" y="74" width="65" height="21" rx="10.5" fill="hsl(355 55% 92%)"/>
+<text x="50" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(355 45% 32%)">Purchase</text></g></g></svg></div><div class="pane" data-v="plat"><svg class="mp" id="s-plat" width="1056" height="1046" viewBox="0 0 1056 1046" xmlns="http://www.w3.org/2000/svg"><g><g class="ed" data-a="M07|DOA" data-b="M04|Notification"><path class="ep" d="M 284 211 C 528 211 528 523 772 523" marker-end="url(#arw)"/><rect class="lb" x="467" y="356" width="123" height="20" rx="10"/><text class="lt" x="528" y="370">ถึงคิวอนุมัติ → แจ้ง</text></g><g class="ed" data-a="M22|Journal Entry" data-b="M06|Audit Trail Store"><path class="ep" d="M 284 835 C 350 835 350 913 416 913" marker-end="url(#arw)"/><rect class="lb" x="295" y="863" width="111" height="20" rx="10"/><text class="lt" x="350" y="878">ทุกรายการเก็บ log</text></g><g class="ed" data-a="M31|Document Center" data-b="M17|Goods Receipt (GRN)"><path class="ep" d="M 284 523 C 350 523 350 133 416 133" marker-end="url(#arw)"/><rect class="lb" x="288" y="317" width="125" height="20" rx="10"/><text class="lt" x="350" y="332">แนบใบส่งของผู้ขาย</text></g><g class="ed" data-a="M31|Document Center" data-b="M22|AP Invoice"><path class="ep" d="M 284 523 C 350 523 350 445 416 445" marker-end="url(#arw)"/><rect class="lb" x="300" y="473" width="100" height="20" rx="10"/><text class="lt" x="350" y="488">แนบใบกำกับภาษี</text></g><g class="ed" data-a="M32|Ticket Feature" data-b="M04|Notification"><path class="ep" d="M 640 289 C 706 289 706 523 772 523" marker-end="url(#arw)"/><rect class="lb" x="638" y="395" width="136" height="20" rx="10"/><text class="lt" x="706" y="410">อัพเดต ticket → แจ้ง</text></g><g class="ed" data-a="M06|Error Monitor" data-b="M04|Notification"><path class="ep" d="M 284 367 C 528 367 528 523 772 523" marker-end="url(#arw)"/><rect class="lb" x="458" y="434" width="139" height="20" rx="10"/><text class="lt" x="528" y="448">ระบบผิดพลาด → แจ้งทีม</text></g><g class="ed" data-a="M08|User Management" data-b="M06|Audit Trail Store"><path class="ep" d="M 284 679 C 350 679 350 913 416 913" marker-end="url(#arw)"/><rect class="lb" x="279" y="785" width="142" height="20" rx="10"/><text class="lt" x="350" y="800">log เข้าใช้/เปลี่ยนสิทธิ์</text></g><g class="ed" data-a="M31|Document Center" data-b="M27|Expense Claim"><path class="ep" d="M 284 523 C 350 523 350 601 416 601" marker-end="url(#arw)"/><rect class="lb" x="292" y="551" width="116" height="20" rx="10"/><text class="lt" x="350" y="566">แนบใบเสร็จเบิก</text></g><g class="ed" data-a="M08|User Management" data-b="M32|Ticket Feature"><path class="ep" d="M 284 679 C 350 679 350 289 416 289" marker-end="url(#arw)"/><rect class="lb" x="289" y="473" width="123" height="20" rx="10"/><text class="lt" x="350" y="488">ผู้แจ้ง/ผู้รับผิดชอบ</text></g><g class="ed" data-a="M31|Document Center" data-b="M14|Sales Order"><path class="ep" d="M 284 523 C 350 523 350 757 416 757" marker-end="url(#arw)"/><rect class="lb" x="307" y="629" width="87" height="20" rx="10"/><text class="lt" x="350" y="644">แนบ PO ลูกค้า</text></g></g><g><g class="nd" data-f="M07|DOA" transform="translate(60,153)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">DOA<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">สายอนุมัติ (DOA)</text>
+<rect x="18" y="74" width="104" height="21" rx="10.5" fill="hsl(322 55% 92%)"/>
+<text x="70" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(322 45% 32%)">Policy &amp; Security</text></g><g class="nd" data-f="M04|Notification" transform="translate(772,465)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(228 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#8A8A8A"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Notification</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">Notification Center</text>
+<rect x="18" y="74" width="65" height="21" rx="10.5" fill="hsl(228 55% 92%)"/>
+<text x="51" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(228 45% 32%)">Platform</text></g><g class="nd" data-f="M22|Journal Entry" transform="translate(60,777)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#8A8A8A"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Journal Entry</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">สมุดรายวัน</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M06|Audit Trail Store" transform="translate(416,855)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(228 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#8A8A8A"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Audit Trail</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">Audit Trail กลาง</text>
+<rect x="18" y="74" width="65" height="21" rx="10.5" fill="hsl(228 55% 92%)"/>
+<text x="51" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(228 45% 32%)">Platform</text></g><g class="nd" data-f="M31|Document Center" transform="translate(60,465)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(228 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF3B30"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Document Center</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ศูนย์เอกสาร/ไฟล์</text>
+<rect x="18" y="74" width="65" height="21" rx="10.5" fill="hsl(228 55% 92%)"/>
+<text x="51" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(228 45% 32%)">Platform</text></g><g class="nd" data-f="M17|Goods Receipt (GRN)" transform="translate(416,75)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(188 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Goods Receipt</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ใบรับสินค้า</text>
+<rect x="18" y="74" width="71" height="21" rx="10.5" fill="hsl(188 55% 92%)"/>
+<text x="53" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(188 45% 32%)">Warehouse</text></g><g class="nd" data-f="M22|AP Invoice" transform="translate(416,387)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(150 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#3B6EF5"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">AP Invoice</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ตั้งหนี้เจ้าหนี้ (3-way)</text>
+<rect x="18" y="74" width="74" height="21" rx="10.5" fill="hsl(150 55% 92%)"/>
+<text x="55" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(150 45% 32%)">Accounting</text></g><g class="nd" data-f="M32|Ticket Feature" transform="translate(416,231)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(252 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#8A8A8A"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Ticket</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">Ticket Feature</text>
+<rect x="18" y="74" width="57" height="21" rx="10.5" fill="hsl(252 55% 92%)"/>
+<text x="46" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(252 45% 32%)">System</text></g><g class="nd" data-f="M06|Error Monitor" transform="translate(60,309)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">Monitor Logs<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">System Log / Error</text>
+<rect x="18" y="74" width="57" height="21" rx="10.5" fill="hsl(252 55% 92%)"/>
+<text x="46" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(252 45% 32%)">System</text></g><g class="nd" data-f="M08|User Management" transform="translate(60,621)">
+<rect class="nb" width="224" height="116" rx="10" fill="#E7F4EC" stroke="#BFE0CC"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="#0F9D58"/>
+<circle cx="20" cy="30" r="4.6" fill="#0F9D58"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#14603C">User Management<tspan fill="#0F9D58" font-weight="800"> ✓</tspan></text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">ผู้ใช้</text>
+<rect x="18" y="74" width="57" height="21" rx="10.5" fill="hsl(252 55% 92%)"/>
+<text x="46" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(252 45% 32%)">System</text></g><g class="nd" data-f="M27|Expense Claim" transform="translate(416,543)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(275 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF3B30"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Expense Claim</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">เบิกค่าใช้จ่าย</text>
+<rect x="18" y="74" width="31" height="21" rx="10.5" fill="hsl(275 55% 92%)"/>
+<text x="34" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(275 45% 32%)">HR</text></g><g class="nd" data-f="M14|Sales Order" transform="translate(416,699)">
+<rect class="nb" width="224" height="116" rx="10" fill="#fff" stroke="#E3DED6"/>
+<rect x="0" y="0" width="5" height="116" rx="2.5" fill="hsl(25 58% 45%)"/>
+<circle cx="20" cy="30" r="4.6" fill="#FF9A1F"/>
+<text x="32" y="35" style="font:700 16px sans-serif" fill="#1c1a17">Sales Order</text>
+<text x="18" y="60" style="font:500 12px 'Noto Sans Thai',sans-serif" fill="#8a8178">คำสั่งขาย</text>
+<rect x="18" y="74" width="45" height="21" rx="10.5" fill="hsl(25 55% 92%)"/>
+<text x="40" y="88.5" text-anchor="middle" style="font:600 10.5px sans-serif" fill="hsl(25 45% 32%)">Sales</text></g></g></svg></div>
+ <div class="pane" data-v="map"><div id="map-vp"><div id="map-canvas"><svg id="map-edges"></svg><div id="map-board"></div></div><div id="map-ctl"><button data-z="in">+</button><button data-z="out">−</button><button data-z="reset">รีเซ็ต</button></div></div></div>
+</div>
+<aside id="pnl"><div class="ph"><button class="cl" id="pc">&#215;</button>
+<span class="mid" id="pi"></span><h2 id="pt"></h2><p id="pe"></p><p class="n2" id="pn2"></p></div>
+<div class="pb" id="pbd"></div></aside>
+<div id="hint" class="hide"></div>
+<svg width="0" height="0" style="position:absolute"><defs>
+<marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6"
+orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#C9C0B6"/></marker></defs></svg>
+<script>
+var FD={"M07|Policy Document": {"th": "เอกสารนโยบาย", "en": "Policy Document", "st": "done", "note": "", "m": "Policy & Security", "mth": "นโยบาย-สิทธิ์", "hue": 322}, "M07|DOA": {"th": "สายอนุมัติ (DOA)", "en": "DOA", "st": "done", "note": "ทุก feature วาง placeholder แล้ว", "m": "Policy & Security", "mth": "นโยบาย-สิทธิ์", "hue": 322}, "M08|User Management": {"th": "ผู้ใช้", "en": "User Management", "st": "done", "note": "", "m": "System", "mth": "ระบบและผู้ใช้", "hue": 252}, "M08|User Role Access": {"th": "บทบาท-สิทธิ์", "en": "Roles & Permissions", "st": "done", "note": "", "m": "Policy & Security", "mth": "นโยบาย-สิทธิ์", "hue": 322}, "M08|Permission Matrix": {"th": "ตารางสิทธิ์", "en": "Permission Matrix", "st": "done", "note": "", "m": "Policy & Security", "mth": "นโยบาย-สิทธิ์", "hue": 322}, "M09|Company Master": {"th": "บริษัท", "en": "Company", "st": "done", "note": "", "m": "Organization", "mth": "โครงสร้างองค์กร", "hue": 82}, "M09|Cost Center": {"th": "ศูนย์ต้นทุน", "en": "Cost Center", "st": "done", "note": "", "m": "Organization", "mth": "โครงสร้างองค์กร", "hue": 82}, "M09|Fiscal Year & Period": {"th": "ปีบัญชีและงวด", "en": "Fiscal Periods", "st": "done", "note": "", "m": "Organization", "mth": "โครงสร้างองค์กร", "hue": 82}, "M09|Calendar & Holiday": {"th": "ปฏิทิน/วันหยุด", "en": "Working Calendar", "st": "gap", "note": "ใช้คำนวณ SLA/overdue", "m": "Organization", "mth": "โครงสร้างองค์กร", "hue": 82}, "M10|Product": {"th": "สินค้า/วัสดุ", "en": "Item Master", "st": "done", "note": "F-PRODUCT-MASTER-001", "m": "Product", "mth": "ข้อมูลสินค้า", "hue": 48}, "M10|UOM": {"th": "หน่วยวัด", "en": "Unit of Measure", "st": "done", "note": "F-UOM-MASTER-001", "m": "Product", "mth": "ข้อมูลสินค้า", "hue": 48}, "M10|BOM": {"th": "สูตร/ชุดสินค้า", "en": "Bill of Materials", "st": "done", "note": "F-BOM-001", "m": "Product", "mth": "ข้อมูลสินค้า", "hue": 48}, "M10|Product Catalog": {"th": "แค็ตตาล็อกสินค้า", "en": "Product Catalog", "st": "done", "note": "⚠ Central Plan ยังขึ้น \"ต้องทำ\"", "m": "Product", "mth": "ข้อมูลสินค้า", "hue": 48}, "M11|Customer Master": {"th": "ลูกค้า", "en": "Customer Master", "st": "html", "note": "sales-module.html", "m": "Sales", "mth": "การขาย", "hue": 25}, "M11|Customer Segment": {"th": "กลุ่มลูกค้า", "en": "Customer Group", "st": "plan", "note": "W1", "m": "Sales", "mth": "การขาย", "hue": 25}, "M11|Vendor": {"th": "ผู้ขาย", "en": "Vendor Master", "st": "done", "note": "W1", "m": "Purchase", "mth": "การจัดซื้อ", "hue": 355}, "M11|Vendor Price List": {"th": "บัญชีราคาผู้ขาย", "en": "Vendor Price List", "st": "done", "note": "W1", "m": "Purchase", "mth": "การจัดซื้อ", "hue": 355}, "M12|COA": {"th": "ผังบัญชี", "en": "Chart of Accounts", "st": "plan", "note": "W1", "m": "Accounting", "mth": "บัญชี", "hue": 150}, "M12|GL Posting Group": {"th": "กลุ่มการลงบัญชี", "en": "GL Posting Group", "st": "html", "note": "sales-module.html", "m": "Accounting", "mth": "บัญชี", "hue": 150}, "M12|Tax Code": {"th": "รหัสภาษี", "en": "Tax Code", "st": "reg", "note": "", "m": "Accounting", "mth": "บัญชี", "hue": 150}, "M12|Payment Term": {"th": "เงื่อนไขชำระเงิน", "en": "Payment Terms", "st": "plan", "note": "W1", "m": "Accounting", "mth": "บัญชี", "hue": 150}, "M12|Payment Method": {"th": "วิธีชำระเงิน", "en": "Payment Method", "st": "done", "note": "", "m": "Finance", "mth": "การเงิน", "hue": 207}, "M12|Bank Master": {"th": "ธนาคาร", "en": "Bank Master", "st": "reg", "note": "", "m": "Finance", "mth": "การเงิน", "hue": 207}, "M13|Prospect": {"th": "ผู้สนใจ (ลีด)", "en": "Prospect", "st": "done", "note": "core-marketing-prospect.html", "m": "Sales", "mth": "การขาย", "hue": 25}, "M14|Quotation": {"th": "ใบเสนอราคา", "en": "Sales Quotation", "st": "html", "note": "W3", "m": "Sales", "mth": "การขาย", "hue": 25}, "M14|Sales Order": {"th": "คำสั่งขาย", "en": "Sales Order", "st": "html", "note": "W3", "m": "Sales", "mth": "การขาย", "hue": 25}, "M14|Promotion": {"th": "โปรโมชัน", "en": "Promotion", "st": "html", "note": "W3", "m": "Sales", "mth": "การขาย", "hue": 25}, "M14|Price List": {"th": "บัญชีราคาขาย", "en": "Sales Price List", "st": "plan", "note": "W1", "m": "Sales", "mth": "การขาย", "hue": 25}, "M14|Sales Channel": {"th": "ช่องทางการขาย", "en": "Sales Channel", "st": "plan", "note": "W1", "m": "Sales", "mth": "การขาย", "hue": 25}, "M14|Sales Configuration": {"th": "ตั้งค่าการขาย", "en": "Sales Configuration", "st": "plan", "note": "W1", "m": "Sales", "mth": "การขาย", "hue": 25}, "M14|Sales Return (RMA)": {"th": "รับคืนจากลูกค้า", "en": "Sales Return", "st": "plan", "note": "W7", "m": "Sales", "mth": "การขาย", "hue": 25}, "M15|PR": {"th": "ใบขอซื้อ", "en": "Purchase Requisition", "st": "done", "note": "W4", "m": "Purchase", "mth": "การจัดซื้อ", "hue": 355}, "M15|CP": {"th": "ใบเทียบราคา", "en": "Quotation Comparison", "st": "plan", "note": "W4", "m": "Purchase", "mth": "การจัดซื้อ", "hue": 355}, "M15|PO": {"th": "ใบสั่งซื้อ", "en": "Purchase Order", "st": "plan", "note": "W4", "m": "Purchase", "mth": "การจัดซื้อ", "hue": 355}, "M15|Purchase Config": {"th": "ตั้งค่าจัดซื้อ", "en": "Purchase Configuration", "st": "html", "note": "มีแล้วแต่ไม่มี artifact", "m": "Purchase", "mth": "การจัดซื้อ", "hue": 355}, "M15|Return to Vendor": {"th": "คืนของผู้ขาย", "en": "Return to Vendor", "st": "plan", "note": "W8", "m": "Warehouse", "mth": "คลังสินค้า", "hue": 188}, "M16|Inventory Balance": {"th": "ยอดคงคลังตามที่เก็บ", "en": "Inventory", "st": "done", "note": "F-INV-STOCK-LOC-001", "m": "Warehouse", "mth": "คลังสินค้า", "hue": 188}, "M16|Stock Adjustment": {"th": "ปรับยอดคงคลัง", "en": "Stock Adjustment", "st": "done", "note": "ENH pack", "m": "Warehouse", "mth": "คลังสินค้า", "hue": 188}, "M16|Stock Transfer": {"th": "การโอนย้าย", "en": "Stock Transfer", "st": "plan", "note": "W2", "m": "Warehouse", "mth": "คลังสินค้า", "hue": 188}, "M16|Stock Count": {"th": "การนับสินค้า", "en": "Stocktake", "st": "plan", "note": "W2", "m": "Warehouse", "mth": "คลังสินค้า", "hue": 188}, "M17|Warehouse & Location": {"th": "คลังและตำแหน่ง", "en": "Warehouse & Bin", "st": "plan", "note": "W1", "m": "Warehouse", "mth": "คลังสินค้า", "hue": 188}, "M17|Goods Receipt (GRN)": {"th": "ใบรับสินค้า", "en": "Goods Receipt", "st": "plan", "note": "W5 — หนักสุด 12 rules", "m": "Warehouse", "mth": "คลังสินค้า", "hue": 188}, "M17|Putaway": {"th": "จัดเก็บเข้าตำแหน่ง", "en": "Put Away", "st": "plan", "note": "W5", "m": "Warehouse", "mth": "คลังสินค้า", "hue": 188}, "M17|Picking": {"th": "หยิบสินค้า", "en": "Picking", "st": "plan", "note": "W6", "m": "Warehouse", "mth": "คลังสินค้า", "hue": 188}, "M17|Packing": {"th": "แพ็คสินค้า", "en": "Packing", "st": "plan", "note": "W6", "m": "Warehouse", "mth": "คลังสินค้า", "hue": 188}, "M17|Delivery Note": {"th": "ใบส่งของ", "en": "Delivery Note", "st": "plan", "note": "W6", "m": "Warehouse", "mth": "คลังสินค้า", "hue": 188}, "M22|Journal Entry": {"th": "สมุดรายวัน", "en": "Journal Entry", "st": "reg", "note": "", "m": "Accounting", "mth": "บัญชี", "hue": 150}, "M22|Opening Balance": {"th": "ยอดยกมา", "en": "Opening Balance", "st": "gap", "note": "", "m": "Accounting", "mth": "บัญชี", "hue": 150}, "M22|AP Invoice": {"th": "ตั้งหนี้เจ้าหนี้ (3-way)", "en": "AP Invoice", "st": "plan", "note": "W7 — 15 rules", "m": "Accounting", "mth": "บัญชี", "hue": 150}, "M22|AR Invoice": {"th": "ใบแจ้งหนี้/ใบกำกับภาษี", "en": "AR Invoice", "st": "plan", "note": "W7", "m": "Accounting", "mth": "บัญชี", "hue": 150}, "M22|Credit / Debit Note": {"th": "ใบลดหนี้/เพิ่มหนี้", "en": "Credit / Debit Note", "st": "plan", "note": "W8 — 19 rules", "m": "Accounting", "mth": "บัญชี", "hue": 150}, "M22|GR/IR Accrual": {"th": "บัญชีพักรับของ", "en": "GR/IR Clearing", "st": "plan", "note": "W8", "m": "Accounting", "mth": "บัญชี", "hue": 150}, "M22|Period Close": {"th": "ปิดงวด/ล็อกงวด", "en": "Period Close", "st": "gap", "note": "★ ไม่มี = ปิดบัญชีไม่ได้", "m": "Accounting", "mth": "บัญชี", "hue": 150}, "M22|Trial Balance": {"th": "งบทดลอง", "en": "Trial Balance", "st": "gap", "note": "", "m": "Accounting", "mth": "บัญชี", "hue": 150}, "M22|Financial Statements": {"th": "งบการเงิน (PL/BS/CF)", "en": "Financial Statements", "st": "gap", "note": "★ ปลายทางของ ERP ทั้งระบบ", "m": "Accounting", "mth": "บัญชี", "hue": 150}, "M23|Receipt Voucher": {"th": "ใบสำคัญรับ", "en": "Receipt Voucher", "st": "plan", "note": "W8", "m": "Finance", "mth": "การเงิน", "hue": 207}, "M23|Payment Voucher": {"th": "ใบสำคัญจ่าย", "en": "Payment Voucher", "st": "plan", "note": "W9", "m": "Finance", "mth": "การเงิน", "hue": 207}, "M23|Bank Reconciliation": {"th": "กระทบยอดธนาคาร", "en": "Bank Reconciliation", "st": "reg", "note": "", "m": "Finance", "mth": "การเงิน", "hue": 207}, "M25|VAT Report": {"th": "รายงานภาษีมูลค่าเพิ่ม (ภ.พ.30)", "en": "VAT Return (PP.30)", "st": "gap", "note": "★ บังคับตามกฎหมาย", "m": "Accounting", "mth": "บัญชี", "hue": 150}, "M25|WHT": {"th": "ภาษีหัก ณ ที่จ่าย (ภ.ง.ด.3/53)", "en": "Withholding Tax", "st": "gap", "note": "★ บังคับตามกฎหมาย", "m": "Accounting", "mth": "บัญชี", "hue": 150}, "M26|Employee": {"th": "พนักงาน", "en": "Employee Master", "st": "done", "note": "feed ทุก module", "m": "HR", "mth": "บุคคล", "hue": 275}, "M27|Attendance": {"th": "ลงเวลา", "en": "Time & Attendance", "st": "reg", "note": "", "m": "HR", "mth": "บุคคล", "hue": 275}, "M27|Leave": {"th": "วันลา", "en": "Leave Management", "st": "reg", "note": "", "m": "HR", "mth": "บุคคล", "hue": 275}, "M27|Payroll": {"th": "เงินเดือน", "en": "Payroll", "st": "reg", "note": "", "m": "HR", "mth": "บุคคล", "hue": 275}, "M27|Expense Claim": {"th": "เบิกค่าใช้จ่าย", "en": "Expense Claim", "st": "gap", "note": "★ ควรวิ่งเข้า AP", "m": "HR", "mth": "บุคคล", "hue": 275}, "M31|Document Center": {"th": "ศูนย์เอกสาร/ไฟล์", "en": "Document Center", "st": "gap", "note": "★ ทุก module แนบไฟล์ แต่ไม่มีที่เก็บกลาง", "m": "Platform", "mth": "แพลตฟอร์ม", "hue": 228}, "M32|Ticket Feature": {"th": "Ticket Feature", "en": "Ticket", "st": "reg", "note": "", "m": "System", "mth": "ระบบและผู้ใช้", "hue": 252}, "M01|Menu Registry": {"th": "ทะเบียนเมนู", "en": "Menu Registry", "st": "gap", "note": "consume TENANT_ENTITLEMENT", "m": "System", "mth": "ระบบและผู้ใช้", "hue": 252}, "M04|Notification": {"th": "Notification Center", "en": "Notification", "st": "reg", "note": "F-NT-01/02/03", "m": "Platform", "mth": "แพลตฟอร์ม", "hue": 228}, "M06|Audit Trail Store": {"th": "Audit Trail กลาง", "en": "Audit Trail", "st": "reg", "note": "append-only", "m": "Platform", "mth": "แพลตฟอร์ม", "hue": 228}, "M06|Error Monitor": {"th": "System Log / Error", "en": "Monitor Logs", "st": "done", "note": "", "m": "System", "mth": "ระบบและผู้ใช้", "hue": 252}, "M40|Tenant Management": {"th": "จัดการผู้เช่า", "en": "Tenant Management", "st": "gap", "note": "v1.2 · provision tenant · ENG-TENANT-PROVISIONER · ยังไม่พัฒนา", "m": "Tenant & Packaging (Cubic)", "mth": "แพ็คเกจ-ผู้เช่า", "hue": 200}, "M40|Onboarding": {"th": "ขึ้นระบบลูกค้าใหม่", "en": "Onboarding", "st": "gap", "note": "v1.2 · 6 phase มีเอกสารใน registry แต่ยังไม่พัฒนา", "m": "Tenant & Packaging (Cubic)", "mth": "แพ็คเกจ-ผู้เช่า", "hue": 200}, "M40|Package & Entitlement": {"th": "แพ็คเกจและสิทธิ์ใช้งาน", "en": "Package & Entitlement", "st": "gap", "note": "v1.2 · SKU Lite/Full ต่อ tenant", "m": "Tenant & Packaging (Cubic)", "mth": "แพ็คเกจ-ผู้เช่า", "hue": 200}, "M40|Module Linkage Config": {"th": "ตั้งค่าการเชื่อม module", "en": "Module Linkage Config", "st": "gap", "note": "v1.2 · Global Contract #10 · matrix เส้น active/manual ต่อ tenant", "m": "Tenant & Packaging (Cubic)", "mth": "แพ็คเกจ-ผู้เช่า", "hue": 200}, "M14|Sales Territory": {"th": "เขตการขาย/สายวิ่ง", "en": "Sales Territory", "st": "html", "note": "v1.3 · sales-module.html · master เขต+สาย", "m": "Sales", "mth": "การขาย", "hue": 25}, "M14|Trade Agreement": {"th": "ข้อตกลงการค้า", "en": "Trade Agreement", "st": "html", "note": "v1.3 · เงื่อนไข/ราคารายสัญญา", "m": "Sales", "mth": "การขาย", "hue": 25}, "M14|Sales Target": {"th": "เป้าการขาย", "en": "Sales Target", "st": "html", "note": "v1.3 · เป้าต่อเขต/พนักงาน", "m": "Sales", "mth": "การขาย", "hue": 25}, "M14|Visit Operation": {"th": "ตรวจเยี่ยมร้านย่อย", "en": "Visit Operation", "st": "html", "note": "v1.3 · Journey Plan + check-in + เช็คสต๊อกร้านย่อย + survey", "m": "Sales", "mth": "การขาย", "hue": 25}, "M14|Outlet Replenishment": {"th": "เติมของร้านย่อย", "en": "Outlet Replenishment", "st": "gap", "note": "v1.3 · ผลเช็คสต๊อก→สั่งเติม→SO", "m": "Sales", "mth": "การขาย", "hue": 25}, "M40|Signup Portal": {"th": "สมัครใช้งานหน้าบ้าน", "en": "Signup Portal", "st": "gap", "note": "v1.3 · เลือก module+ราคา แบบ Odoo", "m": "Tenant & Packaging (Cubic)", "mth": "แพ็คเกจ-ผู้เช่า", "hue": 200}, "M40|Subscription & Billing": {"th": "ชำระเงิน-รอบบิล", "en": "Subscription & Billing", "st": "gap", "note": "v1.3 · payment + ต่ออายุ/upgrade", "m": "Tenant & Packaging (Cubic)", "mth": "แพ็คเกจ-ผู้เช่า", "hue": 200}, "M40|Instant Provisioning": {"th": "เปิดระบบทันที", "en": "Instant Provisioning", "st": "gap", "note": "v1.3 · จ่ายสำเร็จ→พร้อมใช้ทันที (ENG-TENANT-PROVISIONER)", "m": "Tenant & Packaging (Cubic)", "mth": "แพ็คเกจ-ผู้เช่า", "hue": 200}, "M06|My Subscription": {"th": "แพ็คเกจของฉัน", "en": "My Subscription", "st": "gap", "note": "v1.4 · ฝั่ง tenant: ดูสิทธิ์/บิล + ขอซื้อเพิ่ม (C-TEN-03)", "m": "System", "mth": "ระบบและผู้ใช้", "hue": 252}, "M06|My Linkage Settings": {"th": "ตั้งค่าการเชื่อมของฉัน", "en": "My Linkage Settings", "st": "gap", "note": "v1.4 · ฝั่ง tenant: toggle เส้นที่ entitlement เปิดสิทธิ์", "m": "System", "mth": "ระบบและผู้ใช้", "hue": 252}},AE=[["M13|Prospect", "M14|Quotation", "doc", "ลูกค้ามุ่งหวัง → เสนอราคา", "o2c"], ["M14|Quotation", "M14|Sales Order", "doc", "ลูกค้าตอบรับ", "o2c"], ["M14|Sales Order", "M17|Picking", "doc", "สั่งหยิบของ", "o2c"], ["M17|Picking", "M17|Packing", "doc", "หยิบครบ → แพ็ค", "o2c"], ["M17|Packing", "M17|Delivery Note", "doc", "ออกใบส่งของ", "o2c"], ["M17|Delivery Note", "M22|AR Invoice", "doc", "วางบิลตามส่งจริง", "o2c"], ["M22|AR Invoice", "M23|Receipt Voucher", "doc", "รับชำระ", "o2c"], ["M17|Delivery Note", "M14|Sales Return (RMA)", "doc", "ลูกค้าคืนของ", "o2c"], ["M14|Sales Return (RMA)", "M22|Credit / Debit Note", "doc", "ออกใบลดหนี้", "o2c"], ["M14|Sales Return (RMA)", "M16|Inventory Balance", "doc", "รับของกลับเข้าคลัง", "o2c"], ["M15|PR", "M15|CP", "doc", "เทียบราคาผู้ขาย", "p2p"], ["M15|CP", "M15|PO", "doc", "เลือกผู้ขาย → สั่งซื้อ", "p2p"], ["M15|PO", "M17|Goods Receipt (GRN)", "doc", "ของมาถึง", "p2p"], ["M17|Goods Receipt (GRN)", "M17|Putaway", "doc", "เก็บเข้าตำแหน่ง", "p2p"], ["M17|Goods Receipt (GRN)", "M22|GR/IR Accrual", "post", "ตั้งพักรับของ", "p2p"], ["M17|Goods Receipt (GRN)", "M22|AP Invoice", "doc", "3-way match", "p2p"], ["M15|PO", "M22|AP Invoice", "doc", "3-way match", "p2p"], ["M22|AP Invoice", "M23|Payment Voucher", "doc", "ถึงกำหนดจ่าย", "p2p"], ["M22|GR/IR Accrual", "M22|AP Invoice", "post", "ล้างบัญชีพัก", "p2p"], ["M17|Goods Receipt (GRN)", "M15|Return to Vendor", "doc", "ของไม่ผ่าน QC", "p2p"], ["M15|Return to Vendor", "M22|Credit / Debit Note", "doc", "ขอลดหนี้ผู้ขาย", "p2p"], ["M17|Putaway", "M16|Inventory Balance", "doc", "เพิ่มยอด", "stock"], ["M17|Picking", "M16|Inventory Balance", "doc", "ตัดยอด", "stock"], ["M16|Stock Adjustment", "M16|Inventory Balance", "doc", "ปรับยอด", "stock"], ["M16|Stock Transfer", "M16|Inventory Balance", "doc", "ย้ายที่เก็บ", "stock"], ["M16|Stock Count", "M16|Stock Adjustment", "doc", "ผลนับต่าง → ปรับ", "stock"], ["M10|UOM", "M10|Product", "config", "หน่วยนับ", "master"], ["M10|BOM", "M10|Product", "config", "สูตร/ชุด", "master"], ["M10|Product", "M10|Product Catalog", "config", "จัดเข้าแค็ตตาล็อก", "master"], ["M10|Product Catalog", "M14|Price List", "config", "ตั้งราคาตามแค็ตตาล็อก", "master"], ["M11|Customer Segment", "M14|Price List", "config", "ราคาต่อกลุ่มลูกค้า", "master"], ["M14|Price List", "M14|Quotation", "config", "ดึงราคา", "master"], ["M11|Customer Master", "M14|Sales Order", "config", "ลูกค้า", "master"], ["M11|Vendor", "M15|PO", "config", "ผู้ขาย", "master"], ["M11|Vendor Price List", "M15|CP", "config", "ราคาอ้างอิง", "master"], ["M10|Product", "M15|PO", "config", "เฉพาะสินค้าที่ตั้งค่า \"ซื้อได้\"", "master"], ["M10|Product", "M14|Sales Order", "config", "เฉพาะสินค้าที่ตั้งค่า \"ขายได้\"", "master"], ["M14|Promotion", "M14|Sales Order", "config", "โปรฯ/ส่วนลดผูกตอนเปิดออเดอร์", "master"], ["M14|Sales Channel", "M14|Sales Order", "config", "ระบุช่องทางที่ขาย", "master"], ["M09|Company Master", "M17|Warehouse & Location", "config", "คลังสังกัดสาขาในบริษัท", "master"], ["M17|Warehouse & Location", "M16|Inventory Balance", "config", "ยอดต่อที่เก็บ", "master"], ["M12|Payment Term", "M22|AR Invoice", "config", "กำหนดชำระ", "master"], ["M12|Payment Term", "M15|PO", "config", "เครดิตเทอม", "master"], ["M12|Tax Code", "M22|AR Invoice", "config", "ภาษีขาย", "master"], ["M12|Tax Code", "M22|AP Invoice", "config", "ภาษีซื้อ", "master"], ["M12|COA", "M12|GL Posting Group", "config", "ผูกผังบัญชี", "master"], ["M12|GL Posting Group", "M22|Journal Entry", "config", "ลงบัญชีอัตโนมัติ", "master"], ["M12|Payment Method", "M23|Payment Voucher", "config", "วิธีจ่าย", "master"], ["M12|Payment Method", "M23|Receipt Voucher", "config", "วิธีรับ", "master"], ["M12|Bank Master", "M23|Bank Reconciliation", "config", "บัญชีธนาคาร", "master"], ["M09|Cost Center", "M22|Journal Entry", "config", "มิติต้นทุน", "master"], ["M22|Opening Balance", "M22|Journal Entry", "post", "ยอดยกมา", "gl"], ["M22|AR Invoice", "M22|Journal Entry", "post", "ลงบัญชีลูกหนี้", "gl"], ["M22|AP Invoice", "M22|Journal Entry", "post", "ลงบัญชีเจ้าหนี้", "gl"], ["M22|Credit / Debit Note", "M22|Journal Entry", "post", "กลับรายการ", "gl"], ["M23|Receipt Voucher", "M22|Journal Entry", "post", "เงินเข้า", "gl"], ["M23|Payment Voucher", "M22|Journal Entry", "post", "เงินออก", "gl"], ["M22|Journal Entry", "M22|Trial Balance", "post", "รวมยอด", "gl"], ["M09|Fiscal Year & Period", "M22|Period Close", "config", "งวดบัญชี", "gl"], ["M22|Trial Balance", "M22|Period Close", "post", "ตรวจก่อนปิด", "gl"], ["M22|Period Close", "M22|Financial Statements", "post", "ออกงบ", "gl"], ["M22|AR Invoice", "M25|VAT Report", "post", "ภาษีขาย", "gl"], ["M22|AP Invoice", "M25|VAT Report", "post", "ภาษีซื้อ", "gl"], ["M23|Payment Voucher", "M25|WHT", "post", "หัก ณ ที่จ่าย", "gl"], ["M23|Receipt Voucher", "M23|Bank Reconciliation", "post", "กระทบยอด", "gl"], ["M23|Payment Voucher", "M23|Bank Reconciliation", "post", "กระทบยอด", "gl"], ["M09|Company Master", "M26|Employee", "config", "สังกัด สายงาน ตำแหน่ง", "hr"], ["M26|Employee", "M27|Attendance", "config", "คนที่ลงเวลา", "hr"], ["M26|Employee", "M27|Leave", "config", "สิทธิ์ลา", "hr"], ["M26|Employee", "M27|Payroll", "config", "ฐานเงินเดือน", "hr"], ["M09|Calendar & Holiday", "M27|Attendance", "config", "วันทำงาน/วันหยุด", "hr"], ["M27|Attendance", "M27|Payroll", "doc", "ชั่วโมง/OT", "hr"], ["M27|Leave", "M27|Payroll", "doc", "หักลาไม่รับค่าจ้าง", "hr"], ["M27|Payroll", "M22|Journal Entry", "post", "ค่าจ้าง → GL", "hr"], ["M26|Employee", "M27|Expense Claim", "config", "ผู้เบิก", "hr"], ["M27|Expense Claim", "M22|AP Invoice", "doc", "ตั้งหนี้คืนพนักงาน", "hr"], ["M26|Employee", "M08|User Management", "config", "พนักงาน → ผู้ใช้", "hr"], ["M07|Policy Document", "M07|DOA", "config", "นโยบาย → สายอนุมัติ", "gov"], ["M07|DOA", "M15|PR", "gov", "อนุมัติขอซื้อ", "gov"], ["M07|DOA", "M15|PO", "gov", "อนุมัติสั่งซื้อ", "gov"], ["M07|DOA", "M14|Sales Order", "gov", "อนุมัติส่วนลด", "gov"], ["M07|DOA", "M23|Payment Voucher", "gov", "อนุมัติจ่าย", "gov"], ["M07|DOA", "M22|Journal Entry", "gov", "อนุมัติรายการปรับ", "gov"], ["M07|DOA", "M27|Leave", "gov", "อนุมัติลา", "gov"], ["M08|User Management", "M08|User Role Access", "config", "ผู้ใช้ ← บทบาท", "gov"], ["M08|User Role Access", "M08|Permission Matrix", "config", "สรุปเป็นตารางสิทธิ์", "gov"], ["M07|DOA", "M04|Notification", "event", "ถึงคิวอนุมัติ → แจ้ง", "plat"], ["M22|Journal Entry", "M06|Audit Trail Store", "event", "ทุกรายการเก็บ log", "plat"], ["M31|Document Center", "M17|Goods Receipt (GRN)", "config", "แนบใบส่งของผู้ขาย", "plat"], ["M31|Document Center", "M22|AP Invoice", "config", "แนบใบกำกับภาษี", "plat"], ["M16|Inventory Balance", "M14|Quotation", "config", "เช็คของก่อนเสนอราคา", "o2c"], ["M16|Inventory Balance", "M14|Sales Order", "config", "เช็คสต็อก + กันยอด", "o2c"], ["M15|Return to Vendor", "M16|Inventory Balance", "doc", "คืนผู้ขาย → ตัดยอด", "stock"], ["M16|Inventory Balance", "M16|Stock Count", "config", "ยอดตามระบบไว้เทียบนับ", "stock"], ["M16|Inventory Balance", "M22|Journal Entry", "post", "มูลค่าสต็อก → GL", "stock"], ["M10|Product", "M16|Inventory Balance", "config", "สินค้าที่ติดตามสต็อก", "master"], ["M11|Customer Master", "M14|Quotation", "config", "ลูกค้าในใบเสนอราคา", "master"], ["M14|Promotion", "M14|Quotation", "config", "ส่วนลดตอนเสนอราคา", "master"], ["M09|Cost Center", "M27|Expense Claim", "config", "เบิกลงศูนย์ต้นทุน", "master"], ["M07|DOA", "M14|Quotation", "gov", "อนุมัติราคา/ส่วนลดเสนอ", "gov"], ["M07|DOA", "M15|CP", "gov", "อนุมัติผลเทียบราคา", "gov"], ["M07|DOA", "M22|AP Invoice", "gov", "อนุมัติตั้งหนี้ (3-way)", "gov"], ["M07|DOA", "M22|Credit / Debit Note", "gov", "อนุมัติลด/เพิ่มหนี้", "gov"], ["M07|DOA", "M14|Sales Return (RMA)", "gov", "อนุมัติรับคืน", "gov"], ["M07|DOA", "M15|Return to Vendor", "gov", "อนุมัติคืนผู้ขาย", "gov"], ["M07|DOA", "M16|Stock Count", "gov", "อนุมัติผลนับสต็อก", "gov"], ["M07|DOA", "M16|Stock Adjustment", "gov", "อนุมัติปรับยอด", "gov"], ["M07|DOA", "M16|Stock Transfer", "gov", "อนุมัติโอนคลัง", "gov"], ["M07|DOA", "M22|Opening Balance", "gov", "อนุมัติยอดยกมา", "gov"], ["M07|DOA", "M22|Period Close", "gov", "อนุมัติปิดงวด", "gov"], ["M07|DOA", "M27|Expense Claim", "gov", "อนุมัติเบิก", "gov"], ["M07|DOA", "M27|Payroll", "gov", "อนุมัติงวดเงินเดือน", "gov"], ["M08|Permission Matrix", "M01|Menu Registry", "config", "เมนูตามสิทธิ์", "gov"], ["M32|Ticket Feature", "M04|Notification", "event", "อัพเดต ticket → แจ้ง", "plat"], ["M06|Error Monitor", "M04|Notification", "event", "ระบบผิดพลาด → แจ้งทีม", "plat"], ["M08|User Management", "M06|Audit Trail Store", "event", "log เข้าใช้/เปลี่ยนสิทธิ์", "plat"], ["M31|Document Center", "M27|Expense Claim", "config", "แนบใบเสร็จเบิก", "plat"], ["M13|Prospect", "M11|Customer Master", "doc", "ปิดการขายได้ → convert เป็นลูกค้า", "o2c"], ["M14|Sales Configuration", "M14|Sales Order", "config", "กติกาการขาย", "master"], ["M11|Customer Segment", "M11|Customer Master", "config", "จัดกลุ่มลูกค้า", "master"], ["M10|Product", "M14|Quotation", "config", "สินค้าที่ตั้งค่า \"ขายได้\"", "master"], ["M15|Purchase Config", "M15|PR", "config", "กติกาการซื้อ", "master"], ["M11|Vendor", "M11|Vendor Price List", "config", "ราคาต่อผู้ขาย", "master"], ["M09|Company Master", "M07|DOA", "config", "โครงตำแหน่ง → ตั้งสายอนุมัติ", "gov"], ["M09|Cost Center", "M15|PR", "config", "ระบุศูนย์ต้นทุนตอนขอซื้อ", "master"], ["M09|Fiscal Year & Period", "M22|Journal Entry", "config", "คุมงวดที่ลงบัญชีได้", "gl"], ["M07|Policy Document", "M08|User Role Access", "config", "นโยบาย → กรอบสิทธิ์", "gov"], ["M12|Payment Term", "M22|AP Invoice", "config", "กำหนดจ่ายเจ้าหนี้", "master"], ["M12|Bank Master", "M23|Payment Voucher", "config", "จ่ายจากบัญชีธนาคาร", "master"], ["M08|User Management", "M32|Ticket Feature", "config", "ผู้แจ้ง/ผู้รับผิดชอบ", "plat"], ["M31|Document Center", "M14|Sales Order", "config", "แนบ PO ลูกค้า", "plat"], ["M40|Tenant Management", "M40|Onboarding", "config", "เปิด tenant → เริ่มขึ้นระบบ", "plat"], ["M40|Onboarding", "M40|Package & Entitlement", "config", "เลือก package ตอน onboarding", "plat"], ["M40|Package & Entitlement", "M40|Module Linkage Config", "config", "derive matrix อัตโนมัติ", "plat"], ["M40|Package & Entitlement", "M01|Menu Registry", "config", "เมนู/feature ตาม entitlement", "plat"], ["M40|Module Linkage Config", "M14|Sales Order", "config", "ตัวแทน: ทุกเอกสารอ่าน linkage runtime", "plat"], ["M40|Package & Entitlement", "M40|Signup Portal", "config", "SKU/ราคาที่โชว์หน้าบ้าน", "plat"], ["M40|Signup Portal", "M40|Subscription & Billing", "doc", "สมัครแล้วไปจ่ายเงิน", "plat"], ["M40|Subscription & Billing", "M40|Instant Provisioning", "post", "จ่ายสำเร็จ→เปิดระบบ", "plat"], ["M40|Instant Provisioning", "M40|Tenant Management", "post", "สร้าง tenant อัตโนมัติ", "plat"], ["M40|Instant Provisioning", "M40|Package & Entitlement", "post", "เปิดสิทธิ์ตามที่ซื้อ", "plat"], ["M14|Sales Territory", "M11|Customer Master", "config", "ผูกลูกค้าเข้าเขต/สาย", "o2c"], ["M14|Sales Territory", "M14|Visit Operation", "config", "จัดสายเยี่ยม", "o2c"], ["M14|Sales Territory", "M14|Sales Target", "config", "เป้าต่อเขต", "o2c"], ["M11|Customer Master", "M14|Visit Operation", "config", "ร้านย่อยที่เยี่ยม", "o2c"], ["M14|Trade Agreement", "M14|Sales Order", "config", "เงื่อนไข/ราคาตามสัญญา", "o2c"], ["M14|Visit Operation", "M14|Outlet Replenishment", "doc", "ผลเช็คสต๊อก→สั่งเติม", "o2c"], ["M14|Outlet Replenishment", "M14|Sales Order", "doc", "สร้าง SO เติมของ", "o2c"], ["M40|Package & Entitlement", "M06|My Subscription", "config", "C-TEN-03: read สิทธิ์/บิล", "plat"], ["M06|My Subscription", "M40|Subscription & Billing", "doc", "ขอ upgrade/ซื้อเพิ่ม", "plat"], ["M40|Module Linkage Config", "M06|My Linkage Settings", "config", "scope เส้นที่ tenant toggle ได้", "plat"]],DM={"p2p": {"cw": 2480, "ch": 578, "t": "ขาซื้อ", "s": "ใบขอซื้อ → เทียบราคา → สั่งซื้อ → รับของ → ตั้งหนี้ → จ่ายเงิน", "c": "#C62B22", "n": 10, "e": 11}, "o2c": {"cw": 3192, "ch": 578, "t": "ขาขาย", "s": "ลูกค้ามุ่งหวัง → ใบเสนอราคา → คำสั่งขาย → หยิบ-แพ็ค-ส่ง → วางบิล → รับเงิน", "c": "#E07B00", "n": 12, "e": 13}, "stock": {"cw": 1056, "ch": 734, "t": "สต็อก", "s": "ทุกการเคลื่อนไหว → ยอดคงคลัง → ต้นทุน → บัญชี", "c": "#0F7C4A", "n": 8, "e": 8}, "gl": {"cw": 1768, "ch": 1202, "t": "ปิดบัญชี", "s": "เอกสารทุกใบ → สมุดรายวัน → งบทดลอง → ปิดงวด → งบการเงิน + ภาษี", "c": "#3B6EF5", "n": 14, "e": 16}, "hr": {"cw": 1768, "ch": 734, "t": "คน–เงินเดือน", "s": "พนักงาน → ลงเวลา/ลา → เงินเดือน → บัญชี + ประกันสังคม", "c": "#7C3AED", "n": 10, "e": 11}, "gov": {"cw": 1916, "ch": 1202, "t": "อนุมัติ–สิทธิ์", "s": "นโยบาย → DOA → เอกสารที่ต้องอนุมัติ + สิทธิ์ผู้ใช้", "c": "#B0447A", "n": 26, "e": 25}, "master": {"cw": 2524, "ch": 1046, "t": "ข้อมูลหลัก", "s": "master ตัวไหน ป้อนให้เอกสารใบไหน", "c": "#8A7A55", "n": 35, "e": 37}, "plat": {"cw": 1056, "ch": 1046, "t": "แพลตฟอร์ม", "s": "แจ้งเตือน · log · แนบไฟล์", "c": "#0E7490", "n": 12, "e": 10}, "map": {"cw": 2772, "ch": 2146, "t": "ภาพรวม", "s": "22 module · 85 feature · 151 เส้น · v1.4 ระนาบขาย=CUBIC (site แยก) · Sellable(L/F)=Sales/Purchase/WH/Product/HR/Fin/Acc · node ใหม่รอ regen แผนภาพ", "c": "#111", "n": 85, "e": 151}},FN={"p2p": "ขาซื้อ", "o2c": "ขาขาย", "stock": "สต็อก", "gl": "ปิดบัญชี", "hr": "คน–เงินเดือน", "gov": "อนุมัติ–สิทธิ์", "master": "ข้อมูลหลัก", "plat": "แพลตฟอร์ม"},FC={"p2p": "#C62B22", "o2c": "#E07B00", "stock": "#0F7C4A", "gl": "#3B6EF5", "hr": "#7C3AED", "gov": "#B0447A", "master": "#8A7A55", "plat": "#0E7490"};
+var SL={"done": "เสร็จครบ pipeline", "html": "มี HTML/บางส่วน", "plan": "อยู่ใน Central Plan", "reg": "อยู่ใน Registry", "gap": "ยังไม่เคยนับ (GAP)"};
+var FLOWIDS=["p2p", "o2c", "stock", "gl", "hr", "gov", "master", "plat"];
+var mode='sum',view='p2p',sel=null,mapFlow=null,S={};
+for(var k in DM)S[k]={z:1,tx:0,ty:0};
+var stage=document.getElementById('stage');
+function cur(){return mode==='map'?'map':view;}
+function sv(){return document.getElementById('s-'+cur());}
+function apply(){var s=S[cur()];if(sv())sv().style.transform='translate('+s.tx+'px,'+s.ty+'px) scale('+s.z+')';}
+function fitv(){if(mode==='sum')return;var r=stage.getBoundingClientRect(),d=DM[cur()],s=S[cur()];
+ s.z=Math.min(r.width/d.cw,r.height/d.ch)*0.94;
+ s.tx=(r.width-d.cw*s.z)/2;s.ty=(r.height-d.ch*s.z)/2;apply();}
+document.getElementById('zi').onclick=function(){if(mode==='sum')return;S[cur()].z=Math.min(4,S[cur()].z*1.25);apply();};
+document.getElementById('zo').onclick=function(){if(mode==='sum')return;S[cur()].z=Math.max(.06,S[cur()].z/1.25);apply();};
+document.getElementById('zf').onclick=fitv;
+stage.addEventListener('wheel',function(e){if(mode==='sum')return;e.preventDefault();
+ var r=stage.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top,s=S[cur()];
+ var nz=Math.max(.06,Math.min(4,s.z*(e.deltaY<0?1.12:1/1.12)));
+ s.tx=mx-(mx-s.tx)*nz/s.z;s.ty=my-(my-s.ty)*nz/s.z;s.z=nz;apply();},{passive:false});
+var dg=false,px=0,py=0,mv=0;
+stage.addEventListener('mousedown',function(e){if(mode==='sum')return;
+ dg=true;mv=0;px=e.clientX;py=e.clientY;stage.classList.add('drag');});
+window.addEventListener('mousemove',function(e){if(!dg)return;var s=S[cur()];
+ mv+=Math.abs(e.clientX-px)+Math.abs(e.clientY-py);s.tx+=e.clientX-px;s.ty+=e.clientY-py;
+ px=e.clientX;py=e.clientY;apply();});
+window.addEventListener('mouseup',function(){dg=false;stage.classList.remove('drag');});
+function focus(id){var g=sv();if(!g)return;g.classList.add('focus');var on={};on[id]=1;
+ g.querySelectorAll('.ed,.med').forEach(function(e){
+  var h=(e.dataset.a===id||e.dataset.b===id);e.classList.toggle('hi',h);
+  if(h){on[e.dataset.a]=1;on[e.dataset.b]=1;}});
+ g.querySelectorAll('.nd').forEach(function(n){n.classList.toggle('hi',!!on[n.dataset.f]);});}
+function unfocus(){if(sel){focus(sel);return;}var g=sv();if(!g)return;g.classList.remove('focus');
+ g.querySelectorAll('.hi').forEach(function(e){e.classList.remove('hi');});}
+document.querySelectorAll('.nd').forEach(function(n){var id=n.dataset.f;
+ n.addEventListener('mouseenter',function(){if(!sel)focus(id);});
+ n.addEventListener('mouseleave',unfocus);
+ n.addEventListener('click',function(e){e.stopPropagation();if(mv<6)open_(id);});});
+function zoomMod(vid){var g=document.getElementById('s-map'),el=g.querySelector('.mb[data-m="'+vid+'"]');
+ if(!el)return;
+ var t=el.getAttribute('transform').match(/translate\(([-\d.]+),([-\d.]+)\)/);
+ var r=stage.getBoundingClientRect(),s2=S.map,w=+el.querySelector('.pn').getAttribute('width'),
+     h=+el.querySelector('.pn').getAttribute('height');
+ s2.z=Math.min(r.width/(w+160),r.height/(h+160),1.15);
+ s2.tx=r.width/2-(+t[1]+w/2)*s2.z;s2.ty=r.height/2-(+t[2]+h/2)*s2.z;apply();}
+document.querySelectorAll('.mb').forEach(function(g){
+ g.addEventListener('click',function(e){e.stopPropagation();if(mv<6)close_();});
+ g.addEventListener('dblclick',function(e){e.stopPropagation();zoomMod(g.dataset.m);});});
+stage.addEventListener('click',function(){if(mv<6&&mode!=='sum')close_();});
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+function open_(id){var d=FD[id];if(!d)return;
+ var g=sv(),inv=g&&g.querySelector('.nd[data-f="'+CSS.escape(id)+'"]');
+ if(inv){sel=id;focus(id);
+  g.querySelectorAll('.nd').forEach(function(n){n.classList.toggle('sel',n.dataset.f===id);});}
+ var pi=document.getElementById('pi');pi.textContent=d.m+' · '+d.mth;
+ pi.style.background='hsl('+d.hue+' 55% 38%)';
+ var pt=document.getElementById('pt');pt.textContent=d.en;pt.style.color='hsl('+d.hue+' 55% 22%)';
+ document.getElementById('pe').textContent=d.th+' · '+SL[d.st];
+ document.getElementById('pn2').textContent=d.note||'';
+ function row(o,dir,e){var t=FD[o];if(!t)return '';
+  return '<div class="rel" data-go="'+o+'" data-fl="'+e[4]+'"><b>'+dir+' '+esc(t.en)+'</b>'+
+   '<span>'+esc(e[3])+'</span><em>'+esc(t.th)+' · '+t.m+'</em> '+
+   '<span class="fl" style="background:'+FC[e[4]]+'">'+FN[e[4]]+'</span></div>';}
+ var up=[],dn=[];
+ AE.forEach(function(e){if(e[0]===id)dn.push(row(e[1],'&#8594;',e));
+                        if(e[1]===id)up.push(row(e[0],'&#8592;',e));});
+ var h='';
+ if(up.length)h+='<h3>รับมาจาก ('+up.length+')</h3>'+up.join('');
+ if(dn.length)h+='<h3>ส่งต่อไปที่ ('+dn.length+')</h3>'+dn.join('');
+ if(!h)h='<h3>ไม่มีเส้นเชื่อม</h3>';
+ var pb=document.getElementById('pbd');pb.innerHTML=h;
+ pb.querySelectorAll('.rel').forEach(function(r){r.onclick=function(){
+  if(mode==='flow'&&r.dataset.fl!==view){setView(r.dataset.fl);}
+  setTimeout(function(){open_(r.dataset.go);},60);};});
+ document.getElementById('pnl').classList.add('open');}
+function close_(){sel=null;document.getElementById('pnl').classList.remove('open');
+ document.querySelectorAll('.nd.sel').forEach(function(n){n.classList.remove('sel');});unfocus();}
+document.getElementById('pc').onclick=close_;
+document.addEventListener('keydown',function(e){if(e.key==='Escape')close_();});
+function search(){var q=document.getElementById('q').value.trim().toLowerCase();
+ document.querySelectorAll('.nd').forEach(function(n){
+  var d=FD[n.dataset.f];if(!d)return;
+  var t=(d.th+' '+d.en).toLowerCase(),hid=q&&t.indexOf(q)<0;
+  n.classList.toggle('dim',!!hid);n.classList.toggle('mark',!!(q&&!hid));});}
+document.getElementById('q').addEventListener('input',search);
+function paint(){
+ document.querySelectorAll('.pane').forEach(function(p){
+  p.classList.toggle('on', mode==='sum'?p.dataset.v==='sum':p.dataset.v===cur());});
+ document.querySelectorAll('.md').forEach(function(b){b.classList.toggle('on',b.dataset.md===mode);});
+ stage.classList.toggle('sum',mode==='sum');
+ var bar=document.getElementById('bar'),hint=document.getElementById('hint');
+ bar.classList.toggle('hide',mode==='sum');
+ hint.classList.toggle('hide',mode==='sum');
+ document.querySelectorAll('.ch').forEach(function(c){
+  c.classList.toggle('on', mode==='flow' ? c.dataset.f===view : c.dataset.f===mapFlow);});
+ if(mode==='flow'){var d=DM[view];
+  document.getElementById('sub').innerHTML='<b>'+d.t+'</b> — '+d.s+' · '+d.n+' feature · '+d.e+' เส้น';
+  hint.innerHTML='<b>อ่านซ้ายไปขวา</b> = ลำดับงานจริง · <b>ชี้การ์ด</b> = เหลือเฉพาะเส้นของมัน · <b>คลิก</b> = ดูต้นทาง/ปลายทาง';}
+ else if(mode==='map'){
+  document.getElementById('sub').innerHTML=mapFlow?('เน้นสาย <b>'+FN[mapFlow]+'</b> — กดซ้ำเพื่อยกเลิก')
+    :'<b>เลือกสาย</b>เพื่อเน้นเส้นบนแผนที่ · '+DM.map.s;
+  hint.classList.add('hide');
+  document.querySelectorAll('#medges .med').forEach(function(p){
+   p.classList.toggle('act', !!mapFlow && p.classList.contains('f-'+mapFlow));});}
+}
+function setMode(m){mode=m;sel=null;close_();paint();search();if(m!=='sum')fitv();}
+function setView(v){view=v;sel=null;close_();paint();search();fitv();}
+document.querySelectorAll('.md').forEach(function(b){b.onclick=function(){setMode(b.dataset.md);};});
+document.querySelectorAll('.ch').forEach(function(c){c.onclick=function(){
+ if(mode==='map'){mapFlow=(mapFlow===c.dataset.f)?null:c.dataset.f;paint();}
+ else setView(c.dataset.f);};});
+document.querySelectorAll('.fcard').forEach(function(b){b.onclick=function(){
+ view=b.dataset.go;setMode('flow');};});
+document.querySelectorAll('.mrow').forEach(function(b){b.onclick=function(){
+ setMode('map');
+ setTimeout(function(){
+  var g=document.getElementById('s-map'),el=g.querySelector('.mb[data-m="'+b.dataset.m+'"]');
+  if(!el)return;
+  var t=el.getAttribute('transform').match(/translate\(([-\d.]+),([-\d.]+)\)/);
+  var r=stage.getBoundingClientRect(),s=S.map,w=+el.querySelector('.pn').getAttribute('width'),
+      h=+el.querySelector('.pn').getAttribute('height');
+  s.z=Math.min(r.width/(w+180),r.height/(h+180),1.1);
+  s.tx=r.width/2-(+t[1]+w/2)*s.z;s.ty=r.height/2-(+t[2]+h/2)*s.z;apply();},80);};});
+var afDone={};
+function autofit(root){
+ root.querySelectorAll('.nd').forEach(function(g){
+  var t=g.querySelector('.mf')||g.querySelector('.nt');if(!t)return;
+  var isMap=!!g.querySelector('.mf'),W=isMap?170:224,sz=parseFloat(t.style.fontSize),n=0;
+  while(n<26){var bad=false,sp=t.querySelectorAll('tspan');
+   for(var i=0;i<sp.length;i++){var b=sp[i].getBBox();
+    if(b.x<6||b.x+b.width>W-6){bad=true;break;}}
+   if(!bad||sz<=8)break;sz-=0.6;t.style.fontSize=sz+'px';n++;}
+  g.querySelectorAll('.ne').forEach(function(e){
+   var s2=parseFloat(getComputedStyle(e).fontSize),k=0;
+   while((e.getBBox().x<4||e.getBBox().x+e.getBBox().width>220)&&s2>6.5&&k<16){
+     s2-=0.5;e.style.fontSize=s2+'px';k++;}});
+ });}
+window.addEventListener('resize',function(){if(mode!=='sum')fitv();});
+function afRun(){if(mode==='sum')return;var v=cur(),g=sv();
+ if(!g||afDone[v])return;afDone[v]=1;autofit(g);}
+var oldPaint=paint;
+paint=function(){oldPaint();
+ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){setTimeout(afRun,10);});
+ else setTimeout(afRun,60);
+ setTimeout(afRun,900);};
+paint();
+</script>
+<style>
+#map-vp{position:relative;overflow:hidden;height:calc(100vh - 150px);min-height:600px;cursor:grab;background:#F3EFE8}
+#map-vp.drag{cursor:grabbing}
+#map-canvas{position:absolute;top:0;left:0;width:1680px;transform-origin:0 0}
+#map-edges{position:absolute;top:0;left:0;z-index:0;pointer-events:none}
+#map-edges path{fill:none;stroke-width:1.3;opacity:.4;transition:opacity .15s}
+#map-edges.focus{z-index:3}
+#map-edges.focus path{opacity:.04}
+#map-edges.focus path.hot{opacity:1;stroke-width:2.6;filter:drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 1.5px #fff)}
+#map-board{position:relative;z-index:1;padding:18px;font-family:inherit}
+#map-ctl{position:absolute;right:14px;top:14px;z-index:5;display:flex;gap:6px}
+#map-ctl button{width:34px;height:30px;border:1px solid #D8D2C8;border-radius:8px;background:#fff;font-size:15px;cursor:pointer}
+#map-ctl button[data-z="reset"]{width:auto;padding:0 10px;font-size:12px}
+.mb-cols{display:flex;gap:20px;align-items:flex-start}
+.mb-left{flex:0 0 285px;position:relative}
+.mb-left .mb-grp{margin-bottom:0}
+.mb-left .mb-fs{grid-template-columns:1fr}
+.mb-left::after{content:"⇄ API · C-TEN-01..03 (cache + fallback)";display:block;margin-top:10px;text-align:center;font-size:10.5px;font-weight:700;color:#5B4B8A;letter-spacing:.3px}
+.mb-core{flex:1;border:1.5px solid #DCD5CA;border-radius:16px;padding:14px 16px;background:rgba(255,255,255,.28)}
+.mb-core-t{font-size:12px;font-weight:800;letter-spacing:.5px;color:#3B5A86;margin-bottom:12px;text-transform:uppercase}
+.mb-note{font-size:12px;color:#8a8178;margin:0 0 14px;padding:8px 12px;border:1px dashed #D8D2C8;border-radius:8px;background:#FBFAF7}
+.mb-grp{border:1px solid #E7E2DA;border-radius:14px;background:rgba(246,243,238,.82);padding:14px 16px;margin-bottom:18px}
+.mb-grp.cubic{background:rgba(241,236,247,.9);border-color:#D9CFE8}
+.mb-grp-t{font-size:12px;font-weight:700;letter-spacing:.4px;color:#6b6257;margin-bottom:10px;text-transform:uppercase}
+.mb-grp.cubic .mb-grp-t{color:#5B4B8A}
+.mb-row{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.mb-mod{background:#fff;border:1px solid #E3DED6;border-radius:10px;flex:1 1 260px;min-width:250px;overflow:hidden}
+.mb-mh{color:#fff;font-weight:700;font-size:14px;padding:7px 12px;display:flex;align-items:center}
+.mb-mh .n{margin-left:auto;background:rgba(255,255,255,.25);border-radius:999px;padding:0 8px;font-size:11px}
+.mb-mh .cb{font-size:9px;background:#fff;color:#5B4B8A;border-radius:999px;padding:1px 6px;margin-left:8px;letter-spacing:.4px}
+.mb-fs{padding:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.mb-f{border:1px solid #E7E2DA;border-radius:8px;padding:7px 9px;font-size:12px;background:#fff;cursor:pointer}
+.mb-f b{display:block;font-size:12.2px;color:#1c1a17;font-weight:600}
+.mb-f span{color:#8a8178;font-size:11px}
+.mb-f.st-done{background:#EDF7EE;border-color:#BFE3C4}
+.mb-f.st-gap{border-color:#E45A5A}
+.mb-f .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:1px}
+.mb-f:hover{border-color:#1c1a17}
+.pane[data-v="map"]{height:auto !important}
+</style>
+<script>
+(function(){
+  var host=document.getElementById('map-board'); if(!host||typeof FD==='undefined')return;
+  var CORE_GROUPS=[
+    {t:'Foundation — ทำก่อน · ทุกกล่องอ้าง', mods:['Policy & Security','System','Organization','Product','Platform']},
+    {t:'Transactions — เอกสารเดินงาน', mods:['Sales','Warehouse','Purchase']},
+    {t:'Finance · People', mods:['Finance','Accounting','HR']}
+  ];
+  var DOT={done:'#2E9E4F',html:'#3B6EF5',plan:'#E0A400',reg:'#8A63C9',gap:'#E45A5A'};
+  var EC={doc:'#C97E2B',post:'#B5483C',config:'#A39A8C'};
+  var byMod={};
+  Object.keys(FD).forEach(function(k){var f=FD[k];f._k=k;(byMod[f.m]=byMod[f.m]||[]).push(f);});
+  function modBox(mn){
+    var fs=byMod[mn]||[]; if(!fs.length)return '';
+    var hue=fs[0].hue, cubic=mn.indexOf('Cubic')>=0, h;
+    h='<div class="mb-mod"><div class="mb-mh" style="background:hsl('+hue+' 45% 38%)">'+mn.replace(' (Cubic)','')+(cubic?'<span class="cb">CUBIC</span>':'')+'<span class="n">'+fs.length+'</span></div><div class="mb-fs">';
+    fs.forEach(function(f){
+      h+='<div class="mb-f st-'+f.st+'" data-fk="'+f._k+'" title="'+(f.note||'').replace(/"/g,'&quot;')+'"><b><span class="dot" style="background:'+(DOT[f.st]||'#999')+'"></span>'+f.en+(f.st==='done'?' ✓':'')+'</b><span>'+f.th+'</span></div>';
+    });
+    return h+'</div></div>';
+  }
+  var h='<div class="mb-note">ลากเพื่อเลื่อน · scroll เพื่อซูม · <b>ชี้การ์ด = เหลือเฉพาะเส้นของมัน</b> · เส้น: <span style="color:#C97E2B">■ เอกสารต่อ</span> <span style="color:#B5483C">■ post/ผลอัตโนมัติ</span> <span style="color:#A39A8C">■ config/master</span> · v1.4 · 85 features</div>';
+  h+='<div class="mb-cols">';
+  h+='<div class="mb-left"><div class="mb-grp cubic"><div class="mb-grp-t">🟪 CUBIC — SITE แยก<br><span style="font-weight:500;text-transform:none">ระนาบขาย · คนละระบบ/DB/credential · 2B เท่านั้น · ลูกค้าเข้าไม่ได้</span></div><div class="mb-row">'+modBox('Tenant & Packaging (Cubic)')+'</div></div></div>';
+  h+='<div class="mb-core"><div class="mb-core-t">🟦 CUBE CORE — ERP ที่ลูกค้าใช้ (core.2bsimple.com)</div>';
+  CORE_GROUPS.forEach(function(g){
+    h+='<div class="mb-grp"><div class="mb-grp-t">'+g.t+'</div><div class="mb-row">';
+    g.mods.forEach(function(mn){h+=modBox(mn);});
+    h+='</div></div>';
+  });
+  h+='</div></div>';
+  host.innerHTML=h;
+
+  /* ---- edges ---- */
+  var svg=document.getElementById('map-edges'), canvas=document.getElementById('map-canvas'), vp=document.getElementById('map-vp');
+  var edgeIdx={}, built=false;
+  function buildEdges(){
+    if(built||!host.offsetWidth||typeof AE==='undefined')return;
+    var cw=canvas.offsetWidth, ch=host.offsetHeight;
+    svg.setAttribute('width',cw); svg.setAttribute('height',ch); svg.setAttribute('viewBox','0 0 '+cw+' '+ch);
+    var cr=canvas.getBoundingClientRect();
+    var pos={};
+    host.querySelectorAll('.mb-f').forEach(function(el){
+      var r=el.getBoundingClientRect();
+      pos[el.dataset.fk]={l:r.left-cr.left,r:r.right-cr.left,t:r.top-cr.top,b:r.bottom-cr.top,cx:r.left-cr.left+r.width/2,cy:r.top-cr.top+r.height/2};
+    });
+    var frag='';
+    AE.forEach(function(e,i){
+      var a=pos[e[0]], b=pos[e[1]]; if(!a||!b)return;
+      var ax,ay,bx,by,dir;
+      var dx=b.cx-a.cx, dy=b.cy-a.cy;
+      if(Math.abs(dx)>=Math.abs(dy)){
+        // เชื่อมแนวนอน: ออกจากขอบซ้าย/ขวา
+        if(dx>=0){ax=a.r;bx=b.l;} else {ax=a.l;bx=b.r;}
+        ay=a.cy; by=b.cy; dir='h';
+      } else {
+        // เชื่อมแนวตั้ง: ออกจากขอบบน/ล่าง
+        if(dy>=0){ay=a.b;by=b.t;} else {ay=a.t;by=b.b;}
+        ax=a.cx; bx=b.cx; dir='v';
+      }
+      var d;
+      if(dir==='h'){var mx=(ax+bx)/2; d='M'+ax.toFixed(0)+' '+ay.toFixed(0)+' C'+mx.toFixed(0)+' '+ay.toFixed(0)+' '+mx.toFixed(0)+' '+by.toFixed(0)+' '+bx.toFixed(0)+' '+by.toFixed(0);}
+      else {var my=(ay+by)/2; d='M'+ax.toFixed(0)+' '+ay.toFixed(0)+' C'+ax.toFixed(0)+' '+my.toFixed(0)+' '+bx.toFixed(0)+' '+my.toFixed(0)+' '+bx.toFixed(0)+' '+by.toFixed(0);}
+      frag+='<path d="'+d+'" stroke="'+(EC[e[2]]||'#A39A8C')+'" data-i="'+i+'"><title>'+e[0].split('|')[1]+' → '+e[1].split('|')[1]+' · '+(e[3]||'')+'</title></path>';
+      (edgeIdx[e[0]]=edgeIdx[e[0]]||[]).push(i);(edgeIdx[e[1]]=edgeIdx[e[1]]||[]).push(i);
+    });
+    svg.innerHTML=frag; built=true;
+  }
+  host.addEventListener('click',function(ev){
+    var c=ev.target.closest('.mb-f'); if(!c)return;
+    if(window.__mapMoved && window.__mapMoved>6)return;
+    if(typeof open_==='function'){open_(c.dataset.fk); ev.stopPropagation();}
+  });
+  host.addEventListener('mouseover',function(ev){
+    var c=ev.target.closest('.mb-f'); if(!c)return;
+    var ids=edgeIdx[c.dataset.fk]||[]; if(!ids.length)return;
+    svg.classList.add('focus');
+    svg.querySelectorAll('path.hot').forEach(function(p){p.classList.remove('hot');});
+    ids.forEach(function(i){var p=svg.querySelector('path[data-i="'+i+'"]');if(p)p.classList.add('hot');});
+  });
+  host.addEventListener('mouseleave',function(){svg.classList.remove('focus');});
+
+  /* ---- pan / zoom ---- */
+  var tx=0,ty=0,sc=1;
+  function apply(){canvas.style.transform='translate('+tx+'px,'+ty+'px) scale('+sc+')';}
+  var dragging=false,sx=0,sy=0;
+  var moved=0,mx0=0,my0=0;
+  vp.addEventListener('mousedown',function(e){if(e.target.closest('#map-ctl'))return;dragging=true;moved=0;mx0=e.clientX;my0=e.clientY;sx=e.clientX-tx;sy=e.clientY-ty;vp.classList.add('drag');e.preventDefault();});
+  window.addEventListener('mousemove',function(e){if(!dragging)return;moved=Math.max(moved,Math.abs(e.clientX-mx0)+Math.abs(e.clientY-my0));tx=e.clientX-sx;ty=e.clientY-sy;apply();});
+  window.addEventListener('mouseup',function(){window.__mapMoved=moved;dragging=false;vp.classList.remove('drag');setTimeout(function(){window.__mapMoved=0;},50);});
+  vp.addEventListener('wheel',function(e){
+    e.preventDefault();
+    var r=vp.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+    var ns=Math.min(2,Math.max(.3,sc*(e.deltaY<0?1.1:0.9)));
+    tx=mx-(mx-tx)*(ns/sc); ty=my-(my-ty)*(ns/sc); sc=ns; apply();
+  },{passive:false});
+  document.getElementById('map-ctl').addEventListener('click',function(e){
+    var z=e.target.dataset.z; if(!z)return;
+    if(z==='reset'){tx=0;ty=0;sc=1;}
+    else{var r=vp.getBoundingClientRect(),mx=r.width/2,my=r.height/2,ns=Math.min(2,Math.max(.3,sc*(z==='in'?1.15:0.87)));tx=mx-(mx-tx)*(ns/sc);ty=my-(my-ty)*(ns/sc);sc=ns;}
+    apply();
+  });
+
+  /* build when visible */
+  function tryBuild(){buildEdges();}
+  tryBuild();
+  document.addEventListener('click',function(){setTimeout(tryBuild,60);});
+  window.addEventListener('resize',function(){if(!built)tryBuild();});
+})();
+</script>
+
+</body></html>

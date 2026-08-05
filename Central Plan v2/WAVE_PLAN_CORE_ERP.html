@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wave Plan · Core ERP — ลำดับพัฒนา 85 features (greenfield)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ivory:#FAF8F5; --charcoal:#111111; --line:#E8E4DD; --card:#FFFFFF;
+  --red:#FF3B30; --orange:#FF9A1F; --green:#1E8E5A; --grey:#8A8578; --ink:#3B6FB5;
+  --muted:#6E6A60;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ivory);color:var(--charcoal);font-family:'Satoshi','Noto Sans Thai',sans-serif;font-size:14px}
+header{padding:20px 24px 12px;border-bottom:1px solid var(--line);background:var(--ivory);position:sticky;left:0}
+h1{font-size:20px;font-weight:700}
+.sub{color:var(--muted);font-size:12.5px;margin-top:3px}
+.stats{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px}
+.stat{display:flex;align-items:baseline;gap:6px}
+.stat b{font-size:19px}
+.stat span{font-size:12px;color:var(--muted)}
+.filters{display:flex;gap:6px;flex-wrap:wrap;padding:12px 24px;border-bottom:1px solid var(--line);position:sticky;left:0}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:4px 12px;font-size:12.5px;cursor:pointer;font-family:inherit;color:var(--charcoal)}
+.chip.on{background:var(--charcoal);color:var(--ivory);border-color:var(--charcoal)}
+.chip.clr{border-style:dashed;color:var(--muted)}
+.divider{width:1px;background:var(--line);margin:0 6px}
+#warn{display:none;background:var(--red);color:#fff;padding:8px 24px;font-weight:600}
+.board{display:flex;gap:14px;overflow-x:auto;padding:18px 24px 36px;align-items:flex-start}
+.col{min-width:228px;max-width:228px;flex:0 0 auto}
+.colhead{padding:8px 10px;border-radius:10px 10px 0 0;border:1px solid var(--line);border-bottom:2px solid var(--charcoal);background:var(--card)}
+.colhead .t{font-weight:700;font-size:13.5px}
+.colhead .d{font-size:11px;color:var(--muted);margin-top:1px}
+.colbody{display:flex;flex-direction:column;gap:8px;padding:10px 0}
+.fcard{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--mc,#ccc);border-radius:8px;padding:8px 10px}
+.fcard.isdone{background:#E7F4EC;border-color:#BFE0CC;border-left-color:var(--green)}
+.fcard.isdone .en{color:#14603C}
+.fcard.isdone .chk{color:var(--green);font-weight:700}
+.fcard .en{font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px}
+.fcard .th{font-size:12px;color:var(--muted)}
+.fcard .row{display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap}
+.mtag{font-size:10.5px;padding:1px 8px;border-radius:999px;background:var(--mbg,#eee);color:var(--charcoal);font-weight:600}
+.dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.dep{font-size:11px;color:var(--muted);margin-top:5px;border-top:1px dashed var(--line);padding-top:5px}
+.dep b{color:var(--charcoal);font-weight:600}
+.legend{padding:0 24px 30px;font-size:12px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap;align-items:center;position:sticky;left:0}
+.legend .li{display:flex;align-items:center;gap:5px}
+.hidden{display:none!important}
+@media print{.filters{display:none}.board{overflow:visible;flex-wrap:wrap}}
+.cubicbadge{font-size:9px;font-weight:700;background:#5B4B8A;color:#fff;border-radius:999px;padding:1px 7px;margin-left:6px;letter-spacing:.4px}
+.lfbadge{font-size:9px;font-weight:700;border:1px solid #1A1A1A;border-radius:999px;padding:0 6px;margin-left:6px;letter-spacing:.3px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Wave Plan · Core ERP — ลำดับพัฒนาทุก feature (greenfield)</h1>
+  <div class="sub">จาก CENTRAL_PLAN_CORE_ERP.md v1.1 · gen 2026-08-03 (update สถานะทีม) · <b>จัดลำดับแบบยังไม่มีอะไรเสร็จเลยสักตัว</b> — dot สถานะเป็นข้อมูลอ้างอิงว่าของจริงมี artifact แล้วแค่ไหน · แผนเปลี่ยน = regen ไฟล์นี้ใหม่</div>
+  <div class="stats" id="stats"></div>
+</header>
+<div id="warn">จำนวนการ์ดไม่ตรงกับแผนกลาง — ห้ามใช้ไฟล์นี้ จน regen ใหม่</div>
+<div class="filters" id="fModules"></div>
+<div class="board" id="board"></div>
+<div class="legend">
+  <span class="li"><span class="dot" style="background:var(--green)"></span>เสร็จแล้ว (การ์ดพื้นเขียว ✓)</span>
+  <span class="li"><span class="dot" style="background:var(--grey)"></span>ระบบเดิมมี (registry — ยกโครงมาได้)</span>
+  <span class="li"><span class="dot" style="background:var(--ink)"></span>มี HTML บางส่วน</span>
+  <span class="li"><span class="dot" style="background:var(--orange)"></span>อยู่แผน — เริ่มจาก 0</span>
+  <span class="li"><span class="dot" style="background:var(--red)"></span>ยังไม่เคยนับ — เริ่มใหม่</span>
+  <span class="li">รอ: อ้าง feature ใน wave ก่อนหน้า · เส้นข้ามกล่อง mock ได้ระหว่างรอ</span>
+</div>
+<script>
+'use strict';
+var MODULES = {
+  POL:{n:'Policy & Security',c:'#E8DFF5'}, SYS:{n:'System',c:'#DDE9F5'},
+  ORG:{n:'Organization',c:'#E3F0E6'}, PRD:{n:'Product · Lite/Full',lf:1,c:'#F5EBDB'},
+  PLT:{n:'Platform',c:'#EFE4E4'}, SAL:{n:'Sales · Lite/Full',lf:1,c:'#F9E3D8'},
+  WH:{n:'Warehouse · Lite/Full',lf:1,c:'#DBEDE8'}, PUR:{n:'Purchase · Lite/Full',lf:1,c:'#F6E7C9'},
+  FIN:{n:'Finance · Lite/Full',lf:1,c:'#DFE8F2'}, ACC:{n:'Accounting · Lite/Full',lf:1,c:'#EDE8DA'},
+  HR:{n:'HR · Lite/Full',lf:1,c:'#F0E0EA'},
+  TEN:{n:'Tenant & Packaging · CUBIC',cubic:1,c:'#E6DCF0'}
+};
+var STATUS = {
+  done:{label:'เสร็จแล้ว',c:'var(--green)'},
+  reg:{label:'ระบบเดิมมี (registry)',c:'var(--grey)'},
+  html:{label:'มี HTML บางส่วน',c:'var(--ink)'},
+  plan:{label:'อยู่แผน',c:'var(--orange)'},
+  gap:{label:'เริ่มใหม่',c:'var(--red)'}
+};
+var WAVES = [
+  {k:'W1', t:'W1 · ฐานราก', d:'ไม่รอใครในระบบ — ขนานได้ทั้งแถว · +Tenant & Packaging (v1.2)'},
+  {k:'W2', t:'W2 · Governance + สินค้า', d:'DOA · สิทธิ์ · Item · JE backbone'},
+  {k:'W3', t:'W3 · Master ธุรกรรม', d:'ขนานได้ทั้งแถว'},
+  {k:'W4', t:'W4 · Master ต่อยอด', d:'ราคา · ลูกค้า · Inventory'},
+  {k:'W5', t:'W5 · Stock control + คน-เวลา', d:''},
+  {k:'W6', t:'W6 · ขาขายต้นทาง', d:'SQ → SO'},
+  {k:'W7', t:'W7 · ขาซื้อ', d:'PR → CP → PO'},
+  {k:'W8', t:'W8 · รับเข้า', d:'GR → Put Away'},
+  {k:'W9', t:'W9 · จัดส่ง', d:'Picking → Packing → DN'},
+  {k:'W10', t:'W10 · บิล-ตั้งหนี้', d:'ตามส่งจริง + 3-way'},
+  {k:'W11', t:'W11 · ลดหนี้-เคลียร์-รับเงิน', d:''},
+  {k:'W12', t:'W12 · จ่าย-เบิก-เงินเดือน', d:''},
+  {k:'W13', t:'W13 · ภาษี-ยกมา-กระทบยอด', d:''},
+  {k:'W14', t:'W14 · ปิดงวด-งบการเงิน', d:'ปลายทาง ERP'}
+];
+var F = [
+  {en:'Tenant Management',th:'จัดการผู้เช่า',m:'TEN',s:'gap',w:'W1',note:'provision tenant · ยังไม่พัฒนา (v1.2)'},
+  {en:'Onboarding',th:'ขึ้นระบบลูกค้าใหม่',m:'TEN',s:'gap',w:'W1',note:'6 phase · มีเอกสารใน registry แต่ยังไม่พัฒนา'},
+  {en:'Package & Entitlement',th:'แพ็คเกจและสิทธิ์ใช้งาน',m:'TEN',s:'gap',w:'W1',note:'SKU Lite/Full ต่อ tenant'},
+  {en:'Module Linkage Config',th:'ตั้งค่าการเชื่อม module',m:'TEN',s:'gap',w:'W1',note:'matrix เส้น active/manual · Global Contract #10'},
+  {en:'Signup Portal',th:'สมัครใช้งานหน้าบ้าน',m:'TEN',s:'gap',w:'W2',dep:'Package & Entitlement',note:'v1.3 · เลือก module+ราคา แบบ Odoo'},
+  {en:'Subscription & Billing',th:'ชำระเงิน-รอบบิล',m:'TEN',s:'gap',w:'W2',dep:'Signup Portal',note:'v1.3 · payment gateway + ต่ออายุ/upgrade'},
+  {en:'Instant Provisioning',th:'เปิดระบบทันที',m:'TEN',s:'gap',w:'W2',dep:'Billing · Tenant Mgt · Entitlement',note:'v1.3 · จ่ายสำเร็จ→พร้อมใช้ทันที'},
+  {en:'My Subscription',th:'แพ็คเกจของฉัน',m:'SYS',s:'gap',w:'W2',dep:'Package & Entitlement (C-TEN-03)',note:'v1.4 · ฝั่ง tenant: ดูสิทธิ์/บิล + ขอซื้อเพิ่ม'},
+  {en:'My Linkage Settings',th:'ตั้งค่าการเชื่อมของฉัน',m:'SYS',s:'gap',w:'W2',dep:'Module Linkage Config',note:'v1.4 · ฝั่ง tenant: toggle เส้นที่มีสิทธิ์'},
+ // W1 ฐานราก (15)
+ {en:'Policy Document',th:'เอกสารนโยบาย',m:'POL',s:'done',w:'W1'},
+ {en:'User Management',th:'ผู้ใช้',m:'SYS',s:'done',w:'W1',dep:'Employee (mock)'},
+ {en:'Monitor Logs',th:'System Log / Error',m:'SYS',s:'done',w:'W1'},
+ {en:'Company',th:'บริษัท (รวมโครงองค์กร)',m:'ORG',s:'done',w:'W1'},
+ {en:'Cost Center',th:'ศูนย์ต้นทุน',m:'ORG',s:'done',w:'W1'},
+ {en:'Fiscal Periods',th:'ปีบัญชีและงวด',m:'ORG',s:'done',w:'W1'},
+ {en:'Working Calendar',th:'ปฏิทิน/วันหยุด',m:'ORG',s:'gap',w:'W1'},
+ {en:'Unit of Measure',th:'หน่วยวัด',m:'PRD',s:'done',w:'W1'},
+ {en:'Notification',th:'Notification Center',m:'PLT',s:'reg',w:'W1'},
+ {en:'Audit Trail',th:'Audit Trail กลาง',m:'PLT',s:'reg',w:'W1'},
+ {en:'Document Center',th:'ศูนย์เอกสาร/ไฟล์',m:'PLT',s:'gap',w:'W1'},
+ {en:'Bank Master',th:'ธนาคาร',m:'FIN',s:'reg',w:'W1'},
+ {en:'Payment Method',th:'วิธีชำระเงิน',m:'FIN',s:'done',w:'W1'},
+ {en:'Tax Code',th:'รหัสภาษี',m:'ACC',s:'reg',w:'W1'},
+ {en:'Chart of Accounts',th:'ผังบัญชี',m:'ACC',s:'plan',w:'W1'},
+ // W2 Governance + สินค้า (6)
+ {en:'DOA',th:'สายอนุมัติ',m:'POL',s:'done',w:'W2',dep:'Policy Doc · Company (โครงตำแหน่ง)'},
+ {en:'Roles & Permissions',th:'บทบาท-สิทธิ์',m:'POL',s:'done',w:'W2',dep:'Policy Doc · User Mgmt'},
+ {en:'Item Master',th:'สินค้า/วัสดุ (สวิตช์ซื้อได้/ขายได้)',m:'PRD',s:'done',w:'W2',dep:'UoM · BOM (คู่กันใน wave)'},
+ {en:'Bill of Materials',th:'สูตร/ชุดสินค้า',m:'PRD',s:'done',w:'W2',dep:'ทำคู่ Item Master'},
+ {en:'GL Posting Group',th:'กลุ่มการลงบัญชี',m:'ACC',s:'html',w:'W2',dep:'Chart of Accounts'},
+ {en:'Employee Master',th:'พนักงาน (feed ทุก module)',m:'HR',s:'done',w:'W2',dep:'Company'},
+ // W3 Master ธุรกรรม (9)
+ {en:'Permission Matrix',th:'ตารางสิทธิ์',m:'POL',s:'done',w:'W3',dep:'Roles & Permissions'},
+ {en:'Product Catalog',th:'แค็ตตาล็อกสินค้า',m:'PRD',s:'done',w:'W3',dep:'Item Master'},
+ {en:'Customer Group',th:'กลุ่มลูกค้า',m:'SAL',s:'plan',w:'W3'},
+ {en:'Sales Channel',th:'ช่องทางการขาย',m:'SAL',s:'plan',w:'W3'},
+ {en:'Sales Configuration',th:'ตั้งค่าการขาย',m:'SAL',s:'plan',w:'W3'},
+  {en:'Sales Territory',th:'เขตการขาย/สายวิ่ง',m:'SAL',s:'html',w:'W3',note:'v1.3 · sales-module.html'},
+ {en:'Vendor Master',th:'ผู้ขาย',m:'PUR',s:'done',w:'W3'},
+ {en:'Purchase Configuration',th:'ตั้งค่าจัดซื้อ',m:'PUR',s:'html',w:'W3'},
+ {en:'Payment Terms',th:'เงื่อนไขชำระเงิน',m:'ACC',s:'plan',w:'W3'},
+ {en:'Warehouse & Bin',th:'คลังและตำแหน่ง',m:'WH',s:'plan',w:'W3',dep:'Company'},
+ // W4 Master ต่อยอด (7)
+ {en:'Menu Registry',th:'ทะเบียนเมนู',m:'SYS',s:'gap',w:'W4',dep:'Permission Matrix'},
+ {en:'Ticket',th:'Ticket Feature',m:'SYS',s:'reg',w:'W4',dep:'User Mgmt · Notification'},
+ {en:'Customer Master',th:'ลูกค้า',m:'SAL',s:'html',w:'W4',dep:'Customer Group'},
+ {en:'Sales Price List',th:'บัญชีราคาขาย',m:'SAL',s:'plan',w:'W4',dep:'Product Catalog · Customer Group'},
+ {en:'Vendor Price List',th:'บัญชีราคาผู้ขาย',m:'PUR',s:'done',w:'W4',dep:'Vendor Master'},
+ {en:'Promotion',th:'โปรโมชัน',m:'SAL',s:'html',w:'W4',dep:'Customer Group'},
+  {en:'Trade Agreement',th:'ข้อตกลงการค้า',m:'SAL',s:'html',w:'W4',dep:'Customer Master',note:'v1.3 · เงื่อนไข/ราคารายสัญญา'},
+  {en:'Sales Target',th:'เป้าการขาย',m:'SAL',s:'html',w:'W4',dep:'Sales Territory',note:'v1.3 · เป้าต่อเขต/พนักงาน'},
+ {en:'Inventory',th:'ยอดคงคลังตามที่เก็บ',m:'WH',s:'done',w:'W4',dep:'Item Master · W&Bin'},
+ // W5 Stock control + คน-เวลา (6)
+ {en:'Stocktake',th:'การนับสินค้า',m:'WH',s:'plan',w:'W5',dep:'Inventory · DOA'},
+ {en:'Stock Transfer',th:'การโอนย้าย',m:'WH',s:'plan',w:'W5',dep:'Inventory · W&Bin · DOA'},
+ {en:'Prospect',th:'ผู้สนใจ (ลีด)',m:'SAL',s:'done',w:'W5'},
+ {en:'Time & Attendance',th:'ลงเวลา',m:'HR',s:'reg',w:'W5',dep:'Employee · Working Calendar'},
+ {en:'Leave Management',th:'วันลา',m:'HR',s:'reg',w:'W5',dep:'Employee · DOA'},
+ {en:'Journal Entry',th:'สมุดรายวัน (posting backbone)',m:'ACC',s:'reg',w:'W5',dep:'GL Posting Group · Fiscal Periods · Cost Center · DOA'},
+ // W6 ขาขายต้นทาง (3)
+ {en:'Sales Quotation',th:'ใบเสนอราคา',m:'SAL',s:'html',w:'W6',dep:'Prospect · Price List · Customer · Inventory (ATP) · DOA'},
+ {en:'Sales Order',th:'คำสั่งขาย',m:'SAL',s:'html',w:'W6',dep:'SQ · Item · Sales Config · Doc Center · DOA'},
+ {en:'Stock Adjustment',th:'ปรับยอดคงคลัง',m:'WH',s:'done',w:'W6',dep:'Stocktake · Inventory · DOA'},
+ // W7 ขาซื้อ (3)
+ {en:'Purchase Requisition',th:'ใบขอซื้อ',m:'PUR',s:'done',w:'W7',dep:'Purchase Config · Cost Center · DOA'},
+ {en:'Quotation Comparison',th:'ใบเทียบราคา',m:'PUR',s:'plan',w:'W7',dep:'PR · Vendor Price List · DOA'},
+ {en:'Purchase Order',th:'ใบสั่งซื้อ',m:'PUR',s:'plan',w:'W7',dep:'CP · Vendor · Item · Payment Terms · DOA'},
+ // W8 รับเข้า (2)
+ {en:'Goods Receipt',th:'ใบรับสินค้า',m:'WH',s:'plan',w:'W8',dep:'PO · W&Bin · Doc Center — หนักสุด 12 rules'},
+ {en:'Put Away',th:'จัดเก็บเข้าตำแหน่ง',m:'WH',s:'plan',w:'W8',dep:'GR'},
+ // W9 จัดส่ง (3)
+ {en:'Picking',th:'หยิบสินค้า',m:'WH',s:'plan',w:'W9',dep:'SO · Inventory'},
+ {en:'Packing',th:'แพ็คสินค้า',m:'WH',s:'plan',w:'W9',dep:'Picking'},
+ {en:'Delivery Note',th:'ใบส่งของ',m:'WH',s:'plan',w:'W9',dep:'Packing'},
+ // W10 บิล-ตั้งหนี้ (3)
+  {en:'Visit Operation',th:'ตรวจเยี่ยมร้านย่อย',m:'SAL',s:'html',w:'W7',dep:'Customer · Territory',note:'v1.3 · Journey Plan + check-in + เช็คสต๊อกร้านย่อย + survey'},
+  {en:'Outlet Replenishment',th:'เติมของร้านย่อย',m:'SAL',s:'gap',w:'W7',dep:'Visit Operation · SO · Item',note:'v1.3 · ผลเช็คสต๊อก→สั่งเติม→SO อัตโนมัติ'},
+ {en:'Sales Return',th:'รับคืนจากลูกค้า',m:'SAL',s:'plan',w:'W10',dep:'DN · DOA'},
+ {en:'AR Invoice',th:'ใบแจ้งหนี้/ใบกำกับภาษี',m:'ACC',s:'plan',w:'W10',dep:'DN (bill from delivery) · Tax Code · Payment Terms · JE'},
+ {en:'AP Invoice',th:'ตั้งหนี้เจ้าหนี้ (3-way)',m:'ACC',s:'plan',w:'W10',dep:'PO · GR · Doc Center · DOA — 15 rules'},
+ // W11 ลดหนี้-เคลียร์-รับเงิน (4)
+ {en:'Return to Vendor',th:'คืนของผู้ขาย',m:'WH',s:'plan',w:'W11',dep:'GR · DOA'},
+ {en:'Credit / Debit Note',th:'ใบลดหนี้/เพิ่มหนี้',m:'ACC',s:'plan',w:'W11',dep:'Sales Return · RTV · DOA — 19 rules'},
+ {en:'GR/IR Clearing',th:'บัญชีพักรับของ',m:'ACC',s:'plan',w:'W11',dep:'GR · AP Invoice'},
+ {en:'Receipt Voucher',th:'ใบสำคัญรับ',m:'FIN',s:'plan',w:'W11',dep:'AR Invoice · Payment Method · JE'},
+ // W12 จ่าย-เบิก-เงินเดือน (3)
+ {en:'Payment Voucher',th:'ใบสำคัญจ่าย',m:'FIN',s:'plan',w:'W12',dep:'AP Invoice · Bank · DOA · JE'},
+ {en:'Expense Claim',th:'เบิกค่าใช้จ่าย',m:'HR',s:'gap',w:'W12',dep:'Cost Center · AP Invoice · Doc Center · DOA'},
+ {en:'Payroll',th:'เงินเดือน',m:'HR',s:'reg',w:'W12',dep:'Employee · Time · Leave · DOA → JE'},
+ // W13 ภาษี-ยกมา-กระทบยอด (5)
+ {en:'Opening Balance',th:'ยอดยกมา',m:'ACC',s:'gap',w:'W13',dep:'CoA · JE · DOA'},
+ {en:'Trial Balance',th:'งบทดลอง',m:'ACC',s:'gap',w:'W13',dep:'JE'},
+ {en:'VAT Return (PP.30)',th:'ภ.พ.30',m:'ACC',s:'gap',w:'W13',dep:'AR Invoice · AP Invoice — บังคับตามกฎหมาย'},
+ {en:'Withholding Tax',th:'ภ.ง.ด.3/53',m:'ACC',s:'gap',w:'W13',dep:'Payment Voucher — บังคับตามกฎหมาย'},
+ {en:'Bank Reconciliation',th:'กระทบยอดธนาคาร',m:'FIN',s:'reg',w:'W13',dep:'Bank · Receipt V. · Payment V.'},
+ // W14 ปิดงวด-งบ (2)
+ {en:'Period Close',th:'ปิดงวด/ล็อกงวด',m:'ACC',s:'gap',w:'W14',dep:'Trial Balance · Fiscal Periods · DOA'},
+ {en:'Financial Statements',th:'งบการเงิน (PL/BS/CF)',m:'ACC',s:'gap',w:'W14',dep:'Period Close — ปลายทาง ERP ทั้งระบบ'}
+];
+var EXPECTED = 85;
+var selM = {}, selS = {};
+
+function esc(t){var d=document.createElement('span');d.textContent=t;return d.innerHTML;}
+
+function renderStats(){
+  var c={done:0,reg:0,html:0,plan:0,gap:0};
+  F.forEach(function(f){c[f.s]++;});
+  var el=document.getElementById('stats');
+  el.innerHTML=
+    '<div class="stat"><b>'+F.length+'</b><span>features — ทำทุกตัว</span></div>'+
+    '<div class="stat"><b>11</b><span>modules</span></div>'+
+    '<div class="stat"><b>'+WAVES.length+'</b><span>waves</span></div>'+
+    '<div class="stat"><b style="color:var(--green)">'+c.done+'</b><span>เสร็จแล้ว</span></div>'+
+    '<div class="stat"><b style="color:var(--grey)">'+c.reg+'</b><span>ระบบเดิมมี</span></div>'+
+    '<div class="stat"><b style="color:var(--ink)">'+c.html+'</b><span>มี HTML</span></div>'+
+    '<div class="stat"><b style="color:var(--orange)">'+c.plan+'</b><span>อยู่แผน</span></div>'+
+    '<div class="stat"><b style="color:var(--red)">'+c.gap+'</b><span>เริ่มใหม่</span></div>';
+  if(F.length!==EXPECTED){document.getElementById('warn').style.display='block';}
+}
+
+function renderFilters(){
+  var el=document.getElementById('fModules');
+  var htm='';
+  Object.keys(MODULES).forEach(function(k){
+    htm+='<button class="chip" data-m="'+k+'">'+esc(MODULES[k].n)+'</button>';
+  });
+  htm+='<div class="divider"></div>';
+  Object.keys(STATUS).forEach(function(k){
+    htm+='<button class="chip" data-s="'+k+'">'+esc(STATUS[k].label)+'</button>';
+  });
+  htm+='<button class="chip clr" data-clr="1">ล้าง filter</button>';
+  el.innerHTML=htm;
+  el.addEventListener('click',function(e){
+    var b=e.target.closest('.chip'); if(!b)return;
+    if(b.dataset.clr){selM={};selS={};}
+    else if(b.dataset.m){selM[b.dataset.m]=!selM[b.dataset.m];}
+    else if(b.dataset.s){selS[b.dataset.s]=!selS[b.dataset.s];}
+    syncChips(); applyFilter();
+  });
+}
+
+function syncChips(){
+  document.querySelectorAll('.chip[data-m]').forEach(function(b){b.classList.toggle('on',!!selM[b.dataset.m]);});
+  document.querySelectorAll('.chip[data-s]').forEach(function(b){b.classList.toggle('on',!!selS[b.dataset.s]);});
+}
+
+function applyFilter(){
+  var mOn=Object.keys(selM).some(function(k){return selM[k];});
+  var sOn=Object.keys(selS).some(function(k){return selS[k];});
+  document.querySelectorAll('.fcard').forEach(function(c){
+    var ok=(!mOn||selM[c.dataset.m])&&(!sOn||selS[c.dataset.s]);
+    c.classList.toggle('hidden',!ok);
+  });
+  document.querySelectorAll('.col').forEach(function(col){
+    var vis=col.querySelectorAll('.fcard:not(.hidden)').length;
+    col.querySelector('.cnt').textContent=vis;
+  });
+}
+
+function renderBoard(){
+  var el=document.getElementById('board');
+  var htm='';
+  WAVES.forEach(function(w){
+    var items=F.filter(function(f){return f.w===w.k;});
+    htm+='<div class="col"><div class="colhead"><div class="t">'+esc(w.t)+' · <span class="cnt">'+items.length+'</span></div>'+
+         (w.d?'<div class="d">'+esc(w.d)+'</div>':'')+'</div><div class="colbody">';
+    items.forEach(function(f){
+      var mod=MODULES[f.m];
+      var doneCls=(f.s==='done')?' isdone':'';
+      htm+='<div class="fcard'+doneCls+'" data-m="'+f.m+'" data-s="'+f.s+'" style="--mc:'+mod.c+';--mbg:'+mod.c+'">'+
+        '<div class="en"><span class="dot" style="background:'+STATUS[f.s].c+'"></span>'+esc(f.en)+((f.s==='done')?' <span class="chk">✓</span>':'')+'</div>'+
+        '<div class="th">'+esc(f.th)+'</div>'+
+        '<div class="row"><span class="mtag">'+esc(mod.n)+'</span>'+(mod.lf?'<span class="lfbadge">L/F</span>':'')+(mod.cubic?'<span class="cubicbadge">CUBIC</span>':'')+'</div>'+
+        (f.dep?'<div class="dep"><b>รอ:</b> '+esc(f.dep)+'</div>':'')+
+        '</div>';
+    });
+    htm+='</div></div>';
+  });
+  el.innerHTML=htm;
+}
+
+renderStats(); renderFilters(); renderBoard();
+</script>
+</body>
+</html>
