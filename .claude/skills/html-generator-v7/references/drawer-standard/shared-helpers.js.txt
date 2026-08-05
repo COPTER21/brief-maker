@@ -1,0 +1,79 @@
+    // ============================================================
+    //  CANCEL/DELETE MODAL
+    // ============================================================
+    function confirmCancel(id) {
+      const r = state.records.find(x => x.id === id);
+      if (!r) return;
+      const modal = document.createElement('div');
+      modal.className = 'modal-overlay';
+      modal.innerHTML = `
+        <div class="backdrop" onclick="this.parentElement.remove();"></div>
+        <div class="card" style="position: relative; max-width: 480px; width: 100%; box-shadow: var(--sh-xl);">
+          <div style="padding: 18px; border-bottom: 1px solid var(--c-border-soft); display: flex; align-items: flex-start; gap: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--c-danger-08); display: grid; place-items: center; flex-shrink: 0;">
+              <i data-lucide="alert-triangle" class="w-5 h-5" style="color: var(--c-danger);"></i>
+            </div>
+            <div>
+              <h3 style="font-size: 14px; font-weight: 700; color: var(--c-navy);">ลบใบขอซื้อ ${r.pr_no}?</h3>
+              <p style="font-size: 13px; margin-top: 4px; color: var(--c-text-mute);">การลบจะไม่สามารถย้อนกลับได้ กรุณาระบุเหตุผลด้านล่าง</p>
+            </div>
+          </div>
+          <div style="padding: 18px;">
+            <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--c-navy);">เหตุผลในการลบ <span style="color: var(--c-danger);">*</span></label>
+            <textarea id="cancelReason" rows="3" placeholder="ระบุเหตุผล..." class="input" style="height: auto; padding: 10px 12px; resize: vertical;"></textarea>
+          </div>
+          <div style="padding: 12px 18px; background: var(--c-off-white); border-top: 1px solid var(--c-border-soft); display: flex; align-items: center; justify-content: flex-end; gap: 8px; border-radius: 0 0 var(--r-lg) var(--r-lg);">
+            <button onclick="this.closest('.modal-overlay').remove();" class="btn btn-ghost">ปิด</button>
+            <button onclick="(function(){
+              const reason=document.getElementById('cancelReason').value.trim();
+              if(!reason){ showToast('กรุณาระบุเหตุผล','warning'); return; }
+              const rec=state.records.find(x=>x.id==='${id}');
+              rec.status='cancelled'; rec.updated_at=new Date().toISOString().slice(0,10);
+              showToast('ลบ ' + rec.pr_no + ' เรียบร้อย','success');
+              document.querySelectorAll('.modal-overlay').forEach(n=>n.remove());
+              if(getRoute().name==='view') closeViewDrawer(); else renderTableOnly();
+            })()" class="btn btn-danger">
+              <i data-lucide="trash" class="w-4 h-4"></i>
+              <span>ยืนยันลบ</span>
+            </button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      renderIcons();
+    }
+
+    // ============================================================
+    //  SHARED HELPERS
+    // ============================================================
+    function closeAllOverlays() { document.getElementById('overlay-root').innerHTML = ''; }
+
+    function renderPill(status) {
+      const labels = { draft: 'ฉบับร่าง', pending: 'รออนุมัติ', approved: 'อนุมัติแล้ว', rejected: 'ปฏิเสธ', cancelled: 'ยกเลิก' };
+      const cls = ['draft','pending','approved','rejected','cancelled'].includes(status) ? status : 'draft';
+      return `<span class="pill ${cls}">${labels[status] || status}</span>`;
+    }
+
+    function formatMoney(n) {
+      const x = Number(n) || 0;
+      return x.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function formatThaiDate(d) {
+      if (!d) return '';
+      const [y, m, day] = d.split('-').map(Number);
+      const buddhist = (y + 543);
+      return `${day}/${m}/${buddhist}`;
+    }
+
+    function showToast(message, type = 'success') {
+      const colors = { success: 'var(--c-teal)', error: 'var(--c-danger)', warning: 'var(--c-warning)', info: 'var(--c-primary)' };
+      const icons = { success: 'check-circle-2', error: 'x-circle', warning: 'alert-triangle', info: 'info' };
+      const t = document.createElement('div');
+      t.className = 'animate-slide-in';
+      t.style.cssText = `background: ${colors[type]}; color: white; padding: 10px 14px; border-radius: var(--r); box-shadow: var(--sh-lg); display: flex; align-items: center; gap: 10px; min-width: 280px; font-size: 13px;`;
+      t.innerHTML = `<i data-lucide="${icons[type]}" class="w-4 h-4"></i><span>${message}</span>`;
+      document.getElementById('toast-root').appendChild(t);
+      renderIcons();
+      setTimeout(() => { t.style.transition = 'opacity 200ms'; t.style.opacity = '0'; setTimeout(() => t.remove(), 200); }, 2800);
+    }

@@ -1,0 +1,2841 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ธนาคาร / บัญชีบริษัท · CUBE NATIVE</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+
+<!-- Lucide Icons: loader ที่ท้าย body (ดู section "Lucide loader" ก่อน main script tag) -->
+<!-- เหตุผล:
+     1) ย้ายมาท้าย body หลีกเลี่ยง race กับ DOMContentLoaded
+     2) Multi-CDN fallback (unpkg → jsdelivr → cdnjs)
+     3) Pin version (เลิกใช้ @latest ที่ flaky — GitHub issue #2962)
+-->
+
+<style>
+/* ===== BASE-KIT v6.4 — DO NOT EDIT (Rule #69) — page CSS ต่อท้ายหลัง END marker ===== */
+/* ============== CSS VARIABLES (CUBE CI — v2.0 Warm Light rebrand) ============== */
+:root {
+  /* z-index scale (referenced by base-kit CSS via var()) */
+  --z-sticky: 10; --z-shell: 20; --z-dropdown: 30;
+  --z-backdrop: 50; --z-drawer: 51; --z-modal: 60; --z-toast: 80;
+  --c-navy: #111111;
+  --c-navy-2: #111111;
+  --c-primary: #FF3B30;
+  --c-primary-hover: #E62E24;
+  --c-teal: #FF9A1F;
+  --c-teal-light: #FFB763;
+  --c-ink: #111111;
+  --c-mute: #54565C;
+  --c-mute-2: #73757B;
+  --c-mute-3: #9A9CA2;
+  --c-line: #DEDAD4;
+  --c-line-2: #E9E5E0;
+  --c-line-3: #F1EEEA;
+  --c-bg-off: #FAF8F5;
+  --c-success: #1F9D55;
+  --c-warning: #E8870F;
+  --c-danger: #E62E24;
+  --sidebar-w: 232px;
+  --shell-h: 52px;
+  /* v3.13 — Fixed type scale (Iron Rule locked values) */
+  --fs-h1: 22px;        /* page title */
+  --fs-h2: 17px;        /* section title */
+  --fs-h3: 15px;        /* card / drawer title */
+  --fs-body: 14px;      /* body default */
+  --fs-sub: 13px;       /* secondary body / table cell */
+  --fs-meta: 12px;      /* meta / label */
+  --fs-cap: 11px;       /* uppercase section caption */
+  --fs-kpi: 28px;       /* stat value */
+  /* v3.13 — Fixed spacing scale */
+  --sp-xs: 4px; --sp-sm: 8px; --sp-md: 12px; --sp-lg: 20px; --sp-xl: 28px;
+  /* v3.13 — Fixed radius scale */
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-full: 999px;
+}
+
+/* ============== RESET ============== */
+* { box-sizing: border-box; }
+html, body { margin:0; padding:0; }
+/* Rule #35 — Layout Stability: จองพื้นที่ scrollbar ไว้เสมอ → เปิด modal/drawer หรือ
+   content โตขึ้นแล้ว scrollbar โผล่/หาย จะไม่ทำให้หน้าจอขยับซ้าย-ขวา (jank) */
+html { scrollbar-gutter: stable; }
+
+/* ============== SCROLLBAR (Iron Rule #49 — minimal, ห้าม default) ============== */
+/* เส้นบางมาก 5px · track โปร่งใส · พื้นเข้ม (sidebar/panel) = ขาวโปร่ง · พื้นสว่าง = charcoal จาง */
+* { scrollbar-width: thin; scrollbar-color: rgba(17,17,17,.16) transparent; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(17,17,17,.14); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(17,17,17,.26); }
+.sidebar, .slide { scrollbar-color: rgba(255,255,255,.28) transparent; }
+.sidebar ::-webkit-scrollbar-thumb, .slide ::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb, .slide::-webkit-scrollbar-thumb { background: rgba(255,255,255,.28); }
+.sidebar ::-webkit-scrollbar-thumb:hover, .slide ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.42); }
+body {
+  font-family: 'Satoshi', 'Noto Sans Thai', system-ui, sans-serif;
+  background: var(--c-bg-off);
+  color: var(--c-ink);
+  font-size:14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  /* Admin tools: force horizontal scroll on narrow widths */
+  min-width: 1180px;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+[data-lucide] { flex-shrink: 0; }
+
+/* Hide number input spinner globally (Iron Rule #19) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin:0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ============== SIDEBAR ============== */
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sidebar-w);
+  background: #111111;
+  color: #E9E5E0;
+  z-index:var(--z-shell);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.sb-brand {
+  padding:18px;
+  display: flex;
+  align-items: center;
+  gap:12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+.sb-logo {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, #FF3B30, #FF9A1F);
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(255,59,48,0.3);
+}
+.sb-name { font-weight: 700; font-size:14px; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+.sb-sub { font-size:11px; color: #9A9CA2; letter-spacing: 0.06em; font-weight: 600; text-transform: uppercase; margin-top:2px; }
+.sb-nav { flex: 1; padding:12px 8px; overflow-y: auto; }
+
+/* Module = collapsible group (Iron Rule #27).
+   Header toggles expand/collapse only — NOT navigable.
+   Children = .sb-features (clickable feature items). */
+.sb-module { margin-bottom:4px; }
+.sb-module-header {
+  display: flex; align-items: center; gap:8px;
+  width: 100%;
+  padding:8px 10px;
+  border-radius: 6px;
+  background: transparent; border: 0;
+  color: #9A9CA2;
+  font-family: inherit;
+  font-size:11px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  cursor: pointer; transition: all 120ms;
+  text-align: left;
+}
+.sb-module-header:hover { background: rgba(255,255,255,0.04); color: #DEDAD4; }
+.sb-module-header .mod-icon { flex-shrink: 0; opacity: 0.7; }
+.sb-module-header .mod-label { flex: 1; }
+.sb-module-header .mod-chevron {
+  flex-shrink: 0;
+  transition: transform 200ms;
+  opacity: 0.7;
+}
+.sb-module[data-expanded="false"] .mod-chevron { transform: rotate(-90deg); }
+.sb-module[data-expanded="false"] .sb-features { display: none; }
+
+.sb-features { padding:2px 0 6px 0; }
+
+.sb-item {
+  display: flex; align-items: center; gap:10px;
+  padding:8px 12px 8px 16px;
+  border-radius: 6px;
+  color: #DEDAD4;
+  font-size:13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms;
+  margin-bottom:1px;
+  position: relative;
+  user-select: none;
+}
+.sb-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sb-item.is-active {
+  background: #FF3B30;
+  color: #fff;
+  font-weight: 600;
+}
+.sb-item.is-active::before {
+  content: '';
+  position: absolute;
+  left: -10px; top: 7px; bottom: 7px;
+  width: 3px;
+  background: #fff;
+  border-radius: 0 2px 2px 0;
+}
+.sb-item [data-lucide] { width: 16px; height: 16px; opacity: 0.85; }
+.sb-item.is-active [data-lucide] { opacity: 1; }
+.sb-badge {
+  margin-left:auto;
+  font-size:11px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.10);
+  color: #9A9CA2;
+  padding:2px 8px;
+  border-radius: 999px;
+}
+.sb-item.is-active .sb-badge { background: rgba(255,255,255,0.18); color: #fff; }
+.sb-item.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.sb-item.is-disabled:hover { background: transparent; color: #DEDAD4; }
+.sb-footer {
+  padding:12px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  gap:8px;
+  font-size:12px;
+  color: #9A9CA2;
+}
+.pulse-dot {
+  width: 7px; height: 7px;
+  background: var(--c-teal);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(255,154,31,0.20);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ============== MAIN ============== */
+.main {
+  margin-left:var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--c-bg-off);
+}
+
+/* ============== SHELL BAR ============== */
+.shell-bar {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  border-bottom: 1px solid var(--c-line-2);
+  height: var(--shell-h);
+  display: flex;
+  align-items: center;
+  padding:0 24px;
+  z-index:var(--z-sticky);
+  gap:12px;
+}
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap:8px;
+  font-size:13px;
+  color: var(--c-mute);
+}
+.breadcrumb a { cursor: pointer; transition: color 120ms; }
+.breadcrumb a:hover { color: var(--c-primary); }
+.breadcrumb .sep { color: var(--c-mute-3); font-size:11px; }
+.breadcrumb-current { color: var(--c-ink); font-weight: 500; }
+.icon-btn {
+  width: 34px; height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--c-mute);
+  border-radius: 7px;
+  position: relative;
+  transition: all 120ms;
+}
+.icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.icon-btn [data-lucide] { width: 17px; height: 17px; }
+.notif-dot {
+  position: absolute;
+  top: 7px; right: 8px;
+  width: 7px; height: 7px;
+  background: var(--c-danger);
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap:10px;
+  padding:6px 10px 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 120ms;
+}
+.user-chip:hover { background: var(--c-line-3); }
+.user-text { line-height: 1.2; text-align: right; }
+.user-name { font-size:12.5px; font-weight: 500; color: var(--c-ink); white-space: nowrap; }
+.user-role { font-size:11px; color: var(--c-mute-2); white-space: nowrap; margin-top:1px; }
+.avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* User dropdown menu */
+.user-menu {
+  position: absolute;
+  top: calc(var(--shell-h) - 4px);
+  right: 22px;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(17,17,17,0.12);
+  width: 240px;
+  z-index:var(--z-dropdown);
+  padding:6px;
+  display: none;
+}
+.user-menu.is-open { display: block; }
+.user-menu-item {
+  display: flex;
+  align-items: center;
+  gap:10px;
+  padding:8px 12px;
+  border-radius: 6px;
+  font-size:13px;
+  color: var(--c-ink);
+  cursor: pointer;
+  transition: background 120ms;
+}
+.user-menu-item:hover { background: var(--c-bg-off); }
+.user-menu-item [data-lucide] { width: 15px; height: 15px; color: var(--c-mute-2); }
+.user-menu-item.is-danger { color: var(--c-danger); }
+.user-menu-item.is-danger [data-lucide] { color: var(--c-danger); }
+.user-menu-divider { height: 1px; background: var(--c-line-2); margin:6px 0; }
+
+/* ============== CONTENT ============== */
+/* Fluid full-width — content stretches to fill viewport (Iron Rule #30).
+   Do NOT add max-width here; component-level constraints (modal/toast/wizard
+   internal cards) are responsible for their own readability bounds. */
+.content {
+  padding:24px;
+}
+
+/* ============== PAGE HEADER ============== */
+.ph {
+  margin-bottom:18px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap:16px;
+}
+.ph > div:first-child { flex: 1 1 auto; min-width: 280px; }
+.ph-title-row {
+  display: flex;
+  align-items: baseline;
+  gap:10px;
+  margin-bottom:6px;
+}
+.ph-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:20px;
+  font-weight: 700;
+  color: var(--c-navy);
+  margin:0;
+  letter-spacing: -0.01em;
+}
+.ph-count {
+  font-size:12.5px;
+  font-weight: 600;
+  color: var(--c-mute-2);
+  background: var(--c-line-3);
+  padding:3px 10px;
+  border-radius: 999px;
+}
+.ph-sub { font-size:13px; color: var(--c-mute); margin:0; }
+.ph-actions { display: flex;align-items:center; gap:8px; flex-shrink: 0; }
+
+/* ============== BUTTONS ============== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;   /* Rule #36 — content กึ่งกลางแนวนอน */
+  gap:6px;
+  height: 36px;
+  /* Rule #36 — padding-top 2px = optical centering สำหรับฟอนต์ไทย (Noto Sans Thai):
+     baseline ของไทยลอยสูงเมื่อ flex-center เพราะ font เผื่อที่สระล่าง → นัดจ์ลง 2px ให้เข้ากลางจริง.
+     ✅ verified ด้วยการ render จริง — ทนทุกเบราว์เซอร์ (ต่างจาก text-box-trim ที่รองรับเฉพาะ Chrome 133+). */
+  padding:2px 16px 0;
+  border-radius: 8px;
+  font-size:13px;
+  font-weight: 500;
+  /* ⚠️ Rule #36 — ห้ามใส่ line-height:1 / overflow:hidden กับตัวปุ่มที่มีข้อความไทย
+     เพราะจะ "ตัดสระบน-วรรณยุกต์-สระล่าง" ทำให้ตัวอักษรเบี้ยว. ปล่อย line-height ตาม body (1.5). */
+  border: 1px solid transparent;
+  background: transparent;
+  white-space: nowrap;       /* label ไม่ตัดบรรทัด → ปุ่มในแถวเดียวสูงเท่ากัน */
+  transition: all 120ms;
+  user-select: none;
+  cursor: pointer;
+}
+.btn [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; }  /* Rule #36 — icon ไม่ถูกบีบ */
+.btn:disabled, .btn.is-disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+.btn-eq { min-width: 104px; }  /* Rule #36 — ปุ่มคู่ที่ควรสมมาตร → กว้างเท่ากัน */
+/* Rule #36 — label ยาวที่ "ต้อง" จำกัดความกว้าง: truncate ที่ span (.lbl) ไม่ใช่ที่ตัวปุ่ม.
+   line-height (1.5) สูงพอ → overflow:hidden ตัดเฉพาะแนวนอน (ไม่ตัดสระไทย). ปกติปล่อยปุ่มโตตาม label ดีกว่า. */
+.btn-truncate { max-width: 220px; }
+.btn-truncate .lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn-primary { background: var(--c-primary); color: #fff; }
+.btn-primary:hover { background: var(--c-primary-hover); box-shadow: 0 2px 8px rgba(255,59,48,0.30); }
+.btn-secondary { background: #fff; border-color: var(--c-line); color: var(--c-ink); }
+.btn-secondary:hover { background: var(--c-line-3); border-color: var(--c-mute-2); }
+.btn-ghost { color: var(--c-mute); }
+.btn-ghost:hover { background: var(--c-line-3); color: var(--c-ink); }
+.btn-danger { background: #fff; border-color: var(--c-line); color: var(--c-danger); }
+.btn-danger:hover { background: #FFE9E7; border-color: var(--c-danger); }
+.btn-link { background: transparent; border: 0; padding:0 4px; height: auto; color: var(--c-primary); font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn-sm { height: 30px; padding:2px 12px 0; font-size:12px; }
+
+/* ============== STATS (KPI Cards) ============== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap:12px;
+  margin-bottom:18px;
+}
+.stat {
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  padding:16px 16px;
+  transition: all 150ms;
+}
+.stat:hover { border-color: var(--c-line); box-shadow: 0 2px 8px rgba(17,17,17,0.05); }
+.stat-label {
+  display: flex;
+  align-items: center;
+  gap:6px;
+  font-size:12px;
+  font-weight: 500;
+  color: var(--c-mute);
+}
+.stat-label [data-lucide] { width: 13px; height: 13px; color: var(--c-primary); }
+.stat-value {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:26px;
+  font-weight: 700;
+  color: var(--c-navy);
+  margin-top:6px;
+  letter-spacing: -0.01em;
+}
+.stat-meta {
+  font-size:12px;
+  color: var(--c-mute-2);
+  margin-top:6px;
+  display: flex;
+  align-items: center;
+  gap:4px;
+}
+.stat-meta.is-up { color: var(--c-success); }
+.stat-meta.is-down { color: var(--c-danger); }
+.stat-meta [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== CARD ============== */
+.card {
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* ============== FILTER BAR ============== */
+.filter-bar {
+  padding:16px 18px;
+  display: flex;
+  gap:10px;
+  align-items: center;
+  border-bottom: 1px solid var(--c-line-2);
+  background: #fff;
+  flex-wrap: wrap;
+}
+
+/* ============== INPUTS ============== */
+.input, .select {
+  height: 36px;
+  padding:0 12px;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  font-size:13px;
+  background: #fff;
+  color: var(--c-ink);
+  font-family: inherit;
+  transition: all 120ms;
+  width: 100%;
+}
+.input:focus, .select:focus {
+  outline: none;
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px rgba(255,59,48,0.10);
+}
+.select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right:32px;
+  appearance: none;
+}
+.input-search { position: relative; flex: 1; max-width: 320px; }
+.input-search input { padding-left:36px; }
+.input-search .lead-icon {
+  position: absolute;
+  left: 11px; top: 50%;
+  transform: translateY(-50%);
+  width: 15px; height: 15px;
+  color: var(--c-mute-2);
+  pointer-events: none;
+}
+
+/* ===== SEARCH-SELECT (Iron Rule #34) — searchable dropdown แทน <select> เมื่อ options เยอะ/lookup master =====
+   list = position:absolute overlay → ไม่ดันเนื้อหา (สอดคล้อง Rule #35) */
+.search-select { position: relative; width: 100%; }
+.search-select .ss-input { padding-left:32px; padding-right:32px; }
+.search-select .ss-lead {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px;   /* ⬅ ขนาดตายตัว — ไม่พึ่ง .w-4 (กัน Lucide เรนเดอร์ 24px default → placeholder ดูห่าง) */
+  color: var(--c-mute-3); pointer-events: none;
+}
+.search-select .ss-caret {
+  position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+  width: 15px; height: 15px; color: var(--c-mute-3); pointer-events: none;
+}
+.search-select .ss-clear {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  display: inline-flex; padding:3px; border: 0; background: transparent;
+  color: var(--c-mute-2); cursor: pointer; border-radius: 6px;
+}
+.search-select .ss-clear:hover { background: var(--c-line-3); color: var(--c-ink); }
+.ss-list {
+  position: absolute; z-index:var(--z-backdrop); left: 0; right: 0; margin-top:4px;
+  max-height: 280px; overflow-y: auto; background: #fff;
+  border: 1px solid var(--c-line); border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(17,17,17,0.10), 0 4px 10px rgba(17,17,17,0.05);
+}
+.ss-opt {
+  width: 100%; display: flex; align-items: center; gap:10px; padding:10px 12px;
+  border: 0; border-bottom: 1px solid var(--c-line-3); background: transparent;
+  cursor: pointer; text-align: left; font-family: inherit;
+}
+.ss-opt:last-child { border-bottom: 0; }
+.ss-opt:hover, .ss-opt.is-active { background: rgba(255,59,48,0.06); }
+.ss-opt-ic { width: 16px; height: 16px; color: var(--c-primary); flex-shrink: 0; }  /* ขนาดตายตัวเช่นกัน */
+.ss-opt-main { flex: 1; min-width: 0; }
+.ss-opt-label { display: block; font-size:13px; color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-sub { display: block; font-size:12px; color: var(--c-mute-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-right { flex-shrink: 0; font-size:12px; color: var(--c-mute); }
+.ss-opt mark { background: rgba(255,59,48,0.16); color: inherit; padding:0 1px; border-radius: 2px; }
+.ss-empty { padding:20px 16px; text-align: center; font-size:13px; color: var(--c-mute-2); }
+
+/* ============== TABLE ============== */
+.table-scroll { overflow-x: auto; }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size:13px;
+}
+.table thead { background: var(--c-bg-off); }
+.table th {
+  padding:12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--c-mute);
+  font-size:12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--c-line-2);
+  white-space: nowrap;
+}
+.table th.col-check { width: 40px; padding-right:0; }
+.table th.is-sortable { cursor: pointer; user-select: none; }
+.table th.is-sortable:hover { color: var(--c-ink); background: var(--c-line-3); }
+.table th .sort-arrow { display: inline-block; margin-left:4px; opacity: 0.4; }
+.table th.is-sorted .sort-arrow { opacity: 1; color: var(--c-primary); }
+.table td {
+  padding:12px 16px 12px;  /* Rule #38 — optical centering ไทย: pad-top มากกว่า bottom 2px */
+  border-bottom: 1px solid var(--c-line-2);
+  color: var(--c-ink);
+  vertical-align: middle;
+}
+.table tbody tr { transition: background 120ms; }
+.table tbody tr:hover { background: var(--c-bg-off); }
+.table tbody tr.is-selected { background: rgba(255,59,48,0.04); }
+.table tbody tr.is-selected:hover { background: rgba(255,59,48,0.07); }
+.table tbody tr:last-child td { border-bottom: 0; }
+/* Rule #41 — แถวกดได้ = เปิด view (ไม่มีไอคอนดวงตา). row ที่ clickable ต้องสื่อด้วย cursor */
+.table tbody tr.is-clickable { cursor: pointer; }
+/* Rule #42 — Long-list UX: sticky header (opt-in .is-sticky) — ตารางยาว scroll หัวค้าง */
+.table-scroll.is-sticky { max-height: 560px; overflow-y: auto; scrollbar-gutter: stable; }
+.table-scroll.is-sticky thead th {
+  position: sticky; top: 0; z-index: 3;
+  background: var(--c-bg-off);            /* ⚠️ ต้องทึบที่ตัว th (ไม่ใช่แค่ thead) — ไม่งั้น row เลื่อนทะลุซ้อนหัว */
+  box-shadow: inset 0 -1px 0 var(--c-line-2);  /* border-bottom สำหรับ sticky (border ปกติหายตอน sticky) */
+}
+/* Rule #42 — Thai-safe cell truncation: ตัดเฉพาะแนวนอน (… ) line-height พอ ไม่ตัดสระ. ใส่ title=ค่าเต็มเพื่อ hover ดู */
+.cell-truncate { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+/* Rule #43 — ตัวเลข tabular + คอลัมน์ตัวเลขชิดขวา */
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+th.col-num, td.col-num { text-align: right; }
+td.col-num .num, td.col-num { font-variant-numeric: tabular-nums; }
+
+/* ============== CHECKBOX ============== */
+.cb {
+  width: 16px; height: 16px;
+  border: 1.5px solid var(--c-line);
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: all 120ms;
+  flex-shrink: 0;
+}
+.cb.is-checked, .cb.is-partial {
+  background: var(--c-primary);
+  border-color: var(--c-primary);
+}
+.cb.is-checked::after {
+  content: '';
+  position: absolute;
+  left: 4px; top: 1px;
+  width: 5px; height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.cb.is-partial::after {
+  content: '';
+  position: absolute;
+  left: 3px; top: 6px;
+  width: 8px; height: 2px;
+  background: #fff;
+}
+.cb:hover { border-color: var(--c-primary); }
+
+/* ============== USER CELL ============== */
+.user-cell { display: flex; align-items: center; gap:10px; }
+.uc-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.uc-name { font-weight: 600; color: var(--c-ink); font-size:13px; line-height: 1.3; }
+.uc-email { font-size:12px; color: var(--c-mute-2); margin-top:1px; line-height: 1.3; }
+
+/* ============== PILLS ============== */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap:4px;
+  padding:4px 10px 3px;  /* Rule #38 — optical centering ไทย: pad-top มากกว่า bottom 1px กัน text ลอยสูง (verified) */
+  border-radius: 999px;
+  font-size:12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pill [data-lucide] { width: 11px; height: 11px; }
+.pill-registered { background: #E6F0FF; color: #1A5FCC; }
+.pill-active { background: #E6F0FF; color: #1A5FCC; }
+.pill-converted { background: #E4F4EB; color: #157A41; }
+.pill-suspended { background: #FFF1DD; color: #B8690B; }
+.pill-archived { background: var(--c-line-3); color: var(--c-mute-2); }
+/* v3.13 — Semantic pill aliases (ใช้ชุดนี้เป็นหลัก — mapping ดู knowledge/microcopy.md) */
+.pill-info    { background: #E6F0FF; color: #1A5FCC; }   /* กำลังดำเนินการ/ใช้งาน */
+.pill-success { background: #E4F4EB; color: #157A41; }   /* อนุมัติแล้ว/เสร็จสิ้น */
+.pill-warning { background: #FFF1DD; color: #B8690B; }   /* รอดำเนินการ/รออนุมัติ */
+.pill-danger  { background: #FFE9E7; color: #E62E24; }   /* ปฏิเสธ/ยกเลิก */
+.pill-muted   { background: var(--c-line-3); color: var(--c-mute-2); } /* ร่าง/ปิดใช้งาน/เก็บถาวร */
+
+/* v3.13 — Loading spinner (Iron Rule #44) */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.8s linear infinite; }
+
+/* v3.13 — Form Section Grouping (Iron Rule #45) */
+.form-section { margin-top:var(--sp-xl); }
+.form-section:first-child { margin-top:0; }
+.form-section-title {
+  font-size: var(--fs-cap); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--c-mute);
+  padding-bottom:var(--sp-sm); border-bottom: 1px solid var(--c-line-2);
+  margin-bottom:var(--sp-md);
+}
+
+/* v3.13 — Segmented control (ช่วงเวลา dashboard ฯลฯ — Pattern J) */
+.seg-control { display:inline-flex; background: var(--c-line-3); border-radius: var(--r-md); padding:2px; gap:2px; }
+.seg-item {
+  padding:6px 12px 3px; border-radius: var(--r-sm); border: none; background: transparent;
+  font-size: var(--fs-meta); font-weight: 500; color: var(--c-mute-2); cursor: pointer;
+  font-family: inherit; white-space: nowrap;
+}
+.seg-item.is-active { background: #fff; color: var(--c-ink); font-weight: 600; box-shadow: 0 1px 3px rgba(17,17,17,0.08); }
+.pill-danger { background: #FFE9E7; color: var(--c-danger); }
+
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot.is-active { background: #1A5FCC; box-shadow: 0 0 0 2.5px rgba(37,99,235,0.18); }
+.dot.is-converted { background: #157A41; box-shadow: 0 0 0 2.5px rgba(6,95,70,0.20); }
+.dot.is-suspended { background: var(--c-warning); }
+.dot.is-archived { background: var(--c-mute-3); }
+
+/* Mini-link cell (e.g. tenant link) */
+.tenant-link {
+  display: inline-flex;
+  align-items: center;
+  gap:4px;
+  color: var(--c-primary);
+  font-size:12.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.tenant-link:hover { text-decoration: underline; }
+.tenant-link [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== ROW ACTIONS ============== */
+.row-actions { display: inline-flex; gap:2px; }
+.ra-btn {
+  width: 28px; height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--c-mute-2);
+  border-radius: 6px;
+  transition: all 120ms;
+}
+.ra-btn:hover { background: var(--c-line-3); color: var(--c-primary); }
+.ra-btn.is-danger:hover { background: #FFE9E7; color: var(--c-danger); }
+.ra-btn.is-success:hover { background: rgba(255,154,31,0.12); color: var(--c-teal); }
+.ra-btn [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== TABLE FOOTER ============== */
+.table-footer {
+  padding:12px 18px;
+  background: var(--c-bg-off);
+  border-top: 1px solid var(--c-line-2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size:12.5px;
+  color: var(--c-mute);
+  flex-wrap: wrap;
+  gap:10px;
+}
+.pagination { display: inline-flex; gap:4px; align-items: center; }
+.pg-btn {
+  min-width: 30px; height: 30px;
+  padding:0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 6px;
+  color: var(--c-mute);
+  font-size:12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms;
+}
+.pg-btn:hover { border-color: var(--c-line); background: var(--c-bg-off); }
+.pg-btn.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.pg-btn.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn [data-lucide] { width: 13px; height: 13px; }
+
+/* ============== BULK BAR ============== */
+.bulk-bar {
+  background: var(--c-navy);
+  color: #fff;
+  padding:12px 18px;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  gap:12px;
+  border-bottom: 1px solid var(--c-line-2);
+  margin:-1px -1px 0;
+  font-size:13px;
+}
+.bulk-bar .btn { height: 30px; padding:2px 12px 0; font-size:12px; }
+.bulk-bar .btn-secondary {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.18);
+  color: #fff;
+}
+.bulk-bar .btn-secondary:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.30); }
+
+/* ============== DRAWER ============== */
+/* ---- v6.1 Pattern B drawer chrome (locked to references/drawer-standard/pr.html) ----
+   create/edit drawer ให้ใช้ชุดนี้: .dw-head (eyebrow + h2 20px + .top-icon-btn ปิด)
+   + .d-stepper (.stepper-item/.stepper-circle 32px — ไม่ใช่ .stepper กลางของ page wizard)
+   + .dw-footer (ย้อนกลับ secondary ซ้าย · ยกเลิก ghost + primary ชิดขวา) */
+.top-icon-btn { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border:0; background:transparent; border-radius: var(--r-sm); color: var(--c-mute-2); cursor:pointer; transition: all 120ms; flex-shrink:0; }
+.top-icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.dw-head { padding:18px 24px 16px; border-bottom: 1px solid var(--c-line-2); flex-shrink: 0; }
+.dw-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap:16px; }
+.dw-eyebrow { display: flex; align-items: center; gap:6px; font-size:11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-mute-2); margin-bottom:4px; font-weight: 600; }
+.dw-title { font-size:20px; font-weight: 700; color: var(--c-navy); margin:0; letter-spacing: -0.01em; }
+.dw-sub { font-size: var(--fs-meta); color: var(--c-mute-2); margin-top:4px; }
+.d-stepper { display: flex; align-items: flex-start; gap:0; width: 100%; margin-top:18px; }
+.stepper-item { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; min-width: 0; }
+.stepper-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size:13px; font-weight: 600; background: #fff; color: var(--c-mute-3); border: 2px solid var(--c-line); transition: all 200ms; z-index: 2; }
+.stepper-item.active .stepper-circle { background: var(--c-primary); color: #fff; border-color: var(--c-primary); box-shadow: 0 0 0 4px rgba(255,59,48,0.12); }
+.stepper-item.done .stepper-circle { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
+.stepper-label { margin-top:8px; font-size:12px; font-weight: 500; color: var(--c-mute-3); text-align: center; line-height: 1.3; transition: color 200ms; }
+.stepper-item.active .stepper-label { color: var(--c-navy); font-weight: 600; }
+.stepper-item.done .stepper-label { color: var(--c-mute); }
+.stepper-item:not(:last-child)::after { content: ''; position: absolute; top: 15px; left: 50%; right: -50%; height: 2px; background: var(--c-line-2); z-index: 1; }
+.stepper-item.done:not(:last-child)::after { background: var(--c-primary); }
+.dw-footer { padding:16px 24px; border-top: 1px solid var(--c-line-2); background: var(--c-bg-off); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap:8px; }
+.dw-footer-right { display: flex; align-items: center; gap:8px; }
+
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17,17,17,0.40);
+  z-index:var(--z-backdrop);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms;
+}
+.drawer-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 920px;           /* v2 standard (Iron Rule #11) — wide drawer */
+  max-width: 96vw;
+  background: #fff;
+  z-index:var(--z-drawer);
+  transform: translateX(100%);
+  transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -16px 0 40px rgba(17,17,17,0.18);
+}
+.drawer.is-open { transform: translateX(0); }
+.drawer.standard { width: 680px; }   /* simple forms / short view (Iron Rule #11) */
+
+/* ========== STEPPER STANDARD (Iron Rule #47) — ใช้ตัวเดียวทุก wizard ========== */
+.stepper { display:flex; align-items:center; gap:var(--sp-sm); }
+.step { display:flex; align-items:center; gap:var(--sp-sm); }
+.step-dot {
+  width:26px; height:26px; border-radius: var(--r-full);
+  display:flex; align-items:center; justify-content:center;
+  font-size: var(--fs-meta); font-weight:600; padding-top:1px; /* Thai rhythm */
+  border:1.5px solid var(--c-line); background:#fff; color: var(--c-mute-2);
+}
+.step-label { font-size: var(--fs-sub); color: var(--c-mute-2); font-weight:500; white-space:nowrap; }
+.step-connector { width:28px; height:1.5px; background: var(--c-line-2); flex:0 0 auto; }
+.step.is-current .step-dot { border-color: var(--c-primary); background: var(--c-primary); color:#fff; }
+.step.is-current .step-label { color: var(--c-ink); font-weight:600; }
+.step.is-done .step-dot { border-color: var(--c-teal); background:#fff; color: var(--c-teal); }
+.step.is-done .step-connector, .step.is-current ~ * {}
+.step.is-done + .step-connector { background: var(--c-teal); }
+/* placement: drawer wizard → .drawer-stepper-band (ใต้ header) / page wizard → .wizard-stepper-band */
+.drawer-stepper-band { padding:10px 24px; border-bottom: 1px solid var(--c-line-2); background: var(--c-bg-off); }
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  gap:16px;
+  padding:18px 24px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.drawer-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.drawer-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:20px;
+  font-weight: 600;
+  color: var(--c-navy);
+  margin:0;
+  letter-spacing: -0.01em;
+}
+.drawer-subtitle {
+  font-size:12px;
+  color: var(--c-mute);
+  margin-top:4px;
+  display: flex;
+  align-items: center;
+  gap:8px;
+  flex-wrap: wrap;
+}
+.drawer-tabs {
+  display: flex;align-items:center;
+  padding:0 24px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.drawer-tab {
+  padding:10px 16px;
+  font-size:13px;
+  font-weight: 500;
+  color: var(--c-mute);
+  border-bottom: 2px solid transparent;
+  transition: all 120ms;
+  margin-bottom:-1px;
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+}
+.drawer-tab:hover { color: var(--c-ink); }
+.drawer-tab.is-active { color: var(--c-primary); border-bottom-color: var(--c-primary); }
+.drawer-body { flex: 1; overflow-y: auto; padding:24px; scrollbar-gutter: stable; }
+.drawer-section { margin-bottom:24px; }
+.drawer-section-title {
+  font-size:11px;
+  font-weight: 700;
+  color: var(--c-mute);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin:0 0 10px;
+}
+.drawer-fields {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap:10px 16px;
+  font-size:13px;
+}
+.drawer-fields .lbl { color: var(--c-mute); }
+.drawer-fields .val { color: var(--c-ink); font-weight: 500; }
+.drawer-footer {
+  padding:12px 24px;
+  border-top: 1px solid var(--c-line-2);
+  display: flex;
+  gap:8px;
+  align-items: center;
+  background: var(--c-bg-off);
+}
+/* Drawer Button Contract (Iron Rule #31) helpers */
+.footer-spacer { flex: 1; }
+.drawer-footer-meta { font-size:12px; color: var(--c-mute-2); }
+.drawer-header-actions { display: flex; gap:6px; align-items: center; }
+.drawer-header-divider { width: 1px; height: 22px; background: var(--c-line-2); margin:0 4px; flex-shrink: 0; }
+
+/* ============== TIMELINE ============== */
+.timeline { position: relative; padding-left:24px; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--c-line-2);
+}
+.tl-item { position: relative; margin-bottom:16px; }
+.tl-item:last-child { margin-bottom:0; }
+.tl-dot {
+  position: absolute;
+  left: -20px;
+  top: 3px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--c-primary);
+}
+.tl-dot.is-success { border-color: var(--c-success); }
+.tl-dot.is-warning { border-color: var(--c-warning); }
+.tl-title { font-size:13px; font-weight: 600; color: var(--c-ink); }
+.tl-meta { font-size:12px; color: var(--c-mute-2); margin-top:2px; }
+
+/* ============== BOOKMARK / RELATED CARDS ============== */
+.bm-card {
+  display: flex;
+  gap:12px;
+  padding:12px 12px;
+  border: 1px solid var(--c-line-2);
+  border-radius: 8px;
+  margin-bottom:8px;
+  cursor: pointer;
+  transition: all 120ms;
+  align-items: center;
+}
+.bm-card:hover { border-color: var(--c-line); }
+.bm-icon {
+  width: 28px; height: 28px;
+  background: rgba(255,59,48,0.10);
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-primary);
+  flex-shrink: 0;
+}
+.bm-card [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== NOTES ============== */
+.notes-area {
+  width: 100%;
+  min-height: 130px;
+  padding:12px 16px;
+  background: #fff;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  resize: vertical;
+  font-family: inherit;
+  font-size:13px;
+  line-height: 1.55;
+}
+.notes-area:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(255,59,48,0.10); }
+
+/* ============== EMPTY STATE ============== */
+.empty {
+  padding:56px 24px;
+  text-align: center;
+  color: var(--c-mute);
+}
+.empty-icon {
+  width: 52px; height: 52px;
+  margin:0 auto 16px;
+  border-radius: 50%;
+  background: var(--c-line-3);
+  color: var(--c-mute-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.empty-icon [data-lucide] { width: 22px; height: 22px; }
+.empty-title {
+  font-size:16px;
+  font-weight: 600;
+  color: var(--c-ink);
+  margin-bottom:6px;
+  font-family: 'Noto Sans Thai', sans-serif;
+}
+.empty-desc { font-size:13px; color: var(--c-mute); max-width: 320px; margin:0 auto; }
+.empty .btn { margin-top:16px; }  /* Rule #39 — empty state ควรมีปุ่ม action หลัก */
+
+/* ============== MODAL ============== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17,17,17,0.50);
+  z-index:var(--z-backdrop);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 440px;
+  max-width: 92vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.96);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 24px 64px rgba(17,17,17,0.28);
+  overflow: hidden;
+}
+.modal-backdrop.is-open .modal { transform: scale(1); }
+.modal-header {
+  padding:18px 24px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap:12px;
+}
+.modal-header-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: rgba(255,59,48,0.10);
+  color: var(--c-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.modal-header-icon.is-danger { background: #FFE9E7; color: var(--c-danger); }
+.modal-header-icon.is-warning { background: #FFF1DD; color: var(--c-warning); }
+.modal-header-icon [data-lucide] { width: 18px; height: 18px; }
+.modal-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:16px;
+  font-weight: 600;
+  color: var(--c-navy);
+  margin:0 0 4px;
+}
+.modal-subtitle { font-size:13px; color: var(--c-mute); margin:0; line-height: 1.5; }
+.modal-body {
+  padding:6px 24px 18px;
+  font-size:13px;
+  color: var(--c-ink);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+.modal-footer {
+  padding:12px 24px;
+  background: var(--c-bg-off);
+  border-top: 1px solid var(--c-line-2);
+  display: flex;align-items:center;
+  justify-content: flex-end;
+  gap:8px;
+}
+
+/* ============== FIELDS ============== */
+.field { margin-bottom:16px; }
+.field-label { display: block; font-size:12.5px; font-weight: 500; color: var(--c-mute); margin-bottom:6px; }
+.field-label .req { color: var(--c-danger); margin-left:2px; }
+.field-input { width: 100%; }
+.field-help { font-size:12px; color: var(--c-mute-2); margin-top:4px; }
+/* Rule #43 — จองพื้นที่ error ไว้ (visibility แทน display) → error โผล่แล้วฟอร์มไม่กระตุก.
+   ถ้า field ไหนไม่ใส่ <div class="field-error"> ก็ไม่จองพื้นที่ (author เลือกเองรายตัว) */
+.field-error { font-size:12px; color: var(--c-danger); margin-top:4px; min-height: 15px; visibility: hidden; }
+.field.is-invalid .input,
+.field.is-invalid .select { border-color: var(--c-danger); }
+.field.is-invalid .field-error { visibility: visible; }
+
+/* Responsive form grid (Iron Rule #17) */
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap:12px;
+}
+
+/* ============== TOAST ============== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--c-navy);
+  color: #fff;
+  padding:12px 18px;
+  border-radius: 10px;
+  font-size:13px;
+  font-weight: 500;
+  z-index:var(--z-toast);
+  display: flex;
+  align-items: center;
+  gap:10px;
+  box-shadow: 0 12px 32px rgba(17,17,17,0.30);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 380px;
+}
+.toast.is-visible { transform: translateY(0); opacity: 1; }
+.toast.is-success { background: var(--c-success); }
+.toast.is-info { background: var(--c-primary); }
+.toast.is-warning { background: var(--c-warning); }
+.toast.is-error { background: var(--c-danger); }
+.toast [data-lucide] { width: 17px; height: 17px; }
+
+/* ============== LINE EXPAND ANIMATION (Pattern E) ============== */
+.line-expanded {
+  animation: lineExpand 220ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+@keyframes lineExpand {
+  from { max-height: 0; opacity: 0; transform: translateY(-8px); }
+  to { max-height: 600px; opacity: 1; transform: translateY(0); }
+}
+
+/* ============== WIZARD LAYOUT (Iron Rule #22) ============== */
+.page-content-host.has-wizard { display: flex; flex-direction: column; height: 100%; }
+.wizard-shell { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 100%; }
+.wizard-stepper-band {
+  flex: 0 0 auto; background: white;
+  padding:18px 32px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.wizard-body { flex: 1 1 auto; padding:24px 32px 28px; min-height: 0; background: var(--c-bg-off); }
+.wizard-card {
+  padding:28px 32px;
+  width: 100%;
+  max-width: 960px;
+  margin:0 auto;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+}
+.wizard-footer {
+  flex: 0 0 auto;
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding:12px 32px;
+  display: flex;align-items:center;
+  justify-content: space-between;
+  border-top: 1px solid var(--c-line-2);
+  box-shadow: 0 -2px 8px rgba(17,17,17,0.04);
+  z-index:var(--z-sticky);
+}
+.stepper-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+  max-width: 640px;
+  margin:0 auto;
+  gap:0;
+}
+.stepper-row .step-line {
+  flex: 1 1 auto;
+  min-width: 28px;
+  max-width: 80px;
+  height: 2px;
+  background: var(--c-line-2);
+}
+.stepper-row .step-line.is-done { background: var(--c-primary); }
+.step-dot {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--c-line-2);
+  color: var(--c-mute-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12.5px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.step-dot.is-active { background: var(--c-primary); color: #fff; }
+.step-dot.is-done { background: var(--c-primary); color: #fff; }
+
+/* ============== UTILITIES ============== */
+.hidden { display: none !important; }  /* v6.1 — search-select/overlay พึ่ง class นี้ (เดิมหายไป ทำให้ ss-list เปิดค้าง + ปุ่ม X โผล่) */
+.text-mute { color: var(--c-mute); }
+.text-mute-2 { color: var(--c-mute-2); }
+.text-primary { color: var(--c-primary); }
+.text-success { color: var(--c-success); }
+.text-danger { color: var(--c-danger); }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap:8px; }
+.gap-3 { gap:12px; }
+.gap-4 { gap:16px; }
+.mb-2 { margin-bottom:8px; }
+.mb-3 { margin-bottom:12px; }
+.mb-4 { margin-bottom:16px; }
+.mt-2 { margin-top:8px; }
+.mt-3 { margin-top:12px; }
+.mt-4 { margin-top:16px; }
+
+/* Icon utility classes (CSS-defined so no Tailwind dependency for these) */
+.w-2\.5 { width: 10px; }   .h-2\.5 { height: 10px; }
+.w-3   { width: 12px; }    .h-3   { height: 12px; }
+.w-3\.5 { width: 14px; }   .h-3\.5 { height: 14px; }
+.w-4   { width: 16px; }    .h-4   { height: 16px; }
+.w-5   { width: 20px; }    .h-5   { height: 20px; }
+
+/* ============================================================
+   Lucide SVG sizing fix
+   ------------------------------------------------------------
+   Lucide replaces <i data-lucide="..."> with <svg class="lucide ...">
+   ที่มี width="24" height="24" attributes ติดมาด้วย — attributes
+   เหล่านี้ override CSS class .w-N ทำให้ icons เด้งเป็น 24×24
+   ดัน pill/button สูงเกินขนาด design.
+
+   วิธีแก้: บังคับ svg.lucide ทุกตัวให้ width/height = 1em แล้ว
+   ปรับขนาดผ่าน font-size บน parent. Plus override สำหรับเคสที่
+   ใช้ .w-N/.h-N โดยตรงบน <i> (Lucide จะ copy class ไปยัง svg)
+   ============================================================ */
+svg.lucide {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: -0.125em;
+  flex-shrink: 0;
+}
+/* เมื่อ .w-N / .h-N ถูก copy ไปบน svg.lucide ให้บังคับ override
+   width/height attributes ที่ Lucide ใส่มา (specificity ชนะ attribute) */
+svg.lucide.w-2\.5 { width: 10px; }   svg.lucide.h-2\.5 { height: 10px; }
+svg.lucide.w-3    { width: 12px; }   svg.lucide.h-3    { height: 12px; }
+svg.lucide.w-3\.5 { width: 14px; }   svg.lucide.h-3\.5 { height: 14px; }
+svg.lucide.w-4    { width: 16px; }   svg.lucide.h-4    { height: 16px; }
+svg.lucide.w-5    { width: 20px; }   svg.lucide.h-5    { height: 20px; }
+
+/* ===== Tooltip (#33/#67 — hint เข้า ⓘ hover) ===== */
+.info-tip{display:inline-flex;align-items:center;margin-left:6px;color:var(--c-mute-2);cursor:help;position:relative}
+.info-tip svg,.info-tip i{width:14px;height:14px}
+.info-tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:var(--c-navy);color:#fff;font-size:12px;line-height:1.5;padding:8px 12px;border-radius:8px;
+  max-width:340px;width:max-content;white-space:normal;opacity:0;pointer-events:none;transition:opacity .12s;z-index:var(--z-dropdown)}
+.info-tip:hover::after{opacity:1}
+/* ===== Drop-up (#66) ===== */
+.drop-up{bottom:100%!important;top:auto!important;margin-bottom:4px}
+
+/* ===== END BASE-KIT — page-specific CSS below ===== */
+
+/* Company switcher bar */
+.co-bar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; background:#fff;
+  border:1px solid var(--c-line-2); border-radius:10px; padding:12px 16px; margin-bottom:16px; }
+.co-bar .co-label { font-size:12px; font-weight:600; color:var(--c-mute); text-transform:uppercase; letter-spacing:0.06em; }
+.co-bar .select { width:auto; min-width:280px; }
+.co-bar .co-meta { margin-left:auto; display:flex; align-items:center; gap:16px; font-size:12.5px; color:var(--c-mute-2); }
+.co-bar .co-meta b { color:var(--c-ink); font-weight:600; }
+
+/* Page tabs */
+.ptabs { display:flex; align-items:center; gap:2px; border-bottom:1px solid var(--c-line-2); margin-bottom:18px; }
+.ptab { display:inline-flex; align-items:center; gap:7px; padding:10px 16px 8px; font-size:13.5px; font-weight:500;
+  color:var(--c-mute); border:0; background:transparent; border-bottom:2px solid transparent; margin-bottom:-1px;
+  cursor:pointer; font-family:inherit; transition:all 120ms; }
+.ptab:hover { color:var(--c-ink); }
+.ptab.is-active { color:var(--c-primary); border-bottom-color:var(--c-primary); font-weight:600; }
+.ptab [data-lucide] { width:15px; height:15px; }
+.ptab .ptab-count { font-size:11px; font-weight:600; background:var(--c-line-3); color:var(--c-mute-2);
+  padding:1px 7px; border-radius:999px; }
+.ptab.is-active .ptab-count { background:rgba(255,59,48,0.12); color:var(--c-primary); }
+
+/* Bank identity cell */
+.bank-cell { display:flex; align-items:center; gap:10px; }
+.bank-logo { width:32px; height:32px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700; color:#fff; flex-shrink:0; letter-spacing:-0.02em; }
+.bank-name { font-weight:600; color:var(--c-ink); font-size:13px; }
+
+/* Masked account number cell */
+.acc-num { font-variant-numeric:tabular-nums; font-feature-settings:"tnum"; letter-spacing:0.02em; font-size:13px; color:var(--c-ink); }
+.acc-reveal { display:inline-flex; align-items:center; gap:3px; margin-left:8px; font-size:11.5px; font-weight:600;
+  color:var(--c-primary); background:transparent; border:0; padding:2px 4px; border-radius:5px; cursor:pointer; font-family:inherit; }
+.acc-reveal:hover { background:rgba(255,59,48,0.08); }
+.acc-reveal [data-lucide] { width:12px; height:12px; }
+
+/* Default flags */
+.dflags { display:inline-flex; gap:5px; flex-wrap:wrap; }
+.dflag { display:inline-flex; align-items:center; gap:3px; font-size:11px; font-weight:600; padding:3px 8px 2px; border-radius:999px; white-space:nowrap; }
+.dflag [data-lucide] { width:11px; height:11px; }
+.dflag-pay { background:#FFF1DD; color:#B8690B; }
+.dflag-rcv { background:#E4F4EB; color:#157A41; }
+.dflag-none { color:var(--c-mute-3); font-size:12px; }
+
+/* Definition grid in view drawer */
+.def-grid { display:grid; grid-template-columns:150px 1fr; gap:11px 18px; font-size:13px; }
+.def-grid .dg-lbl { color:var(--c-mute); }
+.def-grid .dg-val { color:var(--c-ink); font-weight:500; }
+
+/* Default toggle rows (view drawer) */
+.dtoggle-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px;
+  border:1px solid var(--c-line-2); border-radius:10px; margin-bottom:10px; }
+.dtoggle-row .dt-info { min-width:0; }
+.dtoggle-row .dt-title { font-size:13px; font-weight:600; color:var(--c-ink); display:flex; align-items:center; gap:6px; }
+.dtoggle-row .dt-desc { font-size:12px; color:var(--c-mute-2); margin-top:2px; }
+.toggle { width:42px; height:24px; border-radius:999px; background:var(--c-line); position:relative; cursor:pointer;
+  transition:background 160ms; flex-shrink:0; }
+.toggle.is-on { background:var(--c-primary); }
+.toggle .toggle-slider { position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#fff;
+  box-shadow:0 1px 3px rgba(0,0,0,0.25); transition:transform 160ms; }
+.toggle.is-on .toggle-slider { transform:translateX(18px); }
+
+/* Audit list */
+.audit-list { display:flex; flex-direction:column; gap:0; }
+.audit-item { display:flex; gap:12px; padding:11px 0; border-bottom:1px solid var(--c-line-3); }
+.audit-item:last-child { border-bottom:0; }
+.audit-ic { width:28px; height:28px; border-radius:7px; background:var(--c-line-3); color:var(--c-mute-2);
+  display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+.audit-ic [data-lucide] { width:14px; height:14px; }
+.audit-ic.is-reveal { background:rgba(255,59,48,0.10); color:var(--c-primary); }
+.audit-body { min-width:0; flex:1; }
+.audit-act { font-size:13px; font-weight:600; color:var(--c-ink); }
+.audit-detail { font-size:12px; color:var(--c-mute-2); margin-top:1px; }
+.audit-meta { font-size:11.5px; color:var(--c-mute-3); margin-top:3px; }
+
+/* Doc picker (mock) rows */
+.pick-row { display:flex; align-items:center; gap:11px; padding:11px 12px; border:1px solid var(--c-line-2);
+  border-radius:9px; margin-bottom:8px; }
+.pick-row .pr-main { flex:1; min-width:0; }
+.pick-row .pr-name { font-size:13px; font-weight:600; color:var(--c-ink); }
+.pick-row .pr-sub { font-size:12px; color:var(--c-mute-2); margin-top:1px; }
+.note { display:flex; gap:9px; padding:11px 13px; border-radius:9px; font-size:12.5px; line-height:1.55; }
+.note [data-lucide] { width:16px; height:16px; flex-shrink:0; margin-top:1px; }
+.note.is-info { background:#E6F0FF; color:#1A5FCC; }
+.note.is-warn { background:#FFF1DD; color:#B8690B; }
+</style>
+</head>
+<body>
+
+<!-- ===== SIDEBAR (Iron Rule #27 Module→Feature) ===== -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i data-lucide="box" class="w-4 h-4"></i></div>
+    <div>
+      <div class="sb-name">CUBE NATIVE</div>
+      <div class="sb-sub">Finance</div>
+    </div>
+  </div>
+  <nav class="sb-nav" id="sb-nav">
+    <div class="sb-module" data-module="finance" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="landmark" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">การเงิน</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item is-active" data-feature="bank-master">
+          <i data-lucide="building-2" class="w-4 h-4"></i>
+          <span>ธนาคาร / บัญชีบริษัท</span>
+        </a>
+        <a class="sb-item is-disabled" data-feature="payment-voucher">
+          <i data-lucide="banknote" class="w-4 h-4"></i>
+          <span>ใบสำคัญจ่าย</span>
+        </a>
+        <a class="sb-item is-disabled" data-feature="receipt-voucher">
+          <i data-lucide="receipt" class="w-4 h-4"></i>
+          <span>ใบสำคัญรับ</span>
+        </a>
+        <a class="sb-item is-disabled" data-feature="bank-recon">
+          <i data-lucide="scale" class="w-4 h-4"></i>
+          <span>กระทบยอดธนาคาร</span>
+        </a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="accounting" data-expanded="false">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="book-open" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">บัญชี</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item is-disabled" data-feature="coa">
+          <i data-lucide="list-tree" class="w-4 h-4"></i>
+          <span>ผังบัญชี</span>
+        </a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="system" data-expanded="false">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sliders-horizontal" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">System</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item is-disabled" data-feature="settings">
+          <i data-lucide="settings" class="w-4 h-4"></i>
+          <span>ตั้งค่า</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+  <div class="sb-footer">
+    <div class="pulse-dot"></div>
+    <span>Sandbox · v1.0.0</span>
+  </div>
+</aside>
+
+<!-- ===== MAIN ===== -->
+<main class="main">
+  <header class="shell-bar">
+    <nav class="breadcrumb">
+      <a data-breadcrumb-module="finance">การเงิน</a>
+      <i data-lucide="chevron-right" class="w-3 h-3 sep"></i>
+      <span class="breadcrumb-current">ธนาคาร / บัญชีบริษัท</span>
+    </nav>
+    <div style="display:flex; align-items:center; gap:6px; margin-left:auto;">
+      <div class="notif-wrap" style="position:relative;">
+        <button class="icon-btn" onclick="toggleNotif()" id="notifBtn">
+          <i data-lucide="bell" class="w-4 h-4"></i>
+          <span class="notif-dot"></span>
+        </button>
+      </div>
+      <div style="position:relative;">
+        <div class="user-chip" onclick="toggleUserMenu()">
+          <div class="user-text">
+            <div class="user-name">ศศิธร บุญมี</div>
+            <div class="user-role">Finance Admin · 2BSimple</div>
+          </div>
+          <div class="avatar">ศบ</div>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-item"><i data-lucide="user" class="w-3.5 h-3.5"></i><span>โปรไฟล์ของฉัน</span></div>
+          <div class="user-menu-item"><i data-lucide="settings" class="w-3.5 h-3.5"></i><span>ตั้งค่า</span></div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-item is-danger"><i data-lucide="log-out" class="w-3.5 h-3.5"></i><span>ออกจากระบบ</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="content" id="page-content"><!-- rendered by render() --></div>
+</main>
+
+<script>
+// ===== Shell helpers (from erp-shell template) =====
+function toggleUserMenu(){ document.getElementById('userMenu').classList.toggle('is-open'); }
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.user-chip') && !e.target.closest('.user-menu')) {
+    document.getElementById('userMenu')?.classList.remove('is-open');
+  }
+});
+function toggleNotif(){ showToast('ยังไม่มีการแจ้งเตือนใหม่', 'info'); }
+</script>
+
+<!-- Drawer container (always include, even if no drawer used initially) -->
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <!-- Drawer content rendered by render() function -->
+</div>
+
+<!-- Modal container -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <!-- Modal content rendered by render() function -->
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast" id="toast"></div>
+
+<!-- ============================================================
+     Lucide Icons Loader (multi-CDN fallback, pinned version)
+     ------------------------------------------------------------
+     ทำไมไม่ใช้ <script src="..."> ตรง ๆ:
+       - Single CDN = single point of failure (corp proxy/firewall block)
+       - @latest = breaking changes โดยไม่บอก (GitHub issue #2962)
+       - script tag ใน head โดยไม่มี defer ชน DOMContentLoaded
+     กลยุทธ์:
+       1) Pin version 0.469.0 (stable, ทดสอบแล้ว)
+       2) ลอง CDN 3 ตัวเรียงตามความน่าเชื่อถือ: unpkg → jsdelivr → cdnjs
+       3) ถ้าทุก CDN fail → log warning + ไม่ block render
+            (UI ยังใช้งานได้ แค่ไม่มี icons)
+     ============================================================ -->
+<script>
+(function loadLucide() {
+  var version = '0.469.0';
+  var cdns = [
+    'https://unpkg.com/lucide@' + version + '/dist/umd/lucide.min.js',
+    'https://cdn.jsdelivr.net/npm/lucide@' + version + '/dist/umd/lucide.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/lucide/' + version + '/lucide.min.js'
+  ];
+  var i = 0;
+  function tryNext() {
+    if (i >= cdns.length) {
+      console.warn('[Lucide] All CDNs failed. Icons จะไม่แสดง but UI ยังใช้งานได้');
+      window.lucide = window.lucide || { createIcons: function() {} }; // no-op fallback
+      window.dispatchEvent(new Event('lucide:ready'));
+      return;
+    }
+    var s = document.createElement('script');
+    s.src = cdns[i++];
+    s.onload = function() {
+      window.dispatchEvent(new Event('lucide:ready'));
+    };
+    s.onerror = tryNext;
+    document.head.appendChild(s);
+  }
+  tryNext();
+})();
+</script>
+
+<script>
+// ============================================
+// STATE
+// ============================================
+const state = {
+  currentRoute: 'home',
+  drawer: { open: false, mode: null, recordId: null, step: 1 },
+  modal: { open: false, type: null, data: null },
+  toast: { visible: false, message: '', variant: 'info' },
+  filters: { search: '', status: 'all' },
+  pagination: { page: 1, pageSize: 20 },
+  sort: { col: null, dir: 'asc' },
+  selectedIds: new Set(),
+  records: [],
+};
+
+// ============================================
+// SIDEBAR — Module collapse/expand (Iron Rule #27)
+// Module header is non-navigable; click toggles children visibility.
+// State persists in DOM (data-expanded) — future: persist per user.
+// ============================================
+function toggleModule(headerEl) {
+  const mod = headerEl.closest('.sb-module');
+  if (!mod) return;
+  const isExpanded = mod.getAttribute('data-expanded') !== 'false';
+  mod.setAttribute('data-expanded', isExpanded ? 'false' : 'true');
+}
+
+// ============================================
+// ROUTER (Hash-based, refresh-safe)
+// ============================================
+function getRoute() {
+  const hash = location.hash;
+  if (!hash || hash === '#' || hash === '#/') return 'home';
+  return hash.replace(/^#\//, '');
+}
+function navigate(route) {
+  location.hash = '#/' + route;
+}
+
+// ============================================
+// DRAWER / MODAL TOGGLES
+// ============================================
+function openDrawer(mode, recordId) {
+  state.drawer = { open: true, mode, recordId, step: 1 };
+  render();
+  // Trigger CSS animation
+  requestAnimationFrame(() => {
+    document.getElementById('drawerBackdrop').classList.add('is-open');
+    document.getElementById('drawer').classList.add('is-open');
+  });
+}
+function closeDrawer() {
+  document.getElementById('drawerBackdrop').classList.remove('is-open');
+  document.getElementById('drawer').classList.remove('is-open');
+  setTimeout(() => {
+    state.drawer = { open: false, mode: null, recordId: null, step: 1 };
+  }, 280);
+}
+function openModal(type, data) {
+  state.modal = { open: true, type, data };
+  render();
+  requestAnimationFrame(() => {
+    document.getElementById('modalBackdrop').classList.add('is-open');
+  });
+}
+function closeModal() {
+  document.getElementById('modalBackdrop').classList.remove('is-open');
+  setTimeout(() => {
+    state.modal = { open: false, type: null, data: null };
+  }, 200);
+}
+
+// ============================================
+// TOAST
+// ============================================
+function showToast(message, variant = 'info', durationMs = 2800) {
+  const el = document.getElementById('toast');
+  const iconMap = { success: 'check-circle-2', info: 'info', warning: 'alert-triangle', error: 'x-circle' };
+  el.className = 'toast is-' + variant;
+  el.innerHTML = `<i data-lucide="${iconMap[variant] || 'info'}" class="w-4 h-4"></i><span>${message}</span>`;
+  renderIcons();
+  requestAnimationFrame(() => el.classList.add('is-visible'));
+  setTimeout(() => el.classList.remove('is-visible'), durationMs);
+}
+
+// ============================================
+// ESC key handler (close drawer/modal)
+// ============================================
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (state.modal.open) closeModal();
+    else if (state.drawer.open) closeDrawer();
+  }
+});
+
+// ============================================
+// RENDER (placeholder — replace per feature)
+// ============================================
+function render() {
+  // Specific feature should override this function.
+  //
+  // ⚠️ Iron Rule #29 — Render Preservation:
+  // If your render() does innerHTML rebuild (typical pattern), wrap with
+  // withRenderPreservation() OR use preserveRenderState()/restoreRenderState()
+  // to keep scroll position + focus across re-renders.
+  //
+  // Example:
+  //   function render() {
+  //     const snap = preserveRenderState();
+  //     document.getElementById('page-content').innerHTML = renderPage();
+  //     drawer.innerHTML = state.drawer.open ? renderDrawer() : '';
+  //     renderIcons();
+  //     restoreRenderState(snap);
+  //   }
+  //
+  // After every DOM update, call renderIcons() — safe wrapper ที่ทน race เมื่อ Lucide ยังไม่ load.
+  renderIcons();
+}
+
+// ============================================
+// INIT
+// ============================================
+// Helper: safe icon render — กัน race ก่อน lucide load เสร็จ
+function renderIcons() {
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// ============================================
+// SEARCH-SELECT (Iron Rule #34) — generic searchable dropdown
+// ------------------------------------------------
+// ใช้แทน <select> เมื่อ options เยอะ (>8) หรือเป็น lookup จาก master อื่น.
+// list = position:absolute overlay → ไม่ดันเนื้อหา. แก้เฉพาะ list ตอนพิมพ์ →
+// ไม่ rebuild ทั้งหน้า (ไม่ชน Rule #29). decoupled — เรียก onSelect callback ไม่ผูก render().
+//
+// วิธีใช้ 2 ขั้น:
+//   1) ใส่ markup:  ${searchSelectHTML('country', { placeholder: 'เลือกประเทศ' })}
+//   2) หลัง markup อยู่ใน DOM แล้ว (เช่นท้าย render()):
+//        initSearchSelect('country', {
+//          options: countries.map(c => ({ value:c.code, label:c.name, sub:c.code, icon:'flag', right:'' })),
+//          value: state.form.country,
+//          onSelect: (val, opt) => { state.form.country = val; }
+//        });
+// option fields: { value, label, sub?, icon?, right? }
+// ============================================
+window.__ss = window.__ss || {};
+function ssGet(key){ return window.__ss[key]; }
+function ssEscapeReg(s){ return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+function searchSelectHTML(key, opt){
+  opt = opt || {};
+  var ph = opt.placeholder || 'ค้นหา...';
+  return ''
+    + '<div class="search-select" id="ss-' + key + '">'
+    +   '<i data-lucide="search" class="ss-lead w-4 h-4"></i>'
+    +   '<input type="text" class="input ss-input" id="ss-input-' + key + '" autocomplete="off" placeholder="' + ph + '"'
+    +     ' oninput="ssOnInput(\'' + key + '\', this.value)" onfocus="ssOpen(\'' + key + '\')" onkeydown="ssOnKey(\'' + key + '\', event)">'
+    +   '<button type="button" class="ss-clear hidden" id="ss-clear-' + key + '" tabindex="-1" onclick="ssClear(\'' + key + '\')"><i data-lucide="x" class="w-4 h-4"></i></button>'
+    +   '<i data-lucide="chevron-down" class="ss-caret" id="ss-caret-' + key + '"></i>'
+    +   '<div class="ss-list hidden" id="ss-list-' + key + '"></div>'
+    + '</div>';
+}
+function initSearchSelect(key, cfg){
+  cfg = cfg || {};
+  window.__ss[key] = {
+    options: cfg.options || [], value: (cfg.value != null ? cfg.value : null),
+    onSelect: cfg.onSelect || function(){}, emptyText: cfg.emptyText || 'ไม่พบรายการ',
+    query: '', open: false, hi: 0
+  };
+  ssSetText(key); ssSyncChrome(key); renderIcons();
+}
+function ssFiltered(key){
+  var s = ssGet(key); if(!s) return [];
+  var q = (s.query || '').toLowerCase().trim();
+  if(!q) return s.options;
+  return s.options.filter(function(o){
+    return String(o.label).toLowerCase().includes(q)
+      || String(o.value).toLowerCase().includes(q)
+      || String(o.sub || '').toLowerCase().includes(q);
+  });
+}
+function ssSyncChrome(key){
+  var s = ssGet(key); if(!s) return;
+  var sel = s.options.find(function(o){ return o.value === s.value; });
+  var c = document.getElementById('ss-clear-' + key); if(c) c.classList.toggle('hidden', !sel);
+  var k = document.getElementById('ss-caret-' + key); if(k) k.classList.toggle('hidden', !!sel);
+}
+function ssSetText(key){
+  var s = ssGet(key); if(!s) return;
+  var input = document.getElementById('ss-input-' + key); if(!input) return;
+  var sel = s.options.find(function(o){ return o.value === s.value; });
+  input.value = s.open ? s.query : (sel ? sel.label : '');
+}
+function ssRenderList(key){
+  var s = ssGet(key); if(!s) return;
+  var list = document.getElementById('ss-list-' + key); if(!list) return;
+  var items = ssFiltered(key);
+  if(items.length === 0){
+    list.innerHTML = '<div class="ss-empty">' + s.emptyText + '</div>';
+  } else {
+    var q = (s.query || '').toLowerCase().trim();
+    var hl = function(t){ return q ? String(t).replace(new RegExp('(' + ssEscapeReg(q) + ')', 'gi'), '<mark>$1</mark>') : String(t); };
+    list.innerHTML = items.map(function(o, i){
+      return '<button type="button" class="ss-opt ' + (i === s.hi ? 'is-active' : '') + '" onmousedown="event.preventDefault()" onclick="ssPick(\'' + key + '\', ' + i + ')">'
+        + (o.icon ? '<i data-lucide="' + o.icon + '" class="ss-opt-ic w-4 h-4"></i>' : '')
+        + '<span class="ss-opt-main"><span class="ss-opt-label">' + hl(o.label) + '</span>'
+        + (o.sub ? '<span class="ss-opt-sub">' + hl(o.sub) + '</span>' : '') + '</span>'
+        + (o.right ? '<span class="ss-opt-right">' + o.right + '</span>' : '')
+        + '</button>';
+    }).join('');
+  }
+  list.classList.toggle('hidden', !s.open);
+  renderIcons();
+}
+function ssOpen(key){ var s = ssGet(key); if(!s) return; s.open = true; s.query = ''; s.hi = 0; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+function ssOnInput(key, val){ var s = ssGet(key); if(!s) return; s.query = val; s.open = true; s.hi = 0; s.value = null; ssSyncChrome(key); ssRenderList(key); }
+function ssPick(key, i){ var s = ssGet(key); if(!s) return; var o = ssFiltered(key)[i]; if(!o) return; s.value = o.value; s.query = ''; s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); s.onSelect(o.value, o); }
+function ssClear(key){ var s = ssGet(key); if(!s) return; s.value = null; s.query = ''; s.open = true; ssSetText(key); ssSyncChrome(key); ssRenderList(key); var inp = document.getElementById('ss-input-' + key); if(inp) inp.focus(); s.onSelect(null, null); }
+function ssOnKey(key, e){
+  var s = ssGet(key); if(!s) return; var items = ssFiltered(key);
+  if(e.key === 'ArrowDown'){ e.preventDefault(); s.open = true; s.hi = Math.min(items.length - 1, s.hi + 1); ssRenderList(key); }
+  else if(e.key === 'ArrowUp'){ e.preventDefault(); s.hi = Math.max(0, s.hi - 1); ssRenderList(key); }
+  else if(e.key === 'Enter'){ e.preventDefault(); if(items[s.hi]) ssPick(key, s.hi); }
+  else if(e.key === 'Escape'){ s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+}
+document.addEventListener('click', function(e){
+  Object.keys(window.__ss || {}).forEach(function(key){
+    var wrap = document.getElementById('ss-' + key); var s = ssGet(key);
+    if(wrap && s && s.open && !wrap.contains(e.target)){ s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+  });
+});
+
+// ============================================
+// FORMAT HELPERS (Iron Rule #43) — Thai locale, consistent ทุก feature
+// ใช้ตัวเหล่านี้เสมอ ห้าม format ตัวเลข/วันที่เองรายจุด
+// ============================================
+function fmtNumber(n, dp){ if(n==null||n==='')return '—'; var x=Number(n); if(isNaN(x))return String(n);
+  return x.toLocaleString('th-TH', {minimumFractionDigits: dp||0, maximumFractionDigits: dp!=null?dp:2}); }
+function fmtMoney(n, dp){ if(n==null||n==='')return '—'; var x=Number(n); if(isNaN(x))return String(n);
+  return '฿' + x.toLocaleString('th-TH', {minimumFractionDigits: dp!=null?dp:2, maximumFractionDigits: dp!=null?dp:2}); }
+function fmtDate(iso, buddhist){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso);
+  var s=d.toLocaleDateString('th-TH', {year:'numeric', month:'short', day:'numeric'});
+  return buddhist===false ? d.toLocaleDateString('en-GB',{year:'numeric',month:'short',day:'numeric'}) : s; }
+function fmtDateTime(iso){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso);
+  return d.toLocaleString('th-TH', {year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+
+// ============================================
+// INLINE VALIDATION (Iron Rule #43) — validate ตอน blur, ไม่ใช่รอ submit อย่างเดียว
+// markup: <div class="field"><input class="input" onblur="validateField(this, v => v.trim()? '' : 'จำเป็นต้องกรอก')">
+//          <div class="field-error"></div></div>
+// validator คืน '' = ผ่าน / ข้อความ = error
+// ============================================
+function validateField(el, validator){
+  var field = el.closest('.field'); if(!field) return true;
+  var msg = '';
+  try { msg = validator ? validator(el.value, el) : ''; } catch(e){ msg=''; }
+  var errEl = field.querySelector('.field-error');
+  if(msg){ field.classList.add('is-invalid'); if(errEl) errEl.textContent = msg; return false; }
+  field.classList.remove('is-invalid'); return true;
+}
+function clearFieldError(el){ var f=el.closest('.field'); if(f) f.classList.remove('is-invalid'); }
+
+// ============================================
+// EMPTY STATE (Iron Rule #39) — list/section ว่าง ต้องมี icon + title + desc + (action)
+// ============================================
+function emptyStateHTML(cfg){
+  cfg = cfg || {};
+  var act = cfg.actionLabel ? '<button class="btn btn-primary" onclick="' + (cfg.onAction||'') + '">' +
+    (cfg.actionIcon ? '<i data-lucide="' + cfg.actionIcon + '" class="w-4 h-4"></i>' : '') +
+    '<span>' + cfg.actionLabel + '</span></button>' : '';
+  return '<div class="empty">'
+    + '<div class="empty-icon"><i data-lucide="' + (cfg.icon||'inbox') + '"></i></div>'
+    + '<div class="empty-title">' + (cfg.title||'ยังไม่มีข้อมูล') + '</div>'
+    + '<div class="empty-desc">' + (cfg.desc||'') + '</div>'
+    + act + '</div>';
+}
+
+// ============================================
+// RENDER PRESERVATION (Iron Rule #29)
+// ------------------------------------------------
+// ทุกครั้งที่ render() ทำ innerHTML = ... full DOM rebuild
+// scroll position + focus + cursor selection จะหาย —
+// user รู้สึก "เด้งกลับบน" ทุกครั้งที่ toggle/click.
+//
+// withRenderPreservation(renderFn) wraps a render function
+// to save state before innerHTML rebuild, then restore after.
+//
+// Preserves:
+//   - scrollTop ของ .drawer-body
+//   - scrollTop ของ .modal-body
+//   - window.scrollY (page-level scroll)
+//   - document.activeElement focus + selection range (input/textarea ที่กำลังพิมพ์)
+//
+// Usage:
+//   const render = withRenderPreservation(function actualRender() {
+//     content.innerHTML = ...
+//   });
+//
+// หรือเรียกตรง ๆ ใน render() ที่มีอยู่แล้ว:
+//   function render() {
+//     const snapshot = preserveRenderState();
+//     // ... innerHTML rebuilds ...
+//     restoreRenderState(snapshot);
+//   }
+// ============================================
+function preserveRenderState() {
+  const drawerBody = document.querySelector('.drawer-body');
+  const modalBody = document.querySelector('.modal-body');
+  const activeEl = document.activeElement;
+  const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+  return {
+    drawerScroll: drawerBody ? drawerBody.scrollTop : 0,
+    modalScroll: modalBody ? modalBody.scrollTop : 0,
+    pageScroll: window.scrollY,
+    focusKey: isInput ? {
+      placeholder: activeEl.placeholder || '',
+      type: activeEl.type || '',
+      name: activeEl.name || '',
+      selStart: activeEl.selectionStart,
+      selEnd: activeEl.selectionEnd,
+    } : null,
+  };
+}
+function restoreRenderState(snap) {
+  if (!snap) return;
+  requestAnimationFrame(function() {
+    const dBody = document.querySelector('.drawer-body');
+    if (dBody && snap.drawerScroll > 0) dBody.scrollTop = snap.drawerScroll;
+    const mBody = document.querySelector('.modal-body');
+    if (mBody && snap.modalScroll > 0) mBody.scrollTop = snap.modalScroll;
+    if (snap.pageScroll > 0) window.scrollTo(0, snap.pageScroll);
+
+    if (snap.focusKey) {
+      const candidates = document.querySelectorAll('input, textarea');
+      for (let i = 0; i < candidates.length; i++) {
+        const c = candidates[i];
+        if ((c.placeholder || '') === snap.focusKey.placeholder
+            && (c.type || '') === snap.focusKey.type
+            && (c.name || '') === snap.focusKey.name) {
+          c.focus();
+          if (snap.focusKey.selStart != null && typeof c.setSelectionRange === 'function') {
+            try { c.setSelectionRange(snap.focusKey.selStart, snap.focusKey.selEnd); } catch(e) {}
+          }
+          break;
+        }
+      }
+    }
+  });
+}
+function withRenderPreservation(renderFn) {
+  return function preservedRender() {
+    const snap = preserveRenderState();
+    const result = renderFn.apply(this, arguments);
+    restoreRenderState(snap);
+    return result;
+  };
+}
+
+window.addEventListener('hashchange', function () { render(); });  // v6.1 late-binding — ให้ชี้ render() ตัวที่ feature override (ผูกตรง ๆ จะ capture placeholder เดิม)
+
+// รอ DOM + Lucide ทั้งคู่ก่อน first render
+// (Lucide loader จะ dispatch 'lucide:ready' เมื่อ load สำเร็จ
+//  หรือเมื่อทุก CDN fail แล้ว fallback เป็น no-op)
+var domReady = false;
+var lucideReady = false;
+function bootIfReady() {
+  if (domReady && lucideReady) {
+    render();
+    renderIcons();
+  }
+}
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', function() { domReady = true; bootIfReady(); });
+} else {
+  domReady = true;
+}
+// Listen for ready event AND check ว่า lucide load ไปแล้วหรือยัง
+// (script ตัวนี้รันหลัง loader — ถ้า loader sync เสร็จก่อน, event อาจหายไปแล้ว)
+window.addEventListener('lucide:ready', function() { lucideReady = true; bootIfReady(); });
+if (window.lucide && typeof window.lucide.createIcons === 'function') {
+  lucideReady = true;
+}
+bootIfReady();
+// Safety net: ถ้า lucide:ready ไม่มาภายใน 5s ให้ render ไปก่อน (UI ยังใช้งานได้)
+setTimeout(function() {
+  if (!lucideReady) {
+    console.warn('[Lucide] Timeout — rendering without icons');
+    lucideReady = true;
+    bootIfReady();
+  }
+}, 5000);
+</script>
+
+
+<script>
+/* ===== BASE-KIT UTILS (#66/#68) — DO NOT EDIT ===== */
+function positionMenu(trigger,menu){const r=trigger.getBoundingClientRect();
+  const below=window.innerHeight-r.bottom-12, above=r.top-12, h=Math.min(menu.scrollHeight,320);
+  if(below<h && above>below){menu.classList.add('drop-up');menu.style.maxHeight=Math.min(h,above)+'px';}
+  else{menu.classList.remove('drop-up');menu.style.maxHeight=Math.min(h,Math.max(below,120))+'px';}}
+function openOverlay(menu,trigger){document.querySelectorAll('[data-overlay].open').forEach(m=>{if(m!==menu)closeOverlay(m);});
+  menu.classList.add('open');menu._trigger=trigger;if(trigger)positionMenu(trigger,menu);}
+function closeOverlay(menu){menu.classList.remove('open');if(menu._trigger)menu._trigger.focus();}
+document.addEventListener('click',e=>{document.querySelectorAll('[data-overlay].open').forEach(m=>{
+  if(!m.contains(e.target)&&!(m._trigger&&m._trigger.contains(e.target)))closeOverlay(m);});});
+/* ===== END BASE-KIT UTILS ===== */
+</script>
+<script>
+/* ============================================================
+   F-BNK Bank Master — feature logic (in-memory, no storage)
+   ============================================================ */
+
+// ---- extend shared state ----
+state.currentRoute = 'bank-master';
+state.currentCompany = 'C1';
+state.tab = 'accounts';
+state.revealed = new Set();
+state.filters = { search: '', status: 'all' };
+state.bankFilter = '';
+
+const currentUser = { name: 'ศศิธร บุญมี', canRevealFull: true };
+
+// ---- masters ----
+const companies = [
+  { id: 'C1', name: 'บริษัท ทูบี ซิมเปิล จำกัด', taxId: '0105558001234' },
+  { id: 'C2', name: 'บริษัท คิวบ์ เทค โซลูชันส์ จำกัด', taxId: '0105561009876' },
+];
+
+// Thai bank preset (~22) — BOT code / name / SWIFT / abbr / type / brand color
+const banks = [
+  { code: '002', nameTh: 'ธนาคารกรุงเทพ',            abbr: 'BBL',   swift: 'BKKBTHBK', type: 'local',   color: '#1e4598' },
+  { code: '004', nameTh: 'ธนาคารกสิกรไทย',           abbr: 'KBANK', swift: 'KASITHBK', type: 'local',   color: '#138f2d' },
+  { code: '006', nameTh: 'ธนาคารกรุงไทย',            abbr: 'KTB',   swift: 'KRTHTHBK', type: 'local',   color: '#1ba5e1' },
+  { code: '011', nameTh: 'ธนาคารทหารไทยธนชาต (ttb)', abbr: 'TTB',   swift: 'TMBKTHBK', type: 'local',   color: '#1279be' },
+  { code: '014', nameTh: 'ธนาคารไทยพาณิชย์',         abbr: 'SCB',   swift: 'SICOTHBK', type: 'local',   color: '#4e2e7f' },
+  { code: '025', nameTh: 'ธนาคารกรุงศรีอยุธยา',       abbr: 'BAY',   swift: 'AYUDTHBK', type: 'local',   color: '#b8860b' },
+  { code: '069', nameTh: 'ธนาคารเกียรตินาคินภัทร',    abbr: 'KKP',   swift: 'KKPBTHBK', type: 'local',   color: '#525a6b' },
+  { code: '022', nameTh: 'ธนาคารซีไอเอ็มบีไทย',       abbr: 'CIMBT', swift: 'UBOBTHBK', type: 'local',   color: '#7a1e1e' },
+  { code: '067', nameTh: 'ธนาคารทิสโก้',             abbr: 'TISCO', swift: 'TFPCTHB1', type: 'local',   color: '#0f7b6c' },
+  { code: '024', nameTh: 'ธนาคารยูโอบี',             abbr: 'UOBT',  swift: 'UOVBTHBK', type: 'local',   color: '#005696' },
+  { code: '071', nameTh: 'ธนาคารไทยเครดิต',          abbr: 'TCD',   swift: 'THCETHB1', type: 'local',   color: '#c0392b' },
+  { code: '073', nameTh: 'ธนาคารแลนด์ แอนด์ เฮ้าส์',  abbr: 'LHBANK',swift: 'LAHRTHB2', type: 'local',   color: '#6b4f8a' },
+  { code: '070', nameTh: 'ธนาคารไอซีบีซี (ไทย)',      abbr: 'ICBCT', swift: 'ICBKTHBK', type: 'foreign', color: '#a51e22' },
+  { code: '098', nameTh: 'ธนาคารพัฒนาวิสาหกิจฯ (SME)', abbr: 'SME',   swift: 'SMEDTHB1', type: 'local',   color: '#2e5a34' },
+  { code: '034', nameTh: 'ธนาคารเพื่อการเกษตรฯ (ธ.ก.ส.)', abbr: 'BAAC', swift: 'BAABTHBK', type: 'local', color: '#0b6b3a' },
+  { code: '030', nameTh: 'ธนาคารออมสิน',             abbr: 'GSB',   swift: 'GSBATHBK', type: 'local',   color: '#eb008b' },
+  { code: '033', nameTh: 'ธนาคารอาคารสงเคราะห์',      abbr: 'GHB',   swift: 'GOHUTHB1', type: 'local',   color: '#e67817' },
+  { code: '039', nameTh: 'ธนาคารมิซูโฮ',             abbr: 'MHCB',  swift: 'MHCBTHBK', type: 'foreign', color: '#00448c' },
+  { code: '017', nameTh: 'ซิตี้แบงก์ เอ็น.เอ.',        abbr: 'CITI',  swift: 'CITITHBX', type: 'foreign', color: '#003b70' },
+  { code: '018', nameTh: 'ธนาคารซูมิโตโม มิตซุย',      abbr: 'SMBC',  swift: 'SMBCTHBK', type: 'foreign', color: '#00953b' },
+  { code: '020', nameTh: 'ธนาคารสแตนดาร์ดชาร์เตอร์ด (ไทย)', abbr: 'SCBT', swift: 'SCBLTHBX', type: 'foreign', color: '#0473ea' },
+  { code: '066', nameTh: 'ธนาคารอิสลามแห่งประเทศไทย',  abbr: 'IBANK', swift: 'TIBTTHBK', type: 'local',   color: '#0a7d4b' },
+];
+
+// Chart of Accounts (GL) — cash/bank subset
+const coa = [
+  { code: '1010-01', name: 'เงินสดในมือ' },
+  { code: '1010-02', name: 'เงินฝากธนาคาร - กระแสรายวัน' },
+  { code: '1010-03', name: 'เงินฝากธนาคาร - ออมทรัพย์' },
+  { code: '1010-04', name: 'เงินฝากธนาคาร - ออมทรัพย์ (สำรอง)' },
+  { code: '1010-05', name: 'เงินฝากธนาคาร - ฝากประจำ' },
+  { code: '1010-06', name: 'เงินฝากธนาคาร - บัญชีเงินเดือน' },
+];
+
+const ACCT_TYPES = { savings: 'ออมทรัพย์', current: 'กระแสรายวัน', fixed: 'ฝากประจำ' };
+
+// ---- transactional mock: company bank accounts (5) ----
+let accounts = [
+  { id: 'BA-001', company: 'C1', bankCode: '004', accNo: '0012345678',   accName: 'บจก. ทูบี ซิมเปิล', acctType: 'current', branch: 'สยามพารากอน', glCode: '1010-02', currency: 'THB', status: 'active',   defaultPay: true,  defaultReceive: false, usedInDoc: true,  createdAt: '2024-11-04T09:12:00' },
+  { id: 'BA-002', company: 'C1', bankCode: '014', accNo: '4051234567',   accName: 'บจก. ทูบี ซิมเปิล', acctType: 'savings', branch: 'อโศก',        glCode: '1010-03', currency: 'THB', status: 'active',   defaultPay: false, defaultReceive: true,  usedInDoc: true,  createdAt: '2024-11-04T09:20:00' },
+  { id: 'BA-003', company: 'C1', bankCode: '002', accNo: '1470098765',   accName: 'บจก. ทูบี ซิมเปิล', acctType: 'savings', branch: 'สีลม',        glCode: '1010-04', currency: 'THB', status: 'active',   defaultPay: false, defaultReceive: false, usedInDoc: false, createdAt: '2025-02-18T14:03:00' },
+  { id: 'BA-004', company: 'C1', bankCode: '006', accNo: '9800112233',   accName: 'บจก. ทูบี ซิมเปิล', acctType: 'savings', branch: 'เซ็นทรัลเวิลด์', glCode: '1010-06', currency: 'THB', status: 'inactive', defaultPay: false, defaultReceive: false, usedInDoc: true,  createdAt: '2024-12-01T10:00:00' },
+  { id: 'BA-005', company: 'C2', bankCode: '011', accNo: '2337788990011', accName: 'บจก. คิวบ์ เทค',   acctType: 'current', branch: 'รัชดาภิเษก',  glCode: '1010-02', currency: 'THB', status: 'active',   defaultPay: true,  defaultReceive: true,  usedInDoc: false, createdAt: '2025-03-22T11:45:00' },
+];
+
+// ---- audit trail (FN-90) ----
+let auditSeq = 100;
+let auditLog = [
+  { id: ++auditSeq, accountId: 'BA-001', action: 'created', detail: 'สร้างบัญชี KBANK กระแสรายวัน', user: 'ศศิธร บุญมี', ts: '2024-11-04T09:12:00' },
+  { id: ++auditSeq, accountId: 'BA-001', action: 'set-default', detail: 'ตั้งเป็นบัญชีจ่ายเริ่มต้น', user: 'ศศิธร บุญมี', ts: '2024-11-04T09:15:00' },
+  { id: ++auditSeq, accountId: 'BA-002', action: 'created', detail: 'สร้างบัญชี SCB ออมทรัพย์', user: 'ศศิธร บุญมี', ts: '2024-11-04T09:20:00' },
+  { id: ++auditSeq, accountId: 'BA-002', action: 'set-default', detail: 'ตั้งเป็นบัญชีรับเริ่มต้น', user: 'ศศิธร บุญมี', ts: '2024-11-04T09:22:00' },
+  { id: ++auditSeq, accountId: 'BA-004', action: 'deactivated', detail: 'ปิดใช้งานบัญชี KTB', user: 'ศศิธร บุญมี', ts: '2025-01-10T16:30:00' },
+];
+
+// form buffers
+let accForm = blankAccForm('C1');
+let bankForm = blankBankForm();
+
+function blankAccForm(company){ return { id: null, company: company || state.currentCompany, bankCode: '', accNo: '', accName: '', acctType: 'savings', branch: '', glCode: '', currency: 'THB', defaultPay: false, defaultReceive: false, errors: {} }; }
+function blankBankForm(){ return { nameTh: '', abbr: '', swift: '', code: '', type: 'foreign', errors: {} }; }
+
+// ---- lookups & helpers ----
+function bankOf(code){ return banks.find(b => b.code === code) || { nameTh: 'ไม่ทราบธนาคาร', abbr: '?', swift: '—', color: '#73757B' }; }
+function coaOf(code){ return coa.find(g => g.code === code); }
+function companyOf(id){ return companies.find(c => c.id === id) || companies[0]; }
+function companyAccounts(cid){ return accounts.filter(a => a.company === cid); }
+function maskAccNo(no){ if(!no) return '—'; if(no.length <= 4) return no; return '•'.repeat(no.length - 4) + no.slice(-4); }
+function statusMeta(s){
+  if(s === 'active')   return { label: 'ใช้งาน',     cls: 'pill-info' };
+  if(s === 'inactive') return { label: 'ปิดใช้งาน',  cls: 'pill-muted' };
+  return { label: 'เก็บถาวร', cls: 'pill-muted' };
+}
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function pushAudit(accountId, action, detail){ auditLog.unshift({ id: ++auditSeq, accountId, action, detail, user: currentUser.name, ts: new Date().toISOString() }); }
+
+const AUDIT_META = {
+  'created':     { ic: 'plus-circle', cls: '' },
+  'edited':      { ic: 'pencil',      cls: '' },
+  'revealed':    { ic: 'scan-line',   cls: 'is-reveal' },
+  'set-default': { ic: 'star',        cls: '' },
+  'deactivated': { ic: 'power-off',   cls: '' },
+  'activated':   { ic: 'power',       cls: '' },
+  'archived':    { ic: 'archive',     cls: '' },
+};
+
+// ============================================================
+//  RENDER (override skeleton placeholder) — with preservation
+// ============================================================
+function render(){
+  const snap = preserveRenderState();
+  const host = document.getElementById('page-content');
+  if(host) host.innerHTML = renderPage();
+  renderDrawerEl();
+  renderModalEl();
+  renderIcons();
+  restoreRenderState(snap);
+}
+
+function renderPage(){
+  return headerHTML() + tabsHTML() + (state.tab === 'accounts' ? accountsTabHTML() : banksTabHTML());
+}
+
+function headerHTML(){
+  const actions = state.tab === 'accounts'
+    ? `<button class="btn btn-secondary" onclick="openDocPicker()"><i data-lucide="file-check-2" class="w-4 h-4"></i><span>จำลองเลือกในเอกสาร</span></button>
+       <button class="btn btn-primary" onclick="openCreate()"><i data-lucide="plus" class="w-4 h-4"></i><span>เพิ่มบัญชี</span></button>`
+    : `<button class="btn btn-primary" onclick="openBankCreate()"><i data-lucide="plus" class="w-4 h-4"></i><span>เพิ่มธนาคาร</span></button>`;
+  const sub = state.tab === 'accounts'
+    ? 'จัดการบัญชีธนาคารของบริษัท ผูกบัญชีแยกประเภท (GL) และตั้งค่าบัญชีจ่าย/รับเริ่มต้น'
+    : 'รายชื่อธนาคารมาตรฐาน (อ้างอิงรหัส ธปท.) — เพิ่มธนาคารต่างประเทศพร้อมรหัส SWIFT ได้';
+  return `
+    <div class="ph">
+      <div>
+        <div class="ph-title-row">
+          <h1 class="ph-title">ธนาคาร / บัญชีบริษัท</h1>
+        </div>
+        <p class="ph-sub">${sub}</p>
+      </div>
+      <div class="ph-actions">${actions}</div>
+    </div>`;
+}
+
+function tabsHTML(){
+  const nAcc = accounts.length;
+  const nBank = banks.length;
+  return `
+    <div class="ptabs">
+      <button class="ptab ${state.tab === 'accounts' ? 'is-active' : ''}" onclick="setTab('accounts')">
+        <i data-lucide="building-2" class="w-3.5 h-3.5"></i><span>บัญชีบริษัท</span>
+        <span class="ptab-count">${nAcc}</span>
+      </button>
+      <button class="ptab ${state.tab === 'banks' ? 'is-active' : ''}" onclick="setTab('banks')">
+        <i data-lucide="landmark" class="w-3.5 h-3.5"></i><span>ธนาคาร</span>
+        <span class="ptab-count">${nBank}</span>
+      </button>
+    </div>`;
+}
+
+function setTab(t){ state.tab = t; render(); }
+function changeCompany(v){ state.currentCompany = v; state.filters = { search: '', status: 'all' }; render(); }
+
+// ============================================================
+//  TAB 1 — Company accounts
+// ============================================================
+function accountsTabHTML(){
+  const co = companyOf(state.currentCompany);
+  const all = companyAccounts(state.currentCompany);
+  const active = all.filter(a => a.status === 'active');
+  const dp = all.find(a => a.defaultPay);
+  const dr = all.find(a => a.defaultReceive);
+
+  const q = state.filters.search.toLowerCase().trim();
+  const rows = all.filter(a => {
+    if(state.filters.status !== 'all' && a.status !== state.filters.status) return false;
+    if(!q) return true;
+    const b = bankOf(a.bankCode);
+    return (b.nameTh + ' ' + b.abbr + ' ' + a.accName + ' ' + a.accNo).toLowerCase().includes(q);
+  });
+
+  const coBar = `
+    <div class="co-bar">
+      <span class="co-label">บริษัท</span>
+      <select class="select" onchange="changeCompany(this.value)" aria-label="เลือกบริษัท">
+        ${companies.map(c => `<option value="${c.id}" ${c.id === state.currentCompany ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}
+      </select>
+      <div class="co-meta">
+        <span>เลขผู้เสียภาษี <b>${co.taxId}</b></span>
+        <span>บัญชีจ่ายเริ่มต้น <b>${dp ? bankOf(dp.bankCode).abbr + ' ' + maskAccNo(dp.accNo) : 'ยังไม่ตั้ง'}</b></span>
+        <span>บัญชีรับเริ่มต้น <b>${dr ? bankOf(dr.bankCode).abbr + ' ' + maskAccNo(dr.accNo) : 'ยังไม่ตั้ง'}</b></span>
+      </div>
+    </div>`;
+
+  const stats = `
+    <div class="stats">
+      <div class="stat"><div class="stat-label"><i data-lucide="wallet" class="w-3 h-3"></i>บัญชีทั้งหมด</div><div class="stat-value">${all.length}</div><div class="stat-meta">ในบริษัทนี้</div></div>
+      <div class="stat"><div class="stat-label"><i data-lucide="circle-check" class="w-3 h-3"></i>ใช้งานอยู่</div><div class="stat-value">${active.length}</div><div class="stat-meta">พร้อมใช้ในเอกสาร</div></div>
+      <div class="stat"><div class="stat-label"><i data-lucide="arrow-up-right" class="w-3 h-3"></i>บัญชีจ่ายเริ่มต้น</div><div class="stat-value" style="font-size:18px;">${dp ? esc(bankOf(dp.bankCode).abbr) : '—'}</div><div class="stat-meta">${dp ? ACCT_TYPES[dp.acctType] + ' · ' + maskAccNo(dp.accNo) : 'ยังไม่ได้ตั้งค่า'}</div></div>
+      <div class="stat"><div class="stat-label"><i data-lucide="arrow-down-left" class="w-3 h-3"></i>บัญชีรับเริ่มต้น</div><div class="stat-value" style="font-size:18px;">${dr ? esc(bankOf(dr.bankCode).abbr) : '—'}</div><div class="stat-meta">${dr ? ACCT_TYPES[dr.acctType] + ' · ' + maskAccNo(dr.accNo) : 'ยังไม่ได้ตั้งค่า'}</div></div>
+    </div>`;
+
+  const filter = `
+    <div class="filter-bar">
+      <div class="input-search">
+        <i data-lucide="search" class="lead-icon w-4 h-4"></i>
+        <input class="input" placeholder="ค้นหาธนาคาร / ชื่อบัญชี / เลขบัญชี" value="${esc(state.filters.search)}" oninput="onSearch(this.value)">
+      </div>
+      <select class="select" style="max-width:180px;" onchange="onStatusFilter(this.value)">
+        <option value="all"      ${state.filters.status==='all'?'selected':''}>ทุกสถานะ</option>
+        <option value="active"   ${state.filters.status==='active'?'selected':''}>ใช้งาน</option>
+        <option value="inactive" ${state.filters.status==='inactive'?'selected':''}>ปิดใช้งาน</option>
+        <option value="archived" ${state.filters.status==='archived'?'selected':''}>เก็บถาวร</option>
+      </select>
+      <button class="btn btn-ghost" style="margin-left:auto;" onclick="resetFilters()"><i data-lucide="rotate-ccw" class="w-4 h-4"></i><span>ล้างตัวกรอง</span></button>
+    </div>`;
+
+  let body;
+  if(rows.length === 0){
+    body = emptyStateHTML({
+      icon: 'building-2',
+      title: q || state.filters.status !== 'all' ? 'ไม่พบรายการที่ค้นหา' : 'ยังไม่มีบัญชีธนาคาร',
+      desc: q || state.filters.status !== 'all' ? 'ลองปรับคำค้นหรือล้างตัวกรอง' : 'เริ่มต้นด้วยการเพิ่มบัญชีธนาคารแรกของบริษัทนี้',
+      actionLabel: q || state.filters.status !== 'all' ? 'ล้างตัวกรอง' : 'เพิ่มบัญชี',
+      actionIcon: q || state.filters.status !== 'all' ? 'rotate-ccw' : 'plus',
+      onAction: q || state.filters.status !== 'all' ? 'resetFilters()' : 'openCreate()'
+    });
+  } else {
+    body = `
+      <div class="table-scroll">
+        <table class="table">
+          <thead><tr>
+            <th>ธนาคาร</th><th>ชื่อบัญชี</th><th>เลขบัญชี</th><th>ประเภท</th>
+            <th>บัญชี GL</th><th>ค่าเริ่มต้น</th><th>สถานะ</th><th style="text-align:right;">จัดการ</th>
+          </tr></thead>
+          <tbody>${rows.map(rowHTML).join('')}</tbody>
+        </table>
+      </div>
+      <div class="table-footer">
+        <span>แสดง ${rows.length} จาก ${all.length} รายการ</span>
+        <span>${companyOf(state.currentCompany).name}</span>
+      </div>`;
+  }
+
+  return coBar + stats + `<div class="card">${filter}${body}</div>`;
+}
+
+function rowHTML(a){
+  const b = bankOf(a.bankCode);
+  const g = coaOf(a.glCode);
+  const st = statusMeta(a.status);
+  const revealed = state.revealed.has(a.id);
+  const numCell = revealed
+    ? `<span class="acc-num">${esc(a.accNo)}</span><button class="acc-reveal" onclick="event.stopPropagation(); hideAccNo('${a.id}')"><i data-lucide="eye-off" class="w-3 h-3"></i>ซ่อน</button>`
+    : `<span class="acc-num">${maskAccNo(a.accNo)}</span><button class="acc-reveal" onclick="event.stopPropagation(); revealAccNo('${a.id}')" title="ต้องมีสิทธิ์ · ระบบจะบันทึกการเข้าถึง"><i data-lucide="scan-line" class="w-3 h-3"></i>ดูเต็ม</button>`;
+  const flags = (!a.defaultPay && !a.defaultReceive)
+    ? `<span class="dflag-none">—</span>`
+    : `<span class="dflags">${a.defaultPay ? '<span class="dflag dflag-pay"><i data-lucide="arrow-up-right" class="w-3 h-3"></i>จ่าย</span>' : ''}${a.defaultReceive ? '<span class="dflag dflag-rcv"><i data-lucide="arrow-down-left" class="w-3 h-3"></i>รับ</span>' : ''}</span>`;
+  return `
+    <tr class="is-clickable" onclick="openView('${a.id}')">
+      <td><div class="bank-cell"><span class="bank-logo" style="background:${b.color};">${esc(b.abbr.slice(0,4))}</span><span class="bank-name">${esc(b.nameTh)}</span></div></td>
+      <td>${esc(a.accName)}</td>
+      <td>${numCell}</td>
+      <td>${ACCT_TYPES[a.acctType] || a.acctType}</td>
+      <td><span class="acc-num" style="letter-spacing:0;">${g ? esc(g.code) : '—'}</span></td>
+      <td>${flags}</td>
+      <td><span class="pill ${st.cls}">${st.label}</span></td>
+      <td style="text-align:right;" onclick="event.stopPropagation();">
+        <div class="row-actions" style="justify-content:flex-end;">
+          <button class="ra-btn" title="แก้ไข" onclick="openEdit('${a.id}')"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+          <button class="ra-btn is-danger" title="เก็บถาวร" onclick="openArchive('${a.id}')"><i data-lucide="archive" class="w-4 h-4"></i></button>
+        </div>
+      </td>
+    </tr>`;
+}
+
+function onSearch(v){ state.filters.search = v; render(); }
+function onStatusFilter(v){ state.filters.status = v; render(); }
+function resetFilters(){ state.filters = { search: '', status: 'all' }; render(); }
+
+// FN-05 — reveal full number (permission + audit)
+function revealAccNo(id){
+  const a = accounts.find(x => x.id === id); if(!a) return;
+  if(!currentUser.canRevealFull){ showToast('คุณไม่มีสิทธิ์ดูเลขบัญชีเต็ม', 'warning'); return; }
+  state.revealed.add(id);
+  pushAudit(id, 'revealed', 'เปิดดูเลขบัญชีเต็ม ' + bankOf(a.bankCode).abbr);
+  render();
+  showToast('บันทึกการเข้าถึงเลขบัญชีเต็มแล้ว', 'info');
+}
+function hideAccNo(id){ state.revealed.delete(id); render(); }
+
+// ============================================================
+//  TAB 2 — Bank list (preset + foreign)
+// ============================================================
+function banksTabHTML(){
+  const q = state.bankFilter.toLowerCase().trim();
+  const rows = banks.filter(b => !q || (b.nameTh + ' ' + b.abbr + ' ' + b.swift + ' ' + b.code).toLowerCase().includes(q));
+  const filter = `
+    <div class="filter-bar">
+      <div class="input-search">
+        <i data-lucide="search" class="lead-icon w-4 h-4"></i>
+        <input class="input" placeholder="ค้นหาธนาคาร / SWIFT / รหัส" value="${esc(state.bankFilter)}" oninput="onBankSearch(this.value)">
+      </div>
+    </div>`;
+  const body = rows.length === 0
+    ? emptyStateHTML({ icon: 'landmark', title: 'ไม่พบธนาคารที่ค้นหา', desc: 'ลองปรับคำค้น' })
+    : `
+      <div class="table-scroll">
+        <table class="table">
+          <thead><tr>
+            <th>รหัส ธปท.</th><th>ธนาคาร</th><th>ชื่อย่อ</th><th>SWIFT / BIC</th><th>ประเภท</th><th>บัญชีที่ใช้</th><th style="text-align:right;">จัดการ</th>
+          </tr></thead>
+          <tbody>${rows.map(bankRowHTML).join('')}</tbody>
+        </table>
+      </div>
+      <div class="table-footer"><span>${rows.length} จาก ${banks.length} ธนาคาร</span><span>อ้างอิงรหัสสถาบันการเงิน ธปท.</span></div>`;
+  return `<div class="card">${filter}${body}</div>`;
+}
+
+function bankRowHTML(b){
+  const used = accounts.filter(a => a.bankCode === b.code).length;
+  const typePill = b.type === 'foreign' ? '<span class="pill pill-warning">ต่างประเทศ</span>' : '<span class="pill pill-info">ในประเทศ</span>';
+  const del = b.custom
+    ? `<button class="ra-btn is-danger" title="ลบธนาคารที่เพิ่มเอง" onclick="removeBank('${b.code}')"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`
+    : `<span style="color:var(--c-mute-3); font-size:12px;">มาตรฐาน</span>`;
+  return `
+    <tr>
+      <td><span class="acc-num" style="letter-spacing:0;">${esc(b.code)}</span></td>
+      <td><div class="bank-cell"><span class="bank-logo" style="background:${b.color};">${esc(b.abbr.slice(0,4))}</span><span class="bank-name">${esc(b.nameTh)}</span></div></td>
+      <td>${esc(b.abbr)}</td>
+      <td><span class="acc-num" style="letter-spacing:0.04em;">${esc(b.swift)}</span></td>
+      <td>${typePill}</td>
+      <td>${used ? used + ' บัญชี' : '<span style="color:var(--c-mute-3);">—</span>'}</td>
+      <td style="text-align:right;">${del}</td>
+    </tr>`;
+}
+
+function onBankSearch(v){ state.bankFilter = v; render(); }
+function removeBank(code){
+  const b = banks.find(x => x.code === code); if(!b || !b.custom) return;
+  const idx = banks.indexOf(b); banks.splice(idx, 1);
+  render(); showToast('ลบธนาคารแล้ว', 'success');
+}
+
+// ============================================================
+//  DRAWER — mount into skeleton #drawer
+// ============================================================
+function renderDrawerEl(){
+  const d = document.getElementById('drawer');
+  if(!d) return;
+  if(!state.drawer.open){ d.className = 'drawer'; d.innerHTML = ''; return; }
+  d.className = 'drawer standard';
+  const m = state.drawer.mode;
+  if(m === 'create' || m === 'edit') d.innerHTML = accountFormHTML();
+  else if(m === 'view') d.innerHTML = accountViewHTML();
+  else if(m === 'bank-create') d.innerHTML = bankFormHTML();
+
+  // init master comboboxes (Rule #94)
+  if(m === 'create' || m === 'edit'){
+    initSearchSelect('acc-bank', {
+      options: banks.map(b => ({ value: b.code, label: b.nameTh, sub: b.code + ' · ' + b.swift, icon: 'landmark', right: b.abbr })),
+      value: accForm.bankCode || null,
+      emptyText: 'ไม่พบธนาคาร',
+      onSelect: (v) => { accForm.bankCode = v || ''; if(v) delete accForm.errors.bankCode; }
+    });
+    initSearchSelect('acc-gl', {
+      options: coa.map(g => ({ value: g.code, label: g.name, sub: g.code, icon: 'book-open' })),
+      value: accForm.glCode || null,
+      emptyText: 'ไม่พบบัญชี GL',
+      onSelect: (v) => { accForm.glCode = v || ''; if(v) delete accForm.errors.glCode; }
+    });
+  }
+}
+
+function fieldErr(name){ return accForm.errors[name] ? `<div class="field-error" style="visibility:visible;">${accForm.errors[name]}</div>` : ''; }
+function invCls(name){ return accForm.errors[name] ? ' is-invalid' : ''; }
+
+function accountFormHTML(){
+  const isEdit = state.drawer.mode === 'edit';
+  const co = companyOf(accForm.company);
+  return `
+    <div class="dw-head">
+      <div class="dw-head-row">
+        <div>
+          <div class="dw-eyebrow"><i data-lucide="${isEdit ? 'pencil' : 'building-2'}" class="w-3.5 h-3.5"></i>${isEdit ? 'แก้ไขบัญชีธนาคาร' : 'เพิ่มบัญชีธนาคาร'}</div>
+          <h2 class="dw-title">${isEdit ? esc(accForm.id) : 'บัญชีธนาคารใหม่'}</h2>
+          <div class="dw-sub">${esc(co.name)}</div>
+        </div>
+        <button class="top-icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+    </div>
+    <div class="drawer-body">
+      <div class="form-section">
+        <div class="form-section-title">ข้อมูลบัญชี</div>
+        <div class="field">
+          <label class="field-label">ธนาคาร <span class="req">*</span></label>
+          <div class="field${invCls('bankCode')}">${searchSelectHTML('acc-bank', { placeholder: 'ค้นหาธนาคาร (พิมพ์ชื่อ / รหัส / SWIFT)' })}${fieldErr('bankCode')}</div>
+        </div>
+        <div class="field-row">
+          <div class="field${invCls('accNo')}">
+            <label class="field-label">เลขที่บัญชี <span class="req">*</span></label>
+            <input class="input" id="acc-no" inputmode="numeric" placeholder="ตัวเลข 10-15 หลัก" value="${esc(accForm.accNo)}" oninput="accForm.accNo=this.value.replace(/[^0-9]/g,''); this.value=accForm.accNo;">
+            <div class="field-help">กรอกเฉพาะตัวเลข ไม่ต้องมีขีดหรือเว้นวรรค</div>
+            ${fieldErr('accNo')}
+          </div>
+          <div class="field${invCls('accName')}">
+            <label class="field-label">ชื่อบัญชี <span class="req">*</span></label>
+            <input class="input" id="acc-name" placeholder="ชื่อเจ้าของบัญชี" value="${esc(accForm.accName)}" oninput="accForm.accName=this.value;">
+            ${fieldErr('accName')}
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label">ประเภทบัญชี <span class="req">*</span></label>
+            <select class="select" id="acc-type" onchange="accForm.acctType=this.value;">
+              ${Object.keys(ACCT_TYPES).map(k => `<option value="${k}" ${accForm.acctType===k?'selected':''}>${ACCT_TYPES[k]}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label">สาขา</label>
+            <input class="input" id="acc-branch" placeholder="เช่น สยามพารากอน" value="${esc(accForm.branch)}" oninput="accForm.branch=this.value;">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label">สกุลเงิน
+              <span class="info-tip" data-tip="เฟสนี้รองรับ THB เท่านั้น — สกุลเงินอื่นจะเปิดใช้พร้อม multi-currency (OQ-2)"><i data-lucide="info" class="w-3.5 h-3.5"></i></span>
+            </label>
+            <input class="input" value="THB — บาทไทย" readonly style="background:var(--c-line-3); color:var(--c-mute); cursor:not-allowed;">
+          </div>
+          <div class="field"></div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">การผูกบัญชีแยกประเภท (GL)</div>
+        <div class="field">
+          <label class="field-label">บัญชี GL (ผังบัญชี) <span class="req">*</span></label>
+          <div class="field${invCls('glCode')}">${searchSelectHTML('acc-gl', { placeholder: 'ค้นหาบัญชีจากผังบัญชี (CoA)' })}${fieldErr('glCode')}</div>
+          <div class="field-help">ใช้สำหรับตั้งรายการบันทึกบัญชี (posting) เมื่อมีการรับ-จ่ายผ่านบัญชีนี้</div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">ค่าเริ่มต้นการชำระเงิน</div>
+        <div class="dtoggle-row">
+          <div class="dt-info">
+            <div class="dt-title"><i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>บัญชีจ่ายเริ่มต้น</div>
+            <div class="dt-desc">ตั้งค่าได้เพียง 1 บัญชีต่อบริษัท — เลือกใหม่จะย้ายค่าเริ่มต้นมาบัญชีนี้</div>
+          </div>
+          <div class="toggle ${accForm.defaultPay ? 'is-on' : ''}" onclick="toggleFormDefault('defaultPay')"><div class="toggle-slider"></div></div>
+        </div>
+        <div class="dtoggle-row">
+          <div class="dt-info">
+            <div class="dt-title"><i data-lucide="arrow-down-left" class="w-3.5 h-3.5"></i>บัญชีรับเริ่มต้น</div>
+            <div class="dt-desc">ตั้งค่าได้เพียง 1 บัญชีต่อบริษัท</div>
+          </div>
+          <div class="toggle ${accForm.defaultReceive ? 'is-on' : ''}" onclick="toggleFormDefault('defaultReceive')"><div class="toggle-slider"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="dw-footer">
+      <div></div>
+      <div class="dw-footer-right">
+        <button class="btn btn-ghost" onclick="closeDrawer()">ยกเลิก</button>
+        <button class="btn btn-primary" id="acc-submit" onclick="submitAccount()">
+          <i data-lucide="check" class="w-4 h-4"></i><span>${isEdit ? 'บันทึกการแก้ไข' : 'ยืนยันสร้าง'}</span>
+        </button>
+      </div>
+    </div>`;
+}
+
+function syncAccFromDOM(){
+  const no = document.getElementById('acc-no'); if(no) accForm.accNo = no.value.replace(/[^0-9]/g,'');
+  const nm = document.getElementById('acc-name'); if(nm) accForm.accName = nm.value;
+  const br = document.getElementById('acc-branch'); if(br) accForm.branch = br.value;
+  const tp = document.getElementById('acc-type'); if(tp) accForm.acctType = tp.value;
+}
+function toggleFormDefault(field){ syncAccFromDOM(); accForm[field] = !accForm[field]; render(); }
+
+function validateAccForm(){
+  const e = {};
+  if(!accForm.bankCode) e.bankCode = 'กรุณาเลือกธนาคาร';
+  if(!accForm.accNo) e.accNo = 'กรุณากรอกเลขที่บัญชี';
+  else if(!/^[0-9]{10,15}$/.test(accForm.accNo)) e.accNo = 'เลขบัญชีต้องเป็นตัวเลข 10-15 หลัก';
+  else if(accounts.some(a => a.company === accForm.company && a.accNo === accForm.accNo && a.id !== accForm.id)) e.accNo = 'เลขบัญชีนี้มีอยู่แล้วในบริษัทนี้';
+  if(!accForm.accName.trim()) e.accName = 'กรุณากรอกชื่อบัญชี';
+  if(!accForm.glCode) e.glCode = 'กรุณาเลือกบัญชี GL';
+  return e;
+}
+
+function openCreate(){ accForm = blankAccForm(state.currentCompany); accForm.accName = companyOf(state.currentCompany).name.replace('บริษัท ', 'บจก. ').replace(' จำกัด', ''); state.revealed = new Set(); openDrawer('create'); }
+function openEdit(id){
+  const a = accounts.find(x => x.id === id); if(!a) return;
+  accForm = Object.assign(blankAccForm(a.company), { id: a.id, company: a.company, bankCode: a.bankCode, accNo: a.accNo, accName: a.accName, acctType: a.acctType, branch: a.branch, glCode: a.glCode, currency: a.currency, defaultPay: a.defaultPay, defaultReceive: a.defaultReceive, errors: {} });
+  openDrawer('edit', id);
+}
+
+function submitAccount(){
+  syncAccFromDOM();
+  accForm.errors = validateAccForm();
+  if(Object.keys(accForm.errors).length){ render(); showToast('กรุณากรอกข้อมูลให้ครบถ้วน', 'warning'); return; }
+  const btn = document.getElementById('acc-submit');
+  if(btn){ btn.classList.add('is-disabled'); btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังบันทึก…</span>'; renderIcons(); }
+  setTimeout(commitAccount, 650);
+}
+
+function commitAccount(){
+  const isEdit = state.drawer.mode === 'edit';
+  let rec;
+  if(isEdit){
+    rec = accounts.find(a => a.id === accForm.id);
+    Object.assign(rec, { bankCode: accForm.bankCode, accNo: accForm.accNo, accName: accForm.accName, acctType: accForm.acctType, branch: accForm.branch, glCode: accForm.glCode, defaultPay: accForm.defaultPay, defaultReceive: accForm.defaultReceive });
+    pushAudit(rec.id, 'edited', 'แก้ไขข้อมูลบัญชี ' + bankOf(rec.bankCode).abbr);
+  } else {
+    const seq = accounts.reduce((m, a) => Math.max(m, parseInt(a.id.slice(3)) || 0), 0) + 1;
+    rec = { id: 'BA-' + String(seq).padStart(3, '0'), company: accForm.company, bankCode: accForm.bankCode, accNo: accForm.accNo, accName: accForm.accName, acctType: accForm.acctType, branch: accForm.branch, glCode: accForm.glCode, currency: 'THB', status: 'active', defaultPay: accForm.defaultPay, defaultReceive: accForm.defaultReceive, usedInDoc: false, createdAt: new Date().toISOString() };
+    accounts.push(rec);
+    pushAudit(rec.id, 'created', 'สร้างบัญชี ' + bankOf(rec.bankCode).abbr + ' ' + (ACCT_TYPES[rec.acctType] || ''));
+  }
+  enforceDefaultUnique(rec);
+  closeDrawer();
+  showToast(isEdit ? 'บันทึกการแก้ไขแล้ว' : 'สร้างบัญชีธนาคารสำเร็จ', 'success');
+}
+
+function enforceDefaultUnique(rec){
+  ['defaultPay', 'defaultReceive'].forEach(f => {
+    if(rec[f]) accounts.forEach(a => { if(a.company === rec.company && a.id !== rec.id) a[f] = false; });
+  });
+}
+
+// ============================================================
+//  VIEW drawer (FN-02 toggles · FN-90 audit)
+// ============================================================
+function openView(id){ state.drawer.tab = 'detail'; openDrawer('view', id); state.drawer.tab = 'detail'; }
+function setViewTab(t){ state.drawer.tab = t; render(); }
+
+function accountViewHTML(){
+  const a = accounts.find(x => x.id === state.drawer.recordId);
+  if(!a) return '';
+  const b = bankOf(a.bankCode);
+  const g = coaOf(a.glCode);
+  const st = statusMeta(a.status);
+  const tab = state.drawer.tab || 'detail';
+  const revealed = state.revealed.has(a.id);
+  const numLine = revealed
+    ? `${esc(a.accNo)} <button class="acc-reveal" onclick="hideAccNo('${a.id}')"><i data-lucide="eye-off" class="w-3 h-3"></i>ซ่อน</button>`
+    : `${maskAccNo(a.accNo)} <button class="acc-reveal" onclick="revealAccNo('${a.id}')"><i data-lucide="scan-line" class="w-3 h-3"></i>ดูเต็ม</button>`;
+
+  const toggleAct = a.status === 'active'
+    ? `<button class="btn btn-sm btn-danger" onclick="openDeactivate('${a.id}')"><i data-lucide="power-off" class="w-3.5 h-3.5"></i><span>ปิดใช้งาน</span></button>`
+    : (a.status === 'inactive'
+      ? `<button class="btn btn-sm btn-secondary" onclick="activateAccount('${a.id}')"><i data-lucide="power" class="w-3.5 h-3.5"></i><span>เปิดใช้งาน</span></button>`
+      : '');
+
+  const detailTab = `
+    <div class="drawer-section">
+      <div class="def-grid">
+        <div class="dg-lbl">ธนาคาร</div><div class="dg-val">${esc(b.nameTh)} <span style="color:var(--c-mute-2);">(${esc(b.abbr)} · ${esc(b.code)})</span></div>
+        <div class="dg-lbl">เลขที่บัญชี</div><div class="dg-val"><span class="acc-num">${numLine}</span></div>
+        <div class="dg-lbl">ชื่อบัญชี</div><div class="dg-val">${esc(a.accName)}</div>
+        <div class="dg-lbl">ประเภทบัญชี</div><div class="dg-val">${ACCT_TYPES[a.acctType] || a.acctType}</div>
+        <div class="dg-lbl">สาขา</div><div class="dg-val">${a.branch ? esc(a.branch) : '—'}</div>
+        <div class="dg-lbl">สกุลเงิน</div><div class="dg-val">${esc(a.currency)}</div>
+        <div class="dg-lbl">บัญชี GL</div><div class="dg-val">${g ? esc(g.code) + ' · ' + esc(g.name) : '—'}</div>
+        <div class="dg-lbl">บริษัท</div><div class="dg-val">${esc(companyOf(a.company).name)}</div>
+        <div class="dg-lbl">การใช้งานในเอกสาร</div><div class="dg-val">${a.usedInDoc ? '<span class="pill pill-info">มีการอ้างอิงแล้ว</span>' : '<span style="color:var(--c-mute-2);">ยังไม่ถูกใช้</span>'}</div>
+      </div>
+    </div>`;
+
+  const defaultTab = `
+    <div class="drawer-section">
+      <div class="dtoggle-row">
+        <div class="dt-info">
+          <div class="dt-title"><i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>บัญชีจ่ายเริ่มต้น</div>
+          <div class="dt-desc">ใช้เป็นค่าเริ่มต้นในใบสำคัญจ่าย — มีได้ 1 บัญชีต่อบริษัท</div>
+        </div>
+        <div class="toggle ${a.defaultPay ? 'is-on' : ''}" onclick="toggleDefault('${a.id}','defaultPay')"><div class="toggle-slider"></div></div>
+      </div>
+      <div class="dtoggle-row">
+        <div class="dt-info">
+          <div class="dt-title"><i data-lucide="arrow-down-left" class="w-3.5 h-3.5"></i>บัญชีรับเริ่มต้น</div>
+          <div class="dt-desc">ใช้เป็นค่าเริ่มต้นในใบสำคัญรับ — มีได้ 1 บัญชีต่อบริษัท</div>
+        </div>
+        <div class="toggle ${a.defaultReceive ? 'is-on' : ''}" onclick="toggleDefault('${a.id}','defaultReceive')"><div class="toggle-slider"></div></div>
+      </div>
+      ${a.status !== 'active' ? '<div class="note is-warn" style="margin-top:10px;"><i data-lucide="alert-triangle" class="w-4 h-4"></i><span>บัญชีที่ไม่ได้อยู่สถานะใช้งาน ไม่สามารถตั้งเป็นค่าเริ่มต้นได้</span></div>' : ''}
+    </div>`;
+
+  const logs = auditLog.filter(l => l.accountId === a.id);
+  const auditTab = `
+    <div class="drawer-section">
+      ${logs.length === 0 ? '<div style="color:var(--c-mute-2); font-size:13px; padding:8px 0;">ยังไม่มีประวัติ</div>' : `<div class="audit-list">${logs.map(l => {
+        const m = AUDIT_META[l.action] || { ic: 'dot', cls: '' };
+        return `<div class="audit-item"><div class="audit-ic ${m.cls}"><i data-lucide="${m.ic}" class="w-3.5 h-3.5"></i></div><div class="audit-body"><div class="audit-act">${esc(l.detail)}</div><div class="audit-meta">${esc(l.user)} · ${fmtDateTime(l.ts)}</div></div></div>`;
+      }).join('')}</div>`}
+    </div>`;
+
+  return `
+    <div class="dw-head">
+      <div class="dw-head-row">
+        <div>
+          <div class="dw-eyebrow"><i data-lucide="building-2" class="w-3.5 h-3.5"></i>บัญชีธนาคาร · ${esc(a.id)}</div>
+          <h2 class="dw-title" style="display:flex; align-items:center; gap:10px;">${esc(b.nameTh)} <span class="pill ${st.cls}">${st.label}</span></h2>
+          <div class="dw-sub">${esc(a.accName)} · ${maskAccNo(a.accNo)}</div>
+        </div>
+        <div class="drawer-header-actions">
+          <button class="btn btn-sm btn-secondary" onclick="openEdit('${a.id}')"><i data-lucide="pencil" class="w-3.5 h-3.5"></i><span>แก้ไข</span></button>
+          ${toggleAct}
+          <button class="btn btn-sm btn-danger" onclick="openArchive('${a.id}')"><i data-lucide="archive" class="w-3.5 h-3.5"></i><span>เก็บถาวร</span></button>
+          <span class="drawer-header-divider"></span>
+          <button class="top-icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="drawer-tabs">
+      <button class="drawer-tab ${tab==='detail'?'is-active':''}" onclick="setViewTab('detail')">รายละเอียด</button>
+      <button class="drawer-tab ${tab==='default'?'is-active':''}" onclick="setViewTab('default')">ค่าเริ่มต้น</button>
+      <button class="drawer-tab ${tab==='audit'?'is-active':''}" onclick="setViewTab('audit')">ประวัติ (${logs.length})</button>
+    </div>
+    <div class="drawer-body">
+      ${tab==='detail' ? detailTab : tab==='default' ? defaultTab : auditTab}
+    </div>
+    <div class="dw-footer">
+      <div class="drawer-footer-meta">สร้างเมื่อ ${fmtDateTime(a.createdAt)}</div>
+      <div class="dw-footer-right">
+        <button class="btn btn-secondary" onclick="closeDrawer()">ปิด</button>
+      </div>
+    </div>`;
+}
+
+// FN-02 — default toggle with uniqueness
+function toggleDefault(id, field){
+  const a = accounts.find(x => x.id === id); if(!a) return;
+  if(a.status !== 'active'){ showToast('บัญชีต้องอยู่สถานะใช้งานก่อนตั้งเป็นค่าเริ่มต้น', 'warning'); return; }
+  a[field] = !a[field];
+  if(a[field]) accounts.forEach(x => { if(x.company === a.company && x.id !== a.id) x[field] = false; });
+  const label = field === 'defaultPay' ? 'จ่าย' : 'รับ';
+  pushAudit(id, 'set-default', (a[field] ? 'ตั้งเป็นบัญชี' + label + 'เริ่มต้น' : 'ยกเลิกบัญชี' + label + 'เริ่มต้น'));
+  render();
+  showToast(a[field] ? 'ตั้งเป็นบัญชี' + label + 'เริ่มต้นแล้ว' : 'ยกเลิกค่าเริ่มต้นแล้ว', 'info');
+}
+
+// FN-04 — activate / deactivate
+function activateAccount(id){
+  const a = accounts.find(x => x.id === id); if(!a) return;
+  a.status = 'active';
+  pushAudit(id, 'activated', 'เปิดใช้งานบัญชี ' + bankOf(a.bankCode).abbr);
+  render(); showToast('เปิดใช้งานบัญชีแล้ว', 'success');
+}
+
+// ============================================================
+//  MODALS — mount into skeleton #modalBackdrop .modal
+// ============================================================
+function renderModalEl(){
+  const wrap = document.querySelector('#modalBackdrop .modal');
+  if(!wrap) return;
+  if(!state.modal.open){ wrap.innerHTML = ''; return; }
+  const t = state.modal.type;
+  if(t === 'archive') wrap.innerHTML = archiveModalHTML();
+  else if(t === 'deactivate') wrap.innerHTML = deactivateModalHTML();
+  else if(t === 'docpicker') wrap.innerHTML = docPickerHTML();
+}
+
+function openArchive(id){ openModal('archive', { id }); }
+function archiveModalHTML(){
+  const a = accounts.find(x => x.id === state.modal.data.id); if(!a) return '';
+  const b = bankOf(a.bankCode);
+  const usedNote = a.usedInDoc
+    ? `<div class="note is-warn" style="margin-top:12px;"><i data-lucide="lock" class="w-4 h-4"></i><span>บัญชีนี้ถูกใช้ในเอกสารแล้ว จึง<b>ลบถาวรไม่ได้</b> — ระบบจะเก็บถาวร (soft archive) เท่านั้น เอกสารเดิมยังอ้างอิงบัญชีนี้ได้ตามปกติ</span></div>`
+    : `<div class="note is-info" style="margin-top:12px;"><i data-lucide="info" class="w-4 h-4"></i><span>การเก็บถาวรจะทำให้บัญชีนี้ไม่ปรากฏในตัวเลือกของเอกสารใหม่ และไม่สามารถตั้งเป็นค่าเริ่มต้นได้</span></div>`;
+  return `
+    <div class="modal-header">
+      <div class="modal-header-icon is-danger"><i data-lucide="archive" class="w-4 h-4"></i></div>
+      <div><div class="modal-title">เก็บถาวรบัญชีนี้?</div><div class="modal-subtitle">${esc(b.nameTh)} · ${maskAccNo(a.accNo)}</div></div>
+    </div>
+    <div class="modal-body">
+      ต้องการเก็บถาวรบัญชี "${esc(a.accName)}" ใช่หรือไม่ บัญชีจะถูกย้ายไปสถานะเก็บถาวร
+      ${usedNote}
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn btn-danger" onclick="confirmArchive()"><i data-lucide="archive" class="w-4 h-4"></i><span>เก็บถาวร</span></button>
+    </div>`;
+}
+function confirmArchive(){
+  const a = accounts.find(x => x.id === state.modal.data.id); if(!a) return;
+  a.status = 'archived'; a.defaultPay = false; a.defaultReceive = false;
+  pushAudit(a.id, 'archived', 'เก็บถาวรบัญชี ' + bankOf(a.bankCode).abbr);
+  closeModal();
+  if(state.drawer.open) closeDrawer();
+  render();
+  showToast('เก็บถาวรบัญชีแล้ว', 'success');
+}
+
+function openDeactivate(id){ openModal('deactivate', { id }); }
+function deactivateModalHTML(){
+  const a = accounts.find(x => x.id === state.modal.data.id); if(!a) return '';
+  const b = bankOf(a.bankCode);
+  return `
+    <div class="modal-header">
+      <div class="modal-header-icon is-warning"><i data-lucide="power-off" class="w-4 h-4"></i></div>
+      <div><div class="modal-title">ปิดใช้งานบัญชีนี้?</div><div class="modal-subtitle">${esc(b.nameTh)} · ${maskAccNo(a.accNo)}</div></div>
+    </div>
+    <div class="modal-body">
+      "${esc(a.accName)}" จะไม่ปรากฏในตัวเลือกบัญชีของเอกสารใหม่ (เช่น ใบสำคัญจ่าย/รับ)
+      <div class="note is-info" style="margin-top:12px;"><i data-lucide="info" class="w-4 h-4"></i><span>เอกสารเดิมที่อ้างอิงบัญชีนี้ยังแสดงและใช้งานได้ตามปกติ — คุณเปิดใช้งานใหม่ได้ภายหลัง</span></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn btn-danger" onclick="confirmDeactivate()"><i data-lucide="power-off" class="w-4 h-4"></i><span>ปิดใช้งาน</span></button>
+    </div>`;
+}
+function confirmDeactivate(){
+  const a = accounts.find(x => x.id === state.modal.data.id); if(!a) return;
+  a.status = 'inactive'; a.defaultPay = false; a.defaultReceive = false;
+  pushAudit(a.id, 'deactivated', 'ปิดใช้งานบัญชี ' + bankOf(a.bankCode).abbr);
+  closeModal(); render();
+  showToast('ปิดใช้งานบัญชีแล้ว', 'success');
+}
+
+// FN-04 — mock document picker
+function openDocPicker(){ openModal('docpicker', {}); }
+function docPickerHTML(){
+  const cid = state.currentCompany;
+  const active = companyAccounts(cid).filter(a => a.status === 'active');
+  const inactiveEx = companyAccounts(cid).find(a => a.status !== 'active' && a.usedInDoc);
+  const list = active.length
+    ? active.map(a => { const b = bankOf(a.bankCode); return `
+        <div class="pick-row">
+          <span class="bank-logo" style="background:${b.color};">${esc(b.abbr.slice(0,4))}</span>
+          <div class="pr-main"><div class="pr-name">${esc(b.nameTh)} · ${ACCT_TYPES[a.acctType]}</div><div class="pr-sub">${maskAccNo(a.accNo)}${a.defaultPay?' · ค่าเริ่มต้นจ่าย':''}${a.defaultReceive?' · ค่าเริ่มต้นรับ':''}</div></div>
+          <button class="btn btn-sm btn-secondary" onclick="pickDocAccount('${a.id}')">เลือก</button>
+        </div>`; }).join('')
+    : '<div style="color:var(--c-mute-2); font-size:13px;">ไม่มีบัญชีที่ใช้งานอยู่</div>';
+  const existingNote = inactiveEx
+    ? `<div class="note is-info" style="margin-top:6px;"><i data-lucide="file-clock" class="w-4 h-4"></i><span>ตัวอย่างเอกสารเดิม <b>PV-2025-014</b> อ้างอิงบัญชี ${esc(bankOf(inactiveEx.bankCode).nameTh)} (${maskAccNo(inactiveEx.accNo)}) ซึ่งปัจจุบัน<b>ปิดใช้งาน</b> — เอกสารเดิมยังแสดงบัญชีนี้ตามปกติ แต่บัญชีดังกล่าวจะไม่อยู่ในรายการให้เลือกด้านบน</span></div>`
+    : '';
+  return `
+    <div class="modal-header">
+      <div class="modal-header-icon"><i data-lucide="file-check-2" class="w-4 h-4"></i></div>
+      <div><div class="modal-title">จำลอง: เลือกบัญชีในเอกสาร</div><div class="modal-subtitle">แสดงเฉพาะบัญชี "ใช้งาน" ของ ${esc(companyOf(cid).name)}</div></div>
+    </div>
+    <div class="modal-body">
+      ${list}
+      ${existingNote}
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">ปิด</button>
+    </div>`;
+}
+function pickDocAccount(id){
+  const a = accounts.find(x => x.id === id); if(!a) return;
+  closeModal();
+  showToast('เลือกบัญชี ' + bankOf(a.bankCode).abbr + ' ' + maskAccNo(a.accNo) + ' แล้ว (จำลอง)', 'success');
+}
+
+// ============================================================
+//  BANK create drawer (FN / S-05 — foreign bank + SWIFT)
+// ============================================================
+function openBankCreate(){ bankForm = blankBankForm(); openDrawer('bank-create'); }
+function bfErr(name){ return bankForm.errors[name] ? `<div class="field-error" style="visibility:visible;">${bankForm.errors[name]}</div>` : ''; }
+function bfInv(name){ return bankForm.errors[name] ? ' is-invalid' : ''; }
+
+function bankFormHTML(){
+  return `
+    <div class="dw-head">
+      <div class="dw-head-row">
+        <div>
+          <div class="dw-eyebrow"><i data-lucide="landmark" class="w-3.5 h-3.5"></i>เพิ่มธนาคาร</div>
+          <h2 class="dw-title">ธนาคารใหม่ (นอก preset)</h2>
+          <div class="dw-sub">สำหรับธนาคารต่างประเทศหรือธนาคารที่ยังไม่มีในรายการมาตรฐาน</div>
+        </div>
+        <button class="top-icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+    </div>
+    <div class="drawer-body">
+      <div class="field${bfInv('nameTh')}">
+        <label class="field-label">ชื่อธนาคาร <span class="req">*</span></label>
+        <input class="input" id="bk-name" placeholder="เช่น ธนาคาร HSBC" value="${esc(bankForm.nameTh)}" oninput="bankForm.nameTh=this.value;">
+        ${bfErr('nameTh')}
+      </div>
+      <div class="field-row">
+        <div class="field${bfInv('abbr')}">
+          <label class="field-label">ชื่อย่อ <span class="req">*</span></label>
+          <input class="input" id="bk-abbr" placeholder="เช่น HSBC" value="${esc(bankForm.abbr)}" oninput="bankForm.abbr=this.value.toUpperCase(); this.value=bankForm.abbr;">
+          ${bfErr('abbr')}
+        </div>
+        <div class="field${bfInv('code')}">
+          <label class="field-label">รหัส ธปท. (ถ้ามี)</label>
+          <input class="input" id="bk-code" inputmode="numeric" placeholder="3 หลัก" value="${esc(bankForm.code)}" oninput="bankForm.code=this.value.replace(/[^0-9]/g,'').slice(0,3); this.value=bankForm.code;">
+          ${bfErr('code')}
+        </div>
+      </div>
+      <div class="field${bfInv('swift')}">
+        <label class="field-label">รหัส SWIFT / BIC <span class="req">*</span>
+          <span class="info-tip" data-tip="รหัสสากล 8 หรือ 11 หลัก (ตัวอักษร/ตัวเลข) ใช้ระบุธนาคารในการโอนระหว่างประเทศ"><i data-lucide="info" class="w-3.5 h-3.5"></i></span>
+        </label>
+        <input class="input" id="bk-swift" placeholder="เช่น HSBCTHBK" value="${esc(bankForm.swift)}" oninput="bankForm.swift=this.value.toUpperCase().replace(/[^A-Z0-9]/g,''); this.value=bankForm.swift;">
+        <div class="field-help">8 หรือ 11 หลัก — ตัวอักษรและตัวเลข</div>
+        ${bfErr('swift')}
+      </div>
+      <div class="field">
+        <label class="field-label">ประเภท</label>
+        <select class="select" id="bk-type" onchange="bankForm.type=this.value;">
+          <option value="foreign" ${bankForm.type==='foreign'?'selected':''}>ต่างประเทศ</option>
+          <option value="local" ${bankForm.type==='local'?'selected':''}>ในประเทศ</option>
+        </select>
+      </div>
+    </div>
+    <div class="dw-footer">
+      <div></div>
+      <div class="dw-footer-right">
+        <button class="btn btn-ghost" onclick="closeDrawer()">ยกเลิก</button>
+        <button class="btn btn-primary" id="bk-submit" onclick="submitBank()"><i data-lucide="check" class="w-4 h-4"></i><span>ยืนยันสร้าง</span></button>
+      </div>
+    </div>`;
+}
+
+function submitBank(){
+  const e = {};
+  if(!bankForm.nameTh.trim()) e.nameTh = 'กรุณากรอกชื่อธนาคาร';
+  if(!bankForm.abbr.trim()) e.abbr = 'กรุณากรอกชื่อย่อ';
+  if(!bankForm.swift) e.swift = 'กรุณากรอกรหัส SWIFT';
+  else if(!/^[A-Z0-9]{8}$|^[A-Z0-9]{11}$/.test(bankForm.swift)) e.swift = 'SWIFT ต้องมี 8 หรือ 11 หลัก';
+  else if(banks.some(b => b.swift === bankForm.swift)) e.swift = 'รหัส SWIFT นี้มีอยู่แล้ว';
+  if(bankForm.code && !/^[0-9]{3}$/.test(bankForm.code)) e.code = 'รหัส ธปท. ต้องเป็นตัวเลข 3 หลัก';
+  bankForm.errors = e;
+  if(Object.keys(e).length){ render(); showToast('กรุณากรอกข้อมูลให้ครบถ้วน', 'warning'); return; }
+  const btn = document.getElementById('bk-submit');
+  if(btn){ btn.classList.add('is-disabled'); btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังบันทึก…</span>'; renderIcons(); }
+  setTimeout(() => {
+    const code = bankForm.code || ('X' + String(banks.length + 1).padStart(2, '0'));
+    banks.push({ code, nameTh: bankForm.nameTh.trim(), abbr: bankForm.abbr.trim(), swift: bankForm.swift, type: bankForm.type, color: '#4b5563', custom: true });
+    closeDrawer();
+    state.tab = 'banks';
+    showToast('เพิ่มธนาคารสำเร็จ', 'success');
+  }, 650);
+}
+</script>
+
+<style id="page-late">/* late additions เท่านั้น (#69) — ห้าม inline */</style>
+<!-- PREFLIGHT v6.4 · F-BNK Bank Master
+  round1 (mechanical): spacing-off=0 font-sizes=0 flex-noalign=0 inline-layout=0 z-adhoc=0 hex-off=0
+  round2 (role sweep): 7/7 checked — pattern·placement·states·flow·microcopy·rule94·audit
+  audit.sh: FAIL=0 WARN=3 (all base-kit inherited: uc-email css, base-kit font-size px, ss-caret/emptyState icons)
+  script-syntax: 5/5 blocks OK · playwright: PASS (app JS errors=0; CDN 404s expected offline)
+  counts: companies=2 accounts=5 (C1=4, C2=1; active=3 inactive=1 default-pay=1 default-rcv=1) banks-preset=22 coa=6 audit-seed=5
+  FN: FN-01 combobox+validate+GL / FN-02 switcher+default-unique / FN-03 dup-block / FN-04 picker+inactive / FN-05 mask+reveal+audit / FN-06 soft-archive+audit / FN-90 audit+validation — all wired
+  patterns: A(list per-company + tabs) B(create/edit drawer 680) C(view drawer tabbed) D(modal archive/deactivate/picker) Rule#94 master combobox (bank + GL)
+  date: 2026-08-04
+  (Rule #60: numbers hand-counted; env lacks self_audit.py) -->
+</body>
+</html>
