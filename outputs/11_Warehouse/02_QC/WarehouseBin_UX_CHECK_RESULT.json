@@ -1,0 +1,45 @@
+{
+  "feature": "F-LOCATION-MASTER-001",
+  "file": "outputs/11_Warehouse/01_HTML/WarehouseBin.html",
+  "date": "2026-08-06",
+  "iteration": 3,
+  "gate_type": "re-gate after material change (Hierarchy Tree view added · role switcher realigned · display name renamed)",
+  "generator_spec": "html-generator-v7 (iron-rules #1-94, ci-tokens CUBE Warm Light v2.0, layout-integrity #50-#80, component-contracts, page-anatomy)",
+  "verdict": "PASS",
+  "counts": { "block": 0, "warn": 0, "info": 3, "not_checked": 0 },
+  "counts_iteration2": { "block": 0, "warn": 0, "info": 2, "not_checked": 0 },
+  "no_regression": true,
+  "material_changes_checked": {
+    "tree_view_ux_quality": "GOOD — empty/root-prompt/not-found/loading states present; deep-tree pane has own overflow scroll (max-height calc(100vh-220px)); selected-node highlight (.tree-row.is-sel red tint + red code/icon); summary panel reuses central pillHtml + .def-grid + .path-str + .child-stat chips + .btn btn-sm (CUBE-consistent); shared state.sel bidirectional (tree<->list); segmented switcher + tree toggle are real keyboard-operable buttons; no off-palette hex (tokens + token-derived rgba only). D12 = approved NON-STANDARD deviation, not penalized for pattern absence.",
+    "role_switcher_alignment_D13": "CLEAN — .role-switch(36px)+.role-select(36px) inside .ph-actions(align-items:center); E2E measured dTop=0, selH=btnH=36 vs create button at both viewports; label 'มุมมองบทบาท' (no QA jargon).",
+    "rename_correctness_D14": "CLEAN — 'คลังและตำแหน่ง (Warehouse & Bin)' in title, h1 (renderHeader/loading/error), breadcrumb, sidebar feature label; internal id/route F-LOCATION-MASTER-001 / location-master unchanged (correct).",
+    "latent_bug_1_drawer_rerender": "CLEAN — render() rebuilds #drawer.innerHTML with preserveRenderState/restoreRenderState; E2E in-drawer tab switch keeps drawer open, content rebuilt (innerText 344->397), both viewports.",
+    "latent_bug_2_in_drawer_modal_zindex": "CLEAN — z registry --z-drawer:55/--z-modal:70 + .modal-backdrop{z-index:var(--z-modal)}; E2E from inside view-loc drawer: modalBackdrop=70 > drawer=55 > drawerBackdrop=50, elementFromPoint(modal center)=modal, both viewports."
+  },
+  "self_audit_core_counters": { "spacing_off": 0, "font_off": 0, "font_count": 8, "flex_noalign": 0, "grid_nogap": 0, "inline_layout": 0, "z_adhoc": 0, "hex_off": 0, "preflight": 0, "jargon_leak": 0, "undefined_handlers": 0, "long_banners": 0 },
+  "self_audit_documented_false_positives": { "missing_ids": 8, "fullwidth_select": 3, "custom_tabs": 1, "note": "unchanged from passing iteration 2; runtime-built combobox ids, widths moved to CSS class, .drawer-tab kit class in template string" },
+  "static_scan": { "distinct_hex": 22, "off_palette_hex": 0, "fonts_in_stack": true, "z_scale": { "drawer": 55, "modal": 70, "modal_gt_drawer": true } },
+  "e2e": { "script": "02_QC/regate_e2e.py", "result_json": "02_QC/regate_result.json", "assertions_total": 54, "assertions_passed": 54, "console_errors": 0, "page_errors": 0, "viewports": [1280, 1440] },
+  "screenshots_prefix": "regate3_",
+  "prior_shots_preserved": true,
+  "findings": [
+    {
+      "id": "UX-08", "severity": "INFO", "rule": "a11y / keyboard (tree)",
+      "location": "treeNode() lines 2260-2278",
+      "found": "Tree row select is <div onclick> without role='treeitem'/tabindex/arrow-key nav; container role='tree' but children omit aria-expanded/aria-selected. Tree toggle and view switcher ARE real keyboard-operable buttons.",
+      "fix": "Optional (dev handoff): add roving-tabindex + role='treeitem' + aria-expanded for full keyboard/AT support. Consistent with existing Pattern-A list rows that passed the gate; not a regression."
+    },
+    {
+      "id": "UX-06", "severity": "INFO", "rule": "SPA routing",
+      "location": "drillInto / state.drill / state.sel (JS)",
+      "found": "Drill/tree position is in-memory only; browser refresh returns to root list.",
+      "fix": "Optional: reflect state.drill/state.sel in location.hash for deep-link/back-button."
+    },
+    {
+      "id": "UX-07", "severity": "INFO", "rule": "Prototype affordance",
+      "location": "renderHeader() .ph-actions (role-switch)",
+      "found": "5-role switcher is a demo/QA-only control (realigned per D13); brand label reads 'Warm Light' (theme name) in sidebar/user-chip (iter-2 fix of deprecated 'CUBE NATIVE').",
+      "fix": "Dev handoff: remove role switcher in production (role from auth). Brand label cosmetic, out of scope, left as gated in iter-2."
+    }
+  ]
+}
