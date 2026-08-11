@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เงื่อนไขชำระเงิน (Payment Terms) · CUBE NATIVE</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,600,700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  /* CUBE Warm Light (v8 rebrand 2026-08-09 — เดิมไฟล์นี้เป็น Navy v3.9) */
+  --c-navy: #111111;
+  --c-navy-2: #1C1C1E;
+  --c-primary: #FF3B30;
+  --c-primary-hover: #E62E24;
+  --c-teal: #FF9A1F;
+  --c-teal-light: #FFC46B;
+  --c-ink: #111111;
+  --c-mute: #54565C;
+  --c-mute-2: #73757B;
+  --c-mute-3: #9A9CA2;
+  --c-line: #DEDAD4;
+  --c-line-2: #E9E5E0;
+  --c-line-3: #F1EEEA;
+  --c-bg-off: #FAF8F5;
+  --c-success: #1F9D55;
+  --c-warning: #E8870F;
+  --c-danger: #E62E24;
+  --sidebar-w: 232px;
+  --shell-h: 52px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; min-width:768px; /* Iron Rule #97 v8 */}
+body {
+  font-family: 'Noto Sans Thai', 'Satoshi', system-ui, sans-serif;
+  background: var(--c-bg-off);
+  color: #1E293B;
+  font-size: 14px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-width: 1180px;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+[data-lucide]{flex-shrink:0;width:14px;height:14px;}
+.stat-label [data-lucide]{width:12px;height:12px;}
+.pill [data-lucide]{width:11px;height:11px;}
+.def-star [data-lucide]{width:11px;height:11px;}
+.ra-btn [data-lucide]{width:15px;height:15px;}
+.menu-item [data-lucide]{width:13px;height:13px;}
+.bulkbar [data-lucide]{width:13px;height:13px;}
+/* Iron Rule #96 (v8) — List Full-Height */
+.content{display:flex;flex-direction:column;height:calc(100vh - var(--topbar-h,56px));overflow-y:auto;}
+.content > .card{display:flex;flex-direction:column;flex:1;min-height:320px;}
+.tbl-wrap,.table-scroll{flex:1;min-height:0;overflow-y:auto;scrollbar-gutter:stable;}
+/* Iron Rule #97 (v8) — Responsive 768–1180 */
+.tbl-scroll{flex:1;min-height:0;overflow-y:auto;scrollbar-gutter:stable;}
+.tbl-scroll thead th{position:sticky;top:0;background:var(--c-bg-off);z-index:2;}
+.nav-toggle{display:none;}
+@media (max-width:1180px){
+  .sidebar{transform:translateX(-100%);transition:transform 180ms;z-index:70;}
+  .sidebar.is-open{transform:translateX(0);box-shadow:0 0 0 100vmax rgba(17,17,17,0.35);}
+  .main{margin-left:0 !important;}
+  .content{padding:16px !important;}
+  .drawer{width:min(920px,100vw) !important;}
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* SIDEBAR */
+.sidebar { position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w);
+  background:#111111;
+  color: #E2E8F0; z-index: 20; display: flex; flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06); }
+.sb-brand { padding: 18px; display: flex; align-items: center; gap: 11px;
+  border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
+.sb-logo { width: 34px; height: 34px; background: linear-gradient(135deg, #FF3B30, #FF9A1F);
+  border-radius: 9px; display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; flex-shrink: 0; box-shadow: 0 4px 12px rgba(11,92,255,0.3); }
+.sb-name { font-weight: 700; font-size: 14px; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+.sb-sub { font-size: 10px; color: #94A3B8; letter-spacing: 0.06em; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+.sb-nav { flex: 1; padding: 12px 8px; overflow-y: auto; }
+.sb-module { margin-bottom: 4px; }
+.sb-module-header { display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 8px 10px; border-radius: 6px; background: transparent; border: 0;
+  color: #94A3B8; font-family: inherit; font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 120ms; text-align: left; }
+.sb-module-header:hover { background: rgba(255,255,255,0.04); color: #CBD5E1; }
+.sb-module-header .mod-icon { flex-shrink: 0; opacity: 0.7; }
+.sb-module-header .mod-label { flex: 1; }
+.sb-module-header .mod-chevron { flex-shrink: 0; transition: transform 200ms; opacity: 0.7; }
+.sb-module[data-expanded="false"] .mod-chevron { transform: rotate(-90deg); }
+.sb-module[data-expanded="false"] .sb-features { display: none; }
+.sb-features { padding: 2px 0 6px 0; }
+.sb-item { display: flex; align-items: center; gap: 10px; padding: 7px 12px 7px 14px;
+  border-radius: 6px; color: #CBD5E1; font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all 120ms; margin-bottom: 1px; position: relative; user-select: none; }
+.sb-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sb-item.is-active { background: #FF3B30; color: #fff; font-weight: 600; }
+.sb-item.is-active::before { content: ''; position: absolute; left: -10px; top: 7px; bottom: 7px;
+  width: 3px; background: #fff; border-radius: 0 2px 2px 0; }
+.sb-item [data-lucide] { width: 16px; height: 16px; opacity: 0.85; }
+.sb-item.is-active [data-lucide] { opacity: 1; }
+.sb-item.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.sb-item.is-disabled:hover { background: transparent; color: #CBD5E1; }
+.sb-footer { padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: #94A3B8; }
+.pulse-dot { width: 7px; height: 7px; background: var(--c-teal); border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(0,168,142,0.20); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+/* MAIN */
+.main { margin-left: var(--sidebar-w); min-height: 100vh; background: var(--c-bg-off); }
+.shell-bar { position: sticky; top: 0; background: #fff; border-bottom: 1px solid var(--c-line-2);
+  height: var(--shell-h); display: flex; align-items: center; padding: 0 22px; z-index: 19; gap: 12px; }
+.breadcrumb { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--c-mute); }
+.breadcrumb a { cursor: pointer; transition: color 120ms; }
+.breadcrumb a:hover { color: var(--c-primary); }
+.breadcrumb .sep { color: var(--c-mute-3); font-size: 10px; }
+.breadcrumb-current { color: var(--c-ink); font-weight: 500; }
+.icon-btn { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute); border-radius: 7px; position: relative; transition: all 120ms; }
+.icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.icon-btn [data-lucide] { width: 17px; height: 17px; }
+.notif-dot { position: absolute; top: 7px; right: 8px; width: 7px; height: 7px;
+  background: var(--c-danger); border-radius: 50%; border: 2px solid #fff; }
+.user-chip { display: flex; align-items: center; gap: 9px; padding: 5px 10px 5px 12px;
+  border-radius: 8px; cursor: pointer; transition: background 120ms; }
+.user-chip:hover { background: var(--c-line-3); }
+.user-text { line-height: 1.2; text-align: right; }
+.user-name { font-size: 12.5px; font-weight: 500; color: var(--c-ink); white-space: nowrap; }
+.user-role { font-size: 10.5px; color: var(--c-mute-2); white-space: nowrap; margin-top: 1px; }
+.avatar { width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal)); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+.user-menu { position: absolute; top: calc(var(--shell-h) - 4px); right: 22px; background: #fff;
+  border: 1px solid var(--c-line-2); border-radius: 10px; box-shadow: 0 12px 32px rgba(11,29,58,0.12);
+  width: 240px; z-index: 30; padding: 6px; display: none; }
+.user-menu.is-open { display: block; }
+.user-menu-item { display: flex; align-items: center; gap: 10px; padding: 8px 11px; border-radius: 6px;
+  font-size: 13px; color: var(--c-ink); cursor: pointer; transition: background 120ms; }
+.user-menu-item:hover { background: var(--c-bg-off); }
+.user-menu-item [data-lucide] { width: 15px; height: 15px; color: var(--c-mute-2); }
+.user-menu-item.is-danger { color: var(--c-danger); }
+.user-menu-item.is-danger [data-lucide] { color: var(--c-danger); }
+.user-menu-divider { height: 1px; background: var(--c-line-2); margin: 5px 0; }
+
+/* CONTENT */
+.content { padding: 22px; }
+.ph { margin-bottom: 18px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.ph > div:first-child { flex: 1 1 auto; min-width: 280px; }
+.ph-title-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px; }
+.ph-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 22px; font-weight: 700; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.ph-count { font-size: 12.5px; font-weight: 600; color: var(--c-mute-2); background: var(--c-line-3); padding: 3px 9px; border-radius: 999px; }
+.ph-sub { font-size: 13px; color: var(--c-mute); margin: 0; }
+.ph-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* BUTTONS */
+.btn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: 8px;
+  font-size: 13px; font-weight: 500; border: 1px solid transparent; background: transparent; white-space: nowrap; transition: all 120ms; user-select: none; }
+.btn [data-lucide] { width: 15px; height: 15px; }
+.btn-primary { background: var(--c-primary); color: #fff; }
+.btn-primary:hover { background: var(--c-primary-hover); box-shadow: 0 2px 8px rgba(11,92,255,0.30); }
+.btn-secondary { background: #fff; border-color: var(--c-line); color: var(--c-ink); }
+.btn-secondary:hover { background: var(--c-line-3); border-color: var(--c-mute-2); }
+.btn-ghost { color: var(--c-mute); }
+.btn-ghost:hover { background: var(--c-line-3); color: var(--c-ink); }
+.btn-danger { background: #fff; border-color: var(--c-line); color: var(--c-danger); }
+.btn-danger:hover { background: #FEE2E2; border-color: var(--c-danger); }
+.btn-link { background: transparent; border: 0; padding: 0 4px; height: auto; color: var(--c-primary); font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn-sm { height: 30px; padding: 0 11px; font-size: 12px; }
+
+/* STATS */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.stat { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; padding: 14px 16px; transition: all 150ms; }
+.stat:hover { border-color: var(--c-line); box-shadow: 0 2px 8px rgba(11,29,58,0.05); }
+.stat-label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--c-mute); }
+.stat-label [data-lucide] { width: 13px; height: 13px; color: var(--c-primary); }
+.stat-value { font-family: 'Noto Sans Thai', sans-serif; font-size: 26px; font-weight: 700; color: var(--c-navy); margin-top: 6px; letter-spacing: -0.01em; }
+.stat-meta { font-size: 11.5px; color: var(--c-mute-2); margin-top: 5px; display: flex; align-items: center; gap: 4px; }
+.stat-meta [data-lucide] { width: 12px; height: 12px; }
+
+/* CARD + FILTER */
+.card { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; overflow: hidden; }
+.filter-bar { padding: 14px 18px; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid var(--c-line-2); background: #fff; flex-wrap: wrap; }
+.input, .select { height: 36px; padding: 0 12px; border: 1px solid var(--c-line); border-radius: 8px; font-size: 13px;
+  background: #fff; color: var(--c-ink); font-family: inherit; transition: all 120ms; width: 100%; }
+.input:focus, .select:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(11,92,255,0.10); }
+.select { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat; background-position: right 10px center; padding-right: 32px; appearance: none; }
+.input-search { position: relative; flex: 1; max-width: 320px; }
+.input-search input { padding-left: 36px; }
+.input-search .lead-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--c-mute-2); pointer-events: none; }
+
+/* TABLE */
+.table-scroll { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table thead { background: var(--c-bg-off); }
+.table th { padding: 9px 14px; text-align: left; font-weight: 600; color: var(--c-mute); font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--c-line-2); white-space: nowrap; }
+.table th.is-sortable { cursor: pointer; user-select: none; }
+.table th.is-sortable:hover { color: var(--c-ink); background: var(--c-line-3); }
+.table th .sort-arrow { display: inline-block; margin-left: 4px; opacity: 0.4; }
+.table th.is-sorted .sort-arrow { opacity: 1; color: var(--c-primary); }
+.table td { padding: 7px 14px; border-bottom: 1px solid var(--c-line-2); color: var(--c-ink); vertical-align: middle; }
+.table tbody tr { transition: background 120ms; }
+.table tbody tr:hover { background: var(--c-bg-off); cursor: pointer; }
+.table tbody tr:last-child td { border-bottom: 0; }
+.table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* account code mono + tree indent */
+.acct-code { font-family:'Satoshi', monospace; font-weight: 600; color: var(--c-navy); font-size: 13px; }
+.acct-name-cell { display: flex; align-items: center; gap: 8px; }
+.tree-indent { display: inline-block; }
+.tree-tick { color: var(--c-mute-3); flex-shrink: 0; }
+.acct-name { font-weight: 500; }
+.acct-name.is-header { font-weight: 700; color: var(--c-navy); }
+
+/* PILLS — account type + status */
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.pill [data-lucide] { width: 11px; height: 11px; }
+.pill-active { background: #FFE8E6; color: #C22217; }
+.pill-on { background:#E4F4EB; color:#157A41; }
+.pill-off { background:#FFF1DD; color:#B8690B; }
+.pill-draft { background:var(--c-line-3); color:var(--c-mute-2); }
+.pill [data-lucide]{width:11px;height:11px;}
+.pill-archived { background: var(--c-line-3); color: var(--c-mute-2); }
+.pill-asset { background: #FFE8E6; color: #C22217; }
+.pill-liability { background: #FEF3C7; color: #92400E; }
+.pill-equity { background: #EDE9FE; color: #6D28D9; }
+.pill-income { background: #D1FAE5; color: #065F46; }
+.pill-expense { background: #FEE2E2; color: #B91C1C; }
+.dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.dot.is-active { background: #2563EB; box-shadow: 0 0 0 2.5px rgba(37,99,235,0.18); }
+.dot.is-archived { background: var(--c-mute-3); }
+
+.bal-side { font-size: 12px; font-weight: 600; }
+.bal-dr { color: var(--c-primary); }
+.bal-cr { color: var(--c-teal); }
+
+/* ROW ACTIONS */
+.row-actions { display: inline-flex; gap: 2px; }
+.ra-btn { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute-2); border-radius: 6px; transition: all 120ms; }
+.ra-btn:hover { background: var(--c-line-3); color: var(--c-primary); }
+.ra-btn.is-danger:hover { background: #FEE2E2; color: var(--c-danger); }
+.ra-btn [data-lucide] { width: 15px; height: 15px; }
+
+/* TABLE FOOTER */
+.table-footer { padding: 12px 18px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2);
+  display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: var(--c-mute); flex-wrap: wrap; gap: 10px; }
+.pagination { display: inline-flex; gap: 4px; align-items: center; }
+.pg-btn { min-width: 30px; height: 30px; padding: 0 8px; display: inline-flex; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid var(--c-line-2); border-radius: 6px; color: var(--c-mute); font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 120ms; }
+.pg-btn:hover { border-color: var(--c-line); background: var(--c-bg-off); }
+.pg-btn.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.pg-btn.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn [data-lucide] { width: 13px; height: 13px; }
+
+/* EMPTY */
+.empty { padding: 56px 24px; text-align: center; color: var(--c-mute); }
+.empty-icon { width: 52px; height: 52px; margin: 0 auto 14px; border-radius: 50%; background: var(--c-line-3); color: var(--c-mute-2);
+  display: inline-flex; align-items: center; justify-content: center; }
+.empty-icon [data-lucide] { width: 22px; height: 22px; }
+.empty-title { font-size: 15.5px; font-weight: 600; color: var(--c-ink); margin-bottom: 5px; font-family: 'Noto Sans Thai', sans-serif; }
+.empty-desc { font-size: 13px; color: var(--c-mute); max-width: 320px; margin: 0 auto; }
+
+/* DRAWER */
+.drawer-backdrop { position: fixed; inset: 0; background: rgba(11,29,58,0.40); z-index: 50; opacity: 0; pointer-events: none; transition: opacity 220ms; }
+.drawer-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 540px; background: #fff; z-index: 51;
+  transform: translateX(100%); transition: transform 280ms cubic-bezier(0.4,0,0.2,1); display: flex; flex-direction: column; box-shadow: -16px 0 40px rgba(11,29,58,0.18); }
+.drawer.is-open { transform: translateX(0); }
+.drawer-header { display: flex; align-items: center; gap: 14px; padding: 18px 22px; border-bottom: 1px solid var(--c-line-2); }
+.drawer-avatar { width: 44px; height: 44px; border-radius: 11px; background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; font-family:'Satoshi', monospace; }
+.drawer-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 19px; font-weight: 600; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.drawer-subtitle { font-size: 12px; color: var(--c-mute); margin-top: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.drawer-tabs { display: flex; padding: 0 22px; border-bottom: 1px solid var(--c-line-2); }
+.drawer-tab { padding: 10px 14px; font-size: 13px; font-weight: 500; color: var(--c-mute); border-bottom: 2px solid transparent;
+  transition: all 120ms; margin-bottom: -1px; cursor: pointer; user-select: none; background: transparent; border-left: 0; border-right: 0; border-top: 0; }
+.drawer-tab:hover { color: var(--c-ink); }
+.drawer-tab.is-active { color: var(--c-primary); border-bottom-color: var(--c-primary); }
+.drawer-body { flex: 1; overflow-y: auto; overflow-anchor: none; padding: 22px; }
+.drawer-section { margin-bottom: 22px; }
+.drawer-section-title { font-size: 11px; font-weight: 700; color: var(--c-mute); letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 10px; }
+.drawer-fields { display: grid; grid-template-columns: 140px 1fr; gap: 10px 16px; font-size: 13px; }
+.drawer-fields .lbl { color: var(--c-mute); }
+.drawer-fields .val { color: var(--c-ink); font-weight: 500; }
+.drawer-footer { padding: 13px 22px; border-top: 1px solid var(--c-line-2); display: flex; gap: 8px; align-items: center; background: var(--c-bg-off); }
+.footer-spacer { flex: 1; }
+.drawer-footer-meta { font-size: 12px; color: var(--c-mute-2); }
+.drawer-header-actions { display: flex; gap: 6px; align-items: center; }
+.drawer-header-divider { width: 1px; height: 22px; background: var(--c-line-2); margin: 0 4px; flex-shrink: 0; }
+
+/* FIELDS */
+.field { margin-bottom: 14px; }
+.field-label { display: block; font-size: 12.5px; font-weight: 500; color: var(--c-mute); margin-bottom: 6px; }
+.field-label .req { color: var(--c-danger); margin-left: 2px; }
+.field-input { width: 100%; }
+.field-help { font-size: 11.5px; color: var(--c-mute-2); margin-top: 4px; }
+.field-error { font-size: 11.5px; color: var(--c-danger); margin-top: 4px; display: none; }
+.field.is-invalid .input, .field.is-invalid .select { border-color: var(--c-danger); }
+.field.is-invalid .field-error { display: block; }
+.field-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+
+/* segmented toggle for Dr/Cr + status */
+.seg { display: inline-flex; border: 1px solid var(--c-line); border-radius: 8px; overflow: hidden; }
+.seg-btn { padding: 8px 16px; font-size: 13px; font-weight: 500; background: #fff; border: 0; color: var(--c-mute); transition: all 120ms; }
+.seg-btn + .seg-btn { border-left: 1px solid var(--c-line); }
+.seg-btn.is-on { background: var(--c-primary); color: #fff; }
+
+/* toggle row (Iron Rule #20) */
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border: 1px solid var(--c-line-2); border-radius: 8px; cursor: pointer; user-select: none; }
+.toggle-row:hover { border-color: var(--c-line); }
+.toggle-track { width: 40px; height: 22px; background: var(--c-line); border-radius: 999px; position: relative; transition: background 160ms; flex-shrink: 0; }
+.toggle-track .knob { position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: transform 160ms; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+.toggle-track.is-on { background: var(--c-teal); }
+.toggle-track.is-on .knob { transform: translateX(18px); }
+
+/* info note */
+.note { display: flex; gap: 10px; padding: 12px 14px; background: #FFF5F4; border: 1px solid #BFDBFE; border-radius: 8px; font-size: 12.5px; color: #C22217; }
+.note [data-lucide] { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+.note.is-warn { background: #FFFBEB; border-color: #FDE68A; color: #92400E; }
+
+/* MODAL */
+.modal-backdrop { position: fixed; inset: 0; background: rgba(11,29,58,0.50); z-index: 60; opacity: 0; pointer-events: none; transition: opacity 200ms; display: flex; align-items: center; justify-content: center; }
+.modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.modal { background: #fff; border-radius: 12px; width: 440px; max-width: 92vw; max-height: 90vh; display: flex; flex-direction: column;
+  transform: scale(0.96); transition: transform 200ms cubic-bezier(0.4,0,0.2,1); box-shadow: 0 24px 64px rgba(11,29,58,0.28); overflow: hidden; }
+.modal-backdrop.is-open .modal { transform: scale(1); }
+.modal-header { padding: 18px 22px 12px; display: flex; align-items: flex-start; gap: 12px; }
+.modal-header-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(11,92,255,0.10); color: var(--c-primary); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.modal-header-icon.is-danger { background: #FEE2E2; color: var(--c-danger); }
+.modal-header-icon.is-warning { background: #FEF3C7; color: var(--c-warning); }
+.modal-header-icon [data-lucide] { width: 18px; height: 18px; }
+.modal-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 16px; font-weight: 600; color: var(--c-navy); margin: 0 0 4px; }
+.modal-subtitle { font-size: 13px; color: var(--c-mute); margin: 0; line-height: 1.5; }
+.modal-body { padding: 6px 22px 18px; font-size: 13px; color: var(--c-ink); overflow-y: auto; }
+.modal-footer { padding: 12px 22px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2); display: flex; justify-content: flex-end; gap: 8px; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--c-navy); color: #fff; padding: 13px 18px; border-radius: 10px;
+  font-size: 13px; font-weight: 500; z-index: 80; display: flex; align-items: center; gap: 10px; box-shadow: 0 12px 32px rgba(11,29,58,0.30);
+  transform: translateY(100px); opacity: 0; transition: all 250ms cubic-bezier(0.4,0,0.2,1); max-width: 380px; }
+.toast.is-visible { transform: translateY(0); opacity: 1; }
+.toast.is-success { background: var(--c-success); }
+.toast.is-info { background: var(--c-primary); }
+.toast.is-warning { background: var(--c-warning); }
+.toast.is-error { background: var(--c-danger); }
+.toast [data-lucide] { width: 17px; height: 17px; }
+
+/* UTIL */
+.text-mute { color: var(--c-mute); } .text-mute-2 { color: var(--c-mute-2); }
+.flex { display: flex; } .items-center { align-items: center; } .gap-2 { gap: 8px; }
+.w-3 { width: 12px; } .h-3 { height: 12px; }
+.w-3\.5 { width: 14px; } .h-3\.5 { height: 14px; }
+.w-4 { width: 16px; } .h-4 { height: 16px; }
+.w-5 { width: 20px; } .h-5 { height: 20px; }
+svg.lucide { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; flex-shrink: 0; }
+svg.lucide.w-3 { width: 12px; } svg.lucide.h-3 { height: 12px; }
+svg.lucide.w-3\.5 { width: 14px; } svg.lucide.h-3\.5 { height: 14px; }
+svg.lucide.w-4 { width: 16px; } svg.lucide.h-4 { height: 16px; }
+svg.lucide.w-5 { width: 20px; } svg.lucide.h-5 { height: 20px; }
+
+/* ===== TREE / HIERARCHY ===== */
+.view-switch { display: inline-flex; border: 1px solid var(--c-line); border-radius: 8px; overflow: hidden; }
+.vs-btn { display:inline-flex; align-items:center; gap:6px; padding: 0 13px; height: 36px; font-size: 12.5px; font-weight: 500; background: #fff; border: 0; color: var(--c-mute); transition: all 120ms; }
+.vs-btn + .vs-btn { border-left: 1px solid var(--c-line); }
+.vs-btn.is-on { background: var(--c-primary); color: #fff; }
+.vs-btn [data-lucide] { width: 14px; height: 14px; }
+
+/* tree control + guide lines */
+.acct-name-cell { display:flex; align-items:stretch; gap:0; min-width:0; }
+.tree-rail { display:inline-flex; align-items:stretch; flex-shrink:0; }
+.tree-rail .tseg { width: 18px; flex-shrink:0; position:relative; }
+.tree-rail .tseg.line::before { content:''; position:absolute; left:9px; top:-7px; bottom:-7px; width:1px; background:var(--c-line-2); }
+.tree-toggle { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border: 0; background: transparent; color: var(--c-mute-2); border-radius: 4px; transition: color 120ms; flex-shrink: 0; pointer-events: none; }
+.tree-toggle [data-lucide] { width: 13px; height: 13px; transition: transform 180ms; }
+.tree-toggle.is-collapsed [data-lucide] { transform: rotate(-90deg); }
+/* แถวที่ toggle ได้ = chevron ตาม hover ของ row */
+tr.is-clickable-toggle:hover .tree-toggle { color: var(--c-primary); }
+tr.is-clickable-toggle { cursor: pointer; }
+/* ปุ่ม view (ดวงตา) */
+.ra-btn.is-view:hover { background: rgba(11,92,255,0.10); color: var(--c-primary); }
+.tree-spacer { width: 22px; display: inline-block; flex-shrink: 0; }
+.acct-text { display:flex; flex-direction:column; min-width:0; padding-left:6px; }
+.acct-name { line-height:1.3; }
+.acct-name-en { font-size: 11px; color: var(--c-mute-2); line-height:1.25; font-family:'Satoshi',sans-serif; }
+.kids-count { font-size: 11px; color: var(--c-mute-3); margin-left:7px; font-family:'Satoshi',monospace; }
+
+.lvl-badge { font-family:'Satoshi',monospace; font-size: 9.5px; font-weight: 700; color: var(--c-mute-2); background: var(--c-line-3); padding: 1px 5px; border-radius: 4px; letter-spacing: 0.02em; }
+
+/* Dr/Cr chip — จาง subtle */
+.drcr { display:inline-flex; align-items:center; justify-content:center; min-width:30px; padding:2px 7px; border-radius:5px; font-size:11px; font-weight:700; font-family:'Satoshi',sans-serif; letter-spacing:0.02em; }
+.drcr.dr { background:#EFF4FF; color:#C22217; }
+.drcr.cr { background:#E6F7F3; color:#066A57; }
+
+/* balance amount */
+.rollup-amt { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--c-navy); font-family:'Satoshi',sans-serif; }
+.rollup-amt.is-zero { color: var(--c-mute-3); font-weight: 400; }
+
+/* level emphasis via weight (สากล: indent+weight สื่อ depth, ไม่พึ่ง badge) */
+.acct-name.lvl0 { font-weight: 800; color: var(--c-navy); font-size:13.5px; }
+.acct-name.lvl1 { font-weight: 700; color: var(--c-navy); }
+.acct-name.lvl2 { font-weight: 600; color: var(--c-ink); }
+.acct-name.lvl3 { font-weight: 500; color: var(--c-ink); }
+tr.row-lvl0 td { background: #F4F7FB; border-bottom-color: var(--c-line); }
+tr.row-lvl0:hover td { background: #ECF1F8; }
+tr.row-lvl1 td { background: #FBFCFE; }
+tr.is-archived .acct-name { color: var(--c-mute-3); text-decoration: line-through; }
+
+/* code compose (prefix + segment input) */
+.code-compose { display:flex; align-items:stretch; }
+.code-prefix { display:inline-flex; align-items:center; padding:0 10px; background:var(--c-bg-off); border:1px solid var(--c-line); border-right:0; border-radius:8px 0 0 8px; font-family:'Satoshi',monospace; font-weight:600; color:var(--c-mute); font-size:13px; white-space:nowrap; }
+.code-compose .code-seg-input { border-radius:0 8px 8px 0; }
+.code-compose:has(.code-prefix) .code-seg-input { border-top-left-radius:0; border-bottom-left-radius:0; }
+#codePreview { font-weight:700; color:var(--c-primary); }
+/* segmented Dr/Cr (renamed from .seg to avoid tree collision) */
+.seg-group { display: inline-flex; border: 1px solid var(--c-line); border-radius: 8px; overflow: hidden; }
+.seg-group .seg-btn { padding: 8px 16px; font-size: 13px; font-weight: 500; background: #fff; border: 0; color: var(--c-mute); transition: all 120ms; }
+.seg-group .seg-btn + .seg-btn { border-left: 1px solid var(--c-line); }
+.seg-group .seg-btn.is-on { background: var(--c-primary); color: #fff; }
+
+/* ===== CSV IMPORT ===== */
+.import-drop { border:2px dashed var(--c-line); border-radius:10px; padding:26px; text-align:center; cursor:pointer; transition:all 140ms; background:var(--c-bg-off); }
+.import-drop:hover { border-color:var(--c-primary); background:#F5F8FF; }
+.import-drop .ic { width:44px;height:44px;border-radius:50%;background:rgba(11,92,255,0.10);color:var(--c-primary);display:inline-flex;align-items:center;justify-content:center;margin-bottom:10px; }
+.import-drop .ic [data-lucide]{width:20px;height:20px;}
+.import-file { display:flex;align-items:center;gap:10px;padding:11px 13px;border:1px solid var(--c-line-2);border-radius:8px;background:#fff; }
+.import-file .fic{width:32px;height:32px;border-radius:7px;background:#E6F7F3;color:var(--c-teal);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.import-file .fic [data-lucide]{width:16px;height:16px;}
+.mode-opt { display:flex;gap:10px;align-items:flex-start;padding:11px 13px;border:1px solid var(--c-line-2);border-radius:8px;cursor:pointer;transition:all 120ms;margin-bottom:8px; }
+.mode-opt:hover{border-color:var(--c-line);}
+.mode-opt.is-on{border-color:var(--c-primary);background:#F5F8FF;}
+.mode-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--c-line);flex-shrink:0;margin-top:1px;position:relative;transition:all 120ms;}
+.mode-opt.is-on .mode-radio{border-color:var(--c-primary);}
+.mode-opt.is-on .mode-radio::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--c-primary);}
+
+/* import modal ใหญ่ขึ้นเพื่อใส่ preview */
+.modal.is-lg { width: 680px; }
+/* import-drop เป็น block layout (กัน flex ซ้อน) */
+label.import-drop { display:block; }
+label.import-drop .ic { display:inline-flex; }
+
+/* ===== GL Posting Group additions ===== */
+.tabbar { display:flex; gap:4px; margin: 0 0 16px; border-bottom:1px solid var(--c-line-2); }
+.tab-btn { display:inline-flex; align-items:center; gap:8px; padding:10px 16px; background:transparent;
+  border:none; border-bottom:2px solid transparent; color:var(--c-mute-2); font-size:13.5px; font-weight:600;
+  cursor:pointer; transition:all 140ms; margin-bottom:-1px; }
+.tab-btn:hover { color:var(--c-ink); }
+.tab-btn.is-on { color:var(--c-primary); border-bottom-color:var(--c-primary); }
+.tab-btn [data-lucide] { width:16px; height:16px; }
+.tab-count { display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:18px; padding:0 6px;
+  background:var(--c-line-3); color:var(--c-mute); border-radius:999px; font-size:11px; font-weight:700; }
+.tab-btn.is-on .tab-count { background:var(--c-primary); color:#fff; }
+
+/* card toolbar (เหนือ filter bar) — title+hint ซ้าย, ปุ่ม action ขวา */
+.card-toolbar { display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:14px 16px 0; }
+.card-toolbar-title { display:flex; align-items:center; gap:6px; font-size:14px; font-weight:700; color:var(--c-ink); }
+.card-toolbar-actions { display:flex; gap:8px; flex-shrink:0; }
+
+/* hint icon — hover tooltip อย่างเดียว (ไม่เป็นแผง) */
+.hint-i { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px;
+  color:var(--c-mute-3); cursor:help; position:relative; }
+.hint-i:hover { color:var(--c-primary); }
+.hint-i::after { content:attr(data-tip); position:absolute; top:calc(100% + 8px); left:0;
+  width:max-content; max-width:340px; padding:8px 11px; background:var(--c-navy); color:#fff;
+  font-size:12px; font-weight:400; line-height:1.5; border-radius:8px; white-space:normal;
+  box-shadow:0 8px 24px rgba(11,29,58,0.22); opacity:0; visibility:hidden; transform:translateY(-3px);
+  transition:opacity 140ms, transform 140ms, visibility 140ms; z-index:50; pointer-events:none; text-align:left; }
+.hint-i::before { content:''; position:absolute; top:calc(100% + 2px); left:6px; border:5px solid transparent;
+  border-bottom-color:var(--c-navy); opacity:0; visibility:hidden; transition:opacity 140ms, visibility 140ms; z-index:51; }
+.hint-i:hover::after, .hint-i:hover::before { opacity:1; visibility:visible; transform:translateY(0); }
+
+.acct-chip-row { display:flex; flex-wrap:wrap; gap:6px; }
+.acct-chip { display:inline-flex; align-items:center; gap:6px; padding:3px 9px; background:var(--c-bg-off);
+  border:1px solid var(--c-line-2); border-radius:7px; font-size:11.5px; }
+.acct-chip-lbl { color:var(--c-mute-2); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; }
+.acct-name-inline { color:var(--c-mute-2); font-size:12px; }
+
+/* group badge = pill convention (radius 999, token palette เดียวกับ COA pill) */
+.grp-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:999px; font-size:11.5px; font-weight:600; white-space:nowrap; }
+.grp-bus { background:#EDE9FE; color:#6D28D9; }
+.grp-prod { background:#D1FAE5; color:#065F46; }
+
+.bm-card { display:flex; align-items:center; gap:11px; padding:11px 13px; margin-bottom:8px;
+  background:var(--c-bg-off); border:1px solid var(--c-line-2); border-radius:10px; }
+.bm-icon { width:32px; height:32px; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center;
+  background:#FFF5F4; color:var(--c-primary); border-radius:8px; }
+/* ===== Searchable Dropdown (sdd) ===== */
+.sdd { position:relative; }
+.sdd-trigger { display:flex; align-items:center; gap:8px; width:100%; padding:9px 12px;
+  border:1px solid var(--c-line); border-radius:9px; background:#fff; font-size:13.5px; color:var(--c-ink);
+  cursor:pointer; text-align:left; transition:border-color 120ms, box-shadow 120ms; }
+.sdd-trigger:hover { border-color:var(--c-mute-3); }
+.sdd.is-open .sdd-trigger { border-color:var(--c-primary); box-shadow:0 0 0 3px rgba(11,92,255,0.12); }
+.sdd-trigger .sdd-val { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sdd-trigger .sdd-val.is-placeholder { color:var(--c-mute-3); }
+.sdd-trigger .sdd-chev { flex-shrink:0; color:var(--c-mute-3); transition:transform 160ms; }
+.sdd.is-open .sdd-chev { transform:rotate(180deg); }
+.sdd-panel { position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:60;
+  background:#fff; border:1px solid var(--c-line-2); border-radius:10px; box-shadow:0 12px 32px rgba(11,29,58,0.16);
+  overflow:hidden; display:none; }
+.sdd.is-open .sdd-panel { display:block; }
+.sdd-search { padding:8px; border-bottom:1px solid var(--c-line-2); position:relative; }
+.sdd-search input { width:100%; padding:7px 10px 7px 30px; border:1px solid var(--c-line-2); border-radius:7px;
+  font-size:13px; font-family:inherit; outline:none; }
+.sdd-search input:focus { border-color:var(--c-primary); }
+.sdd-search [data-lucide] { position:absolute; left:18px; top:50%; transform:translateY(-50%); color:var(--c-mute-3); }
+.sdd-list { max-height:240px; overflow-y:auto; padding:4px; }
+.sdd-opt { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:7px; cursor:pointer; font-size:13px; }
+.sdd-opt:hover { background:var(--c-bg-off); }
+.sdd-opt.is-sel { background:#FFF5F4; color:var(--c-primary); font-weight:600; }
+.sdd-opt .sdd-opt-code { font-family:'Satoshi', monospace; font-weight:600; color:var(--c-navy); font-size:12.5px; }
+.sdd-opt.is-sel .sdd-opt-code { color:var(--c-primary); }
+.sdd-opt .sdd-check { margin-left:auto; color:var(--c-primary); flex-shrink:0; }
+.sdd-empty { padding:16px; text-align:center; color:var(--c-mute-2); font-size:12.5px; }
+
+/* ===== Payment Term additions ===== */
+.data-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+.data-table thead th { text-align:left; font-size:11px; font-weight:700; color:var(--c-mute-2); text-transform:uppercase; letter-spacing:0.04em; padding:11px 14px; border-bottom:1px solid var(--c-line-2); background:var(--c-bg-off); white-space:nowrap; }
+.data-table tbody td { padding:13px 14px; border-bottom:1px solid var(--c-line-3); font-size:13px; vertical-align:middle; height:58px; box-sizing:border-box; }
+.data-table tbody tr { cursor:pointer; transition:background 100ms; }
+.data-table tbody tr:hover { background:var(--c-bg-off); }
+.data-table tbody tr:last-child td { border-bottom:none; }
+.row-actions { display:inline-flex; gap:4px; justify-content:flex-end; }
+.acct-name-en { font-size:11.5px; color:var(--c-mute-3); margin-top:1px; }
+.data-table td .acct-name-en, .data-table td > div { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.empty-row { text-align:center; color:var(--c-mute-2); padding:32px; font-size:13px; }
+.table-foot { display:flex; justify-content:space-between; align-items:center; padding:11px 16px; font-size:12px; color:var(--c-mute-2); border-top:1px solid var(--c-line-2); }
+.search-box { position:relative; flex:1; max-width:340px; display:flex; align-items:center; }
+.search-box [data-lucide] { position:absolute; left:11px; color:var(--c-mute-3); }
+.search-input { width:100%; padding:9px 12px 9px 32px; border:1px solid var(--c-line); border-radius:9px; font-size:13.5px; font-family:inherit; outline:none; }
+.search-input:focus { border-color:var(--c-primary); box-shadow:0 0 0 3px rgba(11,92,255,0.12); }
+/* view drawer rows */
+.dv-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--c-line-3); font-size:13px; }
+.dv-row:last-child { border-bottom:none; }
+.dv-lbl { color:var(--c-mute-2); }
+.dv-val { font-weight:600; color:var(--c-ink); }
+.bm-card { background:var(--c-bg-off); border:1px solid var(--c-line-2); border-radius:10px; padding:14px; margin-bottom:16px; }
+.bm-card-title { font-size:11px; font-weight:700; color:var(--c-mute-2); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:6px; }
+.bm-summary { font-size:14px; font-weight:600; color:var(--c-navy); }
+/* installment editor */
+.inst-head { display:grid; grid-template-columns:60px 1fr 1fr 36px; gap:8px; font-size:10.5px; font-weight:700; color:var(--c-mute-3); text-transform:uppercase; padding:2px 0; }
+.inst-row { display:grid; grid-template-columns:60px 1fr 1fr 36px; gap:8px; align-items:center; margin-bottom:6px; }
+.inst-no { font-size:12px; font-weight:600; color:var(--c-mute-2); }
+.inst-input { position:relative; display:flex; align-items:center; }
+.inst-input input { width:100%; padding:7px 28px 7px 10px; border:1px solid var(--c-line); border-radius:7px; font-size:13px; font-family:inherit; outline:none; }
+.inst-input input:focus { border-color:var(--c-primary); }
+.inst-unit { position:absolute; right:9px; font-size:11px; color:var(--c-mute-3); pointer-events:none; }
+.inst-total { margin-top:8px; font-size:12.5px; font-weight:600; padding:6px 10px; border-radius:7px; display:inline-block; }
+.inst-total.is-ok { background:#E1F5EE; color:#0F6E56; }
+.inst-total.is-warn { background:#FEF3C7; color:#92400E; }
+.grn-trigger { display:flex; align-items:center; gap:6px; margin-top:8px; padding:6px 10px; background:#FFF5F4; border-radius:7px; font-size:11.5px; color:#185FA5; }
+.grn-trigger [data-lucide] { color:#185FA5; flex-shrink:0; }
+/* summary cards */
+.sc-row { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; margin-bottom:18px; }
+.menu{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--c-line-2);border-radius:10px;box-shadow:0 8px 24px rgba(17,17,17,0.12);padding:6px;min-width:160px;display:none;z-index:60;}
+.menu.is-open{display:block;}
+.menu-item{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:none;background:none;border-radius:7px;font-size:13px;font-family:inherit;cursor:pointer;text-align:left;}
+.menu-item:hover{background:var(--c-bg-off);}
+.menu-item:disabled{opacity:0.45;cursor:default;}
+.menu-item [data-lucide]{width:13px;height:13px;}
+.bulkbar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#111111;color:#fff;border-radius:10px;margin-bottom:10px;}
+.bulkbar .bb-count{font-size:12.5px;font-weight:600;margin-right:4px;}
+.bulkbar button{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:transparent;color:#fff;font-size:12.5px;font-family:inherit;cursor:pointer;}
+.bulkbar button:hover{background:rgba(255,255,255,0.12);}
+.bulkbar button.is-danger{border-color:#FF6B61;color:#FFB3AD;}
+.bulkbar [data-lucide]{width:13px;height:13px;}
+tr.is-sel td{background:#FFF6F5;}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.stat{background:#fff;border:1px solid var(--c-line-2);border-radius:11px;padding:14px 16px;text-align:left;cursor:pointer;font-family:inherit;}
+.stat:hover{border-color:var(--c-line);}
+.stat.is-on{border-color:var(--c-primary);box-shadow:0 0 0 1px var(--c-primary) inset;}
+.stat-label{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--c-mute-2);font-weight:600;}
+.stat-label [data-lucide]{width:12px;height:12px;}
+.stat-value{font-size:22px;font-weight:700;margin-top:4px;}
+.stat-meta{font-size:11px;color:var(--c-mute-2);margin-top:2px;}
+.sc-card { display:flex; align-items:center; gap:11px; padding:15px 16px; background:#fff; border:1px solid var(--c-line-2); border-radius:11px; min-height:64px; box-sizing:border-box; }
+.sc-icon { width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.sc-val { font-size:20px; font-weight:700; color:var(--c-navy); line-height:1; }
+.sc-label { font-size:11.5px; color:var(--c-mute-2); margin-top:3px; }
+.sc-all .sc-icon { background:#E8EDF5; color:var(--c-navy); }
+.sc-blue .sc-icon { background:#E6F1FB; color:#185FA5; }
+.sc-teal .sc-icon { background:#E1F5EE; color:#0F6E56; }
+.sc-purple .sc-icon { background:#EDE9FE; color:#6D28D9; }
+.sc-amber .sc-icon { background:#FEF3C7; color:#92400E; }
+.sc-green .sc-icon { background:#EAF3DE; color:#3B6D11; }
+@media (max-width:1100px){ .sc-row{ grid-template-columns:repeat(3,1fr); } }
+/* use-in tags */
+.use-tags { display:flex; flex-wrap:wrap; gap:4px; }
+.use-tag { font-size:10.5px; padding:2px 7px; background:#F1F5F9; color:#475569; border-radius:5px; font-weight:500; }
+.def-star { display:inline-flex; margin-left:5px; color:#D97706; vertical-align:middle; }
+.pill-mute { background:#F1F5F9; color:#64748B; }
+/* input with suffix unit */
+.input-suffix { position:relative; display:flex; align-items:center; }
+.input-suffix input { width:100%; padding-right:42px; }
+.input-suffix-unit { position:absolute; right:11px; font-size:12px; color:var(--c-mute-3); pointer-events:none; }
+/* installment card */
+.inst-card { border:1px solid var(--c-line-2); border-radius:9px; padding:10px; margin-bottom:8px; background:var(--c-bg-off); }
+.inst-card-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:7px; }
+.inst-desc { width:100%; margin-bottom:7px; padding:7px 10px; border:1px solid var(--c-line); border-radius:7px; font-size:12.5px; font-family:inherit; outline:none; }
+.inst-desc:focus { border-color:var(--c-primary); }
+.inst-grid2 { display:grid; grid-template-columns:110px 1fr; gap:8px; align-items:center; }
+/* checkbox grid */
+.chk-count { font-size:11px; font-weight:600; color:var(--c-primary); background:#FFF5F4; padding:2px 8px; border-radius:999px; margin-left:6px; }
+.chk-groups { display:flex; flex-direction:column; gap:14px; }
+.chk-group-title { font-size:11px; font-weight:700; color:var(--c-mute-2); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:7px; }
+.chk-list { display:flex; flex-direction:column; gap:7px; }
+.chk-row { display:flex; align-items:center; gap:11px; padding:11px 13px; border:1px solid var(--c-line-2); border-radius:9px; cursor:pointer; transition:border-color 120ms, background 120ms; user-select:none; }
+.chk-row:hover { border-color:var(--c-line); background:var(--c-bg-off); }
+.chk-row.is-on { border-color:var(--c-primary); background:#FFF5F4; }
+.chk-row.is-disabled { opacity:0.5; cursor:not-allowed; background:var(--c-bg-off); }
+.chk-row.is-disabled:hover { border-color:var(--c-line-2); background:var(--c-bg-off); }
+.chk-box { width:20px; height:20px; border-radius:6px; border:1.5px solid var(--c-line); display:flex; align-items:center; justify-content:center; flex-shrink:0; background:#fff; transition:all 120ms; color:#fff; }
+.chk-box.is-on { background:var(--c-primary); border-color:var(--c-primary); }
+.chk-text { display:flex; flex-direction:column; gap:1px; flex:1; min-width:0; }
+.chk-name { font-size:13px; font-weight:600; color:var(--c-ink); }
+.chk-desc { font-size:11.5px; color:var(--c-mute-2); }
+.chk-na { font-size:11px; color:var(--c-mute-3); flex-shrink:0; }
+/* import modal */
+/* toast */
+.toast-host { position:fixed; bottom:20px; right:20px; display:flex; flex-direction:column; gap:8px; z-index:200; }
+.toast { display:flex; align-items:center; gap:9px; padding:11px 15px; border-radius:10px; font-size:13px; font-weight:500; color:#fff; background:var(--c-navy); box-shadow:0 8px 24px rgba(11,29,58,0.22); animation:toastIn 200ms ease; max-width:380px; }
+.toast.is-success { background:#0F6E56; } .toast.is-error { background:#B91C1C; } .toast.is-warning { background:#92400E; } .toast.is-info { background:var(--c-navy); }
+.toast.is-leaving { opacity:0; transform:translateX(8px); transition:opacity 200ms, transform 200ms; }
+@keyframes toastIn { from{opacity:0;transform:translateX(12px);} to{opacity:1;transform:translateX(0);} }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i data-lucide="box" ></i></div>
+    <div>
+      <div class="sb-name">CUBE NATIVE</div>
+      <div class="sb-sub">Finance</div>
+    </div>
+  </div>
+  <nav class="sb-nav" id="sb-nav">
+    <div class="sb-module" data-module="finance" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="landmark" class="mod-icon"></i>
+        <span class="mod-label">การเงิน</span>
+        <i data-lucide="chevron-down" class="mod-chevron"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item" data-feature="coa" href="chart-of-accounts.html">
+          <i data-lucide="list-tree" ></i><span>ผังบัญชี</span>
+        </a>
+        <a class="sb-item" data-feature="posting-group" href="gl-posting-group.html">
+          <i data-lucide="git-merge" ></i><span>GL Posting Group</span>
+        </a>
+        <a class="sb-item is-active" data-feature="payment-term">
+          <i data-lucide="calendar-clock" ></i><span>เงื่อนไขชำระเงิน</span>
+        </a>
+        <a class="sb-item is-disabled" data-feature="gl">
+          <i data-lucide="book-open" ></i><span>สมุดบัญชีแยกประเภท</span>
+        </a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="procurement" data-expanded="false">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="shopping-cart" class="mod-icon"></i>
+        <span class="mod-label">จัดซื้อ</span>
+        <i data-lucide="chevron-down" class="mod-chevron"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item is-disabled" data-feature="pr"><i data-lucide="file-plus" ></i><span>ใบขอซื้อ (PR)</span></a>
+        <a class="sb-item is-disabled" data-feature="po"><i data-lucide="file-text" ></i><span>ใบสั่งซื้อ (PO)</span></a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="system" data-expanded="false">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sliders-horizontal" class="mod-icon"></i>
+        <span class="mod-label">System</span>
+        <i data-lucide="chevron-down" class="mod-chevron"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item is-disabled" data-feature="settings"><i data-lucide="settings" ></i><span>Settings</span></a>
+      </div>
+    </div>
+  </nav>
+  <div class="sb-footer">
+    <div class="pulse-dot"></div>
+    <span>Sandbox · v1.0.0</span>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="shell-bar">
+    <nav class="breadcrumb">
+      <a data-breadcrumb-module="finance">การเงิน</a>
+      <i data-lucide="chevron-right" class="sep"></i>
+      <span class="breadcrumb-current">เงื่อนไขชำระเงิน</span>
+    </nav>
+    <div style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
+      <div style="position: relative;">
+        <button class="icon-btn" onclick="toggleNotif()"><i data-lucide="bell" ></i><span class="notif-dot"></span></button>
+      </div>
+      <div style="position: relative;">
+        <div class="user-chip" onclick="toggleUserMenu()">
+          <div class="user-text">
+            <div class="user-name">Tadswan C.</div>
+            <div class="user-role">Finance Lead · CUBE NATIVE</div>
+          </div>
+          <div class="avatar">TC</div>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-item"><i data-lucide="user" ></i><span>My Profile</span></div>
+          <div class="user-menu-item"><i data-lucide="settings" ></i><span>Preferences</span></div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-item is-danger"><i data-lucide="log-out" ></i><span>Sign out</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="content" id="page-content"></div>
+</main>
+
+<!-- Drawer -->
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer"></div>
+
+<!-- Modal -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Lucide loader -->
+<script>
+(function loadLucide() {
+  var version = '0.469.0';
+  var cdns = [
+    'https://unpkg.com/lucide@' + version + '/dist/umd/lucide.min.js',
+    'https://cdn.jsdelivr.net/npm/lucide@' + version + '/dist/umd/lucide.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/lucide/' + version + '/lucide.min.js'
+  ];
+  var i = 0;
+  function tryNext() {
+    if (i >= cdns.length) { window.lucide = window.lucide || { createIcons: function(){} }; window.dispatchEvent(new Event('lucide:ready')); return; }
+    var s = document.createElement('script'); s.src = cdns[i++];
+    s.onload = function(){ window.dispatchEvent(new Event('lucide:ready')); };
+    s.onerror = tryNext; document.head.appendChild(s);
+  }
+  tryNext();
+})();
+</script>
+
+<script>
+// ============================================ CONFIG
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function gById(id){ return state.terms.find(t=>t.id===id); }
+function renderIcons(){ if(window.lucide && typeof window.lucide.createIcons==='function') window.lucide.createIcons(); }
+
+// Payment Term types (international standard)
+// 6 Payment Types ทางการ (CUBE ERP P2P/S2C — ตาม Cheat Sheet + ENH FRD ระบบเก่า)
+// ใช้ร่วมทั้ง P2P (PO→GRN→PV) และ S2C (SO→Ship→Receipt) · trigger เลือกได้ตาม FRD
+/* BACKEND (standard review 2026-08-09 — SAP baseline date/installment · Odoo payment terms/down payment):
+   1) installment → บัญชีต้องแตก journal item ต่องวด (AP/AR aging ตามงวด ไม่ใช่ก้อนเดียว) — ENG-PT-01
+   2) deposit → บัญชี "เงินมัดจำรับ/จ่ายล่วงหน้า" (clearing) + ★ VAT ไทย: รับมัดจำต้องออกใบกำกับภาษี ณ จุดรับเงิน — เชื่อม Tax Code + GL Posting Setup
+   3) discount_pct/days (2/10 Net 30) → บัญชีส่วนลดรับ/จ่าย (cash discount) — GL Posting Setup
+   4) default term ระดับคู่ค้า: Vendor/Customer master มี field payment_term override ตัว default ของระบบ (SAP/Odoo pattern)
+   5) due_basis = baseline date concept (invoice_date/delivery/eom) — ระบบคำนวณ due จาก basis + net_days */
+const PT_TYPES = {
+  full_prepay:      { label:'ชำระเต็มก่อนส่ง (Full Prepay)',  en:'Full Prepay',      pill:'pill-liability', icon:'wallet',          hint:'จ่าย/รับครบ 100% ก่อนส่งของ — GRN/Ship เปิดหลังชำระ', panelInfo:'ชำระเต็มจำนวน 100% ก่อนส่งของ — GRN/Ship จะเปิดหลังยืนยันการชำระ', trigDefault:'after_full', trigLock:false },
+  full_postpay:     { label:'ชำระเต็มหลังรับ (Full Postpay)',  en:'Full Postpay',     pill:'pill-asset',     icon:'package-check',   hint:'ส่ง/รับของก่อน แล้วชำระเต็มจำนวนทีหลัง', panelInfo:'ส่ง/รับของก่อน แล้วชำระเต็มจำนวนภายในกี่วันที่กำหนด (0 = ทันที)', trigDefault:'immediate', trigLock:false },
+  deposit:          { label:'มัดจำ + ส่วนเหลือ (Deposit)',    en:'Deposit',          pill:'pill-equity',    icon:'piggy-bank',      hint:'วางมัดจำก่อน · ส่วนที่เหลือชำระหลังรับของ', panelInfo:'วางมัดจำก่อน (% หรือจำนวนเงิน) · ส่วนที่เหลือชำระตามเวลาที่กำหนด · มัดจำ inherit/ปรับได้ที่ PO/SO', trigDefault:'after_deposit', trigLock:false },
+  installment:      { label:'แบ่งงวด (Installment)',          en:'Installment',      pill:'pill-income',    icon:'layers',          hint:'ส่งรอบเดียว แบ่งชำระ N งวด (รวม 100%)', panelInfo:'ส่งรอบเดียว แบ่งชำระหลายงวด · ปรับ %/ครบกำหนด ต่องวดได้ที่ PO/SO · ขั้นต่ำ 2 งวด รวม 100%', trigDefault:'immediate', trigLock:false },
+  partial_delivery: { label:'ทยอยส่ง (Partial Delivery)',     en:'Partial Delivery', pill:'pill-expense',   icon:'truck',           hint:'ส่งหลายรอบ · ชำระตามจำนวนที่รับจริงแต่ละรอบ', panelInfo:'ส่งหลายรอบ · ยอดชำระกำหนดที่ GRN/Ship แต่ละรอบตามจำนวนที่รับจริง · ระบบออก Invoice อ้างอิงตาม Delivery แต่ละรอบอัตโนมัติ · ไม่มี schedule ตายตัว', trigDefault:'immediate', trigLock:false },
+  credit:           { label:'เครดิต N วัน (Credit)',          en:'Credit Term',      pill:'pill-asset',     icon:'calendar-clock',  hint:'รับของก่อน · ชำระภายใน N วันตาม due date', panelInfo:'รับของก่อน · Warehouse unlock ทันทีที่ Confirm · ชำระเต็มภายใน N วันตาม Due Date ที่ระบุ', trigDefault:'immediate', trigLock:true },
+  direct_payment:   { label:'Direct Payment (จ่ายตรง)',       en:'Direct Payment',   pill:'pill-mute',      icon:'receipt',         hint:'ไม่ผ่าน PR/PO/QUO→SO — บันทึกตรงเข้า GL ที่ AP/AR Invoice', panelInfo:'บันทึกตรงเข้า GL ที่ AP/AR Invoice — ไม่ผ่าน PR/PO/QUO→SO · ไม่มี Warehouse Trigger · ไม่มี 3-Way Match', trigDefault:null, trigLock:true, noTrigger:true },
+};
+// Warehouse/GRN/Ship Trigger — เลือกได้ตาม FRD (immediate / after_deposit / after_full)
+const TRIGGERS = {
+  immediate:    { label:'ทันที (หลัง PO/SO Confirm)', badge:'pill-active' },
+  after_deposit:{ label:'หลังชำระมัดจำ',              badge:'pill-equity', depositOnly:true },
+  after_full:   { label:'หลังชำระเต็มจำนวน',          badge:'pill-liability' },
+};
+// สถานะ 3 ค่า — pattern เลน (VD-PDM-01) · เปลี่ยนอิสระ ไม่มีอนุมัติ (VD-PDM-02)
+const STATUS_META = {
+  draft:    { label:'ร่าง',      cls:'pill-draft',    icon:'file-pen' },
+  active:   { label:'ใช้งาน',    cls:'pill-on',       icon:'circle-check' },
+  inactive: { label:'ไม่ใช้งาน', cls:'pill-off',      icon:'circle-slash' },
+};
+function statusLabel(st){ return (STATUS_META[st]||{label:st}).label; }
+function statusPill(st){ const m=STATUS_META[st]||STATUS_META.draft; return `<span class="pill ${m.cls}"><i data-lucide="${m.icon}"></i>${m.label}</span>`; }
+// [DOA-ENGINE placeholder] master ไม่มีสายอนุมัติ — field เตรียมเชื่อม Policy Center (approver_role/approved_by/approved_at/approval_chain = null)
+const DEPOSIT_METHOD = { percent:'เปอร์เซ็นต์ (%)', fixed:'จำนวนเงินคงที่ (฿)', manual:'กำหนดเองตอนสร้างเอกสาร' };
+const REMAINING_TIMING = { after_delivery:'หลังส่งสินค้า', after_receipt:'หลังได้รับสินค้า', per_contract:'ตามที่กำหนดในสัญญา' };
+const DUE_TYPE = { on_doc:'เมื่อสร้างเอกสาร (PO/SO)', days_after_delivery:'N วันหลังส่งมอบ', manual:'กำหนดเองตอนทำเอกสาร' };
+const EXPENSE_CAT = { utility:'ค่าสาธารณูปโภค', contract:'ค่าใช้จ่ายตามสัญญา', other:'ค่าใช้จ่ายอื่น' };
+// เอกสารที่ใช้ payment term (P2P + S2C รวม)
+// เอกสารที่ใช้ payment term — แยกฝั่งซื้อ (P2P) / ขาย (S2C) ชื่อเต็ม · Payment Voucher ≠ Receipt (คนละ feature)
+const USE_IN_DOCS = {
+  pr:           { label:'Purchase Requisition', sub:'PR — ใบขอซื้อ',          group:'ฝั่งซื้อ (P2P)' },
+  po:           { label:'Purchase Order',        sub:'PO — ใบสั่งซื้อ',          group:'ฝั่งซื้อ (P2P)' },
+  ap_invoice:   { label:'AP Invoice',            sub:'ใบแจ้งหนี้เจ้าหนี้',       group:'ฝั่งซื้อ (P2P)' },
+  payment_voucher:{ label:'Payment Voucher',     sub:'ใบสำคัญจ่าย',             group:'ฝั่งซื้อ (P2P)' },
+  so:           { label:'Sales Order',           sub:'SO — ใบสั่งขาย',           group:'ฝั่งขาย (S2C)' },
+  quotation:    { label:'Quotation',             sub:'QUO — ใบเสนอราคา (proposal)', group:'ฝั่งขาย (S2C)' },
+  ar_invoice:   { label:'AR Invoice',            sub:'ใบแจ้งหนี้ลูกหนี้',        group:'ฝั่งขาย (S2C)' },
+  receipt:      { label:'Receipt',               sub:'ใบเสร็จรับเงิน',          group:'ฝั่งขาย (S2C)' },
+};
+// keys ฝั่งซื้อ-pre-receipt ที่ direct_payment ปิด (ไม่ผ่าน PR/PO/SO — D05/LD-05)
+const DP_DISABLED_DOCS = ['pr','po','quotation','so'];
+const DUE_BASIS = {
+  invoice_date: 'นับจากวันที่ใบแจ้งหนี้',
+  eom:          'นับจากสิ้นเดือน (End of Month)',
+  delivery:     'นับจากวันส่ง/รับของ',
+};
+
+// ============================================ STATE
+const state = {
+  sdd: { open:null, search:'' },
+  filters: { search:'', type:'all', status:'all' },
+  bulkSel: {},
+  terms: [
+    { id:'t1', code:'PREPAY',  name:'ชำระเต็มก่อนส่ง',        name_en:'Full Prepay 100%', type:'full_prepay', trigger:'after_full', due_basis:'invoice_date', use_in:['po','so'], is_default:false, status:'active', used:14 },
+    { id:'t2', code:'POSTPAY',  name:'ชำระเต็มหลังรับของ',     name_en:'Full Postpay', type:'full_postpay', net_days:0, trigger:'immediate', due_basis:'delivery', use_in:['po','ap_invoice'], is_default:false, status:'active', used:6 },
+    { id:'t3', code:'NET30',   name:'เครดิต 30 วัน',          name_en:'Net 30', type:'credit', net_days:30, trigger:'immediate', due_basis:'invoice_date', use_in:['po','quotation','so','ap_invoice','ar_invoice'], is_default:true, status:'active', used:186 },
+    { id:'t4', code:'NET60',   name:'เครดิต 60 วัน',          name_en:'Net 60', type:'credit', net_days:60, trigger:'immediate', due_basis:'invoice_date', use_in:['po','ap_invoice'], is_default:false, status:'inactive', used:0 },
+    { id:'t5', code:'2-10N30', name:'เครดิต 30 วัน ลดเร็ว 2%', name_en:'2/10 Net 30', type:'credit', net_days:30, discount_pct:2, discount_days:10, trigger:'immediate', due_basis:'invoice_date', use_in:['po','ap_invoice'], is_default:false, status:'active', used:31 },
+    { id:'t6', code:'EOM30',   name:'สิ้นเดือน + 30 วัน',      name_en:'EOM Net 30', type:'credit', net_days:30, trigger:'immediate', due_basis:'eom', use_in:['ap_invoice','ar_invoice'], is_default:false, status:'active', used:8 },
+    { id:'t7', code:'DEP50',   name:'มัดจำ 50% ที่เหลือ 30 วัน', name_en:'50% Deposit, Net 30', type:'deposit', deposit_method:'percent', deposit_value:50, net_days:30, remaining_timing:'after_receipt', trigger:'after_deposit', due_basis:'invoice_date', use_in:['po','quotation','so'], is_default:false, status:'active', used:42 },
+    { id:'t8', code:'DEP30',   name:'มัดจำ 30% ที่เหลือ 15 วัน', name_en:'30% Deposit, Net 15', type:'deposit', deposit_method:'percent', deposit_value:30, net_days:15, remaining_timing:'after_delivery', trigger:'after_deposit', due_basis:'invoice_date', use_in:['quotation','so'], is_default:false, status:'active', used:3 },
+    { id:'t9', code:'INST3',   name:'แบ่ง 3 งวด (40/30/30)',   name_en:'3 Installments', type:'installment', installments:[{pct:40,days:0,due_type:'on_doc',desc:'งวดแรก เมื่อสร้างเอกสาร'},{pct:30,days:30,due_type:'days_after_delivery',desc:'งวด 2 หลังส่ง 30 วัน'},{pct:30,days:60,due_type:'days_after_delivery',desc:'งวดสุดท้าย หลังส่ง 60 วัน'}], trigger:'immediate', due_basis:'invoice_date', use_in:['po','so'], is_default:false, status:'active', used:11 },
+    { id:'t10', code:'PARTIAL', name:'ทยอยส่ง จ่ายตามรับจริง',  name_en:'Partial Delivery', type:'partial_delivery', trigger:'immediate', due_basis:'delivery', use_in:['po','so'], is_default:false, status:'active', used:5 },
+    { id:'t11', code:'DIRECT-UTIL', name:'จ่ายตรง — ค่าสาธารณูปโภค', name_en:'Direct Payment (Utility)', type:'direct_payment', expense_category:'utility', due_basis:'invoice_date', use_in:['ap_invoice','payment_voucher'], is_default:false, status:'active', used:9 },
+    { id:'t12', code:'NET45',  name:'เครดิต 45 วัน (เตรียมใช้)', name_en:'Net 45', type:'credit', net_days:45, trigger:'immediate', due_basis:'invoice_date', use_in:['po','ap_invoice'], is_default:false, status:'draft', used:0 },
+  ],
+  drawer: { open:false, mode:null, recordId:null },
+  form: {},
+  modal: { open:false, type:null, data:null },  seq: 11,
+};
+
+// ============================================ NAV/UI helpers
+function toggleModule(h){ const m=h.closest('.sb-module'); if(!m) return; const e=m.getAttribute('data-expanded')!=='false'; m.setAttribute('data-expanded', e?'false':'true'); }
+function toggleUserMenu(){ document.getElementById('userMenu')?.classList.toggle('is-open'); }
+function toggleNotif(){}
+
+// ============================================ Searchable Dropdown
+const SDD_REG = {};
+function searchDropdown(name, value, opts, placeholder, onPick){
+  SDD_REG[name] = { opts, onPick, placeholder, value };
+  const sel = opts.find(o=>o.value===value);
+  const isOpen = state.sdd.open===name;
+  const q = isOpen ? state.sdd.search.toLowerCase() : '';
+  const filtered = isOpen ? opts.filter(o=>(o.label+' '+(o.code||'')).toLowerCase().includes(q)) : opts;
+  const valHtml = sel
+    ? `<span class="sdd-val">${sel.code?`<span class="sdd-opt-code">${esc(sel.code)}</span> `:''}${esc(sel.label)}</span>`
+    : `<span class="sdd-val is-placeholder">${esc(placeholder)}</span>`;
+  return `<div class="sdd${isOpen?' is-open':''}" data-sdd="${name}">
+    <button type="button" class="sdd-trigger" onclick="toggleSdd('${name}', event)">
+      ${valHtml}<i data-lucide="chevron-down" class="sdd-chev"></i>
+    </button>
+    <div class="sdd-panel" onclick="event.stopPropagation()">
+      <div class="sdd-search">
+        <i data-lucide="search" ></i>
+        <input type="text" placeholder="ค้นหา..." value="${esc(isOpen?state.sdd.search:'')}" oninput="onSddSearch('${name}',this.value)" autocomplete="off">
+      </div>
+      <div class="sdd-list">${sddOptsHtml(name, filtered, value)}</div>
+    </div>
+  </div>`;
+}
+// render รายการ options (ใช้ซ้ำตอน search โดยไม่ render ทั้งหน้า)
+function sddOptsHtml(name, filtered, value){
+  const onPick=(SDD_REG[name]||{}).onPick||'';
+  return filtered.length===0 ? `<div class="sdd-empty">ไม่พบรายการ</div>` :
+    filtered.map(o=>`<div class="sdd-opt${o.value===value?' is-sel':''}" onclick="pickSdd('${onPick}','${name}','${esc(o.value)}')">
+      ${o.code?`<span class="sdd-opt-code">${esc(o.code)}</span>`:''}<span>${esc(o.label)}</span>
+      ${o.value===value?'<i data-lucide="check" class="sdd-check"></i>':''}
+    </div>`).join('');
+}
+// เปิด/ปิด dropdown — manipulate เฉพาะ DOM ของ sdd นั้น ไม่ render ทั้งหน้า (กันเด้ง/กระตุก)
+function toggleSdd(name, ev){ if(ev) ev.stopPropagation();
+  const willOpen = state.sdd.open!==name;
+  if(state.sdd.open){ const prev=document.querySelector(`.sdd[data-sdd="${state.sdd.open}"]`); if(prev) prev.classList.remove('is-open'); }
+  // เก็บ scroll ของ drawer-body ไว้ ก่อนเปิด (ใช้ restore ตอน pick)
+  const body=document.querySelector('.drawer-body'); state._formScroll = body?body.scrollTop:0;
+  state.sdd = willOpen ? {open:name,search:''} : {open:null,search:''};
+  const el=document.querySelector(`.sdd[data-sdd="${name}"]`);
+  if(el && willOpen){
+    el.classList.add('is-open');
+    const inp=el.querySelector('.sdd-search input'); if(inp) inp.value='';
+    sddRefreshList(name);
+    requestAnimationFrame(()=>{ if(inp) inp.focus(); });
+  }
+}
+// อัปเดตเฉพาะ list ภายใน panel ตาม search ปัจจุบัน (ไม่แตะ DOM อื่น)
+function sddRefreshList(name){
+  const reg=SDD_REG[name]; if(!reg) return;
+  const el=document.querySelector(`.sdd[data-sdd="${name}"] .sdd-list`); if(!el) return;
+  const q=(state.sdd.search||'').toLowerCase();
+  const filtered=reg.opts.filter(o=>(o.label+' '+(o.code||'')).toLowerCase().includes(q));
+  el.innerHTML=sddOptsHtml(name, filtered, reg.value);
+  if(window.lucide&&lucide.createIcons) lucide.createIcons();
+}
+function onSddSearch(name, v){ state.sdd.search=v; sddRefreshList(name); }
+function pickSdd(fn, name, value){
+  const el=document.querySelector(`.sdd[data-sdd="${name}"]`); if(el) el.classList.remove('is-open');
+  state.sdd={open:null,search:''};
+  if(window[fn]) window[fn](name, value);
+}
+document.addEventListener('click',(e)=>{ if(state.sdd.open && !e.target.closest('.sdd')){
+  const el=document.querySelector(`.sdd[data-sdd="${state.sdd.open}"]`); if(el) el.classList.remove('is-open');
+  state.sdd={open:null,search:''};
+} });
+
+// ============================================ Term summary (human readable)
+function termSummary(t){
+  const disc = (t.discount_pct&&t.discount_days) ? ` · ลด ${t.discount_pct}% ถ้าจ่ายใน ${t.discount_days} วัน` : '';
+  if(t.type==='full_prepay') return 'ชำระครบ 100% ก่อนส่งของ';
+  if(t.type==='full_postpay') return (t.net_days?`ชำระเต็มภายใน ${t.net_days} วันหลังรับ`:'ชำระเต็มหลังรับของ')+disc;
+  if(t.type==='credit') return (t.net_days===0?'จ่ายทันที':`ครบกำหนด ${t.net_days} วัน`)+disc;
+  if(t.type==='deposit'){ const v=t.deposit_method==='fixed'?`${(t.deposit_value||0).toLocaleString()} บาท`:(t.deposit_method==='manual'?'กำหนดเองตอนทำเอกสาร':`${t.deposit_value||0}%`); return `มัดจำ ${v} · ที่เหลือ ${t.net_days||0} วัน`; }
+  if(t.type==='installment'){ const n=(t.installments||[]).length; return `${n} งวด (${(t.installments||[]).map(i=>i.pct+'%').join(' / ')})`; }
+  if(t.type==='partial_delivery') return 'ทยอยส่ง · ชำระตามจำนวนที่รับจริงแต่ละรอบ';
+  if(t.type==='direct_payment') return 'จ่ายตรงเข้า GL — '+(EXPENSE_CAT[t.expense_category]||'ไม่ผ่าน PR/PO');
+  return '—';
+}
+function triggerLabel(t){ const k=PT_TYPES[t.type]; if(k.noTrigger) return '—'; return (TRIGGERS[t.trigger]||{}).label || (TRIGGERS[k.trigDefault]||{}).label || '—'; }
+
+// ============================================ RENDER PAGE
+function renderPage(){
+  const f=state.filters;
+  let list=state.terms.filter(t=>{
+    if(f.type!=='all' && t.type!==f.type) return false;
+    if(f.status!=='all' && t.status!==f.status) return false;
+    if(f.search){ const q=f.search.toLowerCase(); if(!(t.code.toLowerCase().includes(q)||t.name.toLowerCase().includes(q)||(t.name_en||'').toLowerCase().includes(q))) return false; }
+    return true;
+  });
+  const typeOpts=[{value:'all',label:'ทุกประเภท'}].concat(Object.entries(PT_TYPES).map(([k,v])=>({value:k,label:v.label})));
+  const cntSt=st=>state.terms.filter(t=>t.status===st).length;
+  const selN=Object.keys(state.bulkSel).length;
+  const allSel=list.length>0 && list.every(t=>state.bulkSel[t.id]);
+  const statBtn=(key,icon,label,value,meta,on)=>`<button class="stat ${on?'is-on':''}" onclick="quickFilter('${key}')"><div class="stat-label"><i data-lucide="${icon}"></i><span>${label}</span></div><div class="stat-value">${value}</div><div class="stat-meta">${meta}</div></button>`;
+  return `
+  <div class="ph">
+    <div>
+      <div class="ph-title-row">
+        <h1 class="ph-title">เงื่อนไขชำระเงิน</h1>
+        <span class="ph-count">${state.terms.length} เงื่อนไข</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats">
+    ${statBtn('all','list','ทั้งหมด',state.terms.length,'ทุกประเภท · ทุกสถานะ', f.status==='all'&&f.type==='all')}
+    ${statBtn('active','circle-check','ใช้งาน',cntSt('active'),'พร้อมใช้ในเอกสารซื้อ-ขาย', f.status==='active')}
+    ${statBtn('inactive','circle-slash','ไม่ใช้งาน',cntSt('inactive'),'ซ่อนจากการเลือกใหม่', f.status==='inactive')}
+    ${statBtn('draft','file-pen','ร่าง',cntSt('draft'),'ยังไม่เปิดให้ใช้', f.status==='draft')}
+  </div>
+
+  ${selN>0?`<div class="bulkbar"><span class="bb-count">เลือก ${selN} รายการ</span>
+    <button onclick="bulkSetStatus('active')"><i data-lucide="circle-check"></i>ใช้งาน</button>
+    <button onclick="bulkSetStatus('inactive')"><i data-lucide="circle-slash"></i>ไม่ใช้งาน</button>
+    <button onclick="bulkSetStatus('draft')"><i data-lucide="file-pen"></i>ร่าง</button>
+    <button class="is-danger" onclick="bulkAskDelete()"><i data-lucide="trash-2"></i>ลบ</button>
+    <div style="flex:1;"></div>
+    <button onclick="state.bulkSel={};render();"><i data-lucide="x"></i>ยกเลิก</button>
+  </div>`:''}
+  <div class="card">
+    <div class="card-toolbar">
+      <div class="card-toolbar-title">
+        <span>Payment Terms</span>
+      </div>
+      <div class="card-toolbar-actions">
+        <button class="btn btn-primary btn-sm" onclick="openDrawer('create')"><i data-lucide="plus" ></i><span>เพิ่มเงื่อนไข</span></button>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <div class="search-box">
+        <i data-lucide="search" ></i>
+        <input class="search-input" type="text" placeholder="ค้นหารหัส หรือชื่อเงื่อนไข..." value="${esc(f.search)}" oninput="onSearch(this.value)">
+      </div>
+      <div style="width:230px;">${searchDropdown('filterType', f.type, typeOpts, 'ทุกประเภท', 'onFilterTypePick')}</div>
+    </div>
+    <div class="tbl-scroll">
+    <table class="data-table">
+      <colgroup>
+        <col style="width:34px;"><col style="width:140px;"><col><col style="width:170px;"><col style="width:280px;"><col style="width:120px;"><col style="width:120px;">
+      </colgroup>
+      <thead><tr>
+        <th style="width:34px;"><input type="checkbox" ${allSel?'checked':''} onclick="toggleSelAll(event)"></th><th>รหัส</th><th>ชื่อเงื่อนไข</th><th>ประเภท</th><th>สรุปเงื่อนไข</th><th style="text-align:center;">สถานะ</th><th style="text-align:right;">จัดการ</th>
+      </tr></thead>
+      <tbody>${list.length? list.map(renderRow).join('') : `<tr><td colspan="7"><div class="empty-row">ไม่พบเงื่อนไขที่ตรงกับการค้นหา</div></td></tr>`}</tbody>
+    </table>
+    </div>
+    <div class="table-foot">
+      <span>เงื่อนไขชำระเงิน — ใช้ร่วมทุก transaction (PR/PO/QUOT/SO/Invoice/Payment)</span>
+      <span>แสดง ${list.length} จาก ${state.terms.length} เงื่อนไข</span>
+    </div>
+  </div>
+  `;
+}
+
+function renderRow(t){
+  const k=PT_TYPES[t.type];
+  const sel=!!state.bulkSel[t.id];
+  return `
+  <tr onclick="openDrawer('view','${t.id}')" class="${sel?'is-sel':''}">
+    <td onclick="event.stopPropagation()"><input type="checkbox" ${sel?'checked':''} onclick="toggleSel('${t.id}')"></td>
+    <td><span class="acct-code" style="font-weight:600;">${esc(t.code)}</span>${t.is_default?'<span class="def-star" title="ค่า Default"><i data-lucide="star"></i></span>':''}</td>
+    <td><div style="font-weight:600;">${esc(t.name)}</div>${t.name_en?`<div class="acct-name-en">${esc(t.name_en)}</div>`:''}</td>
+    <td><span class="pill ${k.pill}"><i data-lucide="${k.icon}"></i>${k.label.split(' (')[0]}</span></td>
+    <td><span style="font-size:12.5px; color:var(--c-mute-2);">${esc(termSummary(t))}</span></td>
+    <td style="text-align:center;">${statusPill(t.status)}</td>
+    <td onclick="event.stopPropagation()" style="text-align:right;">
+      <div class="row-actions">
+        <button class="ra-btn" title="แก้ไข" onclick="openDrawer('edit','${t.id}')"><i data-lucide="pencil"></i></button>
+      </div>
+    </td>
+  </tr>`;
+}
+
+// ============================================ ACTIONS
+function onSearch(v){ state.filters.search=v; renderPageOnly(); }
+function quickFilter(key){
+  if(key==='all'){ state.filters.status='all'; state.filters.type='all'; }
+  else { state.filters.status=(state.filters.status===key?'all':key); }
+  render();
+}
+function toggleSel(id){ if(state.bulkSel[id]) delete state.bulkSel[id]; else state.bulkSel[id]=true; render(); }
+function toggleSelAll(ev){ ev.stopPropagation(); const f=state.filters;
+  const vis=state.terms.filter(t=>{ if(f.type!=='all'&&t.type!==f.type) return false; if(f.status!=='all'&&t.status!==f.status) return false; if(f.search){const q=f.search.toLowerCase(); if(!(t.code.toLowerCase().includes(q)||t.name.toLowerCase().includes(q)||(t.name_en||'').toLowerCase().includes(q))) return false;} return true; });
+  const all=vis.length&&vis.every(t=>state.bulkSel[t.id]);
+  if(all) vis.forEach(t=>delete state.bulkSel[t.id]); else vis.forEach(t=>state.bulkSel[t.id]=true);
+  render();
+}
+function bulkSetStatus(st){ const ids=Object.keys(state.bulkSel); if(!ids.length) return;
+  ids.forEach(id=>{ const t=gById(id); if(t) t.status=st; });
+  state.bulkSel={}; render(); showToast('เปลี่ยนสถานะ '+ids.length+' รายการเป็น '+statusLabel(st)+' แล้ว','success');
+}
+function bulkAskDelete(){ const ids=Object.keys(state.bulkSel); if(!ids.length) return; openModal('bulk-delete',null); }
+function bulkDoDelete(){ const ids=Object.keys(state.bulkSel);
+  const del=ids.filter(id=>{ const t=gById(id); return t && !(t.used>0); });
+  const skip=ids.length-del.length;
+  state.terms=state.terms.filter(t=>!del.includes(t.id));
+  state.bulkSel={}; closeModal(); render();
+  showToast('ลบแล้ว '+del.length+' รายการ'+(skip?' · ข้าม '+skip+' รายการที่ถูกใช้งาน':''), skip?'info':'success');
+}
+
+function toggleStatusMenu(ev){ if(ev) ev.stopPropagation(); document.getElementById('statusMenu')?.classList.toggle('is-open'); }
+function setStatusFromMenu(id, st){ const t=gById(id); if(!t) return; t.status=st; render(); showToast('เปลี่ยนสถานะเป็น '+statusLabel(st)+' แล้ว','success'); }
+function onFilterTypePick(_n,v){ state.filters.type=v; render(); }
+function setTab(){}
+
+function openDrawer(mode,id){
+  state.sdd={open:null,search:''};
+  if(mode==='create'){ state.form={type:'credit', due_basis:'invoice_date', net_days:30}; state.drawer={open:true,mode,recordId:null}; }
+  else { const t=gById(id); state.drawer={open:true,mode,recordId:id}; if(mode==='edit') state.form=JSON.parse(JSON.stringify(t)); }
+  render();
+}
+function closeDrawer(){ state.drawer={open:false,mode:null,recordId:null}; state.sdd={open:null,search:''}; render(); }
+function onFormInput(k,v){ state.form[k]=v; }
+function onFormNum(k,v){ state.form[k]= v===''?'':Math.max(0, parseInt(v)||0); }
+// render แล้วคง scroll ของ drawer-body (ใช้ค่าที่เก็บไว้ตอนเปิด dropdown — เลี่ยงอ่านค่าเพี้ยน)
+function renderFormKeepScroll(){
+  const cur=(document.querySelector('.drawer-body')||{}).scrollTop;
+  const s = (state._formScroll!=null) ? state._formScroll : (cur||0);
+  state._formScroll=null;   // ใช้ครั้งเดียว — กันค่าค้างทำ scroll เด้ง (Iron Rule #29)
+  render();
+  const nb=document.querySelector('.drawer-body');
+  if(nb){ nb.scrollTop=s; requestAnimationFrame(()=>{ nb.scrollTop=s; }); }
+}
+function onFormPick(name,value){ state.form[name]=value; renderFormKeepScroll(); }
+function onTypeChange(_n,v){
+  const k=PT_TYPES[v];
+  const keep={ type:v, code:state.form.code, name:state.form.name, name_en:state.form.name_en, due_basis:state.form.due_basis||'invoice_date', use_in:state.form.use_in||[], is_default:state.form.is_default||false, trigger:k.trigDefault };
+  if(v==='full_prepay'){ /* trigger only */ }
+  else if(v==='full_postpay'){ keep.net_days=0; }
+  else if(v==='credit'){ keep.net_days=30; }
+  else if(v==='deposit'){ keep.deposit_method='percent'; keep.deposit_value=50; keep.net_days=30; keep.remaining_timing='after_receipt'; }
+  else if(v==='installment') keep.installments=[{pct:50,days:0,due_type:'on_doc',desc:''},{pct:50,days:30,due_type:'days_after_delivery',desc:''}];
+  else if(v==='partial_delivery'){ keep.due_basis='delivery'; }
+  else if(v==='direct_payment'){ keep.expense_category='utility'; keep.trigger=null; keep.use_in=(keep.use_in||[]).filter(d=>!DP_DISABLED_DOCS.includes(d)); }
+  state.form=keep; render();
+}
+function onTriggerPick(_n,v){ state.form.trigger=v; renderFormKeepScroll(); }
+function onDepMethodPick(_n,v){ state.form.deposit_method=v; if(v==='manual') state.form.deposit_value=''; renderFormKeepScroll(); }
+function onRemainPick(_n,v){ state.form.remaining_timing=v; renderFormKeepScroll(); }
+function onExpensePick(_n,v){ state.form.expense_category=v; renderFormKeepScroll(); }
+function onInstDuePick(name,v){ const i=parseInt(name.split('__')[1]); if(state.form.installments[i]) state.form.installments[i].due_type=v; renderFormKeepScroll(); }
+function onInstDesc(i,v){ if(state.form.installments[i]) state.form.installments[i].desc=v; }
+function toggleUseIn(d){ const arr=state.form.use_in||[]; state.form.use_in = arr.includes(d)?arr.filter(x=>x!==d):arr.concat([d]); renderFormKeepScroll(); }
+function toggleDefault(){ state.form.is_default=!state.form.is_default; renderFormKeepScroll(); }
+
+// installment row ops
+function addInst(){ state.form.installments=(state.form.installments||[]).concat([{pct:0,days:0,due_type:'days_after_delivery',desc:''}]); renderFormKeepScroll(); }
+function removeInst(i){ state.form.installments=(state.form.installments||[]).filter((_,idx)=>idx!==i); renderFormKeepScroll(); }
+function onInstPct(i,v){ state.form.installments[i].pct=Math.max(0,Math.min(100,parseInt(v)||0)); const t=(state.form.installments||[]).reduce((s,x)=>s+(+x.pct||0),0); const el=document.querySelector('.inst-total'); if(el){ el.textContent='รวม '+t+'% '+(t===100?'✓':'(ต้องเป็น 100%)'); el.className='inst-total '+(t===100?'is-ok':'is-warn'); } }
+function onInstDays(i,v){ state.form.installments[i].days=Math.max(0,parseInt(v)||0); }
+
+function archiveSummaryFields(t){ return {type:t.type,code:t.code,name:t.name,name_en:t.name_en,due_basis:t.due_basis}; }
+
+// ============================================ SUBMIT
+function submitTerm(){
+  const f=state.form; let ok=true;
+  ['fld-code','fld-name','fld-type','fld-inst','fld-usein','fld-deposit_value'].forEach(id=>document.getElementById(id)?.classList.remove('is-invalid'));
+  if(!f.code||!f.code.trim()){ document.getElementById('fld-code')?.classList.add('is-invalid'); ok=false; }
+  if(!f.name||!f.name.trim()){ document.getElementById('fld-name')?.classList.add('is-invalid'); ok=false; }
+  const dup=state.terms.find(t=>t.code===(f.code||'').trim() && t.id!==state.drawer.recordId);
+  if(dup){ document.getElementById('fld-code')?.classList.add('is-invalid'); ok=false; }
+  // installment total = 100 (BR-ENH-02/03)
+  if(f.type==='installment'){
+    if((f.installments||[]).length<2){ document.getElementById('fld-inst')?.classList.add('is-invalid'); ok=false; showToast('ต้องมีอย่างน้อย 2 งวด','error'); }
+    const total=(f.installments||[]).reduce((s,i)=>s+(+i.pct||0),0);
+    if(total!==100){ document.getElementById('fld-inst')?.classList.add('is-invalid'); ok=false; showToast('สัดส่วนงวดต้องรวมเป็น 100% (ตอนนี้ '+total+'%)','error'); }
+  }
+  // deposit_value ≤ 100 ถ้า percent (BR-ENH-05)
+  if(f.type==='deposit' && f.deposit_method==='percent' && (+f.deposit_value)>100){ document.getElementById('fld-deposit_value')?.classList.add('is-invalid'); ok=false; showToast('มัดจำแบบ % ต้องไม่เกิน 100','error'); }
+  // credit_days > 0 (BR-ENH-10)
+  if(f.type==='credit' && (!f.net_days||+f.net_days<=0)){ document.getElementById('fld-net_days')?.classList.add('is-invalid'); ok=false; showToast('จำนวนวันเครดิตต้องมากกว่า 0','error'); }
+  // use_in ≥ 1 (BR-ENH-08)
+  if(!(f.use_in||[]).length){ document.getElementById('fld-usein')?.classList.add('is-invalid'); ok=false; showToast('เลือกเอกสารที่ใช้อย่างน้อย 1 รายการ','error'); }
+  // ส่วนลดจ่ายเร็ว: วันลดต้องน้อยกว่าวันเครดิต (standard 2/10 Net 30)
+  if(f.type==='credit' && (+f.discount_pct||0)>0){
+    if(!(+f.discount_days>0) || (+f.discount_days)>=(+f.net_days||0)){ document.getElementById('fld-discount_days')?.classList.add('is-invalid'); ok=false; showToast('วันชำระเพื่อรับส่วนลดต้องมากกว่า 0 และน้อยกว่าวันเครดิต','error'); }
+  }
+  // มัดจำ % ต้องมากกว่า 0
+  if(f.type==='deposit' && f.deposit_method==='percent' && !((+f.deposit_value)>0)){ document.getElementById('fld-deposit_value')?.classList.add('is-invalid'); ok=false; showToast('มัดจำแบบ % ต้องมากกว่า 0','error'); }
+  if(!ok){ if(dup) showToast('รหัสเงื่อนไขนี้มีอยู่แล้ว','error'); return; }
+  // default unique ต่อ type (BR-ENH-02) + default ต้องสถานะใช้งาน (standard)
+  if(f.is_default && (f.status||'active')!=='active'){ ok=false; showToast('ตั้งเป็นค่า Default ได้เฉพาะเงื่อนไขสถานะ "ใช้งาน"','error'); return; }
+  if(f.is_default){ state.terms.forEach(t=>{ if(t.type===f.type && t.id!==state.drawer.recordId && t.is_default){ t.is_default=false; } }); }
+  if(state.drawer.mode==='edit'){
+    Object.assign(gById(state.drawer.recordId), f, {code:f.code.trim(), name:f.name.trim()});
+    closeDrawer(); renderPageOnly(); showToast('บันทึกการแก้ไขแล้ว','success');
+  } else {
+    state.terms.push({ id:'t'+(++state.seq), ...f, code:f.code.trim(), name:f.name.trim(), status:f.status||'active', used:0, approver_role:null, approved_by:null, approved_at:null, approval_chain:null });
+    closeDrawer(); renderPageOnly(); showToast('สร้างเงื่อนไขชำระเงินแล้ว','success');
+  }
+}
+
+// ============================================ ARCHIVE
+function askArchive(id){ openModal('confirm-archive', id); }
+function doArchive(id){ const t=gById(id); if(t) t.status='archived'; closeModal(); if(state.drawer.open) closeDrawer(); renderPageOnly(); showToast('เลิกใช้งานเงื่อนไขแล้ว','info'); }
+function reactivate(id){ const t=gById(id); if(t) t.status='active'; if(state.drawer.open&&state.drawer.mode==='view'){ render(); } else { renderPageOnly(); } showToast('เปิดใช้งานเงื่อนไขอีกครั้งแล้ว','success'); }
+
+// ============================================ DRAWER
+function renderDrawer(){
+  if(!state.drawer.open) return '';
+  const m=state.drawer.mode;
+  let inner='';
+  if(m==='view'){ inner=renderView(gById(state.drawer.recordId)); }
+  else { inner=renderForm(m==='edit'?gById(state.drawer.recordId):null); }
+  return `<div class="drawer-backdrop" onclick="closeDrawer()"></div><aside class="drawer" onclick="event.stopPropagation()">${inner}</aside>`;
+}
+
+function renderForm(t){
+  const isEdit=!!t; const f=state.form; const type=f.type||'credit'; const k=PT_TYPES[type];
+  const typeOpts=Object.entries(PT_TYPES).map(([kk,v])=>({value:kk,label:v.label}));
+  const basisOpts=Object.entries(DUE_BASIS).map(([kk,v])=>({value:kk,label:v}));
+  // trigger options — after_deposit เฉพาะ deposit (D05/BR-ENH-05)
+  const trigOpts=Object.entries(TRIGGERS).filter(([kk,v])=>!v.depositOnly||type==='deposit').map(([kk,v])=>({value:kk,label:v.label}));
+
+  // Warehouse/GRN/Ship Trigger field (ทุก type ยกเว้น direct_payment + credit lock)
+  let triggerField='';
+  if(k.noTrigger){ triggerField=''; }
+  else if(k.trigLock){
+    triggerField=`<div class="grn-trigger"><i data-lucide="lock" ></i><span>Warehouse/GRN trigger: <strong>${esc((TRIGGERS[k.trigDefault]||{}).label||'ทันที')}</strong> (ล็อกตามประเภท)</span></div>`;
+  } else {
+    triggerField=fieldBlock('Warehouse / GRN / Ship Trigger', searchDropdown('trigger', f.trigger||k.trigDefault, trigOpts, '— เลือก —', 'onTriggerPick'), 'จุดที่ระบบ unlock ให้คลังดำเนินการ (Pick/Pack/Ship หรือ GRN)', true);
+  }
+
+  let typeFields='';
+  const discountFields = `
+      ${fieldBlock('ส่วนลดจ่ายเร็ว (%)', numInput('discount_pct', f.discount_pct, 'เช่น 2 (เว้นว่าง = ไม่มี)'), 'ลดกี่ % ถ้าชำระเร็ว (optional)', false)}
+      ${fieldBlock('ภายในกี่วัน (Discount days)', numInput('discount_days', f.discount_days, 'เช่น 10'), 'ได้ส่วนลดถ้าชำระภายในวันนี้ (optional)', false)}`;
+  if(type==='full_prepay'){
+    typeFields = triggerField;
+  } else if(type==='full_postpay'){
+    typeFields = `
+      ${fieldBlock('ชำระภายใน (วันหลังรับของ)', numInput('net_days', f.net_days, 'เช่น 0 = ทันที, 7, 15'), 'รับของแล้วชำระเต็มภายในกี่วัน (0 = ทันที)', true)}
+      ${discountFields}
+      ${triggerField}`;
+  } else if(type==='credit'){
+    typeFields = `
+      ${fieldBlock('จำนวนวันเครดิต (credit_days)', numInput('net_days', f.net_days, 'เช่น 30'), 'ชำระเต็มภายในกี่วันตาม due date · integer > 0', true)}
+      ${discountFields}
+      ${triggerField}`;
+  } else if(type==='deposit'){
+    const methodOpts=Object.entries(DEPOSIT_METHOD).map(([kk,v])=>({value:kk,label:v}));
+    const remainOpts=Object.entries(REMAINING_TIMING).map(([kk,v])=>({value:kk,label:v}));
+    const dm=f.deposit_method||'percent';
+    const valField = dm==='manual' ? '' :
+      fieldBlock('มูลค่ามัดจำ', `<div class="input-suffix"><input class="input field-input" name="deposit_value" type="number" min="0" ${dm==='percent'?'max="100"':''} placeholder="${dm==='percent'?'เช่น 50':'เช่น 5000'}" value="${f.deposit_value===0||f.deposit_value?f.deposit_value:''}" oninput="onFormNum('deposit_value',this.value)"><span class="input-suffix-unit">${dm==='percent'?'%':'บาท'}</span></div>`, dm==='percent'?'มัดจำกี่ % ของยอดรวม (≤100)':'มัดจำเป็นจำนวนเงินคงที่', true);
+    typeFields = `
+      ${fieldBlock('วิธีระบุมัดจำ', searchDropdown('deposit_method', dm, methodOpts, '— เลือก —', 'onDepMethodPick'), 'inherit ได้ที่ PO/SO (D08)', true)}
+      ${valField}
+      ${fieldBlock('ชำระส่วนที่เหลือ (remaining)', searchDropdown('remaining_timing', f.remaining_timing||'after_receipt', remainOpts, '— เลือก —', 'onRemainPick'), 'ส่วนที่เหลือชำระเมื่อใด', true)}
+      ${fieldBlock('ส่วนที่เหลือ ครบกำหนด (วัน)', numInput('net_days', f.net_days, 'เช่น 30'), 'ยอดที่เหลือชำระภายในกี่วัน', true)}
+      ${triggerField}`;
+  } else if(type==='partial_delivery'){
+    typeFields = `${fieldBlock('เครดิตต่อรอบ (วัน, optional)', numInput('net_days', f.net_days, 'เช่น 0 = จ่ายทันทีแต่ละรอบ'), 'ระยะเครดิตของแต่ละรอบที่รับ (เว้นว่าง = จ่ายทันที)', false)}
+      ${triggerField}`;
+  } else if(type==='direct_payment'){
+    const expOpts=Object.entries(EXPENSE_CAT).map(([kk,v])=>({value:kk,label:v}));
+    typeFields = `
+      ${fieldBlock('หมวดหมู่ค่าใช้จ่าย', searchDropdown('expense_category', f.expense_category||'utility', expOpts, '— เลือก —', 'onExpensePick'), 'ประเภทค่าใช้จ่ายสำหรับลงบัญชี', true)}
+      <div class="note is-warn"><i data-lucide="alert-triangle" ></i><span>ประเภทนี้<strong>ไม่ผ่าน PR/PO/QUO→SO</strong> — บันทึกตรงเข้า GL ที่ AP/AR Invoice · ไม่มี Warehouse Trigger · ไม่มี 3-Way Match</span></div>`;
+  } else if(type==='installment'){
+    const dueOpts=Object.entries(DUE_TYPE).map(([kk,v])=>({value:kk,label:v}));
+    const rows=(f.installments||[]).map((ins,i)=>`
+      <div class="inst-card">
+        <div class="inst-card-head">
+          <span class="inst-no">งวด ${i+1}</span>
+          <button class="icon-btn" onclick="removeInst(${i})" ${(f.installments||[]).length<=2?'disabled style=\"opacity:.3;cursor:not-allowed;\"':''}><i data-lucide="trash-2" ></i></button>
+        </div>
+        <input class="input inst-desc" type="text" value="${esc(ins.desc||'')}" oninput="onInstDesc(${i},this.value)" placeholder="รายละเอียดงวด (เช่น มัดจำ / งวดที่ ${i+1})">
+        <div class="inst-grid2">
+          <div class="inst-input"><input class="input" type="number" min="0" max="100" value="${ins.pct}" oninput="onInstPct(${i},this.value)" placeholder="%"><span class="inst-unit">%</span></div>
+          <div>${searchDropdown('instdue__'+i, ins.due_type||'on_doc', dueOpts, 'ครบกำหนด', 'onInstDuePick')}</div>
+        </div>
+      </div>`).join('');
+    const total=(f.installments||[]).reduce((s,i)=>s+(+i.pct||0),0);
+    typeFields = `
+      <div class="field" id="fld-inst">
+        <label class="field-label">ตารางงวดการชำระเงิน (Schedule) <span class="req">*</span></label>
+        ${rows}
+        <button class="btn btn-ghost btn-sm" onclick="addInst()" style="margin-top:4px;"><i data-lucide="plus" ></i><span>เพิ่มงวด</span></button>
+        <div class="inst-total ${total===100?'is-ok':'is-warn'}">รวม ${total}% ${total===100?'✓':'(ต้องเป็น 100%)'}</div>
+        <div class="field-error">สัดส่วนงวดต้องรวมเป็น 100%</div>
+      </div>
+      ${triggerField}`;
+  }
+
+  // use_in checkboxes — direct_payment disable PR/PO/QUOT/SO
+  const useIn=f.use_in||[]; const dpDisabled=type==='direct_payment';
+  // group เอกสารตามฝั่ง (ซื้อ/ขาย)
+  const groups={};
+  Object.entries(USE_IN_DOCS).forEach(([kk,v])=>{ (groups[v.group]=groups[v.group]||[]).push([kk,v]); });
+  const useInChecks=Object.entries(groups).map(([gname,items])=>{
+    const rows=items.map(([kk,v])=>{
+      const dis=dpDisabled&&DP_DISABLED_DOCS.includes(kk);
+      const on=useIn.includes(kk)&&!dis;
+      return `<label class="chk-row${dis?' is-disabled':''}${on?' is-on':''}" ${dis?'':`onclick="toggleUseIn('${kk}')"`}>
+        <span class="chk-box${on?' is-on':''}">${on?'<i data-lucide="check" ></i>':''}</span>
+        <span class="chk-text"><span class="chk-name">${esc(v.label)}</span><span class="chk-desc">${esc(v.sub)}</span></span>
+        ${dis?'<span class="chk-na">ไม่รองรับ</span>':''}
+      </label>`;
+    }).join('');
+    return `<div class="chk-group"><div class="chk-group-title">${esc(gname)}</div><div class="chk-list">${rows}</div></div>`;
+  }).join('');
+
+  return `
+  <div class="drawer-header">
+    <div class="drawer-avatar">${isEdit?`<i data-lucide="${k.icon}" ></i>`:'<i data-lucide="plus" ></i>'}</div>
+    <div style="flex:1; min-width:0;">
+      <h2 class="drawer-title">${isEdit?'แก้ไขเงื่อนไขชำระเงิน':'เพิ่มเงื่อนไขชำระเงิน'}</h2>
+      <div class="drawer-subtitle">${isEdit?`<span class="acct-code">${esc(t.code)}</span>`:'กำหนดเงื่อนไขการชำระเงินใหม่ (ใช้ได้ทั้งซื้อ-ขาย)'}</div>
+    </div>
+    <div class="drawer-header-actions"><button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" ></i></button></div>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-section">
+      <div class="drawer-section-title">ข้อมูลทั่วไป</div>
+      ${fieldBlock('รหัส (Code)', `<input class="input field-input" name="code" type="text" placeholder="เช่น NET30" value="${esc(f.code||'')}" oninput="onFormInput('code',this.value.toUpperCase())">`, 'ตัวพิมพ์ใหญ่ ไม่ซ้ำ', true)}
+      ${fieldBlock('ชื่อเงื่อนไข (TH)', `<input class="input field-input" name="name" type="text" placeholder="เช่น เครดิต 30 วัน" value="${esc(f.name||'')}" oninput="onFormInput('name',this.value)">`, '', true)}
+      ${fieldBlock('ชื่อเงื่อนไข (EN)', `<input class="input field-input" name="name_en" type="text" placeholder="e.g. Net 30" value="${esc(f.name_en||'')}" oninput="onFormInput('name_en',this.value)">`, '', false)}
+      <div class="field" id="fld-type">
+        <label class="field-label">ประเภทเงื่อนไข <span class="req">*</span></label>
+        ${searchDropdown('type', type, typeOpts, '— เลือกประเภท —', 'onTypeChange')}
+      </div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">การตั้งค่าเฉพาะประเภท</div>
+      ${typeFields}
+      ${k.noTrigger?'':fieldBlock('นับวันครบกำหนดจาก (Due basis)', searchDropdown('due_basis', f.due_basis||'invoice_date', basisOpts, '— เลือก —', 'onFormPick'), 'จุดเริ่มนับวันครบกำหนด', true)}
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">การใช้งานในเอกสาร <span class="chk-count">${useIn.length} เลือก</span></div>
+      <div class="chk-groups" id="fld-usein">${useInChecks}</div>
+      <div class="field-error" style="margin-top:6px;">เลือกอย่างน้อย 1 เอกสาร</div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">ตั้งค่าทั่วไป</div>
+      <div class="field" style="margin-bottom:12px;">
+        <label>สถานะ</label>
+        <select class="select" onchange="onFormInput('status', this.value)">
+          <option value="active" ${(f.status||'active')==='active'?'selected':''}>ใช้งาน</option>
+          <option value="inactive" ${f.status==='inactive'?'selected':''}>ไม่ใช้งาน</option>
+          <option value="draft" ${f.status==='draft'?'selected':''}>ร่าง</option>
+        </select>
+      </div>
+      <label class="chk-row${f.is_default?' is-on':''}" onclick="toggleDefault()">
+        <span class="chk-box${f.is_default?' is-on':''}">${f.is_default?'<i data-lucide="check" ></i>':''}</span>
+        <span class="chk-text"><span class="chk-name">ตั้งเป็นค่า Default</span><span class="chk-desc">ระบบเลือกอัตโนมัติในเอกสารใหม่ · มีได้ 1 รายการต่อประเภท</span></span>
+      </label>
+    </div>
+  </div>
+  <div class="drawer-footer">
+    <button class="btn btn-ghost" onclick="closeDrawer()">ยกเลิก</button>
+    <div class="footer-spacer"></div>
+    <button class="btn btn-primary" onclick="submitTerm()"><i data-lucide="check" ></i><span>${isEdit?'บันทึกการแก้ไข':'บันทึกและสร้าง'}</span></button>
+  </div>`;
+}
+
+function numInput(name, val, ph){
+  return `<input class="input field-input" name="${name}" type="number" min="0" placeholder="${ph}" value="${val===0||val?val:''}" oninput="onFormNum('${name}',this.value)">`;
+}
+
+function renderView(t){
+  if(!t) return ''; const k=PT_TYPES[t.type];
+  let detail=[];
+  if(t.type==='full_prepay') detail=[['การชำระ','เต็มจำนวน 100% ก่อนส่ง']];
+  else if(t.type==='full_postpay') detail=[['ชำระภายใน', t.net_days?`${t.net_days} วันหลังรับ`:'ทันทีหลังรับ']];
+  else if(t.type==='credit') detail=[['ครบกำหนด', t.net_days===0?'จ่ายทันที':`${t.net_days} วัน`]];
+  else if(t.type==='deposit'){ const v=t.deposit_method==='fixed'?`${(t.deposit_value||0).toLocaleString()} บาท`:(t.deposit_method==='manual'?'กำหนดเองตอนทำเอกสาร':`${t.deposit_value||0}%`); detail=[['มัดจำ', v],['วิธีระบุมัดจำ', DEPOSIT_METHOD[t.deposit_method]||'—'],['ชำระส่วนที่เหลือ', REMAINING_TIMING[t.remaining_timing]||'—'],['ส่วนที่เหลือครบ', `${t.net_days||0} วัน`]]; }
+  else if(t.type==='installment') detail=(t.installments||[]).map((i,idx)=>[`งวด ${idx+1}${i.desc?' — '+i.desc:''}`, `${i.pct}% · ${(DUE_TYPE[i.due_type]||'').replace('N วัน','+'+(i.days||0)+' วัน')}`]);
+  else if(t.type==='partial_delivery') detail=[['การชำระ','ตามจำนวนที่รับจริงแต่ละรอบ'],['เครดิตต่อรอบ', t.net_days?`${t.net_days} วัน`:'จ่ายทันที']];
+  else if(t.type==='direct_payment') detail=[['การบันทึก','ตรงเข้า GL (ไม่ผ่าน PR/PO/SO)'],['หมวดค่าใช้จ่าย', EXPENSE_CAT[t.expense_category]||'—']];
+  if(t.discount_pct&&t.discount_days) detail.push(['ส่วนลดจ่ายเร็ว', `${t.discount_pct}% ภายใน ${t.discount_days} วัน`]);
+  return `
+  <div class="drawer-header">
+    <div class="drawer-avatar"><i data-lucide="${k.icon}" ></i></div>
+    <div style="flex:1; min-width:0;">
+      <h2 class="drawer-title">${esc(t.name)}</h2>
+      <div class="drawer-subtitle"><span class="acct-code">${esc(t.code)}</span><span>·</span><span class="pill ${k.pill}">${k.label.split(' (')[0]}</span></div>
+    </div>
+    <div class="drawer-header-actions">
+      <button class="btn btn-sm btn-secondary" onclick="openDrawer('edit','${t.id}')"><i data-lucide="pencil" ></i><span>แก้ไข</span></button>
+      <div style="position:relative;">
+        <button class="btn btn-sm btn-secondary" onclick="toggleStatusMenu(event)"><i data-lucide="refresh-ccw"></i><span>เปลี่ยนสถานะ</span><i data-lucide="chevron-down"></i></button>
+        <div class="menu status-menu" id="statusMenu">
+          ${Object.keys(STATUS_META).map(st=>`<button class="menu-item" ${t.status===st?'disabled':''} onclick="setStatusFromMenu('${t.id}','${st}')"><i data-lucide="${STATUS_META[st].icon}"></i>${STATUS_META[st].label}</button>`).join('')}
+        </div>
+      </div>
+      <span class="drawer-header-divider"></span>
+      <button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" ></i></button>
+    </div>
+  </div>
+  <div class="drawer-body">
+    <div class="bm-card">
+      <div class="bm-card-title">สรุปเงื่อนไข</div>
+      <div class="bm-summary">${esc(termSummary(t))}</div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">รายละเอียดการคำนวณ</div>
+      ${detail.map(d=>`<div class="dv-row"><span class="dv-lbl">${esc(d[0])}</span><span class="dv-val">${esc(d[1])}</span></div>`).join('')}
+      <div class="dv-row"><span class="dv-lbl">นับจาก</span><span class="dv-val">${esc(DUE_BASIS[t.due_basis]||'—')}</span></div>
+      ${k.noTrigger?'':`<div class="dv-row"><span class="dv-lbl">WH/GRN/Ship trigger</span><span class="dv-val">${esc(triggerLabel(t))}</span></div>`}
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">การใช้งานในเอกสาร</div>
+      <div class="use-tags">${(t.use_in||[]).map(d=>`<span class="use-tag">${esc((USE_IN_DOCS[d]||{}).label||d)}</span>`).join('')||'<span style="color:var(--c-mute-3);">—</span>'}</div>
+      ${t.is_default?'<div class="dv-row" style="margin-top:10px;"><span class="dv-lbl">ค่า Default</span><span class="dv-val" style="color:var(--c-primary);">✓ เลือกอัตโนมัติในเอกสารใหม่</span></div>':''}
+    </div>
+    ${t.name_en?`<div class="drawer-section"><div class="dv-row"><span class="dv-lbl">ชื่อ (EN)</span><span class="dv-val">${esc(t.name_en)}</span></div></div>`:''}
+  </div>
+  <div class="drawer-footer"><div class="drawer-footer-meta">ใช้ใน PR / PO / SO / Invoice</div><div class="footer-spacer"></div><button class="btn btn-secondary" onclick="closeDrawer()">ปิด</button></div>`;
+}
+
+function fieldBlock(label, inner, help, req){
+  const mm = inner.match(/name="([^"]+)"/) || inner.match(/data-sdd="([^"]+)"/);
+  const id = 'fld-' + (mm ? mm[1] : 'x');
+  return `<div class="field" id="${id}">
+    <label class="field-label">${label}${req?' <span class="req">*</span>':''}</label>
+    ${inner}
+    ${help?``:''}
+    <div class="field-error">กรุณากรอก/เลือกข้อมูลนี้</div>
+  </div>`;
+}
+
+// ============================================ MODAL
+function renderModal(){
+  const m=state.modal; if(!m.open) return '';
+  if(m.type==='bulk-delete'){
+    const ids=Object.keys(state.bulkSel); const delN=ids.filter(id=>{const t=gById(id);return t&&!(t.used>0);}).length; const skipN=ids.length-delN;
+    return `<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"><div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header"><div class="modal-header-icon is-danger"><i data-lucide="trash-2"></i></div>
+        <div style="flex:1;"><h3 class="modal-title">ลบเงื่อนไขชำระเงิน</h3><p class="modal-subtitle">เลือกไว้ ${ids.length} รายการ${skipN?` · ${skipN} รายการถูกใช้งานอยู่จะถูกข้าม`:''}</p></div>
+        <button class="icon-btn" onclick="closeModal()"><i data-lucide="x"></i></button></div>
+      <div class="modal-body"><p style="font-size:13px;">ยืนยันการลบออกจากทะเบียน — รายการที่ถูกใช้ในเอกสารแล้วจะไม่ถูกลบ</p></div>
+      <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>
+        <button class="btn btn-danger" ${delN?'':'disabled'} onclick="bulkDoDelete()"><i data-lucide="trash-2"></i><span>ลบ ${delN} รายการ</span></button></div>
+    </div></div>`;
+  }
+  if(m.type==='confirm-archive'){ const t=gById(m.data); return wrapModal(renderConfirmArchive(
+    'เลิกใช้งานเงื่อนไขชำระเงิน', t?`เงื่อนไข "${esc(t.name)}" (${esc(t.code)})`:'',
+    'เงื่อนไขนี้จะถูกปิดการใช้งาน — ไม่สามารถเลือกใน PO/Invoice/ผู้ขาย/ลูกค้า ใหม่ได้ แต่เอกสารเดิมที่ใช้ไปแล้วยังคงอยู่ (เปิดใช้ใหม่ได้ภายหลัง)',
+    `doArchive('${m.data}')`)); }
+  return '';
+}
+function wrapModal(inner){ return `<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"><div class="modal" onclick="event.stopPropagation()">${inner}</div></div>`; }
+function renderConfirmArchive(title, subject, desc, confirmFn){
+  return `
+  <div class="modal-header"><div class="modal-header-icon" style="background:#FEE2E2; color:var(--c-danger);"><i data-lucide="ban" ></i></div>
+    <div style="flex:1;"><h3 class="modal-title">${title}</h3><p class="modal-subtitle">${subject}</p></div>
+    <button class="icon-btn" onclick="closeModal()" style="margin:-4px -6px 0 0;"><i data-lucide="x" ></i></button></div>
+  <div class="modal-body"><div class="note is-warn"><i data-lucide="alert-triangle" ></i><span>${desc}</span></div></div>
+  <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>
+    <button class="btn btn-danger" onclick="${confirmFn}"><i data-lucide="ban" ></i><span>ยืนยันเลิกใช้งาน</span></button></div>`;
+}
+function openModal(type,data){ state.modal={open:true,type,data}; render(); }
+function closeModal(){ state.modal={open:false,type:null,data:null}; render(); }
+
+// ============================================ CSV IMPORT
+
+
+
+
+
+
+
+/* [ถอดออก 2026-08-09] setImportMode — โหมด replace ถูกตัด (นำเข้าห้ามล้างทะเบียน) */
+
+
+
+// ============================================ TOAST
+function showToast(message, variant='info', durationMs=2800){
+  let host=document.getElementById('toastHost'); if(!host){ host=document.createElement('div'); host.id='toastHost'; host.className='toast-host'; document.body.appendChild(host); }
+  const el=document.createElement('div'); el.className='toast is-'+variant;
+  const icon={success:'check-circle-2',error:'x-circle',warning:'alert-triangle',info:'info'}[variant]||'info';
+  el.innerHTML='<i data-lucide="'+icon+'" ></i><span>'+esc(message)+'</span>';
+  host.appendChild(el); renderIcons();
+  setTimeout(()=>{ el.classList.add('is-leaving'); setTimeout(()=>el.remove(),200); }, durationMs);
+}
+
+// ============================================ RENDER ROOT
+function _keepScroll(fn){    // Iron Rule #29 — Render Preservation: ห้ามเด้งขึ้นบนเมื่อ re-render
+  const c=document.querySelector('.content'); const st=c?c.scrollTop:0;
+  const ts=document.querySelector('.tbl-scroll'); const tst=ts?ts.scrollTop:0;
+  const dwB=document.querySelector('aside.drawer .drawer-body, aside.drawer .dw-body'); const dst=dwB?dwB.scrollTop:0;
+  fn();
+  const c2=document.querySelector('.content'); if(c2) c2.scrollTop=st;
+  const ts2=document.querySelector('.tbl-scroll'); if(ts2) ts2.scrollTop=tst;
+  const dwB2=document.querySelector('aside.drawer .drawer-body, aside.drawer .dw-body'); if(dwB2) dwB2.scrollTop=dst;
+}
+function renderPageOnly(){ _keepScroll(function(){ document.getElementById('page-content').innerHTML=renderPage(); renderIcons(); }); }
+function render(){ _keepScroll(_renderAll); }
+function _renderAll(){
+  document.getElementById('page-content').innerHTML=renderPage();
+  let dl=document.getElementById('drawerLayer'); if(!dl){ dl=document.createElement('div'); dl.id='drawerLayer'; document.body.appendChild(dl); }
+  dl.innerHTML=renderDrawer();
+  let ml=document.getElementById('modalLayer'); if(!ml){ ml=document.createElement('div'); ml.id='modalLayer'; document.body.appendChild(ml); }
+  ml.innerHTML=renderModal();
+  renderIcons();
+  // slide-in: เพิ่ม is-open ใน next frame เพื่อให้ browser เห็น transition จาก translateX(100%)
+  if(state.drawer.open){
+    const bd=dl.querySelector('.drawer-backdrop'), dw=dl.querySelector('.drawer');
+    if(dw){
+      if(state._drawerAnimated){ bd&&bd.classList.add('is-open'); dw&&dw.classList.add('is-open'); }
+      else { requestAnimationFrame(()=>{ requestAnimationFrame(()=>{ bd&&bd.classList.add('is-open'); dw&&dw.classList.add('is-open'); state._drawerAnimated=true; }); }); }
+    }
+  } else { state._drawerAnimated=false; }
+  if(state.modal.open){
+    const mb=ml.querySelector('.modal-backdrop');
+    if(mb && !mb.classList.contains('is-open')){ requestAnimationFrame(()=>{ requestAnimationFrame(()=>{ mb&&mb.classList.add('is-open'); }); }); }
+  }
+}
+window.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){
+  if(state.sdd.open){ const el=document.querySelector(`.sdd[data-sdd="${state.sdd.open}"]`); if(el) el.classList.remove('is-open'); state.sdd={open:null,search:''}; }
+  else if(state.modal.open) closeModal();
+  else if(state.drawer.open) closeDrawer();
+} });
+
+// boot
+let domReady=false, lucideReady=false;
+function bootIfReady(){ if(domReady&&lucideReady){ render(); renderIcons(); } }
+window.addEventListener('lucide:ready',()=>{ lucideReady=true; bootIfReady(); });
+if(document.readyState!=='loading'){ domReady=true; } else { document.addEventListener('DOMContentLoaded',()=>{ domReady=true; bootIfReady(); }); }
+domReady=true; bootIfReady();
+</script>
+<div id="overlay-root"></div>
+</body>
+</html>

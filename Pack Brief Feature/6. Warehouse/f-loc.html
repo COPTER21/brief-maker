@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Location Hierarchy · CUBE 4.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,600,700&display=swap" rel="stylesheet">
+<style>
+:root{--c-navy:#111111;--c-navy-2:#1C1C1E;--c-primary:#FF3B30;--c-primary-hover:#E62E24;--c-teal:#FF9A1F;--c-teal-light:#FFC46B;--c-ink:#111111;--c-mute:#54565C;--c-mute-2:#73757B;--c-mute-3:#9A9CA2;--c-line:#DEDAD4;--c-line-2:#E9E5E0;--c-line-3:#F1EEEA;--c-bg-off:#FAF8F5;--c-success:#1F9D55;--c-warning:#E8870F;--c-danger:#E62E24;--sidebar-w:232px;--shell-h:52px;}
+*{box-sizing:border-box;}html,body{margin:0;padding:0;}
+body{font-family:'Noto Sans Thai','Satoshi',system-ui,sans-serif;background:var(--c-bg-off);color:#1E293B;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;min-width:1180px;}
+a{text-decoration:none;color:inherit;}button{font-family:inherit;cursor:pointer;}[data-lucide]{flex-shrink:0;}
+input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}input[type="number"]{-moz-appearance:textfield;}
+.sidebar{position:fixed;inset:0 auto 0 0;width:var(--sidebar-w);background:linear-gradient(180deg,#111111 0%,#1C1C1E 50%,#111111 100%);color:#E9E5E0;z-index:20;display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,0.06);}
+.sb-brand{padding:18px;display:flex;align-items:center;gap:11px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;}
+.sb-logo{width:34px;height:34px;background:linear-gradient(135deg,#FF3B30,#FF9A1F);border-radius:9px;display:inline-flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;box-shadow:0 4px 12px rgba(11,92,255,0.3);}
+.sb-name{font-weight:700;font-size:14px;color:#fff;letter-spacing:-0.01em;line-height:1.2;}.sb-sub{font-size:10px;color:#9A9CA2;letter-spacing:0.06em;font-weight:600;text-transform:uppercase;margin-top:2px;}
+.sb-nav{flex:1;padding:12px 8px;overflow-y:auto;}.sb-module{margin-bottom:4px;}
+.sb-module-header{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border-radius:6px;background:transparent;border:0;color:#9A9CA2;font-family:inherit;font-size:10.5px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 120ms;text-align:left;}
+.sb-module-header:hover{background:rgba(255,255,255,0.04);color:#DEDAD4;}.sb-module-header .mod-icon{flex-shrink:0;opacity:0.7;}.sb-module-header .mod-label{flex:1;}
+.sb-module-header .mod-chevron{flex-shrink:0;transition:transform 200ms;opacity:0.7;}.sb-module[data-expanded="false"] .mod-chevron{transform:rotate(-90deg);}.sb-module[data-expanded="false"] .sb-features{display:none;}
+.sb-features{padding:2px 0 6px 0;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:7px 12px 7px 14px;border-radius:6px;color:#DEDAD4;font-size:13px;font-weight:500;cursor:pointer;transition:all 120ms;margin-bottom:1px;position:relative;user-select:none;}
+.sb-item:hover{background:rgba(255,255,255,0.05);color:#fff;}.sb-item.is-active{background:#FF3B30;color:#fff;font-weight:600;}
+.sb-item.is-active::before{content:'';position:absolute;left:-10px;top:7px;bottom:7px;width:3px;background:#fff;border-radius:0 2px 2px 0;}
+.sb-item [data-lucide]{width:16px;height:16px;opacity:0.85;}.sb-item.is-active [data-lucide]{opacity:1;}
+.sb-item.is-disabled{opacity:0.4;cursor:not-allowed;}.sb-item.is-disabled:hover{background:transparent;color:#DEDAD4;}
+.sb-footer{padding:12px 16px;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:8px;font-size:11.5px;color:#9A9CA2;}
+.pulse-dot{width:7px;height:7px;background:var(--c-teal);border-radius:50%;box-shadow:0 0 0 3px rgba(0,168,142,0.20);animation:pulse 2s infinite;}@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.6;}}
+.main{margin-left:var(--sidebar-w);min-height:100vh;background:var(--c-bg-off);}
+.shell-bar{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--c-line-2);height:var(--shell-h);display:flex;align-items:center;padding:0 22px;z-index:19;gap:12px;}
+.breadcrumb{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--c-mute);}.breadcrumb a{cursor:pointer;transition:color 120ms;}.breadcrumb a:hover{color:var(--c-primary);}
+.breadcrumb .sep{color:var(--c-mute-3);}.breadcrumb-current{color:var(--c-ink);font-weight:500;}
+.icon-btn{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:0;color:var(--c-mute);border-radius:7px;position:relative;transition:all 120ms;}
+.icon-btn:hover{background:var(--c-line-3);color:var(--c-ink);}.icon-btn [data-lucide]{width:17px;height:17px;}
+.notif-dot{position:absolute;top:7px;right:8px;width:7px;height:7px;background:var(--c-danger);border-radius:50%;border:2px solid #fff;}
+.user-chip{display:flex;align-items:center;gap:9px;padding:5px 10px 5px 12px;border-radius:8px;cursor:pointer;transition:background 120ms;}.user-chip:hover{background:var(--c-line-3);}
+.user-text{line-height:1.2;text-align:right;}.user-name{font-size:12.5px;font-weight:500;color:var(--c-ink);white-space:nowrap;}.user-role{font-size:10.5px;color:var(--c-mute-2);white-space:nowrap;margin-top:1px;}
+.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--c-primary),var(--c-teal));color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;}
+.user-menu{position:absolute;top:calc(var(--shell-h) - 4px);right:22px;background:#fff;border:1px solid var(--c-line-2);border-radius:10px;box-shadow:0 12px 32px rgba(11,29,58,0.12);width:240px;z-index:30;padding:6px;display:none;}.user-menu.is-open{display:block;}
+.user-menu-item{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:6px;font-size:13px;color:var(--c-ink);cursor:pointer;transition:background 120ms;}.user-menu-item:hover{background:var(--c-bg-off);}
+.user-menu-item [data-lucide]{width:15px;height:15px;color:var(--c-mute-2);}.user-menu-item.is-danger{color:var(--c-danger);}.user-menu-item.is-danger [data-lucide]{color:var(--c-danger);}.user-menu-divider{height:1px;background:var(--c-line-2);margin:5px 0;}
+.content{padding:22px;}
+.ph{margin-bottom:18px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:14px;}.ph>div:first-child{flex:1 1 auto;min-width:280px;}
+.ph-title-row{display:flex;align-items:baseline;gap:10px;margin-bottom:5px;}.ph-title{font-family:'Noto Sans Thai',sans-serif;font-size:22px;font-weight:700;color:var(--c-navy);margin:0;letter-spacing:-0.01em;}
+.ph-count{font-size:12.5px;font-weight:600;color:var(--c-mute-2);background:var(--c-line-3);padding:3px 9px;border-radius:999px;}.ph-sub{font-size:13px;color:var(--c-mute);margin:0;}.ph-actions{display:flex;gap:8px;flex-shrink:0;}
+.btn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:8px;font-size:13px;font-weight:500;border:1px solid transparent;background:transparent;white-space:nowrap;transition:all 120ms;user-select:none;}.btn [data-lucide]{width:15px;height:15px;}
+.btn-primary{background:var(--c-primary);color:#fff;}.btn-primary:hover{background:var(--c-primary-hover);box-shadow:0 2px 8px rgba(11,92,255,0.30);}
+.btn-secondary{background:#fff;border-color:var(--c-line);color:var(--c-ink);}.btn-secondary:hover{background:var(--c-line-3);border-color:var(--c-mute-2);}
+.btn-ghost{color:var(--c-mute);}.btn-ghost:hover{background:var(--c-line-3);color:var(--c-ink);}.btn-danger{background:var(--c-danger);color:#fff;border-color:var(--c-danger);}.btn-danger:hover{background:#b91c1c;}
+.btn-sm{height:30px;padding:0 11px;font-size:12px;}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px;}
+.stat{background:#fff;border:1px solid var(--c-line-2);border-radius:10px;padding:14px 16px;transition:all 150ms;}
+.stat.is-click{cursor:pointer;}
+.stat.is-on{border-color:var(--c-primary);box-shadow:0 0 0 1px var(--c-primary) inset;}
+.stat-meta{font-size:10.5px;color:var(--c-mute-3);margin-top:2px;}
+.bulk-bar{display:flex;align-items:center;gap:10px;padding:9px 14px;background:#FFF7ED;border:1px solid #FFD9A8;border-radius:9px;margin-bottom:10px;font-size:12.5px;flex-wrap:wrap;}
+.bulk-bar b{color:var(--c-ink);}
+.qa-row td{background:var(--c-bg-off);}
+.qa-row .input,.qa-row .select{height:32px;min-height:32px;font-size:12.5px;}
+.sm-portal-menu{position:fixed;z-index:500;background:#fff;border:1px solid var(--c-line-2);border-radius:9px;box-shadow:0 8px 28px rgba(17,17,17,.16);padding:4px;min-width:170px;}
+.sm-opt{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:7px;cursor:pointer;font-size:12.5px;}
+.sm-opt:hover{background:var(--c-bg-off);}
+.sm-opt .dot{width:7px;height:7px;border-radius:50%;}
+.chk{width:15px;height:15px;accent-color:var(--c-primary);cursor:pointer;}.stat:hover{border-color:var(--c-line);box-shadow:0 2px 8px rgba(11,29,58,0.05);}
+.stat-label{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--c-mute);}.stat-label [data-lucide]{width:13px;height:13px;color:var(--c-primary);}
+.stat-value{font-family:'Noto Sans Thai',sans-serif;font-size:26px;font-weight:700;color:var(--c-navy);margin-top:6px;letter-spacing:-0.01em;}.stat-meta{font-size:11.5px;color:var(--c-mute-2);margin-top:5px;display:flex;align-items:center;gap:4px;}.stat-meta.is-up{color:var(--c-success);}.stat-meta.is-down{color:var(--c-danger);}.stat-meta [data-lucide]{width:12px;height:12px;}
+.card{background:#fff;border:1px solid var(--c-line-2);border-radius:10px;overflow:hidden;}
+/* filter bar (Pattern A canonical) */
+.filter-bar{padding:14px 18px;display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--c-line-2);background:#fff;flex-wrap:wrap;}
+.input-search{position:relative;flex:1;max-width:320px;}.input-search input{padding-left:36px;}
+.input-search .lead-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--c-mute-2);pointer-events:none;}
+/* drill path (hierarchy navigation) */
+.drill-path{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:14px;font-size:13px;}
+.drill-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:#fff;border:1px solid var(--c-line-2);color:var(--c-mute);cursor:pointer;transition:all 120ms;}
+.drill-chip:hover{border-color:var(--c-line);color:var(--c-ink);}
+.drill-chip.is-current{background:var(--c-navy);border-color:var(--c-navy);color:#fff;cursor:default;}
+.drill-chip [data-lucide]{width:13px;height:13px;}
+.drill-sep{color:var(--c-mute-3);display:inline-flex;}.drill-sep [data-lucide]{width:13px;height:13px;}
+/* card head (section title within a card) */
+.card-head{padding:13px 18px;border-bottom:1px solid var(--c-line-2);display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff;}
+.card-head-title{font-size:13.5px;font-weight:700;color:var(--c-navy);display:flex;align-items:center;gap:8px;}
+.card-head-title [data-lucide]{width:16px;height:16px;color:var(--c-primary);}
+.card-head-title .ch-count{font-size:11.5px;font-weight:600;color:var(--c-mute-2);background:var(--c-line-3);padding:2px 8px;border-radius:999px;}
+.card+.card{margin-top:16px;}
+.seg{display:inline-flex;background:var(--c-line-3);border-radius:8px;padding:3px;gap:2px;}
+.seg-btn{height:28px;padding:0 12px;border:0;background:transparent;border-radius:6px;font-size:12.5px;font-weight:600;color:var(--c-mute);cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:inherit;}
+.seg-btn.is-active{background:#fff;color:var(--c-primary);box-shadow:0 1px 2px rgba(11,29,58,0.08);}
+.seg-btn .ch-count{font-size:10.5px;background:var(--c-line-3);padding:0 6px;border-radius:999px;line-height:15px;}
+.seg-btn.is-active .ch-count{background:rgba(11,92,255,0.10);color:var(--c-primary);}
+/* drill-chip level label */
+.dc-lvl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;opacity:0.65;}
+.drill-chip.is-current .dc-lvl{opacity:0.8;}
+/* view switcher */
+.view-switch{margin-bottom:16px;}
+/* hierarchy view — tree explorer */
+/* #96 Full-Height: explorer ล็อกสูงพอดีจอ — tree/summary scroll ภายใน pane */
+.explorer{display:grid;grid-template-columns:316px 1fr;gap:16px;align-items:stretch;height:calc(100vh - 330px);min-height:420px;}
+.explorer .pane{display:flex;flex-direction:column;min-height:0;}
+.explorer .pane:last-child{overflow:auto;}
+.pane{background:#fff;border:1px solid var(--c-line-2);border-radius:10px;overflow:hidden;}
+.pane-head{padding:12px 16px;border-bottom:1px solid var(--c-line-2);display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--c-bg-off);}
+.pane-head-title{font-size:12.5px;font-weight:700;color:var(--c-navy);display:flex;align-items:center;gap:7px;}
+.pane-head-title [data-lucide]{width:15px;height:15px;color:var(--c-primary);}
+.tree-body{padding:8px;flex:1;min-height:0;overflow:auto;}
+.tn{user-select:none;}
+.tn-row{display:flex;align-items:center;gap:5px;padding:6px 8px;border-radius:7px;cursor:pointer;transition:background 120ms;}
+.tn-row:hover{background:var(--c-line-3);}
+.tn-row.is-sel{background:rgba(11,92,255,0.10);}
+.tn-row.is-sel .tn-label{color:var(--c-primary);font-weight:600;}.tn-row.is-sel .tn-icon{color:var(--c-primary);}
+.tn-toggle{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;color:var(--c-mute-2);flex-shrink:0;border-radius:4px;}
+.tn-toggle:hover{background:var(--c-line-2);}.tn-toggle [data-lucide]{width:13px;height:13px;transition:transform 180ms;}
+.tn.is-collapsed > .tn-row .tn-toggle [data-lucide]{transform:rotate(-90deg);}
+.tn.is-collapsed > .tn-children{display:none;}
+.tn-spacer{width:18px;flex-shrink:0;}
+.tn-icon{width:15px;height:15px;color:var(--c-mute);flex-shrink:0;}
+.tn-lvl{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.03em;color:var(--c-mute-3);flex-shrink:0;}
+.tn-row.is-sel .tn-lvl{color:var(--c-primary);opacity:0.7;}
+.tn-label{flex:1;font-size:12.5px;color:var(--c-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tn-count{font-size:10px;font-weight:600;color:var(--c-mute-2);background:var(--c-line-3);padding:0 6px;border-radius:999px;line-height:16px;flex-shrink:0;}
+.tn-children{padding-left:13px;}
+.tree-root-row{display:flex;align-items:center;gap:7px;padding:7px 8px;border-radius:7px;cursor:pointer;font-weight:600;font-size:12.5px;color:var(--c-ink);margin-bottom:4px;}
+.tree-root-row:hover{background:var(--c-line-3);}.tree-root-row.is-sel{background:rgba(11,92,255,0.10);color:var(--c-primary);}
+.tree-root-row [data-lucide]{width:15px;height:15px;color:var(--c-primary);}
+/* hierarchy view — node summary panel (no list table) */
+.dh-root{background:rgba(11,92,255,0.10);color:var(--c-primary);}
+.ds-head{padding:18px 20px;display:flex;align-items:flex-start;gap:14px;border-bottom:1px solid var(--c-line-2);flex-wrap:wrap;}
+.ds-icon{width:48px;height:48px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ds-icon [data-lucide]{width:22px;height:22px;}
+.ds-title{font-size:18px;font-weight:700;color:var(--c-navy);margin:0;letter-spacing:-0.01em;}
+.ds-sub{font-size:12.5px;color:var(--c-mute);margin-top:5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.ds-actions{margin-left:auto;display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;}
+.ds-body{padding:18px 20px;}
+.ds-section{margin-bottom:20px;}.ds-section:last-child{margin-bottom:0;}
+.ds-section-title{font-size:11px;font-weight:700;color:var(--c-mute);letter-spacing:0.08em;text-transform:uppercase;margin:0 0 10px;}
+.ds-fields{display:grid;grid-template-columns:170px 1fr;gap:9px 16px;font-size:13px;}
+.ds-fields .lbl{color:var(--c-mute);}.ds-fields .val{color:var(--c-ink);font-weight:500;}
+.ds-childstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
+.ds-cstat{border:1px solid var(--c-line-2);border-radius:10px;padding:12px 14px;transition:all 120ms;}
+.ds-cstat.is-link{cursor:pointer;}.ds-cstat.is-link:hover{border-color:var(--c-primary);box-shadow:0 2px 8px rgba(11,29,58,0.06);}
+.ds-cstat-label{font-size:11.5px;color:var(--c-mute);display:flex;align-items:center;gap:6px;}.ds-cstat-label [data-lucide]{width:13px;height:13px;color:var(--c-primary);}
+.ds-cstat-value{font-size:24px;font-weight:700;color:var(--c-navy);margin-top:5px;letter-spacing:-0.01em;}
+.ds-cstat-hint{font-size:10.5px;color:var(--c-mute-3);margin-top:3px;display:flex;align-items:center;gap:3px;}.ds-cstat-hint [data-lucide]{width:11px;height:11px;}
+.ds-hint{font-size:12.5px;color:var(--c-mute);background:var(--c-bg-off);border-radius:8px;padding:12px 14px;display:flex;gap:8px;align-items:center;}.ds-hint [data-lucide]{width:16px;height:16px;color:var(--c-primary);flex-shrink:0;}
+.lvl-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:2px 7px;border-radius:5px;}
+.lvl-warehouse{background:#E0E7FF;color:#3730A3;}.lvl-zone{background:#DBEAFE;color:#1E40AF;}.lvl-area{background:#CCFBF1;color:#0F766E;}.lvl-rack{background:#FEF3C7;color:#92400E;}.lvl-location{background:#F1EEEA;color:#54565C;}
+.input,.select{height:36px;padding:0 12px;border:1px solid var(--c-line);border-radius:8px;font-size:13px;background:#fff;color:var(--c-ink);font-family:inherit;transition:all 120ms;width:100%;}
+.input:focus,.select:focus{outline:none;border-color:var(--c-primary);box-shadow:0 0 0 3px rgba(11,92,255,0.10);}
+.select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:right 10px center;padding-right:32px;appearance:none;}
+.table-scroll{overflow-x:auto;}.table{width:100%;border-collapse:collapse;font-size:13px;}.table thead{background:var(--c-bg-off);}
+.table th{padding:11px 18px;text-align:left;font-weight:600;color:var(--c-mute);font-size:11px;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--c-line-2);white-space:nowrap;}
+.table th.is-sortable{cursor:pointer;user-select:none;}.table th.is-sortable:hover{color:var(--c-ink);background:var(--c-line-3);}.table th .sort-arrow{display:inline-block;margin-left:4px;opacity:0.4;}.table th.is-sorted .sort-arrow{opacity:1;color:var(--c-primary);}
+.table td{padding:12px 18px;border-bottom:1px solid var(--c-line-2);color:var(--c-ink);vertical-align:middle;}.table tbody tr{transition:background 120ms;cursor:pointer;}.table tbody tr:hover{background:var(--c-bg-off);}.table tbody tr:last-child td{border-bottom:0;}
+.num{text-align:right;font-variant-numeric:tabular-nums;}
+.uc-name{font-weight:600;color:var(--c-ink);font-size:13px;line-height:1.3;}.uc-email{font-size:12px;color:var(--c-mute-2);margin-top:1px;line-height:1.3;}
+.loc-cell{line-height:1.3;}.loc-main{font-weight:600;color:var(--c-ink);font-size:12.5px;}.loc-sub{font-size:11.5px;color:var(--c-mute-2);}
+.parent-badge{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;padding:1px 6px;border-radius:4px;}.parent-rack{background:#FEF3C7;color:#92400E;}.parent-area{background:#CCFBF1;color:#0F766E;}
+.flags-cell{display:inline-flex;gap:4px;color:var(--c-mute-2);}.flags-cell [data-lucide]{width:14px;height:14px;}.flags-cell .on{color:var(--c-teal);}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap;}.pill [data-lucide]{width:11px;height:11px;}
+.pill-pickface{background:#DBEAFE;color:#1E40AF;}.pill-reserve{background:#E0E7FF;color:#3730A3;}.pill-hold{background:#FEF3C7;color:#92400E;}.pill-damaged{background:#FEE2E2;color:#E62E24;}.pill-bulk{background:#F1EEEA;color:#54565C;}.pill-staging{background:#CCFBF1;color:#0F766E;}.pill-pack{background:#EDE9FE;color:#6D28D9;}.pill-receiving_dock{background:#DBEAFE;color:#1E40AF;}.pill-transit{background:#FEF3C7;color:#92400E;}.pill-virtual{background:#F1EEEA;color:#73757B;}
+.pill-active{background:#D1FAE5;color:#065F46;}.pill-inactive{background:var(--c-line-3);color:var(--c-mute-2);}.pill-blocked,.pill-maintenance,.pill-full{background:#FEF3C7;color:#92400E;}.pill-frozen{background:#DBEAFE;color:#1E40AF;}.pill-decommissioned{background:#FEE2E2;color:#E62E24;}
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--c-line-3);color:var(--c-mute);}.tag.is-on{background:#CCFBF1;color:#0F766E;}.tag [data-lucide]{width:11px;height:11px;}
+.row-actions{display:inline-flex;gap:2px;}.ra-btn{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:0;color:var(--c-mute-2);border-radius:6px;transition:all 120ms;}.ra-btn:hover{background:var(--c-line-3);color:var(--c-primary);}.ra-btn.is-danger:hover{background:#FEE2E2;color:var(--c-danger);}.ra-btn [data-lucide]{width:15px;height:15px;}
+.table-footer{padding:12px 18px;background:var(--c-bg-off);border-top:1px solid var(--c-line-2);display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--c-mute);flex-wrap:wrap;gap:10px;}
+.pagination{display:inline-flex;gap:4px;align-items:center;}.pg-btn{min-width:30px;height:30px;padding:0 8px;display:inline-flex;align-items:center;justify-content:center;background:#fff;border:1px solid var(--c-line-2);border-radius:6px;color:var(--c-mute);font-size:12.5px;font-weight:500;cursor:pointer;transition:all 120ms;}.pg-btn:hover{border-color:var(--c-line);background:var(--c-bg-off);}.pg-btn.is-active{background:var(--c-primary);border-color:var(--c-primary);color:#fff;}.pg-btn.is-disabled{opacity:0.4;cursor:not-allowed;}.pg-btn [data-lucide]{width:13px;height:13px;}
+.drawer-backdrop{position:fixed;inset:0;background:rgba(11,29,58,0.40);z-index:50;opacity:0;pointer-events:none;transition:opacity 220ms;}.drawer-backdrop.is-open{opacity:1;pointer-events:auto;}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:680px;max-width:96vw;background:#fff;z-index:51;transform:translateX(100%);transition:transform 280ms cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column;box-shadow:-16px 0 40px rgba(11,29,58,0.18);}.drawer.is-open{transform:translateX(0);}
+.drawer-header{display:flex;align-items:center;gap:14px;padding:18px 22px;border-bottom:1px solid var(--c-line-2);}
+.drawer-avatar{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--c-primary),var(--c-teal));color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
+.drawer-title{font-family:'Noto Sans Thai',sans-serif;font-size:19px;font-weight:600;color:var(--c-navy);margin:0;letter-spacing:-0.01em;}
+.drawer-subtitle{font-size:12px;color:var(--c-mute);margin-top:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.drawer-header-actions{display:flex;gap:6px;align-items:center;}
+.drawer-header-divider{width:1px;height:22px;background:var(--c-line-2);margin:0 4px;flex-shrink:0;}
+.drawer-tabs{display:flex;padding:0 22px;border-bottom:1px solid var(--c-line-2);}
+.drawer-tab{padding:10px 14px;font-size:13px;font-weight:500;color:var(--c-mute);border-bottom:2px solid transparent;transition:all 120ms;margin-bottom:-1px;cursor:pointer;user-select:none;background:transparent;border-left:0;border-right:0;border-top:0;}.drawer-tab:hover{color:var(--c-ink);}.drawer-tab.is-active{color:var(--c-primary);border-bottom-color:var(--c-primary);}
+.drawer-body{flex:1;overflow-y:auto;padding:22px;}
+.drawer-section{margin-bottom:22px;}.drawer-section-title{font-size:11px;font-weight:700;color:var(--c-mute);letter-spacing:0.08em;text-transform:uppercase;margin:0 0 10px;}
+.drawer-fields{display:grid;grid-template-columns:150px 1fr;gap:10px 16px;font-size:13px;}.drawer-fields .lbl{color:var(--c-mute);}.drawer-fields .val{color:var(--c-ink);font-weight:500;}
+.drawer-footer{padding:13px 22px;border-top:1px solid var(--c-line-2);display:flex;gap:8px;align-items:center;background:var(--c-bg-off);}
+.footer-spacer{flex:1;}.drawer-footer-meta{font-size:12px;color:var(--c-mute-2);}
+.stepper-band{padding:14px 22px;background:var(--c-bg-off);border-bottom:1px solid var(--c-line-2);}
+.stepper-row{display:flex;align-items:center;width:100%;max-width:360px;margin:0 auto;}
+.step-dot{width:30px;height:30px;border-radius:50%;background:var(--c-line-2);color:var(--c-mute-2);display:inline-flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600;flex-shrink:0;}.step-dot.is-active{background:var(--c-primary);color:#fff;}.step-dot.is-done{background:var(--c-primary);color:#fff;}
+.step-line{flex:1;height:2px;background:var(--c-line-2);margin:0 6px;}.step-line.is-done{background:var(--c-primary);}
+.field{margin-bottom:14px;}.field-label{display:block;font-size:12.5px;font-weight:500;color:var(--c-mute);margin-bottom:6px;}.field-label .req{color:var(--c-danger);margin-left:2px;}
+.field-help{font-size:11.5px;color:var(--c-mute-2);margin-top:4px;}.field-error{font-size:11.5px;color:var(--c-danger);margin-top:4px;}
+.field-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 18px;}
+.fg-full{grid-column:1/-1;}
+.radio-row{display:flex;gap:10px;}.radio-card{flex:1;border:1.5px solid var(--c-line);border-radius:8px;padding:12px;cursor:pointer;transition:all 120ms;text-align:center;}
+.radio-card:hover{border-color:var(--c-mute-2);}.radio-card.is-sel{border-color:var(--c-primary);background:rgba(11,92,255,0.05);}
+.radio-card .rc-title{font-weight:600;font-size:13px;color:var(--c-ink);}.radio-card .rc-sub{font-size:11px;color:var(--c-mute-2);margin-top:2px;}
+.toggle-field{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--c-line-3);}.toggle-field:last-child{border-bottom:0;}
+.toggle-field .tf-label{font-size:13px;color:var(--c-ink);}.toggle-field .tf-sub{font-size:11px;color:var(--c-mute-2);margin-top:1px;}
+.toggle-track{width:38px;height:22px;background:var(--c-line);border-radius:999px;position:relative;transition:background 150ms;flex-shrink:0;cursor:pointer;}.toggle-track.is-on{background:var(--c-primary);}
+.toggle-knob{position:absolute;top:2px;left:2px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform 150ms;box-shadow:0 1px 3px rgba(0,0,0,0.2);}.toggle-track.is-on .toggle-knob{transform:translateX(16px);}
+.preview-box{background:var(--c-bg-off);border:1px dashed var(--c-line);border-radius:8px;padding:14px;text-align:center;margin-top:8px;}.preview-num{font-size:24px;font-weight:700;color:var(--c-primary);}.preview-lbl{font-size:12px;color:var(--c-mute);}
+.code-sample{font-family: 'Noto Sans Thai', 'Satoshi', system-ui, sans-serif;font-size:11.5px;color:var(--c-mute);background:#fff;border:1px solid var(--c-line-2);border-radius:6px;padding:6px 9px;margin-top:8px;word-break:break-all;}
+.empty{padding:40px 24px;text-align:center;color:var(--c-mute);}.empty-icon{width:52px;height:52px;margin:0 auto 14px;border-radius:50%;background:var(--c-line-3);color:var(--c-mute-2);display:inline-flex;align-items:center;justify-content:center;}.empty-icon [data-lucide]{width:22px;height:22px;}.empty-title{font-size:15px;font-weight:600;color:var(--c-ink);margin-bottom:5px;}.empty-desc{font-size:12.5px;color:var(--c-mute);max-width:340px;margin:0 auto;}
+.timeline{position:relative;padding-left:24px;}.timeline::before{content:'';position:absolute;left:8px;top:4px;bottom:4px;width:2px;background:var(--c-line-2);}
+.tl-item{position:relative;margin-bottom:16px;}.tl-item:last-child{margin-bottom:0;}.tl-dot{position:absolute;left:-20px;top:3px;width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid var(--c-primary);}.tl-dot.is-success{border-color:var(--c-success);}.tl-dot.is-warning{border-color:var(--c-warning);}
+.tl-title{font-size:13px;font-weight:600;color:var(--c-ink);}.tl-meta{font-size:11.5px;color:var(--c-mute-2);margin-top:2px;}
+.modal-backdrop{position:fixed;inset:0;background:rgba(11,29,58,0.50);z-index:60;opacity:0;pointer-events:none;transition:opacity 200ms;display:flex;align-items:center;justify-content:center;}.modal-backdrop.is-open{opacity:1;pointer-events:auto;}
+.modal{background:#fff;border-radius:12px;width:440px;max-width:92vw;max-height:90vh;display:flex;flex-direction:column;transform:scale(0.96);transition:transform 200ms cubic-bezier(0.4,0,0.2,1);box-shadow:0 24px 64px rgba(11,29,58,0.28);overflow:hidden;}.modal-backdrop.is-open .modal{transform:scale(1);}
+.modal-header{padding:18px 22px 12px;display:flex;align-items:flex-start;gap:12px;}.modal-header-icon{width:36px;height:36px;border-radius:8px;background:rgba(11,92,255,0.10);color:var(--c-primary);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}.modal-header-icon.is-danger{background:#FEE2E2;color:var(--c-danger);}.modal-header-icon.is-warning{background:#FEF3C7;color:var(--c-warning);}.modal-header-icon [data-lucide]{width:18px;height:18px;}
+.modal-title{font-family:'Noto Sans Thai',sans-serif;font-size:16px;font-weight:600;color:var(--c-navy);margin:0 0 4px;}.modal-subtitle{font-size:13px;color:var(--c-mute);margin:0;line-height:1.5;}
+.modal-body{padding:6px 22px 18px;font-size:13px;color:var(--c-ink);overflow-y:auto;}.modal-footer{padding:12px 22px;background:var(--c-bg-off);border-top:1px solid var(--c-line-2);display:flex;justify-content:flex-end;gap:8px;}
+.warn-box{padding:12px;background:#FEE2E2;border-radius:8px;font-size:12.5px;color:#991B1B;}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--c-navy);color:#fff;padding:13px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:80;display:flex;align-items:center;gap:10px;box-shadow:0 12px 32px rgba(11,29,58,0.30);transform:translateY(100px);opacity:0;transition:all 250ms cubic-bezier(0.4,0,0.2,1);max-width:380px;}.toast.is-visible{transform:translateY(0);opacity:1;}.toast.is-success{background:var(--c-success);}.toast.is-info{background:var(--c-primary);}.toast.is-warning{background:var(--c-warning);}.toast.is-error{background:var(--c-danger);}.toast [data-lucide]{width:17px;height:17px;}
+.w-3{width:12px;}.h-3{height:12px;}.w-3\.5{width:14px;}.h-3\.5{height:14px;}.w-4{width:16px;}.h-4{height:16px;}.w-5{width:20px;}.h-5{height:20px;}
+svg.lucide{width:1em;height:1em;display:inline-block;vertical-align:-0.125em;flex-shrink:0;}svg.lucide.w-3{width:12px;}svg.lucide.h-3{height:12px;}svg.lucide.w-3\.5{width:14px;}svg.lucide.h-3\.5{height:14px;}svg.lucide.w-4{width:16px;}svg.lucide.h-4{height:16px;}svg.lucide.w-5{width:20px;}svg.lucide.h-5{height:20px;}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sb-brand"><div class="sb-logo"><i data-lucide="box" class="w-4 h-4"></i></div><div><div class="sb-name">CUBE 4.0</div><div class="sb-sub">Inventory · Master Data</div></div></div>
+  <nav class="sb-nav" id="sb-nav">
+    <div class="sb-module" data-module="master-data" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)"><i data-lucide="database" class="mod-icon w-3.5 h-3.5"></i><span class="mod-label">Master Data</span><i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i></button>
+      <div class="sb-features">
+        <a class="sb-item is-active" data-feature="location-master"><i data-lucide="network" class="w-4 h-4"></i><span>Location Hierarchy</span></a>
+        <a class="sb-item is-disabled" data-feature="product-master"><i data-lucide="boxes" class="w-4 h-4"></i><span>Product Master</span></a>
+        <a class="sb-item is-disabled" data-feature="vendor-master"><i data-lucide="contact" class="w-4 h-4"></i><span>Vendor Master</span></a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="inventory" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)"><i data-lucide="warehouse" class="mod-icon w-3.5 h-3.5"></i><span class="mod-label">Inventory</span><i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i></button>
+      <div class="sb-features">
+        <a class="sb-item is-disabled" data-feature="stock-by-location"><i data-lucide="layers" class="w-4 h-4"></i><span>Stock by Location</span></a>
+        <a class="sb-item is-disabled" data-feature="grn"><i data-lucide="package-check" class="w-4 h-4"></i><span>Goods Receipt</span></a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="system" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)"><i data-lucide="sliders-horizontal" class="mod-icon w-3.5 h-3.5"></i><span class="mod-label">System</span><i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i></button>
+      <div class="sb-features"><a class="sb-item is-disabled" data-feature="settings"><i data-lucide="settings" class="w-4 h-4"></i><span>Settings</span></a></div>
+    </div>
+  </nav>
+  <div class="sb-footer"><div class="pulse-dot"></div><span>UAT · v1.1.0</span></div>
+</aside>
+<main class="main">
+  <header class="shell-bar">
+    <nav class="breadcrumb"><a data-breadcrumb-module="master-data">Master Data</a><i data-lucide="chevron-right" class="w-3 h-3 sep"></i><span class="breadcrumb-current">Location Hierarchy</span></nav>
+    <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+      <div class="notif-wrap" style="position:relative;"><button class="icon-btn" onclick="toggleNotif()"><i data-lucide="bell" class="w-4 h-4"></i><span class="notif-dot"></span></button></div>
+      <div style="position:relative;">
+        <div class="user-chip" onclick="toggleUserMenu()"><div class="user-text"><div class="user-name">ธนา คลังสินค้า</div><div class="user-role">Warehouse Manager · CUBE 4.0</div></div><div class="avatar">ธค</div></div>
+        <div class="user-menu" id="userMenu"><div class="user-menu-item"><i data-lucide="user" class="w-3.5 h-3.5"></i><span>โปรไฟล์</span></div><div class="user-menu-item"><i data-lucide="settings" class="w-3.5 h-3.5"></i><span>การตั้งค่า</span></div><div class="user-menu-divider"></div><div class="user-menu-item is-danger"><i data-lucide="log-out" class="w-3.5 h-3.5"></i><span>ออกจากระบบ</span></div></div>
+      </div>
+    </div>
+  </header>
+  <div class="content" id="page-content"></div>
+</main>
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer"></div>
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"><div class="modal" onclick="event.stopPropagation()" id="modalEl"></div></div>
+<div class="toast" id="toast"></div>
+<script>
+const ICONS={"plus": "<path d=\"M5 12h14\" /> <path d=\"M12 5v14\" />", "minus": "<path d=\"M5 12h14\" />", "trash-2": "<path d=\"M3 6h18\" /> <path d=\"M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6\" /> <path d=\"M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2\" /> <line x1=\"10\" x2=\"10\" y1=\"11\" y2=\"17\" /> <line x1=\"14\" x2=\"14\" y1=\"11\" y2=\"17\" />", "lock": "<rect width=\"18\" height=\"11\" x=\"3\" y=\"11\" rx=\"2\" ry=\"2\" /> <path d=\"M7 11V7a5 5 0 0 1 10 0v4\" />", "arrow-right": "<path d=\"M5 12h14\" /> <path d=\"m12 5 7 7-7 7\" />", "scissors": "<circle cx=\"6\" cy=\"6\" r=\"3\" /> <path d=\"M8.12 8.12 12 12\" /> <path d=\"M20 4 8.12 15.88\" /> <circle cx=\"6\" cy=\"18\" r=\"3\" /> <path d=\"M14.8 14.8 20 20\" />", "combine": "<path d=\"M10 18H5a3 3 0 0 1-3-3v-1\" /> <path d=\"M14 2a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2\" /> <path d=\"M20 2a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2\" /> <path d=\"m7 21 3-3-3-3\" /> <rect x=\"14\" y=\"14\" width=\"8\" height=\"8\" rx=\"2\" /> <rect x=\"2\" y=\"2\" width=\"8\" height=\"8\" rx=\"2\" />", "shield": "<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\" />", "activity": "<path d=\"M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2\" />", "alert-circle": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <line x1=\"12\" x2=\"12\" y1=\"8\" y2=\"12\" /> <line x1=\"12\" x2=\"12.01\" y1=\"16\" y2=\"16\" />", "alert-triangle": "<path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\" /> <path d=\"M12 9v4\" /> <path d=\"M12 17h.01\" />", "arrow-left": "<path d=\"m12 19-7-7 7-7\" /> <path d=\"M19 12H5\" />", "ban": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"m4.9 4.9 14.2 14.2\" />", "bell": "<path d=\"M10.268 21a2 2 0 0 0 3.464 0\" /> <path d=\"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326\" />", "box": "<path d=\"M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z\" /> <path d=\"m3.3 7 8.7 5 8.7-5\" /> <path d=\"M12 22V12\" />", "boxes": "<path d=\"M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z\" /> <path d=\"m7 16.5-4.74-2.85\" /> <path d=\"m7 16.5 5-3\" /> <path d=\"M7 16.5v5.17\" /> <path d=\"M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z\" /> <path d=\"m17 16.5-5-3\" /> <path d=\"m17 16.5 4.74-2.85\" /> <path d=\"M17 16.5v5.17\" /> <path d=\"M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z\" /> <path d=\"M12 8 7.26 5.15\" /> <path d=\"m12 8 4.74-2.85\" /> <path d=\"M12 13.5V8\" />", "check": "<path d=\"M20 6 9 17l-5-5\" />", "check-circle-2": "<path d=\"M21.801 10A10 10 0 1 1 17 3.335\" /> <path d=\"m9 11 3 3L22 4\" />", "chevron-down": "<path d=\"m6 9 6 6 6-6\" />", "chevron-left": "<path d=\"m15 18-6-6 6-6\" />", "chevron-right": "<path d=\"m9 18 6-6-6-6\" />", "clipboard-check": "<rect width=\"8\" height=\"4\" x=\"8\" y=\"2\" rx=\"1\" ry=\"1\" /> <path d=\"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2\" /> <path d=\"m9 14 2 2 4-4\" />", "clock": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <polyline points=\"12 6 12 12 16 14\" />", "container": "<path d=\"M22 7.7c0-.6-.4-1.2-.8-1.5l-6.3-3.9a1.72 1.72 0 0 0-1.7 0l-10.3 6c-.5.2-.9.8-.9 1.4v6.6c0 .5.4 1.2.8 1.5l6.3 3.9a1.72 1.72 0 0 0 1.7 0l10.3-6c.5-.3.9-1 .9-1.5Z\" /> <path d=\"M10 21.9V14L2.1 9.1\" /> <path d=\"m10 14 11.9-6.9\" /> <path d=\"M14 19.8v-8.1\" /> <path d=\"M18 17.5V9.4\" />", "database": "<ellipse cx=\"12\" cy=\"5\" rx=\"9\" ry=\"3\" /> <path d=\"M3 5V19A9 3 0 0 0 21 19V5\" /> <path d=\"M3 12A9 3 0 0 0 21 12\" />", "download": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" /> <polyline points=\"7 10 12 15 17 10\" /> <line x1=\"12\" x2=\"12\" y1=\"15\" y2=\"3\" />", "eye": "<path d=\"M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "eye-off": "<path d=\"M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49\" /> <path d=\"M14.084 14.158a3 3 0 0 1-4.242-4.242\" /> <path d=\"M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143\" /> <path d=\"m2 2 20 20\" />", "flag": "<path d=\"M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z\" /> <line x1=\"4\" x2=\"4\" y1=\"22\" y2=\"15\" />", "gauge": "<path d=\"m12 14 4-4\" /> <path d=\"M3.34 19a10 10 0 1 1 17.32 0\" />", "grid-3x3": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" /> <path d=\"M3 9h18\" /> <path d=\"M3 15h18\" /> <path d=\"M9 3v18\" /> <path d=\"M15 3v18\" />", "hard-hat": "<path d=\"M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5\" /> <path d=\"M14 6a6 6 0 0 1 6 6v3\" /> <path d=\"M4 15v-3a6 6 0 0 1 6-6\" /> <rect x=\"2\" y=\"15\" width=\"20\" height=\"4\" rx=\"1\" />", "history": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" /> <path d=\"M12 7v5l4 2\" />", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 16v-4\" /> <path d=\"M12 8h.01\" />", "layers": "<path d=\"M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z\" /> <path d=\"M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12\" /> <path d=\"M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17\" />", "layout-grid": "<rect width=\"7\" height=\"7\" x=\"3\" y=\"3\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"14\" y=\"3\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"14\" y=\"14\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\" />", "link": "<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\" /> <path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\" />", "log-out": "<path d=\"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4\" /> <polyline points=\"16 17 21 12 16 7\" /> <line x1=\"21\" x2=\"9\" y1=\"12\" y2=\"12\" />", "map-pin": "<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" />", "package": "<path d=\"M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z\" /> <path d=\"M12 22V12\" /> <path d=\"m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7\" /> <path d=\"m7.5 4.27 9 5.15\" />", "package-check": "<path d=\"m16 16 2 2 4-4\" /> <path d=\"M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14\" /> <path d=\"m7.5 4.27 9 5.15\" /> <polyline points=\"3.29 7 12 12 20.71 7\" /> <line x1=\"12\" x2=\"12\" y1=\"22\" y2=\"12\" />", "package-open": "<path d=\"M12 22v-9\" /> <path d=\"M15.17 2.21a1.67 1.67 0 0 1 1.63 0L21 4.57a1.93 1.93 0 0 1 0 3.36L8.82 14.79a1.655 1.655 0 0 1-1.64 0L3 12.43a1.93 1.93 0 0 1 0-3.36z\" /> <path d=\"M20 13v3.87a2.06 2.06 0 0 1-1.11 1.83l-6 3.08a1.93 1.93 0 0 1-1.78 0l-6-3.08A2.06 2.06 0 0 1 4 16.87V13\" /> <path d=\"M21 12.43a1.93 1.93 0 0 0 0-3.36L8.83 2.2a1.64 1.64 0 0 0-1.63 0L3 4.57a1.93 1.93 0 0 0 0 3.36l12.18 6.86a1.636 1.636 0 0 0 1.63 0z\" />", "package-plus": "<path d=\"M16 16h6\" /> <path d=\"M19 13v6\" /> <path d=\"M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14\" /> <path d=\"m7.5 4.27 9 5.15\" /> <polyline points=\"3.29 7 12 12 20.71 7\" /> <line x1=\"12\" x2=\"12\" y1=\"22\" y2=\"12\" />", "package-search": "<path d=\"M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14\" /> <path d=\"m7.5 4.27 9 5.15\" /> <polyline points=\"3.29 7 12 12 20.71 7\" /> <line x1=\"12\" x2=\"12\" y1=\"22\" y2=\"12\" /> <circle cx=\"18.5\" cy=\"15.5\" r=\"2.5\" /> <path d=\"M20.27 17.27 22 19\" />", "package-x": "<path d=\"M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14\" /> <path d=\"m7.5 4.27 9 5.15\" /> <polyline points=\"3.29 7 12 12 20.71 7\" /> <line x1=\"12\" x2=\"12\" y1=\"22\" y2=\"12\" /> <path d=\"m17 13 5 5m-5 0 5-5\" />", "pause-octagon": "<path d=\"M10 15V9\" /> <path d=\"M14 15V9\" /> <path d=\"M2.586 16.726A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2h6.624a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586z\" />", "refresh-cw": "<path d=\"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8\" /> <path d=\"M21 3v5h-5\" /> <path d=\"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16\" /> <path d=\"M8 16H3v5\" />", "rotate-ccw": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" />", "route": "<circle cx=\"6\" cy=\"19\" r=\"3\" /> <path d=\"M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15\" /> <circle cx=\"18\" cy=\"5\" r=\"3\" />", "search": "<circle cx=\"11\" cy=\"11\" r=\"8\" /> <path d=\"m21 21-4.3-4.3\" />", "search-x": "<path d=\"m13.5 8.5-5 5\" /> <path d=\"m8.5 8.5 5 5\" /> <circle cx=\"11\" cy=\"11\" r=\"8\" /> <path d=\"m21 21-4.3-4.3\" />", "settings": "<path d=\"M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "shopping-cart": "<circle cx=\"8\" cy=\"21\" r=\"1\" /> <circle cx=\"19\" cy=\"21\" r=\"1\" /> <path d=\"M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12\" />", "sliders-horizontal": "<line x1=\"21\" x2=\"14\" y1=\"4\" y2=\"4\" /> <line x1=\"10\" x2=\"3\" y1=\"4\" y2=\"4\" /> <line x1=\"21\" x2=\"12\" y1=\"12\" y2=\"12\" /> <line x1=\"8\" x2=\"3\" y1=\"12\" y2=\"12\" /> <line x1=\"21\" x2=\"16\" y1=\"20\" y2=\"20\" /> <line x1=\"12\" x2=\"3\" y1=\"20\" y2=\"20\" /> <line x1=\"14\" x2=\"14\" y1=\"2\" y2=\"6\" /> <line x1=\"8\" x2=\"8\" y1=\"10\" y2=\"14\" /> <line x1=\"16\" x2=\"16\" y1=\"18\" y2=\"22\" />", "tags": "<path d=\"m15 5 6.3 6.3a2.4 2.4 0 0 1 0 3.4L17 19\" /> <path d=\"M9.586 5.586A2 2 0 0 0 8.172 5H3a1 1 0 0 0-1 1v5.172a2 2 0 0 0 .586 1.414L8.29 18.29a2.426 2.426 0 0 0 3.42 0l3.58-3.58a2.426 2.426 0 0 0 0-3.42z\" /> <circle cx=\"6.5\" cy=\"9.5\" r=\".5\" fill=\"currentColor\" />", "truck": "<path d=\"M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2\" /> <path d=\"M15 18H9\" /> <path d=\"M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14\" /> <circle cx=\"17\" cy=\"18\" r=\"2\" /> <circle cx=\"7\" cy=\"18\" r=\"2\" />", "user": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\" /> <circle cx=\"12\" cy=\"7\" r=\"4\" />", "wallet": "<path d=\"M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1\" /> <path d=\"M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4\" />", "warehouse": "<path d=\"M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z\" /> <path d=\"M6 18h12\" /> <path d=\"M6 14h12\" /> <rect width=\"12\" height=\"12\" x=\"6\" y=\"10\" />", "x": "<path d=\"M18 6 6 18\" /> <path d=\"m6 6 12 12\" />", "x-circle": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"m15 9-6 6\" /> <path d=\"m9 9 6 6\" />", "building-2": "<path d=\"M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z\"/><path d=\"M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2\"/><path d=\"M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2\"/><path d=\"M10 6h4\"/><path d=\"M10 10h4\"/><path d=\"M10 14h4\"/><path d=\"M10 18h4\"/>", "contact": "<path d=\"M16 2v2\"/><path d=\"M7 22v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2\"/><path d=\"M8 2v2\"/><circle cx=\"12\" cy=\"11\" r=\"3\"/><rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/>", "corner-down-right": "<polyline points=\"15 10 20 15 15 20\"/><path d=\"M4 4v7a4 4 0 0 0 4 4h12\"/>", "git-branch": "<line x1=\"6\" x2=\"6\" y1=\"3\" y2=\"15\"/><circle cx=\"18\" cy=\"6\" r=\"3\"/><circle cx=\"6\" cy=\"18\" r=\"3\"/><path d=\"M18 9a9 9 0 0 1-9 9\"/>", "hand": "<path d=\"M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2\"/><path d=\"M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2\"/><path d=\"M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8\"/><path d=\"M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15\"/>", "inbox": "<polyline points=\"22 12 16 12 14 15 10 15 8 12 2 12\"/><path d=\"M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z\"/>", "list": "<path d=\"M3 12h.01\"/><path d=\"M3 18h.01\"/><path d=\"M3 6h.01\"/><path d=\"M8 12h13\"/><path d=\"M8 18h13\"/><path d=\"M8 6h13\"/>", "mouse-pointer-click": "<path d=\"M14 4.1 12 6\"/><path d=\"m5.1 8-2.9-.8\"/><path d=\"m6 12-1.9 2\"/><path d=\"M7.2 2.2 8 5.1\"/><path d=\"M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z\"/>", "network": "<rect x=\"16\" y=\"16\" width=\"6\" height=\"6\" rx=\"1\"/><rect x=\"2\" y=\"16\" width=\"6\" height=\"6\" rx=\"1\"/><rect x=\"9\" y=\"2\" width=\"6\" height=\"6\" rx=\"1\"/><path d=\"M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3\"/><path d=\"M12 12V8\"/>", "pencil": "<path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"/><path d=\"m15 5 4 4\"/>", "repeat": "<path d=\"m17 2 4 4-4 4\"/><path d=\"M3 11v-1a4 4 0 0 1 4-4h14\"/><path d=\"m7 22-4-4 4-4\"/><path d=\"M21 13v1a4 4 0 0 1-4 4H3\"/>", "rows-3": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\"/><path d=\"M21 9H3\"/><path d=\"M21 15H3\"/>", "square-dashed": "<path d=\"M5 3a2 2 0 0 0-2 2\"/><path d=\"M19 3a2 2 0 0 1 2 2\"/><path d=\"M21 19a2 2 0 0 1-2 2\"/><path d=\"M5 21a2 2 0 0 1-2-2\"/><path d=\"M9 3h1\"/><path d=\"M9 21h1\"/><path d=\"M14 3h1\"/><path d=\"M14 21h1\"/><path d=\"M3 9v1\"/><path d=\"M21 9v1\"/><path d=\"M3 14v1\"/><path d=\"M21 14v1\"/>", "thermometer-snowflake": "<path d=\"m10 20-1.25-2.5L6 18\"/><path d=\"M10 4 8.75 6.5 6 6\"/><path d=\"M10.585 15H10\"/><path d=\"M2 12h6.5L10 9\"/><path d=\"M20 14.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z\"/><path d=\"m4 10 1.5 2L4 14\"/><path d=\"m7 21 3-6-1.5-3\"/><path d=\"m7 3 3 6h2\"/>"};
+function renderIcons(){document.querySelectorAll('[data-lucide]').forEach(function(el){
+  var n=el.getAttribute('data-lucide');var p=ICONS[n];if(!p)p=ICONS['box']||'';
+  if(el.tagName.toLowerCase()==='svg')return;
+  var sz=el.getAttribute('data-sz');
+  var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');
+  svg.setAttribute('stroke-width','2');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');
+  svg.setAttribute('data-lucide',n);
+  if(el.className&&el.className.baseVal!==undefined){svg.setAttribute('class',el.className.baseVal);}else if(el.className){svg.setAttribute('class',el.className);}
+  if(sz){svg.style.width=sz+'px';svg.style.height=sz+'px';}
+  svg.innerHTML=p;el.replaceWith(svg);});}
+window.lucide={createIcons:renderIcons};
+</script>
+<script>
+// ========================================================================
+// CUBE 4.0 — Location Hierarchy Manager (Warehouse → Zone → Area → Rack → Location)
+// ========================================================================
+const ROLE='warehouse_manager'; const canManage=['warehouse_manager','admin'].includes(ROLE);
+
+// ====== DATA (5-level hierarchy) ======
+let WAREHOUSES=[
+  {id:'WH-01',code:'WH-01',name:'คลังกลาง บางนา',addr_line:'123 ถ.บางนา-ตราด กม.18',province:'สมุทรปราการ',district:'บางพลี',subdistrict:'บางพลีใหญ่',postcode:'10540',status:'active',created:'2026-04-01T09:00:00'},
+  {id:'WH-02',code:'WH-02',name:'คลังภาคเหนือ ลำพูน',addr_line:'88 นิคมอุตสาหกรรมภาคเหนือ',province:'ลำพูน',district:'เมืองลำพูน',subdistrict:'บ้านกลาง',postcode:'51000',status:'active',created:'2026-04-10T09:00:00'},
+];
+// Thai geo (representative subset for cascading dropdown demo)
+const TH_GEO={
+  'กรุงเทพมหานคร':{'บางนา':{'บางนาเหนือ':'10260','บางนาใต้':'10260'},'คลองเตย':{'คลองเตย':'10110','คลองตัน':'10110','พระโขนง':'10110'},'ประเวศ':{'ประเวศ':'10250','หนองบอน':'10250','ดอกไม้':'10250'}},
+  'สมุทรปราการ':{'เมืองสมุทรปราการ':{'ปากน้ำ':'10270','บางเมือง':'10270','ท้ายบ้าน':'10280'},'บางพลี':{'บางพลีใหญ่':'10540','บางแก้ว':'10540','ราชาเทวะ':'10540'},'พระประแดง':{'ตลาด':'10130','บางพึ่ง':'10130'}},
+  'ลำพูน':{'เมืองลำพูน':{'ในเมือง':'51000','เวียงยอง':'51000','บ้านกลาง':'51000','ป่าสัก':'51000'},'บ้านธิ':{'บ้านธิ':'51180','ห้วยยาบ':'51180'}},
+  'ชลบุรี':{'เมืองชลบุรี':{'บางปลาสร้อย':'20000','มะขามหย่ง':'20000','บ้านสวน':'20000'},'ศรีราชา':{'ศรีราชา':'20110','สุรศักดิ์':'20110','ทุ่งสุขลา':'20230'}},
+  'พระนครศรีอยุธยา':{'พระนครศรีอยุธยา':{'ประตูชัย':'13000','หอรัตนไชย':'13000'},'บางปะอิน':{'บางปะอิน':'13160','คลองจิก':'13160','บ้านเลน':'13160'}}
+};
+function geoProvinces(){return Object.keys(TH_GEO);}
+function geoDistricts(p){return p&&TH_GEO[p]?Object.keys(TH_GEO[p]):[];}
+function geoSubs(p,d){return p&&d&&TH_GEO[p]&&TH_GEO[p][d]?Object.keys(TH_GEO[p][d]):[];}
+function geoPostcode(p,d,s){try{return TH_GEO[p][d][s]||'';}catch(e){return '';}}
+function isBkk(p){return p==='กรุงเทพมหานคร';}
+function waddr(w){
+  if(!w)return '—';
+  if(!w.province&&w.address)return w.address;
+  if(!w.province)return w.addr_line||'—';
+  const sub=w.subdistrict?`${isBkk(w.province)?'แขวง':'ต.'}${w.subdistrict}`:'';
+  const dis=w.district?`${isBkk(w.province)?'เขต':'อ.'}${w.district}`:'';
+  const prov=`${isBkk(w.province)?'':'จ.'}${w.province}`;
+  return [w.addr_line,sub,dis,prov,w.postcode].filter(Boolean).join(' ');
+}
+let ZONES=[
+  {id:'Z-STORAGE',code:'Z-STG',name:'Storage Zone',warehouse_id:'WH-01',temp_controlled:false,temp_min:null,temp_max:null,status:'active',created:'2026-04-02T09:00:00'},
+  {id:'Z-QC',code:'Z-QC',name:'QC / Hold Zone',warehouse_id:'WH-01',temp_controlled:false,temp_min:null,temp_max:null,status:'active',created:'2026-04-02T09:00:00'},
+  {id:'Z-RECEIVING',code:'Z-RCV',name:'Receiving Zone',warehouse_id:'WH-01',temp_controlled:false,temp_min:null,temp_max:null,status:'active',created:'2026-04-02T09:00:00'},
+  {id:'Z-OUTBOUND',code:'Z-OUT',name:'Outbound Zone',warehouse_id:'WH-01',temp_controlled:false,temp_min:null,temp_max:null,status:'active',created:'2026-04-02T09:00:00'},
+  {id:'Z-COLD',code:'Z-COLD',name:'Cold Chain Zone',warehouse_id:'WH-02',temp_controlled:true,temp_min:2,temp_max:8,status:'active',created:'2026-04-11T09:00:00'},
+];
+let AREAS=[
+  {id:'A-FM',code:'A-FM',name:'Fast Mover Floor',zone_id:'Z-STORAGE',allows_direct:true,status:'active',created:'2026-04-03T09:00:00'},
+  {id:'A-AISLE-A',code:'A-AISLE-A',name:'Aisle A',zone_id:'Z-STORAGE',allows_direct:false,status:'active',created:'2026-04-03T09:00:00'},
+  {id:'A-AISLE-B',code:'A-AISLE-B',name:'Aisle B',zone_id:'Z-STORAGE',allows_direct:false,status:'active',created:'2026-04-03T09:00:00'},
+  {id:'A-HOLD',code:'A-HOLD',name:'Hold Area',zone_id:'Z-QC',allows_direct:true,status:'active',created:'2026-04-03T09:00:00'},
+  {id:'A-DOCK',code:'A-DOCK',name:'Receiving Dock',zone_id:'Z-RECEIVING',allows_direct:true,status:'active',created:'2026-04-03T09:00:00'},
+  {id:'A-PACK',code:'A-PACK',name:'Pack Stations',zone_id:'Z-OUTBOUND',allows_direct:true,status:'active',created:'2026-04-03T09:00:00'},
+  {id:'A-CHILL',code:'A-CHILL',name:'Chiller Area',zone_id:'Z-COLD',allows_direct:false,status:'active',created:'2026-04-12T09:00:00'},
+];
+let RACKS=[
+  {id:'R-A01',code:'R-A01',name:'Rack A-01',area_id:'A-AISLE-A',rows:4,cols:12,levels:4,status:'active',created:'2026-04-04T09:00:00'},
+  {id:'R-A02',code:'R-A02',name:'Rack A-02',area_id:'A-AISLE-A',rows:4,cols:12,levels:4,status:'active',created:'2026-04-04T09:00:00'},
+  {id:'R-B01',code:'R-B01',name:'Rack B-01',area_id:'A-AISLE-B',rows:4,cols:10,levels:5,status:'active',created:'2026-04-04T09:00:00'},
+  {id:'R-B02',code:'R-B02',name:'Rack B-02',area_id:'A-AISLE-B',rows:4,cols:10,levels:5,status:'active',created:'2026-04-04T09:00:00'},
+  {id:'R-C01',code:'R-C01',name:'Chiller Rack C-01',area_id:'A-CHILL',rows:3,cols:8,levels:3,status:'active',created:'2026-04-13T09:00:00'},
+];
+// storage_uom = หน่วยเก็บสินค้าของตำแหน่ง (LOCK จาก F-INV: 1 location 1 uom — ledger เก็บฐาน, จอแสดงตามหน่วยตำแหน่ง)
+// เปลี่ยนได้เฉพาะตอนตำแหน่งไม่มีสต็อก (hasStock=false) [AI-DRAFT — OQ-LOC-06 รอ Strike ยืนยันสิทธิ์]
+const STORAGE_UOMS=['ตัว','ลัง','กล่อง','มัด','ถุง','ใบ','ขวด'];
+function mkLoc(o){return Object.assign({pickable:true,putawayable:true,replenishable:false,mixed_lot:false,mixed_item:false,neg_stock:false,rotation:'fifo',status:'active',block_reason:'',barcode:'',hasStock:false,row:'',col:'',level:'',position:'',storage_uom:'ตัว',created:'2026-05-10T09:00:00'},o);}
+let LOCATIONS=[
+  mkLoc({id:'L001',code:'A-01-R1-C2-L3',name:'',parent_type:'rack',rack_id:'R-A01',area_id:null,type:'RESERVE',cap_uom:'pallet',cap_val:1,row:'1',col:'2',level:'3',status:'active',hasStock:true,barcode:'8850001000013',storage_uom:'ลัง'}),
+  mkLoc({id:'L002',code:'A-01-R1-C3-L1',parent_type:'rack',rack_id:'R-A01',area_id:null,type:'RESERVE',cap_uom:'pallet',cap_val:1,row:'1',col:'3',level:'1',status:'active',barcode:'8850001000020',storage_uom:'ลัง'}),
+  mkLoc({id:'L003',code:'FM-PF-01',name:'Pick Face FM-01',parent_type:'area',rack_id:null,area_id:'A-FM',type:'PICK_FACE',cap_uom:'box',cap_val:40,pickable:true,replenishable:true,status:'active',hasStock:true,barcode:'8850001000037'}),
+  mkLoc({id:'L004',code:'FM-PF-02',parent_type:'area',rack_id:null,area_id:'A-FM',type:'PICK_FACE',cap_uom:'box',cap_val:40,replenishable:true,status:'full',hasStock:true,barcode:'8850001000044'}),
+  mkLoc({id:'L005',code:'PACK-01',name:'Pack Station 1',parent_type:'area',rack_id:null,area_id:'A-PACK',type:'PACK',cap_uom:'pallet',cap_val:4,pickable:false,mixed_item:true,status:'active',storage_uom:'ลัง'}),
+  mkLoc({id:'L006',code:'PACK-02',parent_type:'area',rack_id:null,area_id:'A-PACK',type:'PACK',cap_uom:'pallet',cap_val:4,pickable:false,mixed_item:true,status:'active',storage_uom:'ลัง'}),
+  mkLoc({id:'L007',code:'B-01-R2-C1-L1',parent_type:'rack',rack_id:'R-B01',area_id:null,type:'BULK',cap_uom:'cbm',cap_val:8,rotation:'lifo',row:'2',col:'1',level:'1',mixed_lot:true,status:'active',hasStock:true,storage_uom:'มัด'}),
+  mkLoc({id:'L008',code:'B-01-R2-C1-L2',parent_type:'rack',rack_id:'R-B01',area_id:null,type:'BULK',cap_uom:'cbm',cap_val:8,rotation:'lifo',row:'2',col:'1',level:'2',status:'blocked',block_reason:'รอซ่อมคานชั้นวาง',storage_uom:'มัด'}),
+  mkLoc({id:'L009',code:'HOLD-GRN0412',name:'HOLD GRN-0412',parent_type:'area',rack_id:null,area_id:'A-HOLD',type:'HOLD',cap_uom:'pallet',cap_val:2,pickable:false,status:'active',hasStock:true}),
+  mkLoc({id:'L010',code:'DMG-01',parent_type:'area',rack_id:null,area_id:'A-HOLD',type:'DAMAGED',cap_uom:'pallet',cap_val:2,pickable:false,status:'active'}),
+  mkLoc({id:'L011',code:'DOCK-IN-01',name:'Receiving Dock 1',parent_type:'area',rack_id:null,area_id:'A-DOCK',type:'RECEIVING_DOCK',cap_uom:'pallet',cap_val:10,mixed_item:true,status:'active'}),
+  mkLoc({id:'L012',code:'A-02-R1-C1-L1',parent_type:'rack',rack_id:'R-A02',area_id:null,type:'RESERVE',cap_uom:'pallet',cap_val:1,row:'1',col:'1',level:'1',status:'frozen',storage_uom:'ลัง'}),
+  mkLoc({id:'L013',code:'A-02-R1-C1-L2',parent_type:'rack',rack_id:'R-A02',area_id:null,type:'RESERVE',cap_uom:'pallet',cap_val:1,row:'1',col:'1',level:'2',status:'active',storage_uom:'ลัง'}),
+  mkLoc({id:'L014',code:'TRN-01',name:'Transit Bay',parent_type:'area',rack_id:null,area_id:'A-DOCK',type:'TRANSIT',cap_uom:'pallet',cap_val:6,status:'active'}),
+  mkLoc({id:'L015',code:'VIRT-ADJ',name:'Virtual Adjustment',parent_type:'area',rack_id:null,area_id:'A-HOLD',type:'VIRTUAL',cap_uom:'piece',cap_val:999999,pickable:false,putawayable:false,neg_stock:true,status:'active'}),
+  mkLoc({id:'L016',code:'B-02-R1-C2-L4',parent_type:'rack',rack_id:'R-B02',area_id:null,type:'BULK',cap_uom:'cbm',cap_val:8,rotation:'lifo',row:'1',col:'2',level:'4',status:'inactive',storage_uom:'มัด'}),
+  mkLoc({id:'L017',code:'C-01-R1-C1-L1',parent_type:'rack',rack_id:'R-C01',area_id:null,type:'RESERVE',cap_uom:'pallet',cap_val:1,row:'1',col:'1',level:'1',status:'active',hasStock:true,storage_uom:'ลัง'}),
+];
+const AUDIT={
+  'L001':[{t:'สร้างตำแหน่ง',by:'ธนา คลังสินค้า',at:'2026-05-10T09:00:00',v:'success'},{t:'เปิดใช้งาน',by:'ธนา คลังสินค้า',at:'2026-05-10T09:05:00',v:'success'},{t:'แก้ไขความจุ 1 → 2 pallet',by:'สุดา หัวหน้าคลัง',at:'2026-05-18T11:20:00',v:''}],
+  'L012':[{t:'สร้างตำแหน่ง',by:'ธนา คลังสินค้า',at:'2026-05-10T09:00:00',v:'success'},{t:'เปลี่ยนสถานะ active → frozen (cycle count)',by:'อนงค์ ควบคุมสต็อก',at:'2026-05-25T08:30:00',v:'warning'}],
+};
+function auditOf(id){return AUDIT[id]||[{t:'สร้างรายการ',by:'ธนา คลังสินค้า',at:(LOCATIONS.find(x=>x.id===id)||{}).created||'2026-05-10T09:00:00',v:'success'}];}
+
+// ====== STATE ======
+const PAGE_SIZE=10;
+const state={
+  view:'list',
+  sel:{level:'root',id:null},
+  collapsed:new Set(),
+  areaTab:'racks',
+  page:1,pageD:1,
+  drawer:{open:false,mode:null,level:null,id:null,step:1,tab:'overview'},
+  modal:{open:false,id:null,level:null},
+  filters:{search:'',type:'all',status:'all'},
+  form:{},bulk:{},bulkSel:new Set()
+};
+
+// ====== LOOKUP HELPERS ======
+const wh=id=>WAREHOUSES.find(x=>x.id===id);
+const zn=id=>ZONES.find(x=>x.id===id);
+const ar=id=>AREAS.find(x=>x.id===id);
+const rk=id=>RACKS.find(x=>x.id===id);
+const lc=id=>LOCATIONS.find(x=>x.id===id);
+function entOf(level,id){return {warehouse:wh,zone:zn,area:ar,rack:rk,location:lc}[level]?.(id);}
+function zonesOf(whId){return ZONES.filter(z=>z.warehouse_id===whId);}
+function areasOf(znId){return AREAS.filter(a=>a.zone_id===znId);}
+function racksOf(arId){return RACKS.filter(r=>r.area_id===arId);}
+function locsOfRack(rId){return LOCATIONS.filter(l=>l.parent_type==='rack'&&l.rack_id===rId);}
+function locsOfAreaDirect(aId){return LOCATIONS.filter(l=>l.parent_type==='area'&&l.area_id===aId);}
+function areaOfRack(rId){return ar(rk(rId)?.area_id);}
+function zoneOfArea(aId){return zn(ar(aId)?.zone_id);}
+function whOfZone(zId){return wh(zn(zId)?.warehouse_id);}
+function childCount(level,id){
+  if(level==='warehouse')return zonesOf(id).length;
+  if(level==='zone')return areasOf(id).length;
+  if(level==='area')return racksOf(id).length+locsOfAreaDirect(id).length;
+  if(level==='rack')return locsOfRack(id).length;
+  return 0;
+}
+
+// ====== LABELS / FMT ======
+const LEVEL_LABEL={root:'ทุก Warehouse',warehouse:'Warehouse',zone:'Zone',area:'Area',rack:'Rack',location:'Location'};
+const LEVEL_ICON={warehouse:'warehouse',zone:'layout-grid',area:'square-dashed',rack:'rows-3',location:'map-pin'};
+const CHILD_LABEL={root:'Warehouse',warehouse:'Zone',zone:'Area',area:'Rack',rack:'Location'};
+function typeLabel(t){return {PICK_FACE:'Pick Face',RESERVE:'Reserve',HOLD:'Hold',DAMAGED:'Damaged',BULK:'Bulk',STAGING:'Staging',PACK:'Pack',RECEIVING_DOCK:'Receiving Dock',TRANSIT:'Transit',VIRTUAL:'Virtual'}[t]||t;}
+function statusLabel(s){return {active:'ใช้งาน',inactive:'ปิดใช้',blocked:'บล็อก',maintenance:'ซ่อมบำรุง',full:'เต็ม',frozen:'แช่แข็ง',decommissioned:'ปลดระวาง'}[s]||s;}
+function rotLabel(r){return {fifo:'FIFO',lifo:'LIFO',fefo:'FEFO',manual:'Manual'}[r]||r;}
+function initials(s){return (s||'?').replace(/[^A-Za-z0-9]/g,'').slice(0,2).toUpperCase();}
+function fmtNum(n){return (n||0).toLocaleString('th-TH');}
+function fmtDateTime(iso){if(!iso)return '—';return new Date(iso).toLocaleString('th-TH',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}
+function yesNo(b){return b?'ใช่':'ไม่';}
+const TYPES=['PICK_FACE','RESERVE','HOLD','DAMAGED','BULK','STAGING','PACK','RECEIVING_DOCK','TRANSIT','VIRTUAL'];
+function locParentLabel(l){return l.parent_type==='rack'?(rk(l.rack_id)?.name||l.rack_id):(ar(l.area_id)?.name||l.area_id);}
+function locFullPath(l){
+  if(l.parent_type==='rack'){const r=rk(l.rack_id),a=ar(r?.area_id),z=zn(a?.zone_id),w=wh(z?.warehouse_id);return [w?.code,z?.name,a?.name,r?.name,l.code].filter(Boolean).join(' › ');}
+  const a=ar(l.area_id),z=zn(a?.zone_id),w=wh(z?.warehouse_id);return [w?.code,z?.name,a?.name,l.code].filter(Boolean).join(' › ');
+}
+
+// ====== DRILL NAVIGATION ======
+function setView(v){state.view=v;render();}
+function selectNode(level,id){state.sel={level,id};state.page=1;state.pageD=1;state.areaTab='racks';state.filters={search:'',type:'all',status:'all'};render();}
+function resetFilters(){state.filters={search:'',type:'all',status:'all'};state.page=1;state.pageD=1;render();}
+function setAreaTab(t){state.areaTab=t;state.page=1;state.filters={search:'',type:'all',status:'all'};render();}
+function setFilter(k,v){state.filters[k]=v;state.page=1;state.pageD=1;render();}
+function goPage(n,which){const key=which==='D'?'pageD':'page';state[key]=n;render();}
+function paginate(rows,page){const total=rows.length;const totalPages=Math.max(1,Math.ceil(total/PAGE_SIZE));const p=Math.min(Math.max(1,page),totalPages);const start=total===0?0:(p-1)*PAGE_SIZE;return{slice:rows.slice(start,start+PAGE_SIZE),total,page:p,totalPages,start:total===0?0:start+1,end:Math.min(start+PAGE_SIZE,total)};}
+
+// ====== HIERARCHY VIEW — TREE ======
+function isCollapsed(k){return state.collapsed.has(k);}
+function toggleNode(k){state.collapsed.has(k)?state.collapsed.delete(k):state.collapsed.add(k);render();}
+function nodeRow(level,id,name){
+  const key=level+':'+id;const kids=childCount(level,id);const sel=state.sel.level===level&&state.sel.id===id;const hasKids=kids>0;
+  return `<div class="tn-row ${sel?'is-sel':''}" onclick="selectNode('${level}','${id}')">
+    ${hasKids?`<span class="tn-toggle" onclick="event.stopPropagation();toggleNode('${key}')"><i data-lucide="chevron-down" class="w-3 h-3"></i></span>`:`<span class="tn-spacer"></span>`}
+    <i data-lucide="${LEVEL_ICON[level]}" class="tn-icon"></i>
+    <span class="tn-lvl">${LEVEL_LABEL[level]}</span>
+    <span class="tn-label" title="${name}">${name}</span>
+    ${hasKids?`<span class="tn-count">${kids}</span>`:''}
+  </div>`;
+}
+function renderTree(){
+  const rootSel=state.sel.level==='root';
+  let html=`<div class="tree-root-row ${rootSel?'is-sel':''}" onclick="selectNode('root',null)"><i data-lucide="building-2" class="w-4 h-4"></i><span style="flex:1;">ทุก Warehouse</span><span class="tn-count">${WAREHOUSES.length}</span></div>`;
+  WAREHOUSES.forEach(w=>{
+    const wColl=isCollapsed('warehouse:'+w.id);
+    html+=`<div class="tn ${wColl?'is-collapsed':''}">${nodeRow('warehouse',w.id,w.name)}<div class="tn-children">`;
+    zonesOf(w.id).forEach(z=>{
+      const zColl=isCollapsed('zone:'+z.id);
+      html+=`<div class="tn ${zColl?'is-collapsed':''}">${nodeRow('zone',z.id,z.name)}<div class="tn-children">`;
+      areasOf(z.id).forEach(a=>{
+        const aColl=isCollapsed('area:'+a.id);
+        html+=`<div class="tn ${aColl?'is-collapsed':''}">${nodeRow('area',a.id,a.name)}<div class="tn-children">`;
+        racksOf(a.id).forEach(r=>{html+=`<div class="tn">${nodeRow('rack',r.id,r.name)}</div>`;});
+        html+=`</div></div>`;
+      });
+      html+=`</div></div>`;
+    });
+    html+=`</div></div>`;
+  });
+  return html;
+}
+
+// ====== DETAIL PANE PATH ======
+function selPath(){
+  const {level,id}=state.sel;const out=[{level:'root',id:null,name:'ทุก Warehouse'}];
+  if(level==='root')return out;
+  if(level==='warehouse'){out.push({level,id,name:wh(id).code});return out;}
+  if(level==='zone'){const z=zn(id);out.push({level:'warehouse',id:z.warehouse_id,name:wh(z.warehouse_id).code});out.push({level,id,name:z.name});return out;}
+  if(level==='area'){const a=ar(id),z=zn(a.zone_id);out.push({level:'warehouse',id:z.warehouse_id,name:wh(z.warehouse_id).code});out.push({level:'zone',id:z.id,name:z.name});out.push({level,id,name:a.name});return out;}
+  if(level==='rack'){const r=rk(id),a=ar(r.area_id),z=zn(a.zone_id);out.push({level:'warehouse',id:z.warehouse_id,name:wh(z.warehouse_id).code});out.push({level:'zone',id:z.id,name:z.name});out.push({level:'area',id:a.id,name:a.name});out.push({level,id,name:r.name});return out;}
+  return out;
+}
+// ====== PATTERN A — DRILL-DOWN LIST ======
+function statPill(s){return `<span class="pill pill-${s}">${statusLabel(s)}</span>`;}
+
+// row builders — onclick = drill (non-leaf) or view (location); actions cell always present
+function actionsCell(level,id){
+  return `<td onclick="event.stopPropagation()" style="text-align:right;"><div class="row-actions">
+    <button class="ra-btn" onclick="openView('${level}','${id}')" title="ดูรายละเอียด"><i data-lucide="eye" class="w-4 h-4"></i></button>
+    ${canManage?`<button class="ra-btn" onclick="openDrawer('edit','${level}','${id}')" title="แก้ไข"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+    <button class="ra-btn is-danger" onclick="openModal('${level}','${id}')" title="${level==='location'?'ปลดระวาง':'ลบ'}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`:''}
+  </div></td>`;
+}
+function whRow(w){return `<tr onclick="selectNode('warehouse','${w.id}')"><td><b>${w.code}</b></td><td>${w.name}</td><td>${waddr(w)}</td><td class="num">${fmtNum(zonesOf(w.id).length)}</td><td>${statPill(w.status)}</td>${actionsCell('warehouse',w.id)}</tr>`;}
+function znRow(z){return `<tr onclick="selectNode('zone','${z.id}')"><td><b>${z.code}</b></td><td>${z.name}</td><td>${z.temp_controlled?`<span class="tag is-on"><i data-lucide="thermometer-snowflake" class="w-3 h-3"></i>${z.temp_min}–${z.temp_max}°C</span>`:`<span class="tag">ปกติ</span>`}</td><td class="num">${fmtNum(areasOf(z.id).length)}</td><td>${statPill(z.status)}</td>${actionsCell('zone',z.id)}</tr>`;}
+function arRow(a){return `<tr onclick="selectNode('area','${a.id}')"><td><b>${a.code}</b></td><td>${a.name}</td><td>${a.allows_direct?`<span class="tag is-on"><i data-lucide="check" class="w-3 h-3"></i>วาง Location ตรงได้</span>`:`<span class="tag">ต้องผ่าน Rack</span>`}</td><td class="num">${fmtNum(racksOf(a.id).length)}</td><td class="num">${fmtNum(locsOfAreaDirect(a.id).length)}</td><td>${statPill(a.status)}</td>${actionsCell('area',a.id)}</tr>`;}
+function rkRow(r){return `<tr onclick="selectNode('rack','${r.id}')"><td><b>${r.code}</b></td><td>${r.name||'—'}</td><td>${r.rows}×${r.cols}×${r.levels} <span style="color:var(--c-mute-3);font-size:11px;">(R×C×L)</span></td><td class="num">${fmtNum(locsOfRack(r.id).length)}</td><td>${statPill(r.status)}</td>${actionsCell('rack',r.id)}</tr>`;}
+function locRow(l){return `<tr onclick="openView('location','${l.id}')">
+  <td onclick="event.stopPropagation()" style="width:34px;"><input type="checkbox" class="chk" ${state.bulkSel.has(l.id)?'checked':''} onchange="toggleBulk('${l.id}')"></td>
+  <td><b>${l.code}</b>${l.name?`<span style="color:var(--c-mute-2);font-weight:400;"> · ${l.name}</span>`:''}</td>
+  <td><span class="parent-badge parent-${l.parent_type}">${l.parent_type==='rack'?'Rack':'Area'}</span> ${locParentLabel(l)}</td>
+  <td><span class="pill pill-${l.type.toLowerCase()}">${typeLabel(l.type)}</span></td>
+  <td class="num">${fmtNum(l.cap_val)} <span style="color:var(--c-mute-3);font-size:11px;">${l.cap_uom}</span></td>
+  <td><span class="pill" style="background:var(--c-line-3);color:var(--c-ink);">${l.storage_uom||'ตัว'}</span></td>
+  <td>${rotLabel(l.rotation)}</td>
+  <td><div class="flags-cell"><i data-lucide="hand" class="w-3.5 h-3.5 ${l.pickable?'on':''}" title="pickable"></i><i data-lucide="download" class="w-3.5 h-3.5 ${l.putawayable?'on':''}" title="putawayable"></i><i data-lucide="repeat" class="w-3.5 h-3.5 ${l.replenishable?'on':''}" title="replenishable"></i></div></td>
+  <td onclick="event.stopPropagation()">${statusPillMenu(l)}</td>${actionsCell('location',l.id)}</tr>`;}
+
+// filters
+function applySearch(rows){const q=(state.filters.search||'').toLowerCase();if(!q)return rows;return rows.filter(r=>(r.code||'').toLowerCase().includes(q)||(r.name||'').toLowerCase().includes(q));}
+function applyLocFilter(rows){let a=rows.slice();const f=state.filters;if(f.type!=='all')a=a.filter(r=>r.type===f.type);if(f.status!=='all')a=a.filter(r=>r.status===f.status);if(f.search){const q=f.search.toLowerCase();a=a.filter(r=>(r.code||'').toLowerCase().includes(q)||(r.name||'').toLowerCase().includes(q));}return a;}
+
+// generic Pattern A card: filter-bar (in card) + table + table-footer (count + pagination)
+function listCard(opts){
+  // opts: {kind, rows, cols, rowFn, page, which, searchPh, locFilter, head}
+  const filtered=opts.locFilter?applyLocFilter(opts.rows):applySearch(opts.rows);
+  const pg=paginate(filtered,opts.page);
+  const headHtml=opts.head||'';
+  const filterBar=`<div class="filter-bar">
+    <div class="input-search"><i data-lucide="search" class="lead-icon"></i><input id="flt-search" class="input" type="text" placeholder="${opts.searchPh}" value="${state.filters.search}" oninput="setFilter('search',this.value)"></div>
+    ${opts.locFilter?`<select class="select" style="max-width:160px;" onchange="setFilter('type',this.value)"><option value="all"${state.filters.type==='all'?' selected':''}>ทุกประเภท</option>${TYPES.map(t=>`<option value="${t}"${state.filters.type===t?' selected':''}>${typeLabel(t)}</option>`).join('')}</select>
+    <select class="select" style="max-width:150px;" onchange="setFilter('status',this.value)"><option value="all"${state.filters.status==='all'?' selected':''}>ทุกสถานะ</option>${['active','inactive','blocked','full','frozen','decommissioned'].map(s=>`<option value="${s}"${state.filters.status===s?' selected':''}>${statusLabel(s)}</option>`).join('')}</select>`:''}
+    <button class="btn btn-ghost btn-sm" onclick="resetFilters()"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i><span>รีเซ็ต</span></button>
+  </div>`;
+  let tbody;
+  if(pg.total===0){
+    tbody=`<tr><td colspan="${opts.cols.length+1}"><div class="empty"><div class="empty-icon"><i data-lucide="inbox" class="w-5 h-5"></i></div><div class="empty-title">ไม่พบรายการ</div><div class="empty-desc">${state.filters.search||state.filters.type!=='all'||state.filters.status!=='all'?'ลองปรับตัวกรอง หรือกดรีเซ็ต':'กดปุ่มเพิ่มด้านบนเพื่อสร้างรายการแรก'}</div></div></td></tr>`;
+  }else{tbody=pg.slice.map(opts.rowFn).join('');}
+  if(opts.extraRow)tbody+=opts.extraRow;
+  const footer=`<div class="table-footer"><div>แสดง ${fmtNum(pg.start)}–${fmtNum(pg.end)} จาก ${fmtNum(pg.total)} รายการ</div>
+    ${pg.totalPages>1?`<div class="pagination">
+      <button class="pg-btn ${pg.page===1?'is-disabled':''}" onclick="goPage(${pg.page-1},'${opts.which}')"><i data-lucide="chevron-left" class="w-3 h-3"></i></button>
+      ${Array.from({length:pg.totalPages},(_,i)=>i+1).map(n=>`<button class="pg-btn ${n===pg.page?'is-active':''}" onclick="goPage(${n},'${opts.which}')">${n}</button>`).join('')}
+      <button class="pg-btn ${pg.page===pg.totalPages?'is-disabled':''}" onclick="goPage(${pg.page+1},'${opts.which}')"><i data-lucide="chevron-right" class="w-3 h-3"></i></button>
+    </div>`:''}</div>`;
+  const thead=`<thead><tr>${opts.cols.map(c=>`<th${c.r?' style="text-align:right;"':''}>${c.h}</th>`).join('')}<th style="width:108px;text-align:right;"></th></tr></thead>`;
+  return `<div class="card">${headHtml}${filterBar}<div class="table-scroll"><table class="table">${thead}<tbody>${tbody}</tbody></table></div>${footer}</div>`;
+}
+
+// ph actions (contextual add) per level
+function phActions(){
+  const {level,id}=state.sel;if(!canManage)return '';
+  if(level==='root')return `<button class="btn btn-primary" onclick="openDrawer('create','warehouse',null)"><i data-lucide="plus" class="w-4 h-4"></i><span>เพิ่ม Warehouse</span></button>`;
+  if(level==='warehouse')return `<button class="btn btn-primary" onclick="openDrawer('create','zone',null)"><i data-lucide="plus" class="w-4 h-4"></i><span>เพิ่ม Zone</span></button>`;
+  if(level==='zone')return `<button class="btn btn-primary" onclick="openDrawer('create','area',null)"><i data-lucide="plus" class="w-4 h-4"></i><span>เพิ่ม Area</span></button>`;
+  if(level==='area'){const a=ar(id);return `<button class="btn btn-secondary" onclick="openDrawer('bulk',null,null)"><i data-lucide="layers" class="w-4 h-4"></i><span>สร้างจำนวนมาก</span></button>${a.allows_direct?`<button class="btn btn-secondary" onclick="openDrawer('create','location',null)"><i data-lucide="map-pin" class="w-4 h-4"></i><span>เพิ่ม Location</span></button>`:''}<button class="btn btn-primary" onclick="openDrawer('create','rack',null)"><i data-lucide="plus" class="w-4 h-4"></i><span>เพิ่ม Rack</span></button>`;}
+  if(level==='rack')return `<button class="btn btn-secondary" onclick="openDrawer('bulk',null,null)"><i data-lucide="layers" class="w-4 h-4"></i><span>สร้างจำนวนมาก</span></button><button class="btn btn-primary" onclick="openDrawer('create','location',null)"><i data-lucide="plus" class="w-4 h-4"></i><span>เพิ่ม Location</span></button>`;
+  return '';
+}
+
+// breadcrumb-style drill path (with level label)
+function drillPath(){
+  if(state.sel.level==='all-locations'){
+    return `<div class="drill-path"><span class="drill-chip" onclick="selectNode('root',null)"><i data-lucide="building-2" class="w-3 h-3"></i><span>ทุก Warehouse</span></span><span class="drill-sep"><i data-lucide="chevron-right" class="w-3 h-3"></i></span><span class="drill-chip is-current"><i data-lucide="map-pin" class="w-3 h-3"></i><span>Location ทั้งหมด</span></span></div>`;
+  }
+  const path=selPath();
+  return `<div class="drill-path">${path.map((p,i)=>{const cur=i===path.length-1;const icon=i===0?'building-2':LEVEL_ICON[p.level];const lvl=p.level==='root'?'':`<span class="dc-lvl">${LEVEL_LABEL[p.level]}</span>`;return `<span class="drill-chip ${cur?'is-current':''}" ${cur?'':`onclick="selectNode('${p.level}','${p.id}')"`}><i data-lucide="${icon}" class="w-3 h-3"></i>${lvl}<span>${p.name}</span></span>${cur?'':'<span class="drill-sep"><i data-lucide="chevron-right" class="w-3 h-3"></i></span>'}`;}).join('')}</div>`;
+}
+
+// content body — the list card(s) for current level
+function locPathShort(l){
+  const parts=[];
+  if(l.parent_type==='rack'){const r=rk(l.rack_id);const a=r?ar(r.area_id):null;const z=a?zn(a.zone_id):null;const w=z?wh(z.warehouse_id):null;
+    if(w)parts.push(w.code);if(z)parts.push(z.name);if(a)parts.push(a.code);if(r)parts.push(r.code);}
+  else{const a=ar(l.area_id);const z=a?zn(a.zone_id):null;const w=z?wh(z.warehouse_id):null;
+    if(w)parts.push(w.code);if(z)parts.push(z.name);if(a)parts.push(a.code);}
+  return parts.join(' › ');
+}
+function locRowFlat(l){return `<tr onclick="openView('location','${l.id}')">
+  <td onclick="event.stopPropagation()" style="width:34px;"><input type="checkbox" class="chk" ${state.bulkSel.has(l.id)?'checked':''} onchange="toggleBulk('${l.id}')"></td>
+  <td><b>${l.code}</b>${l.name?`<span style="color:var(--c-mute-2);font-weight:400;"> · ${l.name}</span>`:''}</td>
+  <td style="font-size:11.5px;color:var(--c-mute);">${locPathShort(l)}</td>
+  <td><span class="pill pill-${l.type.toLowerCase()}">${typeLabel(l.type)}</span></td>
+  <td><span class="pill" style="background:var(--c-line-3);color:var(--c-ink);">${l.storage_uom||'ตัว'}</span></td>
+  <td class="num">${fmtNum(l.cap_val)} <span style="color:var(--c-mute-3);font-size:11px;">${l.cap_uom}</span></td>
+  <td onclick="event.stopPropagation()">${statusPillMenu(l)}</td>${actionsCell('location',l.id)}</tr>`;}
+function contentBody(){
+  const {level,id}=state.sel;
+  if(level==='all-locations'){
+    const head=`<div class="card-head"><div class="card-head-title"><i data-lucide="map-pin" class="w-4 h-4"></i>Location ทั้งหมด (ทุกคลัง · ข้ามชั้น)</div></div>`;
+    return bulkBar()+listCard({rows:LOCATIONS,page:state.page,which:'',searchPh:'ค้นหา รหัส/ชื่อตำแหน่ง...',locFilter:true,head,
+      cols:[{h:''},{h:'รหัส / ชื่อ'},{h:'ตำแหน่งในโครงสร้าง'},{h:'ประเภท'},{h:'หน่วยเก็บ'},{h:'ความจุ',r:1},{h:'สถานะ'}],rowFn:locRowFlat});
+  }
+  if(level==='root')return listCard({kind:'warehouse',rows:WAREHOUSES,page:state.page,which:'',searchPh:'ค้นหาคลัง...',cols:[{h:'รหัส'},{h:'ชื่อคลัง'},{h:'ที่อยู่'},{h:'Zones',r:1},{h:'สถานะ'}],rowFn:whRow});
+  if(level==='warehouse')return listCard({rows:zonesOf(id),page:state.page,which:'',searchPh:'ค้นหา Zone...',cols:[{h:'รหัส'},{h:'ชื่อ Zone'},{h:'อุณหภูมิ'},{h:'Areas',r:1},{h:'สถานะ'}],rowFn:znRow});
+  if(level==='zone')return listCard({rows:areasOf(id),page:state.page,which:'',searchPh:'ค้นหา Area...',cols:[{h:'รหัส'},{h:'ชื่อ Area'},{h:'Direct location?'},{h:'Racks',r:1},{h:'Loc ตรง',r:1},{h:'สถานะ'}],rowFn:arRow});
+  if(level==='area'){
+    const a=ar(id);const racks=racksOf(id);const dlocs=locsOfAreaDirect(id);
+    const seg=a.allows_direct?`<div class="seg"><button class="seg-btn ${state.areaTab==='racks'?'is-active':''}" onclick="setAreaTab('racks')"><i data-lucide="rows-3" class="w-3.5 h-3.5"></i>Racks<span class="ch-count">${racks.length}</span></button><button class="seg-btn ${state.areaTab==='locs'?'is-active':''}" onclick="setAreaTab('locs')"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i>Location ตรง<span class="ch-count">${dlocs.length}</span></button></div>`:'';
+    const headTitle=`<div class="card-head"><div class="card-head-title"><i data-lucide="${state.areaTab==='locs'?'map-pin':'rows-3'}" class="w-4 h-4"></i>${state.areaTab==='locs'?'Location ใต้ Area โดยตรง':'Racks ในพื้นที่'}${state.areaTab==='locs'?'<span class="tag is-on"><i data-lucide="git-branch" class="w-3 h-3"></i>flexible parent</span>':''}</div>${seg}</div>`;
+    if(a.allows_direct&&state.areaTab==='locs'){
+      return bulkBar()+listCard({extraRow:quickAddRow('area',id,10),rows:dlocs,page:state.page,which:'',searchPh:'ค้นหา Location...',locFilter:true,head:headTitle,cols:[{h:''},{h:'รหัส / ชื่อ'},{h:'Parent'},{h:'ประเภท'},{h:'ความจุ',r:1},{h:'หน่วยเก็บ'},{h:'หมุนเวียน'},{h:'flags'},{h:'สถานะ'}],rowFn:locRow});
+    }
+    return listCard({rows:racks,page:state.page,which:'',searchPh:'ค้นหา Rack...',head:headTitle,cols:[{h:'รหัส'},{h:'ชื่อ Rack'},{h:'ขนาด (R×C×L)'},{h:'Locations',r:1},{h:'สถานะ'}],rowFn:rkRow});
+  }
+  if(level==='rack')return bulkBar()+listCard({extraRow:quickAddRow('rack',id,10),rows:locsOfRack(id),page:state.page,which:'',searchPh:'ค้นหา Location...',locFilter:true,cols:[{h:''},{h:'รหัส / ชื่อ'},{h:'Parent'},{h:'ประเภท'},{h:'ความจุ',r:1},{h:'หน่วยเก็บ'},{h:'หมุนเวียน'},{h:'flags'},{h:'สถานะ'}],rowFn:locRow});
+  return '';
+}
+
+function phCount(){
+  const {level,id}=state.sel;
+  if(level==='all-locations')return `${fmtNum(LOCATIONS.length)} Location`;
+  if(level==='root')return `${fmtNum(WAREHOUSES.length)} Warehouse`;
+  const n=childCount(level,id);return `${fmtNum(n)} ${CHILD_LABEL[level]}`;
+}
+
+// ====== HIERARCHY VIEW — NODE SUMMARY PANEL (no list table) ======
+function dsCstat(icon,label,value,onclickAttr){
+  const link=onclickAttr?'is-link':'';
+  return `<div class="ds-cstat ${link}" ${onclickAttr}><div class="ds-cstat-label"><i data-lucide="${icon}" class="w-3.5 h-3.5"></i>${label}</div><div class="ds-cstat-value">${fmtNum(value)}</div>${onclickAttr?`<div class="ds-cstat-hint"><i data-lucide="arrow-right" class="w-3 h-3"></i>ดูใน List view</div>`:''}</div>`;
+}
+function nodeSummary(){
+  const {level,id}=state.sel;
+  if(level==='root'){
+    const head=`<div class="ds-head"><div class="ds-icon dh-root"><i data-lucide="building-2" class="w-5 h-5"></i></div>
+      <div style="min-width:0;"><h2 class="ds-title">ทุก Warehouse</h2><div class="ds-sub">ภาพรวมลำดับชั้นจัดเก็บทั้งระบบ</div></div>
+      <div class="ds-actions">${canManage?`<button class="btn btn-sm btn-primary" onclick="openDrawer('create','warehouse',null)"><i data-lucide="plus" class="w-3.5 h-3.5"></i><span>เพิ่ม Warehouse</span></button>`:''}</div></div>`;
+    const body=`<div class="ds-body">
+      <div class="ds-section"><h3 class="ds-section-title">สรุปจำนวนแต่ละระดับ</h3><div class="ds-childstats">
+        ${dsCstat('warehouse','Warehouse',WAREHOUSES.length,`onclick="setView('list')"`)}
+        ${dsCstat('layout-grid','Zone',ZONES.length,'')}
+        ${dsCstat('square-dashed','Area',AREAS.length,'')}
+        ${dsCstat('rows-3','Rack',RACKS.length,'')}
+        ${dsCstat('map-pin','Location',LOCATIONS.length,'')}
+      </div></div>
+      <div class="ds-section"><div class="ds-hint"><i data-lucide="mouse-pointer-click" class="w-4 h-4"></i>เลือก node จาก tree ด้านซ้ายเพื่อดูรายละเอียดของแต่ละระดับ — หรือสลับไป List view เพื่อจัดการแบบตาราง</div></div>
+    </div>`;
+    return head+body;
+  }
+  const e=entOf(level,id);if(!e)return '';
+  let sub=`<span class="lvl-badge lvl-${level}">${LEVEL_LABEL[level]}</span><span>${e.code}</span>`;
+  if(e.status)sub+=`<span>·</span>${statPill(e.status)}`;
+  let acts='';
+  if(canManage){
+    acts+=`<button class="btn btn-sm btn-secondary" onclick="openDrawer('edit','${level}','${id}')"><i data-lucide="pencil" class="w-3.5 h-3.5"></i><span>แก้ไข</span></button>`;
+    if(level==='warehouse')acts+=`<button class="btn btn-sm btn-primary" onclick="openDrawer('create','zone',null)"><i data-lucide="plus" class="w-3.5 h-3.5"></i><span>เพิ่ม Zone</span></button>`;
+    else if(level==='zone')acts+=`<button class="btn btn-sm btn-primary" onclick="openDrawer('create','area',null)"><i data-lucide="plus" class="w-3.5 h-3.5"></i><span>เพิ่ม Area</span></button>`;
+    else if(level==='area')acts+=`<button class="btn btn-sm btn-primary" onclick="openDrawer('create','rack',null)"><i data-lucide="plus" class="w-3.5 h-3.5"></i><span>เพิ่ม Rack</span></button>`;
+    else if(level==='rack')acts+=`<button class="btn btn-sm btn-primary" onclick="openDrawer('create','location',null)"><i data-lucide="plus" class="w-3.5 h-3.5"></i><span>เพิ่ม Location</span></button>`;
+    acts+=`<button class="btn btn-sm btn-danger" onclick="openModal('${level}','${id}')"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i><span>ลบ</span></button>`;
+  }
+  const head=`<div class="ds-head"><div class="ds-icon lvl-${level}"><i data-lucide="${LEVEL_ICON[level]}" class="w-5 h-5"></i></div>
+    <div style="min-width:0;"><h2 class="ds-title">${e.name}</h2><div class="ds-sub">${sub}</div></div>
+    <div class="ds-actions">${acts}</div></div>`;
+  let fields='';
+  if(level==='warehouse')fields=`<div class="lbl">รหัส</div><div class="val">${e.code}</div><div class="lbl">ที่อยู่</div><div class="val">${waddr(e)}</div>`;
+  if(level==='zone')fields=`<div class="lbl">รหัส</div><div class="val">${e.code}</div><div class="lbl">Warehouse</div><div class="val">${wh(e.warehouse_id)?.name||'—'}</div><div class="lbl">ควบคุมอุณหภูมิ</div><div class="val">${e.temp_controlled?`ใช่ (${e.temp_min}–${e.temp_max}°C)`:'ไม่'}</div>`;
+  if(level==='area')fields=`<div class="lbl">รหัส</div><div class="val">${e.code}</div><div class="lbl">Zone</div><div class="val">${zn(e.zone_id)?.name||'—'}</div><div class="lbl">วาง Location ตรง</div><div class="val">${e.allows_direct?'ได้ (flexible parent)':'ไม่ได้ (ต้องผ่าน Rack)'}</div>`;
+  if(level==='rack')fields=`<div class="lbl">รหัส</div><div class="val">${e.code}</div><div class="lbl">Area</div><div class="val">${ar(e.area_id)?.name||'—'}</div><div class="lbl">ขนาด (R×C×L)</div><div class="val">${e.rows}×${e.cols}×${e.levels}</div>`;
+  let cstats='';
+  if(level==='warehouse')cstats=dsCstat('layout-grid','Zones',zonesOf(id).length,`onclick="setView('list')"`);
+  if(level==='zone')cstats=dsCstat('square-dashed','Areas',areasOf(id).length,`onclick="setView('list')"`);
+  if(level==='area')cstats=dsCstat('rows-3','Racks',racksOf(id).length,`onclick="setView('list')"`)+dsCstat('map-pin','Location ตรง',locsOfAreaDirect(id).length,`onclick="setAreaTab('locs');setView('list')"`);
+  if(level==='rack')cstats=dsCstat('map-pin','Locations',locsOfRack(id).length,`onclick="setView('list')"`);
+  const body=`<div class="ds-body">
+    <div class="ds-section"><h3 class="ds-section-title">ลำดับชั้น (full path)</h3><div style="font-size:12.5px;color:var(--c-mute);background:var(--c-bg-off);padding:10px 12px;border-radius:8px;line-height:1.6;">${selViewPathStr(level,id)}</div></div>
+    <div class="ds-section"><h3 class="ds-section-title">ข้อมูล${LEVEL_LABEL[level]}</h3><div class="ds-fields">${fields}</div></div>
+    <div class="ds-section"><h3 class="ds-section-title">รายการลูก</h3><div class="ds-childstats">${cstats}</div></div>
+  </div>`;
+  return head+body;
+}
+
+function renderPage(){
+  const body=state.view==='hierarchy'
+    ? `<div class="explorer">
+        <div class="pane"><div class="pane-head"><div class="pane-head-title"><i data-lucide="network" class="w-4 h-4"></i>ลำดับชั้นจัดเก็บ</div>${canManage?`<button class="icon-btn" title="เพิ่ม Warehouse" onclick="openDrawer('create','warehouse',null)"><i data-lucide="plus" class="w-4 h-4"></i></button>`:''}</div><div class="tree-body">${renderTree()}</div></div>
+        <div class="pane">${nodeSummary()}</div>
+       </div>`
+    : `${drillPath()}${contentBody()}`;
+  return `<div class="ph"><div><div class="ph-title-row"><h1 class="ph-title">Location Hierarchy</h1><span class="ph-count">${phCount()}</span></div>
+    <p class="ph-sub">โครงสร้างจัดเก็บ 5 ระดับ Warehouse › Zone › Area › Rack › Location — แม่แบบตำแหน่งของทุกคลัง</p></div>
+    <div class="ph-actions">${phActions()}</div></div>
+  <div class="view-switch"><div class="seg">
+    <button class="seg-btn ${state.view==='list'?'is-active':''}" onclick="setView('list')"><i data-lucide="list" class="w-3.5 h-3.5"></i>List view</button>
+    <button class="seg-btn ${state.view==='hierarchy'?'is-active':''}" onclick="setView('hierarchy')"><i data-lucide="network" class="w-3.5 h-3.5"></i>Hierarchy view</button>
+  </div></div>
+  <div class="stats">
+    <div class="stat"><div class="stat-label"><i data-lucide="warehouse" class="w-3 h-3"></i>Warehouse</div><div class="stat-value">${fmtNum(WAREHOUSES.length)}</div></div>
+    <div class="stat"><div class="stat-label"><i data-lucide="layout-grid" class="w-3 h-3"></i>Zone</div><div class="stat-value">${fmtNum(ZONES.length)}</div></div>
+    <div class="stat"><div class="stat-label"><i data-lucide="square-dashed" class="w-3 h-3"></i>Area</div><div class="stat-value">${fmtNum(AREAS.length)}</div></div>
+    <div class="stat"><div class="stat-label"><i data-lucide="rows-3" class="w-3 h-3"></i>Rack</div><div class="stat-value">${fmtNum(RACKS.length)}</div></div>
+    <div class="stat is-click ${state.sel.level==='all-locations'?'is-on':''}" onclick="selectNode('all-locations',null)"><div class="stat-label"><i data-lucide="map-pin" class="w-3 h-3"></i>Location</div><div class="stat-value">${fmtNum(LOCATIONS.length)}</div><div class="stat-meta">คลิกดูแบบแบนทุกตำแหน่ง</div></div>
+  </div>
+  ${body}`;
+}
+
+// ====== TREE/SHELL UI ======
+function toggleModule(h){const m=h.closest('.sb-module');if(!m)return;const ex=m.getAttribute('data-expanded')!=='false';m.setAttribute('data-expanded',ex?'false':'true');}
+function toggleUserMenu(){document.getElementById('userMenu').classList.toggle('is-open');}
+document.addEventListener('click',e=>{if(!e.target.closest('.user-chip')&&!e.target.closest('.user-menu'))document.getElementById('userMenu')?.classList.remove('is-open');});
+function toggleNotif(){showToast('ไม่มีการแจ้งเตือนใหม่','info');}
+
+// ====== DRAWER OPEN/CLOSE ======
+function openView(level,id){openDrawer('view',level,id);}
+function openDrawer(mode,level,id){
+  if(!canManage&&mode!=='view'){showToast('ไม่มีสิทธิ์ดำเนินการ','error');return;}
+  if(mode==='bulk'){
+    // determine target area/rack from selection
+    let area_id=null,rack_id=null,target='area';
+    if(state.sel.level==='rack'){rack_id=state.sel.id;area_id=rk(rack_id).area_id;target='rack';}
+    else if(state.sel.level==='area'){area_id=state.sel.id;target='area';}
+    state.bulk={target,area_id:area_id||AREAS[0].id,rack_id:rack_id||'',rackPat:'A-{n}',rackQty:5,rows:4,cols:12,levels:4,locPat:'{rack}-R{r}-C{c}-L{l}',type:'RESERVE',storage_uom:'ลัง',cap_uom:'pallet',cap_val:1,rotation:'fifo'};
+    state.drawer={open:true,mode:'bulk',level:'location',id:null,step:1,tab:'overview'};
+    return openDrawerFx();
+  }
+  let form={};
+  const parent=parentContext(level);
+  if(mode==='create'){
+    if(level==='warehouse')form={code:'',name:'',addr_line:'',province:'',district:'',subdistrict:'',postcode:'',status:'active'};
+    if(level==='zone')form={code:'',name:'',warehouse_id:parent.warehouse_id||WAREHOUSES[0].id,temp_controlled:false,temp_min:'',temp_max:'',status:'active'};
+    if(level==='area')form={code:'',name:'',zone_id:parent.zone_id||ZONES[0].id,allows_direct:false,status:'active'};
+    if(level==='rack')form={code:'',name:'',area_id:parent.area_id||AREAS[0].id,rows:4,cols:12,levels:4,status:'active'};
+    if(level==='location')form={parent_type:parent.parent_type||'rack',rack_id:parent.rack_id||'',area_id:parent.area_id||'',code:'',name:'',type:'RESERVE',storage_uom:'ตัว',cap_uom:'pallet',cap_val:'',rotation:'fifo',row:'',col:'',level:'',position:'',pickable:true,putawayable:true,replenishable:false,mixed_lot:false,mixed_item:false,neg_stock:false,barcode:''};
+  } else if(mode==='edit'){
+    const e=entOf(level,id);form=JSON.parse(JSON.stringify(e));
+    if(level==='zone'){form.temp_min=e.temp_min??'';form.temp_max=e.temp_max??'';}
+  }
+  state.drawer={open:true,mode,level,id,step:1,tab:'overview'};state.form=form;openDrawerFx();
+}
+function parentContext(level){
+  const {level:sl,id}=state.sel;
+  if(level==='zone'){if(sl==='warehouse')return {warehouse_id:id};return {};}
+  if(level==='area'){if(sl==='zone')return {zone_id:id};if(sl==='warehouse')return {};return {};}
+  if(level==='rack'){if(sl==='area')return {area_id:id};return {};}
+  if(level==='location'){
+    if(sl==='rack')return {parent_type:'rack',rack_id:id};
+    if(sl==='area'&&ar(id).allows_direct)return {parent_type:'area',area_id:id};
+    return {};
+  }
+  return {};
+}
+function openDrawerFx(){render();requestAnimationFrame(()=>{document.getElementById('drawerBackdrop').classList.add('is-open');document.getElementById('drawer').classList.add('is-open');});}
+function closeDrawer(){document.getElementById('drawerBackdrop').classList.remove('is-open');document.getElementById('drawer').classList.remove('is-open');setTimeout(()=>{state.drawer={open:false,mode:null,level:null,id:null,step:1,tab:'overview'};render();},280);}
+function setTab(t){state.drawer.tab=t;render();}
+function toggleFormFlag(k){captureForm();state.form[k]=!state.form[k];render();}
+function setFormVal(k,v){captureForm();state.form[k]=v;render();}
+function setLocParentType(t){captureForm();state.form.parent_type=t;render();}
+
+// ====== CAPTURE FORM ======
+function captureForm(){const g=id=>document.getElementById(id);const f=state.form;const lv=state.drawer.level;
+  const set=(id,key)=>{if(g(id))f[key]=g(id).value;};
+  set('f-code','code');set('f-name','name');set('f-addr-line','addr_line');set('f-province','province');set('f-district','district');set('f-subdistrict','subdistrict');set('f-postcode','postcode');
+  set('f-wh','warehouse_id');set('f-zone','zone_id');set('f-area','area_id');set('f-rack','rack_id');
+  set('f-temp-min','temp_min');set('f-temp-max','temp_max');
+  set('f-rows','rows');set('f-cols','cols');set('f-levels','levels');
+  set('f-type','type');set('f-storage-uom','storage_uom');set('f-cap-uom','cap_uom');set('f-cap-val','cap_val');set('f-rotation','rotation');
+  set('f-row','row');set('f-col','col');set('f-level','level');set('f-position','position');set('f-barcode','barcode');
+}
+
+// address cascade handlers
+function setProvince(v){captureForm();state.form.province=v;state.form.district='';state.form.subdistrict='';state.form.postcode='';render();}
+function setDistrict(v){captureForm();state.form.district=v;state.form.subdistrict='';state.form.postcode='';render();}
+function setSubdistrict(v){captureForm();state.form.subdistrict=v;state.form.postcode=geoPostcode(state.form.province,state.form.district,v);render();}
+
+// ====== SUBMIT PER LEVEL ======
+function genId(p){return p+'-'+Date.now().toString().slice(-6);}
+function submitForm(){captureForm();const f=state.form;const lv=state.drawer.level;const isEdit=state.drawer.mode==='edit';
+  if(!f.code||!String(f.code).trim()){showToast('กรุณากรอกรหัส','warning');return;}
+  if(!f.name||!String(f.name).trim()){showToast('กรุณากรอกชื่อ','warning');return;}
+  if(lv==='warehouse'){
+    if(isEdit){Object.assign(wh(state.drawer.id),{code:f.code,name:f.name,addr_line:f.addr_line,province:f.province,district:f.district,subdistrict:f.subdistrict,postcode:f.postcode,status:f.status||wh(state.drawer.id).status});}
+    else{const id=genId('WH');WAREHOUSES.push({id,code:f.code,name:f.name,addr_line:f.addr_line,province:f.province,district:f.district,subdistrict:f.subdistrict,postcode:f.postcode,status:'active',created:new Date().toISOString()});state.sel={level:'warehouse',id};}
+    done(lv,isEdit,f.code);return;
+  }
+  if(lv==='zone'){
+    if(f.temp_controlled&&(f.temp_min===''||f.temp_max==='')){showToast('กรุณากรอกช่วงอุณหภูมิ','warning');return;}
+    const data={code:f.code,name:f.name,warehouse_id:f.warehouse_id,temp_controlled:!!f.temp_controlled,temp_min:f.temp_controlled?+f.temp_min:null,temp_max:f.temp_controlled?+f.temp_max:null};
+    if(isEdit)Object.assign(zn(state.drawer.id),data);
+    else{const id=genId('Z');ZONES.push(Object.assign({id,status:'active',created:new Date().toISOString()},data));state.sel={level:'zone',id};}
+    done(lv,isEdit,f.code);return;
+  }
+  if(lv==='area'){
+    const data={code:f.code,name:f.name,zone_id:f.zone_id,allows_direct:!!f.allows_direct};
+    if(isEdit)Object.assign(ar(state.drawer.id),data);
+    else{const id=genId('A');AREAS.push(Object.assign({id,status:'active',created:new Date().toISOString()},data));state.sel={level:'area',id};}
+    done(lv,isEdit,f.code);return;
+  }
+  if(lv==='rack'){
+    const data={code:f.code,name:f.name,area_id:f.area_id,rows:+f.rows||0,cols:+f.cols||0,levels:+f.levels||0};
+    if(isEdit)Object.assign(rk(state.drawer.id),data);
+    else{const id=genId('R');RACKS.push(Object.assign({id,status:'active',created:new Date().toISOString()},data));state.sel={level:'rack',id};}
+    done(lv,isEdit,f.code);return;
+  }
+}
+function done(lv,isEdit,code){showToast((isEdit?'บันทึกการแก้ไข ':'สร้าง ')+LEVEL_LABEL[lv]+' "'+code+'" '+(isEdit?'แล้ว':'สำเร็จ'),'success');closeDrawer();}
+
+// ====== LOCATION wizard ======
+function locNext(){captureForm();const f=state.form;
+  if(f.parent_type==='rack'&&!f.rack_id){showToast('กรุณาเลือก Rack','warning');return;}
+  if(f.parent_type==='area'){if(!f.area_id){showToast('กรุณาเลือก Area','warning');return;}if(!ar(f.area_id).allows_direct){showToast('Area นี้ไม่อนุญาตวางตำแหน่งตรง — เพิ่ม Rack ก่อน','error');return;}}
+  if(!f.code.trim()){showToast('กรุณากรอกรหัสตำแหน่ง','warning');return;}
+  state.drawer.step=2;render();}
+function locPrev(){captureForm();state.drawer.step=1;render();}
+function submitLoc(){captureForm();const f=state.form;const isEdit=state.drawer.mode==='edit';
+  if(!f.cap_val||+f.cap_val<=0){showToast('ความจุต้องมากกว่า 0','warning');return;}
+  if(!isEdit){
+    const dup=LOCATIONS.some(x=>x.code===f.code&&(f.parent_type==='rack'?x.rack_id===f.rack_id:x.area_id===f.area_id));
+    if(dup){showToast('รหัสซ้ำภายใน parent เดียวกัน','error');return;}
+    const id='L'+Date.now().toString().slice(-6);
+    LOCATIONS.unshift(mkLoc({id,code:f.code,name:f.name,parent_type:f.parent_type,rack_id:f.parent_type==='rack'?f.rack_id:null,area_id:f.parent_type==='area'?f.area_id:null,type:f.type,storage_uom:f.storage_uom||'ตัว',cap_uom:f.cap_uom,cap_val:+f.cap_val,rotation:f.rotation,row:f.row,col:f.col,level:f.level,position:f.position,pickable:f.pickable,putawayable:f.putawayable,replenishable:f.replenishable,mixed_lot:f.mixed_lot,mixed_item:f.mixed_item,neg_stock:f.neg_stock,barcode:f.barcode,status:'active',created:new Date().toISOString()}));
+    showToast('สร้างตำแหน่ง "'+f.code+'" สำเร็จ','success');
+  }else{
+    Object.assign(lc(state.drawer.id),{code:f.code,name:f.name,parent_type:f.parent_type,rack_id:f.parent_type==='rack'?f.rack_id:null,area_id:f.parent_type==='area'?f.area_id:null,type:f.type,cap_uom:f.cap_uom,cap_val:+f.cap_val,rotation:f.rotation,row:f.row,col:f.col,level:f.level,position:f.position,pickable:f.pickable,putawayable:f.putawayable,replenishable:f.replenishable,mixed_lot:f.mixed_lot,mixed_item:f.mixed_item,neg_stock:f.neg_stock,barcode:f.barcode});
+    showToast('บันทึกการแก้ไขแล้ว','success');
+  }
+  closeDrawer();
+}
+
+// ====== BULK ======
+function captureBulk(){const g=id=>document.getElementById(id);const b=state.bulk;const set=(id,key,num)=>{if(g(id))b[key]=num?+g(id).value:g(id).value;};
+  set('b-area','area_id');set('b-rackPat','rackPat');set('b-rackQty','rackQty',1);set('b-rows','rows',1);set('b-cols','cols',1);set('b-levels','levels',1);set('b-locPat','locPat');set('b-type','type');set('b-rotation','rotation');set('b-cap-uom','cap_uom');set('b-storage-uom','storage_uom');set('b-cap-val','cap_val',1);}
+function refreshBulk(){captureBulk();render();}
+function sampleCode(b){return (b.locPat||'').replace('{rack}',(b.rackPat||'').replace('{n}','1')).replace('{r}','1').replace('{c}','1').replace('{l}','1');}
+const BULK_PRESETS=[
+ {id:'std',label:'Rack มาตรฐาน (Rack-Row-Col-Level)',rackPat:'A-{n}',locPat:'{rack}-R{r}-C{c}-L{l}'},
+ {id:'aisle',label:'Aisle-Bay-Level (SAP style)',rackPat:'AA-{n}',locPat:'{rack}-{c}-{l}'},
+ {id:'flat',label:'ชั้นเรียบต่อเนื่อง (ลำดับเดียว)',rackPat:'F-{n}',locPat:'{rack}-{c}'},
+];
+function applyBulkPreset(pid){const p=BULK_PRESETS.find(x=>x.id===pid);if(!p)return;captureBulk();state.bulk.rackPat=p.rackPat;state.bulk.locPat=p.locPat;state.bulk.preset=pid;render();}
+function bulkPreviewNames(b,limit){
+  const out=[];const rq=Math.max(1,+b.rackQty||1);
+  outer:for(let n=1;n<=rq;n++){const rack=(b.rackPat||'').replace('{n}',n);
+    for(let r=1;r<=Math.max(1,+b.rows||1);r++)for(let c=1;c<=Math.max(1,+b.cols||1);c++)for(let l=1;l<=Math.max(1,+b.levels||1);l++){
+      out.push((b.locPat||'').replace('{rack}',rack).replace('{r}',r).replace('{c}',c).replace('{l}',l));
+      if(out.length>=limit)break outer;}}
+  return out;
+}
+function submitBulk(){captureBulk();const b=state.bulk;const perRack=(b.rows||0)*(b.cols||0)*(b.levels||0);const n=(b.rackQty||0)*perRack;
+  if(n<=0){showToast('template ไม่ถูกต้อง','warning');return;}if(!b.cap_val||b.cap_val<=0){showToast('ความจุต้องมากกว่า 0','warning');return;}
+  LOCATIONS.unshift(mkLoc({id:'L'+Date.now().toString().slice(-6),code:sampleCode(b),name:'(ตัวอย่างจาก bulk-gen)',parent_type:'area',area_id:b.area_id,rack_id:null,type:b.type,storage_uom:b.storage_uom||'ลัง',cap_uom:b.cap_uom,cap_val:b.cap_val,rotation:b.rotation,status:'active',created:new Date().toISOString()}));
+  closeDrawer();showToast('สร้าง '+fmtNum(b.rackQty)+' rack × '+fmtNum(n)+' ตำแหน่งสำเร็จ (atomic)','success');
+}
+
+// ====== MODAL (delete/deactivate with empty check) ======
+function openModal(level,id){state.modal={open:true,level,id};render();requestAnimationFrame(()=>document.getElementById('modalBackdrop').classList.add('is-open'));}
+function closeModal(){document.getElementById('modalBackdrop').classList.remove('is-open');setTimeout(()=>{state.modal={open:false,level:null,id:null};render();},200);}
+function blockReason(level,id){
+  if(level==='warehouse'&&zonesOf(id).length)return 'ยังมี Zone อยู่ภายใต้คลังนี้ — ต้องลบ/ย้าย Zone ก่อน';
+  if(level==='zone'&&areasOf(id).length)return 'ยังมี Area อยู่ภายใต้ Zone นี้ — ต้องลบ/ย้าย Area ก่อน';
+  if(level==='area'&&(racksOf(id).length||locsOfAreaDirect(id).length))return 'ยังมี Rack หรือ Location อยู่ภายใต้ Area นี้ — ต้องลบก่อน';
+  if(level==='rack'&&locsOfRack(id).length)return 'ยังมี Location อยู่ภายใต้ Rack นี้ — ต้องลบก่อน';
+  if(level==='location'&&lc(id).hasStock)return 'ตำแหน่งนี้ยังมีสต็อกอยู่ — ต้องย้ายสต็อกออก (stock=0) ก่อนปลดระวาง';
+  return '';
+}
+function confirmModal(){const {level,id}=state.modal;const reason=blockReason(level,id);
+  if(reason){showToast(reason,'error');return;}
+  if(level==='warehouse')WAREHOUSES=WAREHOUSES.filter(x=>x.id!==id);
+  else if(level==='zone')ZONES=ZONES.filter(x=>x.id!==id);
+  else if(level==='area')AREAS=AREAS.filter(x=>x.id!==id);
+  else if(level==='rack')RACKS=RACKS.filter(x=>x.id!==id);
+  else if(level==='location'){lc(id).status='decommissioned';}
+  // reset selection if removed node was selected
+  if(state.sel.level===level&&state.sel.id===id&&level!=='location'){const p=selPath();state.sel=p.length>1?p[p.length-2]:{level:'root',id:null};}
+  closeModal();if(state.drawer.open)closeDrawer();
+  showToast(level==='location'?'ปลดระวางตำแหน่งแล้ว':'ลบ '+LEVEL_LABEL[level]+' แล้ว','success');
+}
+
+// ====== TOAST + RENDER + BOOT ======
+function showToast(msg,variant='info',ms=2600){const el=document.getElementById('toast');const map={success:'check-circle-2',info:'info',warning:'alert-triangle',error:'x-circle'};el.className='toast is-'+variant;el.innerHTML=`<i data-lucide="${map[variant]||'info'}" class="w-4 h-4"></i><span>${msg}</span>`;renderIcons();requestAnimationFrame(()=>el.classList.add('is-visible'));setTimeout(()=>el.classList.remove('is-visible'),ms);}
+// ===== B. statusMenu (portal — คลิก pill เปลี่ยนสถานะทันที) =====
+const LOC_STATUS_OPTS=[['active','ใช้งาน'],['inactive','พักใช้งาน'],['blocked','บล็อก'],['frozen','Freeze (cycle count)']];
+function statusPillMenu(l){
+  return `<span style="cursor:pointer;" onclick="openStatusMenu(event,'${l.id}')" title="คลิกเปลี่ยนสถานะ">${statPill(l.status)}</span>`;
+}
+function closeStatusMenu(){const el=document.getElementById('sm-portal-menu');if(el)el.remove();}
+function openStatusMenu(ev,id){
+  ev.stopPropagation();closeStatusMenu();
+  const l=lc(id);if(!l||!canManage)return;
+  const r=ev.currentTarget.getBoundingClientRect();
+  const div=document.createElement('div');div.id='sm-portal-menu';div.className='sm-portal-menu';
+  div.innerHTML=LOC_STATUS_OPTS.map(([v,lb])=>`<div class="sm-opt" onclick="pickStatus('${id}','${v}')"><span class="dot" style="background:${v==='active'?'var(--c-success)':v==='inactive'?'var(--c-mute-3)':v==='blocked'?'var(--c-danger)':'#3B82F6'};"></span>${lb}${l.status===v?' ✓':''}</div>`).join('');
+  document.body.appendChild(div);
+  div.style.left=Math.min(r.left,innerWidth-190)+'px';div.style.top=(r.bottom+4)+'px';
+  requestAnimationFrame(()=>{const h=div.getBoundingClientRect().height;if(r.bottom+4+h>innerHeight-8)div.style.top=Math.max(8,r.top-4-h)+'px';});
+}
+document.addEventListener('click',e=>{if(!e.target.closest('#sm-portal-menu'))closeStatusMenu();},true);
+function closeStatusModal(){state.modal={open:false,id:null,level:null};render();}
+function confirmStatusReason(){
+  const reason=(document.getElementById('sr-reason')||{}).value?.trim();
+  if(!reason){showToast('กรอกเหตุผลก่อน','warning');return;}
+  const v=state.modal.target;
+  if(state.modal.bulk){
+    [...state.bulkSel].forEach(id=>applyStatusSilent(id,v,reason));
+    showToast(`${v==='blocked'?'บล็อก':'Freeze'} ${state.bulkSel.size} ตำแหน่ง`,'success');
+    state.bulkSel.clear();
+  }else{applyStatusSilent(state.modal.id,v,reason);showToast(`${lc(state.modal.id).code}: ${statusLabel(v)}`,'success');}
+  state.modal={open:false,id:null,level:null};render();
+}
+function pickStatus(id,v){
+  closeStatusMenu();const l=lc(id);if(!l||l.status===v)return;
+  if(v==='blocked'||v==='frozen'){state.modal={open:true,id,level:'status-reason',target:v};render();return;}
+  applyStatus(id,v,'');
+}
+function applyStatus(id,v,reason){
+  const l=lc(id);const old=l.status;
+  l.status=v;l.block_reason=(v==='blocked'||v==='frozen')?reason:'';
+  (AUDIT[id]=AUDIT[id]||[]).unshift({t:`เปลี่ยนสถานะ ${statusLabel(old)} → ${statusLabel(v)}${reason?' — '+reason:''}`,by:'ธนา คลังสินค้า',at:new Date().toISOString(),v:v==='active'?'success':'warning'});
+  showToast(`${l.code}: ${statusLabel(old)} → ${statusLabel(v)}`,'success');render();
+}
+// ===== B2. bulk select =====
+function toggleBulk(id){state.bulkSel.has(id)?state.bulkSel.delete(id):state.bulkSel.add(id);render();}
+function clearBulk(){state.bulkSel.clear();render();}
+function bulkBar(){
+  const n=state.bulkSel.size;if(!n)return '';
+  return `<div class="bulk-bar"><span>เลือก <b>${n}</b> ตำแหน่ง</span>
+    <button class="btn btn-sm btn-secondary" onclick="bulkStatus('active')">ใช้งาน</button>
+    <button class="btn btn-sm btn-secondary" onclick="bulkStatus('inactive')">พักใช้งาน</button>
+    <button class="btn btn-sm btn-secondary" onclick="bulkStatus('blocked')">บล็อก</button>
+    <button class="btn btn-sm btn-secondary" onclick="bulkStatus('frozen')">Freeze</button>
+    <span style="border-left:1px solid #FFD9A8;height:20px;"></span>
+    <select class="select" style="max-width:170px;height:32px;min-height:32px;" id="bulk-uom"><option value="">ตั้งหน่วยเก็บ...</option>${STORAGE_UOMS.map(u=>`<option value="${u}">${u}</option>`).join('')}</select>
+    <button class="btn btn-sm btn-secondary" onclick="bulkUom()">ใช้</button>
+    <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="clearBulk()">ล้างที่เลือก</button></div>`;
+}
+function bulkStatus(v){
+  if(v==='blocked'||v==='frozen'){state.modal={open:true,id:null,level:'status-reason',target:v,bulk:true};render();return;}
+  [...state.bulkSel].forEach(id=>{const l=lc(id);if(l&&l.status!==v)applyStatusSilent(id,v,'');});
+  showToast(`เปลี่ยนสถานะ ${state.bulkSel.size} ตำแหน่ง → ${statusLabel(v)}`,'success');clearBulk();
+}
+function applyStatusSilent(id,v,reason){const l=lc(id);const old=l.status;l.status=v;l.block_reason=(v==='blocked'||v==='frozen')?reason:'';(AUDIT[id]=AUDIT[id]||[]).unshift({t:`เปลี่ยนสถานะ ${statusLabel(old)} → ${statusLabel(v)}${reason?' — '+reason:''} (bulk)`,by:'ธนา คลังสินค้า',at:new Date().toISOString(),v:'warning'});}
+function bulkUom(){
+  const u=document.getElementById('bulk-uom').value;if(!u){showToast('เลือกหน่วยเก็บก่อน','warning');return;}
+  let done=0,skip=0;
+  [...state.bulkSel].forEach(id=>{const l=lc(id);if(!l)return;if(l.hasStock){skip++;return;}
+    if(l.storage_uom!==u){l.storage_uom=u;(AUDIT[id]=AUDIT[id]||[]).unshift({t:`ตั้งหน่วยเก็บ → ${u} (bulk)`,by:'ธนา คลังสินค้า',at:new Date().toISOString(),v:''});done++;}});
+  showToast(`ตั้งหน่วยเก็บ "${u}" ${done} ตำแหน่ง${skip?` · ข้าม ${skip} (มีสต็อก — 1 ตำแหน่ง 1 หน่วย)`:''}`,skip?'warning':'success');clearBulk();
+}
+// ===== C. quick add row =====
+function quickAdd(parentType,parentId){
+  const code=(document.getElementById('qa-code')||{}).value?.trim();
+  const type=(document.getElementById('qa-type')||{}).value;
+  const uom=(document.getElementById('qa-uom')||{}).value;
+  if(!code){showToast('กรอกรหัสตำแหน่งก่อน','warning');return;}
+  const sib=parentType==='rack'?locsOfRack(parentId):locsOfAreaDirect(parentId);
+  if(sib.some(x=>x.code.toLowerCase()===code.toLowerCase())){showToast('รหัสซ้ำภายใน parent เดียวกัน','warning');return;}
+  const id='L'+Date.now().toString().slice(-6);
+  LOCATIONS.unshift(mkLoc({id,code,parent_type:parentType,rack_id:parentType==='rack'?parentId:null,area_id:parentType==='area'?parentId:null,type,storage_uom:uom,cap_uom:'pallet',cap_val:1,status:'active',created:new Date().toISOString()}));
+  (AUDIT[id]=AUDIT[id]||[]).unshift({t:'สร้างตำแหน่ง (quick add)',by:'ธนา คลังสินค้า',at:new Date().toISOString(),v:'success'});
+  showToast(`เพิ่ม ${code} แล้ว — แก้ความจุ/flags ต่อได้ในหน้าแก้ไข`,'success');render();
+}
+function quickAddRow(parentType,parentId,colspan){
+  if(!canManage)return '';
+  return `<tr class="qa-row" onclick="event.stopPropagation()"><td colspan="${colspan}">
+    <div style="display:flex;gap:8px;align-items:center;">
+      <i data-lucide="corner-down-right" class="w-3.5 h-3.5" style="color:var(--c-mute-3);"></i>
+      <input class="input" id="qa-code" placeholder="รหัสตำแหน่งใหม่ เช่น A-01-R1-C4-L1" style="max-width:240px;">
+      <select class="select" id="qa-type" style="max-width:150px;">${TYPES.map(t=>`<option value="${t}"${t==='RESERVE'?' selected':''}>${typeLabel(t)}</option>`).join('')}</select>
+      <select class="select" id="qa-uom" style="max-width:110px;">${STORAGE_UOMS.map(u=>`<option value="${u}"${u==='ลัง'?' selected':''}>${u}</option>`).join('')}</select>
+      <button class="btn btn-sm btn-primary" onclick="quickAdd('${parentType}','${parentId}')"><i data-lucide="plus" class="w-3.5 h-3.5"></i><span>เพิ่มเร็ว</span></button>
+    </div></td></tr>`;
+}
+function render(){const snap=preserveRenderState();document.getElementById('page-content').innerHTML=renderPage();document.getElementById('drawer').innerHTML=renderDrawer();document.getElementById('modalEl').innerHTML=renderModal();document.getElementById('modalBackdrop').classList.toggle('is-open',!!state.modal.open);renderIcons();restoreRenderState(snap);}
+function renderIcons(){if(window.lucide&&typeof window.lucide.createIcons==='function')window.lucide.createIcons();}
+function preserveRenderState(){const db=document.querySelector('.drawer-body');const mb=document.querySelector('.modal-body');const tb=document.querySelector('.tree-body');const a=document.activeElement;const isI=a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA');return{ds:db?db.scrollTop:0,ms:mb?mb.scrollTop:0,ts:tb?tb.scrollTop:0,ps:window.scrollY,fk:isI?{id:a.id||'',ss:a.selectionStart,se:a.selectionEnd}:null};}
+function restoreRenderState(s){if(!s)return;requestAnimationFrame(()=>{const db=document.querySelector('.drawer-body');if(db&&s.ds>0)db.scrollTop=s.ds;const mb=document.querySelector('.modal-body');if(mb&&s.ms>0)mb.scrollTop=s.ms;const tb=document.querySelector('.tree-body');if(tb&&s.ts>0)tb.scrollTop=s.ts;if(s.ps>0)window.scrollTo(0,s.ps);if(s.fk&&s.fk.id){const c=document.getElementById(s.fk.id);if(c){c.focus();if(s.fk.ss!=null&&c.setSelectionRange){try{c.setSelectionRange(s.fk.ss,s.fk.se);}catch(e){}}}}});}
+window.addEventListener('keydown',e=>{if(e.key==='Escape'){if(state.modal.open)closeModal();else if(state.drawer.open)closeDrawer();}});
+var domReady=false,lucideReady=false;function bootIfReady(){if(domReady&&lucideReady){render();renderIcons();}}
+if(document.readyState==='loading'){window.addEventListener('DOMContentLoaded',function(){domReady=true;bootIfReady();});}else{domReady=true;}
+window.addEventListener('lucide:ready',function(){lucideReady=true;bootIfReady();});
+if(window.lucide&&typeof window.lucide.createIcons==='function'){lucideReady=true;}
+bootIfReady();setTimeout(function(){if(!lucideReady){lucideReady=true;bootIfReady();}},5000);
+// ====== DRAWER RENDER (router) ======
+function renderDrawer(){
+  if(!state.drawer.open)return '';
+  const m=state.drawer.mode;const lv=state.drawer.level;
+  if(m==='bulk')return renderBulkDrawer();
+  if(m==='view')return renderViewDrawer();
+  if(lv==='location')return renderLocationForm();
+  return renderSimpleForm(); // warehouse / zone / area / rack
+}
+
+function drawerHeaderForm(){
+  const isEdit=state.drawer.mode==='edit';const lv=state.drawer.level;
+  return `<div class="drawer-header"><div class="drawer-avatar"><i data-lucide="${isEdit?'pencil':'plus'}" class="w-5 h-5"></i></div>
+    <div style="flex:1;min-width:0;"><h2 class="drawer-title">${isEdit?'แก้ไข':'เพิ่ม'} ${LEVEL_LABEL[lv]}</h2><div class="drawer-subtitle"><span class="lvl-badge lvl-${lv}">${LEVEL_LABEL[lv]}</span></div></div>
+    <button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-4 h-4"></i></button></div>`;
+}
+function footerForm(submitFn){
+  return `<div class="drawer-footer"><button class="btn btn-ghost" onclick="closeDrawer()">ยกเลิก</button><div class="footer-spacer"></div>
+    <button class="btn btn-primary" onclick="${submitFn}"><i data-lucide="check" class="w-4 h-4"></i><span>${state.drawer.mode==='edit'?'บันทึกการแก้ไข':'ยืนยันสร้าง'}</span></button></div>`;
+}
+
+// ---- SIMPLE FORMS: warehouse / zone / area / rack ----
+function renderSimpleForm(){
+  const lv=state.drawer.level;const f=state.form;
+  let body='';
+  if(lv==='warehouse'){
+    const f2=f;const provs=geoProvinces();const dists=geoDistricts(f2.province);const subs=geoSubs(f2.province,f2.district);
+    body=`<div class="drawer-section"><h3 class="drawer-section-title">ข้อมูลคลัง</h3>
+      <div class="form-grid">
+      <div class="field"><label class="field-label">รหัสคลัง <span class="req">*</span></label><input class="input" id="f-code" value="${f.code||''}" placeholder="เช่น WH-03"></div>
+      <div class="field"><label class="field-label">ชื่อคลัง <span class="req">*</span></label><input class="input" id="f-name" value="${f.name||''}"></div>
+      </div></div>
+      <div class="drawer-section"><h3 class="drawer-section-title">ที่อยู่</h3>
+      <div class="form-grid">
+      <div class="field fg-full"><label class="field-label">ที่อยู่ (บ้านเลขที่ / ถนน)</label><input class="input" id="f-addr-line" value="${f.addr_line||''}" placeholder="เช่น 123 ถ.บางนา-ตราด กม.18"></div>
+      <div class="field"><label class="field-label">จังหวัด</label><select class="select" id="f-province" onchange="setProvince(this.value)"><option value="">— เลือกจังหวัด —</option>${provs.map(p=>`<option value="${p}"${f2.province===p?' selected':''}>${p}</option>`).join('')}</select></div>
+      <div class="field"><label class="field-label">${isBkk(f2.province)?'เขต':'อำเภอ'}</label><select class="select" id="f-district" onchange="setDistrict(this.value)" ${dists.length?'':'disabled'}><option value="">${dists.length?'— เลือก —':'เลือกจังหวัดก่อน'}</option>${dists.map(d=>`<option value="${d}"${f2.district===d?' selected':''}>${d}</option>`).join('')}</select></div>
+      <div class="field"><label class="field-label">${isBkk(f2.province)?'แขวง':'ตำบล'}</label><select class="select" id="f-subdistrict" onchange="setSubdistrict(this.value)" ${subs.length?'':'disabled'}><option value="">${subs.length?'— เลือก —':'เลือกอำเภอก่อน'}</option>${subs.map(s=>`<option value="${s}"${f2.subdistrict===s?' selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="field"><label class="field-label">รหัสไปรษณีย์</label><input class="input" id="f-postcode" value="${f.postcode||''}" placeholder="" readonly></div>
+      </div></div>`;
+  }
+  if(lv==='zone'){
+    body=`<div class="drawer-section"><h3 class="drawer-section-title">สังกัด</h3>
+      <div class="field"><label class="field-label">Warehouse <span class="req">*</span></label><select class="select" id="f-wh">${WAREHOUSES.map(w=>`<option value="${w.id}"${f.warehouse_id===w.id?' selected':''}>${w.name} (${w.code})</option>`).join('')}</select></div></div>
+      <div class="drawer-section"><h3 class="drawer-section-title">ข้อมูล Zone</h3>
+      <div class="form-grid">
+      <div class="field"><label class="field-label">รหัส Zone <span class="req">*</span></label><input class="input" id="f-code" value="${f.code||''}" placeholder="เช่น Z-DRY"></div>
+      <div class="field"><label class="field-label">ชื่อ Zone <span class="req">*</span></label><input class="input" id="f-name" value="${f.name||''}"></div>
+      </div></div>
+      <div class="drawer-section"><h3 class="drawer-section-title">การควบคุมอุณหภูมิ</h3>
+      <div class="toggle-field"><div><div class="tf-label">ควบคุมอุณหภูมิ (cold chain)</div><div class="tf-sub">เปิดเมื่อเป็นโซนแช่เย็น/แช่แข็ง</div></div><div class="toggle-track ${f.temp_controlled?'is-on':''}" onclick="toggleFormFlag('temp_controlled')"><div class="toggle-knob"></div></div></div>
+      ${f.temp_controlled?`<div class="field-row" style="margin-top:12px;"><div class="field"><label class="field-label">อุณหภูมิต่ำสุด (°C)</label><input class="input" type="number" id="f-temp-min" value="${f.temp_min}"></div><div class="field"><label class="field-label">อุณหภูมิสูงสุด (°C)</label><input class="input" type="number" id="f-temp-max" value="${f.temp_max}"></div></div>`:''}
+      </div>`;
+  }
+  if(lv==='area'){
+    const zopts=ZONES.map(z=>`<option value="${z.id}"${f.zone_id===z.id?' selected':''}>${z.name} · ${whOfZone(z.id)?.code}</option>`).join('');
+    body=`<div class="drawer-section"><h3 class="drawer-section-title">สังกัด</h3>
+      <div class="field"><label class="field-label">Zone <span class="req">*</span></label><select class="select" id="f-zone">${zopts}</select></div></div>
+      <div class="drawer-section"><h3 class="drawer-section-title">ข้อมูล Area</h3>
+      <div class="form-grid">
+      <div class="field"><label class="field-label">รหัส Area <span class="req">*</span></label><input class="input" id="f-code" value="${f.code||''}" placeholder="เช่น A-FLOOR"></div>
+      <div class="field"><label class="field-label">ชื่อ Area <span class="req">*</span></label><input class="input" id="f-name" value="${f.name||''}"></div>
+      </div></div>
+      <div class="drawer-section"><h3 class="drawer-section-title">Flexible Parent</h3>
+      <div class="toggle-field"><div><div class="tf-label">อนุญาตวาง Location ตรงใต้ Area</div><div class="tf-sub">allows_direct_location — วางบนพื้นได้โดยไม่ต้องผ่าน Rack</div></div><div class="toggle-track ${f.allows_direct?'is-on':''}" onclick="toggleFormFlag('allows_direct')"><div class="toggle-knob"></div></div></div></div>`;
+  }
+  if(lv==='rack'){
+    const aopts=AREAS.map(a=>`<option value="${a.id}"${f.area_id===a.id?' selected':''}>${a.name} · ${zoneOfArea(a.id)?.name}</option>`).join('');
+    body=`<div class="drawer-section"><h3 class="drawer-section-title">สังกัด</h3>
+      <div class="field"><label class="field-label">Area <span class="req">*</span></label><select class="select" id="f-area">${aopts}</select></div></div>
+      <div class="drawer-section"><h3 class="drawer-section-title">ข้อมูล Rack</h3>
+      <div class="form-grid">
+      <div class="field"><label class="field-label">รหัส Rack <span class="req">*</span></label><input class="input" id="f-code" value="${f.code||''}" placeholder="เช่น R-A03"></div>
+      <div class="field"><label class="field-label">ชื่อ Rack <span class="req">*</span></label><input class="input" id="f-name" value="${f.name||''}"></div>
+      </div></div>
+      <div class="drawer-section"><h3 class="drawer-section-title">ขนาดกริด</h3>
+      <div class="field-row"><div class="field"><label class="field-label">Rows</label><input class="input" type="number" id="f-rows" value="${f.rows||''}"></div><div class="field"><label class="field-label">Columns</label><input class="input" type="number" id="f-cols" value="${f.cols||''}"></div><div class="field"><label class="field-label">Levels</label><input class="input" type="number" id="f-levels" value="${f.levels||''}"></div></div>
+      </div>`;
+  }
+  return drawerHeaderForm()+`<div class="drawer-body">${body}</div>`+footerForm('submitForm()');
+}
+
+// ---- LOCATION WIZARD (2-step) ----
+function renderLocationForm(){
+  const f=state.form;const isEdit=state.drawer.mode==='edit';const step=state.drawer.step;
+  const rackOpts=RACKS.filter(r=>r.status==='active').map(r=>`<option value="${r.id}"${f.rack_id===r.id?' selected':''}>${r.name} (${ar(r.area_id)?.name})</option>`).join('');
+  const areaOpts=AREAS.map(a=>`<option value="${a.id}"${f.area_id===a.id?' selected':''}>${a.name}${a.allows_direct?'':' (ไม่อนุญาตวางตรง)'}</option>`).join('');
+  const head=`<div class="drawer-header"><div class="drawer-avatar"><i data-lucide="${isEdit?'pencil':'map-pin'}" class="w-5 h-5"></i></div>
+    <div style="flex:1;min-width:0;"><h2 class="drawer-title">${isEdit?'แก้ไขตำแหน่ง':'เพิ่ม Location'}</h2><div class="drawer-subtitle"><span>ขั้นที่ ${step}/2</span><span>·</span><span>${step===1?'Parent &amp; ข้อมูลหลัก':'ความจุ &amp; พฤติกรรม'}</span></div></div>
+    <button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+  <div class="stepper-band"><div class="stepper-row"><div class="step-dot ${step>=1?'is-active':''}">${step>1?'<i data-lucide="check" class="w-3 h-3"></i>':'1'}</div><div class="step-line ${step>1?'is-done':''}"></div><div class="step-dot ${step>=2?'is-active':''}">2</div></div></div>`;
+  let body;
+  if(step===1){
+    body=`<div class="drawer-section"><h3 class="drawer-section-title">Parent (flexible) <span class="req">*</span></h3>
+      <div class="radio-row">
+        <div class="radio-card ${f.parent_type==='rack'?'is-sel':''}" onclick="setLocParentType('rack')"><div class="rc-title">ใต้ Rack</div><div class="rc-sub">bin ในชั้นวาง</div></div>
+        <div class="radio-card ${f.parent_type==='area'?'is-sel':''}" onclick="setLocParentType('area')"><div class="rc-title">ใต้ Area</div><div class="rc-sub">วางบนพื้นโดยตรง</div></div>
+      </div>
+      ${f.parent_type==='rack'?`<div class="field" style="margin-top:12px;"><label class="field-label">เลือก Rack <span class="req">*</span></label><select class="select" id="f-rack"><option value="">— เลือก —</option>${rackOpts}</select></div>`:
+        `<div class="field" style="margin-top:12px;"><label class="field-label">เลือก Area <span class="req">*</span></label><select class="select" id="f-area" onchange="captureForm();render();"><option value="">— เลือก —</option>${areaOpts}</select>
+        ${f.area_id&&!ar(f.area_id).allows_direct?`<div class="field-error">Area นี้ allows_direct = false — เลือก Area อื่น หรือเพิ่ม Rack ก่อน</div>`:``}</div>`}
+    </div>
+    <div class="drawer-section"><h3 class="drawer-section-title">ข้อมูลหลัก</h3>
+      <div class="form-grid">
+      <div class="field"><label class="field-label">รหัสตำแหน่ง <span class="req">*</span></label><input class="input" id="f-code" value="${f.code||''}" placeholder="เช่น A-01-R1-C2-L3"></div>
+      <div class="field"><label class="field-label">ชื่อ (ไม่บังคับ)</label><input class="input" id="f-name" value="${f.name||''}"></div>
+      <div class="field fg-full"><label class="field-label">ประเภทตำแหน่ง <span class="req">*</span></label><select class="select" id="f-type">${TYPES.map(t=>`<option value="${t}"${f.type===t?' selected':''}>${typeLabel(t)}</option>`).join('')}</select></div>
+      </div>
+    </div>`;
+  }else{
+    body=`<div class="drawer-section"><h3 class="drawer-section-title">หน่วยเก็บสินค้า</h3>
+      <div class="field"><label class="field-label">หน่วยเก็บของตำแหน่งนี้ <span class="req">*</span></label>
+        <select class="select" id="f-storage-uom" ${f.hasStock?'disabled':''}>${STORAGE_UOMS.map(u=>`<option value="${u}"${(f.storage_uom||'ตัว')===u?' selected':''}>${u}</option>`).join('')}</select>
+        ${f.hasStock?`<div class="field-error" style="color:var(--c-warning);">ตำแหน่งมีสต็อกอยู่ — เปลี่ยนหน่วยเก็บไม่ได้ (1 ตำแหน่ง 1 หน่วย)</div>`:''}</div>
+    </div>
+    <div class="drawer-section"><h3 class="drawer-section-title">ความจุ &amp; การหมุนเวียน</h3>
+      <div class="field-row"><div class="field"><label class="field-label">หน่วยความจุ <span class="req">*</span></label><select class="select" id="f-cap-uom">${['pallet','box','piece','cbm','kg'].map(u=>`<option value="${u}"${f.cap_uom===u?' selected':''}>${u}</option>`).join('')}</select></div>
+      <div class="field"><label class="field-label">ความจุ <span class="req">*</span></label><input class="input" type="number" id="f-cap-val" value="${f.cap_val||''}" placeholder="> 0"></div></div>
+      <div class="field"><label class="field-label">กลยุทธ์หมุนเวียน <span class="req">*</span></label><select class="select" id="f-rotation">${['fifo','lifo','fefo','manual'].map(r=>`<option value="${r}"${f.rotation===r?' selected':''}>${rotLabel(r)}</option>`).join('')}</select></div>
+      <div class="field-row"><div class="field"><label class="field-label">Row</label><input class="input" id="f-row" value="${f.row||''}"></div><div class="field"><label class="field-label">Column</label><input class="input" id="f-col" value="${f.col||''}"></div><div class="field"><label class="field-label">Level</label><input class="input" type="number" id="f-level" value="${f.level||''}"></div><div class="field"><label class="field-label">Position</label><input class="input" id="f-position" value="${f.position||''}"></div></div>
+    </div>
+    <div class="drawer-section"><h3 class="drawer-section-title">พฤติกรรม (behavior flags)</h3>
+      <div class="toggle-field"><div class="tf-label">หยิบได้ (pickable)</div><div class="toggle-track ${f.pickable?'is-on':''}" onclick="toggleFormFlag('pickable')"><div class="toggle-knob"></div></div></div>
+      <div class="toggle-field"><div class="tf-label">วางได้ (putawayable)</div><div class="toggle-track ${f.putawayable?'is-on':''}" onclick="toggleFormFlag('putawayable')"><div class="toggle-knob"></div></div></div>
+      <div class="toggle-field"><div class="tf-label">เติมเต็มได้ (replenishable)</div><div class="toggle-track ${f.replenishable?'is-on':''}" onclick="toggleFormFlag('replenishable')"><div class="toggle-knob"></div></div></div>
+    </div>
+    <div class="drawer-section"><h3 class="drawer-section-title">การปนกัน (mixing)</h3>
+      <div class="toggle-field"><div class="tf-label">ปน lot ได้ (allow mixed lot)</div><div class="toggle-track ${f.mixed_lot?'is-on':''}" onclick="toggleFormFlag('mixed_lot')"><div class="toggle-knob"></div></div></div>
+      <div class="toggle-field"><div class="tf-label">ปน item ได้ (allow mixed item)</div><div class="toggle-track ${f.mixed_item?'is-on':''}" onclick="toggleFormFlag('mixed_item')"><div class="toggle-knob"></div></div></div>
+      <div class="toggle-field"><div class="tf-label">สต็อกติดลบได้ (allow negative stock)</div><div class="toggle-track ${f.neg_stock?'is-on':''}" onclick="toggleFormFlag('neg_stock')"><div class="toggle-knob"></div></div></div>
+    </div>
+    <div class="drawer-section"><div class="field"><label class="field-label">บาร์โค้ด / QR ${isEdit?'':''}</label><input class="input" id="f-barcode" value="${f.barcode||''}" placeholder="สแกนหรือพิมพ์"></div></div>`;
+  }
+  const footer=`<div class="drawer-footer">
+    ${step>1?`<button class="btn btn-secondary" onclick="locPrev()"><i data-lucide="arrow-left" class="w-4 h-4"></i><span>กลับ</span></button>`:`<button class="btn btn-ghost" onclick="closeDrawer()">ยกเลิก</button>`}
+    <div class="footer-spacer"></div>
+    ${step<2?`<button class="btn btn-primary" onclick="locNext()"><span>ถัดไป</span><i data-lucide="arrow-right" class="w-4 h-4"></i></button>`:`<button class="btn btn-primary" onclick="submitLoc()"><i data-lucide="check" class="w-4 h-4"></i><span>${isEdit?'บันทึกการแก้ไข':'ยืนยันสร้าง'}</span></button>`}
+  </div>`;
+  return head+`<div class="drawer-body">${body}</div>`+footer;
+}
+
+// ---- BULK ----
+function renderBulkDrawer(){
+  const b=state.bulk;const perRack=(b.rows||0)*(b.cols||0)*(b.levels||0);const total=(b.rackQty||0)*perRack;
+  return `<div class="drawer-header"><div class="drawer-avatar"><i data-lucide="layers" class="w-5 h-5"></i></div>
+    <div style="flex:1;"><h2 class="drawer-title">สร้าง Location จำนวนมาก</h2><div class="drawer-subtitle">สร้าง rack + location จาก template (atomic)</div></div>
+    <button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+  <div class="drawer-body">
+    <div class="drawer-section"><h3 class="drawer-section-title">เป้าหมาย</h3>
+      <div class="field"><label class="field-label">Area</label><select class="select" id="b-area" onchange="refreshBulk()">${AREAS.map(a=>`<option value="${a.id}"${b.area_id===a.id?' selected':''}>${a.name} · ${zoneOfArea(a.id)?.name}</option>`).join('')}</select></div></div>
+    <div class="drawer-section"><h3 class="drawer-section-title">Rack template</h3>
+      <div class="field"><label class="field-label">Preset รูปแบบรหัส</label><select class="select" onchange="applyBulkPreset(this.value)"><option value="">กำหนดเอง</option>${BULK_PRESETS.map(p=>`<option value="${p.id}"${b.preset===p.id?' selected':''}>${p.label}</option>`).join('')}</select></div>
+      <div class="field"><label class="field-label">รูปแบบรหัส Rack</label><input class="input" id="b-rackPat" value="${b.rackPat||''}" oninput="refreshBulk()" placeholder="เช่น A-{n}"></div>
+      <div class="field-row"><div class="field"><label class="field-label">จำนวน Rack</label><input class="input" type="number" id="b-rackQty" value="${b.rackQty}" oninput="refreshBulk()"></div>
+      <div class="field"><label class="field-label">Rows</label><input class="input" type="number" id="b-rows" value="${b.rows}" oninput="refreshBulk()"></div>
+      <div class="field"><label class="field-label">Columns</label><input class="input" type="number" id="b-cols" value="${b.cols}" oninput="refreshBulk()"></div>
+      <div class="field"><label class="field-label">Levels</label><input class="input" type="number" id="b-levels" value="${b.levels}" oninput="refreshBulk()"></div></div></div>
+    <div class="drawer-section"><h3 class="drawer-section-title">Location template</h3>
+      <div class="field"><label class="field-label">รูปแบบรหัส Location</label><input class="input" id="b-locPat" value="${b.locPat||''}" oninput="refreshBulk()" placeholder="{rack}-R{r}-C{c}-L{l}"></div>
+      <div class="field-row">
+        <div class="field"><label class="field-label">ประเภท</label><select class="select" id="b-type" onchange="refreshBulk()">${TYPES.map(t=>`<option value="${t}"${b.type===t?' selected':''}>${typeLabel(t)}</option>`).join('')}</select></div>
+        <div class="field"><label class="field-label">กลยุทธ์หมุนเวียน</label><select class="select" id="b-rotation" onchange="refreshBulk()">${['fifo','lifo','fefo','manual'].map(r=>`<option value="${r}"${b.rotation===r?' selected':''}>${rotLabel(r)}</option>`).join('')}</select></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label class="field-label">หน่วยความจุ</label><select class="select" id="b-cap-uom" onchange="refreshBulk()">${['pallet','box','piece','cbm','kg'].map(u=>`<option value="${u}"${b.cap_uom===u?' selected':''}>${u}</option>`).join('')}</select></div>
+        <div class="field"><label class="field-label">หน่วยเก็บสินค้า (ทุกตำแหน่งที่สร้าง)</label><select class="select" id="b-storage-uom" onchange="refreshBulk()">${STORAGE_UOMS.map(u=>`<option value="${u}"${(b.storage_uom||'ลัง')===u?' selected':''}>${u}</option>`).join('')}</select></div>
+        <div class="field"><label class="field-label">ความจุ</label><input class="input" type="number" id="b-cap-val" value="${b.cap_val}" oninput="refreshBulk()"></div>
+      </div>
+      <div class="code-sample" style="line-height:1.7;">
+        <b>ตัวอย่างรหัสที่จะได้ (5 ตัวแรก):</b><br>${bulkPreviewNames(b,5).map(x=>`<span class="pill" style="background:var(--c-line-3);color:var(--c-ink);margin:2px 4px 2px 0;">${x}</span>`).join('')||'—'}
+        <div style="color:var(--c-mute-2);margin-top:4px;">รวมทั้งหมด ${fmtNum((b.rackQty||0)*((b.rows||0)*(b.cols||0)*(b.levels||0)))} ตำแหน่ง · ${fmtNum(b.rackQty||0)} rack</div></div>
+      <div class="preview-box"><div class="preview-num">${fmtNum(total)}</div><div class="preview-lbl">ตำแหน่งจะถูกสร้าง (${fmtNum(b.rackQty)} rack × ${fmtNum(perRack)} ต่อ rack)</div></div>
+    </div>
+  </div>
+  <div class="drawer-footer"><button class="btn btn-ghost" onclick="closeDrawer()">ยกเลิก</button><div class="footer-spacer"></div>
+    <button class="btn btn-primary" onclick="submitBulk()"><i data-lucide="check" class="w-4 h-4"></i><span>สร้าง ${fmtNum(total)} ตำแหน่ง</span></button></div>`;
+}
+
+// ---- VIEW (per level) ----
+function renderViewDrawer(){
+  const lv=state.drawer.level;const id=state.drawer.id;const e=entOf(lv,id);if(!e)return '';
+  const canDelete=canManage&&(lv!=='location'||e.status!=='decommissioned');
+  const delLabel=lv==='location'?'ปลดระวาง':'ลบ';
+  const header=`<div class="drawer-header"><div class="drawer-avatar">${initials(e.code)}</div>
+    <div style="flex:1;min-width:0;"><h2 class="drawer-title" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e.name}</h2>
+    <div class="drawer-subtitle"><span class="lvl-badge lvl-${lv}">${LEVEL_LABEL[lv]}</span><span>${e.code}</span>${e.status?`<span>·</span>${statPill(e.status)}`:''}</div></div>
+    <div class="drawer-header-actions">
+      ${canManage?`<button class="btn btn-sm btn-secondary" onclick="openDrawer('edit','${lv}','${id}')"><i data-lucide="pencil" class="w-3.5 h-3.5"></i><span>แก้ไข</span></button>`:''}
+      ${canDelete?`<button class="btn btn-sm btn-danger" onclick="openModal('${lv}','${id}')"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i><span>${delLabel}</span></button>`:''}
+      <span class="drawer-header-divider"></span>
+      <button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-4 h-4"></i></button>
+    </div></div>`;
+  if(lv==='location')return header+renderLocViewTabsBody(e);
+  // simple levels: overview + children summary
+  let fields='';
+  if(lv==='warehouse')fields=`<div class="lbl">รหัส</div><div class="val">${e.code}</div><div class="lbl">ชื่อ</div><div class="val">${e.name}</div><div class="lbl">ที่อยู่</div><div class="val">${waddr(e)}</div><div class="lbl">จำนวน Zone</div><div class="val">${fmtNum(zonesOf(id).length)}</div>`;
+  if(lv==='zone')fields=`<div class="lbl">รหัส</div><div class="val">${e.code}</div><div class="lbl">ชื่อ</div><div class="val">${e.name}</div><div class="lbl">Warehouse</div><div class="val">${wh(e.warehouse_id)?.name}</div><div class="lbl">ควบคุมอุณหภูมิ</div><div class="val">${e.temp_controlled?`ใช่ (${e.temp_min}–${e.temp_max}°C)`:'ไม่'}</div><div class="lbl">จำนวน Area</div><div class="val">${fmtNum(areasOf(id).length)}</div>`;
+  if(lv==='area')fields=`<div class="lbl">รหัส</div><div class="val">${e.code}</div><div class="lbl">ชื่อ</div><div class="val">${e.name}</div><div class="lbl">Zone</div><div class="val">${zn(e.zone_id)?.name}</div><div class="lbl">วาง Location ตรง</div><div class="val">${e.allows_direct?'ได้ (flexible parent)':'ไม่ได้ (ต้องผ่าน Rack)'}</div><div class="lbl">จำนวน Rack</div><div class="val">${fmtNum(racksOf(id).length)}</div><div class="lbl">Location ตรง</div><div class="val">${fmtNum(locsOfAreaDirect(id).length)}</div>`;
+  if(lv==='rack')fields=`<div class="lbl">รหัส</div><div class="val">${e.code}</div><div class="lbl">ชื่อ</div><div class="val">${e.name}</div><div class="lbl">Area</div><div class="val">${ar(e.area_id)?.name}</div><div class="lbl">ขนาด (R×C×L)</div><div class="val">${e.rows}×${e.cols}×${e.levels}</div><div class="lbl">จำนวน Location</div><div class="val">${fmtNum(locsOfRack(id).length)}</div>`;
+  const pathStr=selViewPathStr(lv,id);
+  const body=`<div class="drawer-body">
+    <div class="drawer-section"><h3 class="drawer-section-title">ลำดับชั้น (full path)</h3><div style="font-size:12.5px;color:var(--c-mute);background:var(--c-bg-off);padding:10px 12px;border-radius:8px;line-height:1.6;">${pathStr}</div></div>
+    <div class="drawer-section"><h3 class="drawer-section-title">ข้อมูล${LEVEL_LABEL[lv]}</h3><div class="drawer-fields">${fields}</div></div>
+    <div class="drawer-section"><button class="btn btn-secondary" style="width:100%;justify-content:center;" onclick="closeDrawer();selectNode('${lv}','${id}')"><i data-lucide="corner-down-right" class="w-4 h-4"></i><span>ดูรายการลูก (เจาะลงระดับถัดไป)</span></button></div>
+  </div>`;
+  const footer=`<div class="drawer-footer"><div class="drawer-footer-meta">สร้างเมื่อ ${fmtDateTime(e.created)}</div><div class="footer-spacer"></div><button class="btn btn-secondary" onclick="closeDrawer()">ปิด</button></div>`;
+  return header+body+footer;
+}
+function selViewPathStr(lv,id){
+  if(lv==='warehouse')return wh(id).code;
+  if(lv==='zone'){const z=zn(id);return [wh(z.warehouse_id)?.code,z.name].join(' › ');}
+  if(lv==='area'){const a=ar(id),z=zn(a.zone_id);return [wh(z.warehouse_id)?.code,z.name,a.name].join(' › ');}
+  if(lv==='rack'){const r=rk(id),a=ar(r.area_id),z=zn(a.zone_id);return [wh(z.warehouse_id)?.code,z.name,a.name,r.name].join(' › ');}
+  return '';
+}
+function renderLocViewTabsBody(r){
+  const tab=state.drawer.tab;
+  return `<div class="drawer-tabs"><button class="drawer-tab ${tab==='overview'?'is-active':''}" onclick="setTab('overview')">ภาพรวม</button><button class="drawer-tab ${tab==='cap'?'is-active':''}" onclick="setTab('cap')">ความจุ &amp; flags</button><button class="drawer-tab ${tab==='history'?'is-active':''}" onclick="setTab('history')">ประวัติ</button></div>
+  <div class="drawer-body">
+    ${tab==='overview'?`<div class="drawer-section"><h3 class="drawer-section-title">ลำดับชั้น (full path)</h3><div style="font-size:12.5px;color:var(--c-mute);background:var(--c-bg-off);padding:10px 12px;border-radius:8px;line-height:1.6;">${locFullPath(r)}</div></div>
+      <div class="drawer-section"><h3 class="drawer-section-title">ข้อมูลตำแหน่ง</h3><div class="drawer-fields">
+      <div class="lbl">รหัส</div><div class="val">${r.code}</div><div class="lbl">ชื่อ</div><div class="val">${r.name||'—'}</div>
+      <div class="lbl">Parent</div><div class="val"><span class="parent-badge parent-${r.parent_type}">${r.parent_type==='rack'?'Rack':'Area'}</span> ${locParentLabel(r)}</div>
+      <div class="lbl">ประเภท</div><div class="val"><span class="pill pill-${r.type.toLowerCase()}">${typeLabel(r.type)}</span></div>
+      <div class="lbl">หน่วยเก็บสินค้า</div><div class="val"><b>${r.storage_uom||'ตัว'}</b> <span style="color:var(--c-mute-3);font-size:11px;">1 ตำแหน่ง 1 หน่วย${r.hasStock?' · มีสต็อก — ล็อก':''}</span></div>
+      ${(r.row||r.col||r.level||r.position)?`<div class="lbl">พิกัด (R/C/L)</div><div class="val">${[r.row||'-',r.col||'-',r.level||'-'].join(' / ')}${r.position?(' · '+r.position):''}</div>`:''}
+      <div class="lbl">สถานะ</div><div class="val">${statPill(r.status)}</div>
+      ${r.block_reason?`<div class="lbl">เหตุผลที่บล็อก</div><div class="val">${r.block_reason}</div>`:''}</div></div>`:''}
+    ${tab==='cap'?`<div class="drawer-section"><h3 class="drawer-section-title">ความจุ &amp; การหมุนเวียน</h3><div class="drawer-fields">
+      <div class="lbl">หน่วยเก็บสินค้า</div><div class="val">${r.storage_uom||'ตัว'}</div>
+      <div class="lbl">ความจุ</div><div class="val">${fmtNum(r.cap_val)} ${r.cap_uom}</div><div class="lbl">กลยุทธ์หมุนเวียน</div><div class="val">${rotLabel(r.rotation)}</div><div class="lbl">บาร์โค้ด / QR</div><div class="val">${r.barcode||'—'}</div></div></div>
+      <div class="drawer-section"><h3 class="drawer-section-title">พฤติกรรม (behavior flags)</h3><div class="drawer-fields">
+      <div class="lbl">หยิบได้ (pickable)</div><div class="val">${yesNo(r.pickable)}</div><div class="lbl">วางได้ (putawayable)</div><div class="val">${yesNo(r.putawayable)}</div><div class="lbl">เติมเต็มได้</div><div class="val">${yesNo(r.replenishable)}</div></div></div>
+      <div class="drawer-section"><h3 class="drawer-section-title">การปนกัน (mixing)</h3><div class="drawer-fields">
+      <div class="lbl">ปน lot ได้</div><div class="val">${yesNo(r.mixed_lot)}</div><div class="lbl">ปน item ได้</div><div class="val">${yesNo(r.mixed_item)}</div><div class="lbl">สต็อกติดลบได้</div><div class="val">${yesNo(r.neg_stock)}</div></div></div>`:''}
+    ${tab==='history'?`<div class="drawer-section"><h3 class="drawer-section-title">ประวัติการเปลี่ยนแปลง (WORM)</h3><div class="timeline">${auditOf(r.id).map(a=>`<div class="tl-item"><div class="tl-dot ${a.v?'is-'+a.v:''}"></div><div class="tl-title">${a.t}</div><div class="tl-meta">${fmtDateTime(a.at)} · ${a.by}</div></div>`).join('')}</div></div>`:''}
+  </div>
+  <div class="drawer-footer"><div class="drawer-footer-meta">สร้างเมื่อ ${fmtDateTime(r.created)}</div><div class="footer-spacer"></div><button class="btn btn-secondary" onclick="closeDrawer()">ปิด</button></div>`;
+}
+
+// ---- MODAL ----
+function renderModal(){
+  if(state.modal.open&&state.modal.level==='status-reason'){
+    const v=state.modal.target;const isBulk=!!state.modal.bulk;
+    const title=v==='blocked'?'บล็อกตำแหน่ง':'Freeze ตำแหน่ง (cycle count)';
+    return `<div class="modal-header"><div class="modal-header-icon"><i data-lucide="${v==='blocked'?'ban':'thermometer-snowflake'}" class="w-5 h-5"></i></div>
+        <div style="flex:1;"><h3 class="modal-title">${title}${isBulk?` — ${state.bulkSel.size} ตำแหน่ง`:''}</h3></div>
+        <button class="icon-btn" onclick="closeStatusModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+      <div class="modal-body"><div class="field"><label class="field-label">เหตุผล <span class="req">*</span></label>
+        <input class="input" id="sr-reason" placeholder="${v==='blocked'?'เช่น รอซ่อมคานชั้นวาง':'เช่น นับสต็อกประจำงวด'}" autofocus></div></div>
+      <div class="modal-footer"><button class="btn btn-secondary" onclick="closeStatusModal()">ยกเลิก</button>
+        <button class="btn btn-primary" onclick="confirmStatusReason()">ยืนยัน</button></div>`;
+  }
+  if(!state.modal.open)return '';
+  const {level,id}=state.modal;const e=entOf(level,id);if(!e)return '';
+  const reason=blockReason(level,id);const isLoc=level==='location';
+  const title=isLoc?'ปลดระวางตำแหน่ง':'ลบ '+LEVEL_LABEL[level];
+  const okLabel=isLoc?'ปลดระวาง':'ลบ';
+  return `<div class="modal-header"><div class="modal-header-icon is-danger"><i data-lucide="trash-2" class="w-5 h-5"></i></div>
+    <div style="flex:1;"><h3 class="modal-title">${title}</h3><p class="modal-subtitle">คุณกำลัง${isLoc?'ปลดระวาง':'ลบ'} <strong>${e.name}</strong> (${e.code})</p></div>
+    <button class="icon-btn" onclick="closeModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+  <div class="modal-body">${reason?`<div class="warn-box"><strong>ไม่สามารถดำเนินการ:</strong> ${reason}</div>`:`<div style="padding:12px;background:#FEF3C7;border-radius:8px;font-size:12.5px;color:#92400E;">${isLoc?'ตำแหน่งจะถูกตั้งเป็น decommissioned และเก็บประวัติไว้ (ไม่ลบถาวร)':'รายการนี้จะถูกลบออกจากระบบ — การกระทำนี้ถูกบันทึกใน audit log'}</div>`}</div>
+  <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>
+    <button class="btn btn-danger" onclick="confirmModal()" ${reason?'style="opacity:.5;pointer-events:none;"':''}><i data-lucide="trash-2" class="w-4 h-4"></i><span>${okLabel}</span></button></div>`;
+}
+
+</script>
+</body>
+</html>
