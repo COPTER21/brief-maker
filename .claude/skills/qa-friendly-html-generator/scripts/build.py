@@ -62,11 +62,16 @@ def main():
             sys.exit(f"ERROR: cases file missing '{req}'")
     cases = cj['cases']
 
-    # validate every referenced region exists BEFORE dedup
+    # validate every referenced region exists BEFORE dedup (R18 — surface exactly which step)
     need = set(s[3] for c in cases for s in c['steps'] if len(s) > 3 and s[3])
     missing = need - set(shots)
     if missing:
-        print(f"WARNING: {len(missing)} referenced region(s) have no image: {sorted(missing)}")
+        print(f"WARNING (R18): {len(missing)} referenced region(s) have NO image: {sorted(missing)}")
+        for c in cases:
+            for i, s in enumerate(c['steps']):
+                if len(s) > 3 and s[3] in missing:
+                    print(f"    · {c['id']} step {i+1} → regionKey '{s[3]}' (👁 will be blank)")
+        print("    Fix: re-capture those keys, or set their regionKey=\"\" — do NOT ship a wrong screen.")
 
     shots, remap, dropped, used = dedup(shots, cases)
 

@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BOM — สูตรการผลิต (CUBE 4.0)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,600,700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{/* CUBE Warm Light (v8 rebrand 2026-08-09 — เดิม Navy v3.5) */
+--c-navy:#111111;--c-navy-2:#1C1C1E;--c-primary:#FF3B30;--c-primary-hover:#E62E24;--c-teal:#FF9A1F;--c-teal-light:#FFC46B;--c-ink:#111111;--c-mute:#54565C;--c-mute-2:#73757B;--c-mute-3:#9A9CA2;--c-line:#DEDAD4;--c-line-2:#E9E5E0;--c-line-3:#F1EEEA;--c-bg-off:#FAF8F5;--c-success:#1F9D55;--c-warning:#E8870F;--c-danger:#E62E24;--sidebar-w:232px;--shell-h:52px;}
+*{box-sizing:border-box;}html,body{margin:0;padding:0;min-width:768px; /* Iron Rule #97 v8 */}
+body{font-family:'Noto Sans Thai','Satoshi',system-ui,sans-serif;background:var(--c-bg-off);color:#1E293B;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;min-width:768px; /* Iron Rule #97 v8 — desktop-base 768–1180 adaptive */}
+/* Iron Rule #49 — Minimal Scrollbar (5px, mun-mon track โปร่งใส, charcoal จางบนพื้นสว่าง) */
+*{scrollbar-width:thin;scrollbar-color:rgba(17,17,17,.22) transparent;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(17,17,17,.22);border-radius:5px;}
+::-webkit-scrollbar-thumb:hover{background:rgba(17,17,17,.34);}
+button{font-family:inherit;cursor:pointer;}.lucide{flex-shrink:0;}svg.lucide{width:1em;height:1em;display:inline-block;vertical-align:-.125em;flex-shrink:0;stroke:currentColor;}.w-3{width:12px;height:12px;}.w-3\.5{width:14px;height:14px;}.w-4{width:16px;height:16px;}.w-5{width:20px;height:20px;}svg.lucide.w-3{width:12px;height:12px;}svg.lucide.w-3\.5{width:14px;height:14px;}svg.lucide.w-4{width:16px;height:16px;}svg.lucide.w-5{width:20px;height:20px;}
+/* shell */
+.app{display:flex;min-height:100vh;}
+.sidebar{width:var(--sidebar-w);background:#111111;color:#fff;position:fixed;top:0;bottom:0;left:0;padding:16px 12px;overflow-y:auto;}
+.sb-brand{display:flex;align-items:center;gap:9px;padding:6px 8px 16px;font-weight:700;font-size:15px;}
+.sb-brand .logo{width:30px;height:30px;border-radius:8px;background:var(--c-primary);display:flex;align-items:center;justify-content:center;}
+.sb-brand .logo .lucide{width:17px;height:17px;}
+.sb-sec{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#7C8BA8;padding:14px 10px 6px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;font-size:13.5px;color:#C7D2E3;margin-bottom:2px;}
+.sb-item .lucide{width:16px;height:16px;opacity:.85;}
+.sb-item.is-active{background:rgba(11,92,255,.22);color:#fff;font-weight:600;}
+.sb-item.is-active .lucide{opacity:1;color:#FFC46B;}
+.main{flex:1;margin-left:var(--sidebar-w);}
+.shell{height:var(--shell-h);background:#fff;border-bottom:1px solid var(--c-line-2);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:20;}
+.crumb{font-size:13px;color:var(--c-mute-2);display:flex;align-items:center;gap:7px;}
+.crumb b{color:var(--c-ink);font-weight:600;}
+.user-chip{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--c-mute);}
+.user-chip .av{width:30px;height:30px;border-radius:50%;background:var(--c-teal);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;}
+.content{padding:22px 24px;}
+/* page head */
+.page-h{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
+.page-h h1{font-size:19px;font-weight:700;color:var(--c-navy);margin:0;display:flex;align-items:center;gap:9px;}
+.page-h p{font-size:13px;color:var(--c-mute-2);margin:3px 0 0;}
+
+.hint:hover::after{content:attr(data-tip);position:absolute;left:50%;top:130%;transform:translateX(-50%);background:var(--c-navy);color:#fff;font-size:11.5px;font-weight:400;font-style:normal;line-height:1.5;padding:8px 11px;border-radius:7px;width:max-content;max-width:320px;z-index:60;box-shadow:0 6px 20px rgba(11,29,58,.3);}
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.stat{background:#fff;border:1px solid var(--c-line-2);border-radius:11px;padding:13px 15px;}
+.stat-label{font-size:11.5px;color:var(--c-mute-2);display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.stat-label .lucide{width:13px;height:13px;}
+.stat-value{font-size:23px;font-weight:700;color:var(--c-navy);line-height:1.1;}
+.stat-meta{font-size:11px;color:var(--c-mute-3);margin-top:2px;}
+/* filter + table */
+.toolbar{background:#fff;border:1px solid var(--c-line-2);border-radius:12px;padding:14px;margin-bottom:14px;}
+.filter-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.input-search{position:relative;flex:1;min-width:240px;}
+.input-search .lucide{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--c-mute-3);}
+.input,.select{height:38px;border:1px solid var(--c-line);border-radius:9px;padding:0 12px;font-size:13.5px;font-family:inherit;background:#fff;color:var(--c-ink);width:100%;}
+.input-search .input{padding-left:34px;}
+.select{padding-right:30px;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%2364748B' stroke-width='2'><path d='M3 5l3 3 3-3'/></svg>");background-repeat:no-repeat;background-position:right 11px center;cursor:pointer;width:auto;min-width:150px;}
+.btn{height:38px;padding:0 16px;border-radius:9px;border:1px solid var(--c-line);background:#fff;color:var(--c-ink);font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;}
+.btn .lucide{width:15px;height:15px;}
+.btn-primary{background:var(--c-primary);border-color:var(--c-primary);color:#fff;}
+.btn-danger{background:var(--c-danger,#E62E24);color:#fff;border-color:transparent;}
+.btn-danger:disabled{opacity:.5;cursor:default;}
+.btn-primary:hover{background:var(--c-primary-hover);}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--c-mute);}
+.table-card{background:#fff;border:1px solid var(--c-line-2);border-radius:12px;overflow:hidden;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{text-align:left;font-size:10.5px;font-weight:700;color:var(--c-mute-2);text-transform:uppercase;letter-spacing:.04em;padding:11px 14px;border-bottom:1px solid var(--c-line-2);background:var(--c-bg-off);white-space:nowrap;cursor:pointer;user-select:none;}
+tbody td{padding:12px 14px;border-bottom:1px solid var(--c-line-3);vertical-align:middle;}
+tbody tr:hover{background:#FAFBFD;}.row-click{cursor:pointer;}.chev-cell{text-align:right;color:var(--c-mute-3);}.row-click:hover .chev-cell{color:var(--c-primary);}.chev-cell .lucide{width:18px;height:18px;}
+tbody tr:last-child td{border-bottom:none;}
+.parent-cell{display:flex;align-items:center;gap:10px;}
+.parent-ic{width:34px;height:34px;border-radius:8px;background:#111111;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;overflow:hidden;position:relative;}
+.parent-ic img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+.parent-cell .nm{font-weight:600;color:var(--c-ink);}
+.parent-cell .cd{font-size:11.5px;color:var(--c-mute-3);font-family:'Satoshi',monospace;}
+.mono{font-family:'Satoshi',monospace;font-size:12.5px;color:var(--c-mute);}
+.pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;}
+.pill-active{background:#DCFCE7;color:#15803D;}.pill-draft{background:#F1F5F9;color:#64748B;}
+.pill-inactive{background:#FFF1DD;color:#B8690B;}
+.stat{cursor:pointer;border:1px solid var(--c-line-2);}
+.stat.is-on{border-color:var(--c-primary);box-shadow:0 0 0 1px var(--c-primary) inset;}
+.bulkbar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#111111;color:#fff;border-radius:10px;margin-bottom:10px;}
+.bulkbar .bb-count{font-size:12.5px;font-weight:600;margin-right:4px;}
+.bulkbar button{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:transparent;color:#fff;font-size:12.5px;font-family:inherit;cursor:pointer;}
+.bulkbar button:hover{background:rgba(255,255,255,0.12);}
+.bulkbar button.is-danger{border-color:#FF6B61;color:#FFB3AD;}
+.bulkbar button [data-lucide]{width:13px;height:13px;}
+tr.is-sel td{background:#FFF6F5;}
+.pop-menu{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--c-line-2);border-radius:10px;box-shadow:0 8px 24px rgba(17,17,17,0.12);padding:6px;min-width:170px;display:none;z-index:80;}
+.pop-menu.is-open{display:block;}
+.modal-head{display:flex;align-items:center;gap:8px;padding:16px 18px 4px;}
+.modal-head h3{display:flex;align-items:center;gap:8px;font-size:15.5px;margin:0;}
+.modal-body{padding:10px 18px;}
+.modal-foot{display:flex;gap:8px;padding:12px 18px 16px;}
+.pm-item{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:none;background:none;border-radius:7px;font-size:13px;font-family:inherit;cursor:pointer;text-align:left;}
+.pm-item:hover{background:var(--c-bg-off);}
+.pm-item.is-current{opacity:0.45;cursor:default;}
+.ck{width:15px;height:15px;accent-color:var(--c-primary);}
+/* Iron Rule #96 (v8) — List Full-Height */
+.content{display:flex;flex-direction:column;height:calc(100vh - var(--shell-h,52px));overflow-y:auto;}
+.table-card{display:flex;flex-direction:column;flex:1;min-height:0;}
+.table-card table{width:100%;}
+.table-scroll{flex:1;min-height:0;overflow-y:auto;scrollbar-gutter:stable;}
+.table-scroll thead th{position:sticky;top:0;background:var(--c-bg-off);z-index:2;}
+/* Iron Rule #97 (v8) — Responsive 768–1180 */
+@media (max-width:1180px){
+  .sidebar{transform:translateX(-100%);transition:transform 180ms;z-index:70;}
+  .sidebar.is-open{transform:translateX(0);}
+  .main{margin-left:0 !important;}
+  .content{padding:16px !important;}
+  .drawer-panel{width:min(920px,100vw) !important;}
+}
+.badge-def{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:6px;background:#FEF3C7;color:#92400E;display:inline-flex;align-items:center;gap:3px;}
+.badge-def .lucide{width:11px;height:11px;}
+.ver-tag{font-size:11.5px;font-weight:600;color:var(--c-primary);background:#EFF4FF;padding:2px 8px;border-radius:6px;font-family:'Satoshi';}
+.row-act{display:flex;gap:4px;}
+.icon-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--c-line-2);background:#fff;display:inline-flex;align-items:center;justify-content:center;color:var(--c-mute);}
+.icon-btn .lucide{width:15px;height:15px;}
+.icon-btn:hover{background:var(--c-bg-off);color:var(--c-primary);border-color:var(--c-primary);}
+.footer-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--c-line-2);font-size:12.5px;color:var(--c-mute-2);}
+/* ===== DRAWER ===== */
+#overlay-root{position:fixed;inset:0;z-index:100;pointer-events:none;}
+.backdrop{position:absolute;inset:0;background:rgba(11,29,58,.42);opacity:0;transition:opacity .22s;pointer-events:auto;}
+.drawer-panel{position:absolute;top:0;right:0;bottom:0;width:920px;max-width:94vw;background:#fff;box-shadow:-8px 0 40px rgba(11,29,58,.16);transform:translateX(100%);transition:transform .25s ease-out;pointer-events:auto;display:flex;flex-direction:column;}
+.drawer-panel.standard{width:680px;}
+.overlay-on .backdrop{opacity:1;}.overlay-on .drawer-panel{transform:translateX(0);}
+.drawer-head{padding:18px 24px;border-bottom:1px solid var(--c-line-2);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.drawer-head h2{font-size:16px;font-weight:700;color:var(--c-navy);margin:0;display:flex;align-items:center;gap:9px;}
+.drawer-head .sub{font-size:12px;color:var(--c-mute-2);margin-top:2px;}
+.dh-actions{display:flex;align-items:center;gap:8px;}
+.drawer-body{flex:1;overflow-y:auto;padding:20px 24px;}
+.drawer-foot{padding:14px 24px;border-top:1px solid var(--c-line-2);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.foot-spacer{flex:1;}
+/* stepper */
+.stepper{display:flex;gap:0;margin-bottom:20px;}
+.step{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;}
+.step::before{content:'';position:absolute;top:15px;left:-50%;width:100%;height:2px;background:var(--c-line-2);}
+.step:first-child::before{display:none;}
+.step.done::before,.step.active::before{background:var(--c-primary);}
+.step .dot{width:30px;height:30px;border-radius:50%;background:#fff;border:2px solid var(--c-line);color:var(--c-mute-3);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;z-index:1;}
+.step.active .dot{border-color:var(--c-primary);color:var(--c-primary);}
+.step.done .dot{background:var(--c-primary);border-color:var(--c-primary);color:#fff;}
+.step .lb{font-size:12px;color:var(--c-mute-2);font-weight:500;}
+.step.active .lb{color:var(--c-primary);font-weight:600;}
+/* form */
+.fsec{margin-bottom:22px;}
+.fsec-title{font-size:13px;font-weight:700;color:var(--c-navy);margin-bottom:12px;display:flex;align-items:center;gap:7px;}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field.full{grid-column:1/-1;}
+.field label{font-size:12.5px;font-weight:600;color:var(--c-ink);}
+.field label .req{color:var(--c-danger);}
+
+.field .select{width:100%;}
+.toggle-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--c-bg-off);border-radius:9px;border:1px solid var(--c-line-2);}
+.toggle-row .tx{flex:1;font-size:13px;}
+.toggle-row .tx small{display:block;color:var(--c-mute-3);font-size:11.5px;}
+.sw{width:40px;height:23px;border-radius:20px;background:var(--c-line);position:relative;transition:.2s;flex-shrink:0;}
+.sw::after{content:'';position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.sw.on{background:var(--c-teal);}.sw.on::after{left:19px;}
+/* component lines (master-detail) */
+.lines{border:1px solid var(--c-line-2);border-radius:11px;overflow:hidden;}
+.lines-head{display:grid;grid-template-columns:minmax(240px,1fr) 110px 150px 100px 40px;gap:14px;padding:10px 16px;background:var(--c-bg-off);font-size:11.5px;font-weight:600;color:var(--c-mute-2);border-bottom:1px solid var(--c-line-2);}
+.line-row{display:grid;grid-template-columns:minmax(240px,1fr) 110px 150px 100px 40px;gap:14px;padding:14px 16px;border-bottom:1px solid var(--c-line-3);align-items:center;}
+.line-row .input,.line-row .select{height:38px;}
+.line-head{display:grid;grid-template-columns:minmax(240px,1fr) 110px 150px 100px 40px;gap:14px;padding:10px 16px;}
+.line-row:last-child{border-bottom:none;}
+.line-row .input,.line-row .select{height:34px;font-size:12.5px;}
+.del-line{width:30px;height:30px;border-radius:7px;border:1px solid var(--c-line-2);background:#fff;color:var(--c-danger);display:flex;align-items:center;justify-content:center;}
+.del-line .lucide{width:14px;height:14px;}
+.del-line:hover{background:#FEF2F2;}
+.add-line{margin:12px 14px;padding:9px;width:calc(100% - 28px);border:1.5px dashed var(--c-line);border-radius:9px;background:#fff;color:var(--c-primary);font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px;}
+.add-line:hover{border-color:var(--c-primary);background:#F8FAFF;}
+.line-foot{padding:11px 14px;background:var(--c-bg-off);border-top:1px solid var(--c-line-2);display:flex;justify-content:space-between;font-size:12.5px;}
+.line-foot b{color:var(--c-navy);}
+.note{padding:11px 13px;border-radius:9px;font-size:12.5px;display:flex;gap:9px;align-items:flex-start;}
+.note .lucide{width:15px;height:15px;flex-shrink:0;margin-top:1px;}
+.note.is-info{background:#FFF5F4;color:#C22217;}
+.note.is-warn{background:#FFFBEB;color:#92400E;}
+
+/* combobox (searchable select — html-generator-v3 standard) */
+.cbx{position:relative;}
+.cbx-ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--c-mute-3);width:15px;height:15px;}
+.cbx-clear,.cbx-chev{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--c-mute-3);}
+.cbx-clear{background:transparent;border:none;padding:4px;cursor:pointer;display:flex;}
+.cbx-chev{pointer-events:none;}
+.cbx-clear .lucide,.cbx-chev.lucide{width:15px;height:15px;}
+.cbx-suggest{position:fixed;z-index:200;background:#fff;border:1px solid var(--c-line);border-radius:10px;box-shadow:0 10px 30px rgba(17,17,17,.16);max-height:264px;overflow-y:auto;} /* Iron Rule #95 Overlay Portal (v8) */
+.cbx-suggest.hidden{display:none;}
+.cbx-opt{padding:9px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--c-line-3);}
+.cbx-opt:last-child{border-bottom:none;}
+.cbx-opt:hover{background:var(--c-bg-off);}
+.cbx-opt .nm{font-weight:600;color:var(--c-ink);font-size:13px;}
+.cbx-opt .oc{font-family:'Satoshi',monospace;font-size:11px;color:var(--c-mute-3);margin-top:1px;}
+.cbx-opt . av{width:28px;height:28px;border-radius:7px;background:var(--c-navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+.cbx-empty{padding:16px;text-align:center;color:var(--c-mute-3);font-size:12.5px;}
+/* view */
+.dfields{display:grid;grid-template-columns:150px 1fr;gap:10px 16px;font-size:13px;}
+.dfields .lbl{color:var(--c-mute-2);}.dfields .val{color:var(--c-ink);font-weight:500;}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--c-line-2);margin-bottom:18px;}
+.tab{padding:9px 14px;font-size:13px;font-weight:600;color:var(--c-mute-2);border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;user-select:none;}
+.tab.active{color:var(--c-primary);border-bottom-color:var(--c-primary);}
+.vtable{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;}
+.vtable th{text-align:left;font-size:10.5px;font-weight:700;color:var(--c-mute-2);text-transform:uppercase;padding:8px 10px;border-bottom:1px solid var(--c-line-2);background:var(--c-bg-off);}
+.vtable td{padding:9px 10px;border-bottom:1px solid var(--c-line-3);}
+.vtable tfoot td{font-weight:700;color:var(--c-navy);background:var(--c-bg-off);border-top:2px solid var(--c-line-2);}
+.tl{display:flex;flex-direction:column;gap:0;}
+.tl-item{display:flex;gap:11px;padding:0 0 16px;position:relative;}
+.tl-item::before{content:'';position:absolute;left:5px;top:14px;bottom:-2px;width:2px;background:var(--c-line-2);}
+.tl-item:last-child::before{display:none;}
+.tl-dot{width:12px;height:12px;border-radius:50%;background:var(--c-line);border:2px solid #fff;box-shadow:0 0 0 1px var(--c-line);z-index:1;flex-shrink:0;margin-top:2px;}
+.tl-dot.is-success{background:var(--c-success);box-shadow:0 0 0 1px var(--c-success);}
+.tl-dot.is-warning{background:var(--c-warning);box-shadow:0 0 0 1px var(--c-warning);}
+.tl-title{font-size:13px;font-weight:600;color:var(--c-ink);}
+.tl-meta{font-size:11.5px;color:var(--c-mute-3);}
+/* modal */
+#modal-root{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;}
+#modal-root.on{display:flex;}
+.modal-bd{position:absolute;inset:0;background:rgba(11,29,58,.45);}
+.modal{position:relative;background:#fff;border-radius:14px;width:440px;max-width:92vw;box-shadow:0 20px 60px rgba(11,29,58,.3);overflow:hidden;}
+.modal-h{padding:18px 22px 0;font-size:16px;font-weight:700;color:var(--c-navy);display:flex;align-items:center;gap:9px;}
+.modal-b{padding:14px 22px 20px;font-size:13.5px;color:var(--c-mute);line-height:1.6;}
+.modal-f{padding:0 22px 20px;display:flex;gap:10px;justify-content:flex-end;}
+/* toast */
+#toast-root{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center;}
+.toast{background:var(--c-navy);color:#fff;padding:11px 18px;border-radius:9px;font-size:13px;font-weight:500;box-shadow:0 8px 24px rgba(11,29,58,.3);display:flex;align-items:center;gap:9px;animation:tin .25s;}
+.toast .lucide{width:16px;height:16px;}
+.toast.is-warning{background:var(--c-warning);}.toast.is-error{background:var(--c-danger);}.toast.is-success{background:var(--c-success);}
+@keyframes tin{from{opacity:0;transform:translateY(8px);}}
+.empty{text-align:center;padding:50px 20px;color:var(--c-mute-3);}
+.empty .lucide{width:40px;height:40px;margin-bottom:10px;opacity:.5;}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sb-brand"><span class="logo"><i data-lucide="boxes" class="w-4 h-4"></i></span>CUBE 4.0</div>
+    <div class="sb-sec">ข้อมูลหลัก</div>
+    <div class="sb-item"><i data-lucide="package" class="w-4 h-4"></i>ทะเบียนสินค้า</div>
+    <div class="sb-item"><i data-lucide="ruler" class="w-4 h-4"></i>หน่วยนับ (UOM)</div>
+    <div class="sb-item is-active"><i data-lucide="git-merge" class="w-4 h-4"></i>สูตรการผลิต (BOM)</div>
+    <div class="sb-sec">การผลิต</div>
+    <div class="sb-item"><i data-lucide="factory" class="w-4 h-4"></i>ใบสั่งผลิต</div>
+    <div class="sb-item"><i data-lucide="repeat" class="w-4 h-4"></i>ใบแปลงหน่วยสั่งผลิต</div>
+    <div class="sb-sec">คลังสินค้า</div>
+    <div class="sb-item"><i data-lucide="warehouse" class="w-4 h-4"></i>สต็อก</div>
+  </aside>
+  <div class="main">
+    <div class="shell">
+      <div class="crumb">ข้อมูลหลัก<i data-lucide="chevron-right" class="w-3.5 h-3.5"></i><b>สูตรการผลิต (BOM)</b></div>
+      <div class="user-chip"><span>สมชาย (Planner)</span><span class="av">ส</span></div>
+    </div>
+    <div class="content" id="page-content"></div>
+  </div>
+</div>
+<div id="overlay-root"></div>
+<div id="modal-root"><div class="modal-bd" onclick="closeModal()"></div><div class="modal" id="modal-el"></div></div>
+<div id="toast-root"></div>
+<div id="suggest-portal"></div>
+
+<script>
+const ICONS={"alert-triangle": "<path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\" /><path d=\"M12 9v4\" /><path d=\"M12 17h.01\" />", "arrow-right": "<path d=\"M5 12h14\" /><path d=\"m12 5 7 7-7 7\" />", "boxes": "<path d=\"M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z\" /><path d=\"m7 16.5-4.74-2.85\" /><path d=\"m7 16.5 5-3\" /><path d=\"M7 16.5v5.17\" /><path d=\"M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z\" /><path d=\"m17 16.5-5-3\" /><path d=\"m17 16.5 4.74-2.85\" /><path d=\"M17 16.5v5.17\" /><path d=\"M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z\" /><path d=\"M12 8 7.26 5.15\" /><path d=\"m12 8 4.74-2.85\" /><path d=\"M12 13.5V8\" />", "check": "<path d=\"M20 6 9 17l-5-5\" />", "check-circle-2": "<path d=\"M21.801 10A10 10 0 1 1 17 3.335\" /><path d=\"m9 11 3 3L22 4\" />", "chevron-down": "<path d=\"m6 9 6 6 6-6\" />", "chevron-right": "<path d=\"m9 18 6-6-6-6\" />", "x-circle": "<circle cx=\"12\" cy=\"12\" r=\"10\" /><path d=\"m15 9-6 6\" /><path d=\"m9 9 6 6\" />", "file-edit": "<path d=\"M12 22h6a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v10\" /><path d=\"M14 2v4a2 2 0 0 0 2 2h4\" /><path d=\"M10.4 12.6a2 2 0 1 1 3 3L8 21l-4 1 1-4Z\" />", "clock": "<circle cx=\"12\" cy=\"12\" r=\"10\" /><polyline points=\"12 6 12 12 16 14\" />", "eye": "<path d=\"M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0\" /><circle cx=\"12\" cy=\"12\" r=\"3\" />", "factory": "<path d=\"M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z\" /><path d=\"M17 18h1\" /><path d=\"M12 18h1\" /><path d=\"M7 18h1\" />", "git-merge": "<circle cx=\"18\" cy=\"18\" r=\"3\" /><circle cx=\"6\" cy=\"6\" r=\"3\" /><path d=\"M6 21V9a9 9 0 0 0 9 9\" />", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\" /><path d=\"M12 16v-4\" /><path d=\"M12 8h.01\" />", "layers": "<path d=\"M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z\" /><path d=\"M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12\" /><path d=\"M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17\" />", "list": "<path d=\"M3 12h.01\" /><path d=\"M3 18h.01\" /><path d=\"M3 6h.01\" /><path d=\"M8 12h13\" /><path d=\"M8 18h13\" /><path d=\"M8 6h13\" />", "package": "<path d=\"M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z\" /><path d=\"M12 22V12\" /><path d=\"m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7\" /><path d=\"m7.5 4.27 9 5.15\" />", "pencil": "<path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\" /><path d=\"m15 5 4 4\" />", "plus": "<path d=\"M5 12h14\" /><path d=\"M12 5v14\" />", "repeat": "<path d=\"m17 2 4 4-4 4\" /><path d=\"M3 11v-1a4 4 0 0 1 4-4h14\" /><path d=\"m7 22-4-4 4-4\" /><path d=\"M21 13v1a4 4 0 0 1-4 4H3\" />", "rotate-ccw": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /><path d=\"M3 3v5h5\" />", "ruler": "<path d=\"M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z\" /><path d=\"m14.5 12.5 2-2\" /><path d=\"m11.5 9.5 2-2\" /><path d=\"m8.5 6.5 2-2\" /><path d=\"m17.5 15.5 2-2\" />", "search": "<circle cx=\"11\" cy=\"11\" r=\"8\" /><path d=\"m21 21-4.3-4.3\" />", "send": "<path d=\"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z\" /><path d=\"m21.854 2.147-10.94 10.939\" />", "star": "<path d=\"M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z\" />", "trash-2": "<path d=\"M3 6h18\" /><path d=\"M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6\" /><path d=\"M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2\" /><line x1=\"10\" x2=\"10\" y1=\"11\" y2=\"17\" /><line x1=\"14\" x2=\"14\" y1=\"11\" y2=\"17\" />", "warehouse": "<path d=\"M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z\" /><path d=\"M6 18h12\" /><path d=\"M6 14h12\" /><rect width=\"12\" height=\"12\" x=\"6\" y=\"10\" />", "x": "<path d=\"M18 6 6 18\" /><path d=\"m6 6 12 12\" />"};
+function renderIcons(root){
+  (root||document).querySelectorAll('[data-lucide]').forEach(function(el){
+    var n=el.getAttribute('data-lucide'); var inner=ICONS[n]; if(!inner)return;
+    var cls=(el.getAttribute('class')||''); var st=(el.getAttribute('style')||'');
+    var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('class',('lucide '+cls).trim());
+    if(st)svg.setAttribute('style',st);
+    svg.setAttribute('viewBox','0 0 24 24'); svg.setAttribute('fill','none');
+    svg.setAttribute('stroke','currentColor'); svg.setAttribute('stroke-width','2');
+    svg.setAttribute('stroke-linecap','round'); svg.setAttribute('stroke-linejoin','round');
+    svg.innerHTML=inner; el.replaceWith(svg);
+  });
+}
+
+/* ===================== MOCK MASTERS (ผูก context Product + UOM) ===================== */
+// Product Master (subset) — parent = manufacturable (FG/SET) · component = RM/PM/TR
+const PRODUCTS=[                                    // FG มี img — mock เป็น SVG data-URI (ฝังในไฟล์ เปิด offline ได้) · จริง: img url จากทะเบียนสินค้า F-PDM · onerror fallback ตัวอักษร
+  {code:'FG-1001',name:'โต๊ะทำงานไม้สัก 120ซม.',type:'FG',uom:'PCS',cost:3200,img:'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20fill%3D%22%23FFE8D6%22/%3E%3Crect%20x%3D%2212%22%20y%3D%2234%22%20width%3D%2256%22%20height%3D%227%22%20rx%3D%222%22%20fill%3D%22%238B5E34%22/%3E%3Crect%20x%3D%2216%22%20y%3D%2241%22%20width%3D%226%22%20height%3D%2226%22%20fill%3D%22%236B4423%22/%3E%3Crect%20x%3D%2258%22%20y%3D%2241%22%20width%3D%226%22%20height%3D%2226%22%20fill%3D%22%236B4423%22/%3E%3Crect%20x%3D%2244%22%20y%3D%2244%22%20width%3D%2218%22%20height%3D%2212%22%20rx%3D%222%22%20fill%3D%22%23A9744A%22/%3E%3C/svg%3E'},
+  {code:'FG-1020',name:'ชุดโต๊ะอาหาร 6 ที่นั่ง',type:'FG',uom:'SET',cost:8800,img:'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20fill%3D%22%23FDECC8%22/%3E%3Crect%20x%3D%2218%22%20y%3D%2236%22%20width%3D%2244%22%20height%3D%226%22%20rx%3D%222%22%20fill%3D%22%238B5E34%22/%3E%3Crect%20x%3D%2222%22%20y%3D%2242%22%20width%3D%225%22%20height%3D%2222%22%20fill%3D%22%236B4423%22/%3E%3Crect%20x%3D%2253%22%20y%3D%2242%22%20width%3D%225%22%20height%3D%2222%22%20fill%3D%22%236B4423%22/%3E%3Crect%20x%3D%228%22%20y%3D%2230%22%20width%3D%227%22%20height%3D%2230%22%20rx%3D%222%22%20fill%3D%22%23A9744A%22/%3E%3Crect%20x%3D%2265%22%20y%3D%2230%22%20width%3D%227%22%20height%3D%2230%22%20rx%3D%222%22%20fill%3D%22%23A9744A%22/%3E%3C/svg%3E'},
+  {code:'FG-1005',name:'ตู้เก็บเอกสาร 4 ชั้น',type:'FG',uom:'PCS',cost:0,img:'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20fill%3D%22%23EFE3D0%22/%3E%3Crect%20x%3D%2224%22%20y%3D%2212%22%20width%3D%2232%22%20height%3D%2256%22%20rx%3D%223%22%20fill%3D%22%238B5E34%22/%3E%3Crect%20x%3D%2228%22%20y%3D%2218%22%20width%3D%2224%22%20height%3D%2210%22%20rx%3D%221.5%22%20fill%3D%22%23D9B382%22/%3E%3Crect%20x%3D%2228%22%20y%3D%2231%22%20width%3D%2224%22%20height%3D%2210%22%20rx%3D%221.5%22%20fill%3D%22%23D9B382%22/%3E%3Crect%20x%3D%2228%22%20y%3D%2244%22%20width%3D%2224%22%20height%3D%2210%22%20rx%3D%221.5%22%20fill%3D%22%23D9B382%22/%3E%3Crect%20x%3D%2228%22%20y%3D%2257%22%20width%3D%2224%22%20height%3D%227%22%20rx%3D%221.5%22%20fill%3D%22%23D9B382%22/%3E%3C/svg%3E'},
+  {code:'RM-2001',name:'ไม้สักแปรรูป เกรด A',type:'RM',uom:'KG',cost:180},
+  {code:'RM-2010',name:'น้ำยาเคลือบไม้',type:'RM',uom:'L',cost:320},
+  {code:'PM-4001',name:'กล่องลูกฟูก 5 ชั้น',type:'PM',uom:'PCS',cost:12},
+  {code:'TR-5001',name:'น็อตสกรูชุบ 4นิ้ว',type:'TR',uom:'PCS',cost:45},
+  {code:'RM-2020',name:'กาวไม้อุตสาหกรรม',type:'RM',uom:'KG',cost:95},
+  {code:'RM-2030',name:'เบาะผ้าฝ้าย',type:'RM',uom:'PCS',cost:260},
+];
+const PMAP=Object.fromEntries(PRODUCTS.map(p=>[p.code,p]));
+const isParent=p=>['FG','SET'].includes(p.type)||p.type==='FG';
+const PARENTS=PRODUCTS.filter(p=>p.type==='FG');
+const COMPS=PRODUCTS.filter(p=>['RM','PM','TR'].includes(p.type));
+// UOM Master (จาก uom_master · category)
+const UOMS=[
+  {code:'PCS',name:'ชิ้น',cat:'count'},{code:'SET',name:'ชุด',cat:'count'},{code:'BOX',name:'กล่อง',cat:'count'},
+  {code:'KG',name:'กิโลกรัม',cat:'weight'},{code:'G',name:'กรัม',cat:'weight'},
+  {code:'L',name:'ลิตร',cat:'volume'},{code:'ML',name:'มิลลิลิตร',cat:'volume'},
+];
+const uomName=c=>{const u=UOMS.find(x=>x.code===c);return u?u.code+' · '+u.name:c;};
+
+/* ===================== SEED BOM (1 parent หลายสูตร = multi-BOM) ===================== */
+let SEQ=4;
+const RAW=[
+  {id:'b1',code:'BOM-0001',parent:'FG-1001',ver:'v1',name:'สูตรมาตรฐาน',out_qty:1,out_uom:'PCS',is_default:true,status:'active',used:14,approver_role:null,approved_by:null,approved_at:null,approval_chain:null,
+    eff_from:'2026-01-01',eff_to:'',lines:[
+      {item:'RM-2001',qty:12,uom:'KG',scrap:5},{item:'RM-2020',qty:0.3,uom:'KG',scrap:0},
+      {item:'TR-5001',qty:16,uom:'PCS',scrap:2},{item:'RM-2010',qty:0.5,uom:'L',scrap:0},{item:'PM-4001',qty:1,uom:'PCS',scrap:0}],
+    audit:[{k:'create',t:'สร้างสูตร (v1)',by:'somchai',at:'2026-01-02T09:00:00'},{k:'activate',t:'เปิดใช้งาน',by:'somchai',at:'2026-01-03T10:00:00',v:'success'}]},
+  {id:'b2',code:'BOM-0002',parent:'FG-1001',ver:'v2',name:'สูตรประหยัดไม้ (สำรอง)',out_qty:1,out_uom:'PCS',is_default:false,status:'draft',used:0,approver_role:null,approved_by:null,approved_at:null,approval_chain:null,
+    eff_from:'',eff_to:'',lines:[
+      {item:'RM-2001',qty:10,uom:'KG',scrap:4},{item:'RM-2020',qty:0.35,uom:'KG',scrap:0},
+      {item:'TR-5001',qty:18,uom:'PCS',scrap:2},{item:'PM-4001',qty:1,uom:'PCS',scrap:0}],
+    audit:[{k:'create',t:'สร้างสูตร (v2)',by:'somchai',at:'2026-05-20T11:00:00'}]},
+  {id:'b3',code:'BOM-0003',parent:'FG-1020',ver:'v1',name:'สูตรมาตรฐาน',out_qty:1,out_uom:'SET',is_default:true,status:'active',used:6,approver_role:null,approved_by:null,approved_at:null,approval_chain:null,
+    eff_from:'2026-02-01',eff_to:'',lines:[
+      {item:'RM-2001',qty:38,uom:'KG',scrap:6},{item:'RM-2030',qty:6,uom:'PCS',scrap:0},
+      {item:'TR-5001',qty:48,uom:'PCS',scrap:3},{item:'RM-2010',qty:1.2,uom:'L',scrap:0}],
+    audit:[{k:'create',t:'สร้างสูตร (v1)',by:'somchai',at:'2026-02-01T09:00:00'},{k:'activate',t:'เปิดใช้งาน',by:'somchai',at:'2026-02-05T10:00:00',v:'success'}]},
+  {id:'b4',code:'BOM-0004',parent:'FG-1005',ver:'v1',name:'สูตรต้นแบบ',out_qty:1,out_uom:'PCS',is_default:true,status:'draft',used:0,approver_role:null,approved_by:null,approved_at:null,approval_chain:null,
+    eff_from:'',eff_to:'',lines:[{item:'RM-2001',qty:22,uom:'KG',scrap:5},{item:'TR-5001',qty:30,uom:'PCS',scrap:3}],
+    audit:[{k:'create',t:'สร้างสูตร (v1)',by:'wipa',at:'2026-05-28T14:00:00'}]},
+];
+
+/* ===================== STATE + ROUTING ===================== */
+const state={filters:{search:'',parent:'',status:''},bulkSel:{},sort:{key:'code',dir:1},drawer:{open:false,mode:null,id:null,step:1,tab:'overview'},form:null,modal:{open:false,type:null,id:null}};
+let fgSearch={query:'',open:false};
+let lineCombo={idx:-1,query:'',open:false};
+const STATUS_TH={draft:'ร่าง',active:'ใช้งาน',inactive:'ไม่ใช้งาน'};   // สถานะ 3 ค่า pattern เลน (VD-PDM-01/02) — อิสระทุกทิศ
+const STATUS_ICON={draft:'file-edit',active:'check-circle-2',inactive:'x-circle'};
+function statusPill(st){return `<span class="pill pill-${st}">${STATUS_TH[st]||st}</span>`;}
+// used = จำนวนใบสั่งผลิต (MO) ที่อ้างสูตรนี้ (mock — จริง sync จาก Production) → guard ลบ · [AI-DRAFT] แก้ lines ได้ (MO snapshot สูตรตอนเปิดใบ) → OQ
+// [DOA-ENGINE placeholder] approver_role/approved_by/approved_at/approval_chain = null — BR-08 ไม่มีอนุมัติ
+function navTo(r){location.hash='#/'+r;}
+function parseHash(){const h=location.hash.replace(/^#\/?/,'').split('/');return{mode:h[1],id:h[2]};}
+function syncHash(){const p=parseHash();
+  if(p.mode==='create')openForm('create',null);
+  else if(p.mode==='edit'&&p.id)openForm('edit',p.id);
+  else if(p.mode==='view'&&p.id)openView(p.id);
+  else{state.drawer.open=false;state.modal.open=false;}
+  render();
+}
+window.addEventListener('hashchange',syncHash);
+
+/* ===================== HELPERS ===================== */
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function fmtNum(n){return (n==null?0:n).toLocaleString('th-TH',{maximumFractionDigits:2});}
+function fmtDate(d){if(!d)return '—';return new Date(d).toLocaleDateString('th-TH',{day:'2-digit',month:'short',year:'numeric'});}
+function fmtDT(d){if(!d)return '';return new Date(d).toLocaleString('th-TH',{day:'2-digit',month:'short',year:'2-digit',hour:'2-digit',minute:'2-digit'});}
+function initials(c){return c.slice(0,2);}
+function prodAvatar(code,size){                       // รูปสินค้า FG + fallback ตัวอักษรเมื่อโหลดไม่ได้ (offline)
+  const p=PMAP[code]||{};
+  const img=p.img?`<img src="${p.img}" alt="" loading="lazy" onerror="this.remove()">`:'';
+  return `<div class="parent-ic"${size?` style="width:${size}px;height:${size}px;"`:''}>${initials(code)}${img}</div>`;
+}
+function lineCost(l){const p=PMAP[l.item];if(!p)return 0;return p.cost*l.qty*(1+(l.scrap||0)/100);}
+function bomCost(b){return (b.lines||[]).reduce((s,l)=>s+lineCost(l),0);}
+function toast(msg,kind){const r=document.getElementById('toast-root');const t=document.createElement('div');t.className='toast'+(kind?' is-'+kind:'');const ic={success:'check-circle-2',warning:'alert-triangle',error:'x-circle',info:'info'}[kind]||'info';t.innerHTML='<i data-lucide="'+ic+'"></i>'+esc(msg);r.appendChild(t);renderIcons();setTimeout(()=>t.remove(),2600);}
+
+/* ===================== LIST ===================== */
+function filtered(){
+  let r=RAW.slice();const f=state.filters;
+  if(f.search){const q=f.search.toLowerCase();r=r.filter(b=>(b.code+' '+b.name+' '+b.parent+' '+(PMAP[b.parent]?.name||'')).toLowerCase().includes(q));}
+  if(f.parent)r=r.filter(b=>b.parent===f.parent);
+  if(f.status)r=r.filter(b=>b.status===f.status);
+  const k=state.sort.key,d=state.sort.dir;
+  r.sort((a,b)=>{let x=a[k],y=b[k];if(k==='comp'){x=a.lines.length;y=b.lines.length;}if(k==='cost'){x=bomCost(a);y=bomCost(b);}return x>y?d:x<y?-d:0;});
+  return r;
+}
+function renderList(){
+  const rows=filtered();
+  const total=RAW.length,active=RAW.filter(b=>b.status==='active').length,draft=RAW.filter(b=>b.status==='draft').length;
+  const parents=[...new Set(RAW.map(b=>b.parent))].length;
+  return `
+  <div class="page-h"><div><h1><i data-lucide="git-merge" style="width:20px;height:20px;color:var(--c-primary)"></i>สูตรการผลิต (BOM)</h1>
+    <p>กำหนดส่วนประกอบของสินค้าผลิตเอง — ผูกวัตถุดิบจากทะเบียนสินค้า + หน่วยจาก UOM · รองรับหลายสูตรต่อสินค้า</p></div>
+    <button class="btn btn-primary" onclick="navTo('bom/create')"><i data-lucide="plus"></i>สร้างสูตรใหม่</button>
+  </div>
+  <div class="stats">
+    <div class="stat ${state.filters.status===''?'is-on':''}" onclick="quickFilter('')"><div class="stat-label"><i data-lucide="git-merge"></i>สูตรทั้งหมด</div><div class="stat-value">${total}</div><div class="stat-meta">${parents} สินค้าที่มีสูตร</div></div>
+    <div class="stat ${state.filters.status==='active'?'is-on':''}" onclick="quickFilter('active')"><div class="stat-label"><i data-lucide="check-circle-2"></i>ใช้งาน</div><div class="stat-value">${active}</div><div class="stat-meta">พร้อมใช้ผลิต</div></div>
+    <div class="stat ${state.filters.status==='inactive'?'is-on':''}" onclick="quickFilter('inactive')"><div class="stat-label"><i data-lucide="x-circle"></i>ไม่ใช้งาน</div><div class="stat-value">${RAW.filter(b=>b.status==='inactive').length}</div><div class="stat-meta">เลิกใช้สูตรนี้แล้ว</div></div>
+    <div class="stat ${state.filters.status==='draft'?'is-on':''}" onclick="quickFilter('draft')"><div class="stat-label"><i data-lucide="file-edit"></i>ร่าง</div><div class="stat-value">${draft}</div><div class="stat-meta">ยังไม่เปิดใช้</div></div>
+  </div>
+  <div class="toolbar"><div class="filter-bar">
+    <div class="input-search"><i data-lucide="search"></i><input class="input" id="bomSearch" placeholder="ค้นหา รหัสสูตร / ชื่อ / สินค้า..." value="${esc(state.filters.search)}" oninput="setFilter('search',this.value)"></div>
+    <select class="select" onchange="setFilter('parent',this.value)"><option value="">สินค้าทั้งหมด</option>${PARENTS.map(p=>`<option value="${p.code}" ${state.filters.parent===p.code?'selected':''}>${esc(p.code)} · ${esc(p.name)}</option>`).join('')}</select>
+    <select class="select" onchange="setFilter('status',this.value)"><option value="">ทุกสถานะ</option>${Object.entries(STATUS_TH).map(([k,v])=>`<option value="${k}" ${state.filters.status===k?'selected':''}>${v}</option>`).join('')}</select>
+    <button class="btn btn-ghost" onclick="resetFilter()"><i data-lucide="rotate-ccw"></i>ล้าง</button>
+  </div></div>
+  ${(()=>{const selN=Object.keys(state.bulkSel).filter(k=>state.bulkSel[k]).length;return selN?`<div class="bulkbar">
+    <span class="bb-count">เลือก ${selN} รายการ</span>
+    <button onclick="bulkSetStatus('active')"><i data-lucide="check-circle-2"></i>ใช้งาน</button>
+    <button onclick="bulkSetStatus('inactive')"><i data-lucide="x-circle"></i>ไม่ใช้งาน</button>
+    <button onclick="bulkSetStatus('draft')"><i data-lucide="file-edit"></i>ร่าง</button>
+    <button class="is-danger" onclick="openBulkDelete()"><i data-lucide="trash-2"></i>ลบ</button>
+    <div style="flex:1;"></div>
+    <button onclick="state.bulkSel={};render();"><i data-lucide="x"></i>ยกเลิก</button>
+  </div>`:'';})()}
+  <div class="table-card"><div class="table-scroll">
+    <table><thead><tr>
+      <th style="width:34px;" onclick="event.stopPropagation()"><input type="checkbox" class="ck" ${filtered().length&&filtered().every(b=>state.bulkSel[b.id])?'checked':''} onclick="toggleSelAll(this.checked)"></th>
+      <th onclick="sortBy('parent')">สินค้า (ผลผลิต)</th><th onclick="sortBy('ver')">เวอร์ชัน</th>
+      <th onclick="sortBy('name')">ชื่อสูตร</th><th onclick="sortBy('comp')">ส่วนประกอบ</th>
+      <th onclick="sortBy('cost')">ต้นทุนรวม</th><th>มีผล</th><th onclick="sortBy('status')">สถานะ</th><th></th>
+    </tr></thead><tbody>
+    ${rows.length?rows.map(b=>{const p=PMAP[b.parent]||{};return `<tr class="row-click ${state.bulkSel[b.id]?'is-sel':''}" onclick="navTo('bom/view/${b.id}')">
+      <td onclick="event.stopPropagation()"><input type="checkbox" class="ck" ${state.bulkSel[b.id]?'checked':''} onclick="toggleSel('${b.id}',this.checked)"></td>
+      <td><div class="parent-cell">${prodAvatar(b.parent)}<div><div class="nm">${esc(p.name||b.parent)}</div><div class="cd">${esc(b.parent)} · ${esc(b.code)}</div></div></div></td>
+      <td><span class="ver-tag">${esc(b.ver)}</span> ${b.is_default?'<span class="badge-def"><i data-lucide="star"></i>สูตรหลัก</span>':''}</td>
+      <td>${esc(b.name)}</td>
+      <td><span class="mono">${b.lines.length} รายการ</span></td>
+      <td><span class="mono">฿${fmtNum(bomCost(b))}</span></td>
+      <td><span class="mono">${fmtDate(b.eff_from)}</span></td>
+      <td>${statusPill(b.status)}</td>
+      <td class="chev-cell"><i data-lucide="chevron-right"></i></td>
+    </tr>`;}).join(''):`<tr><td colspan="9"><div class="empty"><i data-lucide="git-merge"></i><div>ไม่พบสูตรการผลิต</div></div></td></tr>`}
+    </tbody></table></div>
+    <div class="footer-row"><span>แสดง ${rows.length} จาก ${total} สูตร</span><span>หน้า 1</span></div>
+  </div>`;
+}
+function setFilter(k,v){
+  let caret=null;
+  if(k==='search'){const cur=document.getElementById('bomSearch');caret=cur?cur.selectionStart:null;}
+  state.filters[k]=v;renderInline();
+  if(k==='search'){const el=document.getElementById('bomSearch');if(el){el.focus();const pos=(caret==null?el.value.length:caret);el.setSelectionRange(pos,pos);}}
+}
+function quickFilter(st){state.filters.status=(st===''?'':(state.filters.status===st?'':st));render();}
+function toggleSel(id,on){state.bulkSel[id]=!!on;render();}
+function toggleSelAll(on){filtered().forEach(b=>state.bulkSel[b.id]=!!on);render();}
+function bulkSetStatus(st){
+  const ids=Object.keys(state.bulkSel).filter(k=>state.bulkSel[k]);if(!ids.length)return;
+  let n=0;ids.forEach(id=>{const b=RAW.find(x=>x.id===id);if(!b||b.status===st)return;
+    b.status=st;if(st!=='active')b.is_default=false;               // หลุดจาก active → สูตรหลักหลุดตาม
+    b.audit.push({k:'status',t:'เปลี่ยนสถานะเป็น '+STATUS_TH[st],by:'somchai',at:new Date().toISOString()});n++;});
+  state.bulkSel={};render();toast('เปลี่ยนสถานะ '+n+' สูตรเป็น '+STATUS_TH[st]+' แล้ว','success');
+}
+function setStatus(id,st){
+  const b=RAW.find(x=>x.id===id);if(!b||b.status===st)return;
+  b.status=st;if(st!=='active')b.is_default=false;
+  b.audit.push({k:'status',t:'เปลี่ยนสถานะเป็น '+STATUS_TH[st],by:'somchai',at:new Date().toISOString()});
+  closeMenus();render();toast('เปลี่ยนสถานะเป็น '+STATUS_TH[st]+' แล้ว','success');
+}
+function toggleStatusMenu(e){if(e)e.stopPropagation();const m=document.getElementById('statusMenu');if(!m)return;const was=m.classList.contains('is-open');closeMenus();if(!was)m.classList.add('is-open');}
+function closeMenus(){document.querySelectorAll('.pop-menu').forEach(m=>m.classList.remove('is-open'));}
+function openBulkDelete(){const ids=Object.keys(state.bulkSel).filter(k=>state.bulkSel[k]);if(!ids.length)return;state.modal={open:true,type:'bulkdelete',id:null};render();}
+function confirmBulkDelete(){                                       // used>0 = มี MO อ้างสูตร — ข้าม (guard เลน)
+  const ids=Object.keys(state.bulkSel).filter(k=>state.bulkSel[k]);
+  const del=[],skip=[];
+  ids.forEach(id=>{const b=RAW.find(x=>x.id===id);if(!b)return;((b.used||0)>0?skip:del).push(id);});
+  for(let i=RAW.length-1;i>=0;i--){if(del.includes(RAW[i].id))RAW.splice(i,1);}
+  state.bulkSel={};state.modal={open:false,type:null,id:null};render();
+  toast('ลบแล้ว '+del.length+' สูตร'+(skip.length?' · ข้าม '+skip.length+' (มีใบสั่งผลิตอ้างแล้ว)':''),skip.length?'warning':'success');
+}
+function resetFilter(){state.filters={search:'',parent:'',status:''};render();}
+function sortBy(k){if(state.sort.key===k)state.sort.dir*=-1;else{state.sort.key=k;state.sort.dir=1;}render();}
+function renderInline(){document.getElementById('page-content').innerHTML=renderList();renderIcons();}
+
+/* ===================== FORM (create/edit · master-detail) ===================== */
+// uom helpers — make sure uom ตาม category ของวัตถุดิบนั้น ๆ
+function uomCat(code){const u=UOMS.find(x=>x.code===code);return u?u.cat:null;}
+function uomsForItem(itemCode){const p=PMAP[itemCode];if(!p)return UOMS;const cat=uomCat(p.uom);const f=UOMS.filter(u=>u.cat===cat);return f.length?f:UOMS;}
+function typeLabel(t){return{RM:'วัตถุดิบ',PM:'บรรจุภัณฑ์',TR:'อะไหล่'}[t]||t;}
+// FG combobox
+function fgMatches(){const q=fgSearch.query.toLowerCase();return PARENTS.filter(p=>!q||(p.code+' '+p.name).toLowerCase().includes(q));}
+function renderFgOpts(){const m=fgMatches();if(!m.length)return '<div class="cbx-empty">ไม่พบสินค้า</div>';
+  return m.map(p=>`<div class="cbx-opt" onclick="selectFg('${p.code}')">${prodAvatar(p.code,30)}<div><div class="nm">${esc(p.name)}</div><div class="oc">${esc(p.code)} · หน่วย ${esc(p.uom)}</div></div></div>`).join('');}
+function placeSuggest(sgEl,inputEl){                          // Iron Rule #95 — คำนวณจาก rect ของ input
+  if(!sgEl||!inputEl)return;
+  const r=inputEl.getBoundingClientRect();
+  const spaceBelow=window.innerHeight-r.bottom;
+  sgEl.style.left=r.left+'px'; sgEl.style.width=r.width+'px';
+  if(spaceBelow<200){ sgEl.style.top=''; sgEl.style.bottom=(window.innerHeight-r.top+4)+'px'; }
+  else { sgEl.style.bottom=''; sgEl.style.top=(r.bottom+4)+'px'; }
+}
+function fgSuggestOnly(){                                     // #95 portal จริง — อยู่นอก drawer (กัน transform ทำ fixed เพี้ยน)
+  const portal=document.getElementById('suggest-portal');
+  if(!fgSearch.open){ if(document.getElementById('fgSuggest'))portal.innerHTML=''; return; }
+  portal.innerHTML='<div class="cbx-suggest" id="fgSuggest">'+renderFgOpts()+'</div>';
+  placeSuggest(document.getElementById('fgSuggest'),document.getElementById('fgInput'));
+  renderIcons(portal);
+}
+function onFgSearch(e){fgSearch.query=e.target.value;fgSearch.open=true;fgSuggestOnly();}
+function onFgFocus(){fgSearch.open=true;fgSuggestOnly();}
+function selectFg(code){captureForm();state.form.parent=code;const p=PMAP[code];if(p){state.form.out_uom=p.uom;if(!state.form.ver)state.form.ver='v1';}fgSearch={query:'',open:false};render();}
+function clearFg(){captureForm();state.form.parent='';fgSearch={query:'',open:true};render();setTimeout(()=>document.getElementById('fgInput')&&document.getElementById('fgInput').focus(),0);}
+// line (วัตถุดิบ) combobox
+function lineMatches(){const q=lineCombo.query.toLowerCase();return COMPS.filter(c=>!q||(c.code+' '+c.name).toLowerCase().includes(q));}
+function renderLineOpts(i){const m=lineMatches();if(!m.length)return '<div class="cbx-empty">ไม่พบวัตถุดิบ</div>';
+  return m.map(c=>`<div class="cbx-opt" onclick="selectLineItem(${i},'${c.code}')"><div class="av">${initials(c.code)}</div><div><div class="nm">${esc(c.name)}</div><div class="oc">${esc(c.code)} · ${esc(c.uom)} · ${typeLabel(c.type)}</div></div></div>`).join('');}
+function lineSuggestOnly(i){
+  const portal=document.getElementById('suggest-portal');
+  if(!(lineCombo.idx===i&&lineCombo.open)){ if(document.getElementById('lnSuggest-'+i))portal.innerHTML=''; return; }
+  portal.innerHTML='<div class="cbx-suggest" id="lnSuggest-'+i+'">'+renderLineOpts(i)+'</div>';
+  placeSuggest(document.getElementById('lnSuggest-'+i),document.getElementById('lnInput-'+i));
+  renderIcons(portal);
+}
+function openLineCombo(i){if(lineCombo.idx===i&&lineCombo.open)return; /* กัน focus loop (fix vibe r3) */ captureForm();lineCombo={idx:i,query:'',open:true};render();setTimeout(()=>{const el=document.getElementById('lnInput-'+i);if(el){el.focus();el.select();}},0);}
+function onLineSearch(i,e){lineCombo.idx=i;lineCombo.query=e.target.value;lineCombo.open=true;lineSuggestOnly(i);}
+function selectLineItem(i,code){captureForm();const p=PMAP[code];state.form.lines[i].item=code;if(p)state.form.lines[i].uom=p.uom;lineCombo={idx:-1,query:'',open:false};render();}
+function blankForm(){return{parent:'',ver:'',name:'',out_qty:1,out_uom:'PCS',is_default:false,status:'draft',eff_from:'',eff_to:'',lines:[{item:COMPS[0].code,qty:1,uom:COMPS[0].uom,scrap:0}]};}
+function openForm(mode,id){
+  let f;
+  if(mode==='create')f=blankForm();
+  else{const b=RAW.find(x=>x.id===id);if(!b){navTo('bom');return;}f=JSON.parse(JSON.stringify(b));}
+  state.drawer={open:true,mode,id:id||null,step:1,tab:'overview'};state.form=f;state.modal.open=false;
+}
+function captureForm(){
+  const f=state.form;if(!f)return;
+  const g=id=>document.getElementById(id);
+  if(g('f-ver'))f.ver=g('f-ver').value;
+  if(g('f-name'))f.name=g('f-name').value;
+  if(g('f-outqty'))f.out_qty=+g('f-outqty').value||1;
+  if(g('f-efffrom'))f.eff_from=g('f-efffrom').value;
+  (f.lines||[]).forEach((l,i)=>{
+    if(g('ln-qty-'+i))l.qty=+g('ln-qty-'+i).value||0;
+    if(g('ln-uom-'+i))l.uom=g('ln-uom-'+i).value;
+    if(g('ln-scrap-'+i))l.scrap=+g('ln-scrap-'+i).value||0;
+  });
+}
+function toggleDefault(){captureForm();state.form.is_default=!state.form.is_default;render();}
+function addLine(){captureForm();const def=COMPS[0];state.form.lines.push({item:def.code,qty:1,uom:def.uom,scrap:0});lineCombo={idx:-1,query:'',open:false};render();}
+function delLine(i){captureForm();state.form.lines.splice(i,1);render();}
+function nextStep(){
+  captureForm();const f=state.form;
+  if(state.drawer.step===1){
+    if(!f.parent){toast('เลือกสินค้าผลผลิตก่อน','warning');return;}
+    if(!f.ver.trim()){toast('ระบุเวอร์ชันสูตร','warning');return;}
+    if(!f.name.trim()){toast('ระบุชื่อสูตร','warning');return;}
+    // multi-BOM guard: ห้ามซ้ำ parent+ver
+    if(RAW.some(b=>b.parent===f.parent&&b.ver===f.ver&&b.id!==state.drawer.id)){toast('เวอร์ชัน '+f.ver+' ของสินค้านี้มีอยู่แล้ว','error');return;}
+  }
+  state.drawer.step=Math.min(2,state.drawer.step+1);render();
+}
+function prevStep(){captureForm();state.drawer.step=Math.max(1,state.drawer.step-1);render();}
+function validateLines(f){
+  if(!f.lines.length)return 'ต้องมีส่วนประกอบอย่างน้อย 1 รายการ';
+  const baseCatOk=true;
+  for(const l of f.lines){
+    if(l.item===f.parent)return 'ส่วนประกอบห้ามเป็นตัวสินค้าเอง ('+l.item+') — กัน BOM วน';
+    if(!(l.qty>0))return 'ปริมาณของ '+l.item+' ต้องมากกว่า 0';
+  }
+  const seen=new Set();for(const l of f.lines){if(seen.has(l.item))return 'วัตถุดิบ '+l.item+' ซ้ำ — รวมเป็นรายการเดียว';seen.add(l.item);}
+  return null;
+}
+function saveForm(activate){
+  captureForm();const f=state.form;
+  // VR-01..03 (FRD 05_RULES) — เดิมโค้ดไม่ enforce (fix recheck 2026-08-09)
+  if(!f.parent){toast('เลือกสินค้าผลผลิตก่อน','error');return;}                                   // VR-01
+  if(!(f.ver||'').trim()){toast('ระบุเวอร์ชันสูตร (เช่น v1)','error');return;}                     // VR-02a
+  const dupVer=RAW.some(x=>x.parent===f.parent&&x.ver.toLowerCase()===f.ver.trim().toLowerCase()&&x.id!==state.drawer.id);
+  if(dupVer){toast('เวอร์ชัน '+f.ver+' ของสินค้านี้มีอยู่แล้ว','error');return;}                    // VR-02b unique/parent
+  if(!(f.name||'').trim()){toast('ระบุชื่อสูตร','error');return;}                                  // VR-03
+  const err=validateLines(f);if(err){toast(err,'error');return;}
+  if(state.drawer.mode==='create'){
+    f.id='b'+(++SEQ);f.code='BOM-'+String(1000+SEQ).padStart(4,'0');
+    f.used=0;f.approver_role=null;f.approved_by=null;f.approved_at=null;f.approval_chain=null;   // DOA placeholder (BR-08 ไม่มีอนุมัติ)
+    f.status=activate?'active':'draft';
+    f.audit=[{k:'create',t:'สร้างสูตร ('+f.ver+')',by:'somchai',at:new Date().toISOString()}];
+    if(activate)f.audit.push({k:'activate',t:'เปิดใช้งาน',by:'somchai',at:new Date().toISOString(),v:'success'});
+    if(f.is_default)RAW.forEach(b=>{if(b.parent===f.parent)b.is_default=false;});
+    RAW.unshift(f);
+  }else{
+    const b=RAW.find(x=>x.id===state.drawer.id);
+    if(f.is_default)RAW.forEach(x=>{if(x.parent===f.parent&&x.id!==b.id)x.is_default=false;});
+    Object.assign(b,f);b.audit.push({k:'amend',t:'แก้ไขสูตร',by:'somchai',at:new Date().toISOString()});
+    if(activate&&b.status!=='active'){b.status='active';b.audit.push({k:'activate',t:'เปิดใช้งาน',by:'somchai',at:new Date().toISOString(),v:'success'});}
+  }
+  toast(activate?'เปิดใช้งานแล้ว':'บันทึกร่างแล้ว','success');navTo('bom');
+}
+function renderForm(){
+  const f=state.form,isEdit=state.drawer.mode==='edit',step=state.drawer.step;
+  const p=PMAP[f.parent];
+  const totalCost=bomCost(f);
+  let body;
+  if(step===1){
+    body=`<div class="fsec"><div class="fsec-title"><i data-lucide="package" style="width:15px;height:15px;color:var(--c-primary)"></i>ข้อมูลสูตร</div>
+      <div class="fgrid">
+        <div class="field full"><label>สินค้าผลผลิต (FG) <span class="req">*</span></label>
+          ${isEdit?`<input class="input" value="${esc((PMAP[f.parent]?.code||'')+' · '+(PMAP[f.parent]?.name||''))}" disabled style="opacity:.6">`:`
+          <div class="cbx" id="fgCombo">
+            <i data-lucide="search" class="cbx-ic"></i>
+            <input class="input" id="fgInput" autocomplete="off" style="padding-left:36px;padding-right:34px"
+              value="${f.parent?esc(PMAP[f.parent].code+' · '+PMAP[f.parent].name):esc(fgSearch.query)}"
+              placeholder="ค้นหาสินค้าผลิตเอง (รหัส/ชื่อ)..." oninput="onFgSearch(event)" onfocus="onFgFocus()">
+            ${f.parent?`<button class="cbx-clear" onclick="clearFg()" title="ล้าง"><i data-lucide="x"></i></button>`:`<i data-lucide="chevron-down" class="cbx-chev"></i>`}
+
+          </div>`}</div>
+        <div class="field"><label>เวอร์ชันสูตร <span class="req">*</span></label><input class="input" id="f-ver" value="${esc(f.ver)}" placeholder="v1, v2..." oninput="captureForm()"></div>
+        <div class="field"><label>ชื่อสูตร <span class="req">*</span></label><input class="input" id="f-name" value="${esc(f.name)}" placeholder="เช่น สูตรมาตรฐาน / สูตรประหยัด" oninput="captureForm()"></div>
+        <div class="field"><label>ผลผลิตต่อสูตร</label><input class="input" id="f-outqty" type="number" min="1" value="${f.out_qty}" oninput="captureForm()"></div>
+        <div class="field"><label>เริ่มมีผล (effective)</label><input class="input" id="f-efffrom" type="date" value="${f.eff_from||''}" oninput="captureForm()"></div>
+        <div class="field full"><div class="toggle-row"><div class="tx">ตั้งเป็นสูตรหลัก<small>สูตรที่ระบบเลือกใช้เป็น default ตอนสร้างใบสั่งผลิต (1 สินค้า = 1 สูตรหลัก)</small></div><div class="sw ${f.is_default?'on':''}" onclick="toggleDefault()"></div></div></div>
+      </div></div>
+      ${f.parent?``:''}`;
+  }else{
+    body=`<div class="fsec"><div class="fsec-title"><i data-lucide="list" style="width:15px;height:15px;color:var(--c-primary)"></i>ส่วนประกอบ (วัตถุดิบ) — ${esc(p?p.name:'')} 1 ${uomName(f.out_uom)}</div>
+      <div class="lines">
+        <div class="lines-head"><span>วัตถุดิบ / ส่วนประกอบ</span><span>ปริมาณ</span><span>หน่วย</span><span>เผื่อเสีย%</span><span></span></div>
+        ${f.lines.map((l,i)=>{const cp=PMAP[l.item]||{};const showCombo=lineCombo.idx===i;return `<div class="line-row">
+          <div class="cbx" id="lnCombo-${i}">
+            <input class="input" id="lnInput-${i}" autocomplete="off" style="padding-right:28px"
+              value="${showCombo?esc(lineCombo.query):(cp.code?esc(cp.code+' · '+cp.name):'')}"
+              placeholder="ค้นหาวัตถุดิบ..." oninput="onLineSearch(${i},event)" onfocus="openLineCombo(${i})">
+            <i data-lucide="chevron-down" class="cbx-chev"></i>
+
+          </div>
+          <input class="input" id="ln-qty-${i}" type="number" min="0" step="0.01" value="${l.qty}" oninput="captureForm()">
+          <select class="select" id="ln-uom-${i}" style="width:100%" onchange="captureForm()">${uomsForItem(l.item).map(u=>`<option value="${u.code}" ${l.uom===u.code?'selected':''}>${esc(u.code)} · ${esc(u.name)}</option>`).join('')}</select>
+          <input class="input" id="ln-scrap-${i}" type="number" min="0" max="100" value="${l.scrap||0}" oninput="captureForm()">
+          <button class="del-line" onclick="delLine(${i})"><i data-lucide="trash-2"></i></button>
+        </div>`;}).join('')||'<div style="padding:20px;text-align:center;color:var(--c-mute-3);font-size:13px">ยังไม่มีส่วนประกอบ — กดเพิ่มด้านล่าง</div>'}
+        <button class="add-line" onclick="addLine()"><i data-lucide="plus"></i>เพิ่มส่วนประกอบ</button>
+        <div class="line-foot"><span>${f.lines.length} รายการ · เผื่อเสียคิดในต้นทุน</span><span>ต้นทุนรวมต่อ 1 ${esc(f.out_uom)}: <b>฿${fmtNum(totalCost)}</b></span></div>
+      </div></div>`;
+  }
+  return `<div class="drawer-panel drawer-enter">
+    <div class="drawer-head"><div><h2><i data-lucide="${isEdit?'pencil':'plus'}" style="width:18px;height:18px;color:var(--c-primary)"></i>${isEdit?'แก้ไขสูตร '+esc(f.code):'สร้างสูตรการผลิตใหม่'}</h2>${isEdit?`<div class="sub">${esc(PMAP[f.parent]?.name||'')} · ${esc(f.ver)}</div>`:''}</div>
+      <div class="dh-actions"><button class="icon-btn" onclick="navTo('bom')"><i data-lucide="x"></i></button></div></div>
+    <div class="drawer-body">
+      <div class="stepper">
+        <div class="step ${step>1?'done':'active'}"><div class="dot step-dot">${step>1?'<i data-lucide="check" class="w-3.5 h-3.5"></i>':'1'}</div><div class="lb">ข้อมูลสูตร</div></div>
+        <div class="step ${step===2?'active':''}"><div class="dot step-dot">2</div><div class="lb">ส่วนประกอบ</div></div>
+      </div>
+      ${body}
+    </div>
+    <div class="drawer-foot">
+      <button class="btn btn-ghost" onclick="${step===1?"navTo('bom')":'prevStep()'}">${step===1?'ยกเลิก':'ย้อนกลับ'}</button>
+      <div class="foot-spacer"></div>
+      ${step===2?'<button class="btn" onclick="saveForm(false)">บันทึกร่าง</button>':''}
+      ${step<2?'<button class="btn btn-primary" onclick="nextStep()">ถัดไป<i data-lucide="arrow-right"></i></button>':'<button class="btn btn-primary" onclick="saveForm(true)"><i data-lucide="check"></i>บันทึก + เปิดใช้งาน</button>'}
+    </div>
+  </div>`;
+}
+
+/* ===================== VIEW ===================== */
+function setTab(t){state.drawer.tab=t;render();}
+function openView(id){const b=RAW.find(x=>x.id===id);if(!b){navTo('bom');return;}state.drawer={open:true,mode:'view',id,step:1,tab:'overview'};state.form=null;state.modal.open=false;}
+function renderView(){
+  const b=RAW.find(x=>x.id===state.drawer.id);if(!b)return'';const p=PMAP[b.parent]||{};const tab=state.drawer.tab;
+  const others=RAW.filter(x=>x.parent===b.parent&&x.id!==b.id);
+  let body;
+  if(tab==='overview'){
+    body=`<div class="fsec"><div class="fsec-title">ข้อมูลสูตร</div><div class="dfields">
+      <div class="lbl">รหัสสูตร</div><div class="val">${esc(b.code)}</div>
+      <div class="lbl">สินค้าผลผลิต</div><div class="val">${esc(p.name)} <span class="mono">(${esc(b.parent)})</span></div>
+      <div class="lbl">เวอร์ชัน</div><div class="val">${esc(b.ver)} ${b.is_default?'<span class="badge-def"><i data-lucide="star"></i>สูตรหลัก</span>':''}</div>
+      <div class="lbl">ชื่อสูตร</div><div class="val">${esc(b.name)}</div>
+      <div class="lbl">ผลผลิตต่อสูตร</div><div class="val">${b.out_qty} ${uomName(b.out_uom)}</div>
+      <div class="lbl">เริ่มมีผล</div><div class="val">${fmtDate(b.eff_from)}</div>
+      <div class="lbl">สถานะ</div><div class="val"><span class="pill pill-${b.status}">${STATUS_TH[b.status]}</span></div>
+    </div></div>
+    ${others.length?`<div class="fsec"><div class="fsec-title"><i data-lucide="layers" style="width:15px;height:15px;color:var(--c-primary)"></i>เวอร์ชันอื่นของสินค้านี้ (${others.length})</div>
+      <div class="lines">
+        ${others.map(x=>`<div class="line-row" style="grid-template-columns:auto 1fr auto;gap:8px;align-items:center;cursor:pointer" onclick="navTo('bom/view/${x.id}')">
+          <span style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap"><span class="ver-tag">${esc(x.ver)}</span>${x.is_default?'<span class="badge-def"><i data-lucide="star"></i>สูตรหลัก</span>':''}</span>
+          <span style="color:var(--c-ink);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.name)}</span>
+          <span class="pill pill-${x.status}" style="white-space:nowrap">${STATUS_TH[x.status]}</span>
+        </div>`).join('')}
+      </div></div>`:''}`;
+  }else if(tab==='comp'){
+    body=`<table class="vtable"><thead><tr><th>#</th><th>วัตถุดิบ</th><th>ปริมาณ</th><th>หน่วย</th><th>เผื่อเสีย</th><th>ต้นทุน/หน่วย</th><th style="text-align:right">รวม</th></tr></thead>
+      <tbody>${b.lines.map((l,i)=>{const cp=PMAP[l.item]||{};return `<tr><td class="mono">${i+1}</td><td>${esc(cp.name||l.item)} <span class="mono">(${esc(l.item)})</span></td><td class="mono">${fmtNum(l.qty)}</td><td>${esc(l.uom)}</td><td class="mono">${l.scrap||0}%</td><td class="mono">฿${fmtNum(cp.cost||0)}</td><td class="mono" style="text-align:right">฿${fmtNum(lineCost(l))}</td></tr>`;}).join('')}</tbody>
+      <tfoot><tr><td colspan="6">ต้นทุนวัตถุดิบรวม (ต่อ 1 ${esc(b.out_uom)})</td><td class="mono" style="text-align:right">฿${fmtNum(bomCost(b))}</td></tr></tfoot></table>`;
+  }else{
+    body=`<div class="tl">${b.audit.map(a=>`<div class="tl-item"><div class="tl-dot ${a.v?'is-'+a.v:''}"></div><div><div class="tl-title">${esc(a.t)}</div><div class="tl-meta">${fmtDT(a.at)} · ${esc(a.by)}</div></div></div>`).join('')}</div>`;
+  }
+  return `<div class="drawer-panel drawer-enter">
+    <div class="drawer-head"><div style="display:flex;align-items:center;gap:10px;">${prodAvatar(b.parent,40)}<div><h2>${esc(p.name)} <span class="ver-tag">${esc(b.ver)}</span></h2><div class="sub">${esc(b.code)} · ${esc(b.name)}</div></div></div>
+      <div class="dh-actions">
+        <button class="btn btn-primary" onclick="navTo('bom/edit/${b.id}')"><i data-lucide="pencil"></i>แก้ไขสูตร</button>
+        <div style="position:relative;display:inline-block;">
+          <button class="btn" onclick="toggleStatusMenu(event)"><i data-lucide="repeat"></i>เปลี่ยนสถานะ</button>
+          <div class="pop-menu" id="statusMenu">
+            ${Object.keys(STATUS_TH).map(st=>`<button class="pm-item ${b.status===st?'is-current':''}" onclick="${b.status===st?'event.stopPropagation()':`setStatus('${b.id}','${st}')`}"><i data-lucide="${STATUS_ICON[st]}"></i>${STATUS_TH[st]}</button>`).join('')}
+          </div>
+        </div>
+        <button class="icon-btn" onclick="navTo('bom')"><i data-lucide="x"></i></button></div></div>
+    <div class="drawer-body">
+      <div class="tabs">
+        <div class="tab ${tab==='overview'?'active':''}" onclick="setTab('overview')">ภาพรวม</div>
+        <div class="tab ${tab==='comp'?'active':''}" onclick="setTab('comp')">ส่วนประกอบ (${b.lines.length})</div>
+        <div class="tab ${tab==='hist'?'active':''}" onclick="setTab('hist')">ประวัติ</div>
+      </div>
+      ${body}
+    </div>
+    <div class="drawer-foot"><button class="btn" onclick="navTo('bom')">ปิด</button></div>
+  </div>`;
+}
+
+/* ===================== MODAL (ไม่ใช้ approve — เก็บ infra) ===================== */
+function renderModal(){
+  if(state.modal.type==='bulkdelete'){
+    const ids=Object.keys(state.bulkSel).filter(k=>state.bulkSel[k]);
+    const skip=ids.filter(id=>{const b=RAW.find(x=>x.id===id);return b&&(b.used||0)>0;}).length;
+    return `<div class="modal-head"><h3><i data-lucide="trash-2" style="width:16px;height:16px;color:var(--c-danger)"></i>ลบสูตรการผลิต ${ids.length} รายการ?</h3></div>
+    <div class="modal-body"><p style="font-size:13px;">${skip?`มี <b>${skip} สูตร</b>ถูกใบสั่งผลิต (MO) อ้างแล้ว — จะถูกข้าม ไม่ลบ (ใช้เปลี่ยนสถานะเป็น "ไม่ใช้งาน" แทน)`:'การกระทำนี้ย้อนกลับไม่ได้'}</p></div>
+    <div class="modal-foot"><button class="btn" onclick="state.modal={open:false,type:null,id:null};render();">ยกเลิก</button><div style="flex:1;"></div>
+      <button class="btn btn-danger" ${ids.length-skip?'':'disabled'} onclick="confirmBulkDelete()"><i data-lucide="trash-2"></i>ลบ ${ids.length-skip} สูตร</button></div>`;
+  }
+  return'';
+}
+function closeModal(){state.modal={open:false,type:null,id:null};render();}
+
+/* ===================== RENDER ===================== */
+function render(){ _keepScroll(_renderNow); }
+function _keepScroll(fn){                                          // Iron Rule #29
+  const ct=document.querySelector('.content'), ts=document.querySelector('.table-scroll'), db=document.querySelector('.drawer-body');
+  const sv={c:ct?ct.scrollTop:0, t:ts?ts.scrollTop:0, d:db?db.scrollTop:0};
+  fn();
+  requestAnimationFrame(()=>{
+    const a=document.querySelector('.content'); if(a&&sv.c>0)a.scrollTop=sv.c;
+    const b=document.querySelector('.table-scroll'); if(b&&sv.t>0)b.scrollTop=sv.t;
+    const c=document.querySelector('.drawer-body'); if(c&&sv.d>0)c.scrollTop=sv.d;
+  });
+}
+function _renderNow(){
+  document.getElementById('page-content').innerHTML=renderList();
+  requestAnimationFrame(()=>{                                   // #95: re-render portal หลัง DOM ใหม่
+    if(fgSearch.open)fgSuggestOnly();
+    if(lineCombo.open&&lineCombo.idx>=0)lineSuggestOnly(lineCombo.idx);
+    if(!fgSearch.open&&!(lineCombo.open&&lineCombo.idx>=0)){const pp=document.getElementById('suggest-portal');if(pp)pp.innerHTML='';}
+  });
+  const ov=document.getElementById('overlay-root');
+  if(state.drawer.open){ov.innerHTML=`<div class="backdrop" onclick="navTo('bom')"></div>${state.drawer.mode==='view'?renderView():renderForm()}`;
+    requestAnimationFrame(()=>ov.classList.add('overlay-on'));}
+  else{ov.classList.remove('overlay-on');ov.innerHTML='';}
+  const mr=document.getElementById('modal-root');
+  if(state.modal.open){mr.classList.add('on');document.getElementById('modal-el').innerHTML=renderModal();}
+  else mr.classList.remove('on');
+  renderIcons();
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    if(state.modal.open){closeModal();return;}
+    const sm=document.getElementById('statusMenu');
+    if(sm&&sm.classList.contains('is-open')){closeMenus();return;}
+    if(state.drawer.open){navTo('bom');return;}
+  }
+});
+document.addEventListener('click',function(){closeMenus();});
+document.addEventListener('mousedown',function(e){
+  const portal=document.getElementById('suggest-portal');
+  if(portal&&portal.contains(e.target))return;                   // click ใน portal = เลือก option
+  const fg=document.getElementById('fgCombo');
+  if(fg&&!fg.contains(e.target)&&fgSearch.open){fgSearch.open=false;const el=document.getElementById('fgSuggest');if(el)el.classList.add('hidden');}
+  if(lineCombo.open&&lineCombo.idx>=0){const lc=document.getElementById('lnCombo-'+lineCombo.idx);if(lc&&!lc.contains(e.target)){lineCombo.open=false;const sg=document.getElementById('lnSuggest-'+lineCombo.idx);if(sg)sg.classList.add('hidden');}}
+});
+function reflowSuggest(){                                        // #95 — keep portal attached on scroll/resize
+  if(fgSearch.open){placeSuggest(document.getElementById('fgSuggest'),document.getElementById('fgInput'));}
+  else if(lineCombo.open&&lineCombo.idx>=0){const i=lineCombo.idx;placeSuggest(document.getElementById('lnSuggest-'+i),document.getElementById('lnInput-'+i));}
+}
+window.addEventListener('scroll',reflowSuggest,true);           // capture = จับ scroll ของ drawer-body/table ด้วย
+window.addEventListener('resize',reflowSuggest);
+if(!location.hash)location.hash='#/bom';
+window.addEventListener('DOMContentLoaded',()=>{renderIcons();});
+syncHash();
+</script>
+</body>
+</html>

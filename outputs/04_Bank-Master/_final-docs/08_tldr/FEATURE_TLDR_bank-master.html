@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<!--
+  Feature TL;DR — หน้าปกสรุปฟีเจอร์ Bank Master (F-BNK) · CI CUBE Warm Light
+  สร้างจาก FRD Pack F-BNK (source of truth) + HTML ต้นแบบ f-bank.html
+-->
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สรุปฟีเจอร์ · บัญชีธนาคาร (Bank Master)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ivory:#FAF8F5; --white:#FFFFFF; --charcoal:#111111;
+    --red:#FF3B30; --orange:#FF9A1F;
+    --ink-60:#5a5854; --ink-40:#8b8985; --line:#eae6df;
+    --green-bg:#f0f7f0; --green-ink:#2e7d32; --green-line:#cfe6cf;
+    --red-bg:#fdf1f0; --red-ink:#c62828; --red-line:#f6d5d2;
+    --warn-bg:#fff6e9; --warn-line:#ffe1b3;
+    --font:"Satoshi","Noto Sans Thai",system-ui,-apple-system,sans-serif;
+    --r:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:var(--font); background:var(--ivory); color:var(--charcoal);
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+    padding:32px 20px;
+  }
+  .sheet{max-width:860px;margin:0 auto}
+
+  /* ---- Hero ---- */
+  .hero{
+    background:var(--charcoal); color:var(--white);
+    border-radius:var(--r); padding:28px 30px; margin-bottom:20px;
+  }
+  .hero .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:12px; letter-spacing:.06em; color:#cfcdc8; margin-bottom:12px;
+  }
+  .chip{
+    display:inline-block; background:rgba(255,255,255,.12); color:#fff;
+    padding:3px 10px; border-radius:100px; font-size:12px; font-weight:500;
+  }
+  .chip-red{background:var(--red)}
+  .hero h1{font-size:27px; font-weight:700; line-height:1.25; margin-bottom:10px}
+  .hero .one-liner{font-size:15.5px; color:#e8e6e2; max-width:64ch}
+
+  /* ---- Section card ---- */
+  section{
+    background:var(--white); border:1px solid var(--line);
+    border-radius:var(--r); padding:22px 24px; margin-bottom:16px;
+  }
+  .sec-head{
+    display:flex; align-items:center; gap:10px;
+    font-size:16px; font-weight:700; margin-bottom:14px;
+  }
+  .sec-head .no{
+    width:24px;height:24px;flex:none;display:grid;place-items:center;
+    background:var(--ivory); border:1px solid var(--line); border-radius:8px;
+    font-size:12px; font-weight:700; color:var(--ink-60);
+  }
+  p.lead{font-size:15px; color:var(--charcoal)}
+  p.lead + p.lead{margin-top:8px}
+
+  /* ---- Can / Cannot two-col ---- */
+  .split{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  .box{border-radius:12px; padding:18px 20px}
+  .box.can{background:var(--green-bg); border:1px solid var(--green-line)}
+  .box.cant{background:var(--red-bg); border:1px solid var(--red-line)}
+  .box h3{font-size:14px; font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:8px}
+  .box.can h3{color:var(--green-ink)}
+  .box.cant h3{color:var(--red-ink)}
+  .box ul{list-style:none; display:flex; flex-direction:column; gap:9px}
+  .box li{font-size:14px; padding-left:22px; position:relative}
+  .box.can li::before{content:"✓"; position:absolute; left:0; color:var(--green-ink); font-weight:700}
+  .box.cant li::before{content:"✕"; position:absolute; left:0; color:var(--red-ink); font-weight:700}
+
+  /* ---- who / when ---- */
+  .who-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  .who-grid .mini-label{font-size:12px; color:var(--ink-40); margin-bottom:6px; font-weight:500}
+  .who-grid .mini-val{font-size:14.5px}
+  .tag-row{display:flex; flex-wrap:wrap; gap:8px; margin-top:4px}
+  .tag{background:var(--ivory); border:1px solid var(--line); border-radius:100px; padding:4px 12px; font-size:13px}
+
+  /* ---- screens ---- */
+  .screen{display:flex; gap:12px; padding:12px 0; border-bottom:1px dashed var(--line)}
+  .screen:last-child{border-bottom:none; padding-bottom:0}
+  .screen:first-child{padding-top:0}
+  .screen .dot{width:8px;height:8px;flex:none;margin-top:8px;border-radius:50%;background:var(--orange)}
+  .screen .s-name{font-weight:600; font-size:14.5px}
+  .screen .s-desc{font-size:13.5px; color:var(--ink-60)}
+
+  /* ---- rules ---- */
+  .rule{
+    background:var(--warn-bg); border:1px solid var(--warn-line);
+    border-left:3px solid var(--orange); border-radius:8px;
+    padding:12px 16px; margin-bottom:10px; font-size:14px;
+  }
+  .rule:last-child{margin-bottom:0}
+  .rule b{font-weight:700}
+
+  /* ---- connections ---- */
+  .conn{display:flex; align-items:flex-start; gap:12px; padding:10px 0}
+  .conn .arrow{color:var(--orange); font-weight:700; flex:none}
+  .conn .c-text{font-size:14px}
+  .conn .c-mod{font-weight:600}
+
+  /* ---- meta strip (approval / data) ---- */
+  .meta-strip{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  .meta-item .mini-label{font-size:12px; color:var(--ink-40); margin-bottom:6px; font-weight:500}
+  .meta-item .mini-val{font-size:14px}
+  .badge{display:inline-block;padding:3px 11px;border-radius:100px;font-size:12.5px;font-weight:600}
+  .badge-lock{background:var(--red-bg); color:var(--red-ink); border:1px solid var(--red-line)}
+  .badge-ok{background:var(--green-bg); color:var(--green-ink); border:1px solid var(--green-line)}
+
+  /* ---- footer ---- */
+  footer{margin-top:20px; padding:16px 24px; font-size:12px; color:var(--ink-40); text-align:center}
+  .drift{
+    background:var(--warn-bg); border:1px solid var(--warn-line); border-radius:10px;
+    padding:12px 18px; margin-bottom:16px; font-size:13px; color:#8a5a12;
+  }
+  .drift b{color:var(--orange)}
+
+  @media (max-width:640px){
+    .split,.who-grid,.meta-strip{grid-template-columns:1fr}
+    .hero h1{font-size:23px}
+  }
+  @media print{
+    body{background:#fff; padding:0; font-size:12px}
+    .hero{background:var(--charcoal)!important; -webkit-print-color-adjust:exact; print-color-adjust:exact}
+    section,.box,.rule,.drift{-webkit-print-color-adjust:exact; print-color-adjust:exact; break-inside:avoid}
+    .sheet{max-width:100%}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <!-- ===== HERO ===== -->
+  <div class="hero">
+    <div class="eyebrow">
+      <span>สรุปฟีเจอร์ · อ่าน 2 นาทีเข้าใจ</span>
+      <span class="chip">F-BNK</span>
+      <span class="chip">การเงิน · Accounting</span>
+    </div>
+    <h1>บัญชีธนาคาร (Bank Master)</h1>
+    <div class="one-liner">ที่เก็บรายชื่อบัญชีเงินฝากธนาคารทั้งหมดของบริษัทไว้จุดเดียว (ธนาคาร × สาขา × เลขบัญชี) ใช้ทั้งตอนรับเงินและจ่ายเงิน — เป็นตัวปิดสายการเงิน: ผังบัญชี → กลุ่มบัญชี → <b>บัญชีธนาคาร</b> → วิธีชำระเงิน</div>
+  </div>
+
+  <!-- ===== ① คืออะไร ===== -->
+  <section>
+    <div class="sec-head"><span class="no">1</span>ฟีเจอร์นี้คืออะไร</div>
+    <p class="lead">เป็นสมุดทะเบียนรวมบัญชีเงินฝากธนาคารที่บริษัทมี — บัญชีจริง 1 บัญชี = 1 รายการ (ธนาคารไหน สาขาอะไร เลขบัญชีเท่าไร ชื่อบัญชีว่าอย่างไร).</p>
+    <p class="lead">เดิมข้อมูลบัญชีกระจายอยู่หลายที่ ทำให้ตอนออกใบรับเงิน/จ่ายเงินเลือกบัญชีผิดหรือหาไม่เจอ. หน้านี้รวมไว้ที่เดียว ให้ฝ่ายบัญชีตั้งค่าครั้งเดียว แล้วคนบันทึกใบรับ/ใบจ่ายหยิบไปใช้ได้เลย ไม่ต้องพิมพ์เลขบัญชีเองทุกครั้ง.</p>
+  </section>
+
+  <!-- ===== ②③ ทำได้ / ทำไม่ได้ ===== -->
+  <section>
+    <div class="sec-head"><span class="no">2</span>ทำอะไรได้ · ทำอะไรไม่ได้</div>
+    <div class="split">
+      <div class="box can">
+        <h3>✅ ทำได้</h3>
+        <ul>
+          <li>เพิ่มบัญชีธนาคารใหม่ (เลือกธนาคาร กรอกเลขบัญชี ชื่อบัญชี สาขา ประเภท)</li>
+          <li>แก้ไขข้อมูลบัญชีที่มีอยู่</li>
+          <li>ผูกบัญชีเข้ากับกลุ่มบัญชีแยกประเภท (GL) เพื่อให้ลงบัญชีได้ — จะผูกทีหลังก็ได้</li>
+          <li>ตั้งบัญชีหลัก ★ แยกฝั่งรับ / ฝั่งจ่าย (ฝั่งละ 1 บัญชี)</li>
+          <li>เปลี่ยนสถานะบัญชี: ใช้งาน / ไม่ใช้งาน / ร่าง — ทีละบัญชีหรือหลายบัญชีพร้อมกัน</li>
+          <li>ค้นหา · กรองตามธนาคารหรือสถานะ · เรียงลำดับ</li>
+          <li>นำเข้าหลายบัญชีจากไฟล์ CSV ทีเดียว</li>
+          <li>ส่งออกรายการบัญชีเป็นไฟล์ CSV</li>
+          <li>ลบหลายบัญชีพร้อมกัน (เฉพาะบัญชีที่ยังไม่มีเอกสารผ่าน)</li>
+        </ul>
+      </div>
+      <div class="box cant">
+        <h3>❌ ยังทำไม่ได้ / นอกขอบเขต</h3>
+        <ul>
+          <li>ไม่เก็บยอดเงินคงเหลือในบัญชี (ดูยอดที่ระบบอื่น)</li>
+          <li>รับเฉพาะเงินบาท (THB) — ไม่มีสกุลเงินอื่น ไม่มีรหัสธนาคารต่างประเทศ (SWIFT/IBAN)</li>
+          <li>ไม่มีขั้นตอนอนุมัติ — บันทึกแล้วมีผลทันที</li>
+          <li>นำเข้าไฟล์ได้แค่ "เพิ่ม" — ไม่มีโหมดล้างของเดิมแล้วแทนที่</li>
+          <li>ลบทีละ 1 บัญชีไม่ได้ (ต้องลบเป็นชุด)</li>
+          <li>เปลี่ยนธนาคาร/เลขบัญชีของบัญชีที่มีเอกสารรับ-จ่ายผ่านแล้วไม่ได้</li>
+          <li>ไม่ผูกกับหน้า "วิธีชำระเงิน" (ตัดสินแล้วว่าไม่เชื่อม)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ④ ใครใช้ / ตอนไหน ===== -->
+  <section>
+    <div class="sec-head"><span class="no">3</span>ใครใช้ · ใช้ตอนไหน</div>
+    <div class="who-grid">
+      <div>
+        <div class="mini-label">คนที่ใช้</div>
+        <div class="tag-row">
+          <span class="tag">ฝ่ายบัญชี/การเงิน — ตั้งค่า</span>
+          <span class="tag">หัวหน้าการเงิน — ดูแล</span>
+          <span class="tag">คนดูอย่างเดียว</span>
+          <span class="tag">คนออกใบรับ/ใบจ่าย — ใช้ทางอ้อม</span>
+        </div>
+      </div>
+      <div>
+        <div class="mini-label">ใช้ตอนไหน</div>
+        <div class="mini-val">ตอนเปิดบัญชีธนาคารใหม่กับแบงก์ · ตอนตั้งค่าระบบครั้งแรก · ตอนปิด/เลิกใช้บัญชีเก่า · และตอนคนออกใบรับเงิน/ใบจ่ายเงินต้องหยิบบัญชีไปใช้ (เลือกจากที่นี่)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ⑤ หน้าจอ ===== -->
+  <section>
+    <div class="sec-head"><span class="no">4</span>มีกี่หน้าจอ · แต่ละหน้าทำอะไร</div>
+    <div class="screen"><span class="dot"></span><div><div class="s-name">หน้ารายการบัญชี</div><div class="s-desc">เห็นทุกบัญชีในตารางเดียว · ค้นหา/กรอง/เรียง · ปุ่มเพิ่ม-นำเข้า-ส่งออก · ติ๊กเลือกหลายรายการเพื่อเปลี่ยนสถานะหรือลบ</div></div></div>
+    <div class="screen"><span class="dot"></span><div><div class="s-name">ลิ้นชักเพิ่ม / แก้บัญชี</div><div class="s-desc">กรอกข้อมูล 3 ส่วน: ข้อมูลบัญชี → กลุ่มบัญชี GL → การใช้งาน (เลือกฝั่งรับ/จ่าย + บัญชีหลัก ★ + สถานะ)</div></div></div>
+    <div class="screen"><span class="dot"></span><div><div class="s-name">ลิ้นชักดูรายละเอียด</div><div class="s-desc">สรุปบัญชี + แท็บภาพรวม/ประวัติ + เมนูเปลี่ยนสถานะ · เลขบัญชีถูกปิดบางส่วนเพื่อความปลอดภัย</div></div></div>
+    <div class="screen"><span class="dot"></span><div><div class="s-name">หน้าต่างนำเข้าไฟล์</div><div class="s-desc">3 จังหวะ: เลือกไฟล์ → ระบบตรวจแล้วแสดงผลก่อน → กดนำเข้า (แถวผิดถูกข้าม)</div></div></div>
+    <div class="screen"><span class="dot"></span><div><div class="s-name">หน้าต่างยืนยันลบ</div><div class="s-desc">บอกจำนวนที่จะลบได้จริง และจำนวนที่ถูกข้าม (บัญชีที่มีเอกสารผ่านแล้ว)</div></div></div>
+  </section>
+
+  <!-- ===== ⑥ กฎห้ามพลาด ===== -->
+  <section>
+    <div class="sec-head"><span class="no">5</span>กฎสำคัญ · ห้ามพลาด</div>
+    <div class="rule"><b>⚠️ บัญชีที่มีเอกสารผ่านแล้ว ล็อกธนาคาร + เลขบัญชี</b> — แก้ชื่อ/สาขา/ประเภท/กลุ่ม GL/สถานะได้ตามปกติ แต่แก้ธนาคารกับเลขบัญชีไม่ได้ (กันข้อมูลเก่าเพี้ยน). ถ้าจะเปลี่ยนเลขบัญชี ต้องเปิดเป็นบัญชีใหม่แทน.</div>
+    <div class="rule"><b>⚠️ บัญชีหลัก ★ มีได้ฝั่งละ 1 บัญชีทั้งระบบ</b> — ตั้งตัวใหม่เป็นหลัก ตัวเก่าจะหลุดเองอัตโนมัติ · และถ้าบัญชีถูกปิด (เปลี่ยนเป็นไม่ใช้งาน) ดาวหลุดทันทีทั้งสองฝั่ง.</div>
+    <div class="rule"><b>⚠️ ผูกกลุ่มบัญชี GL หรือไม่ก็บันทึกได้</b> — แต่ถ้ายังไม่ผูก จะเอาไปลงบัญชีแยกประเภทไม่ได้จนกว่าจะผูก (ระบบขึ้นข้อความเตือนไว้ให้).</div>
+    <div class="rule"><b>⚠️ เลขบัญชีต้อง 10–12 หลัก และห้ามซ้ำ</b> — ใส่ขีดคั่นได้ · ห้ามซ้ำกับบัญชีอื่นทั้งทะเบียน (ระบบเทียบแบบตัดขีดออก).</div>
+    <div class="rule"><b>⚠️ ต้องเลือกอย่างน้อย 1 ฝั่งเสมอ</b> — ทุกบัญชีต้องระบุว่าใช้ฝั่งรับเงิน หรือฝั่งจ่ายเงิน หรือทั้งสองฝั่ง.</div>
+    <div class="rule"><b>⚠️ นำเข้าไฟล์ = เพิ่มอย่างเดียว</b> — ของเดิมไม่ถูกแตะ · ระบบตรวจทุกแถวให้ก่อนยืนยัน แถวที่ผิดจะถูกข้าม ไม่ทำให้ทั้งไฟล์ล้ม.</div>
+  </section>
+
+  <!-- ===== ⑦ เชื่อมกับ module ===== -->
+  <section>
+    <div class="sec-head"><span class="no">6</span>เชื่อมกับระบบไหนบ้าง</div>
+    <div class="conn"><span class="arrow">←</span><div class="c-text">รับ<span class="c-mod"> กลุ่มบัญชีแยกประเภท (GL Posting Group)</span> มาให้เลือกผูก — เพื่อบอกว่าเงินเข้า-ออกบัญชีนี้ไปลงบัญชีตัวไหน</div></div>
+    <div class="conn"><span class="arrow">→</span><div class="c-text">ส่งบัญชีให้<span class="c-mod"> ใบรับเงิน และ ใบจ่ายเงิน</span> หยิบไปใช้ตอนบันทึกเอกสาร (ทั้งสองยังไม่สร้าง)</div></div>
+    <div class="conn"><span class="arrow">→</span><div class="c-text">ส่งต่อให้<span class="c-mod"> เครื่องมือลงบัญชีแยกประเภท (GL)</span> ตอนบันทึกบัญชีจริง (ยังไม่สร้าง)</div></div>
+    <div class="conn"><span class="arrow">✕</span><div class="c-text"><b>ไม่</b>เชื่อมกับหน้า<span class="c-mod"> วิธีชำระเงิน (Payment Method)</span> — ตัดสินแล้วว่าไม่ผูก</div></div>
+  </section>
+
+  <!-- ===== ⑧ อนุมัติ + ข้อมูลอ่อนไหว ===== -->
+  <section>
+    <div class="sec-head"><span class="no">7</span>ต้องอนุมัติไหม · ข้อมูลอ่อนไหวแค่ไหน</div>
+    <div class="meta-strip">
+      <div class="meta-item">
+        <div class="mini-label">การอนุมัติ</div>
+        <div class="mini-val"><span class="badge badge-ok">ไม่ต้องอนุมัติ</span> — ฝ่ายบัญชีบันทึกแล้วมีผลทันที ไม่มีสายอนุมัติในหน้านี้</div>
+      </div>
+      <div class="meta-item">
+        <div class="mini-label">ความอ่อนไหวข้อมูล</div>
+        <div class="mini-val"><span class="badge badge-lock">ข้อมูลลับ</span> ดูได้เฉพาะคนมีสิทธิ์ — เลขบัญชีและพร้อมเพย์เป็นข้อมูลอ่อนไหว จึงถูกปิดบางส่วนบนหน้าดูรายละเอียด และมีบันทึกว่าใครเปิดดู</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    หน้าปกสรุปฟีเจอร์ · สร้างจาก F-BNK FRD Pack + HTML ต้นแบบ · เอกสารนี้เป็นตัวช่วยอ่าน — รายละเอียดจริงยึด FRD Pack
+  </footer>
+
+</div>
+</body>
+</html>

@@ -18,6 +18,12 @@ Usage:
   export PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers   # if needed in this env
   python capture.py --pack ./pack --spec shot-spec.json --out shots_b64.json
       [--assets ../assets] [--landscape 1300] [--portrait 940] [--quality 86]
+      [--report shots.report.json] [--strict]
+
+Verify gate (R18): the engine writes a TINY per-key status report (no base64) and
+prints  OK n / SKIP+FAIL n  with the failing keys. Read the report/summary — NOT the
+shots file — to confirm every important step got the RIGHT screenshot before build.
+--strict makes the process exit non-zero if any requested shot produced no image.
 
 shot-spec.json schema (see references/shot-spec-schema.md):
 {
@@ -61,6 +67,10 @@ def main():
     ap.add_argument('--landscape', type=int, default=1300)
     ap.add_argument('--portrait',  type=int, default=940)
     ap.add_argument('--quality',   type=int, default=86)
+    ap.add_argument('--report', default=None,
+                    help='tiny per-key status JSON (no base64). default: <out>.report.json')
+    ap.add_argument('--strict', action='store_true',
+                    help='exit non-zero if any requested shot did not produce an image')
     args = ap.parse_args()
 
     spec   = json.load(open(args.spec, encoding='utf-8'))
@@ -90,6 +100,7 @@ def main():
 
     work = pathlib.Path('./_qa_shots'); work.mkdir(exist_ok=True)
     shots = {}
+    status = {}   # key -> {"status": ok|skip|fail, "note": "..."}  (R18 verify gate)
     with sync_playwright() as p:
         browser = p.chromium.launch()
         for shot in spec['shots']:
@@ -119,6 +130,7 @@ def main():
             try:
                 if loc.count() == 0:
                     print(f"  [skip] target matches nothing for {key}: {t}")
+                    status[key] = {"status": "skip", "note": f"target matched nothing: {t}"}
                     pg.close(); continue
             except Exception:
                 pass
@@ -134,6 +146,7 @@ def main():
                 print(f"  [FAIL] target not visible for {key}: {str(e)[:60]}")
             if not box:
                 print(f"  [skip] no bounding box for {key}")
+                status[key] = {"status": "skip", "note": "target found but not visible (no bounding box) — setup may not reach this state"}
                 pg.close(); continue
             pg.evaluate(ADDHL, box)
             pg.wait_for_timeout(120)
@@ -142,6 +155,7 @@ def main():
                 pg.locator(shot['container']).first.screenshot(path=str(png))
             except Exception as e:
                 print(f"  [FAIL] container screenshot {key}: {str(e)[:70]}")
+                status[key] = {"status": "fail", "note": f"container screenshot failed: {str(e)[:70]}"}
                 pg.close(); continue
             pg.close()
             # optimise: resize to target width, JPEG
@@ -153,13 +167,33 @@ def main():
             jp = work / f"{key}.jpg"
             im.save(jp, quality=args.quality)
             shots[key] = 'data:image/jpeg;base64,' + b64_file(jp)
+            status[key] = {"status": "ok", "note": f"{im.size[0]}x{im.size[1]}"}
             print(f"  [ok] {key}  {im.size[0]}x{im.size[1]}  {len(shots[key])//1024} KB")
         browser.close()
 
+    # any requested key we never reached the loop-body 'ok' for is implicitly not captured
+    for shot in spec['shots']:
+        status.setdefault(shot['key'], {"status": "fail", "note": "not processed"})
+
     json.dump(shots, open(args.out, 'w', encoding='utf-8'), ensure_ascii=False)
+
+    # tiny status report (NO base64) — Claude reads THIS to verify per-key (R18), not the shots file
+    report_path = args.report or (str(pathlib.Path(args.out).with_suffix('')) + '.report.json')
+    json.dump(status, open(report_path, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+
+    ok   = [k for k, v in status.items() if v['status'] == 'ok']
+    bad  = [(k, v) for k, v in status.items() if v['status'] != 'ok']
     total = sum(len(v) for v in shots.values()) // 1024
     print(f"\nWROTE {args.out}  ({len(shots)} regions, ~{total} KB).  base64 NOT printed.")
+    print(f"CAPTURE VERIFY (R18):  OK {len(ok)}  ·  SKIP/FAIL {len(bad)}   → report: {report_path}")
+    for k, v in bad:
+        print(f"  [{v['status']}] {k} — {v['note']}")
+    if bad:
+        print("  ↑ these steps will have NO image. Fix shot-spec (setup/selector) & re-capture,")
+        print("    or set regionKey=\"\" for those steps. Do NOT let a step show a wrong screen (R18).")
     print("Next: python build.py --cases cases.json --shots", args.out, "--out result.html")
+    if args.strict and bad:
+        sys.exit(2)
 
 if __name__ == '__main__':
     main()

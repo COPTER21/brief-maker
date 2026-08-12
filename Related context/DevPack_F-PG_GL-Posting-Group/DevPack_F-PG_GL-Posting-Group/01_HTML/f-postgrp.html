@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GL Posting Group · CUBE NATIVE</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,600,700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {/* CUBE Warm Light (v8 rebrand 2026-08-09 — เดิม Navy v3.9) */
+
+  --c-navy: #111111;
+  --c-navy-2: #111111;
+  --c-primary: #FF3B30;
+  --c-primary-hover: #E62E24;
+  --c-teal: #FF9A1F;
+  --c-teal-light: #FFB763;
+  --c-ink: #111111;
+  --c-mute: #54565C;
+  --c-mute-2: #73757B;
+  --c-mute-3: #9A9CA2;
+  --c-line: #DEDAD4;
+  --c-line-2: #E9E5E0;
+  --c-line-3: #F1EEEA;
+  --c-bg-off: #FAF8F5;
+  --c-success: #1F9D55;
+  --c-warning: #E8870F;
+  --c-danger: #E62E24;
+  --sidebar-w: 232px;
+  --shell-h: 52px;
+  /* semantic tint pairs (reuse for pill/badge families — no new hues) */
+  --c-danger-bg: #FFE9E7;
+  --c-success-bg: #E4F4EB;
+  --c-success-fg: #157A41;
+  --c-warning-bg: #FFF1DD;
+  --c-warning-fg: #B8690B;
+  --c-info-bg: #E6F0FF;
+  --c-info-fg: #1A5FCC;
+  /* account-type pill tokens (COA asset/liability/equity/income/expense — real semantic gap, mapped onto existing families) */
+  --c-acct-asset-bg: var(--c-danger-bg);
+  --c-acct-asset-fg: var(--c-danger);
+  --c-acct-liability-bg: var(--c-warning-bg);
+  --c-acct-liability-fg: var(--c-warning-fg);
+  --c-acct-equity-bg: var(--c-info-bg);
+  --c-acct-equity-fg: var(--c-info-fg);
+  --c-acct-income-bg: var(--c-success-bg);
+  --c-acct-income-fg: var(--c-success-fg);
+  --c-acct-expense-bg: var(--c-line-3);
+  --c-acct-expense-fg: var(--c-mute-2);
+  /* z-index registry (Rule #62) */
+  --z-content: 1;
+  --z-sticky: 10;
+  --z-dropdown: 30;
+  --z-backdrop: 50;
+  --z-drawer: 51;
+  --z-modal: 60;
+  --z-toast: 80;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; min-width:768px; /* Iron Rule #97 v8 */}
+body {
+  font-family: 'Noto Sans Thai', 'Satoshi', system-ui, sans-serif;
+  background: var(--c-bg-off);
+  color: var(--c-ink);
+  font-size: 14px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-width: 1180px;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+[data-lucide] { flex-shrink: 0; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* SIDEBAR */
+.sidebar { position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w);
+  background:#111111;
+  color: rgba(255,255,255,0.78); z-index: var(--z-sticky); display: flex; flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06); }
+.sb-brand { padding: 18px; display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
+.sb-logo { width: 34px; height: 34px; background: linear-gradient(135deg, #FF3B30, #FF9A1F);
+  border-radius: 9px; display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; flex-shrink: 0; box-shadow: 0 4px 12px rgba(11,92,255,0.3); }
+.sb-name { font-weight: 700; font-size: 14px; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+.sb-sub { font-size: 11px; color: rgba(255,255,255,0.45); letter-spacing: 0.06em; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+.sb-nav { flex: 1; padding: 12px 8px; overflow-y: auto; }
+.sb-module { margin-bottom: 4px; }
+.sb-module-header { display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 8px 10px; border-radius: 6px; background: transparent; border: 0;
+  color: rgba(255,255,255,0.5); font-family: inherit; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 120ms; text-align: left; }
+.sb-module-header:hover { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.8); }
+.sb-module-header .mod-icon { flex-shrink: 0; opacity: 0.7; }
+.sb-module-header .mod-label { flex: 1; }
+.sb-module-header .mod-chevron { flex-shrink: 0; transition: transform 200ms; opacity: 0.7; }
+.sb-module[data-expanded="false"] .mod-chevron { transform: rotate(-90deg); }
+.sb-module[data-expanded="false"] .sb-features { display: none; }
+.sb-features { padding: 2px 0 6px 0; }
+.sb-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 16px;
+  border-radius: 6px; color: rgba(255,255,255,0.62); font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all 120ms; margin-bottom: 1px; position: relative; user-select: none; }
+.sb-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sb-item.is-active { background: #FF3B30; color: #fff; font-weight: 600; }
+.sb-item.is-active::before { content: ''; position: absolute; left: -10px; top: 7px; bottom: 7px;
+  width: 3px; background: #fff; border-radius: 0 2px 2px 0; }
+.sb-item [data-lucide] { width: 16px; height: 16px; opacity: 0.85; }
+.sb-item.is-active [data-lucide] { opacity: 1; }
+.sb-item.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.sb-item.is-disabled:hover { background: transparent; color: rgba(255,255,255,0.62); }
+.sb-footer { padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(255,255,255,0.45); }
+.pulse-dot { width: 7px; height: 7px; background: var(--c-teal); border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(0,168,142,0.20); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 700ms linear infinite; }
+
+/* MAIN */
+.main { margin-left: var(--sidebar-w); min-height: 100vh; background: var(--c-bg-off); }
+.shell-bar { position: sticky; top: 0; background: #fff; border-bottom: 1px solid var(--c-line-2);
+  height: var(--shell-h); display: flex; align-items: center; padding: 0 24px; z-index: var(--z-sticky); gap: 12px; }
+.breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--c-mute); }
+.breadcrumb a { cursor: pointer; transition: color 120ms; }
+.breadcrumb a:hover { color: var(--c-primary); }
+.breadcrumb .sep { color: var(--c-mute-3); font-size: 11px; }
+.breadcrumb-current { color: var(--c-ink); font-weight: 500; }
+.icon-btn { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute); border-radius: 7px; position: relative; transition: all 120ms; }
+.icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.icon-btn [data-lucide] { width: 17px; height: 17px; }
+.notif-dot { position: absolute; top: 7px; right: 8px; width: 7px; height: 7px;
+  background: var(--c-danger); border-radius: 50%; border: 2px solid #fff; }
+.user-chip { display: flex; align-items: center; gap: 8px; padding: 6px 10px 6px 12px;
+  border-radius: 8px; cursor: pointer; transition: background 120ms; }
+.user-chip:hover { background: var(--c-line-3); }
+.user-text { line-height: 1.2; text-align: right; }
+.user-name { font-size: 12.5px; font-weight: 500; color: var(--c-ink); white-space: nowrap; }
+.user-role { font-size: 11px; color: var(--c-mute-2); white-space: nowrap; margin-top: 1px; }
+.avatar { width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal)); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+.user-menu { position: absolute; top: calc(var(--shell-h) - 4px); right: 22px; background: #fff;
+  border: 1px solid var(--c-line-2); border-radius: 10px; box-shadow: 0 12px 32px rgba(11,29,58,0.12);
+  width: 240px; z-index: var(--z-dropdown); padding: 6px; display: none; }
+.user-menu.is-open { display: block; }
+.user-menu-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px;
+  font-size: 13px; color: var(--c-ink); cursor: pointer; transition: background 120ms; }
+.user-menu-item:hover { background: var(--c-bg-off); }
+.user-menu-item [data-lucide] { width: 15px; height: 15px; color: var(--c-mute-2); }
+.user-menu-item.is-danger { color: var(--c-danger); }
+.user-menu-item.is-danger [data-lucide] { color: var(--c-danger); }
+.user-menu-divider { height: 1px; background: var(--c-line-2); margin: 6px 0; }
+
+/* CONTENT */
+.content { padding: 24px; }
+.ph { margin-bottom: 18px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.ph > div:first-child { flex: 1 1 auto; min-width: 280px; }
+.ph-title-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+.ph-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 26px; font-weight: 700; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.ph-count { font-size: 12.5px; font-weight: 600; color: var(--c-mute-2); background: var(--c-line-3); padding: 3px 8px; border-radius: 999px; }
+.ph-sub { font-size: 13px; color: var(--c-mute); margin: 0; }
+.ph-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* BUTTONS */
+.btn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 16px; border-radius: 8px;
+  font-size: 13px; font-weight: 500; border: 1px solid transparent; background: transparent; white-space: nowrap; transition: all 120ms; user-select: none; }
+.btn [data-lucide] { width: 15px; height: 15px; }
+.btn-primary { background: var(--c-primary); color: #fff; }
+.btn-primary:hover { background: var(--c-primary-hover); box-shadow: 0 2px 8px rgba(11,92,255,0.30); }
+.btn-secondary { background: #fff; border-color: var(--c-line); color: var(--c-ink); }
+.btn-secondary:hover { background: var(--c-line-3); border-color: var(--c-mute-2); }
+.btn-ghost { color: var(--c-mute); }
+.btn-ghost:hover { background: var(--c-line-3); color: var(--c-ink); }
+.btn-danger { background: #fff; border-color: var(--c-line); color: var(--c-danger); }
+.btn-danger:hover { background: var(--c-danger-bg); border-color: var(--c-danger); }
+.btn-link { background: transparent; border: 0; padding: 0 4px; height: auto; color: var(--c-primary); font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn-sm { height: 30px; padding: 0 12px; font-size: 12px; }
+
+/* STATS */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.stat { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; padding: 16px 16px; transition: all 150ms; }
+.stat:hover { border-color: var(--c-line); box-shadow: 0 2px 8px rgba(11,29,58,0.05); }
+.stat-label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--c-mute); }
+.stat-label [data-lucide] { width: 13px; height: 13px; color: var(--c-primary); }
+.stat-value { font-family: 'Noto Sans Thai', sans-serif; font-size: 26px; font-weight: 700; color: var(--c-navy); margin-top: 6px; letter-spacing: -0.01em; }
+.stat-meta { font-size: 12px; color: var(--c-mute-2); margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+.stat-meta [data-lucide] { width: 12px; height: 12px; }
+
+/* CARD + FILTER */
+.card { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; overflow: hidden; }
+.filter-bar { padding: 16px 18px; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid var(--c-line-2); background: #fff; flex-wrap: wrap; }
+.input, .select { height: 36px; padding: 0 12px; border: 1px solid var(--c-line); border-radius: 8px; font-size: 13px;
+  background: #fff; color: var(--c-ink); font-family: inherit; transition: all 120ms; width: 100%; }
+.input:focus, .select:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(11,92,255,0.10); }
+.select { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat; background-position: right 10px center; padding-right: 32px; appearance: none; }
+.input-search { position: relative; flex: 1; max-width: 320px; }
+.input-search input { padding-left: 36px; }
+.input-search .lead-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--c-mute-2); pointer-events: none; }
+
+/* TABLE */
+.table-scroll { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table thead { background: var(--c-bg-off); }
+.table th { padding: 8px 16px; text-align: left; font-weight: 600; color: var(--c-mute); font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--c-line-2); white-space: nowrap; }
+.table th.is-sortable { cursor: pointer; user-select: none; }
+.table th.is-sortable:hover { color: var(--c-ink); background: var(--c-line-3); }
+.table th .sort-arrow { display: inline-block; margin-left: 4px; opacity: 0.4; }
+.table th.is-sorted .sort-arrow { opacity: 1; color: var(--c-primary); }
+.table td { padding: 8px 16px; border-bottom: 1px solid var(--c-line-2); color: var(--c-ink); vertical-align: middle; }
+.table tbody tr { transition: background 120ms; }
+.table tbody tr:hover { background: var(--c-bg-off); cursor: pointer; }
+.table tbody tr:last-child td { border-bottom: 0; }
+.table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* account code mono + tree indent */
+.acct-code { font-family:'Satoshi', monospace; font-weight: 600; color: var(--c-navy); font-size: 13px; }
+.acct-name-cell { display: flex; align-items: center; gap: 8px; }
+.tree-indent { display: inline-block; }
+.tree-tick { color: var(--c-mute-3); flex-shrink: 0; }
+.acct-name { font-weight: 500; }
+.acct-name.is-header { font-weight: 700; color: var(--c-navy); }
+
+/* PILLS — account type + status */
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.pill [data-lucide] { width: 11px; height: 11px; }
+.pill-active { background: var(--c-success-bg); color: var(--c-success-fg); }
+.pill-on{background:#E4F4EB;color:#157A41;}
+.pill-off{background:#FFF1DD;color:#B8690B;}
+.pill-draft{background:var(--c-line-3);color:var(--c-mute-2);}
+.pill [data-lucide]{width:11px;height:11px;}
+.pill.is-active{background:#E4F4EB;color:#157A41;}
+.pill.is-inactive{background:#FFF1DD;color:#B8690B;}
+.menu{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--c-line-2);border-radius:10px;box-shadow:0 8px 24px rgba(17,17,17,0.12);padding:6px;min-width:160px;display:none;z-index:var(--z-modal);}
+.menu.is-open{display:block;}
+.menu-item{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:none;background:none;border-radius:7px;font-size:13px;font-family:inherit;cursor:pointer;text-align:left;}
+.menu-item:hover{background:var(--c-bg-off);}
+.menu-item:disabled{opacity:0.45;cursor:default;}
+.menu-item [data-lucide]{width:13px;height:13px;}
+.bulkbar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:#111111;color:#fff;border-radius:10px;margin-bottom:10px;}
+.bulkbar .bb-count{font-size:12.5px;font-weight:600;margin-right:4px;}
+.bulkbar button{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:transparent;color:#fff;font-size:12.5px;font-family:inherit;cursor:pointer;}
+.bulkbar button:hover{background:rgba(255,255,255,0.12);}
+.bulkbar button.is-danger{border-color:rgba(255,59,48,0.55);color:var(--c-primary);}
+.bulkbar [data-lucide]{width:13px;height:13px;}
+tr.is-sel td{background:var(--c-danger-bg);}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.stat{cursor:pointer;text-align:left;background:#fff;border:1px solid var(--c-line-2);border-radius:12px;padding:12px 16px;font-family:inherit;}
+.stat.is-on{border-color:var(--c-primary);box-shadow:0 0 0 1px var(--c-primary) inset;}
+.stat .stat-label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--c-mute-2);}
+.stat .stat-label [data-lucide]{width:12px;height:12px;}
+.stat .stat-value{font-size:26px;font-weight:700;margin-top:4px;}
+.stat .stat-meta{font-size:11px;color:var(--c-mute-3);margin-top:2px;}
+.upload-box{display:flex;align-items:center;gap:12px;border:1.5px dashed var(--c-line);border-radius:10px;padding:18px 16px;cursor:pointer;transition:all 120ms;}
+.upload-box:hover{border-color:var(--c-primary);background:var(--c-danger-bg);}
+.upload-box [data-lucide]{width:26px;height:26px;color:var(--c-mute);}
+.import-sum{border-radius:8px;padding:8px 12px;font-size:12.5px;}
+.import-sum.is-success{background:#E4F4EB;color:#157A41;}
+.import-sum.is-warning{background:#FFF1DD;color:#B8690B;}
+.utbl{width:100%;border-collapse:collapse;font-size:12.5px;}
+.utbl th{position:sticky;top:0;background:var(--c-bg-off);text-align:left;padding:8px 10px;font-size:12px;color:var(--c-mute-2);border-bottom:1px solid var(--c-line-2);}
+.utbl td{padding:8px 10px;border-bottom:1px solid var(--c-line-3);vertical-align:top;}
+.lock-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--c-warning-fg);background:var(--c-warning-bg);border-radius:6px;padding:2px 8px;margin-left:8px;vertical-align:middle;}
+.lock-tag [data-lucide]{width:10px;height:10px;}
+[data-lucide]{flex-shrink:0;width:14px;height:14px;}
+.ra-btn [data-lucide]{width:15px;height:15px;}
+/* Iron Rule #96 (v8) — List Full-Height */
+.content{display:flex;flex-direction:column;height:calc(100vh - var(--shell-h,52px));overflow-y:auto;}
+.table-scroll{flex:1;min-height:0;overflow-y:auto;scrollbar-gutter:stable;}
+.table-scroll thead th{position:sticky;top:0;background:var(--c-bg-off);z-index:var(--z-sticky);}
+/* Iron Rule #97 (v8) — Responsive 768–1180 */
+@media (max-width:1180px){
+  .sidebar{transform:translateX(-100%);transition:transform 180ms;z-index:var(--z-drawer);}
+  .sidebar.is-open{transform:translateX(0);}
+  .main{margin-left:0 !important;}
+  .content{padding:16px !important;}
+}
+.pill-archived { background: var(--c-line-3); color: var(--c-mute-2); }
+.pill-asset { background: var(--c-acct-asset-bg); color: var(--c-acct-asset-fg); }
+.pill-liability { background: var(--c-acct-liability-bg); color: var(--c-acct-liability-fg); }
+.pill-equity { background: var(--c-acct-equity-bg); color: var(--c-acct-equity-fg); }
+.pill-income { background: var(--c-acct-income-bg); color: var(--c-acct-income-fg); }
+.pill-expense { background: var(--c-acct-expense-bg); color: var(--c-acct-expense-fg); }
+.dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.dot.is-active { background: var(--c-primary); box-shadow: 0 0 0 2.5px rgba(255,59,48,0.18); }
+.dot.is-archived { background: var(--c-mute-3); }
+
+.bal-side { font-size: 12px; font-weight: 600; }
+.bal-dr { color: var(--c-primary); }
+.bal-cr { color: var(--c-teal); }
+
+/* ROW ACTIONS */
+.row-actions { display: inline-flex; gap: 2px; }
+.ra-btn { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute-2); border-radius: 6px; transition: all 120ms; }
+.ra-btn:hover { background: var(--c-line-3); color: var(--c-primary); }
+.ra-btn.is-danger:hover { background: var(--c-danger-bg); color: var(--c-danger); }
+.ra-btn [data-lucide] { width: 15px; height: 15px; }
+
+/* TABLE FOOTER */
+.table-footer { padding: 12px 18px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2);
+  display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: var(--c-mute); flex-wrap: wrap; gap: 10px; }
+.pagination { display: inline-flex; gap: 4px; align-items: center; }
+.pg-btn { min-width: 30px; height: 30px; padding: 0 8px; display: inline-flex; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid var(--c-line-2); border-radius: 6px; color: var(--c-mute); font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 120ms; }
+.pg-btn:hover { border-color: var(--c-line); background: var(--c-bg-off); }
+.pg-btn.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.pg-btn.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn [data-lucide] { width: 13px; height: 13px; }
+
+/* EMPTY */
+.empty { padding: 56px 24px; text-align: center; color: var(--c-mute); }
+.empty-icon { width: 52px; height: 52px; margin: 0 auto 16px; border-radius: 50%; background: var(--c-line-3); color: var(--c-mute-2);
+  display: inline-flex; align-items: center; justify-content: center; }
+.empty-icon [data-lucide] { width: 22px; height: 22px; }
+.empty-title { font-size: 16px; font-weight: 600; color: var(--c-ink); margin-bottom: 6px; font-family: 'Noto Sans Thai', sans-serif; }
+.empty-desc { font-size: 13px; color: var(--c-mute); max-width: 320px; margin: 0 auto; }
+
+/* DRAWER */
+.drawer-backdrop { position: fixed; inset: 0; background: rgba(11,29,58,0.40); z-index: var(--z-backdrop); opacity: 0; pointer-events: none; transition: opacity 220ms; }
+.drawer-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 920px; max-width: 96vw; background: #fff; z-index: var(--z-drawer);
+  transform: translateX(100%); transition: transform 280ms cubic-bezier(0.4,0,0.2,1); display: flex; flex-direction: column; box-shadow: -16px 0 40px rgba(11,29,58,0.18); }
+.drawer.is-open { transform: translateX(0); }
+.drawer-header { display: flex; align-items: center; gap: 16px; padding: 18px 24px; border-bottom: 1px solid var(--c-line-2); }
+.drawer-avatar { width: 44px; height: 44px; border-radius: 11px; background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; font-family:'Satoshi', monospace; }
+.drawer-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 16px; font-weight: 600; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.drawer-subtitle { font-size: 12px; color: var(--c-mute); margin-top: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.drawer-tabs { display: flex; padding: 0 24px; border-bottom: 1px solid var(--c-line-2); }
+.drawer-tab { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--c-mute); border-bottom: 2px solid transparent;
+  transition: all 120ms; margin-bottom: -1px; cursor: pointer; user-select: none; background: transparent; border-left: 0; border-right: 0; border-top: 0; }
+.drawer-tab:hover { color: var(--c-ink); }
+.drawer-tab.is-active { color: var(--c-primary); border-bottom-color: var(--c-primary); }
+.drawer-body { flex: 1; overflow-y: auto; padding: 24px; }
+.drawer-section { margin-bottom: 24px; }
+.drawer-section-title { font-size: 11px; font-weight: 700; color: var(--c-mute); letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 10px; }
+.drawer-fields { display: grid; grid-template-columns: 140px 1fr; gap: 10px 16px; font-size: 13px; }
+.drawer-fields .lbl { color: var(--c-mute); }
+.drawer-fields .val { color: var(--c-ink); font-weight: 500; }
+.drawer-footer { padding: 12px 24px; border-top: 1px solid var(--c-line-2); display: flex; gap: 8px; align-items: center; background: var(--c-bg-off); }
+.footer-spacer { flex: 1; }
+.drawer-footer-meta { font-size: 12px; color: var(--c-mute-2); }
+.drawer-header-actions { display: flex; gap: 6px; align-items: center; }
+.drawer-header-divider { width: 1px; height: 22px; background: var(--c-line-2); margin: 0 4px; flex-shrink: 0; }
+
+/* FIELDS */
+.field { margin-bottom: 16px; }
+.field-label { display: block; font-size: 12.5px; font-weight: 500; color: var(--c-mute); margin-bottom: 6px; }
+.field-label .req { color: var(--c-danger); margin-left: 2px; }
+.field-input { width: 100%; }
+.field-help { font-size: 12px; color: var(--c-mute-2); margin-top: 4px; }
+.field-error { font-size: 12px; color: var(--c-danger); margin-top: 4px; display: none; }
+.field.is-invalid .input, .field.is-invalid .select { border-color: var(--c-danger); }
+.field.is-invalid .field-error { display: block; }
+.field-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+
+/* segmented toggle for Dr/Cr + status */
+.seg { display: inline-flex; border: 1px solid var(--c-line); border-radius: 8px; overflow: hidden; }
+.seg-btn { padding: 8px 16px; font-size: 13px; font-weight: 500; background: #fff; border: 0; color: var(--c-mute); transition: all 120ms; }
+.seg-btn + .seg-btn { border-left: 1px solid var(--c-line); }
+.seg-btn.is-on { background: var(--c-primary); color: #fff; }
+
+/* toggle row (Iron Rule #20) */
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border: 1px solid var(--c-line-2); border-radius: 8px; cursor: pointer; user-select: none; }
+.toggle-row:hover { border-color: var(--c-line); }
+.toggle-track { width: 40px; height: 22px; background: var(--c-line); border-radius: 999px; position: relative; transition: background 160ms; flex-shrink: 0; }
+.toggle-track .knob { position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: transform 160ms; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+.toggle-track.is-on { background: var(--c-teal); }
+.toggle-track.is-on .knob { transform: translateX(18px); }
+
+/* info note */
+.note { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px; background: var(--c-bg-off); border: 1px solid var(--c-line-2); border-radius: 8px; font-size: 12.5px; color: var(--c-mute); }
+.note [data-lucide] { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; color: var(--c-primary); }
+.note.is-warn { background: var(--c-warning-bg); border-color: var(--c-warning); color: var(--c-warning-fg); }
+
+/* MODAL */
+.modal-backdrop { position: fixed; inset: 0; background: rgba(11,29,58,0.50); z-index: var(--z-modal); opacity: 0; pointer-events: none; transition: opacity 200ms; display: flex; align-items: center; justify-content: center; }
+.modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.modal { background: #fff; border-radius: 12px; width: 440px; max-width: 92vw; max-height: 90vh; display: flex; flex-direction: column;
+  transform: scale(0.96); transition: transform 200ms cubic-bezier(0.4,0,0.2,1); box-shadow: 0 24px 64px rgba(11,29,58,0.28); overflow: hidden; }
+.modal-backdrop.is-open .modal { transform: scale(1); }
+.modal-header { padding: 18px 24px 12px; display: flex; align-items: flex-start; gap: 12px; }
+.modal-header-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(11,92,255,0.10); color: var(--c-primary); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.modal-header-icon.is-danger { background: var(--c-danger-bg); color: var(--c-danger); }
+.modal-header-icon.is-warning { background: var(--c-warning-bg); color: var(--c-warning); }
+.modal-header-icon [data-lucide] { width: 18px; height: 18px; }
+.modal-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 16px; font-weight: 600; color: var(--c-navy); margin: 0 0 4px; }
+.modal-subtitle { font-size: 13px; color: var(--c-mute); margin: 0; line-height: 1.5; }
+.modal-body { padding: 6px 24px 18px; font-size: 13px; color: var(--c-ink); overflow-y: auto; }
+.modal-footer { padding: 12px 24px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2); display: flex; justify-content: flex-end; gap: 8px; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--c-navy); color: #fff; padding: 12px 18px; border-radius: 10px;
+  font-size: 13px; font-weight: 500; z-index: var(--z-toast); display: flex; align-items: center; gap: 10px; box-shadow: 0 12px 32px rgba(11,29,58,0.30);
+  transform: translateY(100px); opacity: 0; transition: all 250ms cubic-bezier(0.4,0,0.2,1); max-width: 380px; }
+.toast.is-visible { transform: translateY(0); opacity: 1; }
+.toast.is-success { background: var(--c-success); }
+.toast.is-info { background: var(--c-primary); }
+.toast.is-warning { background: var(--c-warning); }
+.toast.is-error { background: var(--c-danger); }
+.toast [data-lucide] { width: 17px; height: 17px; }
+
+/* UTIL — LAYOUT (Rule #56: no inline layout style) */
+.ml-auto { margin-left: auto; }
+.grow-min0 { flex: 1; min-width: 0; }
+.hdr-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.setup-meta { margin-left: auto; display: flex; gap: 8px; font-size: 12px; color: var(--c-mute-2); align-items: center; }
+.ff-kind { width: 200px; }
+.ff-status { width: auto; min-width: 130px; }
+.col-check { width: 34px; }
+.col-code { width: 120px; }
+.col-kind { width: 170px; }
+.col-status { width: 90px; }
+.col-status-sm { width: 80px; }
+.col-action { width: 90px; text-align: right; }
+.col-bus { width: 150px; }
+.col-prod { width: 150px; }
+.imp-preview-scroll { margin-top: 10px; max-height: 300px; }
+.imp-done-scroll { margin-top: 10px; max-height: 220px; }
+
+/* UTIL */
+.text-mute { color: var(--c-mute); } .text-mute-2 { color: var(--c-mute-2); }
+.flex { display: flex; } .items-center { align-items: center; } .gap-2 { gap: 8px; }
+.w-3 { width: 12px; } .h-3 { height: 12px; }
+.w-3\.5 { width: 14px; } .h-3\.5 { height: 14px; }
+.w-4 { width: 16px; } .h-4 { height: 16px; }
+.w-5 { width: 20px; } .h-5 { height: 20px; }
+svg.lucide { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; flex-shrink: 0; }
+svg.lucide.w-3 { width: 12px; } svg.lucide.h-3 { height: 12px; }
+svg.lucide.w-3\.5 { width: 14px; } svg.lucide.h-3\.5 { height: 14px; }
+svg.lucide.w-4 { width: 16px; } svg.lucide.h-4 { height: 16px; }
+svg.lucide.w-5 { width: 20px; } svg.lucide.h-5 { height: 20px; }
+
+/* ===== TREE / HIERARCHY ===== */
+.view-switch { display: inline-flex; border: 1px solid var(--c-line); border-radius: 8px; overflow: hidden; }
+.vs-btn { display:inline-flex; align-items:center; gap:6px; padding: 0 12px; height: 36px; font-size: 12.5px; font-weight: 500; background: #fff; border: 0; color: var(--c-mute); transition: all 120ms; }
+.vs-btn + .vs-btn { border-left: 1px solid var(--c-line); }
+.vs-btn.is-on { background: var(--c-primary); color: #fff; }
+.vs-btn [data-lucide] { width: 14px; height: 14px; }
+
+/* tree control + guide lines */
+.acct-name-cell { display:flex; align-items:stretch; gap:0; min-width:0; }
+.tree-rail { display:inline-flex; align-items:stretch; flex-shrink:0; }
+.tree-rail .tseg { width: 18px; flex-shrink:0; position:relative; }
+.tree-rail .tseg.line::before { content:''; position:absolute; left:9px; top:-7px; bottom:-7px; width:1px; background:var(--c-line-2); }
+.tree-toggle { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border: 0; background: transparent; color: var(--c-mute-2); border-radius: 4px; transition: color 120ms; flex-shrink: 0; pointer-events: none; }
+.tree-toggle [data-lucide] { width: 13px; height: 13px; transition: transform 180ms; }
+.tree-toggle.is-collapsed [data-lucide] { transform: rotate(-90deg); }
+/* แถวที่ toggle ได้ = chevron ตาม hover ของ row */
+tr.is-clickable-toggle:hover .tree-toggle { color: var(--c-primary); }
+tr.is-clickable-toggle { cursor: pointer; }
+/* ปุ่ม view (ดวงตา) */
+.ra-btn.is-view:hover { background: rgba(11,92,255,0.10); color: var(--c-primary); }
+.tree-spacer { width: 22px; display: inline-block; flex-shrink: 0; }
+.acct-text { display:flex; flex-direction:column; min-width:0; padding-left:6px; }
+.acct-name { line-height:1.3; }
+.acct-name-en { font-size: 11px; color: var(--c-mute-2); line-height:1.25; font-family:'Satoshi',sans-serif; }
+.kids-count { font-size: 11px; color: var(--c-mute-3); margin-left:8px; font-family:'Satoshi',monospace; }
+
+.lvl-badge { font-family:'Satoshi',monospace; font-size: 11px; font-weight: 700; color: var(--c-mute-2); background: var(--c-line-3); padding: 1px 6px; border-radius: 4px; letter-spacing: 0.02em; }
+
+/* Dr/Cr chip — จาง subtle */
+.drcr { display:inline-flex; align-items:center; justify-content:center; min-width:30px; padding:2px 8px; border-radius:5px; font-size:11px; font-weight:700; font-family:'Satoshi',sans-serif; letter-spacing:0.02em; }
+.drcr.dr { background:var(--c-danger-bg); color:var(--c-danger); }
+.drcr.cr { background:var(--c-success-bg); color:var(--c-success-fg); }
+
+/* balance amount */
+.rollup-amt { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--c-navy); font-family:'Satoshi',sans-serif; }
+.rollup-amt.is-zero { color: var(--c-mute-3); font-weight: 400; }
+
+/* level emphasis via weight (สากล: indent+weight สื่อ depth, ไม่พึ่ง badge) */
+.acct-name.lvl0 { font-weight: 800; color: var(--c-navy); font-size:14px; }
+.acct-name.lvl1 { font-weight: 700; color: var(--c-navy); }
+.acct-name.lvl2 { font-weight: 600; color: var(--c-ink); }
+.acct-name.lvl3 { font-weight: 500; color: var(--c-ink); }
+tr.row-lvl0 td { background: var(--c-bg-off); border-bottom-color: var(--c-line); }
+tr.row-lvl0:hover td { background: var(--c-line-3); }
+tr.row-lvl1 td { background: var(--c-bg-off); }
+tr.is-archived .acct-name { color: var(--c-mute-3); text-decoration: line-through; }
+
+/* code compose (prefix + segment input) */
+.code-compose { display:flex; align-items:stretch; }
+.code-prefix { display:inline-flex; align-items:center; padding:0 10px; background:var(--c-bg-off); border:1px solid var(--c-line); border-right:0; border-radius:8px 0 0 8px; font-family:'Satoshi',monospace; font-weight:600; color:var(--c-mute); font-size:13px; white-space:nowrap; }
+.code-compose .code-seg-input { border-radius:0 8px 8px 0; }
+.code-compose:has(.code-prefix) .code-seg-input { border-top-left-radius:0; border-bottom-left-radius:0; }
+#codePreview { font-weight:700; color:var(--c-primary); }
+/* segmented Dr/Cr (renamed from .seg to avoid tree collision) */
+.seg-group { display: inline-flex; border: 1px solid var(--c-line); border-radius: 8px; overflow: hidden; }
+.seg-group .seg-btn { padding: 8px 16px; font-size: 13px; font-weight: 500; background: #fff; border: 0; color: var(--c-mute); transition: all 120ms; }
+.seg-group .seg-btn + .seg-btn { border-left: 1px solid var(--c-line); }
+.seg-group .seg-btn.is-on { background: var(--c-primary); color: #fff; }
+
+/* ===== CSV IMPORT ===== */
+.import-drop { border:2px dashed var(--c-line); border-radius:10px; padding:24px; text-align:center; cursor:pointer; transition:all 140ms; background:var(--c-bg-off); }
+.import-drop:hover { border-color:var(--c-primary); background:var(--c-danger-bg); }
+.import-drop .ic { width:44px;height:44px;border-radius:50%;background:rgba(11,92,255,0.10);color:var(--c-primary);display:inline-flex;align-items:center;justify-content:center;margin-bottom:10px; }
+.import-drop .ic [data-lucide]{width:20px;height:20px;}
+.import-file { display:flex;align-items:center;gap:10px;padding:12px 12px;border:1px solid var(--c-line-2);border-radius:8px;background:#fff; }
+.import-file .fic{width:32px;height:32px;border-radius:7px;background:var(--c-success-bg);color:var(--c-teal);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.import-file .fic [data-lucide]{width:16px;height:16px;}
+.imp-summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+.imp-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;font-size:12.5px;font-weight:600;}
+.imp-chip.ok{background:var(--c-success-bg);color:var(--c-success-fg);}
+.imp-chip.err{background:var(--c-danger-bg);color:var(--c-danger);}
+.imp-err-list{max-height:160px;overflow-y:auto;border:1px solid var(--c-danger);border-radius:8px;background:var(--c-danger-bg);padding:8px 10px;font-size:12px;color:var(--c-danger);margin-bottom:12px;}
+.imp-err-list .er{padding:3px 0;border-bottom:1px solid var(--c-danger);}
+.imp-err-list .er:last-child{border-bottom:0;}
+.imp-prev{width:100%;border-collapse:collapse;font-size:12px;}
+.imp-prev th{padding:6px 8px;text-align:left;color:var(--c-mute);font-size:11px;text-transform:uppercase;letter-spacing:0.04em;border-bottom:1px solid var(--c-line-2);background:var(--c-bg-off);white-space:nowrap;}
+.imp-prev td{padding:6px 8px;border-bottom:1px solid var(--c-line-3);}
+.imp-prev .acct-code{font-size:12px;}
+.imp-prev tr.bad td{background:var(--c-danger-bg);}
+
+/* import modal ใหญ่ขึ้นเพื่อใส่ preview */
+.modal.is-lg { width: 680px; }
+/* import-drop เป็น block layout (กัน flex ซ้อน) */
+label.import-drop { display:block; }
+label.import-drop .ic { display:inline-flex; }
+
+/* ===== GL Posting Group additions ===== */
+.tabbar { display:flex; gap:4px; margin: 0 0 16px; border-bottom:1px solid var(--c-line-2); }
+.tab-btn { display:inline-flex; align-items:center; gap:8px; padding:10px 16px; background:transparent;
+  border:none; border-bottom:2px solid transparent; color:var(--c-mute-2); font-size:14px; font-weight:600;
+  cursor:pointer; transition:all 140ms; margin-bottom:-1px; }
+.tab-btn:hover { color:var(--c-ink); }
+.tab-btn.is-on { color:var(--c-primary); border-bottom-color:var(--c-primary); }
+.tab-btn [data-lucide] { width:16px; height:16px; }
+.tab-count { display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:18px; padding:0 6px;
+  background:var(--c-line-3); color:var(--c-mute); border-radius:999px; font-size:11px; font-weight:700; }
+.tab-btn.is-on .tab-count { background:var(--c-primary); color:#fff; }
+
+/* card toolbar (เหนือ filter bar) — title+hint ซ้าย, ปุ่ม action ขวา */
+.card-toolbar { display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:16px 16px 0; }
+.card-toolbar-title { display:flex; align-items:center; gap:6px; font-size:14px; font-weight:700; color:var(--c-ink); }
+.card-toolbar-actions { display:flex; gap:8px; flex-shrink:0; }
+
+/* hint icon — hover tooltip อย่างเดียว (ไม่เป็นแผง) */
+.hint-i { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px;
+  color:var(--c-mute-3); cursor:help; position:relative; }
+.hint-i:hover { color:var(--c-primary); }
+.hint-i::after { content:attr(data-tip); position:absolute; top:calc(100% + 8px); left:0;
+  width:max-content; max-width:340px; padding:8px 12px; background:var(--c-navy); color:#fff;
+  font-size:12px; font-weight:400; line-height:1.5; border-radius:8px; white-space:normal;
+  box-shadow:0 8px 24px rgba(11,29,58,0.22); opacity:0; visibility:hidden; transform:translateY(-3px);
+  transition:opacity 140ms, transform 140ms, visibility 140ms; z-index:var(--z-dropdown); pointer-events:none; text-align:left; }
+.hint-i::before { content:''; position:absolute; top:calc(100% + 2px); left:6px; border:5px solid transparent;
+  border-bottom-color:var(--c-navy); opacity:0; visibility:hidden; transition:opacity 140ms, visibility 140ms; z-index:var(--z-dropdown); }
+.hint-i:hover::after, .hint-i:hover::before { opacity:1; visibility:visible; transform:translateY(0); }
+
+.acct-chip-row { display:flex; flex-wrap:wrap; gap:6px; }
+.acct-chip { display:inline-flex; align-items:center; gap:6px; padding:3px 8px; background:var(--c-bg-off);
+  border:1px solid var(--c-line-2); border-radius:7px; font-size:12px; }
+.acct-chip-lbl { color:var(--c-mute-2); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; }
+.acct-name-inline { color:var(--c-mute-2); font-size:12px; }
+
+/* group badge = pill convention (radius 999, token palette เดียวกับ COA pill) */
+.grp-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:999px; font-size:12px; font-weight:600; white-space:nowrap; }
+.grp-bus { background:var(--c-acct-equity-bg); color:var(--c-acct-equity-fg); }
+.grp-prod { background:var(--c-acct-income-bg); color:var(--c-acct-income-fg); }
+
+.bm-card { display:flex; align-items:center; gap:12px; padding:12px 12px; margin-bottom:8px;
+  background:var(--c-bg-off); border:1px solid var(--c-line-2); border-radius:10px; }
+.bm-icon { width:32px; height:32px; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center;
+  background:var(--c-danger-bg); color:var(--c-primary); border-radius:8px; }
+/* ===== Searchable Dropdown (sdd) — master-combobox contract (Rule #94) ===== */
+.sdd { position:relative; }
+.sdd-trigger { display:flex; align-items:center; gap:8px; width:100%; padding:8px 12px;
+  border:1px solid var(--c-line); border-radius:9px; background:#fff; font-size:14px; color:var(--c-ink);
+  cursor:pointer; text-align:left; transition:border-color 120ms, box-shadow 120ms; }
+.sdd-trigger:hover { border-color:var(--c-mute-3); }
+.sdd.is-open .sdd-trigger { border-color:var(--c-primary); box-shadow:0 0 0 3px rgba(11,92,255,0.12); }
+.sdd-trigger .sdd-val { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sdd-trigger .sdd-val.is-placeholder { color:var(--c-mute-3); }
+.sdd-trigger .sdd-chev { flex-shrink:0; color:var(--c-mute-3); transition:transform 160ms; }
+.sdd.is-open .sdd-chev { transform:rotate(180deg); }
+.sdd-clear { flex-shrink:0; width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center;
+  border:0; background:transparent; color:var(--c-mute-3); border-radius:6px; padding:0; cursor:pointer; transition:all 120ms; }
+.sdd-clear:hover { background:var(--c-line-3); color:var(--c-danger); }
+.sdd-panel { position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:var(--z-modal);
+  background:#fff; border:1px solid var(--c-line-2); border-radius:10px; box-shadow:0 12px 32px rgba(11,29,58,0.16);
+  overflow:hidden; display:none; }
+.sdd.is-open .sdd-panel { display:block; }
+.sdd.is-drop-up .sdd-panel { top:auto; bottom:calc(100% + 4px); }
+.sdd-search { padding:8px; border-bottom:1px solid var(--c-line-2); position:relative; }
+.sdd-search input { width:100%; padding:8px 10px 8px 32px; border:1px solid var(--c-line-2); border-radius:7px;
+  font-size:13px; font-family:inherit; outline:none; }
+.sdd-search input:focus { border-color:var(--c-primary); }
+.sdd-search [data-lucide] { position:absolute; left:18px; top:50%; transform:translateY(-50%); color:var(--c-mute-3); }
+.sdd-list { max-height:240px; overflow-y:auto; padding:4px; }
+.sdd-opt { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:7px; cursor:pointer; font-size:13px; }
+.sdd-opt:hover { background:var(--c-bg-off); }
+.sdd-opt.is-highlight { box-shadow:inset 0 0 0 1.5px var(--c-primary); }
+.sdd-opt.is-sel { background:var(--c-danger-bg); color:var(--c-primary); font-weight:600; }
+.sdd-opt .sdd-opt-code { font-family:'Satoshi', monospace; font-weight:600; color:var(--c-navy); font-size:12.5px; }
+.sdd-opt.is-sel .sdd-opt-code { color:var(--c-primary); }
+.sdd-opt .sdd-check { margin-left:auto; color:var(--c-primary); flex-shrink:0; }
+.sdd-empty { padding:16px; text-align:center; color:var(--c-mute-2); font-size:12.5px; }
+</style>
+<!-- PREFLIGHT v6.3 — coverage-gate fix pass for _COVERAGE_REPORT.md (GAP-01 BLOCK, GAP-02/GAP-03 WARN), 2026-08-10
+     round1 self_audit.py counts (real, re-run after fixes): spacing-off=0 · font-off=0 · font-count=7 (limit 8) ·
+     inline-layout=0 · z-adhoc=0 · hex-off=0 · menu-no-maxheight=0 · menu-no-flip=0 (positionSddMenu drop-up added) ·
+     no-global-outside-close=0 · preflight=stamped
+     structural fixes verified by hand (not counted by self_audit): drawer width 540→920px (max-width 96vw), sdd
+     combobox reworked to master-combobox.js.txt contract (highlight state + ↑/↓/Enter/Esc + clear-X + drop-up),
+     create-button label → "ยืนยันสร้าง", loading state (disabled + loader-2 spin + "กำลัง...") added to
+     submitGroup/submitSetup/bulkDoDelete/applyImport
+     round2: 11/11 BLOCK items fixed (UX-01..UX-11)
+     round3 (coverage gate): GAP-01 reverted — removed CSV import Replace/Merge mode step (.mode-opt/.mode-radio,
+     openImport/renderImportModal/applyImport/buildImportPreview/setImportMode) per BR-07/FN-40/FN-16/S-10① —
+     merge-only add is permanent, no mode choice; GAP-02 fixed — submitSetup() now blocks + toasts on used>0
+     bus/prod change (was silent revert), matching tab 1 pattern; GAP-03 fixed — code field (tab1) and bus/prod
+     fields (tab2) now show static locked div + lock-tag when editing a used>0 record, mirroring kind field's
+     existing lock treatment
+     left as-is (WARN/INFO/NOT-CHECKED — out of scope per task): flex-noalign=7 (UX-12) · long-banners=1 (UX-14) ·
+     stopprop-blanket=8 · missing-ids=5 · fullwidth-select=2 (audit false-positive: width moved from inline style to
+     .ff-status class, control unchanged) · custom-tabs=4 (kit-adjacent .tabbar, pre-existing) -->
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i data-lucide="box" ></i></div>
+    <div>
+      <div class="sb-name">CUBE NATIVE</div>
+      <div class="sb-sub">Finance</div>
+    </div>
+  </div>
+  <nav class="sb-nav" id="sb-nav">
+    <div class="sb-module" data-module="finance" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="landmark" class="mod-icon"></i>
+        <span class="mod-label">การเงิน</span>
+        <i data-lucide="chevron-down" class="mod-chevron"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item" data-feature="coa" href="chart-of-accounts.html">
+          <i data-lucide="list-tree" ></i><span>ผังบัญชี</span>
+        </a>
+        <a class="sb-item is-active" data-feature="posting-group">
+          <i data-lucide="git-merge" ></i><span>GL Posting Group</span>
+        </a>
+        <a class="sb-item is-disabled" data-feature="payment-term">
+          <i data-lucide="calendar-clock" ></i><span>เงื่อนไขชำระเงิน</span>
+        </a>
+        <a class="sb-item is-disabled" data-feature="gl">
+          <i data-lucide="book-open" ></i><span>สมุดบัญชีแยกประเภท</span>
+        </a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="procurement" data-expanded="false">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="shopping-cart" class="mod-icon"></i>
+        <span class="mod-label">จัดซื้อ</span>
+        <i data-lucide="chevron-down" class="mod-chevron"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item is-disabled" data-feature="pr"><i data-lucide="file-plus" ></i><span>ใบขอซื้อ (PR)</span></a>
+        <a class="sb-item is-disabled" data-feature="po"><i data-lucide="file-text" ></i><span>ใบสั่งซื้อ (PO)</span></a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="system" data-expanded="false">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sliders-horizontal" class="mod-icon"></i>
+        <span class="mod-label">System</span>
+        <i data-lucide="chevron-down" class="mod-chevron"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item is-disabled" data-feature="settings"><i data-lucide="settings" ></i><span>Settings</span></a>
+      </div>
+    </div>
+  </nav>
+  <div class="sb-footer">
+    <div class="pulse-dot"></div>
+    <span>Sandbox · v1.0.0</span>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="shell-bar">
+    <nav class="breadcrumb">
+      <a data-breadcrumb-module="finance">การเงิน</a>
+      <i data-lucide="chevron-right" class="sep"></i>
+      <span class="breadcrumb-current">GL Posting Group</span>
+    </nav>
+    <div class="hdr-actions">
+      <div style="position: relative;">
+        <button class="icon-btn" onclick="toggleNotif()"><i data-lucide="bell" ></i><span class="notif-dot"></span></button>
+      </div>
+      <div style="position: relative;">
+        <div class="user-chip" onclick="toggleUserMenu()">
+          <div class="user-text">
+            <div class="user-name">Tadswan C.</div>
+            <div class="user-role">Finance Lead · CUBE NATIVE</div>
+          </div>
+          <div class="avatar">TC</div>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-item"><i data-lucide="user" ></i><span>My Profile</span></div>
+          <div class="user-menu-item"><i data-lucide="settings" ></i><span>Preferences</span></div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-item is-danger"><i data-lucide="log-out" ></i><span>Sign out</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="content" id="page-content"></div>
+</main>
+
+<!-- Drawer -->
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer"></div>
+
+<!-- Modal -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Lucide loader -->
+<script>
+(function loadLucide() {
+  var version = '0.469.0';
+  var cdns = [
+    'https://unpkg.com/lucide@' + version + '/dist/umd/lucide.min.js',
+    'https://cdn.jsdelivr.net/npm/lucide@' + version + '/dist/umd/lucide.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/lucide/' + version + '/lucide.min.js'
+  ];
+  var i = 0;
+  function tryNext() {
+    if (i >= cdns.length) { window.lucide = window.lucide || { createIcons: function(){} }; window.dispatchEvent(new Event('lucide:ready')); return; }
+    var s = document.createElement('script'); s.src = cdns[i++];
+    s.onload = function(){ window.dispatchEvent(new Event('lucide:ready')); };
+    s.onerror = tryNext; document.head.appendChild(s);
+  }
+  tryNext();
+})();
+</script>
+<script>
+// ============================================ CONFIG
+// GL Posting Group — เชื่อม transaction เข้ากับ GL account ใน COA (Business Central pattern)
+// 2 ส่วน: (1) Posting Groups master (Vendor/Inventory/Bank specific groups + General Business/Product)
+//         (2) General Posting Setup matrix (Bus × Prod → revenue/cost/COGS accounts)
+
+// COA accounts (leaf/postable เท่านั้น — sync จาก F-COA-001) — Dev จะ fetch จาก COA API จริง
+const COA_ACCOUNTS = [
+  {code:'1-1-10-01', name:'เงินสดในมือ', type:'asset'},
+  {code:'1-1-10-02', name:'เงินฝากธนาคาร - กระแสรายวัน', type:'asset'},
+  {code:'1-1-10-03', name:'เงินฝากธนาคาร - ออมทรัพย์', type:'asset'},
+  {code:'1-1-20-01', name:'ลูกหนี้การค้า', type:'asset'},
+  {code:'1-1-30-01', name:'สินค้าสำเร็จรูป', type:'asset'},
+  {code:'1-1-40', name:'ภาษีซื้อ', type:'asset'},
+  {code:'2-1-10-01', name:'เจ้าหนี้การค้า', type:'liability'},
+  {code:'2-1-10-02', name:'เจ้าหนี้อื่น', type:'liability'},
+  {code:'2-1-20', name:'ภาษีขาย', type:'liability'},
+  {code:'2-1-30', name:'เงินมัดจำรับล่วงหน้า', type:'liability'},
+  {code:'4-1-10', name:'รายได้จากการขาย', type:'income'},
+  {code:'4-1-20', name:'รายได้ค่าบริการ', type:'income'},
+  {code:'4-2', name:'รายได้อื่น', type:'income'},
+  {code:'5-1', name:'ต้นทุนขาย', type:'expense'},
+  {code:'5-2-10-01', name:'เงินเดือน', type:'expense'},
+  {code:'5-2-20', name:'ค่าสาธารณูปโภค', type:'expense'},
+];
+function acctName(code){ const a=COA_ACCOUNTS.find(x=>x.code===code); return a?a.name:'—'; }
+function acctLabel(code){ const a=COA_ACCOUNTS.find(x=>x.code===code); return a?(code+' '+a.name):(code||'— ไม่ระบุ —'); }
+
+// ประเภท Posting Group (specific groups ตาม BC)
+// สถานะ 3 ค่า — pattern เลน (VD-PDM-01/02) เปลี่ยนอิสระ ไม่มีอนุมัติ
+const STATUS_META = {
+  draft:    { label:'ร่าง',      cls:'pill-draft',  icon:'file-pen' },
+  active:   { label:'ใช้งาน',    cls:'pill-on',     icon:'circle-check' },
+  inactive: { label:'ไม่ใช้งาน', cls:'pill-off',    icon:'circle-slash' },
+};
+function statusLabel(st){ return (STATUS_META[st]||{label:st}).label; }
+function statusPill(st){ const m=STATUS_META[st]||STATUS_META.draft; return `<span class="pill ${m.cls}"><i data-lucide="${m.icon}"></i>${m.label}</span>`; }
+// used = จำนวนเอกสาร/journal ที่ posting ผ่าน mapping นี้แล้ว (mock — จริง sync จาก GL) → guard ลบ
+// [DOA-ENGINE placeholder] approver_role/approved_by/approved_at/approval_chain = null — ไม่มีสายอนุมัติใน master นี้
+const PG_KINDS = {
+  vendor:    { label:'เจ้าหนี้ (Vendor)',    en:'Vendor Posting Group',    pill:'pill-liability', icon:'truck',     hint:'map เจ้าหนี้ → บัญชี AP control + บัญชีภาษีซื้อ' },
+  inventory: { label:'สินค้าคงคลัง (Inventory)', en:'Inventory Posting Group', pill:'pill-asset',     icon:'package',   hint:'map สินค้า → บัญชีสินค้าคงคลัง + interim' },
+  bank:      { label:'ธนาคาร (Bank)',         en:'Bank Posting Group',      pill:'pill-equity',    icon:'landmark',  hint:'map บัญชีธนาคาร → GL บัญชีเงินฝาก' },
+  customer:  { label:'ลูกหนี้ (Customer)',     en:'Customer Posting Group',  pill:'pill-income',    icon:'users',     hint:'map ลูกหนี้ → บัญชี AR control + ภาษีขาย' },
+};
+
+// ============================================ STATE
+const state = {
+  bulkSel: {},
+  tab: 'groups',  // groups | setup
+  sdd: { open:null, search:'', highlight:0, dropUp:false },  // searchable dropdown: ชื่อ dropdown ที่เปิด + คำค้น + highlight ไล่ลูกศร (Rule #94)
+  drawer: { open:false, mode:null, recordId:null },
+  modal: { open:false, type:null, data:null },
+  filters: { search:'', kind:'all', status:'all' },
+  setupFilters: { search:'' },
+  form: {},
+  busy: { group:false, setup:false, bulkDelete:false, import:false },  // Rule #44: submitting state ต่อ action
+  seq: 100,
+  // (1) Posting Groups master
+  groups: [
+    { id:'g1', code:'LOCAL', kind:'vendor', name:'เจ้าหนี้ในประเทศ', name_en:'Domestic Vendors',
+      payable_acct:'2-1-10-01', input_vat_acct:'1-1-40', status:'active', used:82 },
+    { id:'g2', code:'FOREIGN', kind:'vendor', name:'เจ้าหนี้ต่างประเทศ', name_en:'Foreign Vendors',
+      payable_acct:'2-1-10-02', input_vat_acct:'1-1-40', status:'active', used:14 },
+    { id:'g3', code:'FINISHED', kind:'inventory', name:'สินค้าสำเร็จรูป', name_en:'Finished Goods',
+      inventory_acct:'1-1-30-01', interim_acct:'1-1-30-01', status:'active', used:57 },
+    { id:'g4', code:'KBANK', kind:'bank', name:'ธนาคารกสิกรไทย', name_en:'KBank',
+      bank_acct:'1-1-10-02', status:'active', used:203 },
+    { id:'g5', code:'DOMESTIC-C', kind:'customer', name:'ลูกค้าในประเทศ', name_en:'Domestic Customers',
+      receivable_acct:'1-1-20-01', output_vat_acct:'2-1-20', status:'active', used:120 },
+    { id:'g6', code:'SCB', kind:'bank', name:'ธนาคารไทยพาณิชย์ (เตรียมใช้)', name_en:'SCB', bank_acct:'1-1-10-03', status:'draft', used:0 },
+    { id:'g7', code:'SCRAP', kind:'inventory', name:'เศษซาก (เลิกใช้)', name_en:'Scrap', inventory_acct:'1-1-30-01', interim_acct:'1-1-30-01', status:'inactive', used:6 },
+  ],
+  // (2) General Posting Setup matrix (Business Group × Product Group → accounts)
+  busGroups: ['DOMESTIC','FOREIGN'],   // General Business Posting Group
+  prodGroups: ['GOODS','SERVICE'],     // General Product Posting Group
+  setup: [
+    { id:'s1', bus:'DOMESTIC', prod:'GOODS', sales_acct:'4-1-10', purchase_acct:'5-1', cogs_acct:'5-1', status:'active', used:340 },
+    { id:'s2', bus:'DOMESTIC', prod:'SERVICE', sales_acct:'4-1-20', purchase_acct:'5-1', cogs_acct:'5-1', status:'active', used:88 },
+    { id:'s3', bus:'FOREIGN', prod:'GOODS', sales_acct:'4-1-10', purchase_acct:'5-1', cogs_acct:'5-1', status:'draft', used:0 },  // matrix เหลือ FOREIGN×SERVICE ยังไม่ตั้ง — template นำเข้าช่องนี้
+  ],
+};
+
+// ============================================ HELPERS
+function toggleModule(h){ const m=h.closest('.sb-module'); if(!m) return; const e=m.getAttribute('data-expanded')!=='false'; m.setAttribute('data-expanded', e?'false':'true'); }
+function toggleUserMenu(){ document.getElementById('userMenu')?.classList.toggle('is-open'); }
+document.addEventListener('click',(e)=>{ if(!e.target.closest('.user-chip')&&!e.target.closest('.user-menu')) document.getElementById('userMenu')?.classList.remove('is-open'); });
+function toggleNotif(){}
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function gById(id){ return state.groups.find(g=>g.id===id); }
+function sById(id){ return state.setup.find(s=>s.id===id); }
+function renderIcons(){ if(window.lucide && typeof window.lucide.createIcons==='function') window.lucide.createIcons(); }
+
+// ===== Searchable Dropdown component (master-combobox contract — Iron Rule #94) =====
+// opts: [{value, label, code?}], onPick: ชื่อ global fn (string) ที่รับ (name, value)
+// state.sdd = { open, search, highlight } — เปิดได้ทีละตัว (shared, render เป็น string ทั้งหน้า)
+// resetValue: ค่าที่ปุ่ม X ล้างการเลือกจะเซ็ตกลับไป (ปกติ '' — ยกเว้น field ที่มี default ที่มีความหมาย เช่น filterKind='all')
+function searchDropdown(name, value, opts, placeholder, onPick, resetValue){
+  resetValue = resetValue===undefined ? '' : resetValue;
+  const sel = opts.find(o=>o.value===value);
+  const isOpen = state.sdd.open===name;
+  const q = isOpen ? state.sdd.search.toLowerCase() : '';
+  const filtered = isOpen ? opts.filter(o=>(o.label+' '+(o.code||'')).toLowerCase().includes(q)) : opts;
+  if(isOpen){
+    state.sdd._opts = filtered; state.sdd._onPick = onPick; state.sdd._resetValue = resetValue;
+    if(state.sdd.highlight>=filtered.length) state.sdd.highlight = Math.max(0, filtered.length-1);
+  }
+  const valHtml = sel
+    ? `<span class="sdd-val">${sel.code?`<span class="sdd-opt-code">${esc(sel.code)}</span> `:''}${esc(sel.label)}</span>`
+    : `<span class="sdd-val is-placeholder">${esc(placeholder)}</span>`;
+  const showClear = !!sel && sel.value!==resetValue;
+  const trailIcon = showClear
+    ? `<button type="button" class="sdd-clear" onclick="event.stopPropagation();clearSdd('${name}','${onPick}','${esc(resetValue)}')" title="ล้างการเลือก"><i data-lucide="x"></i></button>`
+    : `<i data-lucide="chevron-down" class="sdd-chev"></i>`;
+  return `<div class="sdd${isOpen?' is-open':''}${isOpen&&state.sdd.dropUp?' is-drop-up':''}" data-sdd="${name}">
+    <div class="sdd-trigger" tabindex="0" onclick="toggleSdd('${name}', event)">
+      ${valHtml}${trailIcon}
+    </div>
+    <div class="sdd-panel" onclick="event.stopPropagation()">
+      <div class="sdd-search">
+        <i data-lucide="search" ></i>
+        <input type="text" placeholder="ค้นหา..." value="${esc(isOpen?state.sdd.search:'')}" oninput="onSddSearch(this.value)" onkeydown="onSddKey(event)" autocomplete="off">
+      </div>
+      <div class="sdd-list">
+        ${filtered.length===0 ? `<div class="sdd-empty">ไม่พบรายการ</div>` :
+          filtered.map((o,i)=>`<div class="sdd-opt${o.value===value?' is-sel':''}${isOpen&&i===state.sdd.highlight?' is-highlight':''}" onmousedown="event.preventDefault()" onclick="pickSdd('${onPick}','${name}','${esc(o.value)}')">
+            ${o.code?`<span class="sdd-opt-code">${esc(o.code)}</span>`:''}<span>${esc(o.label)}</span>
+            ${o.value===value?'<i data-lucide="check" class="sdd-check"></i>':''}
+          </div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+function positionSddMenu(){
+  const box=document.querySelector('.sdd.is-open'); if(!box) return;
+  const rect=box.getBoundingClientRect();
+  const panel=box.querySelector('.sdd-panel');
+  const needed=(panel&&panel.offsetHeight)||300;
+  const spaceBelow=window.innerHeight-rect.bottom, spaceAbove=rect.top;
+  const dropUp = spaceBelow<needed && spaceAbove>spaceBelow;
+  box.classList.toggle('is-drop-up', dropUp);
+  state.sdd.dropUp = dropUp;
+}
+function focusSddSearch(){ const el=document.querySelector('.sdd.is-open .sdd-search input'); if(el){ el.focus(); el.setSelectionRange(el.value.length,el.value.length); } }
+function toggleSdd(name, ev){ if(ev) ev.stopPropagation();
+  const wasOpen = state.sdd.open===name;
+  state.sdd = wasOpen ? {open:null,search:'',highlight:0,dropUp:false} : {open:name,search:'',highlight:0,dropUp:false};
+  render();
+  if(state.sdd.open===name){ requestAnimationFrame(()=>{ positionSddMenu(); focusSddSearch(); }); }
+}
+function onSddSearch(v){ state.sdd.search=v; state.sdd.highlight=0; render();
+  requestAnimationFrame(()=>{ positionSddMenu(); focusSddSearch(); });
+}
+function onSddKey(e){
+  const st=state.sdd; if(!st.open) return;
+  const opts=st._opts||[];
+  if(e.key==='ArrowDown'){ e.preventDefault(); st.highlight=Math.min(opts.length-1, st.highlight+1); render(); requestAnimationFrame(()=>{ positionSddMenu(); focusSddSearch(); }); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); st.highlight=Math.max(0, st.highlight-1); render(); requestAnimationFrame(()=>{ positionSddMenu(); focusSddSearch(); }); }
+  else if(e.key==='Enter'){ e.preventDefault(); const o=opts[st.highlight]; if(o) pickSdd(st._onPick, st.open, o.value); }
+  else if(e.key==='Escape'){ e.stopPropagation(); state.sdd={open:null,search:'',highlight:0,dropUp:false}; render(); }
+}
+function pickSdd(fn, name, value){ state.sdd={open:null,search:'',highlight:0,dropUp:false}; if(window[fn]) window[fn](name, value); }
+function clearSdd(name, onPick, resetValue){
+  if(window[onPick]) window[onPick](name, resetValue);
+  state.sdd={open:name,search:'',highlight:0,dropUp:false};
+  render();
+  requestAnimationFrame(()=>{ positionSddMenu(); focusSddSearch(); });
+}
+document.addEventListener('click',(e)=>{ if(state.sdd.open && !e.target.closest('.sdd')){ state.sdd={open:null,search:'',highlight:0,dropUp:false}; render(); } });
+
+function preserveRenderState(){
+  const ts=document.querySelector('.table-scroll'), ct=document.querySelector('.content');
+  const extra={ tblScroll:ts?ts.scrollTop:0, contentScroll:ct?ct.scrollTop:0 };
+  const db=document.querySelector('.drawer-body'),mb=document.querySelector('.modal-body'),a=document.activeElement;
+  const isI=a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA');
+  return { ...extra,  drawerScroll:db?db.scrollTop:0, modalScroll:mb?mb.scrollTop:0, pageScroll:window.scrollY,
+    focusKey:isI?{placeholder:a.placeholder||'',name:a.name||'',selStart:a.selectionStart,selEnd:a.selectionEnd}:null };
+}
+function restoreRenderState(snap){ if(!snap) return; requestAnimationFrame(()=>{
+  const ts=document.querySelector('.table-scroll'); if(ts&&snap.tblScroll>0) ts.scrollTop=snap.tblScroll;
+  const ct=document.querySelector('.content'); if(ct&&snap.contentScroll>0) ct.scrollTop=snap.contentScroll;
+  const db=document.querySelector('.drawer-body'); if(db&&snap.drawerScroll>0) db.scrollTop=snap.drawerScroll;
+  const mb=document.querySelector('.modal-body'); if(mb&&snap.modalScroll>0) mb.scrollTop=snap.modalScroll;
+  if(snap.pageScroll>0) window.scrollTo(0,snap.pageScroll);
+  if(snap.focusKey){ const cs=document.querySelectorAll('input, textarea'); for(const c of cs){ if((c.placeholder||'')===snap.focusKey.placeholder&&(c.name||'')===snap.focusKey.name){ c.focus(); if(snap.focusKey.selStart!=null&&c.setSelectionRange){ try{c.setSelectionRange(snap.focusKey.selStart,snap.focusKey.selEnd);}catch(e){} } break; } } }
+}); }
+
+// ============================================ PAGE
+function renderPage(){
+  return `
+  <div class="ph">
+    <div>
+      <div class="ph-title-row">
+        <h1 class="ph-title">GL Posting Group</h1>
+        <span class="ph-count">${state.groups.length} กลุ่ม · ${state.setup.length} setup</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabbar">
+    <button class="tab-btn${state.tab==='groups'?' is-on':''}" onclick="setTab('groups')"><i data-lucide="layers" ></i><span>Posting Groups</span><span class="tab-count">${state.groups.length}</span></button>
+    <button class="tab-btn${state.tab==='setup'?' is-on':''}" onclick="setTab('setup')"><i data-lucide="grid-3x3" ></i><span>General Posting Setup</span><span class="tab-count">${state.setup.length}</span></button>
+  </div>
+
+  ${state.tab==='groups' ? renderGroupsTab() : renderSetupTab()}
+  `;
+}
+
+// ---------- TAB 1: Posting Groups ----------
+function renderGroupsTab(){
+  const rows = state.groups.filter(g=>{
+    if(state.filters.kind!=='all' && g.kind!==state.filters.kind) return false;
+    if(state.filters.status!=='all' && g.status!==state.filters.status) return false;
+    if(state.filters.search){ const q=state.filters.search.toLowerCase();
+      if(!(g.code.toLowerCase().includes(q)||g.name.toLowerCase().includes(q)||(g.name_en||'').toLowerCase().includes(q))) return false; }
+    return true;
+  });
+  const selN=Object.keys(state.bulkSel).length;
+  const allSel=rows.length>0 && rows.every(r=>state.bulkSel[r.id]);
+  const D=state.groups;
+  return `
+  <div class="stats">
+    <button class="stat ${state.filters.status==='all'?'is-on':''}" onclick="quickFilter('all')"><div class="stat-label"><i data-lucide="layers"></i>ทั้งหมด</div><div class="stat-value">${D.length}</div><div class="stat-meta">${Object.keys(PG_KINDS).length} ประเภทกลุ่ม</div></button>
+    <button class="stat ${state.filters.status==='active'?'is-on':''}" onclick="quickFilter('active')"><div class="stat-label"><i data-lucide="circle-check"></i>ใช้งาน</div><div class="stat-value">${D.filter(x=>x.status==='active').length}</div><div class="stat-meta">พร้อมให้เอกสารผูกบัญชี</div></button>
+    <button class="stat ${state.filters.status==='inactive'?'is-on':''}" onclick="quickFilter('inactive')"><div class="stat-label"><i data-lucide="circle-slash"></i>ไม่ใช้งาน</div><div class="stat-value">${D.filter(x=>x.status==='inactive').length}</div><div class="stat-meta">ปิดจากการใช้ใหม่</div></button>
+    <button class="stat ${state.filters.status==='draft'?'is-on':''}" onclick="quickFilter('draft')"><div class="stat-label"><i data-lucide="file-pen"></i>ร่าง</div><div class="stat-value">${D.filter(x=>x.status==='draft').length}</div><div class="stat-meta">เตรียมตั้งค่า ยังไม่เปิดใช้</div></button>
+  </div>
+  ${selN>0?`<div class="bulkbar"><span class="bb-count">เลือก ${selN} รายการ</span>
+    <button onclick="bulkSetStatus('active')"><i data-lucide="circle-check"></i>ใช้งาน</button>
+    <button onclick="bulkSetStatus('inactive')"><i data-lucide="circle-slash"></i>ไม่ใช้งาน</button>
+    <button onclick="bulkSetStatus('draft')"><i data-lucide="file-pen"></i>ร่าง</button>
+    <button class="is-danger" onclick="bulkAskDelete()"><i data-lucide="trash-2"></i>ลบ</button>
+    <div class="footer-spacer"></div>
+    <button onclick="state.bulkSel={};render();"><i data-lucide="x"></i>ยกเลิก</button>
+  </div>`:''}
+  <div class="card">
+    <div class="card-toolbar">
+      <div class="card-toolbar-title">
+        <span>Specific Posting Groups</span>
+      </div>
+      <div class="card-toolbar-actions">
+        <button class="btn btn-secondary btn-sm" onclick="exportCSV()"><i data-lucide="download"></i><span>ส่งออก CSV</span></button>
+        <button class="btn btn-secondary btn-sm" onclick="openImport()"><i data-lucide="upload" ></i><span>นำเข้า CSV</span></button>
+        <button class="btn btn-primary btn-sm" onclick="openDrawer('create-group')"><i data-lucide="plus" ></i><span>เพิ่ม Posting Group</span></button>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <div class="input-search">
+        <i data-lucide="search" class="lead-icon"></i>
+        <input class="input" type="text" placeholder="ค้นหารหัส หรือ ชื่อกลุ่ม..." value="${esc(state.filters.search)}" oninput="onSearch(this.value)">
+      </div>
+      <div class="ff-kind">${searchDropdown('filterKind', state.filters.kind, [{value:'all',label:'ทุกประเภทกลุ่ม'}].concat(Object.entries(PG_KINDS).map(([k,v])=>({value:k,label:v.label}))), 'ทุกประเภทกลุ่ม', 'onFilterKindPick', 'all')}</div>
+      <select class="select ff-status" onchange="state.filters.status=this.value;render();">
+        <option value="all"${state.filters.status==='all'?' selected':''}>ทุกสถานะ</option>
+        <option value="active"${state.filters.status==='active'?' selected':''}>ใช้งาน</option>
+        <option value="inactive"${state.filters.status==='inactive'?' selected':''}>ไม่ใช้งาน</option>
+        <option value="draft"${state.filters.status==='draft'?' selected':''}>ร่าง</option>
+      </select>
+      ${(state.filters.search||state.filters.kind!=='all')?`<button class="btn btn-ghost btn-sm" onclick="resetFilters()"><i data-lucide="x" ></i><span>ล้าง</span></button>`:''}
+    </div>
+    ${rows.length===0?renderEmpty():`
+    <div class="table-scroll">
+      <table class="table">
+        <thead><tr>
+          <th class="col-check"><input type="checkbox" ${allSel?'checked':''} onclick="toggleSelAll(event)"></th>
+          <th class="col-code">รหัส</th>
+          <th>ชื่อกลุ่ม</th>
+          <th class="col-kind">ประเภท</th>
+          <th>บัญชีที่ผูก (COA)</th>
+          <th class="col-status">สถานะ</th>
+          <th class="col-action">จัดการ</th>
+        </tr></thead>
+        <tbody>${rows.map(renderGroupRow).join('')}</tbody>
+      </table>
+    </div>
+    <div class="table-footer"><div>กลุ่มเฉพาะ (Specific Posting Groups) — map entity เข้าบัญชี control</div><div>แสดง ${rows.length} จาก ${state.groups.length} กลุ่ม</div></div>`}
+  </div>`;
+}
+
+function renderGroupRow(g){
+  const k=PG_KINDS[g.kind];
+  // บัญชีที่ผูก — แสดงตาม kind
+  let accts=[];
+  if(g.kind==='vendor'){ accts=[['AP', g.payable_acct],['VAT ซื้อ', g.input_vat_acct]]; }
+  else if(g.kind==='inventory'){ accts=[['สินค้า', g.inventory_acct],['Interim', g.interim_acct]]; }
+  else if(g.kind==='bank'){ accts=[['เงินฝาก', g.bank_acct]]; }
+  else if(g.kind==='customer'){ accts=[['AR', g.receivable_acct],['VAT ขาย', g.output_vat_acct]]; }
+  const acctHtml = accts.filter(a=>a[1]).map(a=>`<span class="acct-chip"><span class="acct-chip-lbl">${a[0]}</span><span class="acct-code">${esc(a[1])}</span></span>`).join('');
+  return `
+  <tr class="${state.bulkSel[g.id]?'is-sel':''}" onclick="openDrawer('view-group','${g.id}')">
+    <td onclick="event.stopPropagation()"><input type="checkbox" ${state.bulkSel[g.id]?'checked':''} onclick="toggleSel('${g.id}')"></td>
+    <td><span class="acct-code" style="font-weight:600;">${esc(g.code)}</span></td>
+    <td><div style="font-weight:600;">${esc(g.name)}</div>${g.name_en?`<div class="acct-name-en">${esc(g.name_en)}</div>`:''}</td>
+    <td><span class="pill ${k.pill}"><i data-lucide="${k.icon}" ></i>${k.label}</span></td>
+    <td><div class="acct-chip-row">${acctHtml||'<span class="text-mute-2">—</span>'}</div></td>
+    <td>${statusPill(g.status)}</td>
+    <td onclick="event.stopPropagation()" style="text-align:right;">
+      <div class="row-actions">
+        <button class="ra-btn" title="แก้ไข" onclick="openDrawer('edit-group','${g.id}')"><i data-lucide="pencil"></i></button>
+      </div>
+    </td>
+  </tr>`;
+}
+
+// ---------- TAB 2: General Posting Setup (matrix) ----------
+function renderSetupTab(){
+  const rows = state.setup.filter(s=>{
+    if(state.filters.status!=='all' && s.status!==state.filters.status) return false;
+    if(state.setupFilters.search){ const q=state.setupFilters.search.toLowerCase();
+      if(!((s.bus+s.prod).toLowerCase().includes(q))) return false; }
+    return true;
+  });
+  const selN=Object.keys(state.bulkSel).length;
+  const allSel=rows.length>0 && rows.every(r=>state.bulkSel[r.id]);
+  const D=state.setup;
+  return `
+  <div class="stats">
+    <button class="stat ${state.filters.status==='all'?'is-on':''}" onclick="quickFilter('all')"><div class="stat-label"><i data-lucide="grid-3x3"></i>ทั้งหมด</div><div class="stat-value">${D.length}</div><div class="stat-meta">${state.busGroups.length} กลุ่มธุรกิจ × ${state.prodGroups.length} กลุ่มสินค้า</div></button>
+    <button class="stat ${state.filters.status==='active'?'is-on':''}" onclick="quickFilter('active')"><div class="stat-label"><i data-lucide="circle-check"></i>ใช้งาน</div><div class="stat-value">${D.filter(x=>x.status==='active').length}</div><div class="stat-meta">พร้อม post ขาย-ซื้อ</div></button>
+    <button class="stat ${state.filters.status==='inactive'?'is-on':''}" onclick="quickFilter('inactive')"><div class="stat-label"><i data-lucide="circle-slash"></i>ไม่ใช้งาน</div><div class="stat-value">${D.filter(x=>x.status==='inactive').length}</div><div class="stat-meta">ปิดจากการใช้ใหม่</div></button>
+    <button class="stat ${state.filters.status==='draft'?'is-on':''}" onclick="quickFilter('draft')"><div class="stat-label"><i data-lucide="file-pen"></i>ร่าง</div><div class="stat-value">${D.filter(x=>x.status==='draft').length}</div><div class="stat-meta">เตรียมตั้งค่า ยังไม่เปิดใช้</div></button>
+  </div>
+  ${selN>0?`<div class="bulkbar"><span class="bb-count">เลือก ${selN} รายการ</span>
+    <button onclick="bulkSetStatus('active')"><i data-lucide="circle-check"></i>ใช้งาน</button>
+    <button onclick="bulkSetStatus('inactive')"><i data-lucide="circle-slash"></i>ไม่ใช้งาน</button>
+    <button onclick="bulkSetStatus('draft')"><i data-lucide="file-pen"></i>ร่าง</button>
+    <button class="is-danger" onclick="bulkAskDelete()"><i data-lucide="trash-2"></i>ลบ</button>
+    <div class="footer-spacer"></div>
+    <button onclick="state.bulkSel={};render();"><i data-lucide="x"></i>ยกเลิก</button>
+  </div>`:''}
+  <div class="card">
+    <div class="card-toolbar">
+      <div class="card-toolbar-title">
+        <span>General Posting Setup</span>
+      </div>
+      <div class="card-toolbar-actions">
+        <button class="btn btn-secondary btn-sm" onclick="exportCSV()"><i data-lucide="download"></i><span>ส่งออก CSV</span></button>
+        <button class="btn btn-secondary btn-sm" onclick="openImport()"><i data-lucide="upload" ></i><span>นำเข้า CSV</span></button>
+        <button class="btn btn-primary btn-sm" onclick="openDrawer('create-setup')"><i data-lucide="plus" ></i><span>เพิ่ม Setup</span></button>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <div class="input-search">
+        <i data-lucide="search" class="lead-icon"></i>
+        <input class="input" type="text" placeholder="ค้นหากลุ่มธุรกิจ/สินค้า..." value="${esc(state.setupFilters.search)}" oninput="onSetupSearch(this.value)">
+      </div>
+      <select class="select ff-status" onchange="state.filters.status=this.value;render();">
+        <option value="all"${state.filters.status==='all'?' selected':''}>ทุกสถานะ</option>
+        <option value="active"${state.filters.status==='active'?' selected':''}>ใช้งาน</option>
+        <option value="inactive"${state.filters.status==='inactive'?' selected':''}>ไม่ใช้งาน</option>
+        <option value="draft"${state.filters.status==='draft'?' selected':''}>ร่าง</option>
+      </select>
+      <div class="setup-meta">
+        <span>กลุ่มธุรกิจ: ${state.busGroups.length}</span><span>·</span><span>กลุ่มสินค้า: ${state.prodGroups.length}</span>
+      </div>
+    </div>
+    ${rows.length===0?renderEmpty():`
+    <div class="table-scroll">
+      <table class="table">
+        <thead><tr>
+          <th class="col-check"><input type="checkbox" ${allSel?'checked':''} onclick="toggleSelAll(event)"></th>
+          <th class="col-bus">กลุ่มธุรกิจ</th>
+          <th class="col-prod">กลุ่มสินค้า</th>
+          <th>บัญชีรายได้ (Sales)</th>
+          <th>บัญชีซื้อ (Purchase)</th>
+          <th>บัญชีต้นทุน (COGS)</th>
+          <th class="col-status-sm">สถานะ</th>
+          <th class="col-action">จัดการ</th>
+        </tr></thead>
+        <tbody>${rows.map(renderSetupRow).join('')}</tbody>
+      </table>
+    </div>
+    <div class="table-footer"><div>1 แถว = 1 ชุดบัญชีต่อ (กลุ่มธุรกิจ × กลุ่มสินค้า)</div><div>แสดง ${rows.length} จาก ${state.setup.length} setup</div></div>`}
+  </div>`;
+}
+
+function renderSetupRow(s){
+  return `
+  <tr class="${state.bulkSel[s.id]?'is-sel':''}" onclick="openDrawer('view-setup','${s.id}')">
+    <td onclick="event.stopPropagation()"><input type="checkbox" ${state.bulkSel[s.id]?'checked':''} onclick="toggleSel('${s.id}')"></td>
+    <td><span class="grp-badge grp-bus">${esc(s.bus)}</span></td>
+    <td><span class="grp-badge grp-prod">${esc(s.prod)}</span></td>
+    <td><span class="acct-code">${esc(s.sales_acct)}</span> <span class="acct-name-inline">${esc(acctName(s.sales_acct))}</span></td>
+    <td><span class="acct-code">${esc(s.purchase_acct)}</span> <span class="acct-name-inline">${esc(acctName(s.purchase_acct))}</span></td>
+    <td><span class="acct-code">${esc(s.cogs_acct)}</span> <span class="acct-name-inline">${esc(acctName(s.cogs_acct))}</span></td>
+    <td>${statusPill(s.status)}</td>
+    <td onclick="event.stopPropagation()" style="text-align:right;">
+      <div class="row-actions">
+        <button class="ra-btn" title="แก้ไข" onclick="openDrawer('edit-setup','${s.id}')"><i data-lucide="pencil"></i></button>
+      </div>
+    </td>
+  </tr>`;
+}
+
+function renderEmpty(){
+  return `<div class="empty">
+    <div class="empty-icon"><i data-lucide="search-x" ></i></div>
+    <div class="empty-title">ไม่พบรายการที่ตรงกับเงื่อนไข</div>
+    <div class="empty-desc">ลองปรับคำค้นหรือล้างตัวกรอง</div>
+  </div>`;
+}
+
+// ============================================ DRAWER
+function renderDrawer(){
+  const d=state.drawer; if(!d.open) return '';
+  if(d.mode==='view-group') return renderViewGroup(gById(d.recordId));
+  if(d.mode==='view-setup') return renderViewSetup(sById(d.recordId));
+  if(d.mode==='create-group'||d.mode==='edit-group') return renderGroupForm(d.mode==='edit-group'?gById(d.recordId):null);
+  if(d.mode==='create-setup'||d.mode==='edit-setup') return renderSetupForm(d.mode==='edit-setup'?sById(d.recordId):null);
+  return '';
+}
+
+function acctSelect(name, value, filterTypes){
+  const opts = COA_ACCOUNTS.filter(a=>!filterTypes||filterTypes.includes(a.type))
+    .map(a=>({value:a.code, code:a.code, label:a.name}));
+  return searchDropdown(name, value, opts, '— เลือกบัญชีจากผังบัญชี —', 'onFormPick');
+}
+
+function renderGroupForm(g){
+  const isEdit=!!g; const f=state.form; const kind=f.kind||'vendor'; const k=PG_KINDS[kind];
+  // fields ตาม kind
+  let acctFields='';
+  if(kind==='vendor'){
+    acctFields=`
+      ${fieldBlock('บัญชีเจ้าหนี้ (AP control)', acctSelect('payable_acct', f.payable_acct, ['liability']), 'บัญชีตั้งหนี้เมื่อรับใบแจ้งหนี้', true)}
+      ${fieldBlock('บัญชีภาษีซื้อ (Input VAT)', acctSelect('input_vat_acct', f.input_vat_acct, ['asset']), 'บัญชีภาษีซื้อที่ขอคืนได้', false)}`;
+  } else if(kind==='inventory'){
+    acctFields=`
+      ${fieldBlock('บัญชีสินค้าคงคลัง (Inventory)', acctSelect('inventory_acct', f.inventory_acct, ['asset']), 'บัญชีมูลค่าสินค้าคงเหลือ', true)}
+      ${fieldBlock('บัญชี Interim (รับของยังไม่วางบิล)', acctSelect('interim_acct', f.interim_acct, ['asset','liability']), 'GR/IR — รับของแล้วแต่ยังไม่มี invoice', false)}`;
+  } else if(kind==='bank'){
+    acctFields=`${fieldBlock('บัญชีเงินฝาก (GL)', acctSelect('bank_acct', f.bank_acct, ['asset']), 'บัญชี GL ของบัญชีธนาคารนี้', true)}`;
+  } else if(kind==='customer'){
+    acctFields=`
+      ${fieldBlock('บัญชีลูกหนี้ (AR control)', acctSelect('receivable_acct', f.receivable_acct, ['asset']), 'บัญชีตั้งลูกหนี้เมื่อขาย', true)}
+      ${fieldBlock('บัญชีภาษีขาย (Output VAT)', acctSelect('output_vat_acct', f.output_vat_acct, ['liability']), 'บัญชีภาษีขายที่ต้องนำส่ง', false)}`;
+  }
+  return `
+  <div class="drawer-header">
+    <div class="drawer-avatar">${isEdit?`<i data-lucide="${k.icon}" ></i>`:'<i data-lucide="plus" ></i>'}</div>
+    <div class="grow-min0">
+      <h2 class="drawer-title">${isEdit?'แก้ไข Posting Group':'เพิ่ม Posting Group'}</h2>
+      <div class="drawer-subtitle">${isEdit?`<span class="acct-code">${esc(g.code)}</span>`:'จับคู่ entity เข้ากับบัญชี control ใน COA'}</div>
+    </div>
+    <div class="drawer-header-actions"><button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" ></i></button></div>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-section">
+      <div class="drawer-section-title">ประเภทกลุ่ม</div>
+      <div class="field" id="fld-kind">
+        <label class="field-label">ประเภท Posting Group <span class="req">*</span></label>
+        ${isEdit
+          ? `<div class="sdd-trigger" style="cursor:not-allowed; opacity:0.7;"><span class="sdd-val">${esc(k.label)}</span></div>`
+          : searchDropdown('kind', kind, Object.entries(PG_KINDS).map(([kk,v])=>({value:kk,label:v.label})), '— เลือกประเภท —', 'onKindChange', 'vendor')}
+      </div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">ข้อมูลกลุ่ม</div>
+      ${fieldBlock('รหัสกลุ่ม (Code)'+((isEdit&&g.used>0)?' <span class="lock-tag"><i data-lucide="lock"></i>ล็อก — มีการบันทึกบัญชีแล้ว</span>':''), (isEdit&&g.used>0)
+        ? `<div class="sdd-trigger" data-sdd="code" style="cursor:not-allowed; opacity:0.7;"><span class="sdd-val acct-code">${esc(f.code||'')}</span></div>`
+        : `<input class="input field-input" name="code" type="text" placeholder="เช่น LOCAL" value="${esc(f.code||'')}" oninput="onFormInput('code',this.value.toUpperCase())">`, 'ตัวพิมพ์ใหญ่ ไม่ซ้ำ', true)}
+      ${fieldBlock('ชื่อกลุ่ม (TH)', `<input class="input field-input" name="name" type="text" placeholder="เช่น เจ้าหนี้ในประเทศ" value="${esc(f.name||'')}" oninput="onFormInput('name',this.value)">`, '', true)}
+      ${fieldBlock('ชื่อกลุ่ม (EN)', `<input class="input field-input" name="name_en" type="text" placeholder="e.g. Domestic Vendors" value="${esc(f.name_en||'')}" oninput="onFormInput('name_en',this.value)">`, '', false)}
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">บัญชีที่ผูก (จากผังบัญชี)</div>
+      ${acctFields}
+      <div class="note"><i data-lucide="link" ></i><span>บัญชีทั้งหมดอ้างอิงจาก <strong>ผังบัญชี</strong> (F-COA-001) — เลือกได้เฉพาะบัญชีลงรายการได้ (leaf)</span></div>
+    </div>
+  
+    <div class="drawer-section">
+      <div class="field"><label class="field-label">สถานะ</label>
+        <select class="select" onchange="state.form.status=this.value;">
+          <option value="active" ${(f.status||'active')==='active'?'selected':''}>ใช้งาน</option>
+          <option value="inactive" ${f.status==='inactive'?'selected':''}>ไม่ใช้งาน</option>
+          <option value="draft" ${f.status==='draft'?'selected':''}>ร่าง</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="drawer-footer">
+    <button class="btn btn-ghost" onclick="closeDrawer()">ยกเลิก</button>
+    <div class="footer-spacer"></div>
+    <button class="btn btn-primary" ${state.busy.group?'disabled':''} onclick="submitGroup()">${state.busy.group?`<i data-lucide="loader-2" class="spin"></i><span>กำลังบันทึก…</span>`:`<i data-lucide="check" ></i><span>${isEdit?'บันทึกการแก้ไข':'ยืนยันสร้าง'}</span>`}</button>
+  </div>`;
+}
+
+function renderSetupForm(s){
+  const isEdit=!!s; const f=state.form;
+  return `
+  <div class="drawer-header">
+    <div class="drawer-avatar"><i data-lucide="${isEdit?'grid-3x3':'plus'}" ></i></div>
+    <div class="grow-min0">
+      <h2 class="drawer-title">${isEdit?'แก้ไข Posting Setup':'เพิ่ม General Posting Setup'}</h2>
+      <div class="drawer-subtitle">${isEdit?`${esc(s.bus)} × ${esc(s.prod)}`:'กำหนดบัญชีต่อ กลุ่มธุรกิจ × กลุ่มสินค้า'}</div>
+    </div>
+    <div class="drawer-header-actions"><button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" ></i></button></div>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-section">
+      <div class="drawer-section-title">ชุดกลุ่ม (Combination)</div>
+      ${fieldBlock('กลุ่มธุรกิจ (Business Group)'+((isEdit&&s.used>0)?' <span class="lock-tag"><i data-lucide="lock"></i>ล็อก — มีการบันทึกบัญชีแล้ว</span>':''), (isEdit&&s.used>0)
+        ? `<div class="sdd-trigger" data-sdd="bus" style="cursor:not-allowed; opacity:0.7;"><span class="sdd-val">${esc(f.bus||'')}</span></div>`
+        : searchDropdown('bus', f.bus, state.busGroups.map(b=>({value:b,label:b})), '— เลือกกลุ่มธุรกิจ —', 'onFormPick'), 'กลุ่มลูกค้า/ผู้ขาย เช่น ในประเทศ/ต่างประเทศ', true)}
+      ${fieldBlock('กลุ่มสินค้า (Product Group)'+((isEdit&&s.used>0)?' <span class="lock-tag"><i data-lucide="lock"></i>ล็อก — มีการบันทึกบัญชีแล้ว</span>':''), (isEdit&&s.used>0)
+        ? `<div class="sdd-trigger" data-sdd="prod" style="cursor:not-allowed; opacity:0.7;"><span class="sdd-val">${esc(f.prod||'')}</span></div>`
+        : searchDropdown('prod', f.prod, state.prodGroups.map(p=>({value:p,label:p})), '— เลือกกลุ่มสินค้า —', 'onFormPick'), 'กลุ่มสินค้า/บริการ', true)}
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">บัญชีที่จะ post (จากผังบัญชี)</div>
+      ${fieldBlock('บัญชีรายได้ (Sales)', acctSelect('sales_acct', f.sales_acct, ['income']), 'post เมื่อขาย', true)}
+      ${fieldBlock('บัญชีซื้อ (Purchase)', acctSelect('purchase_acct', f.purchase_acct, ['expense','asset']), 'post เมื่อซื้อ', true)}
+      ${fieldBlock('บัญชีต้นทุนขาย (COGS)', acctSelect('cogs_acct', f.cogs_acct, ['expense']), 'post เมื่อตัด stock ขาย', true)}
+    </div>
+  
+    <div class="drawer-section">
+      <div class="field"><label class="field-label">สถานะ</label>
+        <select class="select" onchange="state.form.status=this.value;">
+          <option value="active" ${(f.status||'active')==='active'?'selected':''}>ใช้งาน</option>
+          <option value="inactive" ${f.status==='inactive'?'selected':''}>ไม่ใช้งาน</option>
+          <option value="draft" ${f.status==='draft'?'selected':''}>ร่าง</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="drawer-footer">
+    <button class="btn btn-ghost" onclick="closeDrawer()">ยกเลิก</button>
+    <div class="footer-spacer"></div>
+    <button class="btn btn-primary" ${state.busy.setup?'disabled':''} onclick="submitSetup()">${state.busy.setup?`<i data-lucide="loader-2" class="spin"></i><span>กำลังบันทึก…</span>`:`<i data-lucide="check" ></i><span>${isEdit?'บันทึกการแก้ไข':'ยืนยันสร้าง'}</span>`}</button>
+  </div>`;
+}
+
+function fieldBlock(label, inner, help, req){
+  const m = inner.match(/name="([^"]+)"/) || inner.match(/data-sdd="([^"]+)"/);
+  const id = 'fld-' + (m ? m[1] : 'x');
+  return `<div class="field" id="${id}">
+    <label class="field-label">${label}${req?' <span class="req">*</span>':''}</label>
+    ${inner}
+    <div class="field-error">กรุณากรอก/เลือกข้อมูลนี้</div>
+  </div>`;
+}
+
+function renderViewGroup(g){
+  if(!g) return ''; const k=PG_KINDS[g.kind];
+  let accts=[];
+  if(g.kind==='vendor'){ accts=[['บัญชีเจ้าหนี้ (AP)', g.payable_acct],['ภาษีซื้อ (Input VAT)', g.input_vat_acct]]; }
+  else if(g.kind==='inventory'){ accts=[['สินค้าคงคลัง', g.inventory_acct],['Interim (GR/IR)', g.interim_acct]]; }
+  else if(g.kind==='bank'){ accts=[['เงินฝาก (GL)', g.bank_acct]]; }
+  else if(g.kind==='customer'){ accts=[['บัญชีลูกหนี้ (AR)', g.receivable_acct],['ภาษีขาย (Output VAT)', g.output_vat_acct]]; }
+  return `
+  <div class="drawer-header">
+    <div class="drawer-avatar"><i data-lucide="${k.icon}" ></i></div>
+    <div class="grow-min0">
+      <h2 class="drawer-title">${esc(g.name)}</h2>
+      <div class="drawer-subtitle"><span class="acct-code">${esc(g.code)}</span><span>·</span><span class="pill ${k.pill}">${k.label}</span></div>
+    </div>
+    <div class="drawer-header-actions">
+      <button class="btn btn-sm btn-secondary" onclick="openDrawer('edit-group','${g.id}')"><i data-lucide="pencil" ></i><span>แก้ไข</span></button>
+      ${g.status==='active'
+        ? `` : ``}
+      <div style="position:relative;">
+        <button class="btn btn-sm btn-secondary" onclick="toggleStatusMenu(event)"><i data-lucide="refresh-ccw"></i><span>เปลี่ยนสถานะ</span><i data-lucide="chevron-down"></i></button>
+        <div class="menu" id="statusMenu">
+          ${Object.keys(STATUS_META).map(st=>`<button class="menu-item" ${g.status===st?'disabled':''} onclick="setStatusFromMenu('g','${g.id}','${st}')"><i data-lucide="${STATUS_META[st].icon}"></i>${STATUS_META[st].label}</button>`).join('')}
+        </div>
+      </div>
+      <span class="drawer-header-divider"></span>
+      <button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" ></i></button>
+    </div>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-section">
+      <div class="drawer-section-title">ข้อมูลกลุ่ม</div>
+      <div class="drawer-fields">
+        <span class="lbl">รหัส</span><span class="val acct-code">${esc(g.code)}</span>
+        <span class="lbl">ชื่อ (TH)</span><span class="val">${esc(g.name)}</span>
+        <span class="lbl">ชื่อ (EN)</span><span class="val">${g.name_en?esc(g.name_en):'<span class="text-mute-2">—</span>'}</span>
+        <span class="lbl">ประเภท</span><span class="val"><span class="pill ${k.pill}">${k.label}</span></span>
+        <span class="lbl">สถานะ</span><span class="val">${g.status==='active'?'ใช้งาน':'เลิกใช้'}</span>
+      </div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">บัญชีที่ผูก (จากผังบัญชี)</div>
+      ${accts.filter(a=>a[1]).map(a=>`<div class="bm-card"><div class="bm-icon"><i data-lucide="link" ></i></div><div class="grow-min0"><div style="font-size:11.5px; color:var(--c-mute-2);">${a[0]}</div><div style="font-weight:600; font-size:13px;"><span class="acct-code">${esc(a[1])}</span> ${esc(acctName(a[1]))}</div></div></div>`).join('')}
+    </div>
+  </div>
+  <div class="drawer-footer"><div class="drawer-footer-meta">map → COA · ${k.en}</div><div class="footer-spacer"></div><button class="btn btn-secondary" onclick="closeDrawer()">ปิด</button></div>`;
+}
+
+function renderViewSetup(s){
+  if(!s) return '';
+  const accts=[['บัญชีรายได้ (Sales)', s.sales_acct],['บัญชีซื้อ (Purchase)', s.purchase_acct],['บัญชีต้นทุน (COGS)', s.cogs_acct]];
+  return `
+  <div class="drawer-header">
+    <div class="drawer-avatar"><i data-lucide="grid-3x3" ></i></div>
+    <div class="grow-min0">
+      <h2 class="drawer-title">${esc(s.bus)} × ${esc(s.prod)}</h2>
+      <div class="drawer-subtitle">General Posting Setup</div>
+    </div>
+    <div class="drawer-header-actions">
+      <button class="btn btn-sm btn-secondary" onclick="openDrawer('edit-setup','${s.id}')"><i data-lucide="pencil" ></i><span>แก้ไข</span></button>
+      ${s.status==='active'
+        ? `` : ``}
+      <div style="position:relative;">
+        <button class="btn btn-sm btn-secondary" onclick="toggleStatusMenu(event)"><i data-lucide="refresh-ccw"></i><span>เปลี่ยนสถานะ</span><i data-lucide="chevron-down"></i></button>
+        <div class="menu" id="statusMenu">
+          ${Object.keys(STATUS_META).map(st=>`<button class="menu-item" ${s.status===st?'disabled':''} onclick="setStatusFromMenu('s','${s.id}','${st}')"><i data-lucide="${STATUS_META[st].icon}"></i>${STATUS_META[st].label}</button>`).join('')}
+        </div>
+      </div>
+      <span class="drawer-header-divider"></span>
+      <button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" ></i></button>
+    </div>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-section">
+      <div class="drawer-section-title">ชุดกลุ่ม</div>
+      <div class="flex items-center" style="gap:8px;"><span class="grp-badge grp-bus">${esc(s.bus)}</span><i data-lucide="x"  style="color:var(--c-mute-3);"></i><span class="grp-badge grp-prod">${esc(s.prod)}</span></div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">บัญชีที่จะ post</div>
+      ${accts.map(a=>`<div class="bm-card"><div class="bm-icon"><i data-lucide="link" ></i></div><div class="grow-min0"><div style="font-size:11.5px; color:var(--c-mute-2);">${a[0]}</div><div style="font-weight:600; font-size:13px;"><span class="acct-code">${esc(a[1])}</span> ${esc(acctName(a[1]))}</div></div></div>`).join('')}
+    </div>
+  </div>
+  <div class="drawer-footer"><div class="drawer-footer-meta">post → COA accounts</div><div class="footer-spacer"></div><button class="btn btn-secondary" onclick="closeDrawer()">ปิด</button></div>`;
+}
+
+// ============================================ MODAL (import)
+function renderModal(){
+  const m=state.modal; if(!m.open) return '';
+  if(m.type==='import') return renderImportModal();
+  if(m.type==='bulk-delete'){
+    const ids=Object.keys(state.bulkSel);
+    const delN=ids.filter(id=>{const r=curById(id);return r&&!(r.used>0);}).length;
+    const skipN=ids.length-delN;
+    const what=state.tab==='groups'?'Posting Group':'Posting Setup';
+    return `<div class="modal-header"><div class="modal-header-icon" style="background:var(--c-danger-bg);color:var(--c-danger);"><i data-lucide="trash-2"></i></div>
+      <div class="grow-min0"><h3 class="modal-title">ลบ ${what}</h3><p class="modal-subtitle">เลือกไว้ ${ids.length} รายการ${skipN?` · ${skipN} รายการจะถูกข้าม (มีการบันทึกบัญชีผ่านแล้ว)`:''}</p></div>
+      <button class="icon-btn" onclick="closeModal()"><i data-lucide="x"></i></button></div>
+    <div class="modal-body"><p style="font-size:13px;">ยืนยันการลบ — รายการที่มี journal post ผ่าน mapping แล้วจะไม่ถูกลบ (R06 soft-delete) ใช้วิธีเปลี่ยนสถานะเป็น "ไม่ใช้งาน" แทน</p></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><div class="footer-spacer"></div>
+      <button class="btn btn-danger" ${(delN&&!state.busy.bulkDelete)?'':'disabled'} onclick="bulkDoDelete()">${state.busy.bulkDelete?`<i data-lucide="loader-2" class="spin"></i><span>กำลังลบ…</span>`:`<i data-lucide="trash-2"></i><span>ลบ ${delN} รายการ</span>`}</button></div>`;
+  }
+  return '';
+}
+
+// ============================================ ACTIONS
+function setTab(t){ state.tab=t; state.bulkSel={}; state.filters.status='all'; render(); }
+function onSearch(v){ state.filters.search=v; renderPageOnly(); }
+function onFilterKind(v){ state.filters.kind=v; renderPageOnly(); }
+function onFilterKindPick(_name, v){ state.filters.kind=v; render(); }
+function curData(){ return state.tab==='groups' ? state.groups : state.setup; }
+function curById(id){ return state.tab==='groups' ? gById(id) : sById(id); }
+function quickFilter(st){ state.filters.status=(st==='all'?'all':(state.filters.status===st?'all':st)); render(); }
+function toggleSel(id){ if(state.bulkSel[id]) delete state.bulkSel[id]; else state.bulkSel[id]=true; render(); }
+function toggleSelAll(ev){ ev.stopPropagation();
+  const rows=curData().filter(r=>true);
+  const all=rows.length&&rows.every(r=>state.bulkSel[r.id]);
+  if(all) rows.forEach(r=>delete state.bulkSel[r.id]); else rows.forEach(r=>state.bulkSel[r.id]=true);
+  render();
+}
+function bulkSetStatus(st){ const ids=Object.keys(state.bulkSel); if(!ids.length) return;
+  ids.forEach(id=>{ const r=curById(id); if(r) r.status=st; });
+  state.bulkSel={}; render();
+  showToast('เปลี่ยนสถานะ '+ids.length+' รายการเป็น '+statusLabel(st)+' แล้ว','success');
+}
+function bulkAskDelete(){ if(!Object.keys(state.bulkSel).length) return; openModal('bulk-delete',null); }
+async function bulkDoDelete(){ if(state.busy.bulkDelete) return;
+  state.busy.bulkDelete=true; render();
+  await new Promise(r=>setTimeout(r,500));
+  const ids=Object.keys(state.bulkSel);
+  // used>0 (มี posting ผ่าน mapping แล้ว) ห้ามลบ — R06 soft-delete: ใช้เปลี่ยนสถานะแทน
+  const del=ids.filter(id=>{ const r=curById(id); return r && !(r.used>0); });
+  const skip=ids.length-del.length;
+  if(state.tab==='groups') state.groups=state.groups.filter(r=>!del.includes(r.id));
+  else state.setup=state.setup.filter(r=>!del.includes(r.id));
+  state.bulkSel={}; state.busy.bulkDelete=false; closeModal(); render();
+  showToast('ลบแล้ว '+del.length+' รายการ'+(skip?' · ข้าม '+skip+' (มีการบันทึกบัญชีผ่านแล้ว)':''), skip?'info':'success', 3600);
+}
+function toggleStatusMenu(ev){ if(ev) ev.stopPropagation(); document.getElementById('statusMenu')?.classList.toggle('is-open'); }
+function setStatusFromMenu(kind, id, st){ const r=(kind==='g'?gById(id):sById(id)); if(!r) return; r.status=st;
+  render(); showToast('เปลี่ยนสถานะเป็น '+statusLabel(st)+' แล้ว','success');
+}
+function resetFilters(){ state.filters={search:'',kind:'all', status:'all'}; renderPageOnly(); }
+function onSetupSearch(v){ state.setupFilters.search=v; renderPageOnly(); }
+
+function openDrawer(mode, id){
+  state.drawer={open:true,mode,recordId:id||null};
+  if(mode==='create-group') state.form={kind:'vendor',code:'',name:'',name_en:''};
+  else if(mode==='edit-group'){ const g=gById(id); state.form={...g}; }
+  else if(mode==='create-setup') state.form={bus:'',prod:'',sales_acct:'',purchase_acct:'',cogs_acct:''};
+  else if(mode==='edit-setup'){ const s=sById(id); state.form={...s}; }
+  render();
+  requestAnimationFrame(()=>{ document.getElementById('drawerBackdrop').classList.add('is-open'); document.getElementById('drawer').classList.add('is-open'); });
+}
+function closeDrawer(){
+  document.getElementById('drawerBackdrop').classList.remove('is-open');
+  document.getElementById('drawer').classList.remove('is-open');
+  setTimeout(()=>{ state.drawer={open:false,mode:null,recordId:null}; document.getElementById('drawer').innerHTML=''; },280);
+}
+function openModal(type,data){ state.modal={open:true,type,data}; render(); requestAnimationFrame(()=>document.getElementById('modalBackdrop').classList.add('is-open')); }
+function closeModal(){ document.getElementById('modalBackdrop').classList.remove('is-open'); setTimeout(()=>{ state.modal={open:false,type:null,data:null}; document.querySelector('#modalBackdrop .modal').innerHTML=''; },200); }
+
+function onFormInput(k,v){ state.form[k]=v; }
+function onFormPick(name, value){ state.form[name]=value; render(); }
+
+// ===== Archive / Reactivate (soft-delete — master data ห้ามลบจริง) =====
+function onKindChange(_name, v){
+  const val = v!==undefined ? v : _name;
+  state.form.kind = val;
+  // ล้าง account fields ทั้งหมด (กัน data ค้างจาก kind เดิม) — เก็บแค่ code/name/name_en/kind
+  const keep = { kind: val, code: state.form.code, name: state.form.name, name_en: state.form.name_en };
+  state.form = keep;
+  render();
+}
+
+async function submitGroup(){
+  if(state.busy.group) return;
+  const f=state.form; let ok=true;
+  ['fld-code','fld-name','fld-kind'].forEach(id=>document.getElementById(id)?.classList.remove('is-invalid'));
+  if(!f.code||!f.code.trim()){ document.getElementById('fld-code')?.classList.add('is-invalid'); ok=false; }
+  if(!f.name||!f.name.trim()){ document.getElementById('fld-name')?.classList.add('is-invalid'); ok=false; }
+  // dup code
+  const dup=state.groups.find(g=>g.code===(f.code||'').trim() && g.id!==state.drawer.recordId);
+  if(dup){ document.getElementById('fld-code')?.classList.add('is-invalid'); ok=false; }
+  // required primary account ตาม kind
+  const reqAcct={vendor:'payable_acct',inventory:'inventory_acct',bank:'bank_acct',customer:'receivable_acct'}[f.kind];
+  if(reqAcct && !f[reqAcct]){ document.getElementById('fld-'+reqAcct)?.classList.add('is-invalid'); ok=false; }
+  if(!ok){ if(dup) showToast('รหัสกลุ่มนี้มีอยู่แล้ว','error'); return; }
+  if(state.drawer.mode==='edit-group'){
+    const g=gById(state.drawer.recordId);
+    if((g.used||0)>0 && f.code.trim()!==g.code){
+      // IR-PG-01 [AI-DRAFT]: มี posting ผ่านแล้ว — รหัสล็อก (เอกสาร/entity เก่า soft-ref รหัสนี้)
+      document.getElementById('fld-code')?.classList.add('is-invalid');
+      showToast('กลุ่มนี้มีการบันทึกบัญชีผ่านแล้ว — เปลี่ยนรหัสไม่ได้ (แก้ชื่อ/บัญชี/สถานะได้)','error'); return;
+    }
+    state.busy.group=true; render();
+    await new Promise(r=>setTimeout(r,500));
+    Object.assign(g, f, {code:g.used>0?g.code:f.code.trim(), name:f.name.trim(), kind:g.kind /* R05 kind ล็อกหลังสร้าง */});
+    state.busy.group=false; closeDrawer(); renderPageOnly(); showToast('บันทึกการแก้ไขกลุ่มแล้ว','success');
+  } else {
+    state.busy.group=true; render();
+    await new Promise(r=>setTimeout(r,500));
+    state.groups.push({id:'g'+(++state.seq), ...f, code:f.code.trim(), name:f.name.trim(), status:f.status||'active', used:0,
+      approver_role:null, approved_by:null, approved_at:null, approval_chain:null});
+    state.busy.group=false; closeDrawer(); renderPageOnly(); showToast('สร้าง Posting Group แล้ว','success');
+  }
+}
+
+async function submitSetup(){
+  if(state.busy.setup) return;
+  const f=state.form; let ok=true;
+  ['fld-bus','fld-prod','fld-sales_acct','fld-purchase_acct','fld-cogs_acct'].forEach(id=>document.getElementById(id)?.classList.remove('is-invalid'));
+  ['bus','prod','sales_acct','purchase_acct','cogs_acct'].forEach(k=>{ if(!f[k]){ document.getElementById('fld-'+k)?.classList.add('is-invalid'); ok=false; } });
+  // dup combination
+  const dup=state.setup.find(s=>s.bus===f.bus&&s.prod===f.prod&&s.id!==state.drawer.recordId);
+  if(dup){ document.getElementById('fld-bus')?.classList.add('is-invalid'); document.getElementById('fld-prod')?.classList.add('is-invalid'); ok=false; showToast('ชุดกลุ่มนี้มีอยู่แล้ว','error'); return; }
+  if(!ok) return;
+  if(state.drawer.mode==='edit-setup'){
+    const t=sById(state.drawer.recordId);
+    if((t.used||0)>0 && (f.bus!==t.bus || f.prod!==t.prod)){
+      // IR-PG-01/FN-08: มี posting ผ่านแล้ว — combination ล็อก (เอกสารเก่าอ้าง)
+      document.getElementById('fld-bus')?.classList.add('is-invalid');
+      document.getElementById('fld-prod')?.classList.add('is-invalid');
+      showToast('ชุดกลุ่มนี้มีการบันทึกบัญชีผ่านแล้ว — เปลี่ยนกลุ่มธุรกิจ/สินค้าไม่ได้ (แก้บัญชี/สถานะได้)','error'); return;
+    }
+  }
+  state.busy.setup=true; render();
+  await new Promise(r=>setTimeout(r,500));
+  if(state.drawer.mode==='edit-setup'){
+    const t=sById(state.drawer.recordId);
+    Object.assign(t, f);
+    state.busy.setup=false; closeDrawer(); renderPageOnly(); showToast('บันทึกการแก้ไข setup แล้ว','success');
+  } else {
+    state.setup.push({id:'s'+(++state.seq), ...f, status:f.status||'active', used:0,
+      approver_role:null, approved_by:null, approved_at:null, approval_chain:null});
+    state.busy.setup=false; closeDrawer(); renderPageOnly(); showToast('สร้าง Posting Setup แล้ว','success');
+  }
+}
+
+// ============================================ CSV IMPORT (Rule #32) — target = groups
+
+
+
+
+function parseCSV(text){
+  text=text.replace(/^\uFEFF/,'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  return text.split('\n').filter(l=>l.trim()).map(line=>{
+    const cells=[];let cur='';let q=false;
+    for(let i=0;i<line.length;i++){const ch=line[i];
+      if(q){if(ch==='"'){if(line[i+1]==='"'){cur+='"';i++;}else q=false;}else cur+=ch;}
+      else{if(ch==='"')q=true;else if(ch===','){cells.push(cur);cur='';}else cur+=ch;}}
+    cells.push(cur); return cells.map(c=>c.trim());
+  });
+}
+
+/* ==== Import/Export มาตรฐานเลน (per-tab · 3 จังหวะ pick→preview→done · merge-only) ==== */
+const STATUS_TH={'ใช้งาน':'active','ไม่ใช้งาน':'inactive','ร่าง':'draft'};
+const G_COLS=['code','kind','name_th','name_en','account_1','account_2','status'];
+const S_COLS=['bus','prod','sales_acct','purchase_acct','cogs_acct','status'];
+function acctOk(code){ return !!COA_ACCOUNTS.find(a=>a.code===code); }
+function gTemplateText(){
+  return [G_COLS.join(','),
+    'IMPORT-V,vendor,เจ้าหนี้นำเข้า,Import Vendors,2-1-10-01,1-1-40,ใช้งาน',
+    'RAW,inventory,วัตถุดิบ,Raw Materials,1-1-30-01,1-1-30-01,',
+    'BBL,bank,ธนาคารกรุงเทพ,BBL,1-1-10-03,,ไม่ใช้งาน',
+    'LOCAL,vendor,ซ้ำทะเบียน,Dup,2-1-10-01,1-1-40,ใช้งาน',
+    'BAD1,vendor,สถานะผิด,Bad Status,2-1-10-01,1-1-40,พร้อมใช้',
+  ].join('\n');
+}
+function sTemplateText(){
+  return [S_COLS.join(','),
+    'FOREIGN,SERVICE,4-1-20,5-1,5-1,ใช้งาน',
+    'DOMESTIC,GOODS,4-1-10,5-1,5-1,',
+    'FOREIGN,GOODS,9-9-99,5-1,5-1,ใช้งาน',
+  ].join('\n');
+}
+function downloadTemplate(){
+  const isG=state.tab==='groups';
+  const blob=new Blob(['\uFEFF'+(isG?gTemplateText():sTemplateText())],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a');
+  a.href=url; a.download=isG?'postgrp_groups_import_template.csv':'postgrp_setup_import_template.csv';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},100);
+  showToast('ดาวน์โหลด template ตัวอย่างแล้ว','success');
+}
+function exportCSV(){               // ตาม filter + tab ปัจจุบัน (pattern เลน)
+  const isG=state.tab==='groups';
+  const q=v=>{v=''+(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+  let lines;
+  if(isG){
+    const rows=state.groups.filter(g=>(state.filters.kind==='all'||g.kind===state.filters.kind)&&(state.filters.status==='all'||g.status===state.filters.status));
+    const a1={vendor:'payable_acct',inventory:'inventory_acct',bank:'bank_acct',customer:'receivable_acct'};
+    const a2={vendor:'input_vat_acct',inventory:'interim_acct',bank:null,customer:'output_vat_acct'};
+    lines=[G_COLS.join(',')].concat(rows.map(g=>[g.code,g.kind,g.name,g.name_en||'',g[a1[g.kind]]||'',a2[g.kind]?(g[a2[g.kind]]||''):'',statusLabel(g.status)].map(q).join(',')));
+  } else {
+    const rows=state.setup.filter(t=>state.filters.status==='all'||t.status===state.filters.status);
+    lines=[S_COLS.join(',')].concat(rows.map(t=>[t.bus,t.prod,t.sales_acct,t.purchase_acct,t.cogs_acct,statusLabel(t.status)].map(q).join(',')));
+  }
+  const blob=new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=(isG?'postgrp_groups_export_':'postgrp_setup_export_')+new Date().toISOString().slice(0,10)+'.csv';
+  a.click(); URL.revokeObjectURL(a.href);
+  showToast('ส่งออก '+(lines.length-1)+' รายการเป็น CSV แล้ว','success');
+}
+function openImport(){ state.import={step:'pick',target:state.tab,rows:[],ok:0,err:0}; openModal('import',null); }
+function onFilePick(input){ const file=input.files&&input.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=e=>{ buildImportPreview(e.target.result); state.import.step='preview'; render(); };
+  r.onerror=()=>showToast('อ่านไฟล์ไม่สำเร็จ','error');
+  r.readAsText(file,'UTF-8');
+}
+function buildImportPreview(text){
+  const isG=state.import.target==='groups';
+  const grid=parseCSV(text); const rows=[];
+  if(grid.length===0){ state.import.rows=[]; return; }
+  const COLS=isG?G_COLS:S_COLS;
+  const header=grid[0].map(h=>h.toLowerCase());
+  const idx={}; COLS.forEach(c=>idx[c]=header.indexOf(c));
+  const seen=new Set();
+  for(let r=1;r<grid.length;r++){
+    const row=grid[r]; const get=c=>idx[c]>=0?(row[idx[c]]||'').trim():'';
+    const e=[];
+    const stTh=get('status');
+    if(stTh && !STATUS_TH[stTh]) e.push('สถานะไม่ถูกต้อง (BAD_STATUS — ใช้ ใช้งาน/ไม่ใช้งาน/ร่าง หรือเว้นว่าง=ร่าง)');
+    const status=stTh?(STATUS_TH[stTh]||'draft'):'draft';
+    if(isG){
+      const code=get('code').toUpperCase(); const kind=get('kind').toLowerCase();
+      const name=get('name_th'); const a1=get('account_1'); const a2=get('account_2');
+      if(!code) e.push('รหัสว่าง (REQUIRED)');
+      if(!name) e.push('ชื่อว่าง (REQUIRED)');
+      if(!PG_KINDS[kind]) e.push('ประเภทกลุ่มไม่ถูกต้อง (BAD_KIND)');
+      if(code && state.groups.some(g=>g.code===code)) e.push('รหัสซ้ำกับทะเบียน (CODE_DUPLICATE)');
+      if(code && seen.has(code)) e.push('รหัสซ้ำในไฟล์');
+      seen.add(code);
+      if(!a1) e.push('บัญชีหลักว่าง (REQUIRED)');
+      if(a1 && !acctOk(a1)) e.push('บัญชี '+a1+' ไม่มีใน COA (R01)');
+      if(a2 && !acctOk(a2)) e.push('บัญชี '+a2+' ไม่มีใน COA (R01)');
+      rows.push({code,kind,name_th:name,name_en:get('name_en'),a1,a2,status,_err:e});
+    } else {
+      const bus=get('bus').toUpperCase(); const prod=get('prod').toUpperCase();
+      if(!state.busGroups.includes(bus)) e.push('กลุ่มธุรกิจไม่รู้จัก ('+bus+')');
+      if(!state.prodGroups.includes(prod)) e.push('กลุ่มสินค้าไม่รู้จัก ('+prod+')');
+      const key=bus+'×'+prod;
+      if(state.setup.some(t=>t.bus===bus&&t.prod===prod)) e.push('combination ซ้ำกับทะเบียน (R04)');
+      if(seen.has(key)) e.push('combination ซ้ำในไฟล์');
+      seen.add(key);
+      const accts={sales_acct:get('sales_acct'),purchase_acct:get('purchase_acct'),cogs_acct:get('cogs_acct')};
+      Object.entries(accts).forEach(([k,v])=>{ if(!v) e.push(k+' ว่าง (REQUIRED)'); else if(!acctOk(v)) e.push('บัญชี '+v+' ไม่มีใน COA (R01)'); });
+      rows.push({bus,prod,...accts,status,_err:e});
+    }
+  }
+  state.import.rows=rows;
+}
+async function applyImport(){
+  if(state.busy.import) return;
+  const isG=state.import.target==='groups';
+  const rows=state.import.rows.filter(r=>r._err.length===0);
+  const skipped=state.import.rows.length-rows.length;
+  if(!rows.length){ showToast('ไม่มีแถวที่ผ่านการตรวจสอบ','error'); return; }
+  state.busy.import=true; render();
+  await new Promise(r=>setTimeout(r,500));
+  // BR-07/FN-18: นำเข้า = เพิ่มอย่างเดียว (merge-only) — ทะเบียนเดิมไม่ถูกแตะ ไม่มีโหมดล้าง/ทับ
+  rows.forEach(r=>{
+    if(isG){
+      const a1f={vendor:'payable_acct',inventory:'inventory_acct',bank:'bank_acct',customer:'receivable_acct'}[r.kind];
+      const a2f={vendor:'input_vat_acct',inventory:'interim_acct',bank:null,customer:'output_vat_acct'}[r.kind];
+      const rec={id:'g'+(++state.seq),code:r.code,kind:r.kind,name:r.name_th,name_en:r.name_en,status:r.status,used:0,
+        approver_role:null,approved_by:null,approved_at:null,approval_chain:null};
+      rec[a1f]=r.a1; if(a2f&&r.a2) rec[a2f]=r.a2;
+      state.groups.push(rec);
+    } else {
+      state.setup.push({id:'s'+(++state.seq),bus:r.bus,prod:r.prod,sales_acct:r.sales_acct,purchase_acct:r.purchase_acct,cogs_acct:r.cogs_acct,status:r.status,used:0,
+        approver_role:null,approved_by:null,approved_at:null,approval_chain:null});
+    }
+  });
+  state.import.ok=rows.length; state.import.err=skipped; state.import.step='done';
+  state.busy.import=false;
+  render();
+  showToast('นำเข้าแล้ว '+rows.length+' รายการ'+(skipped?' · ข้าม '+skipped+' แถว':''), skipped?'warning':'success', 3600);
+}
+function renderImportModal(){
+  const b=state.import; const isG=b.target==='groups';
+  const head=`<div class="modal-header">
+    <div class="modal-header-icon"><i data-lucide="upload"></i></div>
+    <div><h3 class="modal-title">นำเข้า ${isG?'Posting Groups':'Posting Setup'} จากไฟล์</h3><p class="modal-subtitle">CSV — ระบุสถานะได้ในไฟล์ · เพิ่มรายการใหม่เท่านั้น ทะเบียนเดิมไม่ถูกแตะ</p></div>
+    <button class="icon-btn ml-auto" onclick="closeModal()"><i data-lucide="x"></i></button>
+  </div>`;
+  if(b.step==='pick'){
+    return `${head}
+    <div class="modal-body">
+      <label class="upload-box"><i data-lucide="file-spreadsheet"></i><div><strong>เลือกไฟล์ CSV</strong></div><input type="file" accept=".csv,text/csv" style="display:none;" onchange="onFilePick(this)"></label>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="downloadTemplate()"><i data-lucide="file-down"></i><span>ดาวน์โหลด template ตัวอย่าง</span></button><div class="footer-spacer"></div><button class="btn btn-ghost" onclick="closeModal()">ปิด</button></div>`;
+  }
+  if(b.step==='preview'){
+    const okN=b.rows.filter(r=>!r._err.length).length;
+    const cols=isG?'<th>รหัส</th><th>ประเภท</th><th>ชื่อ</th><th>บัญชี</th>':'<th>กลุ่มธุรกิจ</th><th>กลุ่มสินค้า</th><th>บัญชี</th>';
+    return `${head}
+    <div class="modal-body">
+      <div class="import-sum ${okN<b.rows.length?'is-warning':'is-success'}">ตรวจแล้ว ${b.rows.length} แถว — นำเข้าได้ <strong>${okN}</strong> · ติดปัญหา <strong>${b.rows.length-okN}</strong> (แถวผิดจะถูกข้าม)</div>
+      <div class="table-scroll imp-preview-scroll"><table class="utbl"><thead><tr>${cols}<th>สถานะ</th><th>ผลตรวจ</th></tr></thead><tbody>
+        ${b.rows.map(r=>isG
+          ?`<tr><td><span class="acct-code">${esc(r.code)}</span></td><td>${PG_KINDS[r.kind]?PG_KINDS[r.kind].label:esc(r.kind)}</td><td>${esc(r.name_th)}</td><td><span class="acct-code">${esc(r.a1)}</span>${r.a2?` · <span class="acct-code">${esc(r.a2)}</span>`:''}</td><td>${statusPill(r.status)}</td><td>${r._err.length?`<span class="pill is-inactive" title="${esc(r._err.join(' · '))}">✗ ${esc(r._err[0])}</span>`:'<span class="pill is-active">✓ พร้อมนำเข้า</span>'}</td></tr>`
+          :`<tr><td>${esc(r.bus)}</td><td>${esc(r.prod)}</td><td><span class="acct-code">${esc(r.sales_acct)}</span> · <span class="acct-code">${esc(r.purchase_acct)}</span> · <span class="acct-code">${esc(r.cogs_acct)}</span></td><td>${statusPill(r.status)}</td><td>${r._err.length?`<span class="pill is-inactive" title="${esc(r._err.join(' · '))}">✗ ${esc(r._err[0])}</span>`:'<span class="pill is-active">✓ พร้อมนำเข้า</span>'}</td></tr>`).join('')}
+      </tbody></table></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><div class="footer-spacer"></div><button class="btn btn-primary" ${(okN&&!state.busy.import)?'':'disabled'} onclick="applyImport()">${state.busy.import?`<i data-lucide="loader-2" class="spin"></i><span>กำลังนำเข้า…</span>`:`<i data-lucide="upload"></i><span>นำเข้า ${okN} แถว</span>`}</button></div>`;
+  }
+  return `${head}
+  <div class="modal-body">
+    <div class="import-sum ${b.err?'is-warning':'is-success'}">นำเข้าเสร็จ <strong>${b.ok}</strong> รายการ (สถานะตามไฟล์)${b.err?` · ข้าม <strong>${b.err}</strong> แถว`:''}</div>
+    ${b.err?`<div class="table-scroll imp-done-scroll"><table class="utbl"><thead><tr><th>รายการ</th><th>สาเหตุ</th></tr></thead><tbody>
+      ${b.rows.filter(r=>r._err.length).map(r=>`<tr><td>${isG?esc(r.code):esc(r.bus+' × '+r.prod)}</td><td><span class="pill is-inactive">${esc(r._err[0])}</span></td></tr>`).join('')}
+    </tbody></table></div>`:''}
+  </div>
+  <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">ปิด</button></div>`;
+}
+
+
+// ============================================ TOAST
+function showToast(message, variant='info', durationMs=2800){
+  const el=document.getElementById('toast');
+  const iconMap={success:'check-circle-2',info:'info',warning:'alert-triangle',error:'x-circle'};
+  el.className='toast is-'+variant;
+  el.innerHTML=`<i data-lucide="${iconMap[variant]||'info'}" ></i><span>${esc(message)}</span>`;
+  renderIcons(); requestAnimationFrame(()=>el.classList.add('is-visible'));
+  setTimeout(()=>el.classList.remove('is-visible'),durationMs);
+}
+
+// ============================================ RENDER
+function renderPageOnly(){ const snap=preserveRenderState(); document.getElementById('page-content').innerHTML=renderPage(); renderIcons(); restoreRenderState(snap); }
+function render(){
+  const snap=preserveRenderState();
+  document.getElementById('page-content').innerHTML=renderPage();
+  document.getElementById('drawer').innerHTML=renderDrawer();
+  const modalEl=document.querySelector('#modalBackdrop .modal');
+  modalEl.classList.toggle('is-lg', state.modal.open&&state.modal.type==='import');
+  modalEl.innerHTML=renderModal();
+  renderIcons(); restoreRenderState(snap);
+}
+window.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){
+  if(state.sdd.open){ state.sdd={open:null,search:'',highlight:0,dropUp:false}; render(); }
+  else if(state.modal.open) closeModal();
+  else if(state.drawer.open) closeDrawer();
+} });
+
+// ============================================ INIT
+var domReady=false, lucideReady=false;
+function bootIfReady(){ if(domReady&&lucideReady){ render(); renderIcons(); } }
+if(document.readyState==='loading'){ window.addEventListener('DOMContentLoaded',function(){domReady=true;bootIfReady();}); } else { domReady=true; }
+window.addEventListener('lucide:ready',function(){lucideReady=true;bootIfReady();});
+if(window.lucide && typeof window.lucide.createIcons==='function') lucideReady=true;
+bootIfReady();
+setTimeout(function(){ if(!lucideReady){ lucideReady=true; bootIfReady(); } },5000);
+</script>
+<div id="overlay-root"></div>
+</body>
+</html>
