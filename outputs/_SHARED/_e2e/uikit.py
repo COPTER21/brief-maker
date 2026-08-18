@@ -80,13 +80,13 @@ from playwright.sync_api import sync_playwright
 # ═══════════════════════ JS probes ═══════════════════════
 JS_LAYOUT = """
 () => {
-  const out = { clipped: [], hscroll: [], rowMix: [], textOverflow: [], overlap: [], cellOverflow: [], rowTopMix: [], ghostCtl: [], menuCovered: [], headMisplaced: [], deadStyle: [], iconFlush: [], stackFlush: [] };
+  const out = { clipped: [], hscroll: [], rowMix: [], textOverflow: [], overlap: [], cellOverflow: [], rowTopMix: [], ghostCtl: [], menuCovered: [], optionCrowded: [], selectionCrowded: [], headMisplaced: [], deadStyle: [], iconFlush: [], stackFlush: [] };
   const vis = el => { const r = el.getBoundingClientRect();
     return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden'; };
 
   // 1) ถูกกล่องแม่ตัด — FP#1: กล่องที่ scroll ได้ + เนื้อหาปกติ = เลื่อนไปดูได้ ไม่นับ
   //    v8 (#95): .menu-fixed = เมนูที่ portalMenu() ย้ายไป #overlay-root — ต้องตรวจด้วย
-  document.querySelectorAll('.ss-list:not(.hidden), .menu-fixed, .user-menu.open, .info-tip, .src, .conv-tag, .rev-tag').forEach(el => {
+  document.querySelectorAll('.ss-list:not(.hidden), .menu-fixed, .combo-pop, .user-menu.open, .info-tip, .src, .conv-tag, .rev-tag').forEach(el => {
     if (!vis(el)) return;
     const r = el.getBoundingClientRect();
     const pos = getComputedStyle(el).position;
@@ -124,7 +124,7 @@ JS_LAYOUT = """
   //     (มาทีหลังใน DOM) วาดทับเมนูของแถวบน · ผู้ใช้เจอเอง 2026-08-04
   //     ตัววัดเดิมไม่เจอ เพราะข้อ "ถูกกล่องแม่ตัด" ตรวจแค่ overflow ของบรรพบุรุษ ไม่ได้ถามว่า
   //     "จุดบนเมนูนี้ คลิกแล้วโดนเมนูจริงมั้ย" · ต้องมี ≥2 แถวถึงจะเห็น
-  document.querySelectorAll('.ss-list:not(.hidden), .menu-fixed, [data-overlay].open').forEach(menu => {
+  document.querySelectorAll('.ss-list:not(.hidden), .menu-fixed, .combo-pop, [data-overlay].open').forEach(menu => {
     const r = menu.getBoundingClientRect();
     if (r.width < 4 || r.height < 4) return;
     // สุ่มเป็นตาราง ทุก 16px ตามแนวตั้ง × 3 คอลัมน์ — สุ่มหยาบไปจะพลาดของที่ทับเป็นแถบบาง ๆ
@@ -140,6 +140,28 @@ JS_LAYOUT = """
                              by: (hit.className || hit.tagName).toString().slice(0, 34) });
       break;
     }
+  });
+
+  // 1d) option แบบสองบรรทัดต้องมีพื้นที่หายใจแนวตั้งพอ ไม่ชิดเส้นแบ่งรายการ
+  document.querySelectorAll('.combo-pop button').forEach(option => {
+    if (!vis(option)) return;
+    const cs = getComputedStyle(option);
+    const pt = parseFloat(cs.paddingTop) || 0;
+    const pb = parseFloat(cs.paddingBottom) || 0;
+    if (pt < 14 || pb < 14)
+      out.optionCrowded.push({ el: option.className || option.tagName,
+                               top: Math.round(pt), bottom: Math.round(pb) });
+  });
+
+  // 1e) ค่าที่เลือกแล้วแบบสองบรรทัดต้องไม่ถูกบีบติดขอบ control
+  document.querySelectorAll('.combo-selection').forEach(selection => {
+    if (!vis(selection)) return;
+    const cs = getComputedStyle(selection);
+    const pt = parseFloat(cs.paddingTop) || 0;
+    const pb = parseFloat(cs.paddingBottom) || 0;
+    if (pt < 8 || pb < 8)
+      out.selectionCrowded.push({ el: selection.className,
+                                  top: Math.round(pt), bottom: Math.round(pb) });
   });
 
   // 2) scroll แนวนอนที่ไม่ตั้งใจ
