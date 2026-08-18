@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บัญชีราคาขาย (Sales Price List) · CUBE 4.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,600,700&display=swap" rel="stylesheet">
+<style>
+/* ============ CUBE Warm Light CI (v8) ============ */
+:root{
+  --c-navy:#111111; --c-navy-2:#1C1C1E;
+  --c-primary:#FF3B30; --c-primary-hover:#E62E24;
+  --c-teal:#FF9A1F; --c-teal-light:#FFC46B;
+  --c-ink:#111111; --c-mute:#54565C; --c-mute-2:#73757B; --c-mute-3:#9A9CA2;
+  --c-line:#DEDAD4; --c-line-2:#E9E5E0; --c-line-3:#F1EEEA;
+  --c-bg-off:#FAF8F5; --c-surface-2:#F1EEEA;
+  --c-success:#1F9D55; --c-warning:#E8870F; --c-danger:#E62E24;
+  --sidebar-w:232px; --shell-h:52px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{font-family:'Noto Sans Thai','Satoshi',system-ui,sans-serif;font-size:13.5px;color:var(--c-ink);background:var(--c-bg-off);}
+button{font-family:inherit;}
+input,select,textarea{font-family:inherit;font-size:13px;color:var(--c-ink);}
+::placeholder{color:var(--c-mute-3);}
+
+/* ---- shell ---- */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background:var(--c-navy);color:#fff;display:flex;flex-direction:column;z-index:40;}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:14px 16px;}
+.sb-logo-ico{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--c-primary),var(--c-teal));display:flex;align-items:center;justify-content:center;color:#fff;}
+.sb-logo-t1{font-family:'Satoshi',sans-serif;font-weight:700;font-size:14px;letter-spacing:.02em;}
+.sb-logo-t2{font-size:10px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.08em;}
+.sb-group{padding:14px 16px 5px;font-size:10.5px;font-weight:700;letter-spacing:.09em;color:rgba(255,255,255,.42);text-transform:uppercase;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 16px;font-size:12.8px;color:rgba(255,255,255,.72);cursor:pointer;border-left:3px solid transparent;}
+.sb-item:hover{background:rgba(255,255,255,.05);color:#fff;}
+.sb-item.is-on{background:var(--c-primary);color:#fff;border-left-color:#fff;border-radius:0 8px 8px 0;margin-right:10px;font-weight:600;}
+.sb-foot{margin-top:auto;padding:12px 16px;font-size:11px;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:6px;}
+.sb-foot .dot{width:7px;height:7px;border-radius:50%;background:var(--c-teal);}
+.main{margin-left:var(--sidebar-w);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:var(--shell-h);background:#fff;border-bottom:1px solid var(--c-line-2);display:flex;align-items:center;padding:0 22px;gap:14px;position:sticky;top:0;z-index:30;}
+.crumb{font-size:12.5px;color:var(--c-mute-2);display:flex;align-items:center;gap:6px;}
+.crumb b{color:var(--c-ink);font-weight:600;}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.user-chip{display:flex;align-items:center;gap:9px;cursor:pointer;}
+.uc-txt{text-align:right;}
+.uc-n{font-size:12.5px;font-weight:600;}
+.uc-r{font-size:10.5px;color:var(--c-mute-2);}
+.uc-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--c-primary),var(--c-teal));color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+.content{padding:20px 22px 20px;flex:1;display:flex;flex-direction:column;min-height:0;overflow-y:auto;}
+
+/* ---- page head (#31/#46) ---- */
+.page-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;}
+.ph-title{font-family:'Satoshi','Noto Sans Thai',sans-serif;font-size:21px;font-weight:700;display:flex;align-items:center;gap:10px;}
+.ph-count{font-size:11.5px;font-weight:600;color:var(--c-mute);background:var(--c-line-3);border-radius:999px;padding:3px 10px;}
+.ph-sub{font-size:12.5px;color:var(--c-mute);margin-top:3px;}
+.ph-actions{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+
+/* ---- buttons ---- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;padding:9px 16px;min-height:36px;transition:background 120ms;}
+.btn-primary{background:var(--c-primary);color:#fff;}
+.btn-primary:hover{background:var(--c-primary-hover);}
+.btn-secondary{background:#fff;color:var(--c-ink);border:1px solid var(--c-line);}
+.btn-secondary:hover{background:var(--c-bg-off);}
+.btn-ghost{background:transparent;color:var(--c-mute);}
+.btn-ghost:hover{background:var(--c-line-3);color:var(--c-ink);}
+.btn-danger{background:var(--c-danger);color:#fff;}
+.btn-sm{padding:6px 12px;min-height:31px;font-size:12.5px;}
+.icon-btn{width:32px;height:32px;border-radius:8px;border:none;background:transparent;color:var(--c-mute-2);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;}
+.icon-btn:hover{background:var(--c-line-3);color:var(--c-ink);}
+
+/* ---- stats ---- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px;}
+.stat{background:#fff;border:1px solid var(--c-line-2);border-radius:11px;padding:13px 16px;}
+.stat.is-click{cursor:pointer;}
+.stat.is-on{border-color:var(--c-primary);box-shadow:0 0 0 1px var(--c-primary) inset;}
+.stat-label{font-size:11.5px;font-weight:600;color:var(--c-mute-2);display:flex;align-items:center;gap:6px;}
+.stat-value{font-family:'Satoshi','Noto Sans Thai',sans-serif;font-size:24px;font-weight:700;margin-top:4px;}
+.stat-meta{font-size:10.5px;color:var(--c-mute-3);margin-top:2px;}
+
+/* ---- card + table ---- */
+.card{background:#fff;border:1px solid var(--c-line-2);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;flex:1;min-height:0;}
+.filter-bar{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--c-line-3);flex-wrap:wrap;}
+.search-box{position:relative;flex:1;min-width:220px;max-width:340px;}
+.search-box input{width:100%;padding:8px 12px 8px 34px;border:1px solid var(--c-line);border-radius:8px;font-size:13px;min-height:36px;}
+.search-box svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--c-mute-3);}
+.select{padding:8px 30px 8px 12px;border:1px solid var(--c-line);border-radius:8px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2373757B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 9px center;appearance:none;font-size:12.8px;min-height:36px;cursor:pointer;}
+.table-wrap{flex:1;min-height:0;overflow:auto;}
+table{width:100%;border-collapse:collapse;}
+thead th{position:sticky;top:0;background:var(--c-bg-off);z-index:2;text-align:left;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--c-mute-2);padding:10px 14px;border-bottom:1px solid var(--c-line-2);white-space:nowrap;}
+thead th.num{text-align:right;}
+tbody td{padding:11px 14px;border-bottom:1px solid var(--c-line-3);font-size:13px;vertical-align:middle;}
+tbody td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+tbody tr{cursor:pointer;}
+tbody tr:hover{background:var(--c-bg-off);}
+.table-foot{display:flex;align-items:center;padding:10px 14px;border-top:1px solid var(--c-line-3);font-size:12px;color:var(--c-mute-2);}
+.pager{margin-left:auto;display:flex;align-items:center;gap:4px;}
+.pg-btn{min-width:28px;height:28px;border-radius:7px;border:1px solid var(--c-line-2);background:#fff;font-size:12px;color:var(--c-mute);cursor:pointer;}
+.pg-btn.is-on{background:var(--c-navy);color:#fff;border-color:var(--c-navy);}
+.pg-btn:disabled{opacity:.4;cursor:default;}
+
+/* ---- pills/badges ---- */
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;border-radius:999px;padding:3px 10px;min-height:23px;white-space:nowrap;}
+.pill .dot{width:7px;height:7px;border-radius:50%;}
+.pill-active{background:rgba(31,157,85,.10);color:var(--c-success);}
+.pill-active .dot{background:var(--c-success);}
+.pill-archived{background:var(--c-line-3);color:var(--c-mute);}
+.pill-archived .dot{background:var(--c-mute-3);}
+.cat-tag{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;border-radius:6px;padding:3px 8px;white-space:nowrap;}
+.ref-chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--c-ink);background:var(--c-line-3);border-radius:6px;padding:3px 8px;white-space:nowrap;}
+.ref-chip.is-none{color:var(--c-warning);background:rgba(232,135,15,.10);}
+.ftype{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;flex-shrink:0;}
+.ftype-pdf{background:rgba(230,46,36,.10);color:var(--c-danger);}
+.ftype-img{background:rgba(255,154,31,.12);color:var(--c-teal);}
+.ftype-xls{background:rgba(31,157,85,.10);color:var(--c-success);}
+.ftype-doc{background:rgba(17,17,17,.06);color:var(--c-mute);}
+.ver-badge{display:inline-flex;align-items:center;font-size:10.5px;font-weight:700;color:var(--c-mute-2);background:var(--c-line-3);border-radius:5px;padding:1px 6px;}
+.row-actions{display:inline-flex;gap:2px;}
+.ra-btn{width:29px;height:29px;border-radius:7px;border:none;background:transparent;color:var(--c-mute-2);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;}
+.ra-btn:hover{background:var(--c-line-3);color:var(--c-ink);}
+.ra-btn.is-danger:hover{background:rgba(230,46,36,.08);color:var(--c-danger);}
+
+/* ---- empty ---- */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 20px;text-align:center;}
+.empty-ico{width:52px;height:52px;border-radius:50%;background:var(--c-line-3);display:flex;align-items:center;justify-content:center;color:var(--c-mute-3);margin-bottom:12px;}
+.empty-t{font-size:14px;font-weight:700;}
+.empty-s{font-size:12.5px;color:var(--c-mute-2);margin-top:4px;}
+
+/* ---- drawer (v8: 680 standard) ---- */
+.drawer-backdrop{position:fixed;inset:0;background:rgba(17,17,17,.42);z-index:50;opacity:0;pointer-events:none;transition:opacity 200ms;}
+.drawer-backdrop.is-open{opacity:1;pointer-events:auto;}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:680px;max-width:96vw;background:#fff;z-index:51;transform:translateX(100%);transition:transform 260ms cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;box-shadow:-16px 0 40px rgba(17,17,17,.16);}
+.drawer.is-open{transform:translateX(0);}
+.drawer-header{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--c-line-2);}
+.drawer-avatar{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--c-primary),var(--c-teal));color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.drawer-title{font-size:15.5px;font-weight:700;line-height:1.35;word-break:break-all;}
+.drawer-sub{font-size:11.5px;color:var(--c-mute-2);margin-top:1px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.drawer-hactions{margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.h-div{width:1px;height:20px;background:var(--c-line-2);margin:0 2px;}
+.drawer-tabs{display:flex;border-bottom:1px solid var(--c-line-2);padding:0 20px;gap:2px;}
+.dtab{padding:10px 14px;font-size:12.8px;font-weight:600;color:var(--c-mute-2);cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;}
+.dtab.is-on{color:var(--c-primary);border-bottom-color:var(--c-primary);}
+.drawer-body{flex:1;overflow:auto;padding:18px 20px;}
+.drawer-footer{display:flex;align-items:center;gap:10px;padding:14px 20px;border-top:1px solid var(--c-line-2);background:var(--c-bg-off);}
+.drawer-section{margin-bottom:20px;}
+.drawer-section-title{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--c-mute-2);margin-bottom:10px;}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:9px 14px;font-size:13px;}
+.kv .lbl{color:var(--c-mute-2);}
+.kv .val{font-weight:500;word-break:break-word;}
+
+/* ---- form (#51) ---- */
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 18px;}
+.fg-full{grid-column:1/-1;}
+.field-label{display:block;font-size:12px;font-weight:600;color:var(--c-mute);margin-bottom:5px;}
+.req{color:var(--c-danger);}
+.input{width:100%;padding:8px 12px;border:1px solid var(--c-line);border-radius:8px;min-height:36px;}
+.input:focus,.select:focus{outline:2px solid rgba(255,59,48,.25);border-color:var(--c-primary);}
+.field-error{font-size:11.5px;color:var(--c-danger);margin-top:4px;display:none;}
+.field.is-error .field-error{display:block;}
+.field.is-error .input,.field.is-error .select{border-color:var(--c-danger);}
+textarea.input{min-height:70px;resize:vertical;}
+
+/* ---- upload dropzone ---- */
+.dropzone{border:2px dashed var(--c-line);border-radius:11px;padding:26px 18px;text-align:center;cursor:pointer;background:var(--c-bg-off);}
+.dropzone:hover{border-color:var(--c-primary);}
+.dz-ico{color:var(--c-mute-3);margin-bottom:8px;}
+.dz-t{font-size:13.5px;font-weight:600;}
+.dz-s{font-size:11.5px;color:var(--c-mute-2);margin-top:3px;}
+.upl-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--c-line-2);border-radius:9px;margin-top:8px;}
+.upl-name{font-size:12.8px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.upl-size{font-size:11.5px;color:var(--c-mute-2);flex-shrink:0;}
+
+/* ---- dd combobox (#94 + #95 portal) ---- */
+.dd{position:relative;}
+.dd-trig{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border:1px solid var(--c-line);border-radius:8px;background:#fff;font-size:13px;cursor:pointer;text-align:left;min-height:36px;}
+.dd-trig>span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dd-trig .ph{color:var(--c-mute-3);}
+.dd-panel{display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--c-line-2);border-radius:9px;box-shadow:0 10px 30px rgba(17,17,17,.14);z-index:60;overflow:hidden;}
+.dd-panel.is-open{display:block;}
+.dd-panel.is-portal{position:fixed;left:auto;right:auto;top:auto;z-index:500;}
+.dd-srch{padding:8px;border-bottom:1px solid var(--c-line-3);position:relative;}
+.dd-srch input{width:100%;padding:7px 10px 7px 30px;border:1px solid var(--c-line-2);border-radius:7px;font-size:12.5px;}
+.dd-srch svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--c-mute-3);}
+.dd-list{max-height:220px;overflow:auto;padding:4px;}
+.dd-opt{padding:8px 11px;border-radius:7px;font-size:12.8px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dd-opt:hover{background:var(--c-bg-off);}
+.dd-opt.is-sel{background:rgba(255,59,48,.07);color:var(--c-primary);font-weight:600;}
+.dd-none{padding:14px;text-align:center;font-size:12px;color:var(--c-mute-3);}
+
+/* ---- version list ---- */
+.ver-row{display:flex;align-items:center;gap:11px;padding:10px 12px;border:1px solid var(--c-line-2);border-radius:9px;margin-bottom:8px;}
+.ver-row.is-cur{border-color:var(--c-teal);background:rgba(255,154,31,.05);}
+.ver-num{font-family:'Satoshi',sans-serif;font-weight:700;font-size:13px;width:34px;flex-shrink:0;}
+.ver-meta{flex:1;min-width:0;}
+.ver-n{font-size:12.8px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ver-s{font-size:11px;color:var(--c-mute-2);margin-top:1px;}
+
+/* ---- audit ---- */
+.aud-row{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--c-line-3);font-size:12.5px;}
+.aud-dot{width:8px;height:8px;border-radius:50%;background:var(--c-mute-3);margin-top:5px;flex-shrink:0;}
+.aud-dot.is-success{background:var(--c-success);}
+.aud-dot.is-warning{background:var(--c-warning);}
+.aud-t{flex:1;}
+.aud-by{font-size:11px;color:var(--c-mute-2);margin-top:1px;}
+
+/* ---- modal ---- */
+.modal-backdrop{position:fixed;inset:0;background:rgba(17,17,17,.5);z-index:70;display:none;align-items:center;justify-content:center;}
+.modal-backdrop.is-open{display:flex;}
+.modal{background:#fff;border-radius:12px;width:440px;max-width:92vw;box-shadow:0 24px 60px rgba(17,17,17,.25);}
+.modal-header{display:flex;align-items:center;gap:11px;padding:16px 18px;border-bottom:1px solid var(--c-line-2);}
+.modal-hico{width:36px;height:36px;border-radius:9px;background:rgba(230,46,36,.09);color:var(--c-danger);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.modal-hico.is-neutral{background:var(--c-line-3);color:var(--c-mute);}
+.modal-title{font-size:14.5px;font-weight:700;}
+.modal-body{padding:16px 18px;font-size:13px;color:var(--c-mute);}
+.modal-footer{display:flex;justify-content:flex-end;gap:9px;padding:13px 18px;border-top:1px solid var(--c-line-2);background:var(--c-bg-off);border-radius:0 0 12px 12px;}
+
+/* ---- toast ---- */
+.toast-wrap{position:fixed;right:18px;bottom:18px;z-index:90;display:flex;flex-direction:column;gap:8px;}
+.toast{display:flex;align-items:center;gap:9px;background:var(--c-navy);color:#fff;border-radius:10px;padding:11px 15px;font-size:12.8px;box-shadow:0 10px 30px rgba(17,17,17,.28);animation:tin 200ms ease;}
+.toast.is-success{background:var(--c-success);}
+.toast.is-warning{background:var(--c-warning);}
+@keyframes tin{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@media (max-width:1180px){
+  .stats{grid-template-columns:repeat(2,1fr) !important;}
+  .content{padding:16px 16px 24px;}
+  .page-head{flex-wrap:wrap;}
+  .ph-actions{margin-left:0;width:100%;}
+}
+@media (max-width:900px){
+  .stats{grid-template-columns:1fr !important;}
+  .search-box{min-width:150px;}
+  .kv{grid-template-columns:120px 1fr;}
+}
+/* ===== v8 align: scrollbar (#49) + gutter (#35) ===== */
+html{scrollbar-gutter:stable;}
+*{scrollbar-width:thin;scrollbar-color:rgba(17,17,17,.22) transparent;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(17,17,17,.22);border-radius:999px;}
+.sidebar ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.28);}
+.sidebar *{scrollbar-color:rgba(255,255,255,.28) transparent;}
+
+/* ===== pill vocab กลาง (microcopy §5) ===== */
+.pill-muted{background:var(--c-line-3);color:var(--c-mute);}
+.pill-muted .dot{background:var(--c-mute-3);}
+.pill-info{background:rgba(14,165,233,.12);color:#0284c7;}
+.pill-info .dot{background:#0284c7;}
+.pill-warning{background:rgba(255,154,31,.15);color:#b45309;}
+.pill-warning .dot{background:#E8870F;}
+.pill-success{background:rgba(31,157,85,.12);color:var(--c-success);}
+.pill-success .dot{background:var(--c-success);}
+.pill-danger{background:rgba(255,59,48,.11);color:var(--c-danger);}
+.pill-danger .dot{background:var(--c-danger);}
+.pill-sm{font-size:10.5px;padding:2px 8px;min-height:20px;}
+
+/* ===== list cells (#40 / #63) ===== */
+.cell-main{font-weight:700;font-size:13px;}
+.cell-sub{font-size:11.5px;color:var(--c-mute-2);margin-top:1px;}
+.cell-mono{font-variant-numeric:tabular-nums;}
+.page-fill{flex:1;min-height:0;display:flex;flex-direction:column;}
+.page-fill>.card{flex:1;min-height:0;}
+th.sortable{cursor:pointer;user-select:none;}
+th.sortable:hover{color:var(--c-ink);}
+th .sort-ic{display:inline-flex;vertical-align:middle;margin-left:3px;opacity:.55;}
+th.is-sorted{color:var(--c-ink);}
+th.is-sorted .sort-ic{opacity:1;color:var(--c-primary);}
+
+/* ===== scope chip ===== */
+.scope-chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;border-radius:6px;padding:3px 8px;white-space:nowrap;}
+.scope-all{background:var(--c-line-3);color:var(--c-mute);}
+.scope-channel{background:rgba(14,165,233,.12);color:#0284c7;}
+.scope-group{background:rgba(255,154,31,.15);color:#b45309;}
+.scope-customer{background:rgba(255,59,48,.10);color:var(--c-danger);}
+.prio-badge{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;font-family:'Satoshi',sans-serif;font-weight:700;font-size:11.5px;background:var(--c-navy);color:#fff;flex-shrink:0;}
+.prio-badge.p2{background:#b45309;}
+.prio-badge.p3{background:#0284c7;}
+.prio-badge.p4{background:var(--c-mute-2);}
+
+/* ===== drawer wide (#11 — 920) ===== */
+.drawer.dw-wide{width:920px;}
+.drawer-title .pill{vertical-align:middle;margin-left:8px;}
+.dw-note{display:flex;gap:9px;align-items:flex-start;background:var(--c-bg-off);border:1px solid var(--c-line-2);border-radius:9px;padding:10px 12px;font-size:12.3px;color:var(--c-mute);line-height:1.55;}
+.dw-note.is-warn{background:rgba(232,135,15,.08);border-color:rgba(232,135,15,.35);color:#8a5200;}
+.dw-note.is-ok{background:rgba(31,157,85,.08);border-color:rgba(31,157,85,.3);color:#0a7d4e;}
+.dw-note.is-danger{background:rgba(255,59,48,.07);border-color:rgba(255,59,48,.3);color:#b3261e;}
+.dw-note svg{flex-shrink:0;margin-top:2px;}
+.dg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 16px;}
+.dg{min-width:0;}
+.dg-l{font-size:11px;font-weight:600;color:var(--c-mute-2);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px;}
+.dg-v{font-size:13px;font-weight:600;color:var(--c-ink);word-break:break-word;}
+.dg-v.mono{font-variant-numeric:tabular-nums;}
+.section-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.section-head .drawer-section-title{margin:0;}
+.section-head .spacer{flex:1;}
+
+/* ===== stepper — kit .d-stepper (Iron Rule #47 / #47.1 · CSS ลอกจาก skeleton verbatim) ===== */
+.d-stepper { display: flex; align-items: flex-start; gap:0; width: 100%; margin-top:18px; }
+.stepper-item { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; min-width: 0; }
+.stepper-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size:13px; font-weight: 600; background: #fff; color: var(--c-mute-3); border: 2px solid var(--c-line); transition: all 200ms; z-index: 2; }
+.stepper-item.active .stepper-circle { background: var(--c-primary); color: #fff; border-color: var(--c-primary); box-shadow: 0 0 0 4px rgba(255,59,48,0.12); }
+.stepper-item.done .stepper-circle { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
+.stepper-label { margin-top:8px; font-size:12px; font-weight: 500; color: var(--c-mute-3); text-align: center; line-height: 1.3; transition: color 200ms; }
+.stepper-item.active .stepper-label { color: var(--c-navy); font-weight: 600; }
+.stepper-item.done .stepper-label { color: var(--c-mute); }
+.stepper-item:not(:last-child)::after { content: ''; position: absolute; top: 15px; left: 50%; right: -50%; height: 2px; background: var(--c-line-2); z-index: 1; }
+.stepper-item.done:not(:last-child)::after { background: var(--c-primary); }
+.drawer-stepper-band{padding:0 24px 16px;border-bottom:1px solid var(--c-line-2);flex-shrink:0;background:#fff;}
+.drawer-stepper-band .d-stepper{margin-top:16px;}
+.stepper-item.done{cursor:pointer;}
+/* ===== segmented ===== */
+.seg{display:inline-flex;border:1px solid var(--c-line-2);border-radius:9px;overflow:hidden;background:#fff;}
+.seg-b{border:none;background:#fff;padding:7px 14px;font-size:12.5px;font-weight:600;color:var(--c-mute);cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;min-height:34px;}
+.seg-b+.seg-b{border-left:1px solid var(--c-line-2);}
+.seg-b.is-on{background:var(--c-navy);color:#fff;}
+.seg-b:disabled{opacity:.45;cursor:not-allowed;}
+
+/* ===== master combobox (#94 / #95 portal) ===== */
+.cbx{position:relative;}
+.cbx .cb-lead{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--c-mute-3);pointer-events:none;}
+.cbx .cb-tail{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--c-mute-3);pointer-events:none;}
+.cbx .cb-clear{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:26px;height:26px;}
+.cbx .input{padding-left:34px;padding-right:34px;}
+.cb-menu{background:#fff;border:1px solid var(--c-line);border-radius:10px;box-shadow:0 10px 28px rgba(17,17,17,.16);max-height:280px;overflow-y:auto;z-index:500;}
+.cb-item{display:block;width:100%;text-align:left;padding:8px 12px;background:transparent;border:none;border-bottom:1px solid var(--c-line-3);cursor:pointer;font-family:inherit;color:var(--c-ink);}
+.cb-item:last-child{border-bottom:none;}
+.cb-item:hover,.cb-item.is-hi{background:var(--c-bg-off);}
+.cb-empty{padding:18px 14px;text-align:center;font-size:12.5px;color:var(--c-mute-2);}
+.cb-row{display:flex;align-items:center;gap:9px;}
+.cb-ico{width:28px;height:28px;border-radius:7px;background:var(--c-line-3);color:var(--c-mute);display:grid;place-items:center;flex-shrink:0;}
+.cb-t{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cb-s{font-size:11px;color:var(--c-mute-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* ===== rule line editor ===== */
+.rule-tbl{width:100%;border-collapse:collapse;}
+.rule-tbl th{text-align:left;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--c-mute-2);padding:8px 10px;border-bottom:1px solid var(--c-line-2);background:var(--c-bg-off);white-space:nowrap;}
+.rule-tbl td{padding:8px 8px;border-bottom:1px solid var(--c-line-3);vertical-align:top;font-size:12.8px;}
+.rule-tbl td.num,.rule-tbl th.num{text-align:right;font-variant-numeric:tabular-nums;}
+.rule-tbl tr.is-err td{background:rgba(255,59,48,.04);}
+.rule-tbl .input,.rule-tbl .select{min-height:33px;padding:6px 10px;font-size:12.8px;}
+.rule-tbl .select{padding-right:26px;background-position:right 7px center;}
+.rule-tbl tbody tr:hover{background:transparent;}
+.rule-tbl tbody tr{cursor:default;}
+.rule-wrap{border:1px solid var(--c-line-2);border-radius:10px;overflow:auto;}
+.rule-wrap table{min-width:838px;table-layout:fixed;}
+.rule-wrap.is-view table{table-layout:auto;min-width:700px;}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+input[type=number]{-moz-appearance:textfield;appearance:textfield;}
+.tier-row{grid-template-columns:96px 108px 26px;}
+.tier-row .input{padding-left:8px;padding-right:8px;}
+.tier-live{font-size:11px;color:var(--c-mute-2);line-height:1.35;margin-top:3px;padding-left:2px;}
+tbody td.pl-name{min-width:230px;}
+td.nowrap{white-space:nowrap;}
+.rule-foot{display:flex;align-items:center;gap:10px;padding:10px 12px;border-top:1px solid var(--c-line-3);font-size:12px;color:var(--c-mute-2);background:#fff;}
+.tier-box{margin-top:6px;border-left:2px solid var(--c-line-2);padding-left:10px;}
+.tier-row{display:grid;grid-template-columns:110px 110px 130px 32px;gap:6px;align-items:center;margin-top:5px;}
+.tier-row .tl{font-size:11px;color:var(--c-mute-2);}
+.tier-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--c-mute);background:var(--c-line-3);border-radius:5px;padding:2px 7px;white-space:nowrap;font-variant-numeric:tabular-nums;}
+.tier-chip.is-hit{background:rgba(255,59,48,.10);color:var(--c-danger);}
+.rt-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap;}
+.rt-product{background:rgba(17,17,17,.07);color:var(--c-ink);}
+.rt-category{background:rgba(14,165,233,.12);color:#0284c7;}
+.rt-all{background:rgba(255,154,31,.15);color:#b45309;}
+.err-msg{font-size:11px;color:var(--c-danger);margin-top:3px;}
+.disc-flag{color:var(--c-danger);font-weight:700;}
+.dw-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 16px;background:var(--c-bg-off);border:1px solid var(--c-line-2);border-radius:10px;padding:12px 14px;}
+.dw-summary .dg-l{margin-bottom:2px;}
+
+/* ===== resolver ladder ===== */
+.ladder{display:flex;flex-direction:column;gap:6px;}
+.lad{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--c-line-2);border-radius:10px;background:#fff;}
+.lad.is-win{border-color:var(--c-primary);background:rgba(255,59,48,.04);box-shadow:0 0 0 1px var(--c-primary) inset;}
+.lad.is-skip{opacity:.62;}
+.lad-lvl{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--c-mute-2);width:74px;flex-shrink:0;}
+.lad-main{flex:1;min-width:0;}
+.lad-t{font-size:12.8px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lad-s{font-size:11px;color:var(--c-mute-2);margin-top:1px;}
+.lad-price{font-family:'Satoshi','Noto Sans Thai',sans-serif;font-weight:700;font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap;}
+.lad-price small{font-size:11px;font-weight:500;color:var(--c-mute-2);}
+.res-hero{background:var(--c-navy);color:#fff;border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:16px;}
+.res-hero .rh-l{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6);}
+.res-hero .rh-v{font-family:'Satoshi','Noto Sans Thai',sans-serif;font-size:26px;font-weight:700;line-height:1.1;margin-top:3px;font-variant-numeric:tabular-nums;}
+.res-hero .rh-s{font-size:12px;color:rgba(255,255,255,.75);margin-top:5px;}
+.res-hero .rh-side{margin-left:auto;text-align:right;}
+.res-hero .rh-side .rh-v{font-size:16px;}
+.qs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.qs{background:var(--c-bg-off);border:1px solid var(--c-line-2);border-radius:9px;padding:9px 11px;}
+.qs .l{font-size:10.5px;color:var(--c-mute-2);font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
+.qs .v{font-size:13px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums;}
+
+/* ===== approval timeline ===== */
+.tl{position:relative;padding-left:22px;}
+.tl:before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:1.5px;background:var(--c-line-2);}
+.tl-i{position:relative;padding:6px 0 12px;}
+.tl-i:before{content:'';position:absolute;left:-19px;top:11px;width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid var(--c-mute-3);}
+.tl-i.is-ok:before{border-color:var(--c-success);background:var(--c-success);}
+.tl-i.is-warn:before{border-color:var(--c-warning);background:var(--c-warning);}
+.tl-i.is-bad:before{border-color:var(--c-danger);background:var(--c-danger);}
+.tl-t{font-size:12.8px;font-weight:600;}
+.tl-s{font-size:11.5px;color:var(--c-mute-2);margin-top:1px;}
+.tl-q{margin-top:5px;font-size:12px;color:var(--c-mute);background:var(--c-bg-off);border-radius:7px;padding:7px 10px;}
+
+/* ===== switch ===== */
+.sw{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12.8px;font-weight:600;}
+.sw-track{width:34px;height:20px;border-radius:999px;background:var(--c-line);position:relative;transition:background 150ms;flex-shrink:0;}
+.sw-track:after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left 150ms;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.sw.is-on .sw-track{background:var(--c-primary);}
+.sw.is-on .sw-track:after{left:16px;}
+.field-help{font-size:11.5px;color:var(--c-mute-2);margin-top:4px;}
+.input:disabled,.select:disabled{background:var(--c-line-3);color:var(--c-mute-2);cursor:not-allowed;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.link{color:var(--c-primary);cursor:pointer;font-weight:600;}
+.link:hover{text-decoration:underline;}
+.mini-stat{display:flex;gap:10px;flex-wrap:wrap;}
+.ms{flex:1;min-width:120px;background:var(--c-bg-off);border:1px solid var(--c-line-2);border-radius:9px;padding:9px 12px;}
+.ms .l{font-size:10.5px;color:var(--c-mute-2);font-weight:600;}
+.ms .v{font-family:'Satoshi','Noto Sans Thai',sans-serif;font-size:17px;font-weight:700;margin-top:2px;}
+.ms .v small{font-size:11px;font-weight:500;color:var(--c-mute-2);}
+.kbd{font-family:'Satoshi',monospace;font-size:10.5px;border:1px solid var(--c-line);border-radius:4px;padding:0 5px;color:var(--c-mute);background:#fff;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.spin{animation:spin .8s linear infinite;}
+@media (max-width:1180px){
+  .drawer.dw-wide{width:min(920px,100vw);}
+  .drawer{width:min(680px,100vw);max-width:100vw;}
+  .dg-grid{grid-template-columns:repeat(2,1fr);}
+  .qs-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media (max-width:900px){
+  .form-grid{grid-template-columns:1fr;}
+  .dw-summary{grid-template-columns:1fr;}
+}
+
+/* ===== content tabs (kit: .tabs > .tab.is-active — underline) ===== */
+.tabs{display:flex;align-items:center;gap:4px;padding:0 14px;border-bottom:1px solid var(--c-line-2);overflow-x:auto;flex-shrink:0;}
+.tab{padding:10px 14px;background:transparent;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;font-size:13px;font-weight:500;color:var(--c-mute);cursor:pointer;font-family:inherit;transition:all 120ms;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
+.tab:hover{color:var(--c-ink);}
+.tab.is-active{color:var(--c-primary);border-bottom-color:var(--c-primary);font-weight:600;}
+.tab .tab-count{font-size:11px;font-weight:600;color:var(--c-mute-2);background:var(--c-line-3);border-radius:999px;padding:1px 7px;}
+.tab.is-active .tab-count{background:rgba(255,59,48,.10);color:var(--c-primary);}
+
+/* ===== drawer lean (v2.1) ===== */
+.drawer-header{padding:18px 24px 16px;gap:14px;}
+.drawer-title{font-size:16px;}
+.drawer-sub{gap:10px;margin-top:5px;line-height:1.7;}
+.drawer-sub .sep{color:var(--c-line);}
+.drawer-tabs{padding:0 24px;}
+.drawer-body{padding:24px;}
+.drawer-section{margin-bottom:26px;}
+.drawer-section-title{margin-bottom:12px;}
+.rule-tbl td{padding:10px 12px;}
+.rule-tbl th{padding:9px 12px;}
+.dg-grid{gap:18px 24px;}
+.dw-note{padding:11px 14px;line-height:1.6;}
+.drawer-footer{padding:14px 24px;}
+
+/* ===== employee chip (ผู้อนุมัติ: avatar + ตำแหน่ง + ชื่อ) ===== */
+.emp-chip{display:inline-flex;align-items:center;gap:8px;min-width:0;}
+.emp-av{width:28px;height:28px;border-radius:50%;background:var(--c-navy);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;flex-shrink:0;}
+.emp-chip.is-empty .emp-av{background:var(--c-line-3);color:var(--c-mute-2);border:1px dashed var(--c-line);}
+.emp-t{display:flex;flex-direction:column;line-height:1.25;min-width:0;}
+.emp-r{font-size:10.5px;color:var(--c-mute-2);font-weight:600;white-space:nowrap;}
+.emp-n{font-size:12.8px;font-weight:600;color:var(--c-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.emp-chip.sm .emp-av{width:22px;height:22px;font-size:9.5px;}
+.emp-chip.sm .emp-n{font-size:12px;}
+.slot-row{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;padding:10px 12px;border:1px solid var(--c-line-2);border-radius:10px;background:#fff;}
+.slot-row+.slot-row{margin-top:8px;}
+.slot-no{width:26px;height:26px;border-radius:50%;background:var(--c-navy);color:#fff;font-size:11.5px;font-weight:700;display:grid;place-items:center;margin-top:2px;}
+.slot-role{font-size:11.5px;font-weight:700;color:var(--c-mute);text-transform:none;margin-bottom:5px;}
+.cmp-cell{font-variant-numeric:tabular-nums;font-weight:600;}
+.cmp-cell.is-none{color:var(--c-mute-3);font-weight:400;}
+
+.modal.is-wide{width:780px;max-width:96vw;}
+.modal.is-wide .modal-body{padding:22px 26px 6px;}
+.slot-row{grid-template-columns:34px 220px 1fr;gap:12px;align-items:start;padding:12px 14px;}
+.slot-row+.slot-row{margin-top:10px;}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-ico"><i data-lucide="box" data-sz="19"></i></div>
+    <div><div class="sb-logo-t1">CUBE 4.0</div><div class="sb-logo-t2">Platform</div></div>
+  </div>
+  <div class="sb-group">Sales</div>
+  <div class="sb-item"><i data-lucide="settings-2" data-sz="15"></i>ตั้งค่าการขาย</div>
+  <div class="sb-item"><i data-lucide="users" data-sz="15"></i>กลุ่มลูกค้า</div>
+  <div class="sb-item"><i data-lucide="tag" data-sz="15"></i>ช่องทางการขาย</div>
+  <div class="sb-item"><i data-lucide="building-2" data-sz="15"></i>ลูกค้า</div>
+  <div class="sb-item is-on"><i data-lucide="badge-percent" data-sz="15"></i>บัญชีราคาขาย</div>
+  <div class="sb-item"><i data-lucide="file-text" data-sz="15"></i>ใบเสนอราคา</div>
+  <div class="sb-group">Policy Center</div>
+  <div class="sb-item"><i data-lucide="shield-check" data-sz="15"></i>สายอนุมัติ (DOA)</div>
+  <div class="sb-foot"><span class="dot"></span>UAT · v1.0.0</div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div class="crumb">Sales <i data-lucide="chevron-right" data-sz="13"></i> <b>บัญชีราคาขาย</b></div>
+    <div class="top-right">
+      <button class="icon-btn"><i data-lucide="bell" data-sz="16"></i></button>
+      <select class="select" style="min-height:32px;padding:4px 28px 4px 10px;font-size:12px;" title="สลับบทบาท (เดโมสายอนุมัติ)" onchange="switchPersona(this.value)"><option value="0">👤 Sales Manager</option><option value="1">👤 BU Head</option><option value="2">👤 Sales Officer</option></select>
+      <div class="user-chip">
+        <div class="uc-txt"><div class="uc-n">มานพ ขายเก่ง</div><div class="uc-r">Sales Manager · CUBE 4.0</div></div>
+        <div class="uc-av">มข</div>
+      </div>
+    </div>
+  </div>
+  <div class="content" id="page-content"></div>
+</div>
+
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawerEl"></div>
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"><div class="modal" id="modalCard" onclick="event.stopPropagation()"></div></div>
+<div class="toast-wrap" id="toastWrap"></div>
+<div id="dd-portal"></div>
+<script>
+const ICONS={"plus": "<path d=\"M5 12h14\" /> <path d=\"M12 5v14\" />", "minus": "<path d=\"M5 12h14\" />", "trash-2": "<path d=\"M3 6h18\" /> <path d=\"M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6\" /> <path d=\"M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2\" /> <line x1=\"10\" x2=\"10\" y1=\"11\" y2=\"17\" /> <line x1=\"14\" x2=\"14\" y1=\"11\" y2=\"17\" />", "lock": "<rect width=\"18\" height=\"11\" x=\"3\" y=\"11\" rx=\"2\" ry=\"2\" /> <path d=\"M7 11V7a5 5 0 0 1 10 0v4\" />", "arrow-right": "<path d=\"M5 12h14\" /> <path d=\"m12 5 7 7-7 7\" />", "scissors": "<circle cx=\"6\" cy=\"6\" r=\"3\" /> <path d=\"M8.12 8.12 12 12\" /> <path d=\"M20 4 8.12 15.88\" /> <circle cx=\"6\" cy=\"18\" r=\"3\" /> <path d=\"M14.8 14.8 20 20\" />", "combine": "<path d=\"M10 18H5a3 3 0 0 1-3-3v-1\" /> <path d=\"M14 2a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2\" /> <path d=\"M20 2a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2\" /> <path d=\"m7 21 3-3-3-3\" /> <rect x=\"14\" y=\"14\" width=\"8\" height=\"8\" rx=\"2\" /> <rect x=\"2\" y=\"2\" width=\"8\" height=\"8\" rx=\"2\" />", "shield": "<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\" />", "activity": "<path d=\"M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2\" />", "alert-circle": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <line x1=\"12\" x2=\"12\" y1=\"8\" y2=\"12\" /> <line x1=\"12\" x2=\"12.01\" y1=\"16\" y2=\"16\" />", "alert-triangle": "<path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\" /> <path d=\"M12 9v4\" /> <path d=\"M12 17h.01\" />", "arrow-left": "<path d=\"m12 19-7-7 7-7\" /> <path d=\"M19 12H5\" />", "ban": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"m4.9 4.9 14.2 14.2\" />", "bell": "<path d=\"M10.268 21a2 2 0 0 0 3.464 0\" /> <path d=\"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326\" />", "box": "<path d=\"M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z\" /> <path d=\"m3.3 7 8.7 5 8.7-5\" /> <path d=\"M12 22V12\" />", "boxes": "<path d=\"M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z\" /> <path d=\"m7 16.5-4.74-2.85\" /> <path d=\"m7 16.5 5-3\" /> <path d=\"M7 16.5v5.17\" /> <path d=\"M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z\" /> <path d=\"m17 16.5-5-3\" /> <path d=\"m17 16.5 4.74-2.85\" /> <path d=\"M17 16.5v5.17\" /> <path d=\"M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z\" /> <path d=\"M12 8 7.26 5.15\" /> <path d=\"m12 8 4.74-2.85\" /> <path d=\"M12 13.5V8\" />", "check": "<path d=\"M20 6 9 17l-5-5\" />", "check-circle-2": "<path d=\"M21.801 10A10 10 0 1 1 17 3.335\" /> <path d=\"m9 11 3 3L22 4\" />", "chevron-down": "<path d=\"m6 9 6 6 6-6\" />", "chevron-left": "<path d=\"m15 18-6-6 6-6\" />", "chevron-right": "<path d=\"m9 18 6-6-6-6\" />", "clipboard-check": "<rect width=\"8\" height=\"4\" x=\"8\" y=\"2\" rx=\"1\" ry=\"1\" /> <path d=\"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2\" /> <path d=\"m9 14 2 2 4-4\" />", "clock": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <polyline points=\"12 6 12 12 16 14\" />", "container": "<path d=\"M22 7.7c0-.6-.4-1.2-.8-1.5l-6.3-3.9a1.72 1.72 0 0 0-1.7 0l-10.3 6c-.5.2-.9.8-.9 1.4v6.6c0 .5.4 1.2.8 1.5l6.3 3.9a1.72 1.72 0 0 0 1.7 0l10.3-6c.5-.3.9-1 .9-1.5Z\" /> <path d=\"M10 21.9V14L2.1 9.1\" /> <path d=\"m10 14 11.9-6.9\" /> <path d=\"M14 19.8v-8.1\" /> <path d=\"M18 17.5V9.4\" />", "database": "<ellipse cx=\"12\" cy=\"5\" rx=\"9\" ry=\"3\" /> <path d=\"M3 5V19A9 3 0 0 0 21 19V5\" /> <path d=\"M3 12A9 3 0 0 0 21 12\" />", "download": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" /> <polyline points=\"7 10 12 15 17 10\" /> <line x1=\"12\" x2=\"12\" y1=\"15\" y2=\"3\" />", "eye": "<path d=\"M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "eye-off": "<path d=\"M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49\" /> <path d=\"M14.084 14.158a3 3 0 0 1-4.242-4.242\" /> <path d=\"M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143\" /> <path d=\"m2 2 20 20\" />", "flag": "<path d=\"M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z\" /> <line x1=\"4\" x2=\"4\" y1=\"22\" y2=\"15\" />", "gauge": "<path d=\"m12 14 4-4\" /> <path d=\"M3.34 19a10 10 0 1 1 17.32 0\" />", "grid-3x3": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" /> <path d=\"M3 9h18\" /> <path d=\"M3 15h18\" /> <path d=\"M9 3v18\" /> <path d=\"M15 3v18\" />", "hard-hat": "<path d=\"M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5\" /> <path d=\"M14 6a6 6 0 0 1 6 6v3\" /> <path d=\"M4 15v-3a6 6 0 0 1 6-6\" /> <rect x=\"2\" y=\"15\" width=\"20\" height=\"4\" rx=\"1\" />", "history": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" /> <path d=\"M12 7v5l4 2\" />", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 16v-4\" /> <path d=\"M12 8h.01\" />", "layers": "<path d=\"M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z\" /> <path d=\"M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12\" /> <path d=\"M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17\" />", "layout-grid": "<rect width=\"7\" height=\"7\" x=\"3\" y=\"3\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"14\" y=\"3\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"14\" y=\"14\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\" />", "link": "<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\" /> <path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\" />", "log-out": "<path d=\"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4\" /> <polyline points=\"16 17 21 12 16 7\" /> <line x1=\"21\" x2=\"9\" y1=\"12\" y2=\"12\" />", "map-pin": "<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" />", "package": "<path d=\"M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z\" /> <path d=\"M12 22V12\" /> <path d=\"m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7\" /> <path d=\"m7.5 4.27 9 5.15\" />", "package-check": "<path d=\"m16 16 2 2 4-4\" /> <path d=\"M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14\" /> <path d=\"m7.5 4.27 9 5.15\" /> <polyline points=\"3.29 7 12 12 20.71 7\" /> <line x1=\"12\" x2=\"12\" y1=\"22\" y2=\"12\" />", "package-open": "<path d=\"M12 22v-9\" /> <path d=\"M15.17 2.21a1.67 1.67 0 0 1 1.63 0L21 4.57a1.93 1.93 0 0 1 0 3.36L8.82 14.79a1.655 1.655 0 0 1-1.64 0L3 12.43a1.93 1.93 0 0 1 0-3.36z\" /> <path d=\"M20 13v3.87a2.06 2.06 0 0 1-1.11 1.83l-6 3.08a1.93 1.93 0 0 1-1.78 0l-6-3.08A2.06 2.06 0 0 1 4 16.87V13\" /> <path d=\"M21 12.43a1.93 1.93 0 0 0 0-3.36L8.83 2.2a1.64 1.64 0 0 0-1.63 0L3 4.57a1.93 1.93 0 0 0 0 3.36l12.18 6.86a1.636 1.636 0 0 0 1.63 0z\" />", "package-plus": "<path d=\"M16 16h6\" /> <path d=\"M19 13v6\" /> <path d=\"M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14\" /> <path d=\"m7.5 4.27 9 5.15\" /> <polyline points=\"3.29 7 12 12 20.71 7\" /> <line x1=\"12\" x2=\"12\" y1=\"22\" y2=\"12\" />", "package-search": "<path d=\"M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14\" /> <path d=\"m7.5 4.27 9 5.15\" /> <polyline points=\"3.29 7 12 12 20.71 7\" /> <line x1=\"12\" x2=\"12\" y1=\"22\" y2=\"12\" /> <circle cx=\"18.5\" cy=\"15.5\" r=\"2.5\" /> <path d=\"M20.27 17.27 22 19\" />", "package-x": "<path d=\"M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14\" /> <path d=\"m7.5 4.27 9 5.15\" /> <polyline points=\"3.29 7 12 12 20.71 7\" /> <line x1=\"12\" x2=\"12\" y1=\"22\" y2=\"12\" /> <path d=\"m17 13 5 5m-5 0 5-5\" />", "pause-octagon": "<path d=\"M10 15V9\" /> <path d=\"M14 15V9\" /> <path d=\"M2.586 16.726A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2h6.624a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586z\" />", "refresh-cw": "<path d=\"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8\" /> <path d=\"M21 3v5h-5\" /> <path d=\"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16\" /> <path d=\"M8 16H3v5\" />", "rotate-ccw": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" />", "route": "<circle cx=\"6\" cy=\"19\" r=\"3\" /> <path d=\"M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15\" /> <circle cx=\"18\" cy=\"5\" r=\"3\" />", "search": "<circle cx=\"11\" cy=\"11\" r=\"8\" /> <path d=\"m21 21-4.3-4.3\" />", "search-x": "<path d=\"m13.5 8.5-5 5\" /> <path d=\"m8.5 8.5 5 5\" /> <circle cx=\"11\" cy=\"11\" r=\"8\" /> <path d=\"m21 21-4.3-4.3\" />", "settings": "<path d=\"M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "shopping-cart": "<circle cx=\"8\" cy=\"21\" r=\"1\" /> <circle cx=\"19\" cy=\"21\" r=\"1\" /> <path d=\"M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12\" />", "sliders-horizontal": "<line x1=\"21\" x2=\"14\" y1=\"4\" y2=\"4\" /> <line x1=\"10\" x2=\"3\" y1=\"4\" y2=\"4\" /> <line x1=\"21\" x2=\"12\" y1=\"12\" y2=\"12\" /> <line x1=\"8\" x2=\"3\" y1=\"12\" y2=\"12\" /> <line x1=\"21\" x2=\"16\" y1=\"20\" y2=\"20\" /> <line x1=\"12\" x2=\"3\" y1=\"20\" y2=\"20\" /> <line x1=\"14\" x2=\"14\" y1=\"2\" y2=\"6\" /> <line x1=\"8\" x2=\"8\" y1=\"10\" y2=\"14\" /> <line x1=\"16\" x2=\"16\" y1=\"18\" y2=\"22\" />", "tags": "<path d=\"m15 5 6.3 6.3a2.4 2.4 0 0 1 0 3.4L17 19\" /> <path d=\"M9.586 5.586A2 2 0 0 0 8.172 5H3a1 1 0 0 0-1 1v5.172a2 2 0 0 0 .586 1.414L8.29 18.29a2.426 2.426 0 0 0 3.42 0l3.58-3.58a2.426 2.426 0 0 0 0-3.42z\" /> <circle cx=\"6.5\" cy=\"9.5\" r=\".5\" fill=\"currentColor\" />", "truck": "<path d=\"M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2\" /> <path d=\"M15 18H9\" /> <path d=\"M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14\" /> <circle cx=\"17\" cy=\"18\" r=\"2\" /> <circle cx=\"7\" cy=\"18\" r=\"2\" />", "user": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\" /> <circle cx=\"12\" cy=\"7\" r=\"4\" />", "wallet": "<path d=\"M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1\" /> <path d=\"M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4\" />", "warehouse": "<path d=\"M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z\" /> <path d=\"M6 18h12\" /> <path d=\"M6 14h12\" /> <rect width=\"12\" height=\"12\" x=\"6\" y=\"10\" />", "x": "<path d=\"M18 6 6 18\" /> <path d=\"m6 6 12 12\" />", "x-circle": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"m15 9-6 6\" /> <path d=\"m9 9 6 6\" />", "building-2": "<path d=\"M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z\" /> <path d=\"M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2\" /> <path d=\"M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2\" /> <path d=\"M10 6h4\" /> <path d=\"M10 10h4\" /> <path d=\"M10 14h4\" /> <path d=\"M10 18h4\" />", "contact": "<path d=\"M16 2v2\" /> <path d=\"M7 22v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2\" /> <path d=\"M8 2v2\" /> <circle cx=\"12\" cy=\"11\" r=\"3\" /> <rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\" />", "corner-down-right": "<polyline points=\"15 10 20 15 15 20\" /> <path d=\"M4 4v7a4 4 0 0 0 4 4h12\" />", "git-branch": "<line x1=\"6\" x2=\"6\" y1=\"3\" y2=\"15\" /> <circle cx=\"18\" cy=\"6\" r=\"3\" /> <circle cx=\"6\" cy=\"18\" r=\"3\" /> <path d=\"M18 9a9 9 0 0 1-9 9\" />", "hand": "<path d=\"M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2\"/><path d=\"M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2\"/><path d=\"M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8\"/><path d=\"M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15\"/>", "inbox": "<polyline points=\"22 12 16 12 14 15 10 15 8 12 2 12\"/><path d=\"M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z\"/>", "list": "<path d=\"M3 12h.01\" /> <path d=\"M3 18h.01\" /> <path d=\"M3 6h.01\" /> <path d=\"M8 12h13\" /> <path d=\"M8 18h13\" /> <path d=\"M8 6h13\" />", "mouse-pointer-click": "<path d=\"M14 4.1 12 6\"/><path d=\"m5.1 8-2.9-.8\"/><path d=\"m6 12-1.9 2\"/><path d=\"M7.2 2.2 8 5.1\"/><path d=\"M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z\"/>", "network": "<rect x=\"16\" y=\"16\" width=\"6\" height=\"6\" rx=\"1\" /> <rect x=\"2\" y=\"16\" width=\"6\" height=\"6\" rx=\"1\" /> <rect x=\"9\" y=\"2\" width=\"6\" height=\"6\" rx=\"1\" /> <path d=\"M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3\" /> <path d=\"M12 12V8\" />", "pencil": "<path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\" /> <path d=\"m15 5 4 4\" />", "repeat": "<path d=\"m17 2 4 4-4 4\"/><path d=\"M3 11v-1a4 4 0 0 1 4-4h14\"/><path d=\"m7 22-4-4 4-4\"/><path d=\"M21 13v1a4 4 0 0 1-4 4H3\"/>", "rows-3": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\"/><path d=\"M21 9H3\"/><path d=\"M21 15H3\"/>", "square-dashed": "<path d=\"M5 3a2 2 0 0 0-2 2\"/><path d=\"M19 3a2 2 0 0 1 2 2\"/><path d=\"M21 19a2 2 0 0 1-2 2\"/><path d=\"M5 21a2 2 0 0 1-2-2\"/><path d=\"M9 3h1\"/><path d=\"M9 21h1\"/><path d=\"M14 3h1\"/><path d=\"M14 21h1\"/><path d=\"M3 9v1\"/><path d=\"M21 9v1\"/><path d=\"M3 14v1\"/><path d=\"M21 14v1\"/>", "thermometer-snowflake": "<path d=\"m10 20-1.25-2.5L6 18\"/><path d=\"M10 4 8.75 6.5 6 6\"/><path d=\"M10.585 15H10\"/><path d=\"M2 12h6.5L10 9\"/><path d=\"M20 14.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z\"/><path d=\"m4 10 1.5 2L4 14\"/><path d=\"m7 21 3-6-1.5-3\"/><path d=\"m7 3 3 6h2\"/>", "file-text": "<path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z\" /> <path d=\"M14 2v4a2 2 0 0 0 2 2h4\" /> <path d=\"M10 9H8\" /> <path d=\"M16 13H8\" /> <path d=\"M16 17H8\" />", "file": "<path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z\"/><path d=\"M14 2v4a2 2 0 0 0 2 2h4\"/>", "folder": "<path d=\"M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z\"/>", "upload": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" /> <polyline points=\"17 8 12 3 7 8\" /> <line x1=\"12\" x2=\"12\" y1=\"3\" y2=\"15\" />", "archive": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8\" /> <path d=\"M10 12h4\" />", "link-2": "<path d=\"M9 17H7A5 5 0 0 1 7 7h2\" /> <path d=\"M15 7h2a5 5 0 1 1 0 10h-2\" /> <line x1=\"8\" x2=\"16\" y1=\"12\" y2=\"12\" />", "paperclip": "<path d=\"m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48\"/>", "image": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" ry=\"2\"/><circle cx=\"9\" cy=\"9\" r=\"2\"/><path d=\"m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21\"/>", "file-spreadsheet": "<path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z\"/><path d=\"M14 2v4a2 2 0 0 0 2 2h4\"/><path d=\"M8 13h2\"/><path d=\"M14 13h2\"/><path d=\"M8 17h2\"/><path d=\"M14 17h2\"/>", "filter": "<polygon points=\"22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3\" />", "more-horizontal": "<circle cx=\"12\" cy=\"12\" r=\"1\"/><circle cx=\"19\" cy=\"12\" r=\"1\"/><circle cx=\"5\" cy=\"12\" r=\"1\"/>", "hard-drive": "<line x1=\"22\" x2=\"2\" y1=\"12\" y2=\"12\"/><path d=\"M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z\"/><line x1=\"6\" x2=\"6.01\" y1=\"16\" y2=\"16\"/><line x1=\"10\" x2=\"10.01\" y1=\"16\" y2=\"16\"/>", "file-check-2": "<path d=\"M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4\"/><polyline points=\"14 2 14 8 20 8\"/><path d=\"m3 15 2 2 4-4\"/>", "files": "<path d=\"M20 7h-3a2 2 0 0 1-2-2V2\" /> <path d=\"M9 18a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h7l4 4v10a2 2 0 0 1-2 2Z\" /> <path d=\"M3 7.6v12.8A1.6 1.6 0 0 0 4.6 22h9.8\" />", "tag": "<path d=\"M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z\" /> <circle cx=\"7.5\" cy=\"7.5\" r=\".5\" fill=\"currentColor\" />", "external-link": "<path d=\"M15 3h6v6\" /> <path d=\"M10 14 21 3\" /> <path d=\"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6\" />", "users": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\" /> <circle cx=\"9\" cy=\"7\" r=\"4\" /> <path d=\"M22 21v-2a4 4 0 0 0-3-3.87\" /> <path d=\"M16 3.13a4 4 0 0 1 0 7.75\" />", "calculator": "<rect width=\"16\" height=\"20\" x=\"4\" y=\"2\" rx=\"2\" /> <line x1=\"8\" x2=\"16\" y1=\"6\" y2=\"6\" /> <line x1=\"16\" x2=\"16\" y1=\"14\" y2=\"18\" /> <path d=\"M16 10h.01\" /> <path d=\"M12 10h.01\" /> <path d=\"M8 10h.01\" /> <path d=\"M12 14h.01\" /> <path d=\"M8 14h.01\" /> <path d=\"M12 18h.01\" /> <path d=\"M8 18h.01\" />", "percent": "<line x1=\"19\" x2=\"5\" y1=\"5\" y2=\"19\" /> <circle cx=\"6.5\" cy=\"6.5\" r=\"2.5\" /> <circle cx=\"17.5\" cy=\"17.5\" r=\"2.5\" />", "send": "<path d=\"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z\" /> <path d=\"m21.854 2.147-10.94 10.939\" />", "copy": "<rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\" /> <path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\" />", "trending-up": "<polyline points=\"22 7 13.5 15.5 8.5 10.5 2 17\" /> <polyline points=\"16 7 22 7 22 13\" />", "calendar": "<path d=\"M8 2v4\" /> <path d=\"M16 2v4\" /> <rect width=\"18\" height=\"18\" x=\"3\" y=\"4\" rx=\"2\" /> <path d=\"M3 10h18\" />", "zap": "<path d=\"M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z\" />", "crown": "<path d=\"M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z\" /> <path d=\"M5 21h14\" />", "target": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <circle cx=\"12\" cy=\"12\" r=\"6\" /> <circle cx=\"12\" cy=\"12\" r=\"2\" />", "shield-check": "<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\" /> <path d=\"m9 12 2 2 4-4\" />", "undo-2": "<path d=\"M9 14 4 9l5-5\" /> <path d=\"M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11\" />", "power": "<path d=\"M12 2v10\" /> <path d=\"M18.4 6.6a9 9 0 1 1-12.77.04\" />", "git-compare": "<circle cx=\"18\" cy=\"18\" r=\"3\" /> <circle cx=\"6\" cy=\"6\" r=\"3\" /> <path d=\"M13 6h3a2 2 0 0 1 2 2v7\" /> <path d=\"M11 18H8a2 2 0 0 1-2-2V9\" />", "sparkles": "<path d=\"M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z\" /> <path d=\"M20 3v4\" /> <path d=\"M22 5h-4\" /> <path d=\"M4 17v2\" /> <path d=\"M5 18H3\" />", "coins": "<circle cx=\"8\" cy=\"8\" r=\"6\" /> <path d=\"M18.09 10.37A6 6 0 1 1 10.34 18\" /> <path d=\"M7 6h1v4\" /> <path d=\"m16.71 13.88.7.71-2.82 2.82\" />", "scale": "<path d=\"m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z\" /> <path d=\"m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z\" /> <path d=\"M7 21h10\" /> <path d=\"M12 3v18\" /> <path d=\"M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2\" />", "award": "<path d=\"m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526\" /> <circle cx=\"12\" cy=\"8\" r=\"6\" />", "list-ordered": "<path d=\"M10 12h11\" /> <path d=\"M10 18h11\" /> <path d=\"M10 6h11\" /> <path d=\"M4 10h2\" /> <path d=\"M4 6h1v4\" /> <path d=\"M6 18H4c0-1 2-2 2-3s-1-1.5-2-1\" />", "banknote": "<rect width=\"20\" height=\"12\" x=\"2\" y=\"6\" rx=\"2\" /> <circle cx=\"12\" cy=\"12\" r=\"2\" /> <path d=\"M6 12h.01M18 12h.01\" />", "store": "<path d=\"m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7\" /> <path d=\"M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8\" /> <path d=\"M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4\" /> <path d=\"M2 7h20\" /> <path d=\"M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7\" />", "globe": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\" /> <path d=\"M2 12h20\" />", "user-check": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\" /> <circle cx=\"9\" cy=\"7\" r=\"4\" /> <polyline points=\"16 11 18 13 22 9\" />", "loader-circle": "<path d=\"M21 12a9 9 0 1 1-6.219-8.56\" />", "save": "<path d=\"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z\" /> <path d=\"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7\" /> <path d=\"M7 3v4a1 1 0 0 0 1 1h7\" />", "timer": "<line x1=\"10\" x2=\"14\" y1=\"2\" y2=\"2\" /> <line x1=\"12\" x2=\"15\" y1=\"14\" y2=\"11\" /> <circle cx=\"12\" cy=\"14\" r=\"8\" />", "hourglass": "<path d=\"M5 22h14\" /> <path d=\"M5 2h14\" /> <path d=\"M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22\" /> <path d=\"M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2\" />", "check-check": "<path d=\"M18 6 7 17l-5-5\" /> <path d=\"m22 10-7.5 7.5L13 16\" />", "badge-percent": "<path d=\"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z\" /> <path d=\"m15 9-6 6\" /> <path d=\"M9 9h.01\" /> <path d=\"M15 15h.01\" />", "circle-dollar-sign": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8\" /> <path d=\"M12 18V6\" />", "arrow-down": "<path d=\"M12 5v14\" /> <path d=\"m19 12-7 7-7-7\" />", "calendar-clock": "<path d=\"M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5\" /> <path d=\"M16 2v4\" /> <path d=\"M8 2v4\" /> <path d=\"M3 10h5\" /> <path d=\"M17.5 17.5 16 16.3V14\" /> <circle cx=\"16\" cy=\"16\" r=\"6\" />", "arrow-up-down": "<path d=\"m21 16-4 4-4-4\" /> <path d=\"M17 20V4\" /> <path d=\"m3 8 4-4 4 4\" /> <path d=\"M7 4v16\" />", "play": "<polygon points=\"6 3 20 12 6 21 6 3\" />", "file-down": "<path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z\" /> <path d=\"M14 2v4a2 2 0 0 0 2 2h4\" /> <path d=\"M12 18v-6\" /> <path d=\"m9 15 3 3 3-3\" />", "layers-2": "<path d=\"m16.02 12 5.48 3.13a1 1 0 0 1 0 1.74L13 21.74a2 2 0 0 1-2 0l-8.5-4.87a1 1 0 0 1 0-1.74L7.98 12\" /> <path d=\"M13 13.74a2 2 0 0 1-2 0L2.5 8.87a1 1 0 0 1 0-1.74L11 2.26a2 2 0 0 1 2 0l8.5 4.87a1 1 0 0 1 0 1.74Z\" />", "sigma": "<path d=\"M18 7V5a1 1 0 0 0-1-1H6.5a.5.5 0 0 0-.4.8l4.5 6a2 2 0 0 1 0 2.4l-4.5 6a.5.5 0 0 0 .4.8H17a1 1 0 0 0 1-1v-2\" />", "circle-check": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"m9 12 2 2 4-4\" />", "circle-x": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"m15 9-6 6\" /> <path d=\"m9 9 6 6\" />", "circle-alert": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <line x1=\"12\" x2=\"12\" y1=\"8\" y2=\"12\" /> <line x1=\"12\" x2=\"12.01\" y1=\"16\" y2=\"16\" />", "pin": "<path d=\"M12 17v5\" /> <path d=\"M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z\" />", "pin-off": "<path d=\"M12 17v5\" /> <path d=\"M15 9.34V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H7.89\" /> <path d=\"m2 2 20 20\" /> <path d=\"M9 9v1.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h11\" />", "shield-alert": "<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\" /> <path d=\"M12 8v4\" /> <path d=\"M12 16h.01\" />", "folder-tree": "<path d=\"M20 10a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-2.5a1 1 0 0 1-.8-.4l-.9-1.2A1 1 0 0 0 15 3h-2a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z\" /> <path d=\"M20 21a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-2.9a1 1 0 0 1-.88-.55l-.42-.85a1 1 0 0 0-.92-.6H13a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z\" /> <path d=\"M3 5a2 2 0 0 0 2 2h3\" /> <path d=\"M3 3v13a2 2 0 0 0 2 2h3\" />", "list-tree": "<path d=\"M21 12h-8\" /> <path d=\"M21 6H8\" /> <path d=\"M21 18h-8\" /> <path d=\"M3 6v4c0 1.1.9 2 2 2h3\" /> <path d=\"M3 10v6c0 1.1.9 2 2 2h3\" />", "square-check": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" /> <path d=\"m9 12 2 2 4-4\" />", "square": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" />", "arrow-right-left": "<path d=\"m16 3 4 4-4 4\" /> <path d=\"M20 7H4\" /> <path d=\"m8 21-4-4 4-4\" /> <path d=\"M4 17h16\" />", "trophy": "<path d=\"M6 9H4.5a2.5 2.5 0 0 1 0-5H6\" /> <path d=\"M18 9h1.5a2.5 2.5 0 0 0 0-5H18\" /> <path d=\"M4 22h16\" /> <path d=\"M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22\" /> <path d=\"M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22\" /> <path d=\"M18 2H6v7a6 6 0 0 0 12 0V2Z\" />", "flame": "<path d=\"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z\" />", "bell-ring": "<path d=\"M10.268 21a2 2 0 0 0 3.464 0\" /> <path d=\"M22 8c0-2.3-.8-4.3-2-6\" /> <path d=\"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326\" /> <path d=\"M4 2C2.8 3.7 2 5.7 2 8\" />", "user-round": "<circle cx=\"12\" cy=\"8\" r=\"5\" /> <path d=\"M20 21a8 8 0 0 0-16 0\" />", "users-round": "<path d=\"M18 21a8 8 0 0 0-16 0\" /> <circle cx=\"10\" cy=\"8\" r=\"5\" /> <path d=\"M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3\" />", "building": "<rect width=\"16\" height=\"20\" x=\"4\" y=\"2\" rx=\"2\" ry=\"2\" /> <path d=\"M9 22v-4h6v4\" /> <path d=\"M8 6h.01\" /> <path d=\"M16 6h.01\" /> <path d=\"M12 6h.01\" /> <path d=\"M12 10h.01\" /> <path d=\"M12 14h.01\" /> <path d=\"M16 10h.01\" /> <path d=\"M16 14h.01\" /> <path d=\"M8 10h.01\" /> <path d=\"M8 14h.01\" />", "shopping-bag": "<path d=\"M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z\" /> <path d=\"M3 6h18\" /> <path d=\"M16 10a4 4 0 0 1-8 0\" />", "wallet-cards": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" /> <path d=\"M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2\" /> <path d=\"M3 11h3c.8 0 1.6.3 2.1.9l1.1.9c1.6 1.6 4.1 1.6 5.7 0l1.1-.9c.5-.5 1.3-.9 2.1-.9H21\" />", "receipt": "<path d=\"M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z\" /> <path d=\"M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8\" /> <path d=\"M12 17.5v-11\" />", "receipt-text": "<path d=\"M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z\" /> <path d=\"M14 8H8\" /> <path d=\"M16 12H8\" /> <path d=\"M13 16H8\" />", "ruler": "<path d=\"M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z\" /> <path d=\"m14.5 12.5 2-2\" /> <path d=\"m11.5 9.5 2-2\" /> <path d=\"m8.5 6.5 2-2\" /> <path d=\"m17.5 15.5 2-2\" />", "settings-2": "<path d=\"M20 7h-9\" /> <path d=\"M14 17H5\" /> <circle cx=\"17\" cy=\"17\" r=\"3\" /> <circle cx=\"7\" cy=\"7\" r=\"3\" />", "sliders-vertical": "<line x1=\"4\" x2=\"4\" y1=\"21\" y2=\"14\" /> <line x1=\"4\" x2=\"4\" y1=\"10\" y2=\"3\" /> <line x1=\"12\" x2=\"12\" y1=\"21\" y2=\"12\" /> <line x1=\"12\" x2=\"12\" y1=\"8\" y2=\"3\" /> <line x1=\"20\" x2=\"20\" y1=\"21\" y2=\"16\" /> <line x1=\"20\" x2=\"20\" y1=\"12\" y2=\"3\" /> <line x1=\"2\" x2=\"6\" y1=\"14\" y2=\"14\" /> <line x1=\"10\" x2=\"14\" y1=\"8\" y2=\"8\" /> <line x1=\"18\" x2=\"22\" y1=\"16\" y2=\"16\" />", "chevron-up": "<path d=\"m18 15-6-6-6 6\" />", "loader-2": "<path d=\"M21 12a9 9 0 1 1-6.219-8.56\" />", "megaphone": "<path d=\"m3 11 18-5v12L3 14v-3z\" /> <path d=\"M11.6 16.8a3 3 0 1 1-5.8-1.6\" />"};
+function renderIcons(){document.querySelectorAll('i[data-lucide],span[data-lucide]:not(.ftype)').forEach(function(el){
+  if(el.tagName==='svg')return;
+  var n=el.getAttribute('data-lucide');var p=ICONS[n]||ICONS['box']||'';
+  var sz=el.getAttribute('data-sz')||16;
+  var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');
+  svg.setAttribute('stroke-width','2');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');
+  svg.setAttribute('data-lucide',n);
+  if(el.className&&el.className.indexOf('spin')>=0)svg.setAttribute('class','spin');
+  svg.style.width=sz+'px';svg.style.height=sz+'px';svg.style.flexShrink='0';
+  svg.innerHTML=p;el.replaceWith(svg);});}
+</script>
+<script>
+// ============================================================
+// F-SALES-PL ⑪ · Sales Price List (บัญชีราคาขาย) — CUBE 4.0 Sales · S2 · v2 "ประกาศราคาเป็นรอบ"
+// โมเดล: บัญชีราคา (master คงอยู่ · มีขอบเขต) ← รอบประกาศราคา (หลายสินค้า/รอบ · มีผลตั้งแต่วันที่) → ราคาปัจจุบันของสินค้า = รอบล่าสุดที่มีผลเท่านั้น
+// กฎเหล็ก: ปรับราคาต้องเริ่มจาก "ราคาล่าสุด" เสมอ (snapshot ตอนสร้างรอบ + ตรวจซ้ำตอนส่ง — ถ้ามีรอบใหม่แทรก ต้อง refresh ก่อน)
+//         รอบที่ประกาศแล้วแก้ไม่ได้ — แก้ = ออกรอบใหม่ · DOA อ่านจาก DOA engine (F-DLG-001) ไม่ hardcode
+// ============================================================
+'use strict';
+
+const TODAY_ISO = '2026-08-16';
+// ผู้ใช้จำลอง — สลับบทบาทได้ที่ topbar เพื่อ demo สายอนุมัติหลายขั้น (prototype only)
+const PERSONAS = [
+  { name: 'มานพ ขายเก่ง', role: 'role-mgr-sales', roleLabel: 'Sales Manager', initials: 'มข' },
+  { name: 'ศิริพร หัวหน้า BU', role: 'role-mgr-bu', roleLabel: 'BU Head', initials: 'ศบ' },
+  { name: 'สุดา ฝ่ายขาย', role: 'role-officer-sales', roleLabel: 'Sales Officer', initials: 'สข' },
+];
+const ME = Object.assign({}, PERSONAS[0]);
+const CAN_MANAGE = true;   // ทุก persona ในเดโมสร้าง/แก้ร่างได้ — สิทธิ์จริงอ่านจาก IAM
+const CFG = { fallbackListPrice: true, currency: 'THB' };  // อ่านจาก Sales Configuration (S1)
+
+// ---------- DOA (F-DLG-001) — feature "ประกาศ" เท่านั้น · สายอนุมัติจริงตั้งที่ DOA กลาง (ดู DOA_BRIEF_F-SALES-PL.md) ----------
+// DOA engine placeholder — resolve จาก DOA entry ของ feature นี้ ณ เวลากดส่งอนุมัติ แล้ว snapshot ลง approval_chain (freeze)
+// ★ feature นี้ "ไม่มีวงเงิน" — ทุกรอบใช้สายเดียว อนุมัติตามลำดับตำแหน่ง (ผู้ส่งเลือกคนต่อ slot) · % ส่วนลดเป็นแค่ข้อมูลประกอบ ไม่ใช่เงื่อนไขสาย
+const MOCK_DOA_ENTRY = {
+  doa_entry_ref: 'DOA-SALES-PL', feature_id: 'F-SALES-PL', approval_scope: 'policy_approve', chainMode: 'sequential', departments: 'merged', has_amount: false,
+  matrix: [ { amount_from: 0, amount_to: null, steps: [{ roles: ['role-mgr-sales'] }, { roles: ['role-mgr-bu'] }] } ],   // [DEFAULT — รอยืนยัน] ลำดับ 1 ผู้จัดการฝ่ายขาย → 2 หัวหน้า BU
+};
+const ROLE_LABEL = { 'role-mgr-sales': 'ผู้จัดการฝ่ายขาย', 'role-mgr-bu': 'หัวหน้า BU', 'role-cfo': 'CFO', 'role-officer-sales': 'เจ้าหน้าที่ขาย' };
+// Employee (HR reference · soft-ref) — คนที่ถือตำแหน่งตาม role-* ใช้ให้ผู้ส่งเลือกผู้อนุมัติราย slot ตอนส่ง
+const EMPLOYEES = [
+  { code: 'EMP-0007', name: 'มานพ ขายเก่ง', role: 'role-mgr-sales', dept: 'ฝ่ายขาย', initials: 'มข' },
+  { code: 'EMP-0031', name: 'กิตติ ภาคเหนือ', role: 'role-mgr-sales', dept: 'ฝ่ายขาย (ภาคเหนือ)', initials: 'กภ' },
+  { code: 'EMP-0002', name: 'ศิริพร หัวหน้า BU', role: 'role-mgr-bu', dept: 'BU FMCG', initials: 'ศบ' },
+  { code: 'EMP-0009', name: 'ธนา วงศ์ธุรกิจ', role: 'role-mgr-bu', dept: 'BU HoReCa', initials: 'ธว' },
+  { code: 'EMP-0001', name: 'วิชัย ผอ.ขาย', role: 'role-cfo', dept: 'บริหาร', initials: 'วผ' },
+  { code: 'EMP-0044', name: 'สุดา ฝ่ายขาย', role: 'role-officer-sales', dept: 'ฝ่ายขาย', initials: 'สข' },
+  { code: 'EMP-0052', name: 'อร ออนไลน์', role: 'role-officer-sales', dept: 'ฝ่ายขายออนไลน์', initials: 'ออ' },
+  { code: 'EMP-0058', name: 'แนน กิจเจริญ', role: 'role-officer-sales', dept: 'Key Account', initials: 'นก' },
+];
+const EMP_BY_NAME = Object.fromEntries(EMPLOYEES.map(e => [e.name, e]));
+function empChip(name, roleId, small) {  // avatar + ตำแหน่ง + ชื่อ (มาตรฐานแสดงผู้อนุมัติ)
+  const e = EMP_BY_NAME[name] || null; const role = ROLE_LABEL[roleId || (e && e.role)] || roleId || '';
+  if (!name) return `<span class="emp-chip is-empty ${small ? 'sm' : ''}"><span class="emp-av"><i data-lucide="user-round" data-sz="12"></i></span><span class="emp-t"><span class="emp-r">${esc(role)}</span><span class="emp-n" style="color:var(--c-mute-3);">ยังไม่ระบุคน</span></span></span>`;
+  return `<span class="emp-chip ${small ? 'sm' : ''}"><span class="emp-av">${esc(e ? e.initials : name.slice(0, 2))}</span><span class="emp-t"><span class="emp-r">${esc(role)}${e ? ' · ' + esc(e.dept) : ''}</span><span class="emp-n">${esc(name)}</span></span></span>`;
+}
+const DOA_CAP = 15;   // เกณฑ์เน้นสีส่วนลดสูง (ข้อมูลประกอบ · ไม่เกี่ยวสายอนุมัติ)
+
+
+// ---------- masters (soft-ref · picker only) ----------
+const CATEGORIES = [{ code: 'BEV', name: 'เครื่องดื่ม' }, { code: 'SNACK', name: 'ขนมขบเคี้ยว' }, { code: 'DAIRY', name: 'นมและผลิตภัณฑ์นม' }, { code: 'HH', name: 'ของใช้ในบ้าน' }, { code: 'PC', name: 'ของใช้ส่วนตัว' }];
+const CAT_BY = Object.fromEntries(CATEGORIES.map(c => [c.code, c]));
+const PRODUCTS = [
+  { code: 'FG-1001', name: 'น้ำดื่ม CUBE 600 มล.', cat: 'BEV', uom: 'ขวด', list: 7, uoms: [{ uom: 'ขวด', f: 1 }, { uom: 'แพ็ค 12', f: 12 }, { uom: 'ลัง 48', f: 48 }] },
+  { code: 'FG-1002', name: 'น้ำดื่ม CUBE 1.5 ลิตร', cat: 'BEV', uom: 'ขวด', list: 14, uoms: [{ uom: 'ขวด', f: 1 }, { uom: 'แพ็ค 6', f: 6 }] },
+  { code: 'FG-1010', name: 'ชาเขียวพร้อมดื่ม 500 มล.', cat: 'BEV', uom: 'ขวด', list: 25, uoms: [{ uom: 'ขวด', f: 1 }, { uom: 'ลัง 24', f: 24 }] },
+  { code: 'FG-1011', name: 'กาแฟกระป๋อง 180 มล.', cat: 'BEV', uom: 'กระป๋อง', list: 15, uoms: [{ uom: 'กระป๋อง', f: 1 }, { uom: 'แพ็ค 30', f: 30 }] },
+  { code: 'FG-2001', name: 'มันฝรั่งทอดกรอบ 75 ก.', cat: 'SNACK', uom: 'ซอง', list: 30, uoms: [{ uom: 'ซอง', f: 1 }, { uom: 'ลัง 24', f: 24 }] },
+  { code: 'FG-2002', name: 'ถั่วอบเกลือ 100 ก.', cat: 'SNACK', uom: 'ซอง', list: 22, uoms: [{ uom: 'ซอง', f: 1 }, { uom: 'ลัง 36', f: 36 }] },
+  { code: 'FG-2003', name: 'สาหร่ายทอด 32 ก.', cat: 'SNACK', uom: 'ซอง', list: 35, uoms: [{ uom: 'ซอง', f: 1 }, { uom: 'ลัง 24', f: 24 }] },
+  { code: 'FG-3001', name: 'นม UHT รสจืด 1 ลิตร', cat: 'DAIRY', uom: 'กล่อง', list: 52, uoms: [{ uom: 'กล่อง', f: 1 }, { uom: 'ลัง 12', f: 12 }] },
+  { code: 'FG-3002', name: 'โยเกิร์ตพร้อมดื่ม 180 มล.', cat: 'DAIRY', uom: 'ขวด', list: 18, uoms: [{ uom: 'ขวด', f: 1 }, { uom: 'แพ็ค 4', f: 4 }] },
+  { code: 'FG-4001', name: 'น้ำยาล้างจาน 500 มล.', cat: 'HH', uom: 'ขวด', list: 42, uoms: [{ uom: 'ขวด', f: 1 }, { uom: 'ลัง 12', f: 12 }] },
+  { code: 'FG-4002', name: 'ผงซักฟอก 900 ก.', cat: 'HH', uom: 'ถุง', list: 79, uoms: [{ uom: 'ถุง', f: 1 }, { uom: 'ลัง 12', f: 12 }] },
+  { code: 'FG-5001', name: 'สบู่ก้อน 90 ก.', cat: 'PC', uom: 'ก้อน', list: 24, uoms: [{ uom: 'ก้อน', f: 1 }, { uom: 'แพ็ค 4', f: 4 }] },
+  { code: 'FG-5002', name: 'ยาสีฟัน 150 ก.', cat: 'PC', uom: 'หลอด', list: 65, uoms: [{ uom: 'หลอด', f: 1 }, { uom: 'ลัง 24', f: 24 }] },
+  { code: 'FG-5003', name: 'แชมพู 340 มล.', cat: 'PC', uom: 'ขวด', list: 119, uoms: [{ uom: 'ขวด', f: 1 }, { uom: 'ลัง 12', f: 12 }] },
+];
+const PROD_BY = Object.fromEntries(PRODUCTS.map(p => [p.code, p]));
+const GROUPS = [{ code: 'GT-RETAIL', name: 'ร้านค้าปลีกทั่วไป (GT)' }, { code: 'MT-MODERN', name: 'ห้างค้าปลีกสมัยใหม่ (MT)' }, { code: 'HORECA', name: 'โรงแรม / ร้านอาหาร (HoReCa)' }, { code: 'WHOLESALE', name: 'ค้าส่ง / ยี่ปั๊ว' }, { code: 'KEY-ACC', name: 'Key Account' }, { code: 'ONLINE', name: 'ออนไลน์ / Marketplace' }];
+const GROUP_BY = Object.fromEntries(GROUPS.map(g => [g.code, g]));
+const CHANNELS = [{ code: 'STORE', name: 'หน้าร้าน' }, { code: 'SALESREP', name: 'พนักงานขาย' }, { code: 'ONLINE', name: 'เว็บไซต์ / ออนไลน์' }, { code: 'MARKETPLACE', name: 'Marketplace' }, { code: 'LINE', name: 'LINE OA' }, { code: 'PHONE', name: 'โทรศัพท์' }];
+const CHAN_BY = Object.fromEntries(CHANNELS.map(c => [c.code, c]));
+// Customer Master — price_list = "กลุ่มราคา" ที่ picker บนหน้าลูกค้าชี้มาที่บัญชีราคา (นับเป็นระดับ 1)
+const CUSTOMERS = [
+  { code: 'CUST-2026-0012', name: 'ร้านค้าปลีกสมชาย', group: 'GT-RETAIL', channel: 'SALESREP', price_list: null },
+  { code: 'CUST-2026-0021', name: 'บริษัท ทองดีค้าส่ง จำกัด', group: 'WHOLESALE', channel: 'SALESREP', price_list: null },
+  { code: 'CUST-2026-0033', name: 'Tops Supermarket (สำนักงานใหญ่)', group: 'KEY-ACC', channel: 'SALESREP', price_list: 'PL-TOPS' },
+  { code: 'CUST-2026-0041', name: 'โรงแรมริเวอร์วิว หัวหิน', group: 'HORECA', channel: 'PHONE', price_list: null },
+  { code: 'CUST-2026-0055', name: 'เมธีเทรดดิ้ง', group: 'WHOLESALE', channel: 'ONLINE', price_list: null },
+  { code: 'CUST-2026-0056', name: 'ร้านกัลยาพาณิชย์', group: 'GT-RETAIL', channel: 'STORE', price_list: null },
+  { code: 'CUST-2026-0060', name: 'ร้านค้าออนไลน์ BestBuy TH', group: 'ONLINE', channel: 'MARKETPLACE', price_list: null },
+];
+const CUST_BY = Object.fromEntries(CUSTOMERS.map(c => [c.code, c]));
+
+// ---------- helpers ----------
+const esc = s => (s == null ? '' : String(s)).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+const fm = (n, d) => n == null || isNaN(n) ? '—' : Number(n).toLocaleString('th-TH', { minimumFractionDigits: d == null ? 2 : d, maximumFractionDigits: d == null ? 2 : d });
+const fmi = n => n == null ? '—' : Number(n).toLocaleString('th-TH');
+const fpct = n => (n > 0 ? '+' : '') + fm(n, Math.abs(n) % 1 ? 1 : 0) + '%';
+const TH_MON = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+function fmtDate(s) { if (!s) return '—'; const d = new Date(s); return d.getDate() + ' ' + TH_MON[d.getMonth()] + ' ' + (d.getFullYear() + 543); }
+function fmtDT(s) { if (!s) return '—'; const d = new Date(s); return fmtDate(s) + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+function nowIso() { return new Date().toISOString(); }
+let _seq = 100; function uid(p) { return (p || 'x') + (++_seq); }
+function uomFactor(p, uom) { const u = (p.uoms || []).find(x => x.uom === uom); return u ? u.f : 1; }
+function listPrice(p, uom) { return p.list * uomFactor(p, uom); }
+
+const SCOPE = {
+  customer: { label: 'ลูกค้าเฉพาะราย', prio: 1, icon: 'building-2', cls: 'scope-customer', pick: 'ลูกค้า' },
+  group: { label: 'กลุ่มลูกค้า', prio: 2, icon: 'users', cls: 'scope-group', pick: 'กลุ่มลูกค้า' },
+  channel: { label: 'ช่องทางการขาย', prio: 3, icon: 'tag', cls: 'scope-channel', pick: 'ช่องทาง' },
+  all: { label: 'ทุกลูกค้า', prio: 4, icon: 'globe', cls: 'scope-all', pick: '' },
+};
+function scopeRefName(type, code) { if (type === 'customer') return (CUST_BY[code] || {}).name || code; if (type === 'group') return (GROUP_BY[code] || {}).name || code; if (type === 'channel') return (CHAN_BY[code] || {}).name || code; return 'ทุกลูกค้า'; }
+function scopeText(pl) { if (pl.scope.type === 'all') return 'ทุกลูกค้า'; const n = pl.scope.refs.map(r => scopeRefName(pl.scope.type, r)); return n.length <= 2 ? n.join(' · ') : n.slice(0, 2).join(' · ') + ' +' + (n.length - 2); }
+
+// ---------- data: บัญชีราคา (master) ----------
+function mkPL(o) { return Object.assign({ code: '', name: '', desc: '', scope: { type: 'all', refs: [] }, seq: 10, status: 'active', createdBy: 'สุดา ฝ่ายขาย', createdAt: '2025-12-15T10:00:00', updatedBy: 'สุดา ฝ่ายขาย', updatedAt: '2025-12-15T10:00:00' }, o, { id: o.code }); }
+let PLS = [
+  mkPL({ code: 'PL-STD', name: 'ราคาตั้งมาตรฐาน', desc: 'ราคาขายพื้นฐานทุกลูกค้า — ฐานสุดท้ายเมื่อไม่มีบัญชีราคาอื่นครอบ', scope: { type: 'all', refs: [] }, seq: 90 }),
+  mkPL({ code: 'PL-WS', name: 'ราคาค้าส่ง / ยี่ปั๊ว', desc: 'ราคาสำหรับกลุ่มค้าส่ง', scope: { type: 'group', refs: ['WHOLESALE'] }, seq: 10 }),
+  mkPL({ code: 'PL-GT', name: 'ราคาร้านค้าปลีก GT', desc: 'ราคาสำหรับร้านค้าปลีกทั่วไป', scope: { type: 'group', refs: ['GT-RETAIL'] }, seq: 10 }),
+  mkPL({ code: 'PL-HORECA', name: 'ราคา HoReCa', desc: 'โรงแรม / ร้านอาหาร', scope: { type: 'group', refs: ['HORECA'] }, seq: 10 }),
+  mkPL({ code: 'PL-MKT', name: 'ราคาช่องทางออนไลน์ / Marketplace', desc: 'ราคาหน้าร้านค้าออนไลน์ (Shopee/Lazada/TikTok/เว็บ)', scope: { type: 'channel', refs: ['MARKETPLACE', 'ONLINE'] }, seq: 10, createdBy: 'อร ออนไลน์', updatedBy: 'อร ออนไลน์' }),
+  mkPL({ code: 'PL-TOPS', name: 'ราคาสัญญา Tops (Key Account)', desc: 'ราคาตามสัญญาการค้า Tops', scope: { type: 'customer', refs: ['CUST-2026-0033'] }, seq: 10, createdBy: 'แนน กิจเจริญ', updatedBy: 'แนน กิจเจริญ' }),
+  mkPL({ code: 'PL-EVT', name: 'ราคางานแฟร์ 2568', desc: 'เก็บถาวรหลังจบงาน', scope: { type: 'channel', refs: ['STORE'] }, seq: 20, status: 'archived' }),
+];
+// '*' = ประกาศทับทุกบัญชีราคา (ทุกช่องทาง/กลุ่ม/ลูกค้า) — ราคาใหม่แทนราคาล่าสุดของสินค้านั้นในทุกบัญชีตั้งแต่วันมีผล จนกว่าบัญชีใดจะออกรอบใหม่ทับอีกที
+const ALL_PL = { id: '*', code: '*', name: 'ทุกบัญชีราคา (ทับทุกช่องทาง/กลุ่ม)', desc: '', scope: { type: 'all', refs: [] }, seq: 0, status: 'active' };
+function findPL(id) { return id === '*' ? ALL_PL : PLS.find(x => x.id === id); }
+function plMatch(r, plCode) { return r.pl === plCode || r.pl === '*'; }
+
+// ---------- data: รอบประกาศราคา ----------
+// line: { product, uom, old (snapshot ราคาล่าสุดตอนสร้าง · null = ยังไม่เคยมี), oldSrc (รอบที่มา / 'list' / null), price (ราคาใหม่) }
+function L(product, price, old, oldSrc, uom) { const p = PROD_BY[product]; return { id: uid('l'), product, uom: uom || p.uom, old: old == null ? null : old, oldSrc: oldSrc || null, price }; }
+function mkR(o) {
+  return Object.assign({ code: '', pl: '', title: '', reason: '', effective: TODAY_ISO, status: 'draft', lines: [],
+    createdBy: ME.name, createdAt: '2026-01-01T09:00:00', updatedBy: ME.name, updatedAt: '2026-01-01T09:00:00',
+    submittedBy: null, submittedAt: null, announcedBy: null, announcedAt: null,
+    approval_required: true, approval_status: 'draft', doa_entry_ref: null, approver_role: null, approved_by: null, approved_at: null, approval_chain: null,   // DOA field contract (F-DLG-001) — snapshot ตอนส่ง
+    audit: [] }, o, { id: o.code });
+}
+function seedAudit(r, extra) { r.audit = [{ act: 'สร้างรอบประกาศราคา', by: r.createdBy, at: r.createdAt }].concat(extra || []); return r; }
+const WS1 = { 'FG-1001': 6.2, 'FG-1002': 12.5, 'FG-1010': 22.5, 'FG-1011': 13.5, 'FG-2001': 27.5, 'FG-2002': 20.5, 'FG-2003': 32.5, 'FG-3001': 49, 'FG-3002': 17, 'FG-4001': 39.5, 'FG-4002': 74, 'FG-5001': 22.5, 'FG-5002': 61, 'FG-5003': 112 };
+let ROUNDS = [
+  seedAudit(mkR({ code: 'PA-2026-001', pl: 'PL-STD', title: 'ราคาตั้งประจำปี 2569', reason: 'ประกาศราคาตั้งประจำปี', effective: '2026-01-01', status: 'effective',
+    createdBy: 'สุดา ฝ่ายขาย', createdAt: '2025-12-15T10:00:00', updatedBy: 'สุดา ฝ่ายขาย', updatedAt: '2025-12-20T09:00:00', submittedBy: 'สุดา ฝ่ายขาย', submittedAt: '2025-12-18T15:00:00', announcedBy: 'มานพ ขายเก่ง', announcedAt: '2025-12-20T09:00:00',
+    approver_role: 'sales_manager', approved_by: 'มานพ ขายเก่ง', approval_chain: 'DOA:SALES-PL/AUTO',
+    lines: PRODUCTS.map(p => L(p.code, p.list, null, null)) }), [{ act: 'อนุมัติประกาศ · ผู้จัดการฝ่ายขาย (DOA-SALES-PL)', by: 'สุดา ฝ่ายขาย', at: '2025-12-20T09:00:00' }]),
+  seedAudit(mkR({ code: 'PA-2026-002', pl: 'PL-WS', title: 'ราคาค้าส่ง 2569 รอบ 1', reason: 'ประกาศราคาค้าส่งประจำปี', effective: '2026-01-01', status: 'effective',
+    createdBy: 'สุดา ฝ่ายขาย', createdAt: '2025-12-20T10:00:00', updatedBy: 'สุดา ฝ่ายขาย', updatedAt: '2025-12-28T09:00:00', submittedBy: 'สุดา ฝ่ายขาย', submittedAt: '2025-12-22T15:00:00', announcedBy: 'มานพ ขายเก่ง', announcedAt: '2025-12-28T09:00:00',
+    approver_role: 'sales_manager', approved_by: 'มานพ ขายเก่ง', approval_chain: 'DOA:SALES-PL/L1',
+    lines: PRODUCTS.map(p => L(p.code, WS1[p.code], null, null)) }), [{ act: 'ส่งขออนุมัติเปิดใช้', by: 'สุดา ฝ่ายขาย', at: '2025-12-22T15:00:00' }, { act: 'อนุมัติประกาศ · ผู้จัดการฝ่ายขาย (DOA-SALES-PL)', by: 'มานพ ขายเก่ง', at: '2025-12-28T09:00:00' }]),
+  seedAudit(mkR({ code: 'PA-2026-003', pl: 'PL-WS', title: 'ปรับราคาค้าส่ง Q2 (ต้นทุนวัตถุดิบ)', reason: 'ต้นทุนบรรจุภัณฑ์เพิ่ม 4% — ปรับเครื่องดื่ม 5 SKU', effective: '2026-04-01', status: 'effective',
+    createdBy: 'สุดา ฝ่ายขาย', createdAt: '2026-03-10T10:00:00', updatedBy: 'สุดา ฝ่ายขาย', updatedAt: '2026-03-15T09:00:00', submittedBy: 'สุดา ฝ่ายขาย', submittedAt: '2026-03-12T15:00:00', announcedBy: 'สุดา ฝ่ายขาย', announcedAt: '2026-03-15T09:00:00',
+    approver_role: 'ไม่ต้องอนุมัติ (ในเพดาน)', approved_by: 'ระบบ (auto — ในเพดาน)', approval_chain: 'DOA:SALES-PL/AUTO',
+    lines: [L('FG-1001', 6.4, 6.2, 'PA-2026-002'), L('FG-1002', 12.9, 12.5, 'PA-2026-002'), L('FG-1010', 23, 22.5, 'PA-2026-002'), L('FG-1011', 13.9, 13.5, 'PA-2026-002'), L('FG-3001', 49.5, 49, 'PA-2026-002')] }),
+    [{ act: 'อนุมัติประกาศ · ผู้จัดการฝ่ายขาย (DOA-SALES-PL)', by: 'สุดา ฝ่ายขาย', at: '2026-03-15T09:00:00' }]),
+  seedAudit(mkR({ code: 'PA-2026-004', pl: 'PL-GT', title: 'ราคาร้านค้าปลีก GT 2569', reason: 'ประกาศราคา GT ประจำปี', effective: '2026-01-01', status: 'effective',
+    createdBy: 'สุดา ฝ่ายขาย', createdAt: '2025-12-20T11:00:00', updatedBy: 'สุดา ฝ่ายขาย', updatedAt: '2025-12-28T09:00:00', submittedBy: 'สุดา ฝ่ายขาย', submittedAt: '2025-12-22T15:00:00', announcedBy: 'สุดา ฝ่ายขาย', announcedAt: '2025-12-28T09:00:00',
+    approver_role: 'ไม่ต้องอนุมัติ (ในเพดาน)', approved_by: 'ระบบ (auto — ในเพดาน)', approval_chain: 'DOA:SALES-PL/AUTO',
+    lines: PRODUCTS.map(p => L(p.code, Math.round(p.list * (p.cat === 'BEV' ? 0.94 : 0.96) * 4) / 4, null, null)) }), [{ act: 'อนุมัติประกาศ · ผู้จัดการฝ่ายขาย (DOA-SALES-PL)', by: 'สุดา ฝ่ายขาย', at: '2025-12-28T09:00:00' }]),
+  seedAudit(mkR({ code: 'PA-2026-005', pl: 'PL-MKT', title: 'ราคาออนไลน์ Mid-Year', reason: 'ราคาแคมเปญกลางปี 6 SKU', effective: '2026-06-01', status: 'effective',
+    createdBy: 'อร ออนไลน์', createdAt: '2026-05-20T10:00:00', updatedBy: 'อร ออนไลน์', updatedAt: '2026-05-25T09:00:00', submittedBy: 'อร ออนไลน์', submittedAt: '2026-05-21T15:00:00', announcedBy: 'มานพ ขายเก่ง', announcedAt: '2026-05-25T09:00:00',
+    approver_role: 'sales_manager', approved_by: 'มานพ ขายเก่ง', approval_chain: 'DOA:SALES-PL/L1',
+    lines: [L('FG-1010', 21.5, null, null), L('FG-2001', 26.5, null, null), L('FG-2003', 30, null, null), L('FG-5003', 99, null, null), L('FG-3001', 47.5, null, null), L('FG-1001', 5.9, null, null)] }),
+    [{ act: 'ส่งขออนุมัติเปิดใช้ (ลดสูงสุด 16.8% > 15%)', by: 'อร ออนไลน์', at: '2026-05-21T15:00:00' }, { act: 'อนุมัติประกาศ · ผู้จัดการฝ่ายขาย (DOA-SALES-PL)', by: 'มานพ ขายเก่ง', at: '2026-05-25T09:00:00' }]),
+  seedAudit(mkR({ code: 'PA-2026-006', pl: 'PL-TOPS', title: 'ราคาสัญญา Tops H2/2569', reason: 'ตามสัญญาการค้า Tops ลงนาม 10 มิ.ย. 69', effective: '2026-07-01', status: 'effective',
+    createdBy: 'แนน กิจเจริญ', createdAt: '2026-06-10T10:00:00', updatedBy: 'แนน กิจเจริญ', updatedAt: '2026-06-18T14:00:00', submittedBy: 'แนน กิจเจริญ', submittedAt: '2026-06-12T09:00:00', announcedBy: 'วิชัย ผอ.ขาย', announcedAt: '2026-06-18T14:00:00',
+    approver_role: 'sales_director', approved_by: 'วิชัย ผอ.ขาย', approval_chain: 'DOA:SALES-PL/L2',
+    lines: [L('FG-1001', 5.74, null, null), L('FG-1002', 11.5, null, null), L('FG-1010', 20.5, null, null), L('FG-2001', 24.6, null, null), L('FG-2003', 28.7, null, null), L('FG-3001', 45.8, null, null), L('FG-5003', 104.7, null, null)] }),
+    [{ act: 'ส่งขออนุมัติเปิดใช้ (เฉพาะลูกค้า · ลดสูงสุด 18% > 15%)', by: 'แนน กิจเจริญ', at: '2026-06-12T09:00:00' }, { act: 'อนุมัติประกาศ · หัวหน้า BU (ขั้น 2 · DOA-SALES-PL)', by: 'วิชัย ผอ.ขาย', at: '2026-06-18T14:00:00' }]),
+  seedAudit(mkR({ code: 'PA-2026-007', pl: 'PL-WS', title: 'ราคาค้าส่ง Q4 (แข่งขัน)', reason: 'คู่แข่งลดราคาเครื่องดื่ม — ลดพิเศษ 3 SKU', effective: '2026-10-01', status: 'pending_approval',
+    createdBy: 'สุดา ฝ่ายขาย', createdAt: '2026-08-10T10:00:00', updatedBy: 'สุดา ฝ่ายขาย', updatedAt: '2026-08-14T16:00:00', submittedBy: 'สุดา ฝ่ายขาย', submittedAt: '2026-08-14T16:00:00', approver_role: 'อ่านจาก DOA engine', approval_chain: 'DOA:SALES-PL/L1',
+    lines: [L('FG-1001', 5.5, 6.4, 'PA-2026-003'), L('FG-1010', 20, 23, 'PA-2026-003'), L('FG-1011', 12, 13.9, 'PA-2026-003')] }),
+    [{ act: 'ส่งขออนุมัติเปิดใช้', by: 'สุดา ฝ่ายขาย', at: '2026-08-14T16:00:00', note: 'ลดสูงสุด 21.4% จากราคาตั้ง เกินเพดาน 15%' }]),
+  seedAudit(mkR({ code: 'PA-2026-008', pl: 'PL-HORECA', title: 'ราคา HoReCa Q4', reason: 'เปิดราคากลุ่มโรงแรม/ร้านอาหาร (นม + เครื่องดื่ม)', effective: '2026-09-01', status: 'scheduled',
+    createdBy: 'สุดา ฝ่ายขาย', createdAt: '2026-08-01T10:00:00', updatedBy: 'สุดา ฝ่ายขาย', updatedAt: '2026-08-05T09:00:00', submittedBy: 'สุดา ฝ่ายขาย', submittedAt: '2026-08-02T15:00:00', announcedBy: 'สุดา ฝ่ายขาย', announcedAt: '2026-08-05T09:00:00',
+    approver_role: 'ไม่ต้องอนุมัติ (ในเพดาน)', approved_by: 'ระบบ (auto — ในเพดาน)', approval_chain: 'DOA:SALES-PL/AUTO',
+    lines: [L('FG-3001', 48, null, null), L('FG-3002', 16.5, null, null), L('FG-1001', 6.5, null, null), L('FG-1010', 23.5, null, null)] }),
+    [{ act: 'อนุมัติประกาศ · ผู้จัดการฝ่ายขาย (DOA-SALES-PL) · มีผล 1 ก.ย. 2569', by: 'สุดา ฝ่ายขาย', at: '2026-08-05T09:00:00' }]),
+  seedAudit(mkR({ code: 'PA-2026-009', pl: 'PL-GT', title: 'ปรับราคา GT ของใช้ในบ้าน', reason: 'ร่าง — ปรับผงซักฟอก/น้ำยาล้างจาน', effective: '2026-09-15', status: 'draft',
+    createdBy: 'มานพ ขายเก่ง', createdAt: '2026-08-12T10:00:00', updatedBy: 'มานพ ขายเก่ง', updatedAt: '2026-08-12T10:00:00',
+    lines: [L('FG-4001', 41, 40.25, 'PA-2026-004'), L('FG-4002', 77, 75.75, 'PA-2026-004')] })),
+  seedAudit(mkR({ code: 'PA-2026-011', pl: '*', title: 'ปรับราคายาสีฟัน 150 ก. ทุกช่องทาง', reason: 'ต้นทุนวัตถุดิบเพิ่ม — ปรับขึ้นทุกบัญชีราคาพร้อมกัน แล้วให้แต่ละบัญชีออกรอบของตัวเองต่อถ้าต้องต่างจากนี้', effective: '2026-09-01', status: 'scheduled',
+    createdBy: 'มานพ ขายเก่ง', createdAt: '2026-08-08T10:00:00', updatedBy: 'มานพ ขายเก่ง', updatedAt: '2026-08-11T09:00:00', submittedBy: 'มานพ ขายเก่ง', submittedAt: '2026-08-08T15:00:00', announcedBy: 'ศิริพร หัวหน้า BU', announcedAt: '2026-08-11T09:00:00',
+    lines: [L('FG-5002', 68, 65, 'list')] }), [{ act: 'อนุมัติประกาศ · หัวหน้า BU (DOA-SALES-PL) · มีผล 1 ก.ย. 2569', by: 'ศิริพร หัวหน้า BU', at: '2026-08-11T09:00:00' }]),
+  seedAudit(mkR({ code: 'PA-2026-010', pl: 'PL-MKT', title: 'ราคาออนไลน์ 8.8', reason: 'ยกเลิก — แคมเปญไม่ผ่านงบ', effective: '2026-08-08', status: 'cancelled',
+    createdBy: 'อร ออนไลน์', createdAt: '2026-07-25T10:00:00', updatedBy: 'อร ออนไลน์', updatedAt: '2026-08-01T09:00:00',
+    lines: [L('FG-1010', 19.9, 21.5, 'PA-2026-005'), L('FG-2001', 24.9, 26.5, 'PA-2026-005')] }), [{ act: 'ยกเลิกรอบ', by: 'อร ออนไลน์', at: '2026-08-01T09:00:00', note: 'แคมเปญไม่ผ่านงบ' }]),
+];
+// seed: สร้าง snapshot สายอนุมัติให้รอบที่ประกาศแล้ว (แทน approver_role/approved_by เดิม)
+ROUNDS.forEach(r => {
+  const res = resolveDoa(r); r.doa_entry_ref = res.doa_entry_ref;
+  if (['effective', 'scheduled'].includes(r.status)) { r.approval_status = 'approved'; r.approval_chain = res.steps.map((st, i) => { const who = i === 0 ? (r.announcedBy || 'มานพ ขายเก่ง') : 'ศิริพร หัวหน้า BU'; return { roles: st.roles, assignee: who, status: 'approved', by: who, at: r.announcedAt }; }); r.approved_by = r.approval_chain[r.approval_chain.length - 1].by; r.approved_at = r.announcedAt; r.approver_role = null; }
+  else if (r.status === 'pending_approval') { r.approval_status = 'pending_approval'; r.approval_chain = res.steps.map(st => ({ roles: st.roles, assignee: (EMPLOYEES.find(e => e.role === st.roles[0]) || {}).name || null, status: 'pending', by: null, at: null })); r.approver_role = r.approval_chain[0].roles[0]; }
+  else { r.approval_status = r.status === 'cancelled' ? 'cancelled' : 'draft'; r.approval_chain = null; }
+});
+function findR(id) { return ROUNDS.find(x => x.id === id); }
+function nextRCode() { let mx = 0; ROUNDS.forEach(r => { const m = /PA-2026-(\d+)/.exec(r.code); if (m) mx = Math.max(mx, +m[1]); }); return 'PA-2026-' + String(mx + 1).padStart(3, '0'); }
+
+// ---------- derived ----------
+function rStatus(r, on) { on = on || TODAY_ISO; if (r.status === 'effective' || r.status === 'scheduled') return r.effective <= on ? 'effective' : 'scheduled'; return r.status; }
+const RST = {
+  draft: { label: 'ร่าง', cls: 'pill-muted' }, pending_approval: { label: 'รออนุมัติ', cls: 'pill-warning' },
+  scheduled: { label: 'รอถึงวันมีผล', cls: 'pill-success' }, effective: { label: 'มีผลแล้ว', cls: 'pill-info' },
+  cancelled: { label: 'ยกเลิก', cls: 'pill-danger' }, approved: { label: 'อนุมัติแล้ว', cls: 'pill-success' }, active: { label: 'ใช้งาน', cls: 'pill-info' }, archived: { label: 'เก็บถาวร', cls: 'pill-muted' },
+};
+function pill(s, extra) { const st = RST[s] || { label: s, cls: 'pill-muted' }; return `<span class="pill ${st.cls} ${extra || ''}"><span class="dot"></span>${st.label}</span>`; }
+// ราคาปัจจุบัน (ล่าสุด) ของสินค้า/หน่วย ในบัญชีราคา — จากรอบที่มีผลแล้ว วันมีผลมากสุด (เท่ากัน → ประกาศทีหลังชนะ)
+function latestLine(plCode, product, uom, on, exclId) {
+  on = on || TODAY_ISO; let best = null;
+  ROUNDS.forEach(r => { if (!plMatch(r, plCode) || r.id === exclId || rStatus(r, on) !== 'effective') return;
+    r.lines.forEach(l => { if (l.product !== product || l.uom !== uom) return;
+      if (!best || r.effective > best.r.effective || (r.effective === best.r.effective && (r.announcedAt || '') > (best.r.announcedAt || ''))) best = { r, l }; }); });
+  return best;
+}
+// รอบใดก็ตามที่มีผล/รอมีผล ที่ effective ≥ วันมีผลของ draft นี้ → draft ต้องเทียบกับตัวนั้นด้วย
+function latestAny(plCode, product, uom, exclId) {  // ราคาล่าสุดที่ "ประกาศแล้ว" ทุกวันมีผล (ใช้เป็นฐานปรับ)
+  let best = null;
+  ROUNDS.forEach(r => { if (!plMatch(r, plCode) || r.id === exclId || !['effective', 'scheduled'].includes(rStatus(r))) return;
+    r.lines.forEach(l => { if (l.product !== product || l.uom !== uom) return; if (!best || r.effective > best.r.effective || (r.effective === best.r.effective && (r.announcedAt || '') > (best.r.announcedAt || ''))) best = { r, l }; }); });
+  return best;
+}
+function basePrice(plCode, product, uom, exclId) {   // ฐานสำหรับปรับ = ราคาล่าสุดในบัญชีนี้ · ไม่มี → ราคาตั้ง Item Master · '*' = ฐานกลางคือราคาตั้ง (แต่ละบัญชีมีราคาเดิมต่างกัน)
+  const b = plCode === '*' ? null : latestAny(plCode, product, uom, exclId); if (b) return { price: b.l.price, src: b.r.code, srcTitle: b.r.title, eff: b.r.effective };
+  const p = PROD_BY[product]; return { price: listPrice(p, uom), src: 'list', srcTitle: 'ราคาตั้ง Item Master', eff: null };
+}
+function isSuperseded(r, l) { const b = latestAny(r.pl, l.product, l.uom); return b && b.r.id !== r.id; }
+function lineDisc(l) { const p = PROD_BY[l.product]; const lp = listPrice(p, l.uom); return lp > 0 ? (lp - l.price) / lp * 100 : 0; }
+function lineChg(l) { return l.old > 0 ? (l.price - l.old) / l.old * 100 : null; }
+function maxDisc(r) { return Math.max(0, ...r.lines.map(lineDisc)); }
+// resolve สายอนุมัติจาก DOA entry (mock) — คืน { tier, steps[], why[] } · เรียกตอนส่งอนุมัติแล้ว freeze
+function resolveDoa(r) {
+  const set = MOCK_DOA_ENTRY.matrix[0]; const steps = set.steps.map(st => ({ roles: st.roles.slice() }));
+  return { doa_entry_ref: MOCK_DOA_ENTRY.doa_entry_ref, chainMode: MOCK_DOA_ENTRY.chainMode, steps, why: ['ไม่มีวงเงิน — สายเดียวทุกรอบ อนุมัติตามลำดับตำแหน่ง'], maxDisc: maxDisc(r) };
+}
+function needsDOA(r) { return resolveDoa(r).why; }
+function chainOf(r) { return Array.isArray(r.approval_chain) ? r.approval_chain : []; }
+function currentStep(r) { const c = chainOf(r); return c.find(st => st.status === 'pending') || null; }
+function canActStep(r) { const st = currentStep(r); if (!st || r.submittedBy === ME.name) return false; return st.assignee ? st.assignee === ME.name : st.roles.includes(ME.role); }
+function chainLabel(r) { const c = chainOf(r); return c.length ? c.map(st => st.roles.map(x => ROLE_LABEL[x] || x).join('/')).join(' → ') : '—'; }
+function staleLines(r) { return r.lines.filter(l => { const b = basePrice(r.pl, l.product, l.uom, r.id); return (l.old == null ? null : +l.old) !== +b.price || (l.oldSrc || 'list') !== b.src; }); }
+function plStats(pl) {
+  const rounds = ROUNDS.filter(r => plMatch(r, pl.code)); const eff = rounds.filter(r => rStatus(r) === 'effective');
+  const covered = new Set(); eff.forEach(r => r.lines.forEach(l => covered.add(l.product)));
+  const last = rounds.filter(r => ['effective', 'scheduled'].includes(rStatus(r))).sort((a, b) => b.effective > a.effective ? 1 : -1)[0];
+  return { rounds: rounds.length, covered: covered.size, last, pending: rounds.filter(r => rStatus(r) === 'pending_approval').length };
+}
+
+// ---------- PRICE RESOLVER — ลูกค้า(1) › กลุ่ม(2) › ช่องทาง(3) › ทุกลูกค้า(4) · ในระดับเดียวกัน seq น้อยชนะ · ราคาต่อสินค้า = รอบล่าสุดที่มีผลเท่านั้น ----------
+function resolvePrice(ctx) {
+  const product = PROD_BY[ctx.product]; if (!product) return null;
+  const cust = ctx.customer ? CUST_BY[ctx.customer] : null; const channel = ctx.channel || (cust ? cust.channel : '');
+  const uom = ctx.uom || product.uom; const qty = Math.max(1, +ctx.qty || 1); const on = ctx.date || TODAY_ISO;
+  const rows = [];
+  PLS.forEach(pl => {
+    let level = null, how = '';
+    if (pl.scope.type === 'customer' && cust && pl.scope.refs.includes(cust.code)) { level = 1; how = 'ระบุลูกค้ารายนี้'; }
+    else if (pl.scope.type !== 'customer' && cust && cust.price_list === pl.code) { level = 1; how = 'ผูกจาก Customer Master (กลุ่มราคา)'; }
+    else if (pl.scope.type === 'group' && cust && pl.scope.refs.includes(cust.group)) { level = 2; how = 'กลุ่ม ' + (GROUP_BY[cust.group] || {}).name; }
+    else if (pl.scope.type === 'channel' && channel && pl.scope.refs.includes(channel)) { level = 3; how = 'ช่องทาง ' + (CHAN_BY[channel] || {}).name; }
+    else if (pl.scope.type === 'all') { level = 4; how = 'ทุกลูกค้า'; }
+    if (!level) return;
+    if (pl.status !== 'active') { rows.push({ pl, level, how, skip: 'บัญชีราคาเก็บถาวร' }); return; }
+    const hit = latestLine(pl.code, product.code, uom, on);
+    if (!hit) { const other = latestLine(pl.code, product.code, product.uom, on); rows.push({ pl, level, how, skip: other ? `มีราคาเฉพาะหน่วย ${product.uom} — ไม่มีราคาหน่วย ${uom}` : 'ไม่มีประกาศราคาสินค้านี้ที่มีผล ณ วันที่' }); return; }
+    rows.push({ pl, level, how, round: hit.r, line: hit.l, unit: hit.l.price, disc: lineDisc(hit.l) });
+  });
+  const cands = rows.filter(r => !r.skip).sort((a, b) => a.level - b.level || a.pl.seq - b.pl.seq);
+  const winner = cands[0] || null; const listUnit = listPrice(product, uom);
+  return { product, cust, channel, uom, qty, on, rows: rows.sort((a, b) => a.level - b.level || a.pl.seq - b.pl.seq), winner, listUnit, unit: winner ? winner.unit : (CFG.fallbackListPrice ? listUnit : null), fallback: !winner };
+}
+
+// ---------- state ----------
+const state = {
+  tab: 'rounds', q: '', pl: 'all', status: 'live', page: 1, per: 12, sort: { col: 'effective', dir: 'desc' },
+  curPl: 'PL-WS', curMode: 'cmp', curCat: 'all', curSort: { col: 'code', dir: 'asc' },
+  drawer: { open: false, mode: null, id: null, tab: 'lines', step: 1, wide: false }, form: null, plForm: null, sim: null,
+  modal: { open: false, type: null, id: null }, busy: false,
+};
+let cb = { open: false, key: null, query: '', hi: 0 };
+function pushAudit(r, act, note) { r.audit = [{ act, by: ME.name, at: nowIso(), note: note || '' }].concat(r.audit || []); r.updatedBy = ME.name; r.updatedAt = nowIso(); }
+function setTabPage(t) { state.tab = t; state.page = 1; state.q = ''; render(); }
+function setQ(v) { state.q = v; state.page = 1; renderKeepFocus(); }
+function setPl(v) { state.pl = v; state.page = 1; render(); }
+function setStatus(v) { state.status = v; state.page = 1; render(); }
+function setCurPl(v) { state.curPl = v; render(); }
+function setCurCat(v) { state.curCat = v; render(); }
+function resetF() { state.q = ''; state.pl = 'all'; state.status = 'live'; state.curCat = 'all'; state.page = 1; render(); }
+function goPage(p) { state.page = p; render(); }
+function toggleSort(col) { const s = state.tab === 'current' ? state.curSort : state.sort; if (s.col === col) s.dir = s.dir === 'asc' ? 'desc' : 'asc'; else { s.col = col; s.dir = 'asc'; } render(); }
+function sortHead(col, label, cls) { const s = state.tab === 'current' ? state.curSort : state.sort; const on = s.col === col; return `<th class="sortable ${on ? 'is-sorted' : ''} ${cls || ''}" onclick="toggleSort('${col}')">${label}<span class="sort-ic"><i data-lucide="${on ? (s.dir === 'asc' ? 'chevron-up' : 'chevron-down') : 'arrow-up-down'}" data-sz="12"></i></span></th>`; }
+function renderKeepFocus() { const el = document.activeElement; const is = el && el.closest && el.closest('.search-box'); const pos = is ? el.selectionStart : null; render(); if (is) { const inp = document.querySelector('.search-box input'); if (inp) { inp.focus(); inp.setSelectionRange(pos, pos); } } }
+function scopeChip(pl) { const s = SCOPE[pl.scope.type]; return `<span class="scope-chip ${s.cls}"><i data-lucide="${s.icon}" data-sz="12"></i>${esc(scopeText(pl))}</span>`; }
+function prioBadge(pl) { const p = SCOPE[pl.scope.type].prio; return `<span class="prio-badge p${p}" title="ระดับ ${p} · seq ${pl.seq}">${p}</span>`; }
+function pager(total) {
+  const pages = Math.max(1, Math.ceil(total / state.per)); if (state.page > pages) state.page = pages;
+  return `<div class="table-foot"><span>แสดง ${total === 0 ? 0 : (state.page - 1) * state.per + 1} – ${Math.min(state.page * state.per, total)} จาก ${total} รายการ</span>
+    <div class="pager"><button class="pg-btn" ${state.page <= 1 ? 'disabled' : ''} onclick="goPage(${state.page - 1})"><i data-lucide="chevron-left" data-sz="13"></i></button>
+    ${Array.from({ length: pages }, (_, i) => `<button class="pg-btn ${state.page === i + 1 ? 'is-on' : ''}" onclick="goPage(${i + 1})">${i + 1}</button>`).join('')}
+    <button class="pg-btn" ${state.page >= pages ? 'disabled' : ''} onclick="goPage(${state.page + 1})"><i data-lucide="chevron-right" data-sz="13"></i></button></div></div>`;
+}
+function emptyBox(ico, t, s, btn) { return `<div class="empty"><div class="empty-ico"><i data-lucide="${ico}" data-sz="22"></i></div><div class="empty-t">${t}</div><div class="empty-s">${s}</div>${btn ? `<div style="margin-top:14px;">${btn}</div>` : ''}</div>`; }
+const CLEAR_BTN = `<button class="btn btn-ghost" onclick="resetF()"><i data-lucide="rotate-ccw" data-sz="14"></i>ล้างตัวกรอง</button>`;
+
+// ---------- page ----------
+function render() {
+  const nPend = ROUNDS.filter(r => rStatus(r) === 'pending_approval').length;
+  document.getElementById('page-content').innerHTML = `
+  <div class="page-head">
+    <div>
+      <div class="ph-title">บัญชีราคาขาย <span class="ph-count">${PLS.filter(p => p.status === 'active').length} บัญชี · ${ROUNDS.filter(r => rStatus(r) === 'effective').length} รอบมีผล</span></div>
+      <div class="ph-sub">บัญชีราคา = ชุดราคาต่อกลุ่มเป้าหมาย (Customer Group / ช่องทาง / ลูกค้า) · สินค้าเดียวกันราคาต่างกันได้ตามบัญชี · ประกาศราคาเป็นรอบ รอบเดียวปรับได้หลายสินค้า · ราคาปัจจุบัน = รอบล่าสุดที่มีผล · Quotation/SO ดึงผ่าน Resolver</div>
+    </div>
+    <div class="ph-actions">
+      <button class="btn btn-secondary" onclick="openSim()"><i data-lucide="calculator" data-sz="15"></i>จำลองราคา</button>
+      <button class="btn btn-secondary" onclick="exportCsv()"><i data-lucide="download" data-sz="15"></i>Export CSV</button>
+      ${CAN_MANAGE ? (state.tab === 'pls' ? `<button class="btn btn-primary" onclick="openPlCreate()"><i data-lucide="plus" data-sz="15"></i>สร้างบัญชีราคา</button>` : `<button class="btn btn-primary" onclick="openCreate()"><i data-lucide="plus" data-sz="15"></i>ประกาศราคารอบใหม่</button>`) : ''}
+    </div>
+  </div>
+  <div class="page-fill"><div class="card">
+    <div class="tabs">
+      <button class="tab ${state.tab === 'rounds' ? 'is-active' : ''}" onclick="setTabPage('rounds')">รอบประกาศราคา <span class="tab-count">${ROUNDS.filter(r => rStatus(r) !== 'cancelled').length}</span>${nPend ? `<span class="pill pill-warning pill-sm">${nPend} รออนุมัติ</span>` : ''}</button>
+      <button class="tab ${state.tab === 'current' ? 'is-active' : ''}" onclick="setTabPage('current')">ราคาปัจจุบัน <span class="tab-count">${PRODUCTS.length}</span></button>
+      <button class="tab ${state.tab === 'pls' ? 'is-active' : ''}" onclick="setTabPage('pls')">บัญชีราคา <span class="tab-count">${PLS.length}</span></button>
+    </div>
+    ${state.tab === 'rounds' ? roundsTab() : state.tab === 'current' ? currentTab() : plsTab()}</div></div>`;
+  renderDrawer(); renderModal(); renderPortal(); renderIcons();
+}
+
+// ---- tab 1: รอบประกาศ ----
+function roundsFiltered() {
+  let rows = ROUNDS.slice();
+  if (state.status === 'live') rows = rows.filter(r => !['cancelled'].includes(rStatus(r)));
+  else if (state.status !== 'all') rows = rows.filter(r => rStatus(r) === state.status);
+  if (state.pl !== 'all') rows = rows.filter(r => state.pl === '*' ? r.pl === '*' : plMatch(r, state.pl));
+  const q = state.q.trim().toLowerCase();
+  if (q) rows = rows.filter(r => (r.code + ' ' + r.title + ' ' + r.reason + ' ' + (findPL(r.pl) || {}).name + ' ' + r.lines.map(l => l.product + ' ' + PROD_BY[l.product].name).join(' ')).toLowerCase().includes(q));
+  const c = state.sort.col, d = state.sort.dir === 'asc' ? 1 : -1;
+  const key = r => c === 'code' ? r.code : c === 'title' ? r.title : c === 'pl' ? (findPL(r.pl) || {}).name : c === 'n' ? r.lines.length : c === 'chg' ? maxDisc(r) : c === 'status' ? rStatus(r) : c === 'by' ? (r.announcedBy || r.updatedBy) : c === 'at' ? r.updatedAt : r.effective;
+  rows.sort((a, b) => { const x = key(a), y = key(b); return (x > y ? 1 : x < y ? -1 : 0) * d; });
+  return rows;
+}
+function roundsTab() {
+  const rows = roundsFiltered(); const slice = rows.slice((state.page - 1) * state.per, state.page * state.per);
+  return `<div class="filter-bar">
+      <div class="search-box"><i data-lucide="search" data-sz="14"></i><input placeholder="ค้นหา รหัสรอบ / ชื่อรอบ / บัญชีราคา / สินค้า..." value="${esc(state.q)}" oninput="setQ(this.value)"></div>
+      <select class="select" onchange="setPl(this.value)"><option value="all">ทุกบัญชี (ไม่กรอง)</option><option value="*" ${state.pl === '*' ? 'selected' : ''}>เฉพาะรอบประกาศทับทุกบัญชี</option>${PLS.map(p => `<option value="${p.code}" ${state.pl === p.code ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select>
+      <select class="select" onchange="setStatus(this.value)">
+        <option value="live" ${state.status === 'live' ? 'selected' : ''}>ทุกสถานะ (ไม่รวมยกเลิก)</option>
+        ${['effective', 'scheduled', 'pending_approval', 'draft', 'cancelled'].map(s => `<option value="${s}" ${state.status === s ? 'selected' : ''}>${RST[s].label}</option>`).join('')}
+        <option value="all" ${state.status === 'all' ? 'selected' : ''}>ทั้งหมด</option>
+      </select>
+      <button class="btn btn-ghost btn-sm" onclick="resetF()"><i data-lucide="rotate-ccw" data-sz="13"></i>ล้างตัวกรอง</button>
+    </div>
+    <div class="table-wrap">${slice.length === 0 ? emptyBox(ROUNDS.length ? 'search' : 'megaphone', ROUNDS.length ? 'ไม่พบรายการที่ค้นหา' : 'ยังไม่มีรอบประกาศราคา', ROUNDS.length ? 'ลองปรับคำค้นหรือล้างตัวกรอง' : 'เริ่มต้นด้วยการประกาศราคารอบแรก', ROUNDS.length ? CLEAR_BTN : `<button class="btn btn-primary" onclick="openCreate()"><i data-lucide="plus" data-sz="15"></i>ประกาศราคารอบใหม่</button>`) : `
+      <table><thead><tr>${sortHead('code', 'รหัสรอบ')}${sortHead('title', 'ชื่อรอบ')}${sortHead('pl', 'บัญชีราคา')}${sortHead('effective', 'มีผลตั้งแต่')}${sortHead('n', 'สินค้า', 'num')}${sortHead('chg', 'ลดสูงสุด', 'num')}${sortHead('status', 'สถานะ')}${sortHead('by', 'ผู้ประกาศ')}<th style="width:110px;text-align:right;"></th></tr></thead>
+      <tbody>${slice.map(roundRow).join('')}</tbody></table>`}</div>${pager(rows.length)}`;
+}
+function roundRow(r) {
+  const s = rStatus(r); const pl = findPL(r.pl); const md = maxDisc(r);
+  return `<tr onclick="openView('${r.id}')">
+    <td class="cell-mono nowrap"><b>${r.code}</b></td>
+    <td style="font-weight:600;max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(r.title)}</td>
+    <td style="max-width:200px;">${r.pl === '*' ? '<span class="pill pill-danger pill-sm">ทุกบัญชี</span> ทับทุกช่องทาง/กลุ่ม' : pl ? esc(pl.name) : r.pl}</td>
+    <td class="cell-mono nowrap">${fmtDate(r.effective)}</td>
+    <td class="num">${r.lines.length}</td>
+    <td class="num ${md > DOA_CAP ? 'disc-flag' : ''}">${md > 0.05 ? fm(md, 1) + '%' : '—'}</td>
+    <td>${pill(s)}</td>
+    <td class="nowrap">${esc(r.announcedBy || r.submittedBy || r.updatedBy)}</td>
+    <td onclick="event.stopPropagation()" style="text-align:right;"><div class="row-actions">
+      ${CAN_MANAGE && s === 'draft' ? `<button class="ra-btn" title="แก้ไข" onclick="openEdit('${r.id}')"><i data-lucide="pencil" data-sz="14"></i></button>` : ''}
+      ${CAN_MANAGE ? `<button class="ra-btn" title="ออกรอบใหม่จากรอบนี้" onclick="duplicateR('${r.id}')"><i data-lucide="copy" data-sz="14"></i></button>` : ''}
+      ${CAN_MANAGE && ['draft', 'pending_approval', 'scheduled'].includes(s) ? `<button class="ra-btn is-danger" title="ยกเลิกรอบ" onclick="openModal('cancel','${r.id}')"><i data-lucide="x-circle" data-sz="14"></i></button>` : ''}
+    </div></td></tr>`;
+}
+
+// ---- tab 2: ราคาปัจจุบัน ----
+function currentRows() {
+  const pl = findPL(state.curPl); if (!pl) return [];
+  let rows = PRODUCTS.map(p => { const hit = latestLine(pl.code, p.code, p.uom); const nxt = ROUNDS.filter(r => plMatch(r, pl.code) && rStatus(r) === 'scheduled' && r.lines.some(l => l.product === p.code && l.uom === p.uom)).sort((a, b) => a.effective > b.effective ? 1 : -1)[0];
+    return { p, hit, price: hit ? hit.l.price : null, disc: hit ? lineDisc(hit.l) : null, since: hit ? hit.r.effective : null, round: hit ? hit.r : null, next: nxt ? { r: nxt, l: nxt.lines.find(l => l.product === p.code && l.uom === p.uom) } : null }; });
+  if (state.curCat !== 'all') rows = rows.filter(x => x.p.cat === state.curCat);
+  const q = state.q.trim().toLowerCase(); if (q) rows = rows.filter(x => (x.p.code + ' ' + x.p.name).toLowerCase().includes(q));
+  const c = state.curSort.col, d = state.curSort.dir === 'asc' ? 1 : -1;
+  const key = x => c === 'name' ? x.p.name : c === 'cat' ? x.p.cat : c === 'list' ? x.p.list : c === 'price' ? (x.price == null ? -1 : x.price) : c === 'disc' ? (x.disc == null ? -999 : x.disc) : c === 'since' ? (x.since || '') : c === 'round' ? (x.round ? x.round.code : '') : x.p.code;
+  rows.sort((a, b) => { const x = key(a), y = key(b); return (x > y ? 1 : x < y ? -1 : 0) * d; });
+  return rows;
+}
+function compareTab() {
+  const pls = PLS.filter(p => p.status === 'active'); const q = state.q.trim().toLowerCase();
+  let rows = PRODUCTS.filter(p => (state.curCat === 'all' || p.cat === state.curCat) && (!q || (p.code + ' ' + p.name).toLowerCase().includes(q)));
+  return `<div class="filter-bar">
+      <div class="search-box"><i data-lucide="search" data-sz="14"></i><input placeholder="ค้นหา รหัส / ชื่อสินค้า..." value="${esc(state.q)}" oninput="setQ(this.value)"></div>
+      <div class="seg"><button class="seg-b" onclick="state.curMode='one';render()">รายบัญชี</button><button class="seg-b is-on">เทียบทุกบัญชี</button></div>
+      <select class="select" onchange="setCurCat(this.value)"><option value="all">ทุกหมวด</option>${CATEGORIES.map(c => `<option value="${c.code}" ${state.curCat === c.code ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select>
+      <button class="btn btn-ghost btn-sm" onclick="resetF()"><i data-lucide="rotate-ccw" data-sz="13"></i>ล้างตัวกรอง</button>
+      <span style="margin-left:auto;font-size:12px;color:var(--c-mute-2);">สินค้าเดียวกันราคาต่างกันได้ตามบัญชี · หน่วยฐาน · ก่อน VAT · ณ ${fmtDate(TODAY_ISO)}</span>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>รหัสสินค้า</th><th>สินค้า</th><th>หน่วย</th><th class="num">ราคาตั้ง</th>${pls.map(p => `<th class="num" title="${esc(p.name)} · ${esc(scopeText(p))}"><div style="white-space:nowrap;">${esc(p.name.length > 18 ? p.name.slice(0, 18) + '…' : p.name)}</div><div style="font-weight:500;color:var(--c-mute-3);text-transform:none;letter-spacing:0;">${SCOPE[p.scope.type].label}</div></th>`).join('')}</tr></thead>
+      <tbody>${rows.map(p => `<tr><td class="cell-mono nowrap">${p.code}</td><td class="nowrap" style="font-weight:600;">${esc(p.name)}</td><td>${esc(p.uom)}</td><td class="num">${fm(p.list)}</td>${pls.map(pl => { const h = latestLine(pl.code, p.code, p.uom); return `<td class="num cmp-cell ${h ? '' : 'is-none'}" ${h ? `onclick="openView('${h.r.id}')" style="cursor:pointer;" title="จากรอบ ${h.r.code} · มีผล ${fmtDate(h.r.effective)}"` : ''}>${h ? fm(h.l.price) : '—'}</td>`; }).join('')}</tr>`).join('')}</tbody></table></div>
+    <div class="table-foot"><span>${rows.length} สินค้า × ${pls.length} บัญชีราคา · "—" = ยังไม่มีประกาศในบัญชีนั้น (ตกไปใช้บัญชีระดับถัดไป/ราคาตั้ง) · กดตัวเลขเพื่อเปิดรอบที่ประกาศ</span></div>`;
+}
+function currentTab() {
+  if (state.curMode === 'cmp') return compareTab();
+  const rows = currentRows(); const pl = findPL(state.curPl);
+  return `<div class="filter-bar">
+      <div class="search-box"><i data-lucide="search" data-sz="14"></i><input placeholder="ค้นหา รหัส / ชื่อสินค้า..." value="${esc(state.q)}" oninput="setQ(this.value)"></div>
+      <div class="seg"><button class="seg-b is-on">รายบัญชี</button><button class="seg-b" onclick="state.curMode='cmp';render()">เทียบทุกบัญชี</button></div>
+      <select class="select" onchange="setCurPl(this.value)">${PLS.filter(p => p.status === 'active').map(p => `<option value="${p.code}" ${state.curPl === p.code ? 'selected' : ''}>${esc(p.name)} — ${esc(scopeText(p))}</option>`).join('')}</select>
+      <select class="select" onchange="setCurCat(this.value)"><option value="all">ทุกหมวด</option>${CATEGORIES.map(c => `<option value="${c.code}" ${state.curCat === c.code ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select>
+      <button class="btn btn-ghost btn-sm" onclick="resetF()"><i data-lucide="rotate-ccw" data-sz="13"></i>ล้างตัวกรอง</button>
+      <span style="margin-left:auto;font-size:12px;color:var(--c-mute-2);">ราคาของบัญชี <b style="color:var(--c-ink);">${pl ? esc(pl.name) : ''}</b> ${pl ? scopeChip(pl) : ''} · ณ ${fmtDate(TODAY_ISO)} · หน่วยฐาน · ก่อน VAT</span>
+    </div>
+    <div class="table-wrap">${rows.length === 0 ? emptyBox('search', 'ไม่พบรายการที่ค้นหา', 'ลองปรับคำค้นหรือล้างตัวกรอง', CLEAR_BTN) : `
+      <table><thead><tr>${sortHead('code', 'รหัสสินค้า')}${sortHead('name', 'สินค้า')}${sortHead('cat', 'หมวด')}<th>หน่วย</th>${sortHead('list', 'ราคาตั้ง', 'num')}${sortHead('price', 'ราคาปัจจุบัน', 'num')}${sortHead('disc', 'เทียบราคาตั้ง', 'num')}${sortHead('since', 'มีผลตั้งแต่')}${sortHead('round', 'จากรอบ')}<th>รอบถัดไป</th></tr></thead>
+      <tbody>${rows.map(x => `<tr onclick="${x.round ? `openView('${x.round.id}')` : `openCreate({pl:'${state.curPl}',product:'${x.p.code}'})`}">
+        <td class="cell-mono nowrap">${x.p.code}</td><td style="font-weight:600;">${esc(x.p.name)}</td><td class="nowrap">${esc(CAT_BY[x.p.cat].name)}</td><td>${esc(x.p.uom)}</td>
+        <td class="num">${fm(x.p.list)}</td>
+        <td class="num" style="font-weight:700;">${x.price == null ? '<span style="color:var(--c-mute-3);font-weight:400;">ไม่มี → ตกระดับถัดไป</span>' : fm(x.price)}</td>
+        <td class="num ${x.disc != null && x.disc > DOA_CAP ? 'disc-flag' : ''}">${x.disc == null ? '—' : Math.abs(x.disc) < 0.05 ? '0%' : (x.disc > 0 ? '-' : '+') + fm(Math.abs(x.disc), 1) + '%'}</td>
+        <td class="cell-mono nowrap">${x.since ? fmtDate(x.since) : '—'}</td>
+        <td class="cell-mono nowrap">${x.round ? x.round.code : '—'}</td>
+        <td class="nowrap">${x.next ? `<span class="pill pill-success pill-sm">${fm(x.next.l.price)} · ${fmtDate(x.next.r.effective)}</span>` : '—'}</td>
+      </tr>`).join('')}</tbody></table>`}</div>
+    <div class="table-foot"><span>${rows.length} สินค้า · ${rows.filter(x => x.price != null).length} มีราคาในบัญชีนี้ · กดแถวเพื่อเปิดรอบที่ประกาศราคานั้น</span></div>`;
+}
+
+// ---- tab 3: บัญชีราคา (master) ----
+function plsTab() {
+  let rows = PLS.slice(); const q = state.q.trim().toLowerCase(); if (q) rows = rows.filter(p => (p.code + ' ' + p.name + ' ' + scopeText(p)).toLowerCase().includes(q));
+  rows.sort((a, b) => (a.status === 'archived') - (b.status === 'archived') || SCOPE[a.scope.type].prio - SCOPE[b.scope.type].prio || a.seq - b.seq);
+  return `<div class="filter-bar">
+      <div class="search-box"><i data-lucide="search" data-sz="14"></i><input placeholder="ค้นหา รหัส / ชื่อบัญชีราคา / ขอบเขต..." value="${esc(state.q)}" oninput="setQ(this.value)"></div>
+      <span style="margin-left:auto;font-size:12px;color:var(--c-mute-2);">ลำดับตัดสิน: ลูกค้า 1 › กลุ่ม 2 › ช่องทาง 3 › ทุกลูกค้า 4 · ระดับเดียวกัน seq น้อยชนะ</span>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>รหัส</th><th>บัญชีราคา</th><th>ขอบเขต</th><th>ใช้กับ</th><th>ลำดับ</th><th class="num">สินค้ามีราคา</th><th>รอบล่าสุด</th><th>มีผล</th><th>สถานะ</th><th style="width:110px;text-align:right;"></th></tr></thead>
+      <tbody>${rows.map(pl => { const st = plStats(pl); return `<tr onclick="openPlView('${pl.id}')">
+        <td class="cell-mono nowrap"><b>${pl.code}</b></td><td style="font-weight:600;">${esc(pl.name)}</td>
+        <td class="nowrap">${SCOPE[pl.scope.type].label}</td><td>${scopeChip(pl)}</td><td>${prioBadge(pl)}</td>
+        <td class="num">${st.covered}/${PRODUCTS.length}</td>
+        <td class="cell-mono nowrap">${st.last ? st.last.code : '—'}${st.pending ? ` <span class="pill pill-warning pill-sm">${st.pending} รออนุมัติ</span>` : ''}</td>
+        <td class="cell-mono nowrap">${st.last ? fmtDate(st.last.effective) : '—'}</td>
+        <td>${pill(pl.status)}</td>
+        <td onclick="event.stopPropagation()" style="text-align:right;"><div class="row-actions">
+          ${CAN_MANAGE && pl.status === 'active' ? `<button class="ra-btn" title="ประกาศราคารอบใหม่ในบัญชีนี้" onclick="openCreate({pl:'${pl.id}'})"><i data-lucide="megaphone" data-sz="14"></i></button><button class="ra-btn" title="แก้ไข" onclick="openPlEdit('${pl.id}')"><i data-lucide="pencil" data-sz="14"></i></button><button class="ra-btn" title="เก็บถาวร" onclick="openModal('plarchive','${pl.id}')"><i data-lucide="archive" data-sz="14"></i></button>` : ''}
+          ${CAN_MANAGE && pl.status === 'archived' ? `<button class="ra-btn" title="กู้คืน" onclick="restorePl('${pl.id}')"><i data-lucide="rotate-ccw" data-sz="14"></i></button>` : ''}
+        </div></td></tr>`; }).join('')}</tbody></table></div>
+    <div class="table-foot"><span>${rows.length} บัญชี · 1 บัญชี = ชุดราคา 1 ชุดสำหรับกลุ่มเป้าหมาย (อ้าง Customer Group / ช่องทางการขาย / ลูกค้าเฉพาะราย จาก master ที่ตั้งไว้) · สินค้าเดียวกันราคาต่างกันได้ตามบัญชี · ราคาใส่ผ่านรอบประกาศ</span></div>`;
+}
+function exportCsv() {
+  let head, lines, name;
+  if (state.tab === 'current' && state.curMode === 'cmp') { const pls = PLS.filter(p => p.status === 'active'); head = 'product_code,product,uom,list_price,' + pls.map(p => p.code).join(','); lines = PRODUCTS.map(p => [p.code, '"' + p.name + '"', p.uom, p.list].concat(pls.map(pl => { const h = latestLine(pl.code, p.code, p.uom); return h ? h.l.price : ''; })).join(',')); name = 'current-prices-matrix.csv'; }
+  else if (state.tab === 'current') { const rows = currentRows(); head = 'price_list,product_code,product,uom,list_price,current_price,disc_pct,effective_from,round'; lines = rows.map(x => [state.curPl, x.p.code, '"' + x.p.name + '"', x.p.uom, x.p.list, x.price == null ? '' : x.price, x.disc == null ? '' : fm(x.disc, 2), x.since || '', x.round ? x.round.code : ''].join(',')); name = 'current-prices-' + state.curPl + '.csv'; }
+  else { const rows = roundsFiltered(); head = 'round_code,title,price_list,effective,status,lines,max_disc_pct,announced_by'; lines = rows.map(r => [r.code, '"' + r.title.replace(/"/g, '""') + '"', r.pl, r.effective, rStatus(r), r.lines.length, fm(maxDisc(r), 2), r.announcedBy || ''].join(',')); name = 'price-rounds.csv'; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + [head].concat(lines).join('\n')], { type: 'text/csv;charset=utf-8;' })); a.download = name; document.body.appendChild(a); a.click(); a.remove(); showToast('Export CSV แล้ว', 'info');
+}
+
+// ---------- drawer shell ----------
+function openView(id) { cbReset(); state.drawer = { open: true, mode: 'view', id, tab: 'lines', step: 1, wide: true }; state.form = null; render(); }
+function openPlView(id) { cbReset(); state.drawer = { open: true, mode: 'plview', id, tab: 'lines', step: 1, wide: false }; render(); }
+function openSim(preset) { cbReset(); state.sim = Object.assign({ customer: 'CUST-2026-0021', channel: '', product: 'FG-1001', uom: 'ขวด', qty: '60', date: TODAY_ISO }, preset || {}); state.drawer = { open: true, mode: 'sim', id: null, tab: 'lines', step: 1, wide: false }; render(); }
+function closeDrawer() { cbReset(); state.drawer = { open: false, mode: null, id: null, tab: 'lines', step: 1, wide: false }; state.form = null; state.plForm = null; render(); }
+function cancelForm() { if (state.drawer.mode === 'edit' && state.drawer.id) openView(state.drawer.id); else if (state.drawer.mode === 'pledit' && state.drawer.id) openPlView(state.drawer.id); else closeDrawer(); }
+function setTab(t) { state.drawer.tab = t; renderDrawer(); renderIcons(); }
+function renderDrawer() {
+  const el = document.getElementById('drawerEl'); const bd = document.getElementById('drawerBackdrop');
+  bd.classList.toggle('is-open', state.drawer.open); el.classList.toggle('is-open', state.drawer.open);
+  el.classList.remove('dw-wide'); if (state.drawer.open && state.drawer.wide) el.classList.add('dw-wide');
+  if (!state.drawer.open) { el.innerHTML = ''; return; }
+  const m = state.drawer.mode;
+  el.innerHTML = m === 'view' ? viewDrawer() : m === 'plview' ? plViewDrawer() : m === 'sim' ? simDrawer() : (m === 'plcreate' || m === 'pledit') ? plFormDrawer() : formDrawer();
+}
+function renderDrawerOnly(keepKey) {
+  const b = document.querySelector('.drawer-body'); const top = b ? b.scrollTop : 0;
+  renderDrawer(); renderPortal(); renderIcons();
+  const b2 = document.querySelector('.drawer-body'); if (b2) b2.scrollTop = top;
+  if (keepKey) { const el = document.getElementById('cbi-' + keepKey); if (el) { el.focus(); const n = el.value.length; el.setSelectionRange(n, n); } }
+}
+function dg(l, v, mono) { return `<div class="dg"><div class="dg-l">${l}</div><div class="dg-v ${mono ? 'mono' : ''}">${v == null || v === '' ? '—' : v}</div></div>`; }
+function chgCell(v) { if (v == null) return '<span style="color:var(--c-mute-3);">ใหม่</span>'; if (Math.abs(v) < 0.05) return '<span style="color:var(--c-mute-2);">0%</span>'; return `<span style="color:${v < 0 ? 'var(--c-danger)' : 'var(--c-success)'};font-weight:600;">${fpct(v)}</span>`; }
+function linesTable(r) {
+  if (!r.lines.length) return emptyBox('list-tree', 'ยังไม่มีรายการสินค้าในรอบนี้', 'เพิ่มสินค้าที่ต้องการปรับราคา');
+  const rows = r.lines.slice().sort((a, b) => a.product.localeCompare(b.product));
+  return `<div class="rule-wrap is-view"><table class="rule-tbl"><thead><tr><th>รหัสสินค้า</th><th>สินค้า</th><th>หน่วย</th><th class="num">ราคาก่อนหน้า</th><th class="num">ราคาใหม่</th><th class="num">เปลี่ยน</th><th class="num">เทียบราคาตั้ง</th><th>สถานะราคา</th></tr></thead>
+    <tbody>${rows.map(l => { const p = PROD_BY[l.product]; const d = lineDisc(l); const sup = rStatus(r) === 'effective' && isSuperseded(r, l); return `<tr>
+      <td class="cell-mono nowrap">${p.code}</td><td style="font-weight:600;">${esc(p.name)}</td><td>${esc(l.uom)}</td>
+      <td class="num" title="${r.pl === '*' ? 'ฐานกลาง = ราคาตั้ง Item Master · แต่ละบัญชีมีราคาเดิมต่างกัน' : l.oldSrc ? (l.oldSrc === 'list' ? 'ฐาน: ราคาตั้ง Item Master' : 'ฐาน: รอบ ' + l.oldSrc) : 'ยังไม่เคยมีราคาในบัญชีนี้'}">${r.pl === '*' ? '<span style="color:var(--c-mute-2);font-size:11.5px;">ต่างกันตามบัญชี</span>' : l.old == null ? '<span style="color:var(--c-mute-3);">—</span>' : fm(l.old)}</td>
+      <td class="num" style="font-weight:700;">${fm(l.price)}</td>
+      <td class="num">${chgCell(lineChg(l))}</td>
+      <td class="num ${d > DOA_CAP ? 'disc-flag' : ''}" title="ราคาตั้ง ${fm(listPrice(p, l.uom))}">${Math.abs(d) < 0.05 ? '0%' : (d > 0 ? '-' : '+') + fm(Math.abs(d), 1) + '%'}</td>
+      <td>${rStatus(r) === 'effective' ? (r.pl === '*' ? '<span class="pill pill-info pill-sm">ทุกบัญชี (จนกว่าบัญชีจะทับ)</span>' : sup ? '<span class="pill pill-muted pill-sm">ถูกแทนแล้ว</span>' : '<span class="pill pill-info pill-sm">ราคาปัจจุบัน</span>') : rStatus(r) === 'scheduled' ? '<span class="pill pill-success pill-sm">รอมีผล</span>' : '<span style="color:var(--c-mute-3);">—</span>'}</td>
+    </tr>`; }).join('')}</tbody></table>
+    <div class="rule-foot"><span>${r.lines.length} สินค้า · หน่วยฐาน · ก่อน VAT</span></div></div>`;
+}
+function doaTimeline(r) {
+  const chain = chainOf(r); const res = chain.length ? null : resolveDoa(r);
+  const steps = chain.length ? chain : res.steps.map(st => ({ roles: st.roles, status: 'preview', by: null, at: null }));
+  return `<div class="tl">
+    <div class="tl-i is-ok"><div class="tl-t">ส่งอนุมัติ</div><div class="tl-s">${r.submittedBy ? esc(r.submittedBy) + ' · ' + fmtDT(r.submittedAt) : (rStatus(r) === 'draft' ? '<span style="color:var(--c-mute-3);">ยังไม่ส่ง — สายด้านล่างคือที่จะ resolve ตามข้อมูลปัจจุบัน</span>' : '—')}</div></div>
+    ${steps.map((st, i) => `<div class="tl-i ${st.status === 'approved' ? 'is-ok' : st.status === 'rejected' ? 'is-bad' : st.status === 'pending' ? 'is-warn' : ''}"><div class="tl-t" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span>ขั้น ${i + 1}</span>${st.status === 'approved' ? '<span class="pill pill-success pill-sm">อนุมัติแล้ว</span>' : st.status === 'rejected' ? '<span class="pill pill-danger pill-sm">ไม่อนุมัติ</span>' : st.status === 'pending' ? '<span class="pill pill-warning pill-sm">รออนุมัติ</span>' : '<span class="pill pill-muted pill-sm">เลือกคนตอนส่ง</span>'}</div><div style="margin-top:6px;">${empChip(st.by || st.assignee, st.roles[0])}</div><div class="tl-s">${st.at ? fmtDT(st.at) : ''}${st.note ? '<div class="tl-q">' + esc(st.note) + '</div>' : ''}</div></div>`).join('')}
+  </div>`;
+}
+function switchPersona(i) { Object.assign(ME, PERSONAS[+i]); document.querySelector('.uc-n').textContent = ME.name; document.querySelector('.uc-r').textContent = ME.roleLabel + ' · CUBE 4.0'; document.querySelector('.uc-av').textContent = ME.initials; showToast('สลับบทบาทเป็น ' + ME.roleLabel + ' (เดโม)', 'info'); render(); }
+function viewDrawer() {
+  const r = findR(state.drawer.id); if (!r) return ''; const s = rStatus(r); const pl = findPL(r.pl); const tab = state.drawer.tab; const doa = needsDOA(r); const md = maxDisc(r); const sod = r.submittedBy === ME.name; const cur = currentStep(r); const canAct = canActStep(r);
+  const stale = s === 'draft' ? staleLines(r) : [];
+  const head = `<div class="drawer-header">
+    <div class="drawer-avatar"><i data-lucide="megaphone" data-sz="17"></i></div>
+    <div style="flex:1;min-width:0;"><div class="drawer-title" style="word-break:normal;">${esc(r.title)}${pill(s)}</div>
+      <div class="drawer-sub"><span class="cell-mono">${r.code}</span><span class="sep">|</span><span>${r.pl === '*' ? 'ทุกบัญชีราคา (ทับทุกช่องทาง/กลุ่ม)' : pl ? esc(pl.name) : r.pl}</span><span class="sep">|</span><span>มีผล ${fmtDate(r.effective)}</span></div></div>
+    <div class="drawer-hactions">
+      ${CAN_MANAGE && s === 'draft' ? `<button class="btn btn-secondary btn-sm" onclick="openEdit('${r.id}')"><i data-lucide="pencil" data-sz="14"></i>แก้ไข</button><button class="btn btn-primary btn-sm" onclick="openModal('submit','${r.id}')" ${stale.length ? 'disabled title="ฐานราคาเปลี่ยน — refresh ก่อน"' : ''}><i data-lucide="send" data-sz="14"></i>ส่งอนุมัติ</button>` : ''}
+      ${s === 'pending_approval' && canAct ? `<button class="btn btn-secondary btn-sm" onclick="openModal('reject','${r.id}')"><i data-lucide="undo-2" data-sz="14"></i>ไม่อนุมัติ</button><button class="btn btn-primary btn-sm" onclick="openModal('approve','${r.id}')"><i data-lucide="check-circle-2" data-sz="14"></i>อนุมัติ</button>` : ''}
+      <div class="h-div"></div><button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" data-sz="16"></i></button></div></div>
+  <div class="drawer-tabs"><button class="dtab ${tab === 'lines' ? 'is-on' : ''}" onclick="setTab('lines')">รายการราคา (${r.lines.length})</button><button class="dtab ${tab === 'info' ? 'is-on' : ''}" onclick="setTab('info')">การอนุมัติ & ข้อมูลรอบ</button><button class="dtab ${tab === 'history' ? 'is-on' : ''}" onclick="setTab('history')">ประวัติ (${r.audit.length})</button></div>`;
+  const notes = `
+    ${s === 'draft' && stale.length ? `<div class="dw-note is-danger" style="margin-bottom:14px;"><i data-lucide="alert-triangle" data-sz="15"></i><div><b>ฐานราคาเปลี่ยนแล้ว ${stale.length} รายการ</b> — มีรอบใหม่ประกาศสินค้าเหล่านี้หลังจากสร้างร่าง (${stale.map(l => esc(PROD_BY[l.product].name)).slice(0, 3).join(', ')}${stale.length > 3 ? ' …' : ''}) · ต้องเริ่มจากราคาล่าสุดเท่านั้น → <span class="link" onclick="refreshBase('${r.id}')">refresh ฐานราคา</span> ก่อนส่ง</div></div>` : ''}`;
+  let body = '';
+  if (tab === 'lines') body = notes + linesTable(r);
+  else if (tab === 'info') body = `${notes}
+    <div class="drawer-section"><div class="drawer-section-title">ข้อมูลรอบ</div><div class="dg-grid">
+      ${dg('บัญชีราคา', r.pl === '*' ? '<span class="pill pill-danger pill-sm">ทุกบัญชี</span> ทับราคาสินค้าในรอบนี้ทุกช่องทาง/กลุ่ม/ลูกค้า' : pl ? esc(pl.name) + ' <span class="cell-mono" style="color:var(--c-mute-2);font-weight:500;">' + pl.code + '</span>' : r.pl)}${dg('ขอบเขต', r.pl === '*' ? PLS.filter(x => x.status === 'active').length + ' บัญชีที่ใช้งาน' : pl ? SCOPE[pl.scope.type].label + ' · ' + esc(scopeText(pl)) : '—')}${dg('ระดับตัดสิน', r.pl === '*' ? 'ตามบัญชีที่ลูกค้าเข้าข่าย' : pl ? 'ระดับ ' + SCOPE[pl.scope.type].prio + ' · seq ' + pl.seq : '—')}
+      ${dg('มีผลตั้งแต่', fmtDate(r.effective))}${dg('จำนวนสินค้า', r.lines.length + ' รายการ')}${dg('ลดจากราคาตั้งสูงสุด', `<span class="${md > DOA_CAP ? 'disc-flag' : ''}">${fm(md, 1)}%</span>`)}
+    </div>${r.reason ? `<div style="margin-top:12px;font-size:12.8px;color:var(--c-mute);line-height:1.6;"><b>เหตุผล:</b> ${esc(r.reason)}</div>` : ''}</div>
+    <div class="drawer-section"><div class="drawer-section-title">การอนุมัติ (DOA · F-DLG-001)</div>
+      ${doaTimeline(r)}
+      <div class="dg-grid" style="margin-top:14px;">${dg('DOA entry', `<span class="kbd">${esc(r.doa_entry_ref || MOCK_DOA_ENTRY.doa_entry_ref)}</span>`)}${dg('เงื่อนไขที่ resolve', doa.map(esc).join('<br>'))}${dg('สถานะอนุมัติ', pill(r.approval_status === 'approved' ? 'approved' : r.approval_status === 'pending_approval' ? 'pending_approval' : r.approval_status === 'cancelled' ? 'cancelled' : 'draft'))}</div>
+      <div class="field-help" style="margin-top:10px;">สายอนุมัติ resolve จาก DOA entry ตอนกดส่ง แล้ว freeze (แก้ DOA ทีหลังไม่กระทบใบที่ส่งไปแล้ว) · ตั้งค่าจริงที่หน้า DOA กลาง — feature ไม่ตั้งเอง</div></div>
+    <div class="drawer-section"><div class="drawer-section-title">ใช้โดย</div><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="ref-chip">Sales Quotation</span><span class="ref-chip">Sales Order</span><span class="ref-chip">Trade Agreement</span><span class="ref-chip">Promotion</span><span class="ref-chip">Customer Master (กลุ่มราคา)</span></div>
+      </div>`;
+  else body = `<div class="drawer-section"><div class="drawer-section-title">เส้นทางอนุมัติและการเปลี่ยนแปลง (append-only)</div><div class="tl">${r.audit.map(a => { const k = /อนุมัติ|เปิดใช้|ประกาศแล้ว/.test(a.act) && !/ส่งขอ|ตีกลับ/.test(a.act) ? 'is-ok' : /ส่งขอ|refresh/.test(a.act) ? 'is-warn' : /ตีกลับ|ยกเลิก/.test(a.act) ? 'is-bad' : ''; return `<div class="tl-i ${k}"><div class="tl-t">${esc(a.act)}</div><div class="tl-s">${esc(a.by)} · ${fmtDT(a.at)}</div>${a.note ? `<div class="tl-q">${esc(a.note)}</div>` : ''}</div>`; }).join('')}</div></div>`;
+  return head + `<div class="drawer-body">${body}</div><div class="drawer-footer"><span style="font-size:11.5px;color:var(--c-mute-2);">${s === 'effective' ? '<i data-lucide="lock" data-sz="12" style="vertical-align:-2px;"></i> มีผลแล้ว — ล็อกแก้ไข · ปรับอีก = ออกรอบใหม่ &nbsp;·&nbsp; ' : ''}สร้าง ${esc(r.createdBy)} · ${fmtDT(r.createdAt)}</span><div style="margin-left:auto;display:flex;gap:8px;">
+    ${CAN_MANAGE ? `<button class="btn btn-secondary" onclick="duplicateR('${r.id}')" title="ออกรอบใหม่ด้วยสินค้าชุดนี้ · ฐานราคา = ราคาล่าสุด"><i data-lucide="copy" data-sz="14"></i>ออกรอบใหม่จากรอบนี้</button>` : ''}
+    ${CAN_MANAGE && ['draft', 'pending_approval', 'scheduled'].includes(s) ? `<button class="btn btn-secondary" onclick="openModal('cancel','${r.id}')"><i data-lucide="x-circle" data-sz="14"></i>ยกเลิกรอบ</button>` : ''}
+    <button class="btn btn-secondary" onclick="closeDrawer()">ปิด</button></div></div>`;
+}
+function plViewDrawer() {
+  const pl = findPL(state.drawer.id); if (!pl) return ''; const st = plStats(pl); const rounds = ROUNDS.filter(r => plMatch(r, pl.code)).sort((a, b) => b.effective > a.effective ? 1 : -1);
+  return `<div class="drawer-header"><div class="drawer-avatar"><i data-lucide="badge-percent" data-sz="17"></i></div>
+    <div style="flex:1;min-width:0;"><div class="drawer-title" style="word-break:normal;">${esc(pl.name)}${pill(pl.status)}</div><div class="drawer-sub"><span class="cell-mono">${pl.code}</span><span class="sep">|</span>${scopeChip(pl)}<span class="sep">|</span><span>ระดับ ${SCOPE[pl.scope.type].prio} · seq ${pl.seq}</span></div></div>
+    <div class="drawer-hactions">${CAN_MANAGE && pl.status === 'active' ? `<button class="btn btn-secondary btn-sm" onclick="openPlEdit('${pl.id}')"><i data-lucide="pencil" data-sz="14"></i>แก้ไข</button><button class="btn btn-primary btn-sm" onclick="openCreate({pl:'${pl.id}'})"><i data-lucide="megaphone" data-sz="14"></i>ประกาศราคารอบใหม่</button>` : ''}<div class="h-div"></div><button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" data-sz="16"></i></button></div></div>
+  <div class="drawer-body">
+    <div class="drawer-section"><div class="drawer-section-title">ขอบเขต</div><div class="dg-grid" style="grid-template-columns:repeat(2,1fr);">
+      ${dg('ขอบเขต', SCOPE[pl.scope.type].label)}${dg('ใช้กับ', pl.scope.type === 'all' ? 'ทุกลูกค้า' : pl.scope.refs.map(r => `<div>${esc(scopeRefName(pl.scope.type, r))} <span class="cell-mono" style="color:var(--c-mute-2);font-weight:500;">${r}</span></div>`).join(''))}
+      ${dg('ลำดับตัดสิน', 'ระดับ ' + SCOPE[pl.scope.type].prio + ' จาก 4 · seq ' + pl.seq)}${dg('สินค้ามีราคาปัจจุบัน', st.covered + '/' + PRODUCTS.length + ' SKU')}
+    </div>${pl.desc ? `<div style="margin-top:12px;font-size:12.8px;color:var(--c-mute);line-height:1.6;">${esc(pl.desc)}</div>` : ''}</div>
+    <div class="drawer-section"><div class="section-head"><div class="drawer-section-title">รอบประกาศราคาในบัญชีนี้ (${rounds.length})</div><span class="spacer"></span><span class="link" onclick="state.tab='current';state.curPl='${pl.id}';closeDrawer();">ดูราคาปัจจุบันทั้งบัญชี →</span></div>
+      ${rounds.length ? `<div class="rule-wrap is-view"><table class="rule-tbl"><thead><tr><th>รหัสรอบ</th><th>ชื่อรอบ</th><th>มีผล</th><th class="num">สินค้า</th><th>สถานะ</th></tr></thead><tbody>${rounds.map(r => `<tr onclick="openView('${r.id}')" style="cursor:pointer;"><td class="cell-mono nowrap">${r.code}</td><td style="font-weight:600;">${esc(r.title)}</td><td class="cell-mono nowrap">${fmtDate(r.effective)}</td><td class="num">${r.lines.length}</td><td>${pill(rStatus(r))}</td></tr>`).join('')}</tbody></table></div>` : emptyBox('megaphone', 'ยังไม่มีรอบประกาศ', 'ลูกค้าในขอบเขตนี้จะตกไปใช้บัญชีระดับถัดไป / ราคาตั้ง')}</div>
+  </div>
+  <div class="drawer-footer"><span style="font-size:11.5px;color:var(--c-mute-2);">สร้าง ${esc(pl.createdBy)} · ${fmtDT(pl.createdAt)}</span><div style="margin-left:auto;display:flex;gap:8px;">${CAN_MANAGE && pl.status === 'active' ? `<button class="btn btn-secondary" onclick="openModal('plarchive','${pl.id}')"><i data-lucide="archive" data-sz="14"></i>เก็บถาวร</button>` : ''}${CAN_MANAGE && pl.status === 'archived' ? `<button class="btn btn-secondary" onclick="restorePl('${pl.id}')"><i data-lucide="rotate-ccw" data-sz="14"></i>กู้คืน</button>` : ''}<button class="btn btn-secondary" onclick="closeDrawer()">ปิด</button></div></div>`;
+}
+
+// ---------- simulate ----------
+function simSet(k, v) { state.sim[k] = v; if (k === 'product') { const p = PROD_BY[v]; if (p) state.sim.uom = p.uom; } renderDrawerOnly(); }
+function simDrawer() {
+  const s = state.sim; const res = resolvePrice(s); const p = PROD_BY[s.product]; const cust = s.customer ? CUST_BY[s.customer] : null; const lvlName = { 1: 'ลูกค้า', 2: 'กลุ่ม', 3: 'ช่องทาง', 4: 'ทุกลูกค้า' };
+  return `<div class="drawer-header"><div class="drawer-avatar"><i data-lucide="calculator" data-sz="17"></i></div>
+    <div style="flex:1;min-width:0;"><div class="drawer-title" style="word-break:normal;">จำลองราคา (Price Resolver)</div><div class="drawer-sub">ราคาที่ Quotation / Sales Order จะดึงได้ · เห็นทุกบัญชีที่เข้าข่ายและเหตุผลที่ชนะ</div></div>
+    <div class="drawer-hactions"><button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" data-sz="16"></i></button></div></div>
+  <div class="drawer-body">
+    <div class="drawer-section"><div class="drawer-section-title">เงื่อนไข</div><div class="form-grid">
+      <div class="field"><label class="field-label">ลูกค้า</label>${comboField('sim-cust')}<div class="field-help">${cust ? `กลุ่ม ${esc((GROUP_BY[cust.group] || {}).name)} · ช่องทางเริ่มต้น ${esc((CHAN_BY[cust.channel] || {}).name)}${cust.price_list ? ` · ผูกบัญชี ${cust.price_list}` : ''}` : 'เว้นว่าง = ลูกค้าใหม่ (ใช้เฉพาะระดับช่องทาง + ทุกลูกค้า)'}</div></div>
+      <div class="field"><label class="field-label">ช่องทางบนเอกสาร</label>${comboField('sim-chan')}<div class="field-help">เว้นว่าง = ใช้ช่องทางเริ่มต้นของลูกค้า</div></div>
+      <div class="field fg-full"><label class="field-label">สินค้า <span class="req">*</span></label>${comboField('sim-prod')}</div>
+      <div class="field"><label class="field-label">หน่วย</label><select class="select" style="width:100%;" onchange="simSet('uom',this.value)">${(p ? p.uoms : []).map(u => `<option value="${esc(u.uom)}" ${s.uom === u.uom ? 'selected' : ''}>${esc(u.uom)}${u.f > 1 ? ' (=' + u.f + ' ' + esc(p.uom) + ')' : ''}</option>`).join('')}</select></div>
+      <div class="field"><label class="field-label">ปริมาณ</label><input class="input" type="number" min="1" value="${esc(s.qty)}" oninput="simSet('qty',this.value)"></div>
+      <div class="field"><label class="field-label">วันที่เอกสาร</label><input class="input" type="date" value="${esc(s.date)}" onchange="simSet('date',this.value)"></div>
+    </div></div>
+    ${res ? `<div class="drawer-section"><div class="res-hero">
+        <div><div class="rh-l">ราคาที่ได้ / ${esc(res.uom)}</div><div class="rh-v">${res.unit == null ? '—' : fm(res.unit) + ' ฿'}</div><div class="rh-s">${res.winner ? `จาก <b>${esc(res.winner.pl.code)}</b> ${esc(res.winner.pl.name)} · ระดับ${lvlName[res.winner.level]} · รอบ ${esc(res.winner.round.code)} (มีผล ${fmtDate(res.winner.round.effective)})` : (CFG.fallbackListPrice ? 'ไม่มีบัญชีราคาครอบ → ใช้ราคาตั้ง Item Master' : 'ไม่มีราคา — บล็อกการออกเอกสาร')}</div></div>
+        <div class="rh-side"><div class="rh-l">รวม ${fmi(res.qty)} ${esc(res.uom)}</div><div class="rh-v">${res.unit == null ? '—' : fm(res.unit * res.qty) + ' ฿'}</div><div class="rh-s">ราคาตั้ง ${fm(res.listUnit)} ฿ · ${res.winner && res.winner.disc > 0.05 ? 'ลด ' + fm(res.winner.disc, 1) + '%' : 'ไม่มีส่วนลด'}</div></div></div></div>
+    <div class="drawer-section"><div class="drawer-section-title">ลำดับการตัดสิน — ลูกค้า › กลุ่ม › ช่องทาง › ทุกลูกค้า (ระดับเดียวกัน seq น้อยชนะ · ราคาต่อสินค้า = รอบล่าสุดที่มีผล)</div><div class="ladder">
+      ${res.rows.length ? res.rows.map(r => `<div class="lad ${res.winner && r.pl.id === res.winner.pl.id ? 'is-win' : ''} ${r.skip ? 'is-skip' : ''}"><span class="prio-badge p${r.level}">${r.level}</span><div class="lad-lvl">${lvlName[r.level]}</div>
+        <div class="lad-main"><div class="lad-t">${esc(r.pl.code)} · ${esc(r.pl.name)} ${res.winner && r.pl.id === res.winner.pl.id ? '<span class="pill pill-danger pill-sm" style="margin-left:6px;">ใช้ราคานี้</span>' : ''}</div>
+          <div class="lad-s">${esc(r.how)} · ${r.skip ? `<span style="color:var(--c-danger);">ข้าม — ${esc(r.skip)}</span>` : `รอบ ${esc(r.round.code)} · มีผล ${fmtDate(r.round.effective)} · seq ${r.pl.seq}`}</div></div>
+        <div class="lad-price">${r.skip ? '—' : fm(r.unit) + ' <small>฿</small>'}</div></div>`).join('') : ''}
+      <div class="lad ${res.fallback ? 'is-win' : 'is-skip'}"><span class="prio-badge p4" style="background:var(--c-mute-3);">—</span><div class="lad-lvl">ฐาน</div><div class="lad-main"><div class="lad-t">ราคาตั้ง Item Master ${res.fallback ? '<span class="pill pill-danger pill-sm" style="margin-left:6px;">ใช้ราคานี้</span>' : ''}</div><div class="lad-s">${esc(res.product.code)} · fallback เมื่อไม่มีบัญชีราคาครอบ (Sales Configuration)</div></div><div class="lad-price">${fm(res.listUnit)} <small>฿</small></div></div>
+    </div><div class="field-help" style="margin-top:8px;">โปรโมชัน / Trade Agreement ต่อยอดจากราคานี้ในขั้นถัดไป (นอก scope) · ราคาก่อน VAT</div></div>` : ''}
+  </div>
+  <div class="drawer-footer"><span style="font-size:11.5px;color:var(--c-mute-2);">Resolver ตัวเดียวกับที่ Quotation / SO เรียกใช้ — ENG candidate: <span class="kbd">price-resolver</span></span><div style="margin-left:auto;"><button class="btn btn-secondary" onclick="closeDrawer()">ปิด</button></div></div>`;
+}
+
+// ---------- round form (create / edit draft · 3 ขั้น) ----------
+function newLine(plCode, product, uom, exclId) { const p = PROD_BY[product]; uom = uom || p.uom; const b = basePrice(plCode, product, uom, exclId); return { id: uid('n'), product, uom, old: b.src === 'list' && !latestAny(plCode, product, uom, exclId) ? null : b.price, oldSrc: b.src === 'list' && !latestAny(plCode, product, uom, exclId) ? null : b.src, base: b.price, baseSrc: b.src, price: '' }; }
+function formFrom(r, preset) {
+  preset = preset || {};
+  if (!r) { const f = { pl: preset.pl || '', title: '', reason: '', effective: TODAY_ISO, lines: [], _err: {} }; if (preset.product && f.pl) f.lines.push(newLine(f.pl, preset.product)); return f; }
+  return { pl: r.pl, title: r.title, reason: r.reason, effective: r.effective, lines: r.lines.map(l => { const b = basePrice(r.pl, l.product, l.uom, r.id); return { id: l.id, product: l.product, uom: l.uom, old: l.old, oldSrc: l.oldSrc, base: b.price, baseSrc: b.src, price: String(l.price) }; }), _err: {} };
+}
+function openCreate(preset) { cbReset(); state.form = formFrom(null, preset); state.drawer = { open: true, mode: 'create', id: null, tab: 'lines', step: 1, wide: true }; render(); }
+function openEdit(id) { const r = findR(id); if (rStatus(r) !== 'draft') { showToast('แก้ไขได้เฉพาะร่าง — รอบที่ประกาศแล้วให้ออกรอบใหม่', 'warning'); return; } cbReset(); state.form = formFrom(r); state.drawer = { open: true, mode: 'edit', id, tab: 'lines', step: 1, wide: true }; render(); }
+function fSet(k, v) { state.form[k] = v; }
+function fSetPl(v) { const f = state.form; if (f.pl !== v) { f.pl = v; f.lines.forEach(l => { const b = basePrice(v, l.product, l.uom, state.drawer.id); l.base = b.price; l.baseSrc = b.src; const has = latestAny(v, l.product, l.uom, state.drawer.id); l.old = has ? b.price : null; l.oldSrc = has ? b.src : null; }); } renderDrawerOnly(); }
+function lineAdd(product) { const f = state.form; if (!f.pl) { showToast('เลือกบัญชีราคาก่อน', 'warning'); return; } if (f.lines.some(l => l.product === product && l.uom === PROD_BY[product].uom)) { showToast('มีสินค้านี้ในรอบแล้ว', 'warning'); return; } f.lines.push(newLine(f.pl, product, null, state.drawer.id)); renderDrawerOnly(); }
+function lineRemove(i) { state.form.lines.splice(i, 1); renderDrawerOnly(); }
+function lineSet(i, k, v) { state.form.lines[i][k] = v; }
+function lineSetUom(i, v) { const l = state.form.lines[i]; l.uom = v; const b = basePrice(state.form.pl, l.product, v, state.drawer.id); const has = latestAny(state.form.pl, l.product, v, state.drawer.id); l.base = b.price; l.baseSrc = b.src; l.old = has ? b.price : null; l.oldSrc = has ? b.src : null; renderDrawerOnly(); }
+function lineBlur(i) { renderDrawerOnly(); }
+function bulkAdd(scopeKey) {  // เพิ่มทั้งหมวด / ทุกสินค้า — ราคาใหม่ = ฐานล่าสุด (ผู้ใช้ปรับต่อ หรือใช้ปรับทั้งตาราง %)
+  const f = state.form; if (!f.pl) { showToast('เลือกบัญชีราคาก่อน', 'warning'); return; }
+  const list = scopeKey === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat === scopeKey); let n = 0;
+  list.forEach(p => { if (!f.lines.some(l => l.product === p.code && l.uom === p.uom)) { const nl = newLine(f.pl, p.code, null, state.drawer.id); nl.price = String(nl.base); f.lines.push(nl); n++; } });
+  f._bulkCat = ''; renderDrawerOnly(); showToast(`เพิ่ม ${n} สินค้า (ราคาใหม่ตั้งต้น = ราคาล่าสุด — ปรับต่อได้)`, n ? 'success' : 'info');
+}
+function bulkAdjust() { const f = state.form; const pct = +f._adjPct; if (!pct) { showToast('ระบุ % ที่จะปรับ', 'warning'); return; } f.lines.forEach(l => { const b = +l.base; l.price = String(Math.round(b * (1 + pct / 100) * 100) / 100); }); renderDrawerOnly(); showToast(`ปรับทั้งตาราง ${fpct(pct)} จากราคาล่าสุดแล้ว`, 'success'); }
+function lineErrors(f) {
+  const e = {}; const seen = {};
+  f.lines.forEach(l => { const m = []; const k = l.product + '|' + l.uom; if (seen[k]) m.push('สินค้า/หน่วยซ้ำในรอบนี้'); seen[k] = 1;
+    if (String(l.price).trim() === '' || isNaN(+l.price)) m.push('ระบุราคาใหม่'); else if (!(+l.price > 0)) m.push('ราคาต้อง > 0'); else if (f.pl !== '*' && Math.abs(+l.price - +l.base) < 0.005) m.push('ราคาใหม่เท่ากับราคาล่าสุด — ไม่ต้องประกาศ');
+    if (m.length) e[l.id] = m.join(' · '); });
+  return e;
+}
+function formErrors(step) {
+  const f = state.form; const e = {};
+  if (step === 1 || step == null) { if (!f.pl) e.pl = 'เลือกบัญชีราคา'; if (!f.title.trim()) e.title = 'ระบุชื่อรอบประกาศ'; if (!f.effective) e.effective = 'ระบุวันมีผล'; else if (f.effective < TODAY_ISO) e.effective = 'วันมีผลต้องไม่ย้อนหลัง'; }
+  if (step === 2 || step == null) { if (!f.lines.length) e.lines0 = 'เพิ่มสินค้าอย่างน้อย 1 รายการ'; const le = lineErrors(f); if (Object.keys(le).length) e.lines = le; }
+  return e;
+}
+function formToR(f) { return { pl: f.pl, title: f.title.trim(), reason: f.reason.trim(), effective: f.effective, lines: f.lines.map(l => ({ id: l.id, product: l.product, uom: l.uom, old: l.old == null ? null : +l.old, oldSrc: l.oldSrc, price: +l.price })) }; }
+function nextStep() { const s = state.drawer.step; const e = formErrors(s); state.form._err = e; if (Object.keys(e).length) { renderDrawerOnly(); showToast('กรุณากรอกข้อมูลให้ครบถ้วน', 'warning'); return; } state.drawer.step = Math.min(3, s + 1); cbReset(); renderDrawerOnly(); }
+function prevStep() { state.drawer.step = Math.max(1, state.drawer.step - 1); cbReset(); renderDrawerOnly(); }
+function gotoStep(n) { if (n < state.drawer.step) { state.drawer.step = n; cbReset(); renderDrawerOnly(); } }
+function saveForm(mode) {
+  const e = formErrors(null); state.form._err = e;
+  if (Object.keys(e).length) { state.drawer.step = (e.lines || e.lines0) && !e.pl && !e.title && !e.effective ? 2 : 1; renderDrawerOnly(); showToast('กรุณากรอกข้อมูลให้ครบถ้วน', 'warning'); return; }
+  if (state.busy) return; state.busy = true; renderDrawerOnly();
+  setTimeout(() => {
+    state.busy = false; const data = formToR(state.form); let r;
+    if (state.drawer.mode === 'create') { r = seedAudit(mkR(Object.assign({ code: nextRCode(), status: 'draft', createdBy: ME.name, createdAt: nowIso(), updatedBy: ME.name, updatedAt: nowIso() }, data))); ROUNDS.unshift(r); }
+    else { r = findR(state.drawer.id); Object.assign(r, data); pushAudit(r, 'แก้ไขร่างรอบประกาศ'); }
+    if (mode === 'submit') { const st = staleLines(r); if (st.length) { showToast('ฐานราคาเปลี่ยน — refresh ก่อนประกาศ', 'warning'); openView(r.id); return; } openView(r.id); openModal('submit', r.id); return; }
+    else showToast(state.drawer.mode === 'create' ? 'สร้างรอบประกาศราคาสำเร็จ (ร่าง)' : 'บันทึกการแก้ไขแล้ว', 'success');
+    openView(r.id);
+  }, 420);
+}
+function doSubmit(r, assignees) {   // BR-DOA-01 ส่งได้เฉพาะร่าง · BR-DOA-02 resolve แล้ว freeze · ผู้ส่งเลือกคนต่อ slot
+  const res = resolveDoa(r); assignees = assignees || res.steps.map(st => (EMPLOYEES.find(e => e.role === st.roles[0]) || {}).name || null);
+  r.status = 'pending_approval'; r.approval_status = 'pending_approval'; r.submittedBy = ME.name; r.submittedAt = nowIso();
+  r.doa_entry_ref = res.doa_entry_ref; r.approval_chain = res.steps.map((st, i) => ({ roles: st.roles, assignee: assignees[i] || null, status: 'pending', by: null, at: null })); r.approver_role = r.approval_chain[0].roles[0]; r.approved_by = null; r.approved_at = null;
+  pushAudit(r, 'ส่งอนุมัติประกาศราคา · ' + r.approval_chain.map((st, i) => (i + 1) + ') ' + (st.assignee || '?') + ' (' + (ROLE_LABEL[st.roles[0]] || st.roles[0]) + ')').join(' → '), res.why.join(' · ')); showToast('ส่งอนุมัติแล้ว — เข้ากล่อง My Approval ของ ' + (r.approval_chain[0].assignee || '') + ' (ENG-NOTIFY doa_pending)', 'success');
+}
+function refreshBase(id) { const r = findR(id); let n = 0; r.lines.forEach(l => { const b = basePrice(r.pl, l.product, l.uom, r.id); if (+l.old !== +b.price || (l.oldSrc || 'list') !== b.src) { l.old = b.price; l.oldSrc = b.src; n++; } }); pushAudit(r, `refresh ฐานราคาเป็นราคาล่าสุด (${n} รายการ)`); showToast(`refresh ฐานราคาแล้ว ${n} รายการ — ตรวจราคาใหม่อีกครั้ง`, 'success'); openView(id); }
+function duplicateR(id) {
+  const src = findR(id); const r = seedAudit(mkR({ code: nextRCode(), pl: src.pl, title: src.title.replace(/ \(สำเนา\)$/, '') + ' (รอบใหม่)', reason: '', effective: TODAY_ISO, status: 'draft', createdBy: ME.name, createdAt: nowIso(), updatedBy: ME.name, updatedAt: nowIso(),
+    lines: src.lines.map(l => { const nl = newLine(src.pl, l.product, l.uom); return { id: nl.id, product: l.product, uom: l.uom, old: nl.old, oldSrc: nl.oldSrc, price: nl.base }; }) }));
+  r.audit[0].act = 'สร้างรอบใหม่จาก ' + src.code + ' (ฐานราคา = ราคาล่าสุด ไม่ใช่ราคาในรอบเดิม)'; ROUNDS.unshift(r); showToast(`สร้าง ${r.code} (ร่าง) — ฐานราคาดึงจากราคาล่าสุด`, 'success'); openEdit(r.id);
+}
+function lineEditor() {
+  const f = state.form; const errs = (f._err && f._err.lines) || {}; const plOk = !!f.pl;
+  const rows = f.lines.map((l, i) => { const p = PROD_BY[l.product]; const err = errs[l.id]; const np = +l.price; const has = String(l.price).trim() !== '' && !isNaN(np); const chg = has && l.base > 0 ? (np - l.base) / l.base * 100 : null; const d = has ? (listPrice(p, l.uom) - np) / listPrice(p, l.uom) * 100 : null;
+    return `<tr class="${err ? 'is-err' : ''}" id="line-row-${i}">
+      <td class="cell-mono nowrap">${p.code}</td><td><div style="font-weight:600;">${esc(p.name)}</div>${err ? `<div class="err-msg">${esc(err)}</div>` : ''}</td>
+      <td><select class="select" style="width:100%;" onchange="lineSetUom(${i},this.value)">${p.uoms.map(u => `<option value="${esc(u.uom)}" ${l.uom === u.uom ? 'selected' : ''}>${esc(u.uom)}</option>`).join('')}</select></td>
+      <td class="num" style="font-weight:600;">${fm(l.base)}<div style="font-size:10.5px;color:var(--c-mute-2);font-weight:400;">${f.pl === '*' ? 'ราคาตั้ง (ฐานกลาง)' : l.baseSrc === 'list' ? 'ราคาตั้ง (ยังไม่มีในบัญชี)' : 'รอบ ' + l.baseSrc}</div></td>
+      <td><input class="input" type="number" min="0" step="0.01" style="text-align:right;" value="${esc(l.price)}" placeholder="${fm(l.base)}" oninput="lineSet(${i},'price',this.value)" onblur="lineBlur(${i})" onkeydown="if(event.key==='Enter')this.blur()"></td>
+      <td class="num">${chgCell(chg)}</td>
+      <td class="num ${d != null && d > DOA_CAP ? 'disc-flag' : ''}">${d == null ? '—' : Math.abs(d) < 0.05 ? '0%' : (d > 0 ? '-' : '+') + fm(Math.abs(d), 1) + '%'}</td>
+      <td><button class="ra-btn is-danger" onclick="lineRemove(${i})" title="เอาออก"><i data-lucide="trash-2" data-sz="14"></i></button></td></tr>`; }).join('');
+  return `<div class="rule-wrap"><table class="rule-tbl"><colgroup><col style="width:92px"><col><col style="width:110px"><col style="width:120px"><col style="width:120px"><col style="width:86px"><col style="width:100px"><col style="width:40px"></colgroup>
+    <thead><tr><th>รหัส</th><th>สินค้า</th><th>หน่วย</th><th class="num">ราคาล่าสุด (ฐาน)</th><th class="num">ราคาใหม่</th><th class="num">เปลี่ยน</th><th class="num">เทียบราคาตั้ง</th><th></th></tr></thead>
+    <tbody>${rows || `<tr><td colspan="8" style="text-align:center;color:var(--c-mute-3);padding:22px;">${plOk ? 'ยังไม่มีสินค้า — เพิ่มจากช่องค้นหาด้านล่าง หรือเพิ่มทั้งหมวด' : 'เลือกบัญชีราคาในขั้นที่ 1 ก่อน'}</td></tr>`}</tbody></table>
+    <div class="rule-foot" style="gap:8px;">
+      <div style="width:300px;">${comboField('addprod')}</div>
+      <select class="select" style="min-height:31px;padding:5px 26px 5px 10px;font-size:12.5px;width:170px;" onchange="state.form._bulkCat=this.value"><option value="">เพิ่มทั้งหมวด…</option>${CATEGORIES.map(c => `<option value="${c.code}" ${f._bulkCat === c.code ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}<option value="all">ทุกสินค้า (${PRODUCTS.length})</option></select>
+      <button class="btn btn-secondary btn-sm" onclick="if(state.form._bulkCat)bulkAdd(state.form._bulkCat);else showToast('เลือกหมวดก่อน','warning')"><i data-lucide="plus" data-sz="13"></i>เพิ่ม</button>
+      <span style="flex:1;"></span>
+      <button class="btn btn-ghost btn-sm" onclick="downloadTemplate()"><i data-lucide="file-down" data-sz="13"></i>Template</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('lineCsv').click()"><i data-lucide="upload" data-sz="13"></i>Import</button><input type="file" id="lineCsv" accept=".csv,text/csv" style="display:none;" onchange="importLines(this)">
+    </div>
+    <div class="rule-foot" style="gap:8px;border-top:1px solid var(--c-line-3);">
+      <span style="font-size:12px;">ปรับทั้งตารางจากราคาล่าสุด</span><input class="input" type="number" step="0.5" style="width:84px;min-height:31px;padding:5px 8px;text-align:right;" placeholder="±%" value="${esc(f._adjPct || '')}" oninput="state.form._adjPct=this.value"><span style="font-size:12px;">%</span>
+      <button class="btn btn-secondary btn-sm" onclick="bulkAdjust()"><i data-lucide="percent" data-sz="13"></i>ปรับ</button>
+      <span style="flex:1;font-size:11.5px;color:var(--c-mute-2);text-align:right;">${f.lines.length} สินค้า · ราคาต่อหน่วยฐาน · ก่อน VAT</span>
+    </div></div>`;
+}
+function downloadTemplate() { const csv = ['product_code,uom,new_price', 'FG-1001,ขวด,6.50', 'FG-1010,ขวด,23.00'].join('\n'); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' })); a.download = 'price-round-template.csv'; document.body.appendChild(a); a.click(); a.remove(); showToast('ดาวน์โหลด Template CSV แล้ว', 'info'); }
+function importLines(input) {
+  const file = input.files && input.files[0]; if (!file) return; const f = state.form; if (!f.pl) { showToast('เลือกบัญชีราคาก่อน', 'warning'); input.value = ''; return; } const rd = new FileReader();
+  rd.onload = e => { const lines = String(e.target.result).replace(/^\ufeff/, '').split(/\r?\n/).filter(l => l.trim()); const head = (lines[0] || '').split(',').map(h => h.trim().toLowerCase()); const ix = k => head.indexOf(k); let ok = 0, bad = 0;
+    lines.slice(1).forEach(l => { const c = l.split(','); const code = (c[ix('product_code')] || '').trim().toUpperCase(); const uom = (c[ix('uom')] || '').trim(); const price = c[ix('new_price')]; const p = PROD_BY[code]; if (!p || !(+price > 0)) { bad++; return; }
+      const u = uom && p.uoms.some(x => x.uom === uom) ? uom : p.uom; let ln = f.lines.find(x => x.product === code && x.uom === u); if (!ln) { ln = newLine(f.pl, code, u, state.drawer.id); f.lines.push(ln); } ln.price = String(+price); ok++; });
+    renderDrawerOnly(); showToast(`นำเข้า ${ok} รายการ${bad ? ' · ข้าม ' + bad + ' แถวที่ไม่ตรง master/ราคาไม่ถูกต้อง' : ''}`, bad ? 'warning' : 'success'); };
+  rd.readAsText(file, 'utf-8'); input.value = '';
+}
+function formDrawer() {
+  const f = state.form; const isEdit = state.drawer.mode === 'edit'; const step = state.drawer.step; const e = f._err || {}; const r0 = isEdit ? findR(state.drawer.id) : null;
+  const preview = formToR(f); const pl = findPL(f.pl); const md = f.lines.length ? maxDisc({ lines: preview.lines.filter(l => l.price > 0) }) : 0; const doa = f.pl ? needsDOA({ pl: f.pl, lines: preview.lines.filter(l => l.price > 0) }) : [];
+  const steps = ['บัญชีราคาและวันมีผล', 'รายการสินค้าและราคาใหม่', 'ตรวจสอบและยืนยัน'];
+  const stepper = `<div class="drawer-stepper-band"><div class="d-stepper">${steps.map((s, i) => `<div class="stepper-item ${step === i + 1 ? 'active' : step > i + 1 ? 'done' : ''}" ${step > i + 1 ? `onclick="gotoStep(${i + 1})"` : ''}><div class="stepper-circle">${step > i + 1 ? '<i data-lucide="check" data-sz="14"></i>' : i + 1}</div><div class="stepper-label">${s}</div></div>`).join('')}</div></div>`;
+  let body = '';
+  if (step === 1) body = `
+    <div class="drawer-section"><div class="drawer-section-title">บัญชีราคาที่จะประกาศ</div><div class="form-grid">
+      <div class="field fg-full ${e.pl ? 'is-error' : ''}"><label class="field-label">บัญชีราคา <span class="req">*</span></label>${comboField('plpick')}<div class="field-error">${esc(e.pl || '')}</div>${pl ? (pl.code === '*' ? `<div class="field-help" style="color:#8a5200;">ประกาศทับทุกบัญชี — ราคาใหม่ของสินค้าในรอบนี้จะเป็นราคาปัจจุบันของ <b>ทุกบัญชี/ทุกช่องทาง</b> ตั้งแต่วันมีผล (ฐานกลาง = ราคาตั้ง Item Master · แต่ละบัญชีมีราคาเดิมต่างกัน) · บัญชีใดต้องการต่างจากนี้ให้ออกรอบทับภายหลัง</div>` : `<div class="field-help">${SCOPE[pl.scope.type].label} · ${esc(scopeText(pl))} · ระดับ ${SCOPE[pl.scope.type].prio}${pl.scope.type === 'customer' ? ' · <span style="color:#8a5200;">บัญชีเฉพาะลูกค้า — สายอนุมัติเพิ่มขั้น</span>' : ''} · สินค้ามีราคาปัจจุบัน ${plStats(pl).covered}/${PRODUCTS.length}</div>`) : ''}${isEdit ? '<div class="field-help">เปลี่ยนบัญชีราคาแล้ว ฐานราคาทุกบรรทัดจะดึงใหม่จากบัญชีนั้น</div>' : ''}</div>
+      <div class="field fg-full ${e.title ? 'is-error' : ''}"><label class="field-label">ชื่อรอบประกาศ <span class="req">*</span></label><input class="input" value="${esc(f.title)}" placeholder="เช่น ปรับราคาค้าส่ง Q4/2569 (ต้นทุนวัตถุดิบ)" oninput="fSet('title',this.value)"><div class="field-error">${esc(e.title || '')}</div></div>
+      <div class="field ${e.effective ? 'is-error' : ''}"><label class="field-label">มีผลตั้งแต่ <span class="req">*</span></label><input class="input" type="date" value="${esc(f.effective)}" min="${TODAY_ISO}" onchange="fSet('effective',this.value)"><div class="field-help">ราคาใหม่แทนราคาล่าสุดของสินค้าที่อยู่ในรอบตั้งแต่วันนี้เป็นต้นไป · สินค้าที่ไม่อยู่ในรอบไม่กระทบ</div><div class="field-error">${esc(e.effective || '')}</div></div>
+      <div class="field"><label class="field-label">รหัสรอบ</label><input class="input" value="${isEdit ? r0.code : nextRCode() + ' (อัตโนมัติ)'}" disabled><div class="field-help">เลขรันอ่านจาก Document Configuration</div></div>
+      <div class="field fg-full"><label class="field-label">เหตุผลการปรับราคา</label><textarea class="input" placeholder="เช่น ต้นทุนบรรจุภัณฑ์เพิ่ม 4% / คู่แข่งปรับราคา / สัญญาการค้า" oninput="fSet('reason',this.value)">${esc(f.reason)}</textarea></div>
+    </div></div>
+    <div class="dw-note"><i data-lucide="info" data-sz="15"></i><div>รอบเดียวปรับได้หลายสินค้า · ราคาก่อนหน้าของแต่ละสินค้าดึงจาก <b>ราคาล่าสุดในบัญชีนี้เท่านั้น</b> (snapshot ตอนสร้าง — ถ้ามีรอบใหม่แทรกก่อนประกาศ ระบบบังคับ refresh) · รอบที่ประกาศแล้วล็อกแก้ไข</div></div>`;
+  else if (step === 2) body = `
+    <div class="drawer-section"><div class="section-head"><div class="drawer-section-title">รายการสินค้าที่ปรับราคา — ${pl ? esc(pl.name) : '—'} · มีผล ${fmtDate(f.effective)}</div><span class="spacer"></span><span style="font-size:12px;color:var(--c-mute-2);">${f.lines.length} สินค้า</span></div>
+      ${e.lines0 ? `<div class="dw-note is-danger" style="margin-bottom:10px;"><i data-lucide="alert-triangle" data-sz="15"></i><div>${esc(e.lines0)}</div></div>` : ''}
+      ${lineEditor()}
+      <div class="dw-note" style="margin-top:12px;"><i data-lucide="info" data-sz="15"></i><div>ราคาล่าสุด (ฐาน) แก้ไม่ได้ — มาจากรอบล่าสุดที่ประกาศแล้วในบัญชีนี้ / ราคาตั้ง Item Master ถ้ายังไม่เคยมี · ลดจากราคาตั้งสูงสุดตอนนี้ <b class="${md > DOA_CAP ? 'disc-flag' : ''}">${fm(md, 1)}%</b> (ข้อมูลประกอบ — ไม่เกี่ยวสายอนุมัติ) · หน่วยฐาน · ก่อน VAT</div></div></div>`;
+  else { const p = preview; const inc = p.lines.filter(l => l.old != null && l.price > l.old).length, dec = p.lines.filter(l => l.old != null && l.price < l.old).length, nw = p.lines.filter(l => l.old == null).length;
+    body = `<div class="drawer-section"><div class="drawer-section-title">สรุปก่อนประกาศ</div><div class="dw-summary">
+        ${dg('บัญชีราคา', pl ? esc(pl.name) : '—')}${dg('ชื่อรอบ', esc(p.title))}${dg('มีผลตั้งแต่', fmtDate(p.effective))}${dg('จำนวนสินค้า', `${p.lines.length} รายการ · ขึ้น ${inc} · ลง ${dec} · ใหม่ ${nw}`)}
+        ${dg('ลดจากราคาตั้งสูงสุด', `<span class="${md > DOA_CAP ? 'disc-flag' : ''}">${fm(md, 1)}%</span>`)}${dg('เหตุผล', esc(p.reason) || '—')}</div></div>
+      <div class="drawer-section"><div class="drawer-section-title">สายอนุมัติ (DOA · F-DLG-001 · ไม่มีวงเงิน)</div><div class="dw-note"><i data-lucide="shield-check" data-sz="15"></i><div><b>${resolveDoa({ pl: f.pl, lines: preview.lines.filter(l => l.price > 0) }).steps.map((st, i) => (i + 1) + ') ' + st.roles.map(x => ROLE_LABEL[x] || x).join('/')).join(' → ')}</b> — อนุมัติตามลำดับตำแหน่ง · ตอนส่งเลือก "คน" ต่อขั้น<div style="margin-top:3px;font-size:11.5px;">resolve ตอนกดส่งแล้ว freeze · ผู้ส่งอนุมัติเองไม่ได้ (SoD) · ราคาไม่มีผลจนกว่าครบทุกขั้น</div></div></div></div>
+      ${(() => { const same = ROUNDS.filter(o => o.id !== state.drawer.id && ['pending_approval', 'scheduled'].includes(rStatus(o)) && (o.pl === p.pl || o.pl === '*' || p.pl === '*') && o.effective === p.effective && o.lines.some(l => p.lines.some(x => x.product === l.product && x.uom === l.uom))); return same.length ? `<div class="dw-note is-warn" style="margin-bottom:14px;"><i data-lucide="git-compare" data-sz="15"></i><div><b>วันมีผลเดียวกับรอบอื่นที่มีสินค้าซ้ำ:</b> ${same.map(o => esc(o.code + ' ' + o.title)).join(', ')} — ถ้าประกาศทั้งคู่ ระบบใช้รอบที่ประกาศ (อนุมัติครบ) ทีหลังกว่า · แนะนำยกเลิกรอบเก่าหรือเลื่อนวัน</div></div>` : ''; })()}
+      <div class="drawer-section"><div class="drawer-section-title">รายการที่จะประกาศ</div>${linesTable(Object.assign({}, p, { status: 'draft', id: state.drawer.id || '_new' }))}</div>`; }
+  const busy = state.busy;
+  const foot = `<div class="drawer-footer">${step > 1 ? `<button class="btn btn-secondary" onclick="prevStep()" ${busy ? 'disabled' : ''}><i data-lucide="arrow-left" data-sz="14"></i>กลับ</button>` : `<button class="btn btn-ghost" onclick="cancelForm()">ยกเลิก</button>`}
+    <div style="margin-left:auto;display:flex;gap:8px;">${step < 3 ? `<button class="btn btn-primary" onclick="nextStep()">ถัดไป<i data-lucide="arrow-right" data-sz="14"></i></button>`
+      : `<button class="btn btn-secondary" onclick="saveForm('draft')" ${busy ? 'disabled' : ''}><i data-lucide="save" data-sz="14"></i>บันทึกร่าง</button><button class="btn btn-primary" onclick="saveForm('submit')" ${busy ? 'disabled' : ''}>${busy ? '<i data-lucide="loader-circle" data-sz="14" class="spin"></i>กำลังบันทึก…' : `<i data-lucide="send" data-sz="14"></i>บันทึกและส่งอนุมัติ`}</button>`}</div></div>`;
+  return `<div class="drawer-header"><div class="drawer-avatar"><i data-lucide="${isEdit ? 'pencil' : 'megaphone'}" data-sz="17"></i></div>
+    <div style="flex:1;min-width:0;"><div class="drawer-title" style="word-break:normal;">${isEdit ? 'แก้ไขร่างรอบ — ' + esc(r0.code) : 'ประกาศราคารอบใหม่'}</div><div class="drawer-sub">ขั้นที่ ${step}/3 · ${steps[step - 1]}</div></div>
+    <div class="drawer-hactions"><button class="icon-btn" onclick="cancelForm()"><i data-lucide="x" data-sz="16"></i></button></div></div>${stepper}<div class="drawer-body">${body}</div>${foot}`;
+}
+
+// ---------- price list (master) form ----------
+function openPlCreate() { cbReset(); state.plForm = { name: '', desc: '', scopeType: 'group', refs: [], seq: 10, _err: {} }; state.drawer = { open: true, mode: 'plcreate', id: null, tab: 'lines', step: 1, wide: false }; render(); }
+function openPlEdit(id) { const pl = findPL(id); cbReset(); state.plForm = { name: pl.name, desc: pl.desc, scopeType: pl.scope.type, refs: pl.scope.refs.slice(), seq: pl.seq, _err: {} }; state.drawer = { open: true, mode: 'pledit', id, tab: 'lines', step: 1, wide: false }; render(); }
+function pfSet(k, v) { state.plForm[k] = v; }
+function pfScope(t) { const f = state.plForm; if (f.scopeType !== t) { f.scopeType = t; f.refs = []; } cbReset(); renderDrawerOnly(); }
+function pfRemoveRef(c) { state.plForm.refs = state.plForm.refs.filter(r => r !== c); renderDrawerOnly(); }
+function savePl() {
+  const f = state.plForm; const e = {}; if (!f.name.trim()) e.name = 'ระบุชื่อบัญชีราคา'; if (f.scopeType !== 'all' && !f.refs.length) e.refs = 'เลือก' + SCOPE[f.scopeType].pick + 'อย่างน้อย 1 รายการ'; if (!(+f.seq >= 1 && +f.seq <= 999)) e.seq = 'seq 1–999';
+  f._err = e; if (Object.keys(e).length) { renderDrawerOnly(); showToast('กรุณากรอกข้อมูลให้ครบถ้วน', 'warning'); return; }
+  const data = { name: f.name.trim(), desc: f.desc.trim(), scope: { type: f.scopeType, refs: f.scopeType === 'all' ? [] : f.refs.slice() }, seq: +f.seq };
+  if (state.drawer.mode === 'plcreate') { let n = PLS.length + 1, code; do { code = 'PL-' + String(n++).padStart(3, '0'); } while (findPL(code)); const pl = mkPL(Object.assign({ code, status: 'active', createdBy: ME.name, createdAt: nowIso(), updatedBy: ME.name, updatedAt: nowIso() }, data)); PLS.push(pl); showToast('สร้างบัญชีราคาสำเร็จ — ประกาศราคารอบแรกเพื่อให้มีผล', 'success'); openPlView(pl.id); }
+  else { const pl = findPL(state.drawer.id); Object.assign(pl, data, { updatedBy: ME.name, updatedAt: nowIso() }); showToast('บันทึกการแก้ไขแล้ว', 'success'); openPlView(pl.id); }
+}
+function plFormDrawer() {
+  const f = state.plForm; const isEdit = state.drawer.mode === 'pledit'; const e = f._err || {};
+  return `<div class="drawer-header"><div class="drawer-avatar"><i data-lucide="${isEdit ? 'pencil' : 'plus'}" data-sz="17"></i></div><div style="flex:1;min-width:0;"><div class="drawer-title" style="word-break:normal;">${isEdit ? 'แก้ไขบัญชีราคา — ' + esc(findPL(state.drawer.id).code) : 'สร้างบัญชีราคา'}</div><div class="drawer-sub">บัญชีราคาเป็น master ที่คงอยู่ — ราคาสินค้าใส่ผ่านรอบประกาศ</div></div><div class="drawer-hactions"><button class="icon-btn" onclick="cancelForm()"><i data-lucide="x" data-sz="16"></i></button></div></div>
+  <div class="drawer-body">
+    <div class="drawer-section"><div class="drawer-section-title">ข้อมูล</div><div class="form-grid">
+      <div class="field fg-full ${e.name ? 'is-error' : ''}"><label class="field-label">ชื่อบัญชีราคา <span class="req">*</span></label><input class="input" value="${esc(f.name)}" placeholder="เช่น ราคาค้าส่ง / ยี่ปั๊ว" oninput="pfSet('name',this.value)"><div class="field-error">${esc(e.name || '')}</div></div>
+      <div class="field fg-full"><label class="field-label">คำอธิบาย</label><textarea class="input" oninput="pfSet('desc',this.value)">${esc(f.desc)}</textarea></div>
+      <div class="field ${e.seq ? 'is-error' : ''}"><label class="field-label">seq (tie-break ในระดับเดียวกัน)</label><input class="input" type="number" min="1" max="999" value="${esc(f.seq)}" oninput="pfSet('seq',this.value)"><div class="field-help">ระดับเท่ากัน → seq น้อยกว่าชนะ</div><div class="field-error">${esc(e.seq || '')}</div></div>
+    </div></div>
+    <div class="drawer-section"><div class="drawer-section-title">ขอบเขต (ลูกค้า 1 › กลุ่ม 2 › ช่องทาง 3 › ทุกลูกค้า 4)</div>
+      <div class="seg" style="margin-bottom:12px;flex-wrap:wrap;">${['customer', 'group', 'channel', 'all'].map(k => `<button class="seg-b ${f.scopeType === k ? 'is-on' : ''}" onclick="pfScope('${k}')"><i data-lucide="${SCOPE[k].icon}" data-sz="13"></i>${SCOPE[k].label}</button>`).join('')}</div>
+      ${f.scopeType === 'all' ? `<div class="dw-note"><i data-lucide="globe" data-sz="15"></i><div>ใช้กับลูกค้าทุกราย — ระดับต่ำสุด ถูกทับโดยบัญชีระดับลูกค้า / กลุ่ม / ช่องทางเสมอ</div></div>` : `<div class="field ${e.refs ? 'is-error' : ''}" id="fld-refs"><label class="field-label">${SCOPE[f.scopeType].pick} <span class="req">*</span> <span style="font-weight:500;color:var(--c-mute-2);">— เลือกได้หลายรายการ</span></label>${comboField('plref')}
+        ${f.refs.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">${f.refs.map(r => `<span class="scope-chip ${SCOPE[f.scopeType].cls}">${esc(scopeRefName(f.scopeType, r))} <button class="icon-btn" style="width:18px;height:18px;margin-left:2px;color:inherit;" onclick="pfRemoveRef('${r}')"><i data-lucide="x" data-sz="11"></i></button></span>`).join('')}</div>` : ''}<div class="field-error">${esc(e.refs || '')}</div>${f.scopeType === 'customer' && CFG.doaScopeCustomer ? '<div class="field-help" style="color:#8a5200;">บัญชีราคาเฉพาะลูกค้า — ทุกรอบประกาศต้องผ่าน DOA</div>' : ''}</div>`}
+    </div></div>
+  <div class="drawer-footer"><button class="btn btn-ghost" onclick="cancelForm()">ยกเลิก</button><button class="btn btn-primary" style="margin-left:auto;" onclick="savePl()"><i data-lucide="check" data-sz="14"></i>${isEdit ? 'บันทึกการแก้ไข' : 'ยืนยันสร้าง'}</button></div>`;
+}
+function restorePl(id) { const pl = findPL(id); pl.status = 'active'; pl.updatedBy = ME.name; pl.updatedAt = nowIso(); showToast(`กู้คืน ${pl.code} แล้ว`, 'success'); openPlView(id); }
+
+// ---------- modals ----------
+function openModal(type, id) { cbReset(); state.modal = { open: true, type, id, slots: null }; render(); }
+function closeModal() { state.modal = { open: false, type: null, id: null }; render(); }
+function renderModal() {
+  const bd = document.getElementById('modalBackdrop'); const card = document.getElementById('modalCard'); bd.classList.toggle('is-open', state.modal.open);
+  if (!state.modal.open) { card.innerHTML = ''; return; } const t = state.modal.type;
+  const H = (ico, title, danger) => `<div class="modal-header"><div class="modal-hico ${danger ? '' : 'is-neutral'}"><i data-lucide="${ico}" data-sz="17"></i></div><div class="modal-title">${title}</div></div>`;
+  let html = '';
+  if (t === 'plarchive') { const pl = findPL(state.modal.id); const openR = ROUNDS.filter(r => r.pl === pl.code && ['draft', 'pending_approval', 'scheduled'].includes(rStatus(r))); html = H('archive', 'เก็บบัญชีราคาถาวร?') + `<div class="modal-body"><b style="color:var(--c-ink);">${esc(pl.code)} — ${esc(pl.name)}</b> จะไม่ถูกดึงไปใช้กับ Quotation/SO ใบใหม่ · ลูกค้าในขอบเขต ${esc(scopeText(pl))} ตกไประดับถัดไป/ราคาตั้ง · เอกสารเดิมไม่กระทบ · กู้คืนได้${openR.length ? `<div class="dw-note is-warn" style="margin-top:12px;"><i data-lucide="alert-triangle" data-sz="15"></i><div>มีรอบที่ยังไม่จบ ${openR.length} รอบ (${openR.map(r => r.code).join(', ')}) — จะถูกยกเลิกอัตโนมัติ</div></div>` : ''}</div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" onclick="confirmPlArchive()"><i data-lucide="archive" data-sz="14"></i>เก็บถาวร</button></div>`; }
+  else { const r = findR(state.modal.id); if (!r) { card.innerHTML = ''; return; } const doa = needsDOA(r); const pl = findPL(r.pl); const md = maxDisc(r);
+    if (t === 'submit') { const res = resolveDoa(r); const sl = state.modal.slots || (state.modal.slots = res.steps.map(st => ({ roles: st.roles, assignee: null }))); html = H('send', 'ส่งอนุมัติประกาศราคา') + `<div class="modal-body">
+      <div class="dw-summary" style="grid-template-columns:repeat(4,1fr);margin-bottom:18px;">${dg('รอบประกาศ', `<span class="cell-mono">${esc(r.code)}</span><div>${esc(r.title)}</div>`)}${dg('บัญชีราคา', r.pl === '*' ? 'ทุกบัญชีราคา' : pl ? esc(pl.name) : '')}${dg('มีผลตั้งแต่', fmtDate(r.effective))}${dg('สินค้า', r.lines.length + ' รายการ · ลดสูงสุด ' + fm(md, 1) + '%')}</div>
+      <div class="drawer-section-title">สายอนุมัติ (${res.doa_entry_ref} · ไม่มีวงเงิน) — เลือกผู้อนุมัติแต่ละขั้น <span class="req">*</span></div>
+      <div class="field-help" style="margin:-6px 0 12px;">DOA กำหนด "ตำแหน่ง" ต่อขั้น · ผู้ส่งเลือก "คน" ที่ถือตำแหน่งนั้น · อนุมัติตามลำดับ 1 → ${sl.length}</div>
+      ${sl.map((st, i) => `<div class="slot-row ${state.modal._err && !st.assignee ? 'is-err' : ''}"><div class="slot-no">${i + 1}</div><div class="slot-role" style="margin:0;padding-top:8px;">${st.roles.map(x => ROLE_LABEL[x] || x).join(' / ')}<div style="font-weight:500;color:var(--c-mute-3);font-size:11px;">ขั้นที่ ${i + 1}${i === sl.length - 1 ? ' · ขั้นสุดท้าย' : ''}</div></div><div>${st.assignee ? `<div style="display:flex;align-items:center;gap:12px;min-height:38px;">${empChip(st.assignee, st.roles[0])}<button class="btn btn-ghost btn-sm" onclick="slotClear(${i})"><i data-lucide="x" data-sz="12"></i>เปลี่ยน</button></div>` : comboField('slot-' + i)}${state.modal._err && !st.assignee ? '<div class="err-msg">เลือกผู้อนุมัติขั้นนี้</div>' : ''}</div></div>`).join('')}
+      <div class="dw-note" style="margin-top:16px;"><i data-lucide="info" data-sz="15"></i><div>เมื่อส่ง สายจะถูก freeze · เข้ากล่อง My Approval ของคนที่เลือก · ราคายังไม่มีผลจนครบทุกขั้น · หลังส่งแก้ไม่ได้ (ไม่อนุมัติ → กลับร่าง)</div></div></div>
+      <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" onclick="confirmSubmit()"><i data-lucide="send" data-sz="14"></i>ส่งอนุมัติ</button></div>`; }
+    else if (t === 'approve') { const cur = currentStep(r); const last = chainOf(r).filter(st => st.status === 'pending').length <= 1; html = H('check-circle-2', `อนุมัติ — ขั้น ${chainOf(r).indexOf(cur) + 1}/${chainOf(r).length}`) + `<div class="modal-body"><b style="color:var(--c-ink);">${esc(r.code)} — ${esc(r.title)}</b><div style="margin-top:6px;">ส่งโดย ${esc(r.submittedBy || '—')} · ${fmtDT(r.submittedAt)}</div><div style="margin-top:10px;display:flex;gap:18px;flex-wrap:wrap;">${chainOf(r).map((st, i) => `<div style="opacity:${st === cur ? 1 : .55};">${empChip(st.by || st.assignee, st.roles[0], true)}</div>`).join('')}</div>
+      <div class="field" style="margin-top:12px;"><label class="field-label">หมายเหตุ (ไม่บังคับ)</label><input class="input" id="md-note" placeholder="เช่น อนุมัติตามสัญญาการค้า…"></div><div class="dw-note is-ok" style="margin-top:12px;"><i data-lucide="check-check" data-sz="15"></i><div>${last ? `ขั้นสุดท้าย — เมื่ออนุมัติ ราคาใหม่มีผลตั้งแต่ ${fmtDate(r.effective)} · แจ้งผู้ส่งผ่าน ENG-NOTIFY (doa_result)` : 'ยังมีขั้นถัดไป — ส่งต่อให้ผู้อนุมัติขั้นถัดไปผ่าน My Approval'}</div></div></div>
+      <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" onclick="confirmApprove()"><i data-lucide="check-circle-2" data-sz="14"></i>อนุมัติ</button></div>`; }
+    else if (t === 'reject') html = H('undo-2', 'ไม่อนุมัติ — ตีกลับเป็นร่าง', true) + `<div class="modal-body"><b style="color:var(--c-ink);">${esc(r.code)} — ${esc(r.title)}</b> จะกลับเป็น <b>ร่าง</b> ให้ผู้ส่งแก้ไขแล้วส่งใหม่ (สายอนุมัติ resolve ใหม่ตอนส่ง) · ประวัติการตีกลับเก็บ append-only<div class="field" style="margin-top:12px;" id="fld-reason"><label class="field-label">เหตุผล <span class="req">*</span></label><textarea class="input" id="md-reason" placeholder="ระบุเหตุผลที่ไม่อนุมัติ…"></textarea><div class="field-error">ระบุเหตุผล</div></div></div>
+      <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button><button class="btn btn-danger" onclick="confirmReject()"><i data-lucide="undo-2" data-sz="14"></i>ไม่อนุมัติ</button></div>`;
+    else if (t === 'cancel') html = H('x-circle', 'ยกเลิกรอบประกาศราคา?', true) + `<div class="modal-body"><b style="color:var(--c-ink);">${esc(r.code)} — ${esc(r.title)}</b> (${RST[rStatus(r)].label}) จะถูกยกเลิกและไม่มีผลกับราคา · ราคาล่าสุดยังเป็นรอบก่อนหน้า · ยกเลิกแล้วย้อนกลับไม่ได้ (ออกรอบใหม่แทน)
+      <div class="field" style="margin-top:12px;" id="fld-reason"><label class="field-label">เหตุผล <span class="req">*</span></label><textarea class="input" id="md-reason" placeholder="ระบุเหตุผลที่ยกเลิก…"></textarea><div class="field-error">ระบุเหตุผล</div></div></div>
+      <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">กลับ</button><button class="btn btn-danger" onclick="confirmCancel()"><i data-lucide="x-circle" data-sz="14"></i>ยกเลิกรอบ</button></div>`; }
+  card.classList.toggle('is-wide', t === 'submit' || t === 'approve'); card.innerHTML = html; renderIcons();
+}
+function confirmPlArchive() { const pl = findPL(state.modal.id); ROUNDS.filter(r => r.pl === pl.code && ['draft', 'pending_approval', 'scheduled'].includes(rStatus(r))).forEach(r => { chainOf(r).forEach(st => { if (st.status === 'pending') st.status = 'cancelled'; }); r.status = 'cancelled'; r.approval_status = 'cancelled'; pushAudit(r, 'ยกเลิกรอบ', 'บัญชีราคาถูกเก็บถาวร'); }); pl.status = 'archived'; pl.updatedBy = ME.name; pl.updatedAt = nowIso(); state.modal = { open: false }; showToast(`เก็บ ${pl.code} ถาวรแล้ว`, 'success'); openPlView(pl.id); }
+function confirmSubmit() { const r = findR(state.modal.id); const sl = state.modal.slots || []; if (sl.some(st => !st.assignee)) { state.modal._err = true; renderModal(); showToast('เลือกผู้อนุมัติให้ครบทุกขั้น', 'warning'); return; } state.modal = { open: false }; if (staleLines(r).length) { showToast('ฐานราคาเปลี่ยน — refresh ก่อนประกาศ', 'warning'); openView(r.id); return; } doSubmit(r, sl.map(st => st.assignee)); openView(r.id); }
+function slotClear(i) { state.modal.slots[i].assignee = null; cbReset(); renderModal(); }
+function confirmApprove() {
+  const r = findR(state.modal.id); const cur = currentStep(r);
+  if (!canActStep(r)) { showToast('ไม่ใช่ผู้มีสิทธิ์ในขั้นปัจจุบัน', 'warning'); return; }
+  const note = (document.getElementById('md-note') || {}).value || ''; cur.status = 'approved'; cur.by = ME.name; cur.at = nowIso(); cur.note = note;
+  const idx = chainOf(r).indexOf(cur); const next = currentStep(r);
+  if (next) { r.approver_role = next.roles[0]; pushAudit(r, `อนุมัติขั้น ${idx + 1}/${chainOf(r).length} · ${ME.name} (${ROLE_LABEL[cur.roles[0]] || cur.roles[0]})`, note); showToast(`อนุมัติขั้น ${idx + 1} แล้ว — ส่งต่อ ${next.assignee || (ROLE_LABEL[next.roles[0]] || next.roles[0])}`, 'success'); }
+  else { r.status = 'scheduled'; r.approval_status = 'approved'; r.approved_by = ME.name; r.approved_at = nowIso(); r.approver_role = null; r.announcedBy = ME.name; r.announcedAt = nowIso(); pushAudit(r, `อนุมัติขั้น ${idx + 1}/${chainOf(r).length} · ${ME.name} (${ROLE_LABEL[cur.roles[0]] || cur.roles[0]}) — ครบสาย ประกาศราคาแล้ว`, note); showToast(rStatus(r) === 'effective' ? 'อนุมัติครบสาย — ราคามีผลทันที' : `อนุมัติครบสาย — มีผล ${fmtDate(r.effective)}`, 'success'); }
+  state.modal = { open: false }; openView(r.id);
+}
+function reasonOr() { const el = document.getElementById('md-reason'); const v = (el ? el.value : '').trim(); if (!v) { const f = document.getElementById('fld-reason'); if (f) f.classList.add('is-error'); showToast('กรุณากรอกข้อมูลให้ครบถ้วน', 'warning'); } return v; }
+function confirmReject() { const r = findR(state.modal.id); const reason = reasonOr(); if (!reason) return; const cur = currentStep(r); if (!canActStep(r)) { showToast('ไม่ใช่ผู้มีสิทธิ์ในขั้นปัจจุบัน', 'warning'); return; } cur.status = 'rejected'; cur.by = ME.name; cur.at = nowIso(); cur.note = reason; r.approval_history = (r.approval_history || []).concat([{ submittedBy: r.submittedBy, submittedAt: r.submittedAt, chain: r.approval_chain, result: 'rejected' }]); r.status = 'draft'; r.approval_status = 'draft'; r.approved_by = null; r.approver_role = null; r.approval_chain = null; pushAudit(r, 'ไม่อนุมัติ · ' + cur.roles.map(x => ROLE_LABEL[x] || x).join('/') + ' — ตีกลับเป็นร่าง', reason); state.modal = { open: false }; showToast('ตีกลับแล้ว — กลับเป็นร่าง แจ้งผู้ส่งผ่าน ENG-NOTIFY', 'success'); openView(r.id); }
+function confirmCancel() { const r = findR(state.modal.id); const reason = reasonOr(); if (!reason) return; chainOf(r).forEach(st => { if (st.status === 'pending') st.status = 'cancelled'; }); r.status = 'cancelled'; r.approval_status = 'cancelled'; pushAudit(r, 'ยกเลิกรอบ', reason); state.modal = { open: false }; showToast(`ยกเลิก ${r.code} แล้ว`, 'success'); openView(r.id); }
+
+// ---------- master combobox (#94 · portal #95) ----------
+function comboSpec(key) {
+  const rowT = (ico, t, s) => `<div class="cb-row"><div class="cb-ico"><i data-lucide="${ico}" data-sz="14"></i></div><div style="min-width:0;flex:1;"><div class="cb-t">${t}</div>${s ? `<div class="cb-s">${s}</div>` : ''}</div></div>`;
+  const prodItems = q => PRODUCTS.filter(p => !q || (p.name + ' ' + p.code + ' ' + CAT_BY[p.cat].name).toLowerCase().includes(q));
+  const prodRow = p => rowT('package', esc(p.name), `${p.code} · ${esc(CAT_BY[p.cat].name)} · ราคาตั้ง ${fm(p.list)} ฿/${esc(p.uom)}`);
+  if (key === 'plpick') return { ph: 'พิมพ์ค้นหาบัญชีราคา… หรือเลือก "ทุกบัญชีราคา"', get: () => state.form.pl, set: v => fSetPl(v), items: q => [ALL_PL].concat(PLS.filter(p => p.status === 'active')).filter(p => !q || (p.name + ' ' + p.code + ' ' + scopeText(p) + ' ทุกช่องทาง').toLowerCase().includes(q)), row: p => p.code === '*' ? rowT('layers', '<span style="color:var(--c-danger);">ทุกบัญชีราคา</span> — ทับราคาสินค้าในรอบนี้ทุกช่องทาง/กลุ่ม/ลูกค้า', 'ราคาใหม่แทนราคาล่าสุดในทุกบัญชีตั้งแต่วันมีผล · บัญชีใดจะออกรอบทับอีกทีภายหลังก็ได้ (ล่าสุดชนะ)') : rowT(SCOPE[p.scope.type].icon, esc(p.name), `${p.code} · ${SCOPE[p.scope.type].label} · ${esc(scopeText(p))}`), val: p => p.code, disp: v => { const p = findPL(v); return v === '*' ? 'ทุกบัญชีราคา (ทับทุกช่องทาง/กลุ่ม)' : p ? p.code + ' · ' + p.name : v; }, empty: q => `ไม่พบบัญชีราคา "${esc(q)}" — สร้างที่แท็บ บัญชีราคา` };
+  if (key === 'addprod') return { ph: 'พิมพ์รหัส/ชื่อสินค้าเพื่อเพิ่มในรอบ…', get: () => '', set: v => lineAdd(v), items: q => prodItems(q).filter(p => !state.form.lines.some(l => l.product === p.code && l.uom === p.uom)), row: p => { const b = state.form.pl ? basePrice(state.form.pl, p.code, p.uom, state.drawer.id) : null; return rowT('package', esc(p.name), `${p.code} · ${esc(CAT_BY[p.cat].name)}${b ? ' · ' + (state.form.pl === '*' ? 'ฐานกลาง ' : 'ล่าสุด ') + fm(b.price) + (b.src === 'list' ? ' (ราคาตั้ง)' : ' (' + b.src + ')') : ''}`); }, val: p => p.code, empty: q => `ไม่พบสินค้า "${esc(q)}" — เพิ่มที่ Item Master`, keep: true };
+  if (key === 'plref') { const f = state.plForm; const t = f.scopeType; const src = t === 'customer' ? CUSTOMERS.map(c => ({ code: c.code, name: c.name, sub: c.code + ' · ' + (GROUP_BY[c.group] || {}).name, ico: 'building-2' })) : t === 'group' ? GROUPS.map(g => ({ code: g.code, name: g.name, sub: g.code, ico: 'users' })) : CHANNELS.map(c => ({ code: c.code, name: c.name, sub: c.code, ico: 'tag' }));
+    return { ph: 'พิมพ์ค้นหา' + SCOPE[t].pick + '…', get: () => '', set: v => { if (v && !f.refs.includes(v)) f.refs.push(v); }, items: q => src.filter(x => !f.refs.includes(x.code) && (!q || (x.name + ' ' + x.code + ' ' + x.sub).toLowerCase().includes(q))), row: x => rowT(x.ico, esc(x.name), esc(x.sub)), val: x => x.code, empty: q => `ไม่พบ "${esc(q)}"`, keep: true }; }
+  if (key.startsWith('slot-')) { const i = +key.slice(5); const st = state.modal.slots && state.modal.slots[i]; if (!st) return null;
+    return { ph: 'ค้นหาชื่อคนในตำแหน่ง ' + st.roles.map(x => ROLE_LABEL[x] || x).join('/') + '…', get: () => '', set: v => { st.assignee = v; }, items: q => EMPLOYEES.filter(e => st.roles.includes(e.role) && e.name !== ME.name && (!q || (e.name + ' ' + e.code + ' ' + e.dept).toLowerCase().includes(q))), row: e => `<div class="cb-row"><span class="emp-av" style="width:26px;height:26px;font-size:10px;">${esc(e.initials)}</span><div style="min-width:0;flex:1;"><div class="cb-t">${esc(e.name)}</div><div class="cb-s">${esc(ROLE_LABEL[e.role] || e.role)} · ${esc(e.dept)} · ${e.code}</div></div></div>`, val: e => e.name, empty: q => `ไม่พบคนในตำแหน่งนี้ "${esc(q)}" — ตรวจ Employee/DOA`, modal: true }; }
+  if (key === 'sim-cust') return { ph: 'ค้นหาลูกค้า… (เว้นว่างได้)', get: () => state.sim.customer, set: v => { state.sim.customer = v; state.sim.channel = ''; }, items: q => CUSTOMERS.filter(c => !q || (c.name + ' ' + c.code).toLowerCase().includes(q)), row: c => rowT('building-2', esc(c.name), `${c.code} · ${esc((GROUP_BY[c.group] || {}).name)}`), val: c => c.code, disp: v => (CUST_BY[v] || {}).name || v, empty: q => `ไม่พบลูกค้า "${esc(q)}"` };
+  if (key === 'sim-chan') return { ph: 'ใช้ช่องทางของลูกค้า', get: () => state.sim.channel, set: v => { state.sim.channel = v; }, items: q => CHANNELS.filter(c => !q || (c.name + ' ' + c.code).toLowerCase().includes(q)), row: c => rowT('tag', esc(c.name), c.code), val: c => c.code, disp: v => (CHAN_BY[v] || {}).name || v, empty: q => `ไม่พบช่องทาง "${esc(q)}"` };
+  if (key === 'sim-prod') return { ph: 'พิมพ์รหัส/ชื่อสินค้า…', get: () => state.sim.product, set: v => { state.sim.product = v; const p = PROD_BY[v]; if (p) state.sim.uom = p.uom; }, items: prodItems, row: prodRow, val: p => p.code, disp: v => { const p = PROD_BY[v]; return p ? p.code + ' · ' + p.name : v; }, empty: q => `ไม่พบสินค้า "${esc(q)}"` };
+  return null;
+}
+function comboField(key) {
+  const c = comboSpec(key); if (!c) return ''; const raw = c.get() || ''; const cur = c.disp ? c.disp(raw) : raw; const isOpen = cb.open && cb.key === key; const shown = isOpen ? cb.query : cur;
+  return `<div class="cbx" id="cbx-${key}"><span class="cb-lead"><i data-lucide="search" data-sz="14"></i></span><input class="input" id="cbi-${key}" autocomplete="off" value="${esc(shown)}" placeholder="${esc(c.ph)}" oninput="cbInput('${key}',this.value)" onfocus="cbFocus('${key}')" onkeydown="cbKey('${key}',event)">
+    ${raw && !isOpen ? `<button class="icon-btn cb-clear" title="ล้างการเลือก" onclick="cbClear('${key}')"><i data-lucide="x" data-sz="14"></i></button>` : `<span class="cb-tail"><i data-lucide="chevron-down" data-sz="14"></i></span>`}</div>`;
+}
+function cbReset() { cb = { open: false, key: null, query: '', hi: 0 }; const h = document.getElementById('dd-portal'); if (h) h.innerHTML = ''; }
+function cbRe(key) { if (key && key.startsWith('slot-')) { renderModal(); renderPortal(); const el = document.getElementById('cbi-' + key); if (el) { el.focus(); const n = el.value.length; el.setSelectionRange(n, n); } } else renderDrawerOnly(key); }
+function cbFocus(key) { if (cb.open && cb.key === key) return; cb = { open: true, key, query: '', hi: 0 }; cbRe(key); }
+function cbInput(key, v) { cb.key = key; cb.query = v; cb.open = true; cb.hi = 0; cbRe(key); }
+function cbClear(key) { const c = comboSpec(key); if (c) c.set(''); cbReset(); renderDrawerOnly(); const el = document.getElementById('cbi-' + key); if (el) el.focus(); }
+function cbPick(key, i) { const c = comboSpec(key); if (!c) return; const list = c.items(cb.query.trim().toLowerCase()); const it = list[i]; if (!it) return; c.set(c.val(it)); if (c.keep) { cb.query = ''; cb.hi = 0; cbRe(key); } else { cbReset(); if (c.modal) renderModal(); else renderDrawerOnly(); } }
+function cbKey(key, e) { if (!cb.open || cb.key !== key) return; const c = comboSpec(key); const list = c.items(cb.query.trim().toLowerCase());
+  if (e.key === 'ArrowDown') { cb.hi = Math.min(cb.hi + 1, list.length - 1); renderPortal(); e.preventDefault(); } else if (e.key === 'ArrowUp') { cb.hi = Math.max(cb.hi - 1, 0); renderPortal(); e.preventDefault(); } else if (e.key === 'Enter') { cbPick(key, cb.hi); e.preventDefault(); } else if (e.key === 'Escape') { cbReset(); if (c.modal) renderModal(); else renderDrawerOnly(); e.stopPropagation(); } }
+function renderPortal() {
+  const host = document.getElementById('dd-portal'); if (!host) return; if (!cb.open || !cb.key) { host.innerHTML = ''; return; }
+  const anchor = document.getElementById('cbx-' + cb.key); const c = comboSpec(cb.key); if (!anchor || !c) { host.innerHTML = ''; return; }
+  const r = anchor.getBoundingClientRect(); const q = cb.query.trim().toLowerCase(); const list = c.items(q);
+  const body = list.length ? list.map((it, i) => `<button type="button" class="cb-item ${i === cb.hi ? 'is-hi' : ''}" onmousedown="event.preventDefault()" onclick="cbPick('${cb.key}',${i})">${c.row(it)}</button>`).join('') : `<div class="cb-empty">${c.empty(cb.query)}</div>`;
+  const openUp = (window.innerHeight - r.bottom) < 240 && r.top > 260;
+  host.innerHTML = `<div class="cb-menu" style="position:fixed;left:${r.left}px;width:${Math.max(r.width, 300)}px;${openUp ? `bottom:${window.innerHeight - r.top + 4}px;` : `top:${r.bottom + 4}px;`}">${body}</div>`; renderIcons();
+}
+document.addEventListener('mousedown', e => { if (cb.open && !e.target.closest('#cbx-' + cb.key) && !e.target.closest('.cb-menu')) { const key = cb.key; cbReset(); const el = document.getElementById('cbi-' + key); const c = comboSpec(key); if (el && c) { const raw = c.get() || ''; el.value = c.disp ? c.disp(raw) : raw; } } });
+window.addEventListener('scroll', () => { if (cb.open) renderPortal(); }, true);
+window.addEventListener('resize', () => { if (cb.open) renderPortal(); });
+
+// ---------- toast · esc chain · router ----------
+function showToast(msg, kind) { const w = document.getElementById('toastWrap'); const t = document.createElement('div'); t.className = 'toast' + (kind ? ' is-' + kind : ''); t.innerHTML = `<i data-lucide="${kind === 'warning' ? 'alert-triangle' : kind === 'info' ? 'info' : 'check-circle-2'}" data-sz="15"></i>${msg}`; w.appendChild(t); renderIcons(); setTimeout(() => t.remove(), 3500); }
+document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; if (cb.open) { const m = cb.key && cb.key.startsWith('slot-'); cbReset(); if (m) renderModal(); else renderDrawerOnly(); e.stopImmediatePropagation(); return; } if (state.modal.open) { closeModal(); e.stopImmediatePropagation(); return; } if (state.drawer.open) { if (['edit', 'create', 'plcreate', 'pledit'].includes(state.drawer.mode)) cancelForm(); else closeDrawer(); } }, true);
+function route() { if (!location.hash || location.hash === '#/') location.hash = '#/price-lists'; render(); }
+window.addEventListener('hashchange', route);
+window.addEventListener('DOMContentLoaded', route);
+
+</script>
+<!-- PREFLIGHT v8: F-SALES-PL v2.3 (rounds · DOA slots · broadcast) · node --check OK · audit FAIL=0 (WARN #21 data-sz / font tokens / #47 uses kit .d-stepper per skill drawer rule) · Playwright pageerror=0 @1440+@1024 · flows: 3 tabs list/sort/filter/export · round view 3 tabs · pl view · create 3-step + bulk/adjust/import + validation + stale-base guard + refresh · submit w/ per-slot approver picker · multi-step approve (SoD, persona) · reject→draft w/ history · cancel · archive cascades · sim resolver · combobox portal · esc chain -->
+</body>
+</html>
