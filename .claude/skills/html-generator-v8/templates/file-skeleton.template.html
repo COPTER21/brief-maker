@@ -41,6 +41,16 @@
   --c-danger: #E62E24;
   --sidebar-w: 232px;
   --shell-h: 52px;
+  /* ============== Z-INDEX SCALE (ลำดับชั้นการซ้อน) ==============
+     BASE-KIT อ้าง var ชุดนี้ทุก overlay — ขาดไปแล้ว computed เป็น auto ทั้งหมด
+     ผลคือหัวตาราง sticky วาดทับลิ้นชัก · เจอจริง 2026-08-04 (F-COA-001) */
+  --z-shell: 20;      /* sidebar */
+  --z-sticky: 30;     /* shell-bar · thead sticky */
+  --z-dropdown: 40;   /* user menu · tooltip */
+  --z-backdrop: 50;   /* ฉากหลัง drawer/modal · search list */
+  --z-drawer: 55;     /* ตัวลิ้นชัก/หน้าต่าง */
+  --z-portal: 60;     /* เมนูที่ portal ออกไป #overlay-root (Rule #95) — ต้องเหนือลิ้นชัก */
+  --z-toast: 90;      /* สูงสุด — ต้องเห็นเหนือทุกอย่าง */
   /* v3.13 — Fixed type scale (Iron Rule locked values) */
   --fs-h1: 22px;        /* page title */
   --fs-h2: 17px;        /* section title */
@@ -62,6 +72,8 @@ html, body { margin:0; padding:0; }
 /* Rule #35 — Layout Stability: จองพื้นที่ scrollbar ไว้เสมอ → เปิด modal/drawer หรือ
    content โตขึ้นแล้ว scrollbar โผล่/หาย จะไม่ทำให้หน้าจอขยับซ้าย-ขวา (jank) */
 html { scrollbar-gutter: stable; }
+/* scroll lock — เปิด overlay แล้วพื้นหลังต้องไม่ scroll ตาม (ทำงานคู่กับ lockScroll ใน UTILS) */
+body.is-overlay-open { overflow: hidden; }
 
 /* ============== SCROLLBAR (Iron Rule #49 — minimal, ห้าม default) ============== */
 /* เส้นบางมาก 5px · track โปร่งใส · พื้นเข้ม (sidebar/panel) = ขาวโปร่ง · พื้นสว่าง = charcoal จาง */
@@ -361,7 +373,7 @@ input[type="number"] { -moz-appearance: textfield; }
 /* ============== v7.1 LIST FULL-HEIGHT — Rule #96 ============== */
 /* หน้า list หลัก: ตารางยืดเต็มพื้นที่เหลือ ติดขอบล่างเสมอ ทุกขนาดจอ */
 .page-fill { display:flex; flex-direction:column;
-  min-height: calc(100dvh - var(--shellbar-h, 52px) - 48px); } /* 48 = content padding บน+ล่าง */
+  min-height: calc(100dvh - var(--shellbar-h, 52px) - 48px); } /* 48 = ระยะขอบบน+ล่างของ .content */
 @media (max-width:1180px){ .page-fill { min-height: calc(100dvh - var(--shellbar-h, 52px) - 32px); } }
 .page-fill > .card-list, .page-fill > .list-card { flex:1 1 auto; min-height:0;
   display:flex; flex-direction:column; }
@@ -371,8 +383,8 @@ input[type="number"] { -moz-appearance: textfield; }
 
 /* ============== v7.1 OVERLAY PORTAL — Rule #95 ============== */
 /* เมนูที่ portal ออกจาก scroll container (ใช้คู่ portalMenu util) */
-.menu-fixed { position:fixed !important; z-index:var(--z-dropdown);
-  background:#fff; border:1px solid var(--c-line, #E7E2DB); border-radius:10px;
+.menu-fixed { position:fixed !important; z-index:var(--z-portal);
+  background:#fff; border:1px solid var(--c-line, #DEDAD4); border-radius:10px;
   box-shadow:0 12px 32px rgba(17,17,17,.14); overflow-y:auto; }
 
 /* ============== PAGE HEADER ============== */
@@ -551,7 +563,7 @@ input[type="number"] { -moz-appearance: textfield; }
   pointer-events: none;
 }
 
-/* ===== SEARCH-SELECT (Iron Rule #34) — searchable dropdown แทน <select> เมื่อ options เยอะ/lookup master =====
+/* ===== SEARCH-SELECT (Iron Rule #34) — searchable dropdown แทน select ธรรมดา เมื่อ options เยอะ/lookup master =====
    list = position:absolute overlay → ไม่ดันเนื้อหา (สอดคล้อง Rule #35) */
 .search-select { position: relative; width: 100%; }
 .search-select .ss-input { padding-left:32px; padding-right:32px; }
@@ -631,7 +643,7 @@ input[type="number"] { -moz-appearance: textfield; }
 /* Rule #42 — Long-list UX: sticky header (opt-in .is-sticky) — ตารางยาว scroll หัวค้าง */
 .table-scroll.is-sticky { max-height: 560px; overflow-y: auto; scrollbar-gutter: stable; }
 .table-scroll.is-sticky thead th {
-  position: sticky; top: 0; z-index: 3;
+  position: sticky; top: 0; z-index: var(--z-sticky);
   background: var(--c-bg-off);            /* ⚠️ ต้องทึบที่ตัว th (ไม่ใช่แค่ thead) — ไม่งั้น row เลื่อนทะลุซ้อนหัว */
   box-shadow: inset 0 -1px 0 var(--c-line-2);  /* border-bottom สำหรับ sticky (border ปกติหายตอน sticky) */
 }
@@ -1463,12 +1475,20 @@ function openDrawer(mode, recordId) {
   // Trigger CSS animation
   requestAnimationFrame(() => {
     document.getElementById('drawerBackdrop').classList.add('is-open');
-    document.getElementById('drawer').classList.add('is-open');
+    const dw = document.getElementById('drawer');
+    dw.classList.add('is-open');
+    dw.setAttribute('aria-hidden', 'false');
+    lockScroll(true);
+    trapFocus(dw);
   });
 }
 function closeDrawer() {
   document.getElementById('drawerBackdrop').classList.remove('is-open');
-  document.getElementById('drawer').classList.remove('is-open');
+  const dw = document.getElementById('drawer');
+  dw.classList.remove('is-open');
+  dw.setAttribute('aria-hidden', 'true');
+  releaseFocus(dw);
+  lockScroll(false);
   setTimeout(() => {
     state.drawer = { open: false, mode: null, recordId: null, step: 1 };
   }, 280);
@@ -1477,11 +1497,18 @@ function openModal(type, data) {
   state.modal = { open: true, type, data };
   render();
   requestAnimationFrame(() => {
-    document.getElementById('modalBackdrop').classList.add('is-open');
+    const mb = document.getElementById('modalBackdrop');
+    mb.classList.add('is-open');
+    lockScroll(true);
+    trapFocus(mb.querySelector('.modal') || mb);
   });
 }
 function closeModal() {
-  document.getElementById('modalBackdrop').classList.remove('is-open');
+  const mb = document.getElementById('modalBackdrop');
+  mb.classList.remove('is-open');
+  releaseFocus(mb.querySelector('.modal') || mb);
+  /* ลิ้นชักอาจยังเปิดอยู่ข้างหลัง — ปลดล็อกเฉพาะตอนไม่มี overlay เหลือแล้ว */
+  lockScroll(!!(window.state && state.drawer && state.drawer.open));
   setTimeout(() => {
     state.modal = { open: false, type: null, data: null };
   }, 200);
@@ -1547,7 +1574,7 @@ function renderIcons() {
 // ============================================
 // SEARCH-SELECT (Iron Rule #34) — generic searchable dropdown
 // ------------------------------------------------
-// ใช้แทน <select> เมื่อ options เยอะ (>8) หรือเป็น lookup จาก master อื่น.
+// ใช้แทน select ธรรมดา เมื่อ options เยอะ (>8) หรือเป็น lookup จาก master อื่น.
 // list = position:absolute overlay → ไม่ดันเนื้อหา. แก้เฉพาะ list ตอนพิมพ์ →
 // ไม่ rebuild ทั้งหน้า (ไม่ชน Rule #29). decoupled — เรียก onSelect callback ไม่ผูก render().
 //
@@ -1562,6 +1589,7 @@ function renderIcons() {
 // option fields: { value, label, sub?, icon?, right? }
 // ============================================
 window.__ss = window.__ss || {};
+function ssId(p, k){ return p + k; }
 function ssGet(key){ return window.__ss[key]; }
 function ssEscapeReg(s){ return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
@@ -1600,18 +1628,18 @@ function ssFiltered(key){
 function ssSyncChrome(key){
   var s = ssGet(key); if(!s) return;
   var sel = s.options.find(function(o){ return o.value === s.value; });
-  var c = document.getElementById('ss-clear-' + key); if(c) c.classList.toggle('hidden', !sel);
-  var k = document.getElementById('ss-caret-' + key); if(k) k.classList.toggle('hidden', !!sel);
+  var c = document.getElementById(ssId('ss-clear-', key)); if(c) c.classList.toggle('hidden', !sel);
+  var k = document.getElementById(ssId('ss-caret-', key)); if(k) k.classList.toggle('hidden', !!sel);
 }
 function ssSetText(key){
   var s = ssGet(key); if(!s) return;
-  var input = document.getElementById('ss-input-' + key); if(!input) return;
+  var input = document.getElementById(ssId('ss-input-', key)); if(!input) return;
   var sel = s.options.find(function(o){ return o.value === s.value; });
   input.value = s.open ? s.query : (sel ? sel.label : '');
 }
 function ssRenderList(key){
   var s = ssGet(key); if(!s) return;
-  var list = document.getElementById('ss-list-' + key); if(!list) return;
+  var list = document.getElementById(ssId('ss-list-', key)); if(!list) return;
   var items = ssFiltered(key);
   if(items.length === 0){
     list.innerHTML = '<div class="ss-empty">' + s.emptyText + '</div>';
@@ -1633,17 +1661,19 @@ function ssRenderList(key){
 function ssOpen(key){ var s = ssGet(key); if(!s) return; s.open = true; s.query = ''; s.hi = 0; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
 function ssOnInput(key, val){ var s = ssGet(key); if(!s) return; s.query = val; s.open = true; s.hi = 0; s.value = null; ssSyncChrome(key); ssRenderList(key); }
 function ssPick(key, i){ var s = ssGet(key); if(!s) return; var o = ssFiltered(key)[i]; if(!o) return; s.value = o.value; s.query = ''; s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); s.onSelect(o.value, o); }
-function ssClear(key){ var s = ssGet(key); if(!s) return; s.value = null; s.query = ''; s.open = true; ssSetText(key); ssSyncChrome(key); ssRenderList(key); var inp = document.getElementById('ss-input-' + key); if(inp) inp.focus(); s.onSelect(null, null); }
+function ssClear(key){ var s = ssGet(key); if(!s) return; s.value = null; s.query = ''; s.open = true; ssSetText(key); ssSyncChrome(key); ssRenderList(key); var inp = document.getElementById(ssId('ss-input-', key)); if(inp) inp.focus(); s.onSelect(null, null); }
 function ssOnKey(key, e){
   var s = ssGet(key); if(!s) return; var items = ssFiltered(key);
   if(e.key === 'ArrowDown'){ e.preventDefault(); s.open = true; s.hi = Math.min(items.length - 1, s.hi + 1); ssRenderList(key); }
   else if(e.key === 'ArrowUp'){ e.preventDefault(); s.hi = Math.max(0, s.hi - 1); ssRenderList(key); }
   else if(e.key === 'Enter'){ e.preventDefault(); if(items[s.hi]) ssPick(key, s.hi); }
-  else if(e.key === 'Escape'){ s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+  /* Esc ต้องปิดแค่เมนู ห้ามให้ event ทะลุไปปิดลิ้นชัก/หน้าต่างยืนยัน (Rule #94 ข้อ 3 — Esc chain)
+     แก้ 2026-08-03 โดยทีม ERP-Design · ดู CLAUDE.md หัวข้อ "แก้ที่ตัว skill" */
+  else if(e.key === 'Escape'){ e.stopPropagation(); s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
 }
 document.addEventListener('click', function(e){
   Object.keys(window.__ss || {}).forEach(function(key){
-    var wrap = document.getElementById('ss-' + key); var s = ssGet(key);
+    var wrap = document.getElementById(ssId('ss-', key)); var s = ssGet(key);
     if(wrap && s && s.open && !wrap.contains(e.target)){ s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
   });
 });
@@ -1843,6 +1873,38 @@ function openOverlay(menu,trigger){document.querySelectorAll('[data-overlay].ope
 function closeOverlay(menu){menu.classList.remove('open');if(menu._trigger)menu._trigger.focus();}
 document.addEventListener('click',e=>{document.querySelectorAll('[data-overlay].open').forEach(m=>{
   if(!m.contains(e.target)&&!(m._trigger&&m._trigger.contains(e.target)))closeOverlay(m);});});
+
+/* --- scroll lock + focus trap (#a11y · เพิ่ม 2026-08-04) ---
+   lockScroll: กันพื้นหลังเลื่อนตอน overlay เปิด · นับชั้นได้ (modal ซ้อน drawer)
+   trapFocus : กัน Tab หลุดออกไปพื้นหลัง + โฟกัสตัวแรกในกล่อง + คืนโฟกัสเดิมตอนปิด */
+function lockScroll(on){ document.body.classList.toggle('is-overlay-open', !!on); }
+var __focusStack = [];
+function trapFocus(box){
+  if(!box) return;
+  var prev = document.activeElement;
+  var sel = 'a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  function onKey(e){
+    if(e.key !== 'Tab') return;
+    var f = [].slice.call(box.querySelectorAll(sel)).filter(function(el){ var r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; });
+    if(!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+  box.__trap = onKey; box.__prevFocus = prev;
+  document.addEventListener('keydown', onKey);
+  requestAnimationFrame(function(){
+    var f = box.querySelector(sel);
+    if(f) f.focus();
+  });
+}
+function releaseFocus(box){
+  if(!box || !box.__trap) return;
+  document.removeEventListener('keydown', box.__trap);
+  var prev = box.__prevFocus;
+  box.__trap = null; box.__prevFocus = null;
+  if(prev && typeof prev.focus === 'function') prev.focus();
+}
 /* ===== END BASE-KIT UTILS ===== */
 </script>
 <style id="page-late">/* late additions เท่านั้น (#69) — ห้าม inline */</style>

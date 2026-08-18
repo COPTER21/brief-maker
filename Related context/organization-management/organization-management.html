@@ -1,0 +1,2275 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organization · CUBE NATIVE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============== CSS VARIABLES (CUBE NATIVE CI) ============== */
+:root {
+  --c-navy: #0B1D3A;
+  --c-navy-2: #14284A;
+  --c-primary: #0B5CFF;
+  --c-primary-hover: #0847CC;
+  --c-teal: #00A88E;
+  --c-teal-light: #5EEAD4;
+  --c-ink: #0F172A;
+  --c-mute: #475569;
+  --c-mute-2: #64748B;
+  --c-mute-3: #94A3B8;
+  --c-line: #CBD5E1;
+  --c-line-2: #E2E8F0;
+  --c-line-3: #F1F5F9;
+  --c-bg-off: #F6F8FB;
+  --c-success: #10B981;
+  --c-warning: #D97706;
+  --c-danger: #DC2626;
+  --sidebar-w: 232px;
+  --shell-h: 52px;
+}
+
+/* ============== RESET ============== */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans Thai', 'Inter', system-ui, sans-serif;
+  background: var(--c-bg-off);
+  color: #1E293B;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  /* Admin tools: force horizontal scroll on narrow widths */
+  min-width: 1180px;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+[data-lucide] { flex-shrink: 0; }
+
+/* Hide number input spinner globally (Iron Rule #19) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ============== SIDEBAR ============== */
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sidebar-w);
+  background: linear-gradient(180deg, #0B1D3A 0%, #14284A 50%, #0B1D3A 100%);
+  color: #E2E8F0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.sb-brand {
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+.sb-logo {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, #0B5CFF, #00A88E);
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(11,92,255,0.3);
+}
+.sb-name { font-weight: 700; font-size: 14px; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+.sb-sub { font-size: 10px; color: #94A3B8; letter-spacing: 0.06em; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+.sb-nav { flex: 1; padding: 12px 8px; overflow-y: auto; }
+
+/* Module = collapsible group (Iron Rule #27).
+   Header toggles expand/collapse only — NOT navigable.
+   Children = .sb-features (clickable feature items). */
+.sb-module { margin-bottom: 4px; }
+.sb-module-header {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: transparent; border: 0;
+  color: #94A3B8;
+  font-family: inherit;
+  font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  cursor: pointer; transition: all 120ms;
+  text-align: left;
+}
+.sb-module-header:hover { background: rgba(255,255,255,0.04); color: #CBD5E1; }
+.sb-module-header .mod-icon { flex-shrink: 0; opacity: 0.7; }
+.sb-module-header .mod-label { flex: 1; }
+.sb-module-header .mod-chevron {
+  flex-shrink: 0;
+  transition: transform 200ms;
+  opacity: 0.7;
+}
+.sb-module[data-expanded="false"] .mod-chevron { transform: rotate(-90deg); }
+.sb-module[data-expanded="false"] .sb-features { display: none; }
+
+.sb-features { padding: 2px 0 6px 0; }
+
+.sb-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 12px 7px 14px;
+  border-radius: 6px;
+  color: #CBD5E1;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms;
+  margin-bottom: 1px;
+  position: relative;
+  user-select: none;
+}
+.sb-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sb-item.is-active {
+  background: #0B5CFF;
+  color: #fff;
+  font-weight: 600;
+}
+.sb-item.is-active::before {
+  content: '';
+  position: absolute;
+  left: -10px; top: 7px; bottom: 7px;
+  width: 3px;
+  background: #fff;
+  border-radius: 0 2px 2px 0;
+}
+.sb-item [data-lucide] { width: 16px; height: 16px; opacity: 0.85; }
+.sb-item.is-active [data-lucide] { opacity: 1; }
+.sb-badge {
+  margin-left: auto;
+  font-size: 10.5px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.10);
+  color: #94A3B8;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+.sb-item.is-active .sb-badge { background: rgba(255,255,255,0.18); color: #fff; }
+.sb-item.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.sb-item.is-disabled:hover { background: transparent; color: #CBD5E1; }
+.sb-footer {
+  padding: 12px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: #94A3B8;
+}
+.pulse-dot {
+  width: 7px; height: 7px;
+  background: var(--c-teal);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(0,168,142,0.20);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ============== MAIN ============== */
+.main {
+  margin-left: var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--c-bg-off);
+}
+
+/* ============== SHELL BAR ============== */
+.shell-bar {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  border-bottom: 1px solid var(--c-line-2);
+  height: var(--shell-h);
+  display: flex;
+  align-items: center;
+  padding: 0 22px;
+  z-index: 19;
+  gap: 12px;
+}
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--c-mute);
+}
+.breadcrumb a { cursor: pointer; transition: color 120ms; }
+.breadcrumb a:hover { color: var(--c-primary); }
+.breadcrumb .sep { color: var(--c-mute-3); font-size: 10px; }
+.breadcrumb-current { color: var(--c-ink); font-weight: 500; }
+.icon-btn {
+  width: 34px; height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--c-mute);
+  border-radius: 7px;
+  position: relative;
+  transition: all 120ms;
+}
+.icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.icon-btn [data-lucide] { width: 17px; height: 17px; }
+.notif-dot {
+  position: absolute;
+  top: 7px; right: 8px;
+  width: 7px; height: 7px;
+  background: var(--c-danger);
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 10px 5px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 120ms;
+}
+.user-chip:hover { background: var(--c-line-3); }
+.user-text { line-height: 1.2; text-align: right; }
+.user-name { font-size: 12.5px; font-weight: 500; color: var(--c-ink); white-space: nowrap; }
+.user-role { font-size: 10.5px; color: var(--c-mute-2); white-space: nowrap; margin-top: 1px; }
+.avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* User dropdown menu */
+.user-menu {
+  position: absolute;
+  top: calc(var(--shell-h) - 4px);
+  right: 22px;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(11,29,58,0.12);
+  width: 240px;
+  z-index: 30;
+  padding: 6px;
+  display: none;
+}
+.user-menu.is-open { display: block; }
+.user-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 11px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--c-ink);
+  cursor: pointer;
+  transition: background 120ms;
+}
+.user-menu-item:hover { background: var(--c-bg-off); }
+.user-menu-item [data-lucide] { width: 15px; height: 15px; color: var(--c-mute-2); }
+.user-menu-item.is-danger { color: var(--c-danger); }
+.user-menu-item.is-danger [data-lucide] { color: var(--c-danger); }
+.user-menu-divider { height: 1px; background: var(--c-line-2); margin: 5px 0; }
+
+/* ============== CONTENT ============== */
+/* Fluid full-width — content stretches to fill viewport (Iron Rule #30).
+   Do NOT add max-width here; component-level constraints (modal/toast/wizard
+   internal cards) are responsible for their own readability bounds. */
+.content {
+  padding: 22px;
+}
+
+/* ============== PAGE HEADER ============== */
+.ph {
+  margin-bottom: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+}
+.ph > div:first-child { flex: 1 1 auto; min-width: 280px; }
+.ph-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+.ph-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--c-navy);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.ph-count {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--c-mute-2);
+  background: var(--c-line-3);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.ph-sub { font-size: 13px; color: var(--c-mute); margin: 0; }
+.ph-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ============== BUTTONS ============== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  background: transparent;
+  white-space: nowrap;
+  transition: all 120ms;
+  user-select: none;
+}
+.btn [data-lucide] { width: 15px; height: 15px; }
+.btn-primary { background: var(--c-primary); color: #fff; }
+.btn-primary:hover { background: var(--c-primary-hover); box-shadow: 0 2px 8px rgba(11,92,255,0.30); }
+.btn-secondary { background: #fff; border-color: var(--c-line); color: var(--c-ink); }
+.btn-secondary:hover { background: var(--c-line-3); border-color: var(--c-mute-2); }
+.btn-ghost { color: var(--c-mute); }
+.btn-ghost:hover { background: var(--c-line-3); color: var(--c-ink); }
+.btn-danger { background: #fff; border-color: var(--c-line); color: var(--c-danger); }
+.btn-danger:hover { background: #FEE2E2; border-color: var(--c-danger); }
+.btn-link { background: transparent; border: 0; padding: 0 4px; height: auto; color: var(--c-primary); font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn-sm { height: 30px; padding: 0 11px; font-size: 12px; }
+
+/* ============== STATS (KPI Cards) ============== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.stat {
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  padding: 14px 16px;
+  transition: all 150ms;
+}
+.stat:hover { border-color: var(--c-line); box-shadow: 0 2px 8px rgba(11,29,58,0.05); }
+.stat-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--c-mute);
+}
+.stat-label [data-lucide] { width: 13px; height: 13px; color: var(--c-primary); }
+.stat-value {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--c-navy);
+  margin-top: 6px;
+  letter-spacing: -0.01em;
+}
+.stat-meta {
+  font-size: 11.5px;
+  color: var(--c-mute-2);
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.stat-meta.is-up { color: var(--c-success); }
+.stat-meta.is-down { color: var(--c-danger); }
+.stat-meta [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== CARD ============== */
+.card {
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* ============== FILTER BAR ============== */
+.filter-bar {
+  padding: 14px 18px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border-bottom: 1px solid var(--c-line-2);
+  background: #fff;
+  flex-wrap: wrap;
+}
+
+/* ============== INPUTS ============== */
+.input, .select {
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  font-size: 13px;
+  background: #fff;
+  color: var(--c-ink);
+  font-family: inherit;
+  transition: all 120ms;
+  width: 100%;
+}
+.input:focus, .select:focus {
+  outline: none;
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px rgba(11,92,255,0.10);
+}
+.select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px;
+  appearance: none;
+}
+.input-search { position: relative; flex: 1; max-width: 320px; }
+.input-search input { padding-left: 36px; }
+.input-search .lead-icon {
+  position: absolute;
+  left: 11px; top: 50%;
+  transform: translateY(-50%);
+  width: 15px; height: 15px;
+  color: var(--c-mute-2);
+  pointer-events: none;
+}
+
+/* ============== TABLE ============== */
+.table-scroll { overflow-x: auto; }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.table thead { background: var(--c-bg-off); }
+.table th {
+  padding: 11px 14px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--c-mute);
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--c-line-2);
+  white-space: nowrap;
+}
+.table th.col-check { width: 40px; padding-right: 0; }
+.table th.is-sortable { cursor: pointer; user-select: none; }
+.table th.is-sortable:hover { color: var(--c-ink); background: var(--c-line-3); }
+.table th .sort-arrow { display: inline-block; margin-left: 4px; opacity: 0.4; }
+.table th.is-sorted .sort-arrow { opacity: 1; color: var(--c-primary); }
+.table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--c-line-2);
+  color: var(--c-ink);
+  vertical-align: middle;
+}
+.table tbody tr { transition: background 120ms; }
+.table tbody tr:hover { background: var(--c-bg-off); }
+.table tbody tr.is-selected { background: rgba(11,92,255,0.04); }
+.table tbody tr.is-selected:hover { background: rgba(11,92,255,0.07); }
+.table tbody tr:last-child td { border-bottom: 0; }
+
+/* ============== CHECKBOX ============== */
+.cb {
+  width: 16px; height: 16px;
+  border: 1.5px solid var(--c-line);
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: all 120ms;
+  flex-shrink: 0;
+}
+.cb.is-checked, .cb.is-partial {
+  background: var(--c-primary);
+  border-color: var(--c-primary);
+}
+.cb.is-checked::after {
+  content: '';
+  position: absolute;
+  left: 4px; top: 1px;
+  width: 5px; height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.cb.is-partial::after {
+  content: '';
+  position: absolute;
+  left: 3px; top: 6px;
+  width: 8px; height: 2px;
+  background: #fff;
+}
+.cb:hover { border-color: var(--c-primary); }
+
+/* ============== USER CELL ============== */
+.user-cell { display: flex; align-items: center; gap: 10px; }
+.uc-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11.5px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.uc-name { font-weight: 600; color: var(--c-ink); font-size: 13px; line-height: 1.3; }
+.uc-email { font-size: 12px; color: var(--c-mute-2); margin-top: 1px; line-height: 1.3; }
+
+/* ============== PILLS ============== */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pill [data-lucide] { width: 11px; height: 11px; }
+.pill-registered { background: #DBEAFE; color: #1E40AF; }
+.pill-active { background: #DBEAFE; color: #1E40AF; }
+.pill-converted { background: #D1FAE5; color: #065F46; }
+.pill-suspended { background: #FEF3C7; color: #92400E; }
+.pill-archived { background: var(--c-line-3); color: var(--c-mute-2); }
+.pill-danger { background: #FEE2E2; color: var(--c-danger); }
+
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot.is-active { background: #2563EB; box-shadow: 0 0 0 2.5px rgba(37,99,235,0.18); }
+.dot.is-converted { background: #065F46; box-shadow: 0 0 0 2.5px rgba(6,95,70,0.20); }
+.dot.is-suspended { background: var(--c-warning); }
+.dot.is-archived { background: var(--c-mute-3); }
+
+/* Mini-link cell (e.g. tenant link) */
+.tenant-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--c-primary);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.tenant-link:hover { text-decoration: underline; }
+.tenant-link [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== ROW ACTIONS ============== */
+.row-actions { display: inline-flex; gap: 2px; }
+.ra-btn {
+  width: 28px; height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--c-mute-2);
+  border-radius: 6px;
+  transition: all 120ms;
+}
+.ra-btn:hover { background: var(--c-line-3); color: var(--c-primary); }
+.ra-btn.is-danger:hover { background: #FEE2E2; color: var(--c-danger); }
+.ra-btn.is-success:hover { background: rgba(0,168,142,0.12); color: var(--c-teal); }
+.ra-btn [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== TABLE FOOTER ============== */
+.table-footer {
+  padding: 12px 18px;
+  background: var(--c-bg-off);
+  border-top: 1px solid var(--c-line-2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
+  color: var(--c-mute);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.pagination { display: inline-flex; gap: 4px; align-items: center; }
+.pg-btn {
+  min-width: 30px; height: 30px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 6px;
+  color: var(--c-mute);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms;
+}
+.pg-btn:hover { border-color: var(--c-line); background: var(--c-bg-off); }
+.pg-btn.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.pg-btn.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn [data-lucide] { width: 13px; height: 13px; }
+
+/* ============== BULK BAR ============== */
+.bulk-bar {
+  background: var(--c-navy);
+  color: #fff;
+  padding: 11px 18px;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--c-line-2);
+  margin: -1px -1px 0;
+  font-size: 13px;
+}
+.bulk-bar .btn { height: 30px; padding: 0 11px; font-size: 12px; }
+.bulk-bar .btn-secondary {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.18);
+  color: #fff;
+}
+.bulk-bar .btn-secondary:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.30); }
+
+/* ============== DRAWER ============== */
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(11,29,58,0.40);
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms;
+}
+.drawer-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 540px;
+  background: #fff;
+  z-index: 51;
+  transform: translateX(100%);
+  transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -16px 0 40px rgba(11,29,58,0.18);
+}
+.drawer.is-open { transform: translateX(0); }
+.drawer-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.drawer-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.drawer-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--c-navy);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.drawer-subtitle {
+  font-size: 12px;
+  color: var(--c-mute);
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.drawer-tabs {
+  display: flex;
+  padding: 0 22px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.drawer-tab {
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--c-mute);
+  border-bottom: 2px solid transparent;
+  transition: all 120ms;
+  margin-bottom: -1px;
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+}
+.drawer-tab:hover { color: var(--c-ink); }
+.drawer-tab.is-active { color: var(--c-primary); border-bottom-color: var(--c-primary); }
+.drawer-body { flex: 1; overflow-y: auto; padding: 22px; }
+.drawer-section { margin-bottom: 22px; }
+.drawer-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--c-mute);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+}
+.drawer-fields {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 10px 16px;
+  font-size: 13px;
+}
+.drawer-fields .lbl { color: var(--c-mute); }
+.drawer-fields .val { color: var(--c-ink); font-weight: 500; }
+.drawer-footer {
+  padding: 13px 22px;
+  border-top: 1px solid var(--c-line-2);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: var(--c-bg-off);
+}
+/* Drawer Button Contract (Iron Rule #31) helpers */
+.footer-spacer { flex: 1; }
+.drawer-footer-meta { font-size: 12px; color: var(--c-mute-2); }
+.drawer-header-actions { display: flex; gap: 6px; align-items: center; }
+.drawer-header-divider { width: 1px; height: 22px; background: var(--c-line-2); margin: 0 4px; flex-shrink: 0; }
+
+/* ============== TIMELINE ============== */
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--c-line-2);
+}
+.tl-item { position: relative; margin-bottom: 16px; }
+.tl-item:last-child { margin-bottom: 0; }
+.tl-dot {
+  position: absolute;
+  left: -20px;
+  top: 3px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--c-primary);
+}
+.tl-dot.is-success { border-color: var(--c-success); }
+.tl-dot.is-warning { border-color: var(--c-warning); }
+.tl-title { font-size: 13px; font-weight: 600; color: var(--c-ink); }
+.tl-meta { font-size: 11.5px; color: var(--c-mute-2); margin-top: 2px; }
+
+/* ============== BOOKMARK / RELATED CARDS ============== */
+.bm-card {
+  display: flex;
+  gap: 12px;
+  padding: 11px 12px;
+  border: 1px solid var(--c-line-2);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 120ms;
+  align-items: center;
+}
+.bm-card:hover { border-color: var(--c-line); }
+.bm-icon {
+  width: 28px; height: 28px;
+  background: rgba(11,92,255,0.10);
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-primary);
+  flex-shrink: 0;
+}
+.bm-card [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== NOTES ============== */
+.notes-area {
+  width: 100%;
+  min-height: 130px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.notes-area:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(11,92,255,0.10); }
+
+/* ============== EMPTY STATE ============== */
+.empty {
+  padding: 56px 24px;
+  text-align: center;
+  color: var(--c-mute);
+}
+.empty-icon {
+  width: 52px; height: 52px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: var(--c-line-3);
+  color: var(--c-mute-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.empty-icon [data-lucide] { width: 22px; height: 22px; }
+.empty-title {
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--c-ink);
+  margin-bottom: 5px;
+  font-family: 'Noto Sans Thai', sans-serif;
+}
+.empty-desc { font-size: 13px; color: var(--c-mute); max-width: 320px; margin: 0 auto; }
+
+/* ============== MODAL ============== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(11,29,58,0.50);
+  z-index: 60;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 440px;
+  max-width: 92vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.96);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 24px 64px rgba(11,29,58,0.28);
+  overflow: hidden;
+}
+.modal-backdrop.is-open .modal { transform: scale(1); }
+.modal-header {
+  padding: 18px 22px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.modal-header-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: rgba(11,92,255,0.10);
+  color: var(--c-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.modal-header-icon.is-danger { background: #FEE2E2; color: var(--c-danger); }
+.modal-header-icon.is-warning { background: #FEF3C7; color: var(--c-warning); }
+.modal-header-icon [data-lucide] { width: 18px; height: 18px; }
+.modal-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--c-navy);
+  margin: 0 0 4px;
+}
+.modal-subtitle { font-size: 13px; color: var(--c-mute); margin: 0; line-height: 1.5; }
+.modal-body {
+  padding: 6px 22px 18px;
+  font-size: 13px;
+  color: var(--c-ink);
+  overflow-y: auto;
+}
+.modal-footer {
+  padding: 12px 22px;
+  background: var(--c-bg-off);
+  border-top: 1px solid var(--c-line-2);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ============== FIELDS ============== */
+.field { margin-bottom: 14px; }
+.field-label { display: block; font-size: 12.5px; font-weight: 500; color: var(--c-mute); margin-bottom: 6px; }
+.field-label .req { color: var(--c-danger); margin-left: 2px; }
+.field-input { width: 100%; }
+.field-help { font-size: 11.5px; color: var(--c-mute-2); margin-top: 4px; }
+.field-error { font-size: 11.5px; color: var(--c-danger); margin-top: 4px; display: none; }
+.field.is-invalid .input,
+.field.is-invalid .select { border-color: var(--c-danger); }
+.field.is-invalid .field-error { display: block; }
+
+/* Responsive form grid (Iron Rule #17) */
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+/* ============== TOAST ============== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--c-navy);
+  color: #fff;
+  padding: 13px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 12px 32px rgba(11,29,58,0.30);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 380px;
+}
+.toast.is-visible { transform: translateY(0); opacity: 1; }
+.toast.is-success { background: var(--c-success); }
+.toast.is-info { background: var(--c-primary); }
+.toast.is-warning { background: var(--c-warning); }
+.toast.is-error { background: var(--c-danger); }
+.toast [data-lucide] { width: 17px; height: 17px; }
+
+/* ============== LINE EXPAND ANIMATION (Pattern E) ============== */
+.line-expanded {
+  animation: lineExpand 220ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+@keyframes lineExpand {
+  from { max-height: 0; opacity: 0; transform: translateY(-8px); }
+  to { max-height: 600px; opacity: 1; transform: translateY(0); }
+}
+
+/* ============== WIZARD LAYOUT (Iron Rule #22) ============== */
+.page-content-host.has-wizard { display: flex; flex-direction: column; height: 100%; }
+.wizard-shell { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 100%; }
+.wizard-stepper-band {
+  flex: 0 0 auto; background: white;
+  padding: 18px 32px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.wizard-body { flex: 1 1 auto; padding: 24px 32px 28px; min-height: 0; background: var(--c-bg-off); }
+.wizard-card {
+  padding: 28px 32px;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+}
+.wizard-footer {
+  flex: 0 0 auto;
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding: 12px 32px;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--c-line-2);
+  box-shadow: 0 -2px 8px rgba(11,29,58,0.04);
+  z-index: 10;
+}
+.stepper-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  gap: 0;
+}
+.stepper-row .step-line {
+  flex: 1 1 auto;
+  min-width: 28px;
+  max-width: 80px;
+  height: 2px;
+  background: var(--c-line-2);
+}
+.stepper-row .step-line.is-done { background: var(--c-primary); }
+.step-dot {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--c-line-2);
+  color: var(--c-mute-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12.5px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.step-dot.is-active { background: var(--c-primary); color: #fff; }
+.step-dot.is-done { background: var(--c-primary); color: #fff; }
+
+/* ============== UTILITIES ============== */
+.text-mute { color: var(--c-mute); }
+.text-mute-2 { color: var(--c-mute-2); }
+.text-primary { color: var(--c-primary); }
+.text-success { color: var(--c-success); }
+.text-danger { color: var(--c-danger); }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mb-4 { margin-bottom: 16px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.mt-4 { margin-top: 16px; }
+
+/* Icon utility classes (CSS-defined so no Tailwind dependency for these) */
+.w-2\.5 { width: 10px; }   .h-2\.5 { height: 10px; }
+.w-3   { width: 12px; }    .h-3   { height: 12px; }
+.w-3\.5 { width: 14px; }   .h-3\.5 { height: 14px; }
+.w-4   { width: 16px; }    .h-4   { height: 16px; }
+.w-5   { width: 20px; }    .h-5   { height: 20px; }
+
+/* ============================================================
+   Lucide SVG sizing fix
+   ------------------------------------------------------------
+   Lucide replaces <i data-lucide="..."> with <svg class="lucide ...">
+   ที่มี width="24" height="24" attributes ติดมาด้วย — attributes
+   เหล่านี้ override CSS class .w-N ทำให้ icons เด้งเป็น 24×24
+   ดัน pill/button สูงเกินขนาด design.
+
+   วิธีแก้: บังคับ svg.lucide ทุกตัวให้ width/height = 1em แล้ว
+   ปรับขนาดผ่าน font-size บน parent. Plus override สำหรับเคสที่
+   ใช้ .w-N/.h-N โดยตรงบน <i> (Lucide จะ copy class ไปยัง svg)
+   ============================================================ */
+svg.lucide {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: -0.125em;
+  flex-shrink: 0;
+}
+/* เมื่อ .w-N / .h-N ถูก copy ไปบน svg.lucide ให้บังคับ override
+   width/height attributes ที่ Lucide ใส่มา (specificity ชนะ attribute) */
+svg.lucide.w-2\.5 { width: 10px; }   svg.lucide.h-2\.5 { height: 10px; }
+svg.lucide.w-3    { width: 12px; }   svg.lucide.h-3    { height: 12px; }
+svg.lucide.w-3\.5 { width: 14px; }   svg.lucide.h-3\.5 { height: 14px; }
+svg.lucide.w-4    { width: 16px; }   svg.lucide.h-4    { height: 16px; }
+svg.lucide.w-5    { width: 20px; }   svg.lucide.h-5    { height: 20px; }
+
+/* ---- CSV import modal + detail landing (v4) ---- */
+.modal.is-lg{width:680px;max-width:94vw;}
+.btn.is-dim{opacity:0.45;pointer-events:none;}
+.seg{display:inline-flex;background:var(--c-bg-off);border:1px solid var(--c-line-2);border-radius:8px;padding:3px;}
+.seg button{border:0;background:transparent;padding:6px 14px;border-radius:6px;font-size:12.5px;font-weight:500;color:var(--c-mute);cursor:pointer;font-family:inherit;}
+.seg button.is-active{background:#fff;color:var(--c-primary);font-weight:600;box-shadow:0 1px 2px rgba(11,29,58,0.08);}
+.imp-block{margin-bottom:16px;}
+.imp-label{font-size:12px;font-weight:700;color:var(--c-mute);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;display:flex;align-items:center;gap:8px;justify-content:space-between;}
+.imp-drop{border:1.5px dashed var(--c-line);border-radius:10px;padding:20px;text-align:center;background:var(--c-bg-off);cursor:pointer;transition:all 120ms;}
+.imp-drop:hover{border-color:var(--c-primary);background:#fff;}
+.imp-drop [data-lucide]{width:26px;height:26px;color:var(--c-mute-2);}
+.imp-drop .id-t{font-size:13px;font-weight:600;color:var(--c-ink);margin-top:8px;}
+.imp-drop .id-s{font-size:12px;color:var(--c-mute-2);margin-top:2px;}
+.imp-summary{display:flex;gap:10px;margin:6px 0 12px;flex-wrap:wrap;}
+.imp-stat{flex:1;min-width:96px;border:1px solid var(--c-line-2);border-radius:9px;padding:9px 12px;}
+.imp-stat .v{font-size:20px;font-weight:700;color:var(--c-navy);}
+.imp-stat .l{font-size:11.5px;color:var(--c-mute);margin-top:1px;}
+.imp-stat.ok .v{color:var(--c-success);}
+.imp-stat.fail .v{color:var(--c-danger);}
+.imp-errs{background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:#991B1B;max-height:130px;overflow:auto;}
+.imp-errs div{padding:2px 0;}
+.imp-note{font-size:11.5px;color:var(--c-mute-2);margin-top:6px;line-height:1.5;}
+.preview-scroll{max-height:200px;overflow:auto;border:1px solid var(--c-line-2);border-radius:8px;}
+.preview-scroll .table th{position:sticky;top:0;background:var(--c-bg-off);z-index:1;}
+.back-link{display:inline-flex;align-items:center;gap:6px;color:var(--c-mute);font-size:13px;cursor:pointer;margin-bottom:14px;background:transparent;border:0;font-family:inherit;padding:0;}
+.back-link:hover{color:var(--c-primary);}
+.back-link [data-lucide]{width:15px;height:15px;}
+
+.row-click{cursor:pointer;}
+.table tbody tr.row-click:hover{background:var(--c-bg-off);}
+.name-link{color:var(--c-ink);font-weight:600;cursor:pointer;}
+.name-link:hover{color:var(--c-primary);text-decoration:underline;}
+.rel-empty{padding:16px;text-align:center;color:var(--c-mute-2);font-size:12.5px;}
+.detail-longtext{font-size:13px;color:var(--c-ink);line-height:1.65;white-space:pre-wrap;}
+/* ============== FEATURE: ORGANIZATION (v2 redesign) ============== */
+.org-tabs{display:flex;gap:3px;background:#fff;border:1px solid var(--c-line-2);border-radius:10px;padding:4px;margin-bottom:20px;width:fit-content;max-width:100%;flex-wrap:wrap;}
+.org-tab{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:7px;font-size:13px;font-weight:500;color:var(--c-mute);background:transparent;border:0;cursor:pointer;transition:all 120ms;white-space:nowrap;font-family:inherit;}
+.org-tab:hover{color:var(--c-ink);background:var(--c-line-3);}
+.org-tab.is-active{background:var(--c-primary);color:#fff;font-weight:600;}
+.org-tab [data-lucide]{width:15px;height:15px;}
+.org-tab .ot-count{font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;background:var(--c-line-3);color:var(--c-mute-2);}
+.org-tab.is-active .ot-count{background:rgba(255,255,255,0.22);color:#fff;}
+.hint{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--c-line-2);color:var(--c-mute-2);font-size:10px;font-weight:700;font-style:normal;cursor:help;position:relative;vertical-align:middle;margin-left:6px;}
+.hint::after{content:attr(data-tip);position:absolute;left:0;top:calc(100% + 8px);background:var(--c-navy);color:#fff;padding:9px 12px;border-radius:8px;font-size:11.5px;font-weight:400;line-height:1.55;width:max-content;max-width:320px;white-space:normal;text-align:left;opacity:0;pointer-events:none;transition:opacity 140ms;z-index:90;box-shadow:0 8px 24px rgba(11,29,58,0.22);}
+.hint:hover::after{opacity:1;}
+.tier-badge{display:inline-flex;align-items:center;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:6px;font-family:'Inter',sans-serif;letter-spacing:0.02em;}
+.tier-m{background:#EEF2FF;color:#3730A3;}
+.tier-s{background:#ECFEFF;color:#0E7490;}
+.tier-e{background:#F1F5F9;color:#475569;}
+.track-tag{font-size:12px;color:var(--c-mute);}
+.code-cell{font-family:'Inter',sans-serif;font-weight:600;color:var(--c-navy);font-size:12.5px;letter-spacing:0.01em;}
+.mono{font-family:'Inter',sans-serif;}
+.cell-name{font-weight:600;color:var(--c-ink);font-size:13px;line-height:1.3;}
+.cell-en{font-size:12px;color:var(--c-mute-2);margin-top:1px;line-height:1.3;}
+.muted-cell{color:var(--c-mute-2);font-size:12.5px;}
+/* drawer groups + form */
+.drawer-group{margin-bottom:24px;}
+.drawer-group:last-child{margin-bottom:6px;}
+.drawer-group-title{font-size:11px;font-weight:700;color:var(--c-mute);letter-spacing:0.08em;text-transform:uppercase;margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--c-line-2);display:flex;align-items:center;gap:8px;}
+.drawer-group-title [data-lucide]{width:14px;height:14px;color:var(--c-primary);}
+.field-grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;}
+.field-grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;}
+.tgl{width:42px;height:24px;border-radius:999px;background:var(--c-line);position:relative;cursor:pointer;transition:background 160ms;flex-shrink:0;}
+.tgl.is-on{background:var(--c-primary);}
+.tgl::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform 160ms;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+.tgl.is-on::after{transform:translateX(18px);}
+.status-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--c-bg-off);border:1px solid var(--c-line-2);border-radius:8px;}
+.status-row .sr-text{flex:1;}
+.status-row .sr-title{font-size:13px;font-weight:600;color:var(--c-ink);}
+.status-row .sr-sub{font-size:11.5px;color:var(--c-mute-2);margin-top:2px;}
+.chip-link{display:inline-flex;align-items:center;gap:5px;color:var(--c-ink);font-size:12.5px;font-weight:500;}
+.chip-link [data-lucide]{width:12px;height:12px;color:var(--c-mute-3);}
+
+/* ---- company detail ---- */
+.profile-hero{display:flex;gap:18px;align-items:flex-start;background:#fff;border:1px solid var(--c-line-2);border-radius:12px;padding:22px;margin-bottom:16px;}
+.profile-logo{width:62px;height:62px;border-radius:14px;background:linear-gradient(135deg,var(--c-primary),var(--c-teal));color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 6px 16px rgba(11,92,255,0.25);}
+.profile-logo [data-lucide]{width:28px;height:28px;}
+.profile-logo.has-img{background:#fff;padding:0;}
+.profile-logo img{width:100%;height:100%;object-fit:cover;border-radius:14px;display:block;}
+.logo-edit{display:flex;gap:16px;align-items:center;}
+.logo-preview{width:84px;height:84px;border-radius:14px;border:1px solid var(--c-line-2);background:linear-gradient(135deg,var(--c-primary),var(--c-teal));color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
+.logo-preview.has-img{background:#fff;}
+.logo-preview img{width:100%;height:100%;object-fit:cover;display:block;}
+.logo-preview [data-lucide]{width:34px;height:34px;}
+.logo-actions{flex:1;min-width:0;}
+.logo-btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.profile-main{flex:1;min-width:0;}
+.profile-name{font-size:21px;font-weight:700;color:var(--c-navy);font-family:'Noto Sans Thai',sans-serif;letter-spacing:-0.01em;line-height:1.25;}
+.profile-en{font-size:13px;color:var(--c-mute-2);margin-top:3px;}
+.profile-tags{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap;}
+.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px;}
+.detail-card{background:#fff;border:1px solid var(--c-line-2);border-radius:12px;padding:18px 22px;}
+.detail-card-title{font-size:12.5px;font-weight:700;color:var(--c-navy);margin:0 0 10px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:0.04em;}
+.detail-card-title [data-lucide]{width:15px;height:15px;color:var(--c-primary);}
+.kv{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--c-line-3);font-size:13px;}
+.kv:last-child{border-bottom:0;}
+.kv .k{color:var(--c-mute);flex-shrink:0;}
+.kv .v{color:var(--c-ink);font-weight:500;text-align:right;word-break:break-word;}
+.mini-stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+.mini-stat{flex:1;min-width:150px;background:#fff;border:1px solid var(--c-line-2);border-radius:12px;padding:15px 18px;cursor:pointer;transition:all 130ms;}
+.mini-stat:hover{border-color:var(--c-primary);box-shadow:0 4px 14px rgba(11,92,255,0.12);transform:translateY(-1px);}
+.mini-stat .ms-val{font-size:26px;font-weight:700;color:var(--c-navy);letter-spacing:-0.01em;}
+.mini-stat .ms-lbl{font-size:12.5px;color:var(--c-mute);display:flex;align-items:center;gap:6px;margin-top:3px;}
+.mini-stat .ms-lbl [data-lucide]{width:14px;height:14px;color:var(--c-primary);}
+
+/* ---- toolbar + view switch ---- */
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.toolbar-spacer{flex:1;}
+.view-switch{display:inline-flex;background:#fff;border:1px solid var(--c-line-2);border-radius:9px;padding:3px;}
+.vs-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:0;background:transparent;border-radius:7px;font-size:12.5px;font-weight:500;color:var(--c-mute);cursor:pointer;font-family:inherit;transition:all 120ms;}
+.vs-btn:hover{color:var(--c-ink);}
+.vs-btn.is-active{background:var(--c-primary);color:#fff;font-weight:600;}
+.vs-btn [data-lucide]{width:14px;height:14px;}
+
+/* ---- tree ---- */
+.tree{background:#fff;border:1px solid var(--c-line-2);border-radius:12px;overflow:hidden;}
+.tree-head{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--c-bg-off);border-bottom:1px solid var(--c-line-2);font-size:12px;font-weight:700;color:var(--c-mute);letter-spacing:0.04em;text-transform:uppercase;}
+.tree-head [data-lucide]{width:14px;height:14px;color:var(--c-primary);}
+.tree-row{display:flex;align-items:center;gap:10px;padding:9px 14px 9px 8px;border-bottom:1px solid var(--c-line-3);transition:background 120ms;}
+.tree-row:last-child{border-bottom:0;}
+.tree-row:hover{background:var(--c-bg-off);}
+.tree-row.is-root{background:linear-gradient(90deg,rgba(11,92,255,0.045),transparent);}
+.tree-caret{width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:0;color:var(--c-mute-2);border-radius:6px;cursor:pointer;flex-shrink:0;}
+.tree-caret:hover{background:var(--c-line-2);color:var(--c-ink);}
+.tree-caret-empty{width:24px;flex-shrink:0;display:inline-block;}
+.tree-ic{width:30px;height:30px;border-radius:8px;background:rgba(11,92,255,0.08);color:var(--c-primary);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tree-ic [data-lucide]{width:15px;height:15px;}
+.tree-ic.is-co{background:linear-gradient(135deg,var(--c-primary),var(--c-teal));color:#fff;}
+.tree-ic.is-pos{background:rgba(0,168,142,0.12);color:var(--c-teal);}
+.tree-main{flex:1;min-width:0;}
+.tree-name{font-size:13.5px;font-weight:600;color:var(--c-ink);}
+.tree-name .tree-code{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:var(--c-mute-2);margin-left:8px;}
+.tree-sub{font-size:12px;color:var(--c-mute-2);margin-top:1px;}
+.tree-meta{display:flex;align-items:center;gap:12px;margin-right:6px;flex-shrink:0;}
+.tree-meta .tm-head{font-size:12px;color:var(--c-mute);display:inline-flex;align-items:center;gap:5px;}
+.tree-meta .tm-head [data-lucide]{width:12px;height:12px;color:var(--c-mute-3);}
+.tree-actions{display:inline-flex;gap:1px;flex-shrink:0;}
+.tree-actions .ra-btn{width:26px;height:26px;}
+.tree-actions .ra-btn [data-lucide]{width:14px;height:14px;}
+.tree-actions .ra-btn.is-dim{opacity:0.3;pointer-events:none;}
+
+/* ---- org chart ---- */
+.chart-wrap{background:#fff;border:1px solid var(--c-line-2);border-radius:12px;padding:8px 16px 24px;overflow-x:auto;}
+.chart-hint{font-size:12px;color:var(--c-mute-2);margin:12px 4px 4px;display:flex;align-items:center;gap:6px;}
+.chart-hint [data-lucide]{width:14px;height:14px;}
+.orgchart{display:inline-block;min-width:100%;text-align:center;padding-top:8px;}
+.orgchart ul{display:flex;justify-content:center;padding-top:22px;position:relative;margin:0;padding-left:0;list-style:none;}
+.orgchart li{list-style:none;text-align:center;position:relative;padding:22px 11px 0;}
+.orgchart li::before,.orgchart li::after{content:'';position:absolute;top:0;right:50%;border-top:2px solid var(--c-line);width:50%;height:22px;}
+.orgchart li::after{right:auto;left:50%;border-left:2px solid var(--c-line);}
+.orgchart li:only-child::before,.orgchart li:only-child::after{display:none;}
+.orgchart li:only-child{padding-top:0;}
+.orgchart li:first-child::before,.orgchart li:last-child::after{border:0;}
+.orgchart li:last-child::before{border-right:2px solid var(--c-line);border-radius:0 6px 0 0;}
+.orgchart li:first-child::after{border-radius:6px 0 0 0;}
+.orgchart ul ul::before{content:'';position:absolute;top:0;left:50%;border-left:2px solid var(--c-line);width:0;height:22px;}
+.node{display:inline-block;vertical-align:top;background:#fff;border:1px solid var(--c-line);border-radius:10px;padding:10px 14px;min-width:148px;max-width:210px;cursor:pointer;transition:all 140ms;box-shadow:0 1px 3px rgba(11,29,58,0.04);text-align:left;}
+.node:hover{border-color:var(--c-primary);box-shadow:0 4px 14px rgba(11,92,255,0.15);transform:translateY(-1px);}
+.node-title{font-size:13px;font-weight:600;color:var(--c-ink);line-height:1.3;}
+.node-sub{font-size:11px;color:var(--c-mute-2);margin-top:2px;font-family:'Inter',sans-serif;}
+.node-meta{font-size:11px;color:var(--c-mute);margin-top:7px;display:flex;align-items:center;gap:4px;}
+.node-meta [data-lucide]{width:11px;height:11px;color:var(--c-mute-3);}
+.node-badges{margin-top:7px;}
+.node-company{background:linear-gradient(135deg,var(--c-navy),var(--c-navy-2));border-color:var(--c-navy);min-width:172px;cursor:default;}
+.node-company:hover{transform:none;box-shadow:0 1px 3px rgba(11,29,58,0.04);border-color:var(--c-navy);}
+.node-company .node-title{color:#fff;}
+.node-company .node-sub{color:#94A3B8;}
+.node-pos{border-left:3px solid var(--c-primary);}
+.node-div{border-left:3px solid #7C3AED;}
+.bind-tag{font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;background:#F3E8FF;color:#6D28D9;margin-left:6px;}
+.div-chip{display:inline-flex;align-items:center;gap:5px;color:#6D28D9;font-weight:600;}
+.div-chip [data-lucide]{width:12px;height:12px;}
+.node-dept{border-left:3px solid var(--c-teal);}
+
+/* ---- CSV import modal (Iron Rule #32) ---- */
+.modal.is-lg{width:680px;max-width:94vw;}
+.imp-section{margin-bottom:16px;}
+.imp-label{font-size:12px;font-weight:700;color:var(--c-mute);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;}
+.imp-mode{display:inline-flex;background:var(--c-bg-off);border:1px solid var(--c-line-2);border-radius:9px;padding:3px;}
+.imp-mode .vs-btn.is-active{background:var(--c-primary);color:#fff;}
+.imp-help{font-size:12px;color:var(--c-mute-2);margin-top:6px;line-height:1.5;}
+.imp-drop{border:1.5px dashed var(--c-line);border-radius:10px;padding:22px;text-align:center;background:var(--c-bg-off);transition:all 140ms;}
+.imp-drop:hover{border-color:var(--c-primary);background:#fff;}
+.imp-drop [data-lucide]{width:26px;height:26px;color:var(--c-primary);}
+.imp-drop .impd-title{font-size:14px;font-weight:600;color:var(--c-ink);margin-top:8px;}
+.imp-drop .impd-sub{font-size:12px;color:var(--c-mute-2);margin-top:3px;}
+.imp-file-input{display:none;}
+.imp-tmpl{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--c-primary);font-weight:600;cursor:pointer;}
+.imp-tmpl [data-lucide]{width:14px;height:14px;}
+.imp-summary{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.imp-chip{flex:1;min-width:90px;border-radius:8px;padding:10px 12px;border:1px solid var(--c-line-2);}
+.imp-chip .ic-val{font-size:20px;font-weight:700;}
+.imp-chip .ic-lbl{font-size:11.5px;color:var(--c-mute);margin-top:2px;}
+.imp-chip.ok{background:#ECFDF5;border-color:#A7F3D0;} .imp-chip.ok .ic-val{color:#065F46;}
+.imp-chip.warn{background:#FFFBEB;border-color:#FDE68A;} .imp-chip.warn .ic-val{color:#92400E;}
+.imp-chip.err{background:#FEF2F2;border-color:#FECACA;} .imp-chip.err .ic-val{color:#B91C1C;}
+.imp-result{max-height:300px;overflow-y:auto;border:1px solid var(--c-line-2);border-radius:10px;}
+.imp-st{font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;}
+.imp-st.ok{background:#D1FAE5;color:#065F46;} .imp-st.warn{background:#FEF3C7;color:#92400E;} .imp-st.err{background:#FEE2E2;color:#B91C1C;}
+
+/* ---- detail landing ---- */
+.detail-back{margin-bottom:14px;}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px;margin-top:16px;}
+.rel-card{background:#fff;border:1px solid var(--c-line-2);border-radius:12px;overflow:hidden;}
+.rel-card-head{display:flex;align-items:center;gap:8px;padding:13px 18px;border-bottom:1px solid var(--c-line-2);font-size:12.5px;font-weight:700;color:var(--c-navy);background:var(--c-bg-off);}
+.rel-card-head [data-lucide]{width:15px;height:15px;color:var(--c-primary);}
+.rel-card-head .rc-count{margin-left:auto;font-size:11px;font-weight:600;color:var(--c-mute-2);background:var(--c-line-3);padding:1px 8px;border-radius:999px;}
+.rel-row{display:flex;align-items:center;gap:10px;padding:11px 18px;border-bottom:1px solid var(--c-line-3);cursor:pointer;transition:background 120ms;}
+.rel-row:last-child{border-bottom:0;}
+.rel-row:hover{background:var(--c-bg-off);}
+.rel-ic{width:30px;height:30px;border-radius:8px;background:rgba(11,92,255,0.08);color:var(--c-primary);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rel-ic [data-lucide]{width:15px;height:15px;}
+.rel-main{flex:1;min-width:0;}
+.rel-name{font-size:13px;font-weight:600;color:var(--c-ink);}
+.rel-sub{font-size:11.5px;color:var(--c-mute-2);margin-top:1px;}
+.rel-empty{padding:22px;text-align:center;color:var(--c-mute-2);font-size:12.5px;}
+.row-name-link{color:var(--c-ink);font-weight:600;cursor:pointer;}
+.row-name-link:hover{color:var(--c-primary);text-decoration:underline;}
+.crumb-path{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:12.5px;color:var(--c-mute);margin-bottom:14px;}
+.crumb-path a{color:var(--c-primary);cursor:pointer;} .crumb-path a:hover{text-decoration:underline;}
+.crumb-path [data-lucide]{width:12px;height:12px;color:var(--c-mute-3);}
+
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i data-lucide="box" class="w-4 h-4"></i></div>
+    <div>
+      <div class="sb-name">CUBE NATIVE</div>
+      <div class="sb-sub">Core Cube</div>
+    </div>
+  </div>
+  <nav class="sb-nav" id="sb-nav">
+    <div class="sb-module" data-module="organization" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="building-2" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">Organization</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item" data-feature="company" onclick="navigate('company')">
+          <i data-lucide="building" class="w-4 h-4"></i><span>Company</span></a>
+        <a class="sb-item" data-feature="branch" onclick="navigate('branch')">
+          <i data-lucide="git-branch" class="w-4 h-4"></i><span>Branch</span></a>
+        <a class="sb-item" data-feature="division" onclick="navigate('division')">
+          <i data-lucide="layers" class="w-4 h-4"></i><span>Division</span></a>
+        <a class="sb-item" data-feature="department" onclick="navigate('department')">
+          <i data-lucide="network" class="w-4 h-4"></i><span>Department</span></a>
+        <a class="sb-item" data-feature="position" onclick="navigate('position')">
+          <i data-lucide="briefcase" class="w-4 h-4"></i><span>Position &amp; Tier</span></a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="identity" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="shield-check" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">Identity &amp; Access</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item is-disabled" data-feature="users"><i data-lucide="users" class="w-4 h-4"></i><span>User Management</span><span class="sb-badge">done</span></a>
+        <a class="sb-item is-disabled" data-feature="roles"><i data-lucide="key-round" class="w-4 h-4"></i><span>Role Management</span><span class="sb-badge">done</span></a>
+        <a class="sb-item is-disabled" data-feature="profile"><i data-lucide="user-circle" class="w-4 h-4"></i><span>My Profile</span><span class="sb-badge">next</span></a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="system" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sliders-horizontal" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">System</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item is-disabled" data-feature="settings"><i data-lucide="settings" class="w-4 h-4"></i><span>Settings</span></a>
+      </div>
+    </div>
+  </nav>
+  <div class="sb-footer">
+    <div class="pulse-dot"></div>
+    <span>UAT · Organization v1.0.0</span>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="shell-bar">
+    <nav class="breadcrumb">
+      <a onclick="navigate('company')">CUBE NATIVE</a>
+      <i data-lucide="chevron-right" class="w-3 h-3 sep"></i>
+      <a onclick="navigate('company')">Core Cube</a>
+      <i data-lucide="chevron-right" class="w-3 h-3 sep"></i>
+      <span class="breadcrumb-current" id="bc-current">Organization</span>
+    </nav>
+    <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+      <button class="icon-btn"><i data-lucide="bell" class="w-4 h-4"></i><span class="notif-dot"></span></button>
+      <div style="position:relative;">
+        <div class="user-chip" onclick="toggleUserMenu()">
+          <div class="user-text"><div class="user-name">2B-info</div><div class="user-role">Tenant Admin</div></div>
+          <div class="avatar">2B</div>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-item"><i data-lucide="user" class="w-3.5 h-3.5"></i><span>My Profile</span></div>
+          <div class="user-menu-item"><i data-lucide="settings" class="w-3.5 h-3.5"></i><span>Preferences</span></div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-item is-danger"><i data-lucide="log-out" class="w-3.5 h-3.5"></i><span>Sign out</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="content" id="page-content"></div>
+</main>
+
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer"></div>
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function loadLucide(){
+  var v='0.469.0';
+  var cdns=['https://unpkg.com/lucide@'+v+'/dist/umd/lucide.min.js',
+            'https://cdn.jsdelivr.net/npm/lucide@'+v+'/dist/umd/lucide.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/lucide/'+v+'/lucide.min.js'];
+  var i=0;
+  function tryNext(){
+    if(i>=cdns.length){ window.lucide=window.lucide||{createIcons:function(){}}; window.dispatchEvent(new Event('lucide:ready')); return; }
+    var s=document.createElement('script'); s.src=cdns[i++];
+    s.onload=function(){ window.dispatchEvent(new Event('lucide:ready')); };
+    s.onerror=tryNext; document.head.appendChild(s);
+  }
+  tryNext();
+})();
+</script>
+<script>
+// ============================================================
+// ORGANIZATION MODULE v4 — Company / Branch / Division / Department / Position
+// Hierarchy: Branch > Division > Department > Sub-dept. Position binds dept OR division.
+// + per-record landing detail, expanded forms, CSV export/import (Iron Rule #32).
+// 1 ERP account = 1 company. Mock data only. Dev: replace state.* with API.
+// ============================================================
+
+const PROVINCES = ["กรุงเทพมหานคร","กระบี่","กาญจนบุรี","กาฬสินธุ์","กำแพงเพชร","ขอนแก่น","จันทบุรี","ฉะเชิงเทรา","ชลบุรี","ชัยนาท","ชัยภูมิ","ชุมพร","เชียงราย","เชียงใหม่","ตรัง","ตราด","ตาก","นครนายก","นครปฐม","นครพนม","นครราชสีมา","นครศรีธรรมราช","นครสวรรค์","นนทบุรี","นราธิวาส","น่าน","บึงกาฬ","บุรีรัมย์","ปทุมธานี","ประจวบคีรีขันธ์","ปราจีนบุรี","ปัตตานี","พระนครศรีอยุธยา","พะเยา","พังงา","พัทลุง","พิจิตร","พิษณุโลก","เพชรบุรี","เพชรบูรณ์","แพร่","ภูเก็ต","มหาสารคาม","มุกดาหาร","แม่ฮ่องสอน","ยโสธร","ยะลา","ร้อยเอ็ด","ระนอง","ระยอง","ราชบุรี","ลพบุรี","ลำปาง","ลำพูน","เลย","ศรีสะเกษ","สกลนคร","สงขลา","สตูล","สมุทรปราการ","สมุทรสงคราม","สมุทรสาคร","สระแก้ว","สระบุรี","สิงห์บุรี","สุโขทัย","สุพรรณบุรี","สุราษฎร์ธานี","สุรินทร์","หนองคาย","หนองบัวลำภู","อ่างทอง","อำนาจเจริญ","อุดรธานี","อุตรดิตถ์","อุทัยธานี","อุบลราชธานี"];
+const LEGAL_TYPES = ["บริษัทจำกัด (บจก.)","บริษัทมหาชนจำกัด (บมจ.)","ห้างหุ้นส่วนจำกัด (หจก.)","ห้างหุ้นส่วนสามัญ","บุคคลธรรมดา","กิจการร่วมค้า"];
+const MONTHS = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+const TIERS = { management:["M1","M2","M3","M4","M5","M6","M7"], specialist:["S1","S2","S3","S4","S5","S6"], operational:["E1","E2","E3","E4","E5"] };
+const TRACK_LABEL = { management:"บริหาร (Management)", specialist:"วิชาการ (Specialist)", operational:"ปฏิบัติการ (Operational)" };
+const EMP_TYPES = ["พนักงานประจำ","สัญญาจ้าง","รายวัน","ทดลองงาน","Outsource"];
+
+const state = {
+  route:'company', detailId:null,
+  view:{ department:'list', position:'list' },
+  drawer:{open:false, entity:null, mode:null, id:null, parentId:null},
+  modal:{open:false, type:null, data:null},
+  filters:{ branch:{q:'',status:'all'}, division:{q:'',status:'all'}, department:{q:'',status:'all'}, position:{q:'',status:'all'} },
+  seq:{ branch:3, division:4, department:9, position:8 },
+  company:{ code:'COM-001', logo_url:'', name_th:'บริษัท ทูบีซิมเปิล จำกัด', name_en:'2BSimple Co., Ltd.', legal:LEGAL_TYPES[0], reg_no:'0105557000001', reg_date:'15 มีนาคม 2557', capital:'10,000,000', business_type:'พัฒนาและให้บริการซอฟต์แวร์ ERP', tsic:'62019', tax_id:'0105557000001', vat:'จดทะเบียน', tax_office:'สรรพากรพื้นที่กรุงเทพมหานคร 10', fiscal:'มกราคม', currency:'THB', addr_no:'199/9', addr_building:'อาคารทูบี ชั้น 12', addr_soi:'ลาดพร้าว 1', addr_road:'ถนนลาดพร้าว', subdistrict:'จอมพล', district:'จตุจักร', province:'กรุงเทพมหานคร', zip:'10900', phone:'02-123-4567', fax:'02-123-4568', email:'info@2bsimple.co.th', website:'www.2bsimple.co.th', contact_person:'คุณสมหญิง ติดต่อ', active:true },
+  branch:[
+    {id:1,code:'00000',name_th:'สำนักงานใหญ่',name_en:'Head Office',type:'สำนักงานใหญ่',manager:'สำนักผู้บริหาร',open_date:'2557',is_vat_branch:'สาขาจดทะเบียน',addr_no:'199/9',addr_road:'ถนนลาดพร้าว',subdistrict:'จอมพล',district:'จตุจักร',province:'กรุงเทพมหานคร',zip:'10900',phone:'02-123-4567',fax:'02-123-4568',email:'hq@2bsimple.co.th',note:'',active:true},
+    {id:2,code:'00001',name_th:'สาขาขอนแก่น',name_en:'Khon Kaen Branch',type:'สาขา',manager:'ก้อง คลัง',open_date:'2562',is_vat_branch:'สาขาจดทะเบียน',addr_no:'',addr_road:'',subdistrict:'ในเมือง',district:'เมือง',province:'ขอนแก่น',zip:'40000',phone:'043-200-300',fax:'',email:'kkc@2bsimple.co.th',note:'',active:true},
+    {id:3,code:'00002',name_th:'สาขาเชียงใหม่',name_en:'Chiang Mai Branch',type:'สาขา',manager:'',open_date:'2564',is_vat_branch:'ไม่จดทะเบียน',addr_no:'',addr_road:'',subdistrict:'สุเทพ',district:'เมือง',province:'เชียงใหม่',zip:'50200',phone:'053-100-200',fax:'',email:'',note:'',active:true}
+  ],
+  division:[
+    {id:1,code:'DIV-FIN', name_th:'สายงานการเงินและบัญชี',   name_en:'Finance & Accounting',  abbr:'FIN', branch_id:1, head:'สุดา บัญชี',  deputy:'พิมพ์ใจ คลัง', email:'finance@2bsimple.co.th', cost_center:'CC-1200', description:'รับผิดชอบการเงิน บัญชี งบประมาณ และการควบคุมภายใน', active:true},
+    {id:2,code:'DIV-TECH',name_th:'สายงานเทคโนโลยีสารสนเทศ', name_en:'Information Technology', abbr:'TECH',branch_id:1, head:'Bird',       deputy:'ชิน โครงสร้าง',email:'it@2bsimple.co.th',     cost_center:'CC-1300', description:'พัฒนาและดูแลระบบสารสนเทศและโครงสร้างพื้นฐาน', active:true},
+    {id:3,code:'DIV-OPS', name_th:'สายงานปฏิบัติการ',        name_en:'Operations',           abbr:'OPS', branch_id:1, head:'สมชาย ใจดี', deputy:'', email:'ops@2bsimple.co.th',    cost_center:'CC-1400', description:'จัดซื้อ คลังสินค้า และงานปฏิบัติการ', active:true},
+    {id:4,code:'DIV-CORP',name_th:'สายงานสำนักงานกลาง',      name_en:'Corporate Services',   abbr:'CORP',branch_id:1, head:'สำนัก CEO',  deputy:'', email:'corp@2bsimple.co.th',   cost_center:'CC-1500', description:'ทรัพยากรบุคคล ธุรการ และงานสำนักงาน', active:true}
+  ],
+  department:[
+    {id:1,code:'DEP-ACC',name_th:'แผนกบัญชี',           name_en:'Accounting',          division_id:1, parent_id:null, seq:1, branch_id:1, head:'อรอนงค์ การบัญชี', cost_center:'CC-1210', email:'acc@2bsimple.co.th', ext:'1210', location:'ชั้น 10', headcount:'6', description:'จัดทำบัญชีและรายงานการเงิน', active:true},
+    {id:2,code:'DEP-TRE',name_th:'แผนกการเงิน',         name_en:'Treasury',            division_id:1, parent_id:null, seq:2, branch_id:1, head:'พิมพ์ใจ คลัง',     cost_center:'CC-1220', email:'', ext:'1220', location:'ชั้น 10', headcount:'4', description:'', active:true},
+    {id:3,code:'DEP-DEV',name_th:'แผนกพัฒนาระบบ',       name_en:'Software Development',division_id:2, parent_id:null, seq:1, branch_id:1, head:'Strike',          cost_center:'CC-1310', email:'dev@2bsimple.co.th', ext:'1310', location:'ชั้น 11', headcount:'12', description:'พัฒนาผลิตภัณฑ์และโซลูชัน', active:true},
+    {id:4,code:'DEP-INF',name_th:'แผนกโครงสร้างพื้นฐาน',name_en:'Infrastructure',      division_id:2, parent_id:null, seq:2, branch_id:1, head:'ชิน โครงสร้าง',   cost_center:'CC-1320', email:'', ext:'1320', location:'ชั้น 11', headcount:'5', description:'', active:true},
+    {id:5,code:'DEP-OPS',name_th:'ทีม DevOps',          name_en:'DevOps',              division_id:2, parent_id:3,    seq:1, branch_id:1, head:'',                cost_center:'CC-1330', email:'', ext:'', location:'ชั้น 11', headcount:'3', description:'', active:true},
+    {id:6,code:'DEP-PUR',name_th:'แผนกจัดซื้อ',         name_en:'Procurement',         division_id:3, parent_id:null, seq:1, branch_id:1, head:'สมชาย ใจดี',      cost_center:'CC-1410', email:'', ext:'1410', location:'ชั้น 9', headcount:'4', description:'', active:true},
+    {id:7,code:'DEP-WH', name_th:'แผนกคลังสินค้า',      name_en:'Warehouse',           division_id:3, parent_id:null, seq:2, branch_id:2, head:'ก้อง คลัง',       cost_center:'CC-1420', email:'', ext:'', location:'ขอนแก่น', headcount:'8', description:'', active:true},
+    {id:8,code:'DEP-HR', name_th:'แผนกทรัพยากรบุคคล',   name_en:'Human Resources',     division_id:4, parent_id:null, seq:1, branch_id:1, head:'มาลี สุขใจ',      cost_center:'CC-1510', email:'hr@2bsimple.co.th', ext:'1510', location:'ชั้น 9', headcount:'5', description:'', active:false},
+    {id:9,code:'DEP-MD', name_th:'สำนักผู้บริหาร',      name_en:'Executive Office',    division_id:null,parent_id:null,seq:1, branch_id:1, head:'สำนัก CEO',       cost_center:'CC-1000', email:'', ext:'1000', location:'ชั้น 12', headcount:'3', description:'งานเลขานุการผู้บริหาร', active:true}
+  ],
+  position:[
+    {id:1,code:'POS-CEO',   name_th:'ประธานเจ้าหน้าที่บริหาร',  name_en:'Chief Executive Officer',  track:'management', tier:'M7', parent_id:null, seq:1, dept_id:9,    division_id:null, job_family:'ผู้บริหารระดับสูง', grade:'EX-1', employment_type:'พนักงานประจำ', headcount:'1', salary_min:'', salary_max:'', job_desc:'กำหนดทิศทางและกลยุทธ์องค์กร', qualification:'ประสบการณ์บริหารระดับสูง 15 ปีขึ้นไป', note:'', active:true},
+    {id:2,code:'POS-CFO',   name_th:'ประธานเจ้าหน้าที่การเงิน',  name_en:'Chief Financial Officer',  track:'management', tier:'M6', parent_id:1,    seq:1, dept_id:null, division_id:1,    job_family:'ผู้บริหารระดับสูง', grade:'EX-2', employment_type:'พนักงานประจำ', headcount:'1', salary_min:'', salary_max:'', job_desc:'กำกับดูแลสายงานการเงินและบัญชี', qualification:'CPA หรือประสบการณ์การเงิน 12 ปี', note:'ผูกกับสายงาน (ไม่อยู่ใต้แผนกเฉพาะ)', active:true},
+    {id:3,code:'POS-CTO',   name_th:'ประธานเจ้าหน้าที่เทคโนโลยี',name_en:'Chief Technology Officer', track:'management', tier:'M6', parent_id:1,    seq:2, dept_id:null, division_id:2,    job_family:'ผู้บริหารระดับสูง', grade:'EX-2', employment_type:'พนักงานประจำ', headcount:'1', salary_min:'', salary_max:'', job_desc:'กำกับดูแลสายงานเทคโนโลยี', qualification:'ประสบการณ์เทคโนโลยี 12 ปี', note:'ผูกกับสายงาน (ไม่อยู่ใต้แผนกเฉพาะ)', active:true},
+    {id:4,code:'POS-DEVMGR',name_th:'ผู้จัดการฝ่ายพัฒนา',       name_en:'Development Manager',      track:'management', tier:'M4', parent_id:3,    seq:1, dept_id:3,    division_id:null, job_family:'บริหารงานพัฒนา', grade:'MG-1', employment_type:'พนักงานประจำ', headcount:'1', salary_min:'80000', salary_max:'120000', job_desc:'บริหารทีมพัฒนาและส่งมอบงาน', qualification:'ประสบการณ์พัฒนา 8 ปี', note:'', active:true},
+    {id:5,code:'POS-SRDEV', name_th:'นักพัฒนาระบบอาวุโส',       name_en:'Senior Developer',         track:'specialist', tier:'S4', parent_id:4,    seq:1, dept_id:3,    division_id:null, job_family:'วิศวกรรมซอฟต์แวร์', grade:'SP-3', employment_type:'พนักงานประจำ', headcount:'4', salary_min:'55000', salary_max:'85000', job_desc:'ออกแบบและพัฒนาระบบที่ซับซ้อน', qualification:'ประสบการณ์พัฒนา 5 ปี', note:'', active:true},
+    {id:6,code:'POS-DEV',   name_th:'นักพัฒนาระบบ',             name_en:'Developer',                track:'specialist', tier:'S2', parent_id:5,    seq:1, dept_id:3,    division_id:null, job_family:'วิศวกรรมซอฟต์แวร์', grade:'SP-1', employment_type:'พนักงานประจำ', headcount:'6', salary_min:'30000', salary_max:'55000', job_desc:'พัฒนาฟีเจอร์ตาม spec', qualification:'ปริญญาตรี วิทย์คอม/วิศวะ', note:'', active:true},
+    {id:7,code:'POS-ACCMGR',name_th:'ผู้จัดการแผนกบัญชี',       name_en:'Accounting Manager',       track:'management', tier:'M3', parent_id:2,    seq:1, dept_id:1,    division_id:null, job_family:'บริหารงานบัญชี', grade:'MG-1', employment_type:'พนักงานประจำ', headcount:'1', salary_min:'', salary_max:'', job_desc:'บริหารงานบัญชีและปิดงบ', qualification:'CPD ประสบการณ์ 8 ปี', note:'', active:true},
+    {id:8,code:'POS-ACC',   name_th:'เจ้าหน้าที่บัญชี',         name_en:'Accountant',               track:'specialist', tier:'S1', parent_id:7,    seq:1, dept_id:1,    division_id:null, job_family:'บัญชีการเงิน', grade:'SP-1', employment_type:'พนักงานประจำ', headcount:'4', salary_min:'', salary_max:'', job_desc:'บันทึกบัญชีและกระทบยอด', qualification:'ปริญญาตรี บัญชี', note:'', active:true}
+  ]
+};
+
+const TABS = [
+  {id:'company',    label:'Company',         icon:'building',   th:'บริษัท',   hint:'ข้อมูลนิติบุคคลของ ERP account นี้ — 1 account = 1 บริษัท จึงเป็นหน้ารายละเอียด (ส่วนที่เป็นหลายรายการคือ “สาขา”)'},
+  {id:'branch',     label:'Branch',          icon:'git-branch', th:'สาขา',     hint:'สาขาภายใต้บริษัท — รหัสสาขา 5 หลักตามระบบภาษี (00000 = สำนักงานใหญ่, 00001+ = สาขา)'},
+  {id:'division',   label:'Division',        icon:'layers',     th:'สายงาน',   hint:'สายงาน (Division) — ระดับใหญ่กว่าแผนก เล็กกว่าสาขา · แผนกจะสังกัดสายงานหรือไม่ก็ได้ · ตำแหน่งผูกกับแผนกหรือสายงานก็ได้'},
+  {id:'department', label:'Department',      icon:'network',    th:'แผนก',     hint:'แผนก — สังกัดสายงาน (ถ้ามี) + รองรับแผนกย่อย (parent) — ดูรายการหรือผังองค์กร (Company → สายงาน → แผนก)'},
+  {id:'position',   label:'Position & Tier', icon:'briefcase',  th:'ตำแหน่ง',  hint:'ตำแหน่ง + สายบังคับบัญชา (รายงานต่อ) + ระดับตำแหน่ง (Tier: บริหาร M / วิชาการ S / ปฏิบัติการ E) — ผูกกับแผนกหรือสายงานก็ได้'}
+];
+
+// ---------------- Utils ----------------
+function esc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function rec(entity,id){ return state[entity].find(r=>r.id===id); }
+function deptName(id){ const d=rec('department',id); return d?d.name_th:'—'; }
+function branchName(id){ const b=rec('branch',id); return b?b.name_th:'—'; }
+function divisionName(id){ const d=rec('division',id); return d?d.name_th:'—'; }
+function positionName(id){ const p=rec('position',id); return p?p.name_th:'—'; }
+function codeOf(entity,id){ const r=rec(entity,id); return r?r.code:''; }
+function idByCode(entity,code){ const r=state[entity].find(x=>x.code===code); return r?r.id:null; }
+function tierClass(t){ if(!t)return 'tier-e'; const c=t[0]; return c==='M'?'tier-m':c==='S'?'tier-s':'tier-e'; }
+function money(n){ if(n==null||n==='')return null; const v=Number(String(n).replace(/[, ]/g,'')); return isNaN(v)?n:v.toLocaleString('en-US'); }
+function childrenOf(entity,pid){ return state[entity].filter(r=>(r.parent_id==null?null:r.parent_id)===pid).sort((a,b)=>(a.seq||0)-(b.seq||0)); }
+function descendantsOf(entity,id){ const out=new Set(); (function rec2(p){ childrenOf(entity,p).forEach(c=>{ out.add(c.id); rec2(c.id); }); })(id); return out; }
+function deptCountInDivision(id){ return state.department.filter(d=>d.division_id===id).length; }
+
+// ---------------- Render root ----------------
+function render(){
+  const snap=preserveRenderState();
+  syncSidebar();
+  document.getElementById('page-content').innerHTML = renderPage();
+  document.getElementById('drawer').innerHTML = state.drawer.open ? renderDrawer() : '';
+  const mEl=document.querySelector('#modalBackdrop .modal');
+  mEl.innerHTML = state.modal.open ? renderModal() : '';
+  mEl.classList.toggle('is-lg', state.modal.open && state.modal.type==='import');
+  renderIcons();
+  restoreRenderState(snap);
+}
+function syncSidebar(){
+  document.querySelectorAll('.sb-item[data-feature]').forEach(el=>{
+    if(el.classList.contains('is-disabled')) return;
+    el.classList.toggle('is-active', el.getAttribute('data-feature')===state.route);
+  });
+  const t=TABS.find(t=>t.id===state.route); const bc=document.getElementById('bc-current');
+  if(bc&&t){ const d=state.detailId!=null?rec(state.route,state.detailId):null; bc.textContent = d ? (t.label+' · '+d.name_th) : ('Organization · '+t.label); }
+}
+function renderTabs(){
+  return '<div class="org-tabs">'+TABS.map(t=>{
+    const cnt = t.id==='company' ? 1 : state[t.id].length;
+    return '<button class="org-tab '+(t.id===state.route&&state.detailId==null?'is-active':'')+'" onclick="navigate(\''+t.id+'\')">'+
+      '<i data-lucide="'+t.icon+'" class="w-4 h-4"></i><span>'+t.label+'</span><span class="ot-count">'+cnt+'</span></button>';
+  }).join('')+'</div>';
+}
+function pageHeader(titleTh, subTh, hint, actionsHtml, countBadge){
+  return '<div class="ph"><div><div class="ph-title-row"><h1 class="ph-title">'+esc(titleTh)+
+    '<span class="hint" data-tip="'+esc(hint)+'">i</span></h1>'+
+    (countBadge?'<span class="ph-count">'+countBadge+'</span>':'')+'</div>'+
+    '<p class="ph-sub">'+esc(subTh)+'</p></div><div class="ph-actions">'+actionsHtml+'</div></div>';
+}
+function renderPage(){
+  if(state.detailId!=null && state.route!=='company') return renderDetail(state.route,state.detailId);
+  if(state.route==='company') return renderCompany();
+  if(state.route==='branch') return renderBranch();
+  if(state.route==='division') return renderDivision();
+  return renderHierarchy(state.route);
+}
+
+// ---------------- shared cells ----------------
+function statusPill(active){
+  return active ? '<span class="pill pill-converted"><span class="dot is-converted"></span>ใช้งาน</span>'
+                : '<span class="pill pill-archived"><span class="dot is-archived"></span>ปิดใช้งาน</span>';
+}
+function trOpen(e,id){ return '<tr class="row-click" onclick="openDetail(\''+e+'\','+id+')">'; }
+function rowActions(e,id,active){
+  return '<div class="row-actions" onclick="event.stopPropagation()">'+
+    '<button class="ra-btn" title="แก้ไข" onclick="openDrawer(\''+e+'\',\'edit\','+id+')"><i data-lucide="square-pen" class="w-4 h-4"></i></button>'+
+    '<button class="ra-btn '+(active?'':'is-success')+'" title="'+(active?'ปิดใช้งาน':'เปิดใช้งาน')+'" onclick="toggleStatus(\''+e+'\','+id+')"><i data-lucide="'+(active?'toggle-right':'toggle-left')+'" class="w-4 h-4"></i></button>'+
+    '<button class="ra-btn is-danger" title="ลบ" onclick="askDelete(\''+e+'\','+id+')"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>';
+}
+function nameCell(e,r){ return '<div class="name-link" onclick="openDetail(\''+e+'\','+r.id+')">'+esc(r.name_th)+'</div>'+(r.name_en?'<div class="cell-en">'+esc(r.name_en)+'</div>':''); }
+function getList(e){
+  const f=state.filters[e]||{q:'',status:'all'}; const q=(f.q||'').toLowerCase();
+  return state[e].filter(r=>{
+    const hay=[r.code,r.name_th,r.name_en,r.province,r.head].filter(Boolean).join(' ').toLowerCase();
+    const okQ=!q||hay.indexOf(q)>=0; const okS=f.status==='all'||(f.status==='active'?r.active:!r.active);
+    return okQ&&okS;
+  });
+}
+function filterBar(e,placeholder){
+  const f=state.filters[e];
+  return '<div class="filter-bar"><div class="input-search"><i data-lucide="search" class="lead-icon w-4 h-4"></i>'+
+    '<input class="input" name="q_'+e+'" placeholder="'+esc(placeholder)+'" value="'+esc(f.q)+'" oninput="setFilter(\''+e+'\',\'q\',this.value)"></div>'+
+    '<select class="select" style="max-width:170px" onchange="setFilter(\''+e+'\',\'status\',this.value)">'+
+    opt('all','ทุกสถานะ',f.status)+opt('active','ใช้งาน',f.status)+opt('inactive','ปิดใช้งาน',f.status)+'</select></div>';
+}
+function listFooter(e,shown){ return '<div class="table-footer"><span>แสดง '+shown+' จาก '+state[e].length+' รายการ</span>'+
+  '<div class="pagination"><button class="pg-btn is-disabled"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button><button class="pg-btn is-active">1</button><button class="pg-btn is-disabled"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button></div></div>'; }
+function emptyState(msg){ return '<div class="empty"><div class="empty-icon"><i data-lucide="inbox" class="w-5 h-5"></i></div><div class="empty-title">ไม่พบรายการ</div><div class="empty-desc">'+esc(msg)+'</div></div>'; }
+function csvBtns(e){ return '<button class="btn btn-secondary" onclick="openImport(\''+e+'\')"><i data-lucide="upload" class="w-4 h-4"></i><span>นำเข้า CSV</span></button>'+
+  '<button class="btn btn-secondary" onclick="exportCsv(\''+e+'\')"><i data-lucide="download" class="w-4 h-4"></i><span>Export CSV</span></button>'; }
+
+// ---------------- Company ----------------
+function kv(k,v){ return '<div class="kv"><span class="k">'+esc(k)+'</span><span class="v">'+(v?esc(v):'—')+'</span></div>'; }
+function renderCompany(){
+  const c=state.company; const t=TABS[0];
+  const addr=[c.addr_no,c.addr_building,c.addr_soi,c.addr_road, c.subdistrict?('ต./แขวง '+c.subdistrict):'', c.district?('อ./เขต '+c.district):'', c.province, c.zip].filter(Boolean).join(' ');
+  const actions='<button class="btn btn-secondary" onclick="exportCsv(\'company\')"><i data-lucide="download" class="w-4 h-4"></i><span>Export CSV</span></button>'+
+    '<button class="btn btn-primary" onclick="openDrawer(\'company\',\'edit\',0)"><i data-lucide="square-pen" class="w-4 h-4"></i><span>แก้ไขข้อมูลบริษัท</span></button>';
+  const ph=pageHeader('ข้อมูลบริษัท','โปรไฟล์นิติบุคคลของ ERP account นี้ — Organization Module (Core Cube)', t.hint, actions, null);
+  const logoInner = c.logo_url ? '<img src="'+esc(c.logo_url)+'" alt="logo">' : '<i data-lucide="building" class="w-5 h-5"></i>';
+  const hero='<div class="profile-hero"><div class="profile-logo'+(c.logo_url?' has-img':'')+'">'+logoInner+'</div>'+
+    '<div class="profile-main"><div class="profile-name">'+esc(c.name_th)+'</div><div class="profile-en">'+esc(c.name_en||'')+'</div>'+
+    '<div class="profile-tags"><span class="pill pill-active">'+esc(c.legal)+'</span>'+
+      '<span class="pill pill-registered"><i data-lucide="receipt" class="w-3 h-3"></i>'+esc(c.vat)+'</span>'+statusPill(c.active)+'</div></div></div>';
+  const mini='<div class="mini-stats">'+
+    '<div class="mini-stat" onclick="navigate(\'branch\')"><div class="ms-val">'+state.branch.length+'</div><div class="ms-lbl"><i data-lucide="git-branch" class="w-3.5 h-3.5"></i>สาขา</div></div>'+
+    '<div class="mini-stat" onclick="navigate(\'division\')"><div class="ms-val">'+state.division.length+'</div><div class="ms-lbl"><i data-lucide="layers" class="w-3.5 h-3.5"></i>สายงาน</div></div>'+
+    '<div class="mini-stat" onclick="navigate(\'department\')"><div class="ms-val">'+state.department.length+'</div><div class="ms-lbl"><i data-lucide="network" class="w-3.5 h-3.5"></i>แผนก</div></div>'+
+    '<div class="mini-stat" onclick="navigate(\'position\')"><div class="ms-val">'+state.position.length+'</div><div class="ms-lbl"><i data-lucide="briefcase" class="w-3.5 h-3.5"></i>ตำแหน่ง</div></div>'+
+    '</div>';
+  const cards='<div class="detail-grid">'+
+    '<div class="detail-card"><div class="detail-card-title"><i data-lucide="info" class="w-4 h-4"></i>ข้อมูลทั่วไป</div>'+kv('รหัสบริษัท',c.code)+kv('ชื่อ (ไทย)',c.name_th)+kv('ชื่อ (อังกฤษ)',c.name_en)+kv('ประเภทนิติบุคคล',c.legal)+kv('ประเภทธุรกิจ',c.business_type)+kv('รหัส TSIC',c.tsic)+'</div>'+
+    '<div class="detail-card"><div class="detail-card-title"><i data-lucide="receipt" class="w-4 h-4"></i>ทะเบียน · ภาษี · บัญชี</div>'+kv('เลขทะเบียนนิติบุคคล',c.reg_no)+kv('วันจดทะเบียน',c.reg_date)+kv('ทุนจดทะเบียน (บาท)',c.capital)+kv('เลขผู้เสียภาษี',c.tax_id)+kv('สถานะ VAT',c.vat)+kv('สำนักงานสรรพากร',c.tax_office)+kv('รอบปีบัญชี',c.fiscal)+kv('สกุลเงิน',c.currency)+'</div>'+
+    '<div class="detail-card"><div class="detail-card-title"><i data-lucide="map-pin" class="w-4 h-4"></i>ที่อยู่จดทะเบียน</div>'+kv('ที่อยู่',addr)+kv('จังหวัด',c.province)+kv('รหัสไปรษณีย์',c.zip)+'</div>'+
+    '<div class="detail-card"><div class="detail-card-title"><i data-lucide="phone" class="w-4 h-4"></i>ช่องทางติดต่อ</div>'+kv('ผู้ติดต่อ',c.contact_person)+kv('โทรศัพท์',c.phone)+kv('โทรสาร',c.fax)+kv('อีเมล',c.email)+kv('เว็บไซต์',c.website)+'</div>'+
+    '</div>';
+  return ph+renderTabs()+hero+mini+cards;
+}
+
+// ---------------- Branch ----------------
+function renderBranch(){
+  const t=TABS[1]; const list=getList('branch').slice().sort((a,b)=>String(a.code).localeCompare(String(b.code)));
+  const actions='<button class="btn btn-secondary" onclick="exportCsv(\'branch\')"><i data-lucide="download" class="w-4 h-4"></i><span>Export CSV</span></button>'+
+    '<button class="btn btn-primary" onclick="openDrawer(\'branch\',\'create\')"><i data-lucide="plus" class="w-4 h-4"></i><span>เพิ่มสาขา</span></button>';
+  const ph=pageHeader('สาขา','สาขาทั้งหมดภายใต้ '+state.company.name_th, t.hint, actions, state.branch.length+' รายการ');
+  let body;
+  if(!list.length) body=emptyState('ลองปรับตัวกรอง หรือกดปุ่ม “เพิ่มสาขา”');
+  else body='<div class="table-scroll"><table class="table"><thead><tr><th>รหัสสาขา</th><th>ชื่อสาขา</th><th>ประเภท</th><th>ผู้จัดการ</th><th>จังหวัด</th><th>โทรศัพท์</th><th>สถานะ</th><th style="text-align:right">จัดการ</th></tr></thead><tbody>'+
+    list.map(r=>{ const isHQ=r.code==='00000';
+      return trOpen('branch',r.id)+'<td class="mono code-cell">'+esc(r.code)+'</td><td>'+nameCell('branch',r)+'</td>'+
+        '<td>'+(isHQ?'<span class="pill pill-active">สำนักงานใหญ่</span>':'<span class="pill pill-archived">สาขา</span>')+'</td>'+
+        '<td class="muted-cell">'+esc(r.manager||'—')+'</td><td class="muted-cell">'+esc(r.province)+'</td><td class="muted-cell mono">'+esc(r.phone||'—')+'</td><td>'+statusPill(r.active)+'</td>'+
+        '<td style="text-align:right">'+rowActions('branch',r.id,r.active)+'</td></tr>'; }).join('')+'</tbody></table></div>';
+  return ph+renderTabs()+'<div class="card">'+filterBar('branch','ค้นหารหัส / ชื่อสาขา / จังหวัด...')+body+listFooter('branch',list.length)+'</div>';
+}
+
+// ---------------- Division ----------------
+function renderDivision(){
+  const t=TABS[2]; const list=getList('division').slice().sort((a,b)=>String(a.code).localeCompare(String(b.code)));
+  const addLabel='เพิ่มสายงาน';
+  const actions=csvBtns('division')+'<button class="btn btn-primary" onclick="openDrawer(\'division\',\'create\')"><i data-lucide="plus" class="w-4 h-4"></i><span>'+addLabel+'</span></button>';
+  const ph=pageHeader('สายงาน','สายงาน (Division) — ระดับใหญ่กว่าแผนก เล็กกว่าสาขา', t.hint, actions, state.division.length+' รายการ');
+  let body;
+  if(!list.length) body=emptyState('ลองปรับตัวกรอง หรือกดปุ่ม “เพิ่มสายงาน”');
+  else body='<div class="table-scroll"><table class="table"><thead><tr><th>รหัส</th><th>ชื่อสายงาน</th><th>สาขา</th><th>หัวหน้าสายงาน</th><th>แผนกในสังกัด</th><th>สถานะ</th><th style="text-align:right">จัดการ</th></tr></thead><tbody>'+
+    list.map(r=>trOpen('division',r.id)+'<td class="code-cell">'+esc(r.code)+'</td><td>'+nameCell('division',r)+'</td><td class="muted-cell">'+esc(branchName(r.branch_id))+'</td><td class="muted-cell">'+esc(r.head||'—')+'</td>'+
+      '<td><span class="pill pill-registered">'+deptCountInDivision(r.id)+' แผนก</span></td><td>'+statusPill(r.active)+'</td>'+
+      '<td style="text-align:right">'+rowActions('division',r.id,r.active)+'</td></tr>').join('')+'</tbody></table></div>';
+  return ph+renderTabs()+'<div class="card">'+filterBar('division','ค้นหารหัส / ชื่อสายงาน...')+body+listFooter('division',list.length)+'</div>';
+}
+
+// ---------------- Hierarchy (Department / Position) ----------------
+function renderHierarchy(e){
+  const t=TABS.find(t=>t.id===e); const view=state.view[e];
+  const addLabel = e==='department' ? 'เพิ่มแผนก' : 'เพิ่มตำแหน่ง';
+  const actions=csvBtns(e)+'<button class="btn btn-primary" onclick="openDrawer(\''+e+'\',\'create\')"><i data-lucide="plus" class="w-4 h-4"></i><span>'+addLabel+'</span></button>';
+  const ph=pageHeader(e==='department'?'แผนก':'ตำแหน่งและระดับ',
+      e==='department'?'จัดการแผนกของ '+state.company.name_th:'จัดการตำแหน่ง + ระดับตำแหน่ง + สายบังคับบัญชา',
+      t.hint, actions, state[e].length+' รายการ');
+  const toolbar='<div class="toolbar"><div class="view-switch">'+
+      '<button class="vs-btn '+(view==='list'?'is-active':'')+'" onclick="setView(\''+e+'\',\'list\')"><i data-lucide="list" class="w-3.5 h-3.5"></i>รายการ</button>'+
+      '<button class="vs-btn '+(view==='chart'?'is-active':'')+'" onclick="setView(\''+e+'\',\'chart\')"><i data-lucide="git-fork" class="w-3.5 h-3.5"></i>ผังองค์กร</button>'+
+      '</div></div>';
+  const main = view==='list' ? renderList(e) : renderChart(e);
+  return ph+renderTabs()+toolbar+main;
+}
+function deptDivLabel(r){ return r.division_id ? ('<span class="div-chip"><i data-lucide="layers" class="w-3 h-3"></i>'+esc(divisionName(r.division_id))+'</span>') : '<span style="color:var(--c-mute-3)">— ไม่สังกัด</span>'; }
+function posBindLabel(r){
+  if(r.dept_id) return esc(deptName(r.dept_id));
+  if(r.division_id) return esc(divisionName(r.division_id))+'<span class="bind-tag">สายงาน</span>';
+  return '<span style="color:var(--c-mute-3)">—</span>';
+}
+function renderList(e){
+  const list=getList(e).slice().sort((a,b)=>String(a.code).localeCompare(String(b.code)));
+  let body;
+  if(!list.length){ body=emptyState('ลองปรับตัวกรอง หรือกดปุ่มเพิ่มด้านบน'); }
+  else if(e==='department'){
+    body='<div class="table-scroll"><table class="table"><thead><tr><th>รหัส</th><th>ชื่อแผนก</th><th>สายงาน</th><th>แผนกแม่</th><th>สาขา</th><th>หัวหน้า</th><th>สถานะ</th><th style="text-align:right">จัดการ</th></tr></thead><tbody>'+
+      list.map(r=>trOpen('department',r.id)+'<td class="code-cell">'+esc(r.code)+'</td><td>'+nameCell('department',r)+'</td><td class="muted-cell">'+deptDivLabel(r)+'</td><td class="muted-cell">'+(r.parent_id?esc(deptName(r.parent_id)):'<span style="color:var(--c-mute-3)">—</span>')+'</td><td class="muted-cell">'+esc(branchName(r.branch_id))+'</td><td class="muted-cell">'+esc(r.head||'—')+'</td><td>'+statusPill(r.active)+'</td><td style="text-align:right">'+rowActions('department',r.id,r.active)+'</td></tr>').join('')+
+      '</tbody></table></div>';
+  } else {
+    body='<div class="table-scroll"><table class="table"><thead><tr><th>รหัส</th><th>ชื่อตำแหน่ง</th><th>สายอาชีพ</th><th>ระดับ</th><th>สังกัด</th><th>รายงานต่อ</th><th>สถานะ</th><th style="text-align:right">จัดการ</th></tr></thead><tbody>'+
+      list.map(r=>trOpen('position',r.id)+'<td class="code-cell">'+esc(r.code)+'</td><td>'+nameCell('position',r)+'</td><td class="track-tag">'+esc((TRACK_LABEL[r.track]||'').split(' (')[0])+'</td><td><span class="tier-badge '+tierClass(r.tier)+'">'+esc(r.tier)+'</span></td><td class="muted-cell">'+posBindLabel(r)+'</td><td class="muted-cell">'+(r.parent_id?esc(positionName(r.parent_id)):'<span style="color:var(--c-mute-3)">— สูงสุด</span>')+'</td><td>'+statusPill(r.active)+'</td><td style="text-align:right">'+rowActions('position',r.id,r.active)+'</td></tr>').join('')+
+      '</tbody></table></div>';
+  }
+  return '<div class="card">'+filterBar(e, e==='department'?'ค้นหารหัส / ชื่อแผนก...':'ค้นหารหัส / ชื่อตำแหน่ง...')+body+listFooter(e,list.length)+'</div>';
+}
+
+// ---------------- Detail landing ----------------
+function detailHero(icon,title,en,tags){
+  return '<div class="profile-hero"><div class="profile-logo"><i data-lucide="'+icon+'" class="w-5 h-5"></i></div>'+
+    '<div class="profile-main"><div class="profile-name">'+esc(title)+'</div>'+(en?'<div class="profile-en">'+esc(en)+'</div>':'')+
+    '<div class="profile-tags">'+tags+'</div></div>'+
+    '<div class="ph-actions"></div></div>';
+}
+function relTable(headers, rowsHtml, emptyMsg){
+  if(!rowsHtml) return '<div class="rel-empty">'+esc(emptyMsg)+'</div>';
+  return '<div class="table-scroll"><table class="table"><thead><tr>'+headers.map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+rowsHtml+'</tbody></table></div>';
+}
+function renderDetail(e,id){
+  const r=rec(e,id);
+  const t=TABS.find(t=>t.id===e);
+  const back='<button class="back-link" onclick="navigate(\''+e+'\')"><i data-lucide="arrow-left" class="w-4 h-4"></i>กลับไปรายการ'+esc(t.th)+'</button>';
+  if(!r) return back+'<div class="card"><div class="empty"><div class="empty-icon"><i data-lucide="search-x" class="w-5 h-5"></i></div><div class="empty-title">ไม่พบรายการ</div></div></div>';
+  const editBtn='<button class="btn btn-secondary" onclick="openDrawer(\''+e+'\',\'edit\','+id+')"><i data-lucide="square-pen" class="w-4 h-4"></i><span>แก้ไข</span></button>';
+  const ph='<div class="ph"><div><div class="ph-title-row"><h1 class="ph-title">รายละเอียด'+esc(t.th)+'</h1></div><p class="ph-sub"><span class="mono">'+esc(r.code)+'</span></p></div><div class="ph-actions">'+editBtn+'</div></div>';
+  let content='';
+  if(e==='branch'){
+    const isHQ=r.code==='00000'; const addr=[r.addr_no,r.addr_road,r.subdistrict?('ต./แขวง '+r.subdistrict):'',r.district?('อ./เขต '+r.district):'',r.province,r.zip].filter(Boolean).join(' ');
+    const tags=(isHQ?'<span class="pill pill-active">สำนักงานใหญ่</span>':'<span class="pill pill-archived">สาขา</span>')+statusPill(r.active);
+    const depts=state.department.filter(d=>d.branch_id===id);
+    content=detailHero('git-branch',r.name_th,r.name_en,tags)+
+      '<div class="detail-grid">'+
+      '<div class="detail-card"><div class="detail-card-title"><i data-lucide="info" class="w-4 h-4"></i>ข้อมูลสาขา</div>'+kv('รหัสสาขา',r.code)+kv('ประเภท',r.type)+kv('ผู้จัดการสาขา',r.manager)+kv('ปีที่เปิดทำการ',r.open_date)+kv('สถานะภาษีสาขา',r.is_vat_branch)+'</div>'+
+      '<div class="detail-card"><div class="detail-card-title"><i data-lucide="map-pin" class="w-4 h-4"></i>ที่อยู่ · ติดต่อ</div>'+kv('ที่อยู่',addr)+kv('โทรศัพท์',r.phone)+kv('โทรสาร',r.fax)+kv('อีเมล',r.email)+'</div>'+
+      '</div>'+
+      '<div class="detail-card" style="margin-top:16px"><div class="detail-card-title"><i data-lucide="network" class="w-4 h-4"></i>แผนกในสาขานี้ ('+depts.length+')</div>'+
+      relTable(['รหัส','ชื่อแผนก','สายงาน','หัวหน้า'], depts.map(d=>'<tr><td class="code-cell">'+esc(d.code)+'</td><td>'+nameCell('department',d)+'</td><td class="muted-cell">'+(d.division_id?esc(divisionName(d.division_id)):'—')+'</td><td class="muted-cell">'+esc(d.head||'—')+'</td></tr>').join(''),'ยังไม่มีแผนกในสาขานี้')+'</div>';
+  } else if(e==='division'){
+    const tags=statusPill(r.active)+(r.abbr?'<span class="pill pill-registered">'+esc(r.abbr)+'</span>':'');
+    const depts=state.department.filter(d=>d.division_id===id);
+    const poss=state.position.filter(p=>p.division_id===id);
+    content=detailHero('layers',r.name_th,r.name_en,tags)+
+      '<div class="detail-grid">'+
+      '<div class="detail-card"><div class="detail-card-title"><i data-lucide="info" class="w-4 h-4"></i>ข้อมูลทั่วไป</div>'+kv('รหัสสายงาน',r.code)+kv('ชื่อย่อ',r.abbr)+kv('สาขาที่สังกัด',branchName(r.branch_id))+kv('หัวหน้าสายงาน',r.head)+kv('รองหัวหน้า',r.deputy)+'</div>'+
+      '<div class="detail-card"><div class="detail-card-title"><i data-lucide="briefcase" class="w-4 h-4"></i>การจัดการ</div>'+kv('อีเมลกลาง',r.email)+kv('ศูนย์ต้นทุน',r.cost_center)+kv('จำนวนแผนก',deptCountInDivision(id)+' แผนก')+kv('จำนวนตำแหน่งระดับสายงาน',poss.length+' ตำแหน่ง')+'</div>'+
+      '</div>'+
+      (r.description?'<div class="detail-card" style="margin-top:16px"><div class="detail-card-title"><i data-lucide="file-text" class="w-4 h-4"></i>คำอธิบาย / พันธกิจ</div><div class="detail-longtext">'+esc(r.description)+'</div></div>':'')+
+      '<div class="detail-card" style="margin-top:16px"><div class="detail-card-title"><i data-lucide="network" class="w-4 h-4"></i>แผนกในสังกัด ('+depts.length+')</div>'+
+      relTable(['รหัส','ชื่อแผนก','แผนกแม่','หัวหน้า'], depts.map(d=>'<tr><td class="code-cell">'+esc(d.code)+'</td><td>'+nameCell('department',d)+'</td><td class="muted-cell">'+(d.parent_id?esc(deptName(d.parent_id)):'—')+'</td><td class="muted-cell">'+esc(d.head||'—')+'</td></tr>').join(''),'ยังไม่มีแผนกในสังกัด')+'</div>';
+  } else if(e==='department'){
+    const tags=statusPill(r.active)+deptDivLabel(r);
+    const kids=childrenOf('department',id); const poss=state.position.filter(p=>p.dept_id===id);
+    content=detailHero('network',r.name_th,r.name_en,tags)+
+      '<div class="detail-grid">'+
+      '<div class="detail-card"><div class="detail-card-title"><i data-lucide="info" class="w-4 h-4"></i>ข้อมูลแผนก</div>'+kv('รหัสแผนก',r.code)+kv('สังกัดสายงาน',r.division_id?divisionName(r.division_id):'— ไม่สังกัด')+kv('แผนกแม่',r.parent_id?deptName(r.parent_id):'— ระดับบนสุด')+kv('สาขา',branchName(r.branch_id))+'</div>'+
+      '<div class="detail-card"><div class="detail-card-title"><i data-lucide="user-cog" class="w-4 h-4"></i>การจัดการ</div>'+kv('หัวหน้าแผนก',r.head)+kv('ศูนย์ต้นทุน',r.cost_center)+kv('อีเมลกลุ่ม',r.email)+kv('เบอร์ภายใน',r.ext)+kv('ที่ตั้ง',r.location)+kv('อัตรากำลัง',r.headcount)+'</div>'+
+      '</div>'+
+      (r.description?'<div class="detail-card" style="margin-top:16px"><div class="detail-card-title"><i data-lucide="file-text" class="w-4 h-4"></i>คำอธิบาย</div><div class="detail-longtext">'+esc(r.description)+'</div></div>':'')+
+      '<div class="detail-grid" style="margin-top:16px">'+
+      '<div class="detail-card"><div class="detail-card-title"><i data-lucide="git-fork" class="w-4 h-4"></i>แผนกย่อย ('+kids.length+')</div>'+
+      relTable(['รหัส','ชื่อแผนก','หัวหน้า'], kids.map(d=>'<tr><td class="code-cell">'+esc(d.code)+'</td><td>'+nameCell('department',d)+'</td><td class="muted-cell">'+esc(d.head||'—')+'</td></tr>').join(''),'ไม่มีแผนกย่อย')+'</div>'+
+      '<div class="detail-card"><div class="detail-card-title"><i data-lucide="briefcase" class="w-4 h-4"></i>ตำแหน่งในแผนก ('+poss.length+')</div>'+
+      relTable(['รหัส','ชื่อตำแหน่ง','ระดับ'], poss.map(p=>'<tr><td class="code-cell">'+esc(p.code)+'</td><td>'+nameCell('position',p)+'</td><td><span class="tier-badge '+tierClass(p.tier)+'">'+esc(p.tier)+'</span></td></tr>').join(''),'ไม่มีตำแหน่งในแผนกนี้')+'</div>'+
+      '</div>';
+  } else { // position
+    const tags='<span class="tier-badge '+tierClass(r.tier)+'">'+esc(r.tier)+'</span>'+'<span class="pill pill-registered">'+esc((TRACK_LABEL[r.track]||'').split(' (')[0])+'</span>'+statusPill(r.active);
+    const reports=childrenOf('position',id);
+    const sal=(r.salary_min||r.salary_max)?((money(r.salary_min)||'—')+' – '+(money(r.salary_max)||'—')+' บาท'):'';
+    content=detailHero('briefcase',r.name_th,r.name_en,tags)+
+      '<div class="detail-grid">'+
+      '<div class="detail-card"><div class="detail-card-title"><i data-lucide="layers" class="w-4 h-4"></i>ข้อมูลตำแหน่ง</div>'+kv('รหัสตำแหน่ง',r.code)+kv('สายอาชีพ',(TRACK_LABEL[r.track]||'').split(' (')[0])+kv('ระดับ (Tier)',r.tier)+kv('กลุ่มงาน (Job Family)',r.job_family)+kv('Job Grade',r.grade)+'</div>'+
+      '<div class="detail-card"><div class="detail-card-title"><i data-lucide="git-merge" class="w-4 h-4"></i>สังกัด · สายบังคับบัญชา</div>'+kv('แผนก',r.dept_id?deptName(r.dept_id):'—')+kv('สายงาน',r.division_id?divisionName(r.division_id):'—')+kv('รายงานต่อ',r.parent_id?positionName(r.parent_id):'— ระดับสูงสุด')+kv('ประเภทการจ้าง',r.employment_type)+kv('อัตรากำลัง',r.headcount)+kv('ช่วงเงินเดือน',sal)+'</div>'+
+      '</div>'+
+      (r.job_desc?'<div class="detail-card" style="margin-top:16px"><div class="detail-card-title"><i data-lucide="clipboard-list" class="w-4 h-4"></i>หน้าที่ความรับผิดชอบ</div><div class="detail-longtext">'+esc(r.job_desc)+'</div></div>':'')+
+      (r.qualification?'<div class="detail-card" style="margin-top:16px"><div class="detail-card-title"><i data-lucide="graduation-cap" class="w-4 h-4"></i>คุณสมบัติ</div><div class="detail-longtext">'+esc(r.qualification)+'</div></div>':'')+
+      (r.note?'<div class="detail-card" style="margin-top:16px"><div class="detail-card-title"><i data-lucide="route" class="w-4 h-4"></i>หมายเหตุ / เส้นทางอาชีพ</div><div class="detail-longtext">'+esc(r.note)+'</div></div>':'')+
+      '<div class="detail-card" style="margin-top:16px"><div class="detail-card-title"><i data-lucide="users" class="w-4 h-4"></i>ผู้ใต้บังคับบัญชาโดยตรง ('+reports.length+')</div>'+
+      relTable(['รหัส','ชื่อตำแหน่ง','ระดับ','สังกัด'], reports.map(p=>'<tr><td class="code-cell">'+esc(p.code)+'</td><td>'+nameCell('position',p)+'</td><td><span class="tier-badge '+tierClass(p.tier)+'">'+esc(p.tier)+'</span></td><td class="muted-cell">'+posBindLabel(p)+'</td></tr>').join(''),'ไม่มีผู้ใต้บังคับบัญชาโดยตรง')+'</div>';
+  }
+  return back+ph+content;
+}
+
+// ---------------- Org Chart ----------------
+function companyNode(){ return '<div class="node node-company"><div class="node-title">'+esc(state.company.name_th)+'</div><div class="node-sub">'+esc(state.company.name_en||state.company.code)+'</div></div>'; }
+function divisionNodeBox(div){
+  return '<div class="node node-div" onclick="openDetail(\'division\','+div.id+')">'+
+    '<div class="node-title">'+esc(div.name_th)+'</div><div class="node-sub">'+esc(div.code)+'</div>'+
+    (div.head?'<div class="node-meta"><i data-lucide="user" class="w-3 h-3"></i>'+esc(div.head)+'</div>':'')+'</div>';
+}
+function nodeBox(e,r){
+  if(e==='department'){
+    return '<div class="node node-dept" onclick="openDetail(\'department\','+r.id+')">'+
+      '<div class="node-title">'+esc(r.name_th)+'</div><div class="node-sub">'+esc(r.code)+'</div>'+
+      (r.head&&r.head!=='—'?'<div class="node-meta"><i data-lucide="user" class="w-3 h-3"></i>'+esc(r.head)+'</div>':'')+'</div>';
+  }
+  const bind = r.dept_id?deptName(r.dept_id):(r.division_id?divisionName(r.division_id):null);
+  return '<div class="node node-pos" onclick="openDetail(\'position\','+r.id+')">'+
+    '<div class="node-title">'+esc(r.name_th)+'</div>'+
+    '<div class="node-badges"><span class="tier-badge '+tierClass(r.tier)+'">'+esc(r.tier)+'</span></div>'+
+    (bind?'<div class="node-meta"><i data-lucide="network" class="w-3 h-3"></i>'+esc(bind)+'</div>':'')+'</div>';
+}
+function chartNode(e,r,vis){
+  vis=vis||new Set(); if(vis.has(r.id)) return ''; vis.add(r.id);
+  const kids=childrenOf(e,r.id).filter(k=>!vis.has(k.id));
+  return '<li>'+nodeBox(e,r)+(kids.length?'<ul>'+kids.map(k=>chartNode(e,k,new Set(vis))).join('')+'</ul>':'')+'</li>';
+}
+function chartRoots(e){
+  const rows=state[e]; const ids=new Set(rows.map(r=>r.id)); const seen=new Set(); const roots=[];
+  function mark(r,vis){ if(vis.has(r.id))return; vis.add(r.id); seen.add(r.id); childrenOf(e,r.id).forEach(c=>mark(c,vis)); }
+  rows.filter(r=> r.parent_id==null || !ids.has(r.parent_id)).sort((a,b)=>(a.seq||0)-(b.seq||0)).forEach(r=>{ if(!seen.has(r.id)){ roots.push(r); mark(r,new Set()); } });
+  rows.slice().sort((a,b)=>a.id-b.id).forEach(r=>{ if(!seen.has(r.id)){ roots.push(r); mark(r,new Set()); } });
+  return roots;
+}
+function renderChart(e){
+  const hint='<div class="chart-hint"><i data-lucide="info" class="w-3.5 h-3.5"></i>คลิกการ์ดเพื่อดูรายละเอียด · เลื่อนแนวนอนเพื่อดูทั้งผัง</div>';
+  if(e==='department') return '<div class="chart-wrap">'+hint+renderDeptChart()+'</div>';
+  const roots=chartRoots('position');
+  const inner=roots.map(r=>chartNode('position',r,new Set())).join('');
+  const chart='<div class="orgchart"><ul><li>'+companyNode()+(inner?'<ul>'+inner+'</ul>':'')+'</li></ul></div>';
+  return '<div class="chart-wrap">'+hint+chart+'</div>';
+}
+function renderDeptChart(){
+  const rows=state.department; const ids=new Set(rows.map(r=>r.id)); const seen=new Set();
+  function mark(r,vis){ if(vis.has(r.id))return; vis.add(r.id); seen.add(r.id); childrenOf('department',r.id).forEach(c=>mark(c,vis)); }
+  const tops=rows.filter(r=> r.parent_id==null || !ids.has(r.parent_id));
+  const validDiv=id=> id!=null && state.division.some(v=>v.id===id);
+  const divNodes=state.division.slice().sort((a,b)=>a.id-b.id).map(div=>{
+    const dtops=tops.filter(d=> d.division_id===div.id).sort((a,b)=>(a.seq||0)-(b.seq||0));
+    dtops.forEach(d=>mark(d,new Set()));
+    const inner=dtops.map(d=>chartNode('department',d,new Set())).join('');
+    return '<li>'+divisionNodeBox(div)+(inner?'<ul>'+inner+'</ul>':'')+'</li>';
+  }).join('');
+  const noDiv=tops.filter(d=> !validDiv(d.division_id)).sort((a,b)=>(a.seq||0)-(b.seq||0));
+  noDiv.forEach(d=>mark(d,new Set()));
+  const noDivNodes=noDiv.map(d=>chartNode('department',d,new Set())).join('');
+  const leftover=rows.slice().sort((a,b)=>a.id-b.id).filter(r=>!seen.has(r.id));
+  leftover.forEach(d=>mark(d,new Set()));
+  const leftoverNodes=leftover.map(d=>chartNode('department',d,new Set())).join('');
+  const childrenHtml=divNodes+noDivNodes+leftoverNodes;
+  return '<div class="orgchart"><ul><li>'+companyNode()+(childrenHtml?'<ul>'+childrenHtml+'</ul>':'')+'</li></ul></div>';
+}
+
+// ---------------- handlers ----------------
+function setView(e,v){ state.view[e]=v; render(); }
+function setFilter(e,k,v){ state.filters[e][k]=v; render(); }
+function toggleStatus(e,id){ const r=rec(e,id); if(!r)return; r.active=!r.active; render(); showToast((r.active?'เปิดใช้งาน':'ปิดใช้งาน')+' "'+r.name_th+'" แล้ว', r.active?'success':'warning'); }
+function openDetail(e,id){ navigate(e+'/'+id); }
+
+// ---------------- Form helpers ----------------
+function opt(v,l,sel){ return '<option value="'+esc(v)+'"'+(String(sel)===String(v)?' selected':'')+'>'+esc(l)+'</option>'; }
+function fieldWrap(label,req,inner,help){ return '<div class="field"><label class="field-label">'+esc(label)+(req?'<span class="req">*</span>':'')+'</label>'+inner+(help?'<div class="field-help">'+esc(help)+'</div>':'')+'</div>'; }
+function inp(id,val,ph,type){ return '<input class="input" id="'+id+'" type="'+(type||'text')+'" value="'+esc(val||'')+'" placeholder="'+esc(ph||'')+'">'; }
+function selFld(id,options,val){ return '<select class="select" id="'+id+'">'+options.map(o=>opt(o[0],o[1],val)).join('')+'</select>'; }
+function taFld(id,val,ph){ return '<textarea class="notes-area" id="'+id+'" placeholder="'+esc(ph||'')+'" style="min-height:80px">'+esc(val||'')+'</textarea>'; }
+function provinceSel(id,val){ return '<select class="select" id="'+id+'">'+[['','— เลือกจังหวัด —']].concat(PROVINCES.map(p=>[p,p])).map(o=>opt(o[0],o[1],val)).join('')+'</select>'; }
+function branchSel(id,val){ return '<select class="select" id="'+id+'">'+[opt('','— ไม่ระบุ —',val)].concat(state.branch.map(b=>opt(b.id,b.code+' · '+b.name_th,val))).join('')+'</select>'; }
+function divisionSel(id,val){ return '<select class="select" id="'+id+'">'+[opt('','— ไม่สังกัดสายงาน —',val)].concat(state.division.map(d=>opt(d.id,d.name_th,val))).join('')+'</select>'; }
+function deptSel(id,val){ return '<select class="select" id="'+id+'">'+[opt('','— ไม่ระบุ —',val)].concat(state.department.map(d=>opt(d.id,d.name_th,val))).join('')+'</select>'; }
+function parentSel(id,e,val,selfId,placeholder){
+  const excl=new Set(); if(selfId!=null){ descendantsOf(e,selfId).forEach(x=>excl.add(x)); excl.add(selfId); }
+  return '<select class="select" id="'+id+'">'+[opt('',placeholder,val)].concat(state[e].filter(r=>!excl.has(r.id)).map(r=>opt(r.id,r.name_th+'  ('+r.code+')',val))).join('')+'</select>';
+}
+function grp(title,icon,inner){ return '<div class="drawer-group"><div class="drawer-group-title"><i data-lucide="'+icon+'" class="w-3.5 h-3.5"></i>'+esc(title)+'</div>'+inner+'</div>'; }
+function companyLogoField(r){
+  var has=!!(r&&r.logo_url);
+  return '<div class="logo-edit">'+
+    '<div class="logo-preview'+(has?' has-img':'')+'" id="companyLogoPreview">'+(has?'<img src="'+esc(r.logo_url)+'" alt="logo">':'<i data-lucide="building"></i>')+'</div>'+
+    '<div class="logo-actions">'+
+      '<div class="logo-btns">'+
+        '<input type="file" id="f_logo_file" accept="image/png,image/jpeg,image/svg+xml" style="display:none" onchange="onCompanyLogoPick(this)">'+
+        '<button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById(\'f_logo_file\').click()"><i data-lucide="upload" class="w-4 h-4"></i><span>อัปโหลดโลโก้</span></button>'+
+        '<button type="button" class="btn btn-ghost btn-sm" id="btnRemoveLogo" onclick="removeCompanyLogo()" style="'+(has?'':'display:none')+'"><i data-lucide="trash-2" class="w-4 h-4"></i><span>ลบโลโก้</span></button>'+
+      '</div>'+
+      '<div class="field-help">รองรับ PNG / JPG / SVG · ขนาดแนะนำ ≥ 256×256px · PNG พื้นหลังโปร่งใสแสดงผลดีที่สุด · ไฟล์ไม่เกิน 2MB</div>'+
+    '</div>'+
+  '</div>';
+}
+function onCompanyLogoPick(input){
+  var f=input.files&&input.files[0]; if(!f) return;
+  if(!/^image\//.test(f.type)){ showToast('ไฟล์ต้องเป็นรูปภาพ (PNG/JPG/SVG)','warning'); input.value=''; return; }
+  if(f.size>2*1024*1024){ showToast('ไฟล์ใหญ่เกิน 2MB','warning'); input.value=''; return; }
+  var reader=new FileReader();
+  reader.onload=function(ev){ state.companyLogoDraft=ev.target.result;
+    var pv=document.getElementById('companyLogoPreview'); if(pv){ pv.innerHTML='<img src="'+state.companyLogoDraft+'" alt="logo">'; pv.classList.add('has-img'); }
+    var rm=document.getElementById('btnRemoveLogo'); if(rm) rm.style.display='';
+  };
+  reader.readAsDataURL(f);
+}
+function removeCompanyLogo(){ state.companyLogoDraft='';
+  var pv=document.getElementById('companyLogoPreview'); if(pv){ pv.innerHTML='<i data-lucide="building"></i>'; pv.classList.remove('has-img'); renderIcons(); }
+  var rm=document.getElementById('btnRemoveLogo'); if(rm) rm.style.display='none';
+  var fi=document.getElementById('f_logo_file'); if(fi) fi.value='';
+}
+function statusToggle(active){
+  return grp('สถานะ','power','<div class="status-row"><div class="sr-text"><div class="sr-title">เปิดใช้งาน</div><div class="sr-sub">รายการที่ปิดจะไม่ถูกเลือกใน dropdown ของระบบอื่น</div></div>'+
+    '<div class="tgl '+(active?'is-on':'')+'" id="f_active" onclick="this.classList.toggle(\'is-on\')"></div></div>');
+}
+
+// ---------------- Drawer ----------------
+function renderDrawer(){
+  const {entity,mode,id,parentId}=state.drawer; const t=TABS.find(t=>t.id===entity);
+  let r;
+  if(entity==='company') r=state.company;
+  else if(mode==='edit') r=rec(entity,id);
+  else r={ parent_id:(parentId!=null?parentId:null) };
+  const title = entity==='company' ? 'แก้ไขข้อมูลบริษัท' : (mode==='edit'?'แก้ไข':'เพิ่ม')+t.th;
+  let sub;
+  if(entity==='company') sub='<span class="mono">'+esc(r.code)+'</span> · ข้อมูลนิติบุคคล';
+  else if(mode==='edit') sub='<span class="mono">'+esc(r.code)+'</span> · '+esc(r.name_th);
+  else sub='สร้างรายการใหม่';
+  const body=renderForm(entity,r);
+  return '<div class="drawer-header"><div class="drawer-avatar"><i data-lucide="'+t.icon+'" class="w-5 h-5"></i></div>'+
+    '<div style="flex:1"><h2 class="drawer-title">'+title+'</h2><div class="drawer-subtitle">'+sub+'</div></div>'+
+    '<button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-4 h-4"></i></button></div>'+
+    '<div class="drawer-body">'+body+'</div>'+
+    '<div class="drawer-footer"><button class="btn btn-ghost" onclick="closeDrawer()">ยกเลิก</button>'+
+      '<div class="footer-spacer"></div>'+
+      '<button class="btn btn-primary" onclick="saveRecord()"><i data-lucide="check" class="w-4 h-4"></i><span>บันทึก</span></button></div>';
+}
+
+function renderForm(e,r){
+  r=r||{};
+  if(e==='company'){
+    return grp('โลโก้บริษัท','image',companyLogoField(r))
+      + grp('ข้อมูลทั่วไป','info',
+        '<div class="field-grid-2">'+fieldWrap('รหัสบริษัท',false,inp('f_code',r.code,'COM-001'))+fieldWrap('ประเภทนิติบุคคล',true,selFld('f_legal',LEGAL_TYPES.map(x=>[x,x]),r.legal||LEGAL_TYPES[0]))+'</div>'+
+        fieldWrap('ชื่อบริษัท (ไทย)',true,inp('f_name_th',r.name_th,'บริษัท ... จำกัด'))+fieldWrap('ชื่อบริษัท (อังกฤษ)',false,inp('f_name_en',r.name_en,'... Co., Ltd.'))+
+        '<div class="field-grid-2">'+fieldWrap('ประเภทธุรกิจ',false,inp('f_business_type',r.business_type))+fieldWrap('รหัส TSIC',false,inp('f_tsic',r.tsic,'00000'))+'</div>')
+      + grp('ทะเบียน · ภาษี · บัญชี','receipt',
+        '<div class="field-grid-2">'+fieldWrap('เลขทะเบียนนิติบุคคล',false,inp('f_reg_no',r.reg_no))+fieldWrap('วันจดทะเบียน',false,inp('f_reg_date',r.reg_date,'วว ดดดด ปปปป'))+'</div>'+
+        '<div class="field-grid-2">'+fieldWrap('ทุนจดทะเบียน (บาท)',false,inp('f_capital',r.capital,'0'))+fieldWrap('เลขประจำตัวผู้เสียภาษี (13 หลัก)',true,inp('f_tax_id',r.tax_id,'0 0000 00000 00 0'))+'</div>'+
+        '<div class="field-grid-2">'+fieldWrap('สถานะ VAT',false,selFld('f_vat',[['จดทะเบียน','จดทะเบียน VAT'],['ไม่จดทะเบียน','ไม่จดทะเบียน']],r.vat||'จดทะเบียน'))+fieldWrap('สำนักงานสรรพากร',false,inp('f_tax_office',r.tax_office))+'</div>'+
+        '<div class="field-grid-2">'+fieldWrap('รอบปีบัญชี (เริ่ม)',false,selFld('f_fiscal',MONTHS.map(m=>[m,m]),r.fiscal||'มกราคม'))+fieldWrap('สกุลเงินหลัก',false,selFld('f_currency',[['THB','THB — บาท'],['USD','USD'],['EUR','EUR'],['CNY','CNY']],r.currency||'THB'))+'</div>')
+      + grp('ที่อยู่จดทะเบียน','map-pin',
+        '<div class="field-grid-3">'+fieldWrap('เลขที่',false,inp('f_addr_no',r.addr_no))+fieldWrap('อาคาร/หมู่',false,inp('f_addr_building',r.addr_building))+fieldWrap('ซอย',false,inp('f_addr_soi',r.addr_soi))+'</div>'+
+        fieldWrap('ถนน',false,inp('f_addr_road',r.addr_road))+
+        '<div class="field-grid-2">'+fieldWrap('ตำบล/แขวง',false,inp('f_subdistrict',r.subdistrict))+fieldWrap('อำเภอ/เขต',false,inp('f_district',r.district))+'</div>'+
+        '<div class="field-grid-2">'+fieldWrap('จังหวัด',false,provinceSel('f_province',r.province))+fieldWrap('รหัสไปรษณีย์',false,inp('f_zip',r.zip,'10900'))+'</div>')
+      + grp('ช่องทางติดต่อ','phone',
+        fieldWrap('ผู้ติดต่อ',false,inp('f_contact_person',r.contact_person))+
+        '<div class="field-grid-2">'+fieldWrap('โทรศัพท์',false,inp('f_phone',r.phone,'02-000-0000'))+fieldWrap('โทรสาร',false,inp('f_fax',r.fax))+'</div>'+
+        '<div class="field-grid-2">'+fieldWrap('อีเมล',false,inp('f_email',r.email,'info@example.co.th','email'))+fieldWrap('เว็บไซต์',false,inp('f_website',r.website,'www.example.co.th'))+'</div>')
+      + statusToggle(r.active!==false);
+  }
+  if(e==='branch'){
+    return grp('ข้อมูลสาขา','git-branch',
+        '<div class="field-grid-2">'+fieldWrap('รหัสสาขา (5 หลัก)',true,inp('f_code',r.code,'00000'),'00000 = สำนักงานใหญ่ · 00001+ = สาขา')+fieldWrap('ประเภท',false,selFld('f_type',[['สำนักงานใหญ่','สำนักงานใหญ่ (HQ)'],['สาขา','สาขา (Branch)']],r.type||'สาขา'))+'</div>'+
+        fieldWrap('ชื่อสาขา (ไทย)',true,inp('f_name_th',r.name_th,'สาขา...'))+fieldWrap('ชื่อสาขา (อังกฤษ)',false,inp('f_name_en',r.name_en,'... Branch'))+
+        '<div class="field-grid-2">'+fieldWrap('ผู้จัดการสาขา',false,inp('f_manager',r.manager))+fieldWrap('ปีที่เปิดทำการ',false,inp('f_open_date',r.open_date,'พ.ศ.'))+'</div>'+
+        fieldWrap('สถานะภาษีสาขา',false,selFld('f_is_vat_branch',[['สาขาจดทะเบียน','สาขาจดทะเบียน VAT'],['ไม่จดทะเบียน','ไม่จดทะเบียน']],r.is_vat_branch||'สาขาจดทะเบียน')))
+      + grp('ที่อยู่','map-pin',
+        '<div class="field-grid-2">'+fieldWrap('เลขที่',false,inp('f_addr_no',r.addr_no))+fieldWrap('ถนน',false,inp('f_addr_road',r.addr_road))+'</div>'+
+        '<div class="field-grid-2">'+fieldWrap('ตำบล/แขวง',false,inp('f_subdistrict',r.subdistrict))+fieldWrap('อำเภอ/เขต',false,inp('f_district',r.district))+'</div>'+
+        '<div class="field-grid-2">'+fieldWrap('จังหวัด',false,provinceSel('f_province',r.province))+fieldWrap('รหัสไปรษณีย์',false,inp('f_zip',r.zip))+'</div>')
+      + grp('ช่องทางติดต่อ','phone',
+        '<div class="field-grid-2">'+fieldWrap('โทรศัพท์',false,inp('f_phone',r.phone,'0-0000-0000'))+fieldWrap('โทรสาร',false,inp('f_fax',r.fax))+'</div>'+
+        fieldWrap('อีเมล',false,inp('f_email',r.email))+fieldWrap('หมายเหตุ',false,taFld('f_note',r.note)))
+      + statusToggle(r.active!==false);
+  }
+  if(e==='division'){
+    return grp('ข้อมูลสายงาน','layers',
+        '<div class="field-grid-2">'+fieldWrap('รหัสสายงาน',false,inp('f_code',r.code,'DIV-XXX'))+fieldWrap('ชื่อย่อ',false,inp('f_abbr',r.abbr,'FIN'))+'</div>'+
+        fieldWrap('ชื่อสายงาน (ไทย)',true,inp('f_name_th',r.name_th,'สายงาน...'))+fieldWrap('ชื่อสายงาน (อังกฤษ)',false,inp('f_name_en',r.name_en))+
+        fieldWrap('สาขาที่สังกัด',false,branchSel('f_branch_id',r.branch_id)))
+      + grp('การจัดการ','user-cog',
+        '<div class="field-grid-2">'+fieldWrap('หัวหน้าสายงาน',false,inp('f_head',r.head))+fieldWrap('รองหัวหน้าสายงาน',false,inp('f_deputy',r.deputy))+'</div>'+
+        '<div class="field-grid-2">'+fieldWrap('อีเมลกลาง',false,inp('f_email',r.email))+fieldWrap('ศูนย์ต้นทุน',false,inp('f_cost_center',r.cost_center,'CC-XXXX'))+'</div>'+
+        fieldWrap('คำอธิบาย / พันธกิจ',false,taFld('f_description',r.description)))
+      + statusToggle(r.active!==false);
+  }
+  if(e==='department'){
+    return grp('ข้อมูลแผนก','network',
+        '<div class="field-grid-2">'+fieldWrap('รหัสแผนก',false,inp('f_code',r.code,'DEP-XXX'))+fieldWrap('ชื่อแผนก (ไทย)',true,inp('f_name_th',r.name_th,'แผนก...'))+'</div>'+
+        fieldWrap('ชื่อแผนก (อังกฤษ)',false,inp('f_name_en',r.name_en)))
+      + grp('ตำแหน่งในผังองค์กร','git-merge',
+        fieldWrap('สังกัดสายงาน (ถ้ามี)',false,divisionSel('f_division_id',r.division_id),'แผนกจะอยู่ใต้สายงานหรือไม่ก็ได้ — เว้นว่าง = ขึ้นตรงบริษัท/สาขา')+
+        fieldWrap('สังกัดภายใต้ (แผนกแม่)',false,parentSel('f_parent_id','department',r.parent_id,r.id,'— ระดับบนสุด (ไม่มีแผนกแม่) —'),'สำหรับแผนกย่อย')+
+        fieldWrap('สาขา',false,branchSel('f_branch_id',r.branch_id)))
+      + grp('การจัดการ','user-cog',
+        '<div class="field-grid-2">'+fieldWrap('หัวหน้าแผนก',false,inp('f_head',r.head))+fieldWrap('รหัสศูนย์ต้นทุน',false,inp('f_cost_center',r.cost_center,'CC-XXXX'))+'</div>'+
+        '<div class="field-grid-3">'+fieldWrap('อีเมลกลุ่ม',false,inp('f_email',r.email))+fieldWrap('เบอร์ภายใน',false,inp('f_ext',r.ext))+fieldWrap('อัตรากำลัง',false,inp('f_headcount',r.headcount,'0','number'))+'</div>'+
+        fieldWrap('ที่ตั้ง / ชั้น',false,inp('f_location',r.location))+
+        fieldWrap('คำอธิบาย',false,taFld('f_description',r.description)))
+      + statusToggle(r.active!==false);
+  }
+  // position
+  const curTrack=r.track||'specialist';
+  const trackOpts=[['management',TRACK_LABEL.management],['specialist',TRACK_LABEL.specialist],['operational',TRACK_LABEL.operational]];
+  return grp('ข้อมูลตำแหน่ง','briefcase',
+      '<div class="field-grid-2">'+fieldWrap('รหัสตำแหน่ง',false,inp('f_code',r.code,'POS-XXX'))+fieldWrap('ชื่อตำแหน่ง (ไทย)',true,inp('f_name_th',r.name_th))+'</div>'+
+      fieldWrap('ชื่อตำแหน่ง (อังกฤษ)',false,inp('f_name_en',r.name_en))+
+      '<div class="field-grid-2">'+fieldWrap('กลุ่มงาน (Job Family)',false,inp('f_job_family',r.job_family))+fieldWrap('Job Grade',false,inp('f_grade',r.grade))+'</div>')
+    + grp('สายอาชีพ & ระดับตำแหน่ง','layers',
+      '<div class="field-grid-2">'+fieldWrap('สายอาชีพ',true,'<select class="select" id="f_track" onchange="onTrackChange()">'+trackOpts.map(o=>opt(o[0],o[1],curTrack)).join('')+'</select>')+
+      fieldWrap('ระดับ (Tier)',true,'<select class="select" id="f_tier">'+TIERS[curTrack].map(x=>opt(x,x,r.tier)).join('')+'</select>')+'</div>'+
+      '<div class="field-grid-3">'+fieldWrap('ประเภทการจ้าง',false,selFld('f_employment_type',EMP_TYPES.map(x=>[x,x]),r.employment_type||'พนักงานประจำ'))+fieldWrap('อัตรากำลัง',false,inp('f_headcount',r.headcount,'0','number'))+fieldWrap('Job Grade',false,inp('f_grade2',r.grade))+'</div>'+
+      '<div class="field-grid-2">'+fieldWrap('เงินเดือนต่ำสุด',false,inp('f_salary_min',r.salary_min,'0','number'))+fieldWrap('เงินเดือนสูงสุด',false,inp('f_salary_max',r.salary_max,'0','number'))+'</div>')
+    + grp('สังกัด (เลือกแผนก หรือสายงาน หรือไม่เลือกก็ได้)','git-merge',
+      '<div class="field-grid-2">'+fieldWrap('แผนก',false,deptSel('f_dept_id',r.dept_id))+fieldWrap('สายงาน',false,divisionSel('f_division_id',r.division_id))+'</div>'+
+      '<div class="field-help">พนักงานอาจอยู่ใต้แผนก หรืออยู่ระดับสายงานโดยไม่มีแผนกเฉพาะก็ได้ (เช่น CFO/CTO)</div>')
+    + grp('สายการบังคับบัญชา','users',
+      fieldWrap('รายงานต่อ (ตำแหน่งเหนือกว่า)',false,parentSel('f_parent_id','position',r.parent_id,r.id,'— ระดับสูงสุด (ไม่มีผู้บังคับบัญชา) —')))
+    + grp('รายละเอียดงาน','clipboard-list',
+      fieldWrap('หน้าที่ความรับผิดชอบ',false,taFld('f_job_desc',r.job_desc))+
+      fieldWrap('คุณสมบัติที่ต้องการ',false,taFld('f_qualification',r.qualification))+
+      fieldWrap('หมายเหตุ / เส้นทางอาชีพ',false,taFld('f_note',r.note)))
+    + statusToggle(r.active!==false);
+}
+
+function onTrackChange(){
+  const track=document.getElementById('f_track').value;
+  document.getElementById('f_tier').innerHTML=TIERS[track].map(x=>'<option value="'+x+'">'+x+'</option>').join('');
+}
+
+// ---------------- Save ----------------
+function val(id){ const el=document.getElementById(id); return el?el.value.trim():''; }
+function num(id){ const v=val(id); return v?parseInt(v,10):null; }
+function saveRecord(){
+  const {entity,mode,id}=state.drawer;
+  const active=document.getElementById('f_active').classList.contains('is-on');
+  if(entity==='company'){
+    Object.assign(state.company,{code:val('f_code'),legal:val('f_legal'),name_th:val('f_name_th'),name_en:val('f_name_en'),business_type:val('f_business_type'),tsic:val('f_tsic'),reg_no:val('f_reg_no'),reg_date:val('f_reg_date'),capital:val('f_capital'),tax_id:val('f_tax_id'),vat:val('f_vat'),tax_office:val('f_tax_office'),fiscal:val('f_fiscal'),currency:val('f_currency'),addr_no:val('f_addr_no'),addr_building:val('f_addr_building'),addr_soi:val('f_addr_soi'),addr_road:val('f_addr_road'),subdistrict:val('f_subdistrict'),district:val('f_district'),province:val('f_province'),zip:val('f_zip'),contact_person:val('f_contact_person'),phone:val('f_phone'),fax:val('f_fax'),email:val('f_email'),website:val('f_website'),logo_url:(typeof state.companyLogoDraft==='string'?state.companyLogoDraft:state.company.logo_url),active});
+    if(!state.company.name_th){ showToast('กรุณาระบุชื่อบริษัท','warning'); return; }
+    closeDrawer(); setTimeout(()=>{ render(); showToast('บันทึกข้อมูลบริษัทแล้ว','success'); },60); return;
+  }
+  let data={};
+  if(entity==='branch') data={code:val('f_code'),name_th:val('f_name_th'),name_en:val('f_name_en'),type:val('f_type'),manager:val('f_manager'),open_date:val('f_open_date'),is_vat_branch:val('f_is_vat_branch'),addr_no:val('f_addr_no'),addr_road:val('f_addr_road'),subdistrict:val('f_subdistrict'),district:val('f_district'),province:val('f_province'),zip:val('f_zip'),phone:val('f_phone'),fax:val('f_fax'),email:val('f_email'),note:val('f_note'),active};
+  else if(entity==='division') data={code:val('f_code'),name_th:val('f_name_th'),name_en:val('f_name_en'),abbr:val('f_abbr'),branch_id:num('f_branch_id'),head:val('f_head'),deputy:val('f_deputy'),email:val('f_email'),cost_center:val('f_cost_center'),description:val('f_description'),active};
+  else if(entity==='department') data={code:val('f_code'),name_th:val('f_name_th'),name_en:val('f_name_en'),division_id:num('f_division_id'),parent_id:num('f_parent_id'),branch_id:num('f_branch_id'),head:val('f_head'),cost_center:val('f_cost_center'),email:val('f_email'),ext:val('f_ext'),location:val('f_location'),headcount:val('f_headcount'),description:val('f_description'),active};
+  else data={code:val('f_code'),name_th:val('f_name_th'),name_en:val('f_name_en'),job_family:val('f_job_family'),grade:val('f_grade'),track:val('f_track'),tier:val('f_tier'),employment_type:val('f_employment_type'),headcount:val('f_headcount'),salary_min:val('f_salary_min'),salary_max:val('f_salary_max'),dept_id:num('f_dept_id'),division_id:num('f_division_id'),parent_id:num('f_parent_id'),job_desc:val('f_job_desc'),qualification:val('f_qualification'),note:val('f_note'),active};
+  if(!data.name_th){ showToast('กรุณาระบุชื่อ (ไทย)','warning'); return; }
+  const prefix={branch:'',division:'DIV',department:'DEP',position:'POS'}[entity];
+  if(!data.code){ if(entity==='branch'){ data.code=String(state.branch.length).padStart(5,'0'); } else { state.seq[entity]++; data.code=prefix+'-'+String(state.seq[entity]).padStart(3,'0'); } }
+  const hier=(entity==='department'||entity==='position');
+  if(mode==='edit'){ const r=rec(entity,id); const oldP=r.parent_id; Object.assign(r,data);
+    if(hier && oldP!==data.parent_id){ const sibs=childrenOf(entity,data.parent_id==null?null:data.parent_id).filter(x=>x.id!==r.id); r.seq=(sibs.length?Math.max(...sibs.map(s=>s.seq||0)):0)+1; }
+    closeDrawer(); setTimeout(()=>{ render(); showToast('บันทึกการแก้ไข "'+data.name_th+'" แล้ว','success'); },60);
+  } else {
+    const newId=Math.max(0,...state[entity].map(r=>r.id))+1; data.id=newId;
+    if(hier){ const sibs=childrenOf(entity,data.parent_id==null?null:data.parent_id); data.seq=(sibs.length?Math.max(...sibs.map(s=>s.seq||0)):0)+1; }
+    state[entity].push(data);
+    closeDrawer(); setTimeout(()=>{ render(); showToast('เพิ่ม "'+data.name_th+'" เรียบร้อย','success'); },60);
+  }
+}
+
+// ---------------- Delete ----------------
+function askDelete(e,id){ openModal('delete',{e,id}); }
+function renderModal(){
+  if(state.modal.type==='delete') return renderDeleteModal();
+  if(state.modal.type==='import') return renderImportModal();
+  return '';
+}
+function renderDeleteModal(){
+  const {e,id}=state.modal.data; const r=rec(e,id); if(!r) return ''; const t=TABS.find(t=>t.id===e);
+  let warn='';
+  if(e==='department'||e==='position'){ const k=childrenOf(e,id).length; if(k) warn='<div style="margin-top:8px;font-size:12.5px;color:var(--c-warning)"><b>'+k+' รายการย่อย</b> จะถูกเลื่อนขึ้นไปอยู่ใต้ระดับเหนือกว่าโดยอัตโนมัติ</div>'; }
+  if(e==='division'){ const k=deptCountInDivision(id); if(k) warn='<div style="margin-top:8px;font-size:12.5px;color:var(--c-warning)"><b>'+k+' แผนก</b> ที่สังกัดสายงานนี้จะถูกปรับเป็น “ไม่สังกัดสายงาน”</div>'; }
+  return '<div class="modal-header"><div class="modal-header-icon is-danger"><i data-lucide="trash-2" class="w-4 h-4"></i></div>'+
+    '<div><h3 class="modal-title">ลบ'+esc(t.th)+'?</h3>'+
+    '<p class="modal-subtitle">ต้องการลบ <b>'+esc(r.name_th)+'</b> (<span class="mono">'+esc(r.code)+'</span>) หรือไม่? การลบไม่สามารถย้อนกลับได้'+warn+'</p></div></div>'+
+    '<div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>'+
+    '<button class="btn btn-danger" onclick="confirmDelete()"><i data-lucide="trash-2" class="w-4 h-4"></i><span>ลบ</span></button></div>';
+}
+function confirmDelete(){
+  const {e,id}=state.modal.data; const r=rec(e,id);
+  if(e==='department'||e==='position'){ const par=r?r.parent_id:null; childrenOf(e,id).forEach(c=>{ c.parent_id=par; }); }
+  if(e==='division'){ state.department.forEach(d=>{ if(d.division_id===id) d.division_id=null; }); state.position.forEach(p=>{ if(p.division_id===id) p.division_id=null; }); }
+  state[e]=state[e].filter(x=>x.id!==id);
+  closeModal(); setTimeout(()=>{ render(); showToast('ลบ "'+(r?r.name_th:'')+'" แล้ว','success'); },60);
+}
+
+// ============================================================
+// CSV EXPORT / IMPORT (Iron Rule #32)
+// ============================================================
+const CSV_COLS={
+  division:['code','name_th','name_en','abbr','branch_code','head','deputy','email','cost_center','description','active'],
+  department:['code','name_th','name_en','division_code','parent_code','branch_code','head','cost_center','email','ext','location','headcount','description','active'],
+  position:['code','name_th','name_en','job_family','grade','track','tier','dept_code','division_code','reports_to_code','employment_type','headcount','salary_min','salary_max','job_desc','qualification','note','active']
+};
+function csvCell(v){ v=(v==null?'':String(v)); if(/[",\r\n]/.test(v)) return '"'+v.replace(/"/g,'""')+'"'; return v; }
+function exportField(e,r,c){
+  if(c==='active') return r.active?'true':'false';
+  if(c==='branch_code') return codeOf('branch',r.branch_id);
+  if(c==='division_code') return codeOf('division',r.division_id);
+  if(c==='parent_code') return codeOf('department',r.parent_id);
+  if(c==='dept_code') return codeOf('department',r.dept_id);
+  if(c==='reports_to_code') return codeOf('position',r.parent_id);
+  return r[c]!=null?r[c]:'';
+}
+function exportCsv(e){
+  let cols, rows;
+  if(e==='company'){ cols=Object.keys(state.company).filter(k=>k!=='active'); cols.push('active'); rows=[state.company]; }
+  else if(e==='branch'){ cols=['code','name_th','name_en','type','manager','open_date','is_vat_branch','addr_no','addr_road','subdistrict','district','province','zip','phone','fax','email','note','active']; rows=state.branch; }
+  else { cols=CSV_COLS[e]; rows=state[e]; }
+  const lines=[cols.join(',')];
+  rows.forEach(r=>lines.push(cols.map(c=>csvCell(e==='company'||e==='branch'?(c==='active'?(r.active?'true':'false'):(r[c]!=null?r[c]:'')):exportField(e,r,c))).join(',')));
+  const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=e+'_export.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  showToast('Export '+e+' ('+rows.length+' รายการ) แล้ว','success');
+}
+function downloadTemplate(e){
+  const cols=CSV_COLS[e]; const sample={};
+  cols.forEach(c=>sample[c]='');
+  sample.code=({division:'DIV-NEW',department:'DEP-NEW',position:'POS-NEW'})[e];
+  sample.name_th='ตัวอย่าง'; sample.active='true';
+  if(e==='position'){ sample.track='specialist'; sample.tier='S1'; }
+  const lines=[cols.join(','),cols.map(c=>csvCell(sample[c])).join(',')];
+  const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=e+'_template.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+function parseCsv(text){
+  text=text.replace(/^\ufeff/,''); const rows=[]; let i=0,field='',row=[],inQ=false;
+  while(i<text.length){ const ch=text[i];
+    if(inQ){ if(ch==='"'){ if(text[i+1]==='"'){ field+='"'; i+=2; continue; } inQ=false; i++; continue; } field+=ch; i++; continue; }
+    if(ch==='"'){ inQ=true; i++; continue; }
+    if(ch===','){ row.push(field); field=''; i++; continue; }
+    if(ch==='\r'){ i++; continue; }
+    if(ch==='\n'){ row.push(field); rows.push(row); row=[]; field=''; i++; continue; }
+    field+=ch; i++;
+  }
+  if(field.length||row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r=>r.some(c=>c.trim()!==''));
+}
+function normBool(v){ v=(v||'').trim().toLowerCase(); if(v==='')return true; return ['true','1','y','yes','ใช้งาน','active'].indexOf(v)>=0; }
+function validateImport(e,text,mode){
+  const rows=parseCsv(text);
+  if(!rows.length) return {error:'ไฟล์ว่างเปล่า'};
+  const header=rows[0].map(h=>h.trim()); const idx={}; header.forEach((h,k)=>idx[h]=k);
+  const cols=CSV_COLS[e];
+  const missing=['code','name_th'].filter(c=>!(c in idx));
+  if(missing.length) return {error:'CSV ขาดคอลัมน์จำเป็น: '+missing.join(', ')+' (ดาวน์โหลด Template เพื่อดูรูปแบบ)'};
+  const batchCodes=new Set(); for(let r=1;r<rows.length;r++){ const cd=(rows[r][idx['code']]||'').trim(); if(cd) batchCodes.add(cd); }
+  const divCodes=new Set(state.division.map(x=>x.code));
+  const brCodes=new Set(state.branch.map(x=>x.code));
+  const deptCodes=new Set(state.department.map(x=>x.code));
+  const posCodes=new Set(state.position.map(x=>x.code));
+  const selfExisting=new Set(state[e].map(x=>x.code));
+  const out=[]; let ok=0,fail=0;
+  for(let r=1;r<rows.length;r++){
+    const get=c=> (c in idx)? (rows[r][idx[c]]||'').trim() : '';
+    const obj={}; cols.forEach(c=>obj[c]=get(c)); obj.active=normBool(get('active'));
+    const errs=[];
+    if(!obj.name_th) errs.push('ไม่มีชื่อ (name_th)');
+    if(e==='position'){
+      if(['management','specialist','operational'].indexOf(obj.track)<0) errs.push('track ไม่ถูกต้อง');
+      else if(TIERS[obj.track].indexOf(obj.tier)<0) errs.push('tier "'+obj.tier+'" ไม่อยู่ในสาย '+obj.track);
+      if(obj.dept_code && !deptCodes.has(obj.dept_code)) errs.push('ไม่พบแผนก '+obj.dept_code);
+      if(obj.division_code && !divCodes.has(obj.division_code)) errs.push('ไม่พบสายงาน '+obj.division_code);
+      if(obj.reports_to_code){ const set = mode==='merge'? new Set([...posCodes,...batchCodes]):batchCodes; if(obj.reports_to_code===obj.code) errs.push('รายงานต่อตัวเอง'); else if(!set.has(obj.reports_to_code)) errs.push('ไม่พบตำแหน่งหัวหน้า '+obj.reports_to_code); }
+    }
+    if(e==='department'){
+      if(obj.division_code && !divCodes.has(obj.division_code)) errs.push('ไม่พบสายงาน '+obj.division_code);
+      if(obj.branch_code && !brCodes.has(obj.branch_code)) errs.push('ไม่พบสาขา '+obj.branch_code);
+      if(obj.parent_code){ const set= mode==='merge'? new Set([...deptCodes,...batchCodes]):batchCodes; if(obj.parent_code===obj.code) errs.push('แผนกแม่เป็นตัวเอง'); else if(!set.has(obj.parent_code)) errs.push('ไม่พบแผนกแม่ '+obj.parent_code); }
+    }
+    if(e==='division'){ if(obj.branch_code && !brCodes.has(obj.branch_code)) errs.push('ไม่พบสาขา '+obj.branch_code); }
+    obj._ok=errs.length===0; obj._errs=errs; obj._row=r+1; obj._isUpdate=selfExisting.has(obj.code);
+    if(obj._ok) ok++; else fail++;
+    out.push(obj);
+  }
+  return {rows:out, ok, fail, total:out.length, mode};
+}
+function applyImport(){
+  const d=state.modal.data; const e=d.entity; const res=d.result; if(!res||res.error) return;
+  const valid=res.rows.filter(r=>r._ok);
+  const hier=(e==='department'||e==='position');
+  // assign ids
+  let nextId=Math.max(0,...state[e].map(r=>r.id))+1;
+  const codeToId={};
+  if(d.mode==='replace'){
+    valid.forEach(o=>{ codeToId[o.code]=nextId++; });
+  } else {
+    state[e].forEach(r=>{ codeToId[r.code]=r.id; });
+    valid.forEach(o=>{ if(!(o.code in codeToId)) codeToId[o.code]=nextId++; });
+  }
+  function build(o){
+    const rb={ id:codeToId[o.code], code:o.code, name_th:o.name_th, name_en:o.name_en, active:o.active };
+    if(e==='division'){ Object.assign(rb,{abbr:o.abbr,branch_id:idByCode('branch',o.branch_code),head:o.head,deputy:o.deputy,email:o.email,cost_center:o.cost_center,description:o.description}); }
+    if(e==='department'){ Object.assign(rb,{division_id:idByCode('division',o.division_code),branch_id:idByCode('branch',o.branch_code),head:o.head,cost_center:o.cost_center,email:o.email,ext:o.ext,location:o.location,headcount:o.headcount,description:o.description, parent_id: o.parent_code? (codeToId[o.parent_code]!=null?codeToId[o.parent_code]:idByCode('department',o.parent_code)) : null }); }
+    if(e==='position'){ Object.assign(rb,{job_family:o.job_family,grade:o.grade,track:o.track,tier:o.tier,dept_id:idByCode('department',o.dept_code),division_id:idByCode('division',o.division_code),employment_type:o.employment_type,headcount:o.headcount,salary_min:o.salary_min,salary_max:o.salary_max,job_desc:o.job_desc,qualification:o.qualification,note:o.note, parent_id: o.reports_to_code? (codeToId[o.reports_to_code]!=null?codeToId[o.reports_to_code]:idByCode('position',o.reports_to_code)) : null }); }
+    return rb;
+  }
+  if(d.mode==='replace'){
+    state[e]=valid.map(build);
+  } else {
+    valid.forEach(o=>{ const built=build(o); const ex=state[e].find(x=>x.code===o.code); if(ex) Object.assign(ex,built); else state[e].push(built); });
+  }
+  if(hier){ // reseq siblings
+    const groups={}; state[e].forEach(r=>{ const k=r.parent_id==null?'root':r.parent_id; (groups[k]=groups[k]||[]).push(r); });
+    Object.keys(groups).forEach(k=>{ groups[k].forEach((r,i)=>{ if(!r.seq) r.seq=i+1; }); });
+  }
+  state.seq[e]=Math.max(state.seq[e], state[e].length);
+  closeModal(); setTimeout(()=>{ render(); showToast((d.mode==='replace'?'แทนที่':'รวม')+'ข้อมูล '+e+' สำเร็จ '+valid.length+' รายการ','success'); },60);
+}
+function openImport(e){ state.modal={open:true,type:'import',data:{entity:e,mode:'replace',result:null,fileName:null}}; render(); requestAnimationFrame(()=>document.getElementById('modalBackdrop').classList.add('is-open')); }
+function setImportMode(m){ state.modal.data.mode=m; if(state.modal.data._text) state.modal.data.result=validateImport(state.modal.data.entity,state.modal.data._text,m); render(); }
+function handleCsvFile(input){
+  const f=input.files&&input.files[0]; if(!f) return;
+  const reader=new FileReader();
+  reader.onload=function(ev){ const text=ev.target.result; state.modal.data._text=text; state.modal.data.fileName=f.name; state.modal.data.result=validateImport(state.modal.data.entity,text,state.modal.data.mode); render(); };
+  reader.readAsText(f);
+}
+function renderImportModal(){
+  const d=state.modal.data; const e=d.entity; const t=TABS.find(t=>t.id===e); const res=d.result;
+  const modeSeg='<div class="seg"><button class="'+(d.mode==='replace'?'is-active':'')+'" onclick="setImportMode(\'replace\')">แทนที่ทั้งหมด (Replace)</button><button class="'+(d.mode==='merge'?'is-active':'')+'" onclick="setImportMode(\'merge\')">รวม/อัปเดต (Merge)</button></div>';
+  let resultHtml='';
+  if(res){
+    if(res.error){ resultHtml='<div class="imp-errs"><b>ไฟล์ไม่ถูกต้อง:</b><div>'+esc(res.error)+'</div></div>'; }
+    else {
+      const errLines=res.rows.filter(r=>!r._ok).slice(0,30).map(r=>'<div>แถว '+r._row+' ('+esc(r.code||'-')+'): '+esc(r._errs.join(', '))+'</div>').join('');
+      const preview=res.rows.slice(0,8).map(r=>'<tr><td>'+(r._ok?'<span class="pill pill-converted">ผ่าน</span>':'<span class="pill pill-danger">ไม่ผ่าน</span>')+'</td><td class="code-cell">'+esc(r.code||'—')+'</td><td>'+esc(r.name_th||'—')+'</td><td class="muted-cell">'+(r._isUpdate?'อัปเดต':'เพิ่มใหม่')+'</td></tr>').join('');
+      resultHtml='<div class="imp-summary">'+
+        '<div class="imp-stat ok"><div class="v">'+res.ok+'</div><div class="l">ผ่าน (จะนำเข้า)</div></div>'+
+        '<div class="imp-stat fail"><div class="v">'+res.fail+'</div><div class="l">ไม่ผ่าน (ข้าม)</div></div>'+
+        '<div class="imp-stat"><div class="v">'+res.total+'</div><div class="l">ทั้งหมด</div></div></div>'+
+        (errLines?'<div class="imp-errs">'+errLines+(res.fail>30?'<div>… และอีก '+(res.fail-30)+' แถว</div>':'')+'</div>':'')+
+        '<div class="imp-label">ตัวอย่าง (8 แถวแรก)</div><div class="preview-scroll"><table class="table"><thead><tr><th>สถานะ</th><th>รหัส</th><th>ชื่อ</th><th>การกระทำ</th></tr></thead><tbody>'+preview+'</tbody></table></div>'+
+        (d.mode==='replace'?'<div class="imp-note" style="color:var(--c-warning)"><b>โหมดแทนที่:</b> ข้อมูล '+esc(t.th)+'เดิมทั้งหมด ('+state[e].length+' รายการ) จะถูกแทนที่ด้วยแถวที่ผ่าน '+res.ok+' รายการ</div>':'<div class="imp-note">โหมดรวม: จับคู่ด้วยรหัส — รหัสซ้ำ = อัปเดต, รหัสใหม่ = เพิ่ม</div>');
+    }
+  }
+  const canApply = res && !res.error && res.ok>0;
+  return '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="upload" class="w-4 h-4"></i></div>'+
+    '<div><h3 class="modal-title">นำเข้า'+esc(t.th)+' จาก CSV</h3><p class="modal-subtitle">อัปโหลดไฟล์ CSV (UTF-8) — ระบบจะตรวจสอบก่อนนำเข้า</p></div></div>'+
+    '<div class="modal-body">'+
+      '<div class="imp-block"><div class="imp-label">โหมดนำเข้า</div>'+modeSeg+'</div>'+
+      '<div class="imp-block"><div class="imp-label">ไฟล์ CSV<button class="btn-link" onclick="downloadTemplate(\''+e+'\')"><i data-lucide="file-down" class="w-3.5 h-3.5"></i> ดาวน์โหลด Template</button></div>'+
+        '<div class="imp-drop" onclick="document.getElementById(\'csvFile\').click()"><i data-lucide="upload-cloud" class="w-7 h-7"></i>'+
+        '<div class="id-t">'+(d.fileName?esc(d.fileName):'คลิกเพื่อเลือกไฟล์ CSV')+'</div><div class="id-s">'+(d.fileName?'คลิกเพื่อเลือกไฟล์ใหม่':'รองรับไฟล์ .csv ที่ encode แบบ UTF-8')+'</div></div>'+
+        '<input type="file" id="csvFile" accept=".csv,text/csv" style="display:none" onchange="handleCsvFile(this)">'+
+        '<div class="imp-note">คอลัมน์อ้างอิงใช้ “รหัส” (เช่น division_code, parent_code) — Export CSV ออกมาแก้แล้วนำเข้ากลับได้</div></div>'+
+      resultHtml+
+    '</div>'+
+    '<div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>'+
+      '<button class="btn btn-primary '+(canApply?'':'is-dim')+'" '+(canApply?'onclick="applyImport()"':'')+'><i data-lucide="check" class="w-4 h-4"></i><span>นำเข้า '+(res&&!res.error?res.ok:0)+' รายการ</span></button></div>';
+}
+
+// ============================================================
+// BASE HELPERS
+// ============================================================
+function renderIcons(){ if(window.lucide&&typeof window.lucide.createIcons==='function') window.lucide.createIcons(); }
+function toggleModule(h){ const m=h.closest('.sb-module'); if(!m)return; const ex=m.getAttribute('data-expanded')!=='false'; m.setAttribute('data-expanded',ex?'false':'true'); }
+function toggleUserMenu(){ document.getElementById('userMenu').classList.toggle('is-open'); }
+document.addEventListener('click',e=>{ if(!e.target.closest('.user-chip')&&!e.target.closest('.user-menu')){ var um=document.getElementById('userMenu'); if(um) um.classList.remove('is-open'); } });
+
+function parseHash(){ const h=location.hash.replace(/^#\//,''); if(!h) return {tab:'company',id:null}; const p=h.split('/'); return {tab:p[0], id:p[1]?parseInt(p[1],10):null}; }
+function navigate(r){ location.hash='#/'+r; }
+function applyRoute(){ const {tab,id}=parseHash(); state.route=TABS.some(t=>t.id===tab)?tab:'company'; state.detailId=(id!=null&&!isNaN(id))?id:null; render(); }
+
+function openDrawer(entity,mode,id,parentId){ state.drawer={open:true,entity,mode,id:(id!=null?id:null),parentId:(parentId!=null?parentId:null)}; if(entity==='company') state.companyLogoDraft=state.company.logo_url||''; render();
+  requestAnimationFrame(()=>{ document.getElementById('drawerBackdrop').classList.add('is-open'); document.getElementById('drawer').classList.add('is-open'); }); }
+function closeDrawer(){ document.getElementById('drawerBackdrop').classList.remove('is-open'); document.getElementById('drawer').classList.remove('is-open');
+  setTimeout(()=>{ state.drawer={open:false,entity:null,mode:null,id:null,parentId:null}; },280); }
+function openModal(type,data){ state.modal={open:true,type,data}; render(); requestAnimationFrame(()=>document.getElementById('modalBackdrop').classList.add('is-open')); }
+function closeModal(){ document.getElementById('modalBackdrop').classList.remove('is-open'); setTimeout(()=>{ state.modal={open:false,type:null,data:null}; },200); }
+
+function showToast(msg,variant,dur){ variant=variant||'info'; dur=dur||2800; const el=document.getElementById('toast');
+  const ic={success:'check-circle-2',info:'info',warning:'alert-triangle',error:'x-circle'};
+  el.className='toast is-'+variant; el.innerHTML='<i data-lucide="'+(ic[variant]||'info')+'" class="w-4 h-4"></i><span>'+msg+'</span>'; renderIcons();
+  requestAnimationFrame(()=>el.classList.add('is-visible')); setTimeout(()=>el.classList.remove('is-visible'),dur); }
+
+window.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(state.modal.open) closeModal(); else if(state.drawer.open) closeDrawer(); } });
+
+function preserveRenderState(){ const db=document.querySelector('.drawer-body'),mb=document.querySelector('.modal-body'),ae=document.activeElement;
+  const isI=ae&&(ae.tagName==='INPUT'||ae.tagName==='TEXTAREA');
+  return {drawerScroll:db?db.scrollTop:0,modalScroll:mb?mb.scrollTop:0,pageScroll:window.scrollY,focusKey:isI?{id:ae.id,selStart:ae.selectionStart,selEnd:ae.selectionEnd}:null}; }
+function restoreRenderState(s){ if(!s)return; requestAnimationFrame(()=>{ const db=document.querySelector('.drawer-body'); if(db&&s.drawerScroll>0)db.scrollTop=s.drawerScroll;
+  const mb=document.querySelector('.modal-body'); if(mb&&s.modalScroll>0)mb.scrollTop=s.modalScroll;
+  if(s.pageScroll>0)window.scrollTo(0,s.pageScroll);
+  if(s.focusKey&&s.focusKey.id){ const el=document.getElementById(s.focusKey.id); if(el){ el.focus(); try{ if(s.focusKey.selStart!=null&&el.setSelectionRange)el.setSelectionRange(s.focusKey.selStart,s.focusKey.selEnd);}catch(err){} } } }); }
+
+window.addEventListener('hashchange',applyRoute);
+var domReady=false,lucideReady=false;
+function bootIfReady(){ if(domReady&&lucideReady){ applyRoute(); renderIcons(); } }
+if(document.readyState==='loading') window.addEventListener('DOMContentLoaded',function(){domReady=true;bootIfReady();}); else domReady=true;
+window.addEventListener('lucide:ready',function(){lucideReady=true;bootIfReady();});
+if(window.lucide&&typeof window.lucide.createIcons==='function') lucideReady=true;
+bootIfReady();
+setTimeout(function(){ if(!lucideReady){ lucideReady=true; bootIfReady(); } },5000);
+
+</script>
+</body>
+</html>

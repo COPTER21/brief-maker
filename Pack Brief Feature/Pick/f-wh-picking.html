@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ใบหยิบสินค้า (Picking) · CUBE 4.0</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,600,700&display=swap" rel="stylesheet">
+  <style>
+    /* self-contained utility shim (replaces Tailwind CDN — icon sizing + inline) */
+    .w-3{width:.75rem}.h-3{height:.75rem}
+    .w-3\.5{width:.875rem}.h-3\.5{height:.875rem}
+    .w-4{width:1rem}.h-4{height:1rem}
+    .w-5{width:1.25rem}.h-5{height:1.25rem}
+    .w-6{width:1.5rem}.h-6{height:1.5rem}
+    .w-10{width:2.5rem}.h-10{height:2.5rem}
+    .inline{display:inline-block}
+    svg{vertical-align:middle}
+    button:focus { outline: none; }
+    button:focus-visible { outline: 2px solid var(--c-primary, #0B5CFF); outline-offset: 1px; }
+    .btn-link, .btn-link:focus, .btn-link:focus-visible { outline: none !important; box-shadow: none !important; }
+    .hint { position: relative; display: inline-flex; align-items: center; cursor: help; }
+    .hint::after { content: attr(data-tip); position: absolute; left: 0; top: 150%; white-space: pre-line; width: 290px; background: var(--c-navy, #0B1D3A); color: #fff; font-size: 11px; font-weight: 400; line-height: 1.6; padding: 9px 11px; border-radius: 8px; box-shadow: 0 6px 24px rgba(0,0,0,0.18); opacity: 0; visibility: hidden; transform: translateY(-2px); transition: opacity 120ms, transform 120ms; z-index: 60; pointer-events: none; }
+    .hint:hover::after { opacity: 1; visibility: visible; transform: translateY(0); }
+    .line-tbl th, .line-tbl td { padding-left: 6px; padding-right: 6px; }
+    .line-tbl th:first-child, .line-tbl td:first-child { padding-left: 6px; }
+    .prog{height:6px;border-radius:999px;background:var(--c-border-soft);overflow:hidden;} .prog>div{height:100%;background:var(--c-teal);} .prog>div.warn{background:var(--c-warning);} .prog>div.bad{background:var(--c-danger);}
+    .route-no{width:24px;height:24px;border-radius:50%;background:var(--c-navy);color:#fff;font-size:11px;font-weight:700;display:inline-grid;place-items:center;}
+    .chk{width:16px;height:16px;accent-color:var(--c-primary);cursor:pointer;}
+  </style>
+  <!-- PREFLIGHT v8: F-WH-PICK v1 · UX = SO/PO reference (Warm Light v8) · Warehouse structure per f-loc.html (WH→Zone→Area→Rack→Location · type) · balances per f-inv.html (product×location×lot · on_hand/alloc · FEFO) · source = SO confirmed+reserved + payment trigger gate (immediate/after_deposit/after_full — Finance/AR releases) + not hold · queue tab + pick tab · wave multi-SO · allocation AUTO from master (item lot=FEFO / else FIFO · pick-face-first · route-sorted · per-line override w/ audit — no per-doc strategy) · assignee search-dropdown (avatar·role·workload·เกิน) · pick-line modal standard (scan tiles · qty stepper · shortage reason chips · action short/reloc) · no-location handling (หาใหม่ refresh · manual pick incl. Hold/Staging · ขอเติม/โอน · จัดสรรใหม่) · srcType SO/TRANSFER/REPLENISH/RETURN (อ้างอิง ไม่ผูก SO) · short close · start · record pick per line (scan mock · short → SO backorder) · reloc · finish → to Packing (per SO) · hold/cancel releases loc alloc · services excluded · lucide inline -->
+  <style>
+    /* ============================================================
+       CUBE NATIVE Admin CI v2 — Design Tokens
+       ============================================================ */
+    :root {
+      --c-navy:        #111111;
+      --c-navy-d:      #111111;
+      --c-primary:     #FF3B30;
+      --c-primary-h:   #E62E24;
+      --c-teal:        #1F9D55;
+      --c-slate:       #73757B;
+      --c-off-white:   #FAF8F5;
+      --c-white:       #FFFFFF;
+      --c-border:      #DEDAD4;
+      --c-border-soft: #EFEBE6;
+      --c-text:        #111111;
+      --c-text-mute:   #73757B;
+      --c-text-soft:   #9A9CA2;
+      --c-warning:     #E8870F;
+      --c-danger:      #E62E24;
+      --c-purple:      #FF9A1F;
+      --c-primary-08:  rgba(255, 59, 48, 0.08);
+      --c-primary-12:  rgba(255, 59, 48, 0.12);
+      --c-primary-18:  rgba(255, 59, 48, 0.18);
+      --c-teal-08:     rgba(31, 157, 85, 0.10);
+      --c-warning-08:  rgba(232, 135, 15, 0.12);
+      --c-danger-08:   rgba(230, 46, 36, 0.10);
+      --r-sm: 6px;
+      --r:    10px;
+      --r-lg: 14px;
+      --sh-sm: 0 1px 2px rgba(17, 17, 17, 0.04), 0 1px 3px rgba(17, 17, 17, 0.06);
+      --sh-md: 0 4px 8px rgba(17, 17, 17, 0.04), 0 2px 4px rgba(17, 17, 17, 0.06);
+      --sh-lg: 0 10px 30px rgba(17, 17, 17, 0.08), 0 4px 10px rgba(17, 17, 17, 0.04);
+      --sh-xl: 0 24px 60px rgba(17, 17, 17, 0.10), 0 8px 24px rgba(17, 17, 17, 0.06);
+      --sw: 224px;
+      --hh: 52px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Noto Sans Thai', 'Satoshi', -apple-system, sans-serif;
+      font-size: 13px;
+      line-height: 1.55;
+      background: var(--c-off-white);
+      color: var(--c-text);
+      -webkit-font-smoothing: antialiased;
+    }
+    h1, h2, h3, h4, .display { font-family: 'Noto Sans Thai', 'Satoshi', sans-serif; letter-spacing: -0.015em; font-weight: 700; }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; }
+    input, select, textarea { font-family: inherit; }
+    .num { font-variant-numeric: tabular-nums; }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    html { scrollbar-gutter: stable; scrollbar-width: thin; }
+    ::-webkit-scrollbar-thumb { background: var(--c-border); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--c-text-soft); }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+
+    /* ============================================================
+       SHELL — Sidebar (224px flat) + Main + Topbar (52px white)
+       ============================================================ */
+    .shell { display: grid; grid-template-columns: var(--sw) 1fr; min-height: 100vh; }
+
+    .sb {
+      background: var(--c-navy-d);
+      color: white;
+      height: 100vh;
+      position: sticky; top: 0;
+      display: flex; flex-direction: column;
+      border-right: 1px solid rgba(255,255,255,0.05);
+      overflow: hidden;
+    }
+    .sb-logo {
+      padding: 16px 18px;
+      display: flex; align-items: center; gap: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+    }
+    .sb-logo-mark {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--c-primary), #FF9A1F);
+      border-radius: var(--r-sm);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+      color: white;
+    }
+    .sb-logo-text { line-height: 1.2; min-width: 0; }
+    .sb-logo-title { font-size: 13px; font-weight: 700; color: white; }
+    .sb-logo-sub {
+      font-size: 10px;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 1px;
+    }
+
+    .sb-menu { flex: 1; overflow-y: auto; padding: 10px 0; }
+    .sb-menu::-webkit-scrollbar { width: 4px; }
+    .sb-menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+
+    .sb-grp { padding: 6px 0; }
+    .sb-grp-label {
+      padding: 6px 18px 4px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+    }
+
+    .sb-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 18px;
+      color: rgba(255,255,255,0.72);
+      font-size: 13px;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.12s;
+      text-decoration: none;
+    }
+    .sb-item:hover { background: rgba(255,255,255,0.05); color: white; }
+    .sb-item.active {
+      background: var(--c-primary-18);
+      border-left-color: var(--c-primary);
+      color: white;
+      font-weight: 600;
+    }
+    .sb-icon { flex-shrink: 0; opacity: 0.8; display: grid; place-items: center; }
+    .sb-item.active .sb-icon { opacity: 1; color: var(--c-primary); }
+
+    .sb-badge {
+      margin-left: auto;
+      background: var(--c-danger);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 999px;
+      line-height: 1.4;
+    }
+    .sb-badge.muted { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); }
+
+    .sb-foot {
+      padding: 12px 18px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+      font-size: 10px;
+      color: rgba(255,255,255,0.4);
+    }
+    .sb-foot div + div { margin-top: 2px; }
+
+    /* MAIN */
+    .main { display: flex; flex-direction: column; min-width: 0; background: var(--c-off-white); }
+
+    /* TOPBAR — White */
+    .top {
+      height: var(--hh);
+      background: var(--c-white);
+      border-bottom: 1px solid var(--c-border-soft);
+      padding: 0 22px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .top-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .top-bc { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--c-text); }
+    .bc-root { color: var(--c-text-mute); cursor: pointer; transition: color 120ms; }
+    .bc-root:hover { color: var(--c-primary); }
+    .bc-sep { color: var(--c-text-soft); margin: 0 2px; }
+    .bc-leaf { font-weight: 600; }
+
+    .top-right { display: flex; align-items: center; gap: 12px; }
+    .top-user {
+      display: flex; align-items: center; gap: 9px;
+      padding: 4px 11px 4px 4px;
+      border-radius: 8px;
+      border: 0; background: transparent;
+      cursor: pointer;
+      transition: background 120ms;
+    }
+    .top-user:hover { background: var(--c-off-white); }
+    .top-user:focus, .top-user:focus-visible { outline: none; }
+    .top-user-info {
+      display: flex; flex-direction: column;
+      align-items: flex-end;
+      line-height: 1.2;
+    }
+    .top-user-name { font-size: 12.5px; font-weight: 600; color: var(--c-navy); }
+    .top-user-role { font-size: 10.5px; color: var(--c-text-mute); margin-top: 2px; }
+    .top-avatar {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+      color: white;
+      font-size: 12px; font-weight: 600;
+      display: grid; place-items: center;
+      flex-shrink: 0;
+    }
+
+    /* Icon button (used in drawer headers — printer/download/close) */
+    .top-icon-btn {
+      width: 32px; height: 32px;
+      background: var(--c-off-white);
+      border: 1px solid var(--c-border);
+      border-radius: var(--r);
+      cursor: pointer;
+      display: grid; place-items: center;
+      color: var(--c-text-mute);
+      position: relative;
+      transition: all 120ms;
+    }
+    .top-icon-btn:hover { color: var(--c-text); border-color: var(--c-text-soft); background: var(--c-white); }
+
+    /* PAGE */
+    .page { flex: 1; padding: 22px 24px 40px; overflow-y: auto; }
+
+    /* PAGE HEAD */
+    .ph {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 18px;
+      gap: 16px; flex-wrap: wrap;
+    }
+    .ph-left { min-width: 0; }
+    .ph-title { font-size: 22px; font-weight: 700; color: var(--c-navy); line-height: 1.2; }
+    .ph-sub { font-size: 13px; color: var(--c-text-mute); margin-top: 4px; }
+    .ph-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+    /* ============================================================
+       BUTTON SYSTEM
+       ============================================================ */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 6px;
+      padding: 0 14px;
+      height: 34px;
+      border-radius: var(--r);
+      font-size: 12.5px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      background: transparent;
+      color: var(--c-text);
+      line-height: 1;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .btn:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 2px; }
+    .btn:disabled { cursor: not-allowed; opacity: 0.6; }
+    .btn.lg { height: 38px; padding: 0 18px; font-size: 13px; }
+    .btn.sm { height: 28px; padding: 0 10px; font-size: 12px; }
+    .btn-primary    { background: var(--c-primary); color: white; border-color: var(--c-primary); }
+    .btn-primary:hover:not(:disabled) { background: var(--c-primary-h); border-color: var(--c-primary-h); }
+    .btn-secondary  { background: var(--c-white); color: var(--c-navy); border-color: var(--c-border); }
+    .btn-secondary:hover:not(:disabled) { border-color: var(--c-text-soft); }
+    .btn-ghost      { background: transparent; color: var(--c-text-mute); }
+    .btn-ghost:hover:not(:disabled) { background: var(--c-off-white); color: var(--c-text); }
+    .btn-success    { background: var(--c-teal); color: white; border-color: var(--c-teal); }
+    .btn-success:hover:not(:disabled) { background: #00876F; border-color: #00876F; }
+    .btn-danger     { background: var(--c-danger); color: white; border-color: var(--c-danger); }
+    .btn-danger:hover:not(:disabled) { background: #C9271E; }
+    .btn-link       { background: transparent; border: 0; color: var(--c-primary); padding: 0; height: auto; font-weight: 600; }
+    .btn-link:hover { text-decoration: underline; }
+
+    /* ============================================================
+       PILL / BADGE
+       ============================================================ */
+    .pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.02em; line-height: 1.6;
+      white-space: nowrap;
+    }
+    .pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .pill.draft     { background: rgba(115,117,123,0.12); color: var(--c-slate); }
+    .pill.pending   { background: var(--c-warning-08);    color: #8A5200; }
+    .pill.approved  { background: var(--c-teal-08);       color: var(--c-teal); }
+    .pill.sent      { background: rgba(255,154,31,0.10);  color: var(--c-purple); }
+    .pill.rejected  { background: var(--c-danger-08);     color: var(--c-danger); }
+    .pill.cancelled { background: rgba(115,117,123,0.12); color: var(--c-slate); }
+
+    /* ============================================================
+       CARD
+       ============================================================ */
+    .card {
+      background: var(--c-white);
+      border: 1px solid var(--c-border);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+    }
+    .card-head {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--c-border-soft);
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    }
+    .card-title { font-size: 14px; font-weight: 700; color: var(--c-navy); }
+    .card-body { padding: 16px 18px; }
+    .card-body.flush { padding: 0; }
+
+    /* ============================================================
+       INPUT / SELECT
+       ============================================================ */
+    .input, .select {
+      height: 34px;
+      background: var(--c-white);
+      border: 1px solid var(--c-border);
+      border-radius: var(--r);
+      padding: 0 12px;
+      font-size: 13px;
+      color: var(--c-text);
+      transition: all 0.15s;
+      width: 100%;
+    }
+    .input::placeholder { color: var(--c-text-soft); }
+    .input:focus, .select:focus {
+      outline: none;
+      border-color: var(--c-primary);
+      box-shadow: 0 0 0 3px var(--c-primary-12);
+    }
+    label.required::after { content: ' *'; color: var(--c-danger); }
+
+    /* ============================================================
+       FORM GRID + FIELD (used in wizard + view drawer)
+       ============================================================ */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; }
+    .field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+    .field.full { grid-column: 1 / -1; }
+    .lbl { font-size: 12px; font-weight: 500; color: var(--c-navy); display: block; }
+
+    /* Read-only field display (in view drawer summary) */
+    .field-readonly { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    .lbl-readonly { font-size: 11px; color: var(--c-text-mute); font-weight: 500; }
+    .val-readonly { font-size: 13px; color: var(--c-navy); font-weight: 500; line-height: 1.35; word-break: break-word; }
+
+    /* Combobox dropdown */
+    .suggest-list {
+      position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+      background: white; border: 1px solid var(--c-border); border-radius: var(--r);
+      box-shadow: var(--sh-md);
+      max-height: 320px; overflow-y: auto; z-index: 60;
+    }
+    .suggest-list.hidden { display: none; }
+    .combo-option { padding: 8px 14px; cursor: pointer; border-bottom: 1px solid var(--c-border-soft); transition: background 100ms; }
+    .combo-option:last-child { border-bottom: none; }
+    .combo-option:hover { background: var(--c-primary-04); }
+    .combo-option .opt-primary { font-size: 13px; font-weight: 600; color: var(--c-navy); }
+    .combo-option .opt-secondary { font-size: 11.5px; color: var(--c-text-mute); }
+    .combo-option mark { background: rgba(255,59,48,0.15); color: var(--c-primary); padding: 0; font-weight: 700; }
+
+    /* ============================================================
+       TABS
+       ============================================================ */
+    .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--c-border); margin-bottom: 16px; }
+    .tab {
+      background: transparent; border: none;
+      border-bottom: 2px solid transparent;
+      padding: 8px 14px;
+      font-size: 13px; font-weight: 500; color: var(--c-text-mute);
+      cursor: pointer; margin-bottom: -1px;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .tab:hover { color: var(--c-text); }
+    .tab.on { color: var(--c-primary); border-bottom-color: var(--c-primary); font-weight: 600; }
+
+    /* ============================================================
+       TABLE
+       ============================================================ */
+    .tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .tbl th {
+      text-align: left; padding: 10px 14px;
+      font-size: 10.5px; font-weight: 700;
+      color: var(--c-text-mute);
+      background: var(--c-off-white);
+      border-bottom: 1px solid var(--c-border);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+    .tbl td {
+      padding: 7px 12px;
+      border-bottom: 1px solid var(--c-border-soft);
+      color: var(--c-text);
+      vertical-align: middle;
+    }
+    .tbl tbody tr { transition: background 0.1s; cursor: pointer; }
+    .tbl tbody tr:hover { background: var(--c-off-white); }
+    .tbl tbody tr:last-child td { border-bottom: none; }
+    .tbl-name { font-weight: 600; color: var(--c-navy); }
+    .tbl-meta { font-size: 11px; color: var(--c-text-mute); margin-top: 1px; }
+    .tbl-mono { font-family: ui-monospace, monospace; font-size: 12px; }
+    .tbl-num { font-variant-numeric: tabular-nums; text-align: right; }
+    .tbl-th-sortable { cursor: pointer; user-select: none; }
+    .tbl-th-sortable:hover { color: var(--c-text); }
+
+    /* Progress bar */
+    .progress-bar {
+      width: 64px; height: 6px;
+      background: var(--c-border-soft);
+      border-radius: 999px;
+      overflow: hidden;
+      display: inline-block;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--c-teal);
+      border-radius: 999px;
+      transition: width 200ms;
+    }
+    .progress-bar-fill.pending { background: var(--c-warning); }
+    .progress-bar-fill.zero { background: var(--c-border); }
+
+    /* ============================================================
+       STEPPER
+       ============================================================ */
+    .stepper { display: flex; align-items: flex-start; gap: 0; width: 100%; }
+    .stepper-item {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      position: relative; min-width: 0;
+    }
+    .stepper-circle {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600;
+      background: var(--c-white); color: var(--c-text-soft);
+      border: 2px solid var(--c-border);
+      transition: all 200ms; z-index: 2;
+    }
+    .stepper-item.active .stepper-circle {
+      background: var(--c-primary); color: white; border-color: var(--c-primary);
+      box-shadow: 0 0 0 4px var(--c-primary-12);
+    }
+    .stepper-item.done .stepper-circle {
+      background: var(--c-primary); color: white; border-color: var(--c-primary);
+    }
+    .stepper-label {
+      margin-top: 8px; font-size: 12px; font-weight: 500;
+      color: var(--c-text-soft); text-align: center; line-height: 1.3;
+      transition: color 200ms;
+    }
+    .stepper-item.active .stepper-label { color: var(--c-navy); font-weight: 600; }
+    .stepper-item.done .stepper-label { color: var(--c-text-mute); }
+    .stepper-item:not(:last-child)::after {
+      content: ''; position: absolute;
+      top: 15px; left: 50%; right: -50%; height: 2px;
+      background: var(--c-border); z-index: 1;
+    }
+    .stepper-item.done:not(:last-child)::after { background: var(--c-primary); }
+
+    /* ============================================================
+       DRAWER + MODAL — Self-contained CSS (don't depend on Tailwind utilities)
+       ============================================================ */
+    .overlay-wrap { position: fixed; inset: 0; z-index: 50; }
+    .backdrop { position: absolute; inset: 0; background-color: rgba(0,0,0,0.45); cursor: pointer; }
+    .drawer-panel {
+      position: absolute; right: 0; top: 0;
+      height: 100%; width: 100%;
+      max-width: 920px;
+      background: white;
+      box-shadow: var(--sh-xl);
+      display: flex; flex-direction: column;
+    }
+    .drawer-panel.standard { max-width: 680px; }
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 60;
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    .hidden { display: none !important; }
+
+    .drawer-enter { transform: translateX(100%); }
+    .drawer-active { transform: translateX(0); transition: transform 250ms ease-out; }
+
+    @keyframes slide-in { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .animate-slide-in { animation: slide-in 200ms ease-out; }
+
+    /* Slide-down animation for expandable line panel (Pattern E) */
+    @keyframes line-expand-slide {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+        max-height: 0;
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 600px;
+      }
+    }
+    @keyframes line-collapse-slide {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 600px;
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-8px);
+        max-height: 0;
+      }
+    }
+    .line-expand-panel {
+      animation: line-expand-slide 220ms cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: top;
+      overflow: hidden;
+    }
+    .line-collapse-panel {
+      animation: line-collapse-slide 200ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      transform-origin: top;
+      overflow: hidden;
+    }
+
+    /* ============================================================
+       UPLOAD ZONE
+       ============================================================ */
+    .upload-zone {
+      border: 2px dashed var(--c-border);
+      border-radius: var(--r-lg);
+      padding: 32px 16px;
+      text-align: center;
+      background: #FDFBF8;
+      cursor: pointer;
+      transition: all 150ms;
+    }
+    .upload-zone:hover { border-color: var(--c-primary); background: var(--c-primary-08); }
+    .upload-zone.has-files { padding: 16px; }
+
+    /* ============================================================
+       FORM GRID
+       ============================================================ */
+    .form-grp {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px 18px;
+    }
+    .form-field { display: flex; flex-direction: column; gap: 6px; }
+    .form-field label {
+      font-size: 12.5px; font-weight: 500; color: var(--c-navy);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .form-field-help {
+      font-size: 11px; color: var(--c-text-soft);
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    /* Toggle */
+    .toggle {
+      position: relative; display: inline-block;
+      width: 36px; height: 20px;
+      flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: var(--c-border);
+      border-radius: 20px;
+      transition: 200ms;
+    }
+    .toggle-slider::before {
+      position: absolute; content: '';
+      height: 14px; width: 14px;
+      left: 3px; bottom: 3px;
+      background-color: white;
+      border-radius: 50%;
+      transition: 200ms;
+    }
+    .toggle input:checked + .toggle-slider { background-color: var(--c-primary); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+    /* Section divider for wizard step 2 */
+    .section-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--c-off-white);
+      border: 1px solid var(--c-border);
+      border-radius: var(--r);
+      margin-bottom: 10px;
+    }
+    .section-label { font-size: 13px; font-weight: 500; color: var(--c-navy); display: flex; align-items: center; gap: 8px; }
+
+    mark { background: #FFF1DC; color: var(--c-navy); border-radius: 2px; padding: 0 2px; }
+  
+    /* ===== SO additions (PO idiom) ===== */
+    .drawer-panel.wide { max-width: 1290px; }
+    .emp-chip{display:inline-flex;align-items:center;gap:8px;min-width:0;}
+    .emp-av{width:28px;height:28px;border-radius:50%;background:var(--c-navy);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;flex-shrink:0;}
+    .emp-chip.is-empty .emp-av{background:var(--c-off-white);color:var(--c-text-soft);border:1px dashed var(--c-border);}
+    .emp-t{display:flex;flex-direction:column;line-height:1.25;min-width:0;}
+    .emp-r{font-size:10.5px;color:var(--c-text-mute);font-weight:600;white-space:nowrap;}
+    .emp-n{font-size:12.8px;font-weight:600;color:var(--c-navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .emp-chip.sm .emp-av{width:22px;height:22px;font-size:9.5px;} .emp-chip.sm .emp-n{font-size:12px;}
+    .slot-row{display:grid;grid-template-columns:34px 200px 1fr;gap:12px;align-items:start;padding:12px 14px;border:1px solid var(--c-border);border-radius:var(--r);background:#fff;}
+    .slot-row+.slot-row{margin-top:10px;} .slot-row.is-err{border-color:var(--c-danger);}
+    .slot-no{width:26px;height:26px;border-radius:50%;background:var(--c-navy);color:#fff;font-size:11.5px;font-weight:700;display:grid;place-items:center;margin-top:2px;}
+    .slot-role{font-size:12px;font-weight:700;color:var(--c-navy);padding-top:6px;}
+    .hard-warn{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;margin-bottom:10px;border-radius:var(--r);background:rgba(230,46,36,0.08);border:1px solid rgba(230,46,36,0.25);font-size:12px;color:var(--c-danger);line-height:1.5;}
+    .note{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:var(--r);background:var(--c-off-white);border:1px solid var(--c-border-soft);font-size:12.5px;color:var(--c-text);line-height:1.55;}
+    .note.warn{background:var(--c-warning-08);border-color:rgba(232,135,15,.35);} .note.danger{background:var(--c-danger-08);border-color:rgba(230,46,36,.35);color:var(--c-danger);} .note.ok{background:var(--c-teal-08);border-color:rgba(31,157,85,.35);}
+    .combo-pop{position:fixed;background:#fff;border:1px solid var(--c-border);border-radius:var(--r);box-shadow:var(--sh-lg);z-index:90;max-height:280px;overflow-y:auto;}
+    .combo-pop button{width:100%;text-align:left;padding:8px 12px;background:transparent;border:0;cursor:pointer;border-bottom:1px solid var(--c-border-soft);display:flex;align-items:center;gap:10px;font-family:inherit;}
+    .combo-pop button:hover,.combo-pop button.hi{background:var(--c-primary-08);}
+    .combo-pop button:last-child{border-bottom:0;}
+    .tl{display:flex;flex-direction:column;gap:0;}
+    .tl-i{position:relative;padding:0 0 16px 22px;} .tl-i::before{content:'';position:absolute;left:5px;top:6px;width:9px;height:9px;border-radius:50%;background:#fff;border:2px solid var(--c-border);} .tl-i::after{content:'';position:absolute;left:9px;top:18px;bottom:0;width:1px;background:var(--c-border-soft);} .tl-i:last-child::after{display:none;}
+    .tl-i.ok::before{background:var(--c-teal);border-color:var(--c-teal);} .tl-i.warn::before{background:var(--c-warning);border-color:var(--c-warning);} .tl-i.bad::before{background:var(--c-danger);border-color:var(--c-danger);}
+    .tl-t{font-size:13px;font-weight:600;color:var(--c-navy);} .tl-s{font-size:11.5px;color:var(--c-text-mute);margin-top:2px;} .tl-q{font-size:12px;color:var(--c-text);background:var(--c-off-white);border-left:3px solid var(--c-border);padding:6px 10px;border-radius:0 6px 6px 0;margin-top:6px;}
+    .kbd{font-family:ui-monospace,monospace;font-size:11px;background:var(--c-off-white);border:1px solid var(--c-border);border-radius:4px;padding:1px 6px;}
+    .a4{background:#fff;box-shadow:var(--sh-lg);width:100%;max-width:720px;min-height:900px;padding:36px 40px;font-size:11px;color:#111;margin:0 auto;} .a4 table{width:100%;border-collapse:collapse;font-size:11px;} .a4 th{background:#f3f4f6;border:1px solid #d1d5db;padding:5px 6px;text-align:left;font-weight:700;} .a4 td{border:1px solid #d1d5db;padding:5px 6px;} .a4 .r{text-align:right;font-variant-numeric:tabular-nums;}
+    .pgline{width:64px;height:6px;background:var(--c-border-soft);border-radius:999px;overflow:hidden;display:inline-block;} .pgline>div{height:100%;background:var(--c-teal);border-radius:999px;} .pgline>div.pending{background:var(--c-warning);}
+    .req{color:var(--c-danger);}
+    .field.is-error .input,.field.is-error .select,.field.is-error textarea{border-color:var(--c-danger);}
+    .field-error{font-size:11px;color:var(--c-danger);display:none;} .field.is-error .field-error{display:block;}
+    .field-help{font-size:11px;color:var(--c-text-soft);}
+    .persona{height:32px;border:1px solid var(--c-border);border-radius:var(--r);padding:0 28px 0 10px;font-size:12px;background:#fff;color:var(--c-navy);}
+    .free-row td{background:var(--c-teal-08)!important;}
+  </style>
+</head>
+<body>
+  <!-- ============================================================
+       APP SHELL
+       ============================================================ -->
+  <div class="shell">
+    <!-- SIDEBAR -->
+    <aside class="sb">
+      <div class="sb-logo">
+        <div class="sb-logo-mark">
+          <i data-lucide="box" class="w-4 h-4"></i>
+        </div>
+        <div class="sb-logo-text">
+          <div class="sb-logo-title">CUBE 4.0</div>
+          <div class="sb-logo-sub">Platform</div>
+        </div>
+      </div>
+
+      <nav class="sb-menu">
+        <div class="sb-grp">
+          <a class="sb-item" href="#/list"><span class="sb-icon"><i data-lucide="house" class="w-4 h-4"></i></span>หน้าหลัก</a>
+          <a class="sb-item" href="#/list"><span class="sb-icon"><i data-lucide="inbox" class="w-4 h-4"></i></span>งานของฉัน<span class="sb-badge">3</span></a>
+        </div>
+        <div class="sb-grp">
+          <div class="sb-grp-label">Warehouse</div>
+          <a class="sb-item" href="#/list"><span class="sb-icon"><i data-lucide="warehouse" class="w-4 h-4"></i></span>โครงสร้างคลัง (Location)</a>
+          <a class="sb-item" href="#/list"><span class="sb-icon"><i data-lucide="boxes" class="w-4 h-4"></i></span>สต็อกตามตำแหน่ง</a>
+          <a class="sb-item" href="#/list"><span class="sb-icon"><i data-lucide="package-check" class="w-4 h-4"></i></span>รับเข้า (GRN) · Putaway</a>
+          <a class="sb-item active" href="#/list"><span class="sb-icon"><i data-lucide="hand" class="w-4 h-4"></i></span>ใบหยิบสินค้า (Picking)</a>
+          <a class="sb-item" href="#/list"><span class="sb-icon"><i data-lucide="package" class="w-4 h-4"></i></span>แพ็คสินค้า (Packing)</a>
+          <a class="sb-item" href="#/list"><span class="sb-icon"><i data-lucide="truck" class="w-4 h-4"></i></span>ใบส่งของ (Delivery Note)</a>
+        </div>
+        <div class="sb-grp">
+          <div class="sb-grp-label">Sales</div>
+          <a class="sb-item" href="#/list"><span class="sb-icon"><i data-lucide="shopping-cart" class="w-4 h-4"></i></span>ใบสั่งขาย</a>
+        </div>
+      </nav>
+
+      <div class="sb-foot">
+        <div>© 2026 CUBE 4.0 · F-WH-PICK</div>
+        <div>2BSimple</div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <header class="top">
+        <div class="top-left">
+          <div class="top-bc">
+            <span class="bc-root">Warehouse</span>
+            <i data-lucide="chevron-right" class="w-3 h-3 bc-sep"></i>
+            <span class="bc-leaf">ใบหยิบสินค้า (Picking)</span>
+          </div>
+        </div>
+        <div class="top-right">
+          <button title="การแจ้งเตือน" style="position: relative; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: 0; border-radius: 8px; color: var(--c-text-mute); cursor: pointer; transition: background 120ms; outline: none;" onmouseover="this.style.background='var(--c-off-white)'" onmouseout="this.style.background='transparent'">
+            <i data-lucide="bell" class="w-4 h-4"></i>
+            <span style="position: absolute; top: 8px; right: 9px; width: 7px; height: 7px; background: var(--c-danger); border: 2px solid var(--c-white); border-radius: 50%;"></span>
+          </button>
+          <select class="persona" title="สลับบทบาท (เดโมสายอนุมัติ)" onchange="switchPersona(this.value)"><option value="0">หัวหน้าคลัง</option><option value="1">พนักงานคลัง (วิภาวี)</option><option value="2">พนักงานคลัง (ธนพล)</option><option value="3">Sales (ดูอย่างเดียว)</option></select>
+          <button class="top-user" title="ผู้ใช้งาน">
+            <div class="top-user-info">
+              <div class="top-user-name" id="uc-n">สมชาย ใจดี</div>
+              <div class="top-user-role" id="uc-r">หัวหน้าคลัง · CUBE 4.0</div>
+            </div>
+            <div class="top-avatar" id="uc-av">สจ</div>
+          </button>
+        </div>
+      </header>
+
+      <div class="page" id="page-content"></div>
+    </main>
+  </div>
+
+  <div id="overlay-root"></div>
+  <div id="toast-root" style="position: fixed; top: 16px; right: 16px; z-index: 100; display: flex; flex-direction: column; gap: 8px;"></div>
+
+  <script>
+const ICONS = {"scissors": "<circle cx=\"6\" cy=\"6\" r=\"3\" /> <path d=\"M8.12 8.12 12 12\" /> <path d=\"M20 4 8.12 15.88\" /> <circle cx=\"6\" cy=\"18\" r=\"3\" /> <path d=\"M14.8 14.8 20 20\" />", "bell": "<path d=\"M10.268 21a2 2 0 0 0 3.464 0\" /> <path d=\"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326\" />", "save": "<path d=\"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z\" /> <path d=\"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7\" /> <path d=\"M7 3v4a1 1 0 0 0 1 1h7\" />", "trash-2": "<path d=\"M3 6h18\" /> <path d=\"M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6\" /> <path d=\"M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2\" /> <line x1=\"10\" x2=\"10\" y1=\"11\" y2=\"17\" /> <line x1=\"14\" x2=\"14\" y1=\"11\" y2=\"17\" />", "pause": "<rect x=\"14\" y=\"4\" width=\"4\" height=\"16\" rx=\"1\" /> <rect x=\"6\" y=\"4\" width=\"4\" height=\"16\" rx=\"1\" />", "flask-conical": "<path d=\"M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2\" /> <path d=\"M6.453 15h11.094\" /> <path d=\"M8.5 2h7\" />", "pen-tool": "<path d=\"M15.707 21.293a1 1 0 0 1-1.414 0l-1.586-1.586a1 1 0 0 1 0-1.414l5.586-5.586a1 1 0 0 1 1.414 0l1.586 1.586a1 1 0 0 1 0 1.414z\" /> <path d=\"m18 13-1.375-6.874a1 1 0 0 0-.746-.776L3.235 2.028a1 1 0 0 0-1.207 1.207L5.35 15.879a1 1 0 0 0 .776.746L13 18\" /> <path d=\"m2.3 2.3 7.286 7.286\" /> <circle cx=\"11\" cy=\"11\" r=\"2\" />", "download": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" /> <polyline points=\"7 10 12 15 17 10\" /> <line x1=\"12\" x2=\"12\" y1=\"15\" y2=\"3\" />", "arrow-down-to-line": "<path d=\"M12 17V3\" /> <path d=\"m6 11 6 6 6-6\" /> <path d=\"M19 21H5\" />", "package-check": "<path d=\"m16 16 2 2 4-4\" /> <path d=\"M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14\" /> <path d=\"m7.5 4.27 9 5.15\" /> <polyline points=\"3.29 7 12 12 20.71 7\" /> <line x1=\"12\" x2=\"12\" y1=\"22\" y2=\"12\" />", "history": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" /> <path d=\"M12 7v5l4 2\" />", "eye": "<path d=\"M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "message-square": "<path d=\"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z\" />", "chevron-left": "<path d=\"m15 18-6-6 6-6\" />", "x-circle": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"m15 9-6 6\" /> <path d=\"m9 9 6 6\" />", "inbox": "<polyline points=\"22 12 16 12 14 15 10 15 8 12 2 12\"/><path d=\"M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z\"/>", "house": "<path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\" /> <path d=\"M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\" />", "refresh-cw": "<path d=\"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8\" /> <path d=\"M21 3v5h-5\" /> <path d=\"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16\" /> <path d=\"M8 16H3v5\" />", "clock": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <polyline points=\"12 6 12 12 16 14\" />", "wallet": "<path d=\"M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1\" /> <path d=\"M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4\" />", "sliders-vertical": "<line x1=\"4\" x2=\"4\" y1=\"21\" y2=\"14\" /> <line x1=\"4\" x2=\"4\" y1=\"10\" y2=\"3\" /> <line x1=\"12\" x2=\"12\" y1=\"21\" y2=\"12\" /> <line x1=\"12\" x2=\"12\" y1=\"8\" y2=\"3\" /> <line x1=\"20\" x2=\"20\" y1=\"21\" y2=\"16\" /> <line x1=\"20\" x2=\"20\" y1=\"12\" y2=\"3\" /> <line x1=\"2\" x2=\"6\" y1=\"14\" y2=\"14\" /> <line x1=\"10\" x2=\"14\" y1=\"8\" y2=\"8\" /> <line x1=\"18\" x2=\"22\" y1=\"16\" y2=\"16\" />", "truck": "<path d=\"M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2\" /> <path d=\"M15 18H9\" /> <path d=\"M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14\" /> <circle cx=\"17\" cy=\"18\" r=\"2\" /> <circle cx=\"7\" cy=\"18\" r=\"2\" />", "file-plus": "<path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z\" /> <path d=\"M14 2v4a2 2 0 0 0 2 2h4\" /> <path d=\"M9 15h6\" /> <path d=\"M12 18v-6\" />", "copy": "<rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\" /> <path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\" />", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 16v-4\" /> <path d=\"M12 8h.01\" />", "check": "<path d=\"M20 6 9 17l-5-5\" />", "check-circle-2": "<path d=\"M21.801 10A10 10 0 1 1 17 3.335\" /> <path d=\"m9 11 3 3L22 4\" />", "map-pin": "<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" />", "undo-2": "<path d=\"M9 14 4 9l5-5\" /> <path d=\"M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11\" />", "scan-line": "<path d=\"M3 7V5a2 2 0 0 1 2-2h2\" /> <path d=\"M17 3h2a2 2 0 0 1 2 2v2\" /> <path d=\"M21 17v2a2 2 0 0 1-2 2h-2\" /> <path d=\"M7 21H5a2 2 0 0 1-2-2v-2\" /> <path d=\"M7 12h10\" />", "plus": "<path d=\"M5 12h14\" /> <path d=\"M12 5v14\" />", "x": "<path d=\"M18 6 6 18\" /> <path d=\"m6 6 12 12\" />", "file": "<path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z\"/><path d=\"M14 2v4a2 2 0 0 0 2 2h4\"/>", "printer": "<path d=\"M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2\" /> <path d=\"M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6\" /> <rect x=\"6\" y=\"14\" width=\"12\" height=\"8\" rx=\"1\" />", "user": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\" /> <circle cx=\"12\" cy=\"7\" r=\"4\" />", "hand": "<path d=\"M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2\"/><path d=\"M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2\"/><path d=\"M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8\"/><path d=\"M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15\"/>", "box": "<path d=\"M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z\" /> <path d=\"m3.3 7 8.7 5 8.7-5\" /> <path d=\"M12 22V12\" />", "star": "<path d=\"M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z\" />", "boxes": "<path d=\"M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z\" /> <path d=\"m7 16.5-4.74-2.85\" /> <path d=\"m7 16.5 5-3\" /> <path d=\"M7 16.5v5.17\" /> <path d=\"M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z\" /> <path d=\"m17 16.5-5-3\" /> <path d=\"m17 16.5 4.74-2.85\" /> <path d=\"M17 16.5v5.17\" /> <path d=\"M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z\" /> <path d=\"M12 8 7.26 5.15\" /> <path d=\"m12 8 4.74-2.85\" /> <path d=\"M12 13.5V8\" />", "alert-triangle": "<path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\" /> <path d=\"M12 9v4\" /> <path d=\"M12 17h.01\" />", "chevron-right": "<path d=\"m9 18 6-6-6-6\" />", "play": "<polygon points=\"6 3 20 12 6 21 6 3\" />", "warehouse": "<path d=\"M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z\" /> <path d=\"M6 18h12\" /> <path d=\"M6 14h12\" /> <rect width=\"12\" height=\"12\" x=\"6\" y=\"10\" />", "minus": "<path d=\"M5 12h14\" />", "package": "<path d=\"M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z\" /> <path d=\"M12 22V12\" /> <path d=\"m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7\" /> <path d=\"m7.5 4.27 9 5.15\" />", "ellipsis-vertical": "<circle cx=\"12\" cy=\"12\" r=\"1\" /> <circle cx=\"12\" cy=\"5\" r=\"1\" /> <circle cx=\"12\" cy=\"19\" r=\"1\" />", "arrow-left-right": "<path d=\"M8 3 4 7l4 4\" /> <path d=\"M4 7h16\" /> <path d=\"m16 21 4-4-4-4\" /> <path d=\"M20 17H4\" />", "user-check": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\" /> <circle cx=\"9\" cy=\"7\" r=\"4\" /> <polyline points=\"16 11 18 13 22 9\" />", "shopping-cart": "<circle cx=\"8\" cy=\"21\" r=\"1\" /> <circle cx=\"19\" cy=\"21\" r=\"1\" /> <path d=\"M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12\" />", "search": "<circle cx=\"11\" cy=\"11\" r=\"8\" /> <path d=\"m21 21-4.3-4.3\" />", "file-text": "<path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z\" /> <path d=\"M14 2v4a2 2 0 0 0 2 2h4\" /> <path d=\"M10 9H8\" /> <path d=\"M16 13H8\" /> <path d=\"M16 17H8\" />", "list-checks": "<path d=\"m3 17 2 2 4-4\" /> <path d=\"m3 7 2 2 4-4\" /> <path d=\"M13 6h8\" /> <path d=\"M13 12h8\" /> <path d=\"M13 18h8\" />"};
+function renderIcons(){ document.querySelectorAll('i[data-lucide]').forEach(el => { const n = el.getAttribute('data-lucide'); const body = ICONS[n]; if (!body) return; const cls = el.getAttribute('class') || ''; const st = el.getAttribute('style') || ''; const svg = document.createElementNS('http://www.w3.org/2000/svg','svg'); svg.setAttribute('viewBox','0 0 24 24'); svg.setAttribute('fill','none'); svg.setAttribute('stroke','currentColor'); svg.setAttribute('stroke-width','2'); svg.setAttribute('stroke-linecap','round'); svg.setAttribute('stroke-linejoin','round'); svg.setAttribute('class', cls + ' lucide'); svg.setAttribute('data-lucide', n); if (st) svg.setAttribute('style', st); if (el.getAttribute('onclick')) svg.setAttribute('onclick', el.getAttribute('onclick')); if (el.getAttribute('title')) svg.setAttribute('title', el.getAttribute('title')); svg.innerHTML = body; el.replaceWith(svg); }); }
+'use strict';
+// ============================================================
+// F-WH-PICK · Picking (ใบหยิบสินค้า) — CUBE 4.0 Warehouse · S5 · UX = SO/PO reference · Warm Light v8
+// ต้นทาง: Sales Order ที่ยืนยัน (จองสต๊อกแล้ว) + Warehouse trigger ผ่าน (payment term: ทันที / หลังมัดจำ / หลังชำระเต็ม — Finance/AR Receipt ปล่อย) · ไม่พัก
+// โครงสร้างคลังตาม f-loc.html (Warehouse → Zone → Area → Rack → Location · type PICK_FACE/RESERVE/BULK/STAGING/PACK/HOLD) · สต็อกตำแหน่งตาม f-inv.html (balance = product×location×lot · on_hand/allocated · FEFO)
+// ปลายทาง: Packing → Delivery Note · Inventory movement 'pick' · SO สถานะจัดส่ง
+// ============================================================
+const TODAY_ISO = '2026-08-16'; const TH_MON = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+function nowIso() { const d = new Date(); return TODAY_ISO + 'T' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ':' + String(d.getSeconds()).padStart(2, '0'); }
+function uid(p) { return (p || 'X') + Date.now().toString(36).slice(-4) + Math.random().toString(36).slice(2, 5); }
+function fmi(n) { return (Number(n) || 0).toLocaleString('en-US'); }
+function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+// กลยุทธ์หยิบไม่ได้เลือกต่อใบ — มาจาก master: สินค้ามีล็อต/วันหมดอายุ = FEFO · ไม่มี = FIFO (rotation ของตำแหน่ง f-loc) · Pick Face ก่อน Reserve/Bulk = กฎคลัง (ค่าคงที่ · ย้ายไป Warehouse Config ได้ภายหลัง)
+const CFG = { pickFaceFirst: true, allowShortPick: true, waveMax: 10 };
+function itemStrategy(pid) { const p = PROD_BY[pid]; return p && p.lot ? 'FEFO' : 'FIFO'; }
+// ---------- people / personas ----------
+const PEOPLE = [{ code: 'EMP-01', name: 'สมชาย ใจดี', role: 'หัวหน้าคลัง', initials: 'สจ' }, { code: 'EMP-02', name: 'วิภาวี ตั้งมั่น', role: 'พนักงานคลัง', initials: 'วต' }, { code: 'EMP-03', name: 'ธนพล แสนสุข', role: 'พนักงานคลัง', initials: 'ธส' }, { code: 'EMP-04', name: 'ปรียา ศรีสมบัติ', role: 'พนักงานคลัง', initials: 'ปศ' }, { code: 'EMP-05', name: 'อนุชา ว่องไว', role: 'พนักงานยกของ', initials: 'อว' }];
+const EMP_BY_NAME = Object.fromEntries(PEOPLE.map(e => [e.name, e]));
+const PERSONAS = [{ name: 'สมชาย ใจดี', roleLabel: 'หัวหน้าคลัง', role: 'wh_lead', initials: 'สจ' }, { name: 'วิภาวี ตั้งมั่น', roleLabel: 'พนักงานคลัง', role: 'picker', initials: 'วต' }, { name: 'ธนพล แสนสุข', roleLabel: 'พนักงานคลัง', role: 'picker', initials: 'ธส' }, { name: 'มานพ ขายเก่ง', roleLabel: 'Sales Manager (ดูอย่างเดียว)', role: 'viewer', initials: 'มข' }];
+const ME = Object.assign({}, PERSONAS[0]);
+const EQUIPMENT = ['รถเข็นหยิบ (Pick Cart)', 'แฮนด์ลิฟต์', 'ฟอร์คลิฟต์', 'ไม่ระบุ'];
+// ---------- warehouse hierarchy (subset from f-loc.html) ----------
+const WAREHOUSES = { 'WH-01': { code: 'WH-01', name: 'คลังกลาง บางนา', so: 'WH-BKK' }, 'WH-02': { code: 'WH-02', name: 'คลังภาคเหนือ ลำพูน', so: 'WH-CNX' } };
+const WH_BY_SO = { 'WH-BKK': 'WH-01', 'WH-CNX': 'WH-02' };
+const ZONES = { 'Z-STORAGE': { code: 'Z-STG', name: 'Storage Zone', warehouse_id: 'WH-01', seq: 1 }, 'Z-OUTBOUND': { code: 'Z-OUT', name: 'Outbound Zone', warehouse_id: 'WH-01', seq: 2 }, 'Z-QC': { code: 'Z-QC', name: 'QC / Hold Zone', warehouse_id: 'WH-01', seq: 3 }, 'Z-COLD': { code: 'Z-COLD', name: 'Cold Chain Zone', warehouse_id: 'WH-02', seq: 1 } };
+const AREAS = { 'A-FM': { code: 'A-FM', name: 'Fast Mover Floor', zone_id: 'Z-STORAGE', seq: 1 }, 'A-AISLE-A': { code: 'A-AISLE-A', name: 'Aisle A', zone_id: 'Z-STORAGE', seq: 2 }, 'A-AISLE-B': { code: 'A-AISLE-B', name: 'Aisle B', zone_id: 'Z-STORAGE', seq: 3 }, 'A-BULK': { code: 'A-BULK', name: 'Bulk Floor', zone_id: 'Z-STORAGE', seq: 4 }, 'A-PACK': { code: 'A-PACK', name: 'Pack Stations', zone_id: 'Z-OUTBOUND', seq: 1 }, 'A-STG': { code: 'A-STG', name: 'Staging Out', zone_id: 'Z-OUTBOUND', seq: 2 }, 'A-HOLD': { code: 'A-HOLD', name: 'Hold Area', zone_id: 'Z-QC', seq: 1 }, 'A-CHILL': { code: 'A-CHILL', name: 'Chiller Area', zone_id: 'Z-COLD', seq: 1 } };
+const RACKS = { 'R-A01': { code: 'R-A01', name: 'Rack A-01', area_id: 'A-AISLE-A', seq: 1 }, 'R-A02': { code: 'R-A02', name: 'Rack A-02', area_id: 'A-AISLE-A', seq: 2 }, 'R-B01': { code: 'R-B01', name: 'Rack B-01', area_id: 'A-AISLE-B', seq: 1 }, 'R-B02': { code: 'R-B02', name: 'Rack B-02', area_id: 'A-AISLE-B', seq: 2 }, 'R-C01': { code: 'R-C01', name: 'Chiller Rack C-01', area_id: 'A-CHILL', seq: 1 } };
+const LOC_LIST = [
+  { id: 'L003', code: 'FM-PF-01', name: 'Pick Face FM-01', parent_type: 'area', area_id: 'A-FM', type: 'PICK_FACE', seq: 1 }, { id: 'L004', code: 'FM-PF-02', name: 'Pick Face FM-02', parent_type: 'area', area_id: 'A-FM', type: 'PICK_FACE', seq: 2 }, { id: 'L005', code: 'FM-PF-03', name: 'Pick Face FM-03', parent_type: 'area', area_id: 'A-FM', type: 'PICK_FACE', seq: 3 }, { id: 'L006', code: 'FM-PF-04', name: 'Pick Face FM-04', parent_type: 'area', area_id: 'A-FM', type: 'PICK_FACE', seq: 4 }, { id: 'L007', code: 'FM-PF-05', name: 'Pick Face FM-05', parent_type: 'area', area_id: 'A-FM', type: 'PICK_FACE', seq: 5 }, { id: 'L008', code: 'FM-PF-06', name: 'Pick Face FM-06', parent_type: 'area', area_id: 'A-FM', type: 'PICK_FACE', seq: 6 },
+  { id: 'L001', code: 'A-01-R1-C2-L3', parent_type: 'rack', rack_id: 'R-A01', type: 'RESERVE', seq: 1 }, { id: 'L002', code: 'A-01-R1-C3-L1', parent_type: 'rack', rack_id: 'R-A01', type: 'RESERVE', seq: 2 }, { id: 'L010', code: 'A-02-R1-C1-L2', parent_type: 'rack', rack_id: 'R-A02', type: 'RESERVE', seq: 1 }, { id: 'L011', code: 'A-02-R2-C1-L1', parent_type: 'rack', rack_id: 'R-A02', type: 'RESERVE', seq: 2 }, { id: 'L012', code: 'B-01-R1-C1-L1', parent_type: 'rack', rack_id: 'R-B01', type: 'RESERVE', seq: 1 }, { id: 'L013', code: 'B-01-R1-C2-L2', parent_type: 'rack', rack_id: 'R-B01', type: 'RESERVE', seq: 2 }, { id: 'L014', code: 'B-02-R1-C1-L1', parent_type: 'rack', rack_id: 'R-B02', type: 'RESERVE', seq: 1 },
+  { id: 'L020', code: 'BULK-01', name: 'Bulk Floor 01', parent_type: 'area', area_id: 'A-BULK', type: 'BULK', seq: 1 }, { id: 'L021', code: 'BULK-02', name: 'Bulk Floor 02', parent_type: 'area', area_id: 'A-BULK', type: 'BULK', seq: 2 },
+  { id: 'L030', code: 'PK-01', name: 'Pack Station 01', parent_type: 'area', area_id: 'A-PACK', type: 'PACK', seq: 1 }, { id: 'L031', code: 'STG-OUT-01', name: 'Staging Out 01', parent_type: 'area', area_id: 'A-STG', type: 'STAGING', seq: 1 }, { id: 'L040', code: 'HOLD-01', name: 'Hold 01', parent_type: 'area', area_id: 'A-HOLD', type: 'HOLD', seq: 1 },
+  { id: 'L050', code: 'C-01-R1-C1-L1', parent_type: 'rack', rack_id: 'R-C01', type: 'RESERVE', seq: 1 }, { id: 'L051', code: 'CH-PF-01', name: 'Chiller Pick Face', parent_type: 'area', area_id: 'A-CHILL', type: 'PICK_FACE', seq: 1 },
+];
+const LOCATIONS = Object.fromEntries(LOC_LIST.map(l => [l.id, l]));
+const TYPE_RANK = { PICK_FACE: 0, RESERVE: 1, BULK: 2, STAGING: 3, PACK: 4, HOLD: 7 };
+function typeLabel(t) { return { PICK_FACE: 'Pick Face', RESERVE: 'Reserve', HOLD: 'Hold', BULK: 'Bulk', STAGING: 'Staging', PACK: 'Pack' }[t] || t; }
+function locCtx(l) { let area, rack = null, zone, wh; if (l.parent_type === 'rack') { rack = RACKS[l.rack_id]; area = AREAS[rack.area_id]; } else area = AREAS[l.area_id]; zone = ZONES[area.zone_id]; wh = WAREHOUSES[zone.warehouse_id]; return { wh, zone, area, rack }; }
+function locPath(l) { const c = locCtx(l); return [c.zone.name, c.area.name, c.rack ? c.rack.name : null, l.code].filter(Boolean).join(' › '); }
+function locWh(l) { return locCtx(l).wh.code; }
+function routeKey(l) { const c = locCtx(l); return [c.zone.seq, c.area.seq, c.rack ? c.rack.seq : 0, l.seq].map(n => String(n).padStart(3, '0')).join('.'); }
+// ---------- items (subset · same codes as Sales) ----------
+const PRODUCTS = [{ code: 'FG-1001', name: 'น้ำดื่ม CUBE 600 มล.', uom: 'ขวด', uoms: [{ uom: 'ขวด', f: 1 }, { uom: 'แพ็ค 12', f: 12 }, { uom: 'ลัง 48', f: 48 }], cat: 'BEV', kind: 'goods', lot: true }, { code: 'FG-1002', name: 'น้ำดื่ม CUBE 1.5 ลิตร', uom: 'ขวด', uoms: [{ uom: 'ขวด', f: 1 }, { uom: 'แพ็ค 6', f: 6 }], cat: 'BEV', kind: 'goods', lot: true }, { code: 'FG-1010', name: 'ชาเขียวพร้อมดื่ม 500 มล.', uom: 'ขวด', uoms: [{ uom: 'ขวด', f: 1 }, { uom: 'ลัง 24', f: 24 }], cat: 'BEV', kind: 'goods', lot: true }, { code: 'FG-1011', name: 'กาแฟกระป๋อง 180 มล.', uom: 'กระป๋อง', uoms: [{ uom: 'กระป๋อง', f: 1 }, { uom: 'ลัง 30', f: 30 }], cat: 'BEV', kind: 'goods', lot: true }, { code: 'FG-2001', name: 'มันฝรั่งทอดกรอบ 75 ก.', uom: 'ซอง', uoms: [{ uom: 'ซอง', f: 1 }, { uom: 'ลัง 24', f: 24 }], cat: 'SNACK', kind: 'goods', lot: true }, { code: 'FG-2002', name: 'ถั่วอบเกลือ 100 ก.', uom: 'ซอง', uoms: [{ uom: 'ซอง', f: 1 }, { uom: 'ลัง 36', f: 36 }], cat: 'SNACK', kind: 'goods', lot: true }, { code: 'FG-2003', name: 'ขนมปังกรอบ 200 ก.', uom: 'กล่อง', uoms: [{ uom: 'กล่อง', f: 1 }, { uom: 'ลัง 24', f: 24 }], cat: 'SNACK', kind: 'goods', lot: true }, { code: 'FG-3001', name: 'นม UHT 1 ลิตร', uom: 'กล่อง', uoms: [{ uom: 'กล่อง', f: 1 }, { uom: 'ลัง 12', f: 12 }], cat: 'DAIRY', kind: 'goods', lot: true, cold: true }, { code: 'FG-3002', name: 'โยเกิร์ต 135 ก.', uom: 'ถ้วย', uoms: [{ uom: 'ถ้วย', f: 1 }, { uom: 'แพ็ค 4', f: 4 }], cat: 'DAIRY', kind: 'goods', lot: true, cold: true }, { code: 'FG-4001', name: 'น้ำมันพืช 1 ลิตร', uom: 'ขวด', uoms: [{ uom: 'ขวด', f: 1 }, { uom: 'ลัง 12', f: 12 }], cat: 'GROC', kind: 'goods' }, { code: 'FG-4002', name: 'ข้าวหอมมะลิ 5 กก.', uom: 'ถุง', uoms: [{ uom: 'ถุง', f: 1 }], cat: 'GROC', kind: 'goods' }, { code: 'FG-5001', name: 'สบู่ก้อน 90 ก.', uom: 'ก้อน', uoms: [{ uom: 'ก้อน', f: 1 }, { uom: 'แพ็ค 4', f: 4 }], cat: 'HOME', kind: 'goods' }, { code: 'FG-5002', name: 'ยาสีฟัน 150 ก.', uom: 'หลอด', uoms: [{ uom: 'หลอด', f: 1 }, { uom: 'ลัง 24', f: 24 }], cat: 'HOME', kind: 'goods' }, { code: 'FG-5003', name: 'แชมพู 400 มล.', uom: 'ขวด', uoms: [{ uom: 'ขวด', f: 1 }, { uom: 'ลัง 12', f: 12 }], cat: 'HOME', kind: 'goods' }, { code: 'SV-9001', name: 'ค่าขนส่งพิเศษ (เที่ยวด่วน)', uom: 'เที่ยว', uoms: [{ uom: 'เที่ยว', f: 1 }], cat: 'SERVICE', kind: 'service' }];
+const PROD_BY = Object.fromEntries(PRODUCTS.map(p => [p.code, p]));
+function uomFactor(p, uom) { const u = p.uoms.find(x => x.uom === uom); return u ? u.f : 1; }
+function isService(code) { return (PROD_BY[code] || {}).kind === 'service'; }
+// ---------- stock balances (product × location × lot · base uom · on_hand / alloc = จองระดับตำแหน่งจากใบหยิบ) ----------
+let BAL = []; let _b = 0;
+function bal(pid, loc, on, lot, exp) { BAL.push({ id: 'B' + String(++_b).padStart(3, '0'), pid, loc, on_hand: on, alloc: 0, lot: lot || null, exp: exp || null }); }
+bal('FG-1001', 'L003', 4800, 'LOT-2607A', '2027-06-30'); bal('FG-1001', 'L001', 48000, 'LOT-2607A', '2027-06-30'); bal('FG-1001', 'L002', 24000, 'LOT-2608B', '2027-07-31'); bal('FG-1001', 'L020', 19200, 'LOT-2608B', '2027-07-31');
+bal('FG-1002', 'L004', 1200, 'LOT-2607C', '2027-06-30'); bal('FG-1002', 'L010', 10800, 'LOT-2607C', '2027-06-30');
+bal('FG-1010', 'L005', 960, 'LOT-2606G', '2026-12-31'); bal('FG-1010', 'L011', 3840, 'LOT-2607H', '2027-01-31');
+bal('FG-1011', 'L005', 300, 'LOT-2606K', '2027-03-31'); bal('FG-1011', 'L011', 600, 'LOT-2606K', '2027-03-31');
+bal('FG-2001', 'L006', 480, 'LOT-2608P', '2026-11-30'); bal('FG-2001', 'L012', 1920, 'LOT-2608Q', '2026-12-31');
+bal('FG-2002', 'L006', 216, 'LOT-2607N', '2026-10-31'); bal('FG-2002', 'L012', 484, 'LOT-2608N', '2026-12-31');
+bal('FG-2003', 'L007', 240, 'LOT-2608B', '2026-12-31'); bal('FG-2003', 'L013', 960, 'LOT-2608B', '2026-12-31');
+bal('FG-3001', 'L051', 240, 'LOT-2608M1', '2026-09-20'); bal('FG-3001', 'L050', 360, 'LOT-2608M2', '2026-10-05'); bal('FG-3001', 'L007', 120, 'LOT-2608M1', '2026-09-20');   // นม: บางส่วนอยู่ WH-02 chiller (FEFO ทดสอบ)
+bal('FG-3002', 'L051', 800, 'LOT-2608Y', '2026-09-05'); bal('FG-3002', 'L050', 1200, 'LOT-2608Y2', '2026-09-25');
+bal('FG-4001', 'L008', 120); bal('FG-4001', 'L013', 180); bal('FG-4002', 'L021', 240); bal('FG-5001', 'L008', 800); bal('FG-5001', 'L014', 3200); bal('FG-5002', 'L008', 40); bal('FG-5003', 'L014', 360);
+function avail(b) { return b.on_hand - b.alloc; }
+function whOnhand(pid, wh) { return BAL.filter(b => b.pid === pid && locWh(LOCATIONS[b.loc]) === wh).reduce((s, b) => s + b.on_hand, 0); }
+function whAvail(pid, wh) { return BAL.filter(b => b.pid === pid && locWh(LOCATIONS[b.loc]) === wh).reduce((s, b) => s + avail(b), 0); }
+let MOVEMENTS = [];
+// ---------- Sales Orders ที่ปล่อยมาคิวหยิบ (source · contract จาก F-SALES-SO) ----------
+// gate: payment term trigger (immediate / after_deposit / after_full) · Finance/AR Receipt ปล่อย · hold = SO พัก
+const CUSTS = { 'CUST-2026-0021': 'บริษัท ทองดีค้าส่ง จำกัด', 'CUST-2026-0033': 'Tops Supermarket (สำนักงานใหญ่)', 'CUST-2026-0041': 'โรงแรมริเวอร์วิว หัวหิน', 'CUST-2026-0055': 'เมธีเทรดดิ้ง', 'CUST-2026-0060': 'ร้านค้าออนไลน์ BestBuy TH', 'CUST-2026-0012': 'ร้านค้าปลีกสมชาย', 'CUST-2026-0056': 'ร้านกัลยาพาณิชย์' };
+function soLine(code, uom, qty, o) { const p = PROD_BY[code]; const base = Math.round(qty * uomFactor(p, uom)); return Object.assign({ id: uid('S'), item_code: code, item_name: p.name, unit: uom, qty, base, reserved: base, backorder: 0, picked: 0, is_free: false }, o || {}); }
+let SOS = [
+  { code: 'SO-2026-0202', customer: 'CUST-2026-0033', deliveryDate: '2026-08-19', wh: 'WH-01', method: 'deliver', term: 'N60', trigger: 'immediate', paid: 0, total: 163771.18, priority: 'high', hold: false, status: 'confirmed', shipTo: 'Tops DC วังน้อย', lines: [soLine('FG-1001', 'ขวด', 9600), soLine('FG-1010', 'ขวด', 2400), soLine('FG-2001', 'ซอง', 1200), soLine('FG-3001', 'กล่อง', 600), soLine('SV-9001', 'เที่ยว', 2)] },
+  { code: 'SO-2026-0203', customer: 'CUST-2026-0041', deliveryDate: '2026-08-18', wh: 'WH-01', method: 'deliver', term: 'N30', trigger: 'immediate', paid: 0, total: 17792.39, priority: 'normal', hold: false, status: 'confirmed', shipTo: 'โรงแรมริเวอร์วิว หัวหิน', lines: [soLine('FG-3001', 'ลัง 12', 20), soLine('FG-1010', 'ลัง 24', 10)] },
+  { code: 'SO-2026-0201', customer: 'CUST-2026-0021', deliveryDate: '2026-08-14', wh: 'WH-01', method: 'deliver', term: 'N30', trigger: 'immediate', paid: 0, total: 51470.42, priority: 'high', hold: false, status: 'in_progress', shipTo: 'บจก.ทองดีค้าส่ง ปทุมธานี', lines: [soLine('FG-1001', 'ลัง 48', 120, { picked: 2880 }), soLine('FG-1010', 'ขวด', 480, { picked: 480 }), soLine('FG-2001', 'ซอง', 240), soLine('FG-1001', 'ลัง 48', 12, { is_free: true })] },
+  { code: 'SO-2026-0205', customer: 'CUST-2026-0060', deliveryDate: '2026-08-21', wh: 'WH-01', method: 'deliver', term: 'PREPAY', trigger: 'after_full', paid: 0, total: 33964.24, priority: 'normal', hold: false, status: 'confirmed', shipTo: 'BestBuy TH คลัง บางนา', lines: [soLine('FG-5003', 'ลัง 12', 20), soLine('FG-5002', 'ลัง 24', 1, { reserved: 24 })] },
+  { code: 'SO-2026-0206', customer: 'CUST-2026-0055', deliveryDate: '2026-08-20', wh: 'WH-01', method: 'deliver', term: 'DEP50', trigger: 'after_deposit', paid: 0, total: 18027.36, priority: 'normal', hold: false, status: 'confirmed', shipTo: 'เมธีเทรดดิ้ง สมุทรปราการ', lines: [soLine('FG-5001', 'แพ็ค 4', 40), soLine('FG-4001', 'ลัง 12', 10)] },
+  { code: 'SO-2026-0207', customer: 'CUST-2026-0056', deliveryDate: '2026-08-17', wh: 'WH-01', method: 'pickup', term: 'CASH', trigger: 'immediate', paid: 0, total: 1024.63, priority: 'normal', hold: false, status: 'confirmed', shipTo: 'ลูกค้ามารับเอง (คลังกลาง บางนา)', lines: [soLine('FG-4001', 'ขวด', 24)] },
+  { code: 'SO-2026-0200', customer: 'CUST-2026-0055', deliveryDate: '2026-08-15', wh: 'WH-01', method: 'deliver', term: 'N30', trigger: 'immediate', paid: 0, total: 18027.36, priority: 'low', hold: true, holdReason: 'รอสินค้าเข้า — ยาสีฟันของหมด', status: 'on_hold', shipTo: 'เมธีเทรดดิ้ง', lines: [soLine('FG-5002', 'ลัง 24', 12, { reserved: 40, backorder: 248 })] },
+  { code: 'SO-2026-0208', customer: 'CUST-2026-0012', deliveryDate: '2026-08-19', wh: 'WH-02', method: 'deliver', term: 'N15', trigger: 'immediate', paid: 0, total: 8620.5, priority: 'normal', hold: false, status: 'confirmed', shipTo: 'ร้านค้าปลีกสมชาย (สาขาเชียงใหม่)', lines: [soLine('FG-3001', 'ลัง 12', 30), soLine('FG-3002', 'แพ็ค 4', 100)] },
+];
+const SO_BY = Object.fromEntries(SOS.map(s => [s.code, s]));
+function gate(so) { if (so.hold) return { ok: false, why: 'SO พัก (hold)' + (so.holdReason ? ' — ' + so.holdReason : ''), kind: 'hold' }; if (so.trigger === 'after_full' && so.paid < so.total - 0.005) return { ok: false, why: 'รอชำระเต็มจำนวนก่อนจัดส่ง (Finance/AR)', kind: 'pay' }; if (so.trigger === 'after_deposit' && so.paid <= 0) return { ok: false, why: 'รอชำระมัดจำก่อนจัดส่ง (Finance/AR)', kind: 'pay' }; return { ok: true }; }
+function soPickable(so) { return so.lines.filter(l => !isService(l.item_code)); }
+function soRemaining(so) { return soPickable(so).reduce((s, l) => s + Math.max(0, l.reserved - l.picked - openPickQty(so.code, l.id)), 0); }
+function openPickQty(soCode, lineId) { return PICKS.filter(p => !['cancelled', 'to_pack', 'picked'].includes(p.status)).reduce((s, p) => s + p.lines.filter(x => x.so === soCode && x.soLine === lineId).reduce((a, x) => a + (x.qty - (x.picked || 0)) , 0), 0); }
+function soPickStatus(so) { const tot = soPickable(so).reduce((s, l) => s + l.reserved, 0); const pk = soPickable(so).reduce((s, l) => s + l.picked, 0); const open = soPickable(so).reduce((s, l) => s + openPickQty(so.code, l.id), 0); if (tot === 0) return 'none'; if (pk >= tot) return 'done'; if (open > 0) return 'picking'; if (pk > 0) return 'partial'; return 'queue'; }
+// ---------- picking engine: allocate ตำแหน่ง+lot ตามกลยุทธ์ ----------
+function candidateBals(pid, wh) { return BAL.filter(b => b.pid === pid && locWh(LOCATIONS[b.loc]) === wh && avail(b) > 0 && ['PICK_FACE', 'RESERVE', 'BULK'].includes(LOCATIONS[b.loc].type)); }
+function sortBals(list, strategy) { return list.slice().sort((a, b) => { const la = LOCATIONS[a.loc], lb = LOCATIONS[b.loc]; if (strategy === 'FEFO' && (a.exp || b.exp)) { const ea = a.exp || '9999', eb = b.exp || '9999'; if (ea !== eb) return ea < eb ? -1 : 1; } if (CFG.pickFaceFirst && TYPE_RANK[la.type] !== TYPE_RANK[lb.type]) return TYPE_RANK[la.type] - TYPE_RANK[lb.type]; if (strategy === 'FIFO' && (a.lot || b.lot)) { if ((a.lot || '') !== (b.lot || '')) return (a.lot || '') < (b.lot || '') ? -1 : 1; } return routeKey(la) < routeKey(lb) ? -1 : 1; }); }
+function allocateSO(so, strategy, exclude) { const out = []; soPickable(so).forEach(l => { let need = Math.max(0, l.reserved - l.picked - openPickQty(so.code, l.id)); if (need <= 0) return; const cands = sortBals(candidateBals(l.item_code, so.wh), itemStrategy(l.item_code)); const used = {}; (exclude || []).forEach(x => { used[x.bal] = (used[x.bal] || 0) + x.qty; }); for (const b of cands) { if (need <= 0) break; const av = avail(b) - (used[b.id] || 0); if (av <= 0) continue; const take = Math.min(av, need); out.push({ id: uid('PL'), so: so.code, soLine: l.id, pid: l.item_code, name: l.item_name, unit: l.unit, factor: uomFactor(PROD_BY[l.item_code], l.unit), bal: b.id, loc: b.loc, lot: b.lot, exp: b.exp, qty: take, picked: 0, status: 'pending', is_free: l.is_free, rule: itemStrategy(l.item_code) }); used[b.id] = (used[b.id] || 0) + take; need -= take; } if (need > 0) out.push({ id: uid('PL'), so: so.code, soLine: l.id, pid: l.item_code, name: l.item_name, unit: l.unit, factor: uomFactor(PROD_BY[l.item_code], l.unit), bal: null, loc: null, lot: null, exp: null, qty: need, picked: 0, status: 'short', is_free: l.is_free, note: 'ไม่มีสต๊อกในตำแหน่งที่หยิบได้ · ตรวจ Hold/Bulk/เติม Pick Face' }); }); return out; }
+// หา candidate ใหม่ให้บรรทัด (refresh) — รวม 'manual' = ทุกตำแหน่งที่มีของ (รวม HOLD/STAGING) เพื่อให้หัวหน้าเลือกเอง
+function candidatesFor(pid, wh, manual, excludeBal) { const list = BAL.filter(b => b.pid === pid && locWh(LOCATIONS[b.loc]) === wh && avail(b) > 0 && b.id !== excludeBal && (manual ? true : ['PICK_FACE', 'RESERVE', 'BULK'].includes(LOCATIONS[b.loc].type))); return sortBals(list, itemStrategy(pid)); }
+function refreshLine(p, l) { if (l.status === 'picked') return false; const remain = l.qty - (l.picked || 0); const cands = candidatesFor(l.pid, p.wh, false, null); const b = cands[0]; if (!b) return false; if (l.bal) { const ob = BAL.find(x => x.id === l.bal); if (ob) ob.alloc = Math.max(0, ob.alloc - remain); } const take = Math.min(remain, avail(b)); l.bal = b.id; l.loc = b.loc; l.lot = b.lot; l.exp = b.exp; l.status = 'pending'; l.note = ''; b.alloc += take; if (take < remain) { p.lines.push(Object.assign({}, l, { id: uid('PL'), qty: remain - take, bal: null, loc: null, lot: null, exp: null, status: 'short', note: 'ยังขาด — รอเติม/โอน' })); l.qty = (l.picked || 0) + take; } return true; }
+function routeSort(lines) { return lines.slice().sort((a, b) => { const ka = a.loc ? routeKey(LOCATIONS[a.loc]) : 'zzz', kb = b.loc ? routeKey(LOCATIONS[b.loc]) : 'zzz'; return ka < kb ? -1 : ka > kb ? 1 : 0; }); }
+// ---------- pick documents ----------
+const SRC_TYPES = { SO: ['ใบสั่งขาย', 'approved'], TRANSFER: ['โอนระหว่างคลัง', 'sent'], REPLENISH: ['เติม Pick Face', 'pending'], RETURN: ['คืนผู้ขาย (RTV)', 'draft'], PRODUCTION: ['เบิกผลิต', 'draft'] };
+function mkPick(o) { return Object.assign({ code: '', wh: 'WH-01', srcType: 'SO', sos: [], strategy: 'AUTO', assignee: null, equipment: EQUIPMENT[0], priority: 'normal', note: '', status: 'draft', lines: [], createdBy: ME.name, createdAt: '2026-08-15T09:00:00', updatedBy: ME.name, updatedAt: '2026-08-15T09:00:00', startedAt: null, pickedAt: null, packRef: null, cancel: null, audit: [] }, o, { id: o.code }); }
+function seedAudit(p, extra) { p.audit = [{ act: 'สร้างใบหยิบ', by: p.createdBy, at: p.createdAt }].concat(extra || []); return p; }
+let PICKS = [];
+// PICK-0890: SO-0201 หยิบครบบางส่วนแล้ว (60 ลัง + ชาเขียว 480) → ส่ง Packing แล้ว
+PICKS.push(seedAudit(mkPick({ code: 'PICK-2026-0890', wh: 'WH-01', sos: ['SO-2026-0201'], assignee: 'วิภาวี ตั้งมั่น', status: 'to_pack', createdBy: 'สมชาย ใจดี', createdAt: '2026-08-13T09:00:00', startedAt: '2026-08-13T09:20:00', pickedAt: '2026-08-13T13:40:00', packRef: 'PACK-2026-0455', updatedAt: '2026-08-13T13:45:00', lines: [{ id: 'PLx1', so: 'SO-2026-0201', soLine: SOS[2].lines[0].id, pid: 'FG-1001', name: 'น้ำดื่ม CUBE 600 มล.', unit: 'ลัง 48', factor: 48, bal: 'B002', loc: 'L001', lot: 'LOT-2607A', exp: '2027-06-30', qty: 2880, picked: 2880, status: 'picked', by: 'วิภาวี ตั้งมั่น', at: '2026-08-13T13:30:00' }, { id: 'PLx2', so: 'SO-2026-0201', soLine: SOS[2].lines[1].id, pid: 'FG-1010', name: 'ชาเขียวพร้อมดื่ม 500 มล.', unit: 'ขวด', factor: 1, bal: 'B007', loc: 'L005', lot: 'LOT-2606G', exp: '2026-12-31', qty: 480, picked: 480, status: 'picked', by: 'วิภาวี ตั้งมั่น', at: '2026-08-13T13:40:00' }] }), [{ act: 'มอบหมาย วิภาวี ตั้งมั่น · รถเข็นหยิบ', by: 'สมชาย ใจดี', at: '2026-08-13T09:10:00' }, { act: 'เริ่มหยิบ', by: 'วิภาวี ตั้งมั่น', at: '2026-08-13T09:20:00' }, { act: 'หยิบครบ 2 บรรทัด · ส่งต่อ Packing PACK-2026-0455', by: 'วิภาวี ตั้งมั่น', at: '2026-08-13T13:45:00' }]));
+// PICK-0891: SO-0203 กำลังหยิบ (assigned ธนพล) — บรรทัดนม FEFO จาก Pick Face 120 + Reserve chiller? (WH-01 มีนม FM-PF-05 120 กล่อง เท่านั้น → short 120)
+(() => { const so = SO_BY['SO-2026-0203']; const p = mkPick({ code: 'PICK-2026-0891', wh: 'WH-01', sos: [so.code], assignee: 'ธนพล แสนสุข', status: 'in_progress', priority: 'high', createdBy: 'สมชาย ใจดี', createdAt: '2026-08-15T08:30:00', startedAt: '2026-08-15T09:00:00', updatedAt: '2026-08-15T09:00:00' }); p.lines = routeSort(allocateSO(so)); p.lines.forEach(l => { if (l.bal) BAL.find(b => b.id === l.bal).alloc += l.qty; }); PICKS.push(seedAudit(p, [{ act: 'มอบหมาย ธนพล แสนสุข · รถเข็นหยิบ', by: 'สมชาย ใจดี', at: '2026-08-15T08:40:00' }, { act: 'เริ่มหยิบ', by: 'ธนพล แสนสุข', at: '2026-08-15T09:00:00' }])); })();
+// PICK-0889: ตัวอย่างงานหยิบจากใบโอนระหว่างคลัง (TR) — แหล่งงานไม่ใช่ SO
+PICKS.push(seedAudit(mkPick({ code: 'PICK-2026-0889', wh: 'WH-01', srcType: 'TRANSFER', sos: ['TR-2026-0012'], assignee: 'ปรียา ศรีสมบัติ', status: 'assigned', priority: 'normal', note: 'โอนนม UHT ไป WH-02 (chiller) รถออก 16:00', createdBy: 'สมชาย ใจดี', createdAt: '2026-08-15T14:00:00', updatedAt: '2026-08-15T14:05:00', lines: [{ id: 'PLt1', so: 'TR-2026-0012', soLine: null, pid: 'FG-1001', name: 'น้ำดื่ม CUBE 600 มล.', unit: 'ลัง 48', factor: 48, bal: 'B004', loc: 'L020', lot: 'LOT-2608B', exp: '2027-07-31', qty: 2400, picked: 0, status: 'pending', rule: 'FEFO' }] }), [{ act: 'มอบหมาย ปรียา ศรีสมบัติ · แฮนด์ลิฟต์', by: 'สมชาย ใจดี', at: '2026-08-15T14:05:00' }]));
+BAL.find(b => b.id === 'B004').alloc += 2400;
+const TR_BY = { 'TR-2026-0012': { code: 'TR-2026-0012', from: 'WH-01', to: 'WH-02', reason: 'เติมสต๊อกคลังภาคเหนือ', due: '2026-08-16' } };
+function refLabel(code) { if (SO_BY[code]) return { type: 'SO', name: CUSTS[SO_BY[code].customer], sub: 'ส่ง ' + SO_BY[code].deliveryDate }; if (TR_BY[code]) return { type: 'TRANSFER', name: TR_BY[code].from + ' → ' + TR_BY[code].to, sub: TR_BY[code].reason }; return { type: 'OTHER', name: code, sub: '' }; }
+function findPick(id) { return PICKS.find(x => x.id === id); }
+function nextCode() { let mx = 891; PICKS.forEach(p => { const m = /PICK-2026-(\d+)/.exec(p.code); if (m) mx = Math.max(mx, +m[1]); }); return 'PICK-2026-' + String(mx + 1).padStart(4, '0'); }
+function pickProgress(p) { const tot = p.lines.reduce((s, l) => s + l.qty, 0); const done = p.lines.reduce((s, l) => s + (l.picked || 0), 0); const shortN = p.lines.filter(l => l.status === 'short').length; return { tot, done, pct: tot ? Math.round(done / tot * 100) : 0, lines: p.lines.length, doneLines: p.lines.filter(l => ['picked', 'short'].includes(l.status)).length, shortN }; }
+const PST = { draft: ['ร่าง', 'draft'], assigned: ['มอบหมายแล้ว', 'pending'], in_progress: ['กำลังหยิบ', 'sent'], picked: ['หยิบครบ', 'approved'], to_pack: ['ส่ง Packing แล้ว', 'approved'], on_hold: ['พัก', 'pending'], cancelled: ['ยกเลิก', 'cancelled'] };
+
+
+// ============================================================ UI (PO idiom)
+const state = { view: 'queue', filters: { search: '', status: 'all', wh: 'all', assignee: 'all', gate: 'all' }, sel: {}, pagination: { page: 1, pageSize: 25 } };
+function formatThaiDate(d) { if (!d) return '-'; const [y, m, day] = String(d).slice(0, 10).split('-').map(Number); return `${day}/${m}/${y + 543}`; }
+function fdt(s) { if (!s) return '-'; const d = new Date(s); return formatThaiDate(s.slice(0, 10)) + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+function showToast(message, type = 'success') { const colors = { success: 'var(--c-teal)', error: 'var(--c-danger)', warning: 'var(--c-warning)', info: 'var(--c-primary)' }; const icons = { success: 'check-circle-2', error: 'x-circle', warning: 'alert-triangle', info: 'info' }; const t = document.createElement('div'); t.className = 'animate-slide-in'; t.style.cssText = `background: ${colors[type]}; color: white; padding: 10px 14px; border-radius: var(--r); box-shadow: var(--sh-lg); display: flex; align-items: center; gap: 10px; min-width: 280px; font-size: 13px;`; t.innerHTML = `<i data-lucide="${icons[type]}" class="w-4 h-4"></i><span>${message}</span>`; document.getElementById('toast-root').appendChild(t); renderIcons(); setTimeout(() => { t.style.transition = 'opacity 200ms'; t.style.opacity = '0'; setTimeout(() => t.remove(), 200); }, 2800); }
+function pushAudit(p, act, note) { p.audit = [{ act, by: ME.name, at: nowIso(), note: note || '' }].concat(p.audit || []); p.updatedBy = ME.name; p.updatedAt = nowIso(); }
+function switchPersona(i) { Object.assign(ME, PERSONAS[+i]); document.getElementById('uc-n').textContent = ME.name; document.getElementById('uc-r').textContent = ME.roleLabel + ' · CUBE 4.0'; document.getElementById('uc-av').textContent = ME.initials; showToast('สลับบทบาทเป็น ' + ME.roleLabel + ' (เดโม)', 'info'); render(); }
+function pill(k, cls) { return `<span class="pill ${cls}">${k}</span>`; }
+function pickPill(st) { const m = PST[st] || [st, 'draft']; return pill(m[0], m[1]); }
+function empChip(name, small) { const e = EMP_BY_NAME[name]; if (!name) return `<span class="emp-chip is-empty ${small ? 'sm' : ''}"><span class="emp-av"><i data-lucide="user" class="w-3 h-3"></i></span><span class="emp-t"><span class="emp-r">ผู้หยิบ</span><span class="emp-n" style="color:var(--c-text-soft);">ยังไม่มอบหมาย</span></span></span>`; return `<span class="emp-chip ${small ? 'sm' : ''}"><span class="emp-av">${e ? e.initials : name.slice(0, 2)}</span><span class="emp-t"><span class="emp-r">${e ? e.role : ''}</span><span class="emp-n">${name}</span></span></span>`; }
+const canManage = () => ['wh_lead'].includes(ME.role); const canPick = (p) => ME.role === 'wh_lead' || (ME.role === 'picker' && p.assignee === ME.name);
+const PRIO = { high: ['ด่วน', 'rejected'], normal: ['ปกติ', 'draft'], low: ['ต่ำ', 'draft'] };
+function gatePill(so) { const g = gate(so); if (g.ok) { const s = soPickStatus(so); return { queue: pill('พร้อมหยิบ', 'approved'), picking: pill('มีใบหยิบค้าง', 'sent'), partial: pill('หยิบบางส่วน · เหลือคิว', 'pending'), done: pill('หยิบครบแล้ว', 'draft'), none: pill('ไม่มีสินค้า', 'draft') }[s]; } return g.kind === 'hold' ? pill('พัก (hold)', 'pending') : pill('รอชำระก่อนส่ง', 'rejected'); }
+// ---------------- ROUTER / BOOT ----------------
+function getRoute() { const h = location.hash.slice(2); if (!h) return { name: 'list' }; const p = h.split('/'); if (p[0] === 'create') return { name: 'create', from: p.slice(1).join('/') }; if (p[0] === 'view' && p[1]) return { name: 'view', id: p[1] }; return { name: 'list' }; }
+function navigate(path) { location.hash = '#/' + path; }
+window.addEventListener('hashchange', render); let __booted = false;
+function boot() { if (__booted) return; __booted = true; try { render(); } catch (e) { document.getElementById('page-content').innerHTML = '<div style="padding:32px;color:#EF4444;">Boot error: ' + (e.message || e) + '</div>'; } }
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+function render() { const route = getRoute(); document.getElementById('page-content').innerHTML = renderListPage(); closeAllOverlays(); if (route.name === 'create') openCreateDrawer(route.from); else if (route.name === 'view') openViewDrawer(route.id); requestAnimationFrame(renderIcons); }
+function closeAllOverlays() { document.getElementById('overlay-root').innerHTML = ''; }
+document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; const m = document.querySelector('.modal-overlay'); if (m) { m.remove(); return; } if (document.getElementById('create-drawer')) closeCreateDrawer(); else if (document.getElementById('view-drawer')) closeViewDrawer(); });
+// ---------------- LIST ----------------
+function queueRows() { let rows = SOS.filter(s => soPickStatus(s) !== 'done'); const f = state.filters; const q = f.search.toLowerCase(); if (q) rows = rows.filter(s => (s.code + ' ' + CUSTS[s.customer] + ' ' + s.shipTo + ' ' + s.lines.map(l => l.item_name).join(' ')).toLowerCase().includes(q)); if (f.wh !== 'all') rows = rows.filter(s => s.wh === f.wh); if (f.gate === 'ready') rows = rows.filter(s => gate(s).ok && soPickStatus(s) === 'queue'); else if (f.gate === 'locked') rows = rows.filter(s => !gate(s).ok); else if (f.gate === 'picking') rows = rows.filter(s => ['picking', 'partial'].includes(soPickStatus(s))); rows.sort((a, b) => (a.deliveryDate > b.deliveryDate ? 1 : -1)); return rows; }
+function pickRows() { let rows = PICKS.slice(); const f = state.filters; const q = f.search.toLowerCase(); if (q) rows = rows.filter(p => (p.code + ' ' + p.sos.join(' ') + ' ' + (p.assignee || '') + ' ' + p.lines.map(l => l.name).join(' ')).toLowerCase().includes(q)); if (f.status === 'open') rows = rows.filter(p => ['draft', 'assigned', 'in_progress', 'on_hold'].includes(p.status)); else if (f.status !== 'all') rows = rows.filter(p => p.status === f.status); if (f.wh !== 'all') rows = rows.filter(p => p.wh === f.wh); if (f.assignee === 'me') rows = rows.filter(p => p.assignee === ME.name); else if (f.assignee !== 'all') rows = rows.filter(p => p.assignee === f.assignee); rows.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1)); return rows; }
+function renderListPage() { const ready = SOS.filter(s => gate(s).ok && soPickStatus(s) === 'queue').length; const locked = SOS.filter(s => !gate(s).ok).length; const open = PICKS.filter(p => ['draft', 'assigned', 'in_progress', 'on_hold'].includes(p.status)).length; const mine = PICKS.filter(p => p.assignee === ME.name && ['assigned', 'in_progress'].includes(p.status)).length; const nSel = Object.keys(state.sel).filter(k => state.sel[k]).length;
+  return `
+    <div class="ph"><div class="ph-left"><h1 class="ph-title">ใบหยิบสินค้า (Picking)</h1><div class="ph-sub">รับงานจากใบสั่งขายที่ยืนยันและปล่อยแล้ว → จัดสรรตำแหน่ง/ล็อต (FEFO) → มอบหมาย → หยิบ → ส่งต่อ Packing <span style="margin-left: 6px; padding: 2px 8px; border-radius: 999px; background: var(--c-off-white); font-size: 11px; font-weight: 600; color: var(--c-text-mute);">คิวพร้อมหยิบ ${ready} · รอปล่อย ${locked} · ใบหยิบเปิดอยู่ ${open}${ME.role === 'picker' ? ' · งานของฉัน ' + mine : ''}</span></div></div>
+      <div class="ph-right">${state.view === 'queue' && canManage() ? `<button onclick="createFromSel()" class="btn btn-primary" ${nSel ? '' : 'disabled'}><i data-lucide="plus" class="w-4 h-4"></i><span>สร้างใบหยิบ${nSel ? ' (' + nSel + ' SO)' : ''}</span></button>` : ''}${state.view === 'picks' ? `<button onclick="exportCSV()" class="btn btn-secondary"><i data-lucide="download" class="w-4 h-4"></i><span>ส่งออก CSV</span></button>` : ''}</div></div>
+    <div class="tabs" style="margin-bottom: 14px;"><button class="tab ${state.view === 'queue' ? 'on' : ''}" onclick="state.view='queue'; state.pagination.page=1; render();"><i data-lucide="inbox" class="w-4 h-4"></i>คิวรอหยิบ (SO) <span style="margin-left:4px;font-size:11px;padding:1px 6px;border-radius:999px;background:var(--c-off-white);">${SOS.filter(s => soPickStatus(s) !== 'done').length}</span></button><button class="tab ${state.view === 'picks' ? 'on' : ''}" onclick="state.view='picks'; state.pagination.page=1; render();"><i data-lucide="hand" class="w-4 h-4"></i>ใบหยิบ <span style="margin-left:4px;font-size:11px;padding:1px 6px;border-radius:999px;background:var(--c-off-white);">${PICKS.length}</span></button></div>
+    <div class="card" style="margin-bottom: 14px;"><div class="card-body" style="padding: 12px 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+      <div style="position: relative; flex: 1; min-width: 240px; max-width: 380px;"><i data-lucide="search" class="w-4 h-4" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--c-text-soft);"></i><input type="text" id="searchInput" value="${state.filters.search}" placeholder="${state.view === 'queue' ? 'ค้นหาเลข SO / ลูกค้า / ที่อยู่ / สินค้า...' : 'ค้นหาเลขใบหยิบ / SO / ผู้หยิบ / สินค้า...'}" oninput="state.filters.search=this.value; renderTableOnly();" class="input" style="padding-left: 32px;"></div>
+      <select onchange="state.filters.wh=this.value; renderTableOnly();" class="select" style="width: 190px;"><option value="all">ทุกคลัง</option>${Object.values(WAREHOUSES).map(w => `<option value="${w.code}" ${state.filters.wh === w.code ? 'selected' : ''}>${w.code} · ${w.name}</option>`).join('')}</select>
+      ${state.view === 'queue' ? `<select onchange="state.filters.gate=this.value; renderTableOnly();" class="select" style="width: 190px;"><option value="all">ทุกสถานะคิว</option><option value="ready" ${state.filters.gate === 'ready' ? 'selected' : ''}>พร้อมหยิบ</option><option value="picking" ${state.filters.gate === 'picking' ? 'selected' : ''}>มีใบหยิบ / หยิบบางส่วน</option><option value="locked" ${state.filters.gate === 'locked' ? 'selected' : ''}>รอปล่อย (ชำระ/พัก)</option></select>` : `<select onchange="state.filters.status=this.value; renderTableOnly();" class="select" style="width: 170px;">${[['all', 'สถานะทั้งหมด'], ['open', 'เปิดอยู่'], ['draft', 'ร่าง'], ['assigned', 'มอบหมายแล้ว'], ['in_progress', 'กำลังหยิบ'], ['picked', 'หยิบครบ'], ['to_pack', 'ส่ง Packing แล้ว'], ['on_hold', 'พัก'], ['cancelled', 'ยกเลิก']].map(x => `<option value="${x[0]}" ${state.filters.status === x[0] ? 'selected' : ''}>${x[1]}</option>`).join('')}</select><select onchange="state.filters.assignee=this.value; renderTableOnly();" class="select" style="width: 170px;"><option value="all">ทุกผู้หยิบ</option><option value="me" ${state.filters.assignee === 'me' ? 'selected' : ''}>งานของฉัน</option>${PEOPLE.filter(p => p.role !== 'หัวหน้าคลัง').map(p => `<option value="${p.name}" ${state.filters.assignee === p.name ? 'selected' : ''}>${p.name}</option>`).join('')}</select>`}
+      <button onclick="state.filters={ search: '', status: 'all', wh: 'all', assignee: 'all', gate: 'all' }; render();" class="btn btn-ghost sm"><i data-lucide="x" class="w-3.5 h-3.5"></i><span>รีเซ็ต</span></button></div></div>
+    <div class="card"><div style="overflow-x: auto;"><table class="tbl" id="main-table"><thead>${state.view === 'queue' ? `<tr><th style="width:36px;"></th><th>ใบสั่งขาย</th><th>ลูกค้า · ที่ส่ง</th><th>คลัง</th><th>กำหนดส่ง</th><th>วิธีรับ</th><th style="text-align:right;">รายการ (สินค้า)</th><th style="text-align:right;">คงเหลือต้องหยิบ (หน่วยฐาน)</th><th style="text-align:center;">สถานะคิว</th><th style="text-align:center;">Priority</th><th style="width:60px;"></th></tr>` : `<tr><th>เลขที่</th><th>ประเภท · อ้างอิง</th><th>คลัง</th><th>ผู้หยิบ</th><th>ความคืบหน้า</th><th style="text-align:center;">Priority</th><th>กำหนดส่งเร็วสุด</th><th style="text-align:center;">สถานะ</th><th>อัพเดต</th><th style="width:50px;"></th></tr>`}</thead><tbody id="table-body">${renderRows()}</tbody></table></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-top: 1px solid var(--c-border-soft); background: var(--c-off-white); font-size: 12px; color: var(--c-text-mute);"><div id="pagination-info">${state.view === 'queue' ? queueRows().length + ' SO ในคิว' : pickRows().length + ' ใบหยิบ'}</div><div>${state.view === 'queue' ? 'เลือก SO หลายใบ = สร้างใบหยิบรวม (wave) · SO ที่รอชำระ/พัก เลือกไม่ได้' : ''}</div></div></div>`; }
+function renderRows() { if (state.view === 'queue') { const rows = queueRows(); if (!rows.length) return `<tr><td colspan="11" style="padding: 48px 16px; text-align: center; color: var(--c-text-soft);"><i data-lucide="inbox" class="w-10 h-10"></i><div style="font-size: 13px;">ไม่มี SO ในคิว</div></td></tr>`;
+    return rows.map(so => { const g = gate(so); const st = soPickStatus(so); const rem = soRemaining(so); const canSel = g.ok && ['queue', 'partial'].includes(st) && rem > 0; return `<tr onclick="openSoModal('${so.code}')" style="${!g.ok ? 'opacity:.75;' : ''}">
+      <td onclick="event.stopPropagation()" style="text-align:center;"><input type="checkbox" class="chk" ${canSel ? '' : 'disabled'} ${state.sel[so.code] ? 'checked' : ''} onchange="state.sel['${so.code}']=this.checked; render();"></td>
+      <td class="tbl-name tbl-mono" style="white-space:nowrap;">${so.code}</td><td><div style="font-weight:600;">${CUSTS[so.customer]}</div><div class="tbl-meta">${so.shipTo}</div></td><td class="tbl-mono">${so.wh}</td><td style="white-space:nowrap; color:${so.deliveryDate < TODAY_ISO ? 'var(--c-danger)' : 'var(--c-text-mute)'};">${formatThaiDate(so.deliveryDate)}${so.deliveryDate < TODAY_ISO ? ' <span style="font-size:10.5px;">(เลย)</span>' : ''}</td><td>${so.method === 'pickup' ? '<span class="pill draft">มารับเอง</span>' : 'จัดส่ง'}</td><td class="tbl-num">${soPickable(so).length}${so.lines.length > soPickable(so).length ? ` <span style="font-size:10.5px;color:var(--c-text-soft);">+บริการ ${so.lines.length - soPickable(so).length}</span>` : ''}</td><td class="tbl-num" style="font-weight:600;">${fmi(rem)}${soPickable(so).some(l => l.backorder) ? ` <span class="pill pending" style="margin-left:4px;">backorder ${fmi(soPickable(so).reduce((s, l) => s + l.backorder, 0))}</span>` : ''}</td><td style="text-align:center;">${gatePill(so)}${!g.ok ? `<div class="tbl-meta">${g.why}</div>` : ''}</td><td style="text-align:center;">${pill(PRIO[so.priority][0], PRIO[so.priority][1])}</td>
+      <td onclick="event.stopPropagation()" style="text-align:right;">${!g.ok && g.kind === 'pay' ? `<button class="btn btn-ghost sm" title="Finance ยืนยันรับเงิน (mock)" onclick="mockPay('${so.code}')"><i data-lucide="wallet" class="w-3.5 h-3.5"></i></button>` : ''}${canSel && canManage() ? `<button class="btn btn-ghost sm" title="สร้างใบหยิบ" onclick="navigate('create/${so.code}')"><i data-lucide="plus" class="w-3.5 h-3.5"></i></button>` : ''}</td></tr>`; }).join(''); }
+  const rows = pickRows(); if (!rows.length) return `<tr><td colspan="10" style="padding: 48px 16px; text-align: center; color: var(--c-text-soft);"><i data-lucide="inbox" class="w-10 h-10"></i><div style="font-size: 13px;">ไม่พบใบหยิบ</div></td></tr>`;
+  return rows.map(p => { const pr = pickProgress(p); const dl = p.sos.map(c => SO_BY[c] ? SO_BY[c].deliveryDate : (TR_BY[c] || {}).due).filter(Boolean).sort()[0]; return `<tr onclick="navigate('view/${p.id}')"><td class="tbl-name tbl-mono" style="white-space:nowrap;">${p.code}${p.sos.length > 1 ? ' <span class="pill draft" style="font-size:10px;">wave ' + p.sos.length + '</span>' : ''}</td><td><span class="pill ${(SRC_TYPES[p.srcType] || SRC_TYPES.SO)[1]}" style="margin-right:6px;">${(SRC_TYPES[p.srcType] || SRC_TYPES.SO)[0]}</span>${p.sos.map(c => `<span class="tbl-mono" style="color:var(--c-primary);font-size:11.5px;">${c}</span>`).join(', ')}</td><td class="tbl-mono">${p.wh}</td><td>${p.assignee ? empChip(p.assignee, true) : '<span style="color:var(--c-text-soft);">-</span>'}</td><td style="min-width:150px;"><div style="display:flex;align-items:center;gap:8px;"><div class="prog" style="flex:1;"><div class="${pr.shortN ? 'warn' : ''}" style="width:${pr.pct}%;"></div></div><span style="font-size:11px;color:var(--c-text-mute);white-space:nowrap;">${pr.doneLines}/${pr.lines} บรรทัด${pr.shortN ? ' · ขาด ' + pr.shortN : ''}</span></div></td><td style="text-align:center;">${pill(PRIO[p.priority][0], PRIO[p.priority][1])}</td><td style="white-space:nowrap;color:var(--c-text-mute);">${formatThaiDate(dl)}</td><td style="text-align:center;">${pickPill(p.status)}</td><td style="white-space:nowrap;color:var(--c-text-mute);">${fdt(p.updatedAt)}</td><td onclick="event.stopPropagation()" style="text-align:right;"><button class="btn btn-ghost sm" onclick="navigate('view/${p.id}')"><i data-lucide="eye" class="w-4 h-4"></i></button></td></tr>`; }).join(''); }
+function renderTableOnly() { document.getElementById('table-body').innerHTML = renderRows(); renderIcons(); }
+function createFromSel() { const codes = Object.keys(state.sel).filter(k => state.sel[k]); if (!codes.length) return; navigate('create/' + codes.join(',')); }
+function mockPay(code) { const so = SO_BY[code]; so.paid = so.trigger === 'after_deposit' ? so.total * 0.5 : so.total; showToast(`Finance บันทึกรับเงิน ${code} — ปล่อยเข้าคิวหยิบ (ENG-NOTIFY so.released)`, 'success'); render(); }
+function exportCSV() { const head = 'pick_no,so,wh,assignee,status,lines,done,priority'; const lines = pickRows().map(p => { const pr = pickProgress(p); return [p.code, '"' + p.sos.join('|') + '"', p.wh, p.assignee || '', p.status, pr.lines, pr.doneLines, p.priority].join(','); }); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + [head].concat(lines).join('\n')], { type: 'text/csv;charset=utf-8;' })); a.download = 'picks.csv'; document.body.appendChild(a); a.click(); a.remove(); }
+// ---------------- SO quick modal (from queue) ----------------
+function modalShell(inner) { const m = document.createElement('div'); m.className = 'modal-overlay'; m.innerHTML = `<div class="backdrop" onclick="this.parentElement.remove();"></div>${inner}`; document.body.appendChild(m); renderIcons(); return m; }
+function closeModal() { document.querySelectorAll('.modal-overlay').forEach(n => n.remove()); }
+function openSoModal(code) { const so = SO_BY[code]; const g = gate(so); const st = soPickStatus(so); const picks = PICKS.filter(p => p.sos.includes(code)); closeModal(); modalShell(`<div class="card" style="position: relative; max-width: 760px; width: 100%; box-shadow: var(--sh-xl);"><div style="padding: 18px; border-bottom: 1px solid var(--c-border-soft); display: flex; align-items: flex-start; gap: 12px;"><div style="width: 40px; height: 40px; border-radius: 50%; background: var(--c-primary-08); display: grid; place-items: center; flex-shrink: 0;"><i data-lucide="shopping-cart" class="w-5 h-5" style="color: var(--c-primary);"></i></div><div style="flex:1;"><h3 style="font-size: 14px; font-weight: 700; color: var(--c-navy);">${so.code} · ${CUSTS[so.customer]} ${gatePill(so)}</h3><p style="font-size: 13px; margin-top: 4px; color: var(--c-text-mute);">ส่ง ${formatThaiDate(so.deliveryDate)} · ${so.method === 'pickup' ? 'ลูกค้ามารับเอง' : so.shipTo} · คลัง ${so.wh} · เงื่อนไข ${so.term} (Warehouse: ${{ immediate: 'ทันที', after_deposit: 'หลังมัดจำ', after_full: 'หลังชำระเต็ม' }[so.trigger]})${!g.ok ? ' · <span style="color:var(--c-danger);font-weight:600;">' + g.why + '</span>' : ''}</p></div><button onclick="closeModal()" class="top-icon-btn"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+    <div style="padding: 0;"><table class="tbl" style="font-size:12.5px;"><thead><tr><th>สินค้า</th><th style="text-align:right;">สั่ง</th><th style="text-align:right;">จอง (ฐาน)</th><th style="text-align:right;">หยิบแล้ว</th><th style="text-align:right;">ในใบหยิบ</th><th style="text-align:right;">คงเหลือ</th><th style="text-align:right;">Backorder</th><th style="text-align:right;">ATP คลัง</th></tr></thead><tbody>${so.lines.map(l => { if (isService(l.item_code)) return `<tr><td>${l.item_name} <span class="pill draft">บริการ</span></td><td class="tbl-num">${fmi(l.qty)} ${l.unit}</td><td colspan="6" style="color:var(--c-text-soft);">ไม่หยิบ · ตัดจ่ายเมื่อวางบิล</td></tr>`; const op = openPickQty(so.code, l.id); const rem = Math.max(0, l.reserved - l.picked - op); return `<tr><td><span style="font-weight:600;">${l.item_name}</span>${l.is_free ? ' <span class="pill approved">ของแถม</span>' : ''}<div class="tbl-meta">${l.item_code}</div></td><td class="tbl-num">${fmi(l.qty)} ${l.unit}</td><td class="tbl-num">${fmi(l.reserved)}</td><td class="tbl-num" style="color:var(--c-teal);font-weight:600;">${fmi(l.picked)}</td><td class="tbl-num">${op ? fmi(op) : '-'}</td><td class="tbl-num" style="font-weight:600;">${fmi(rem)}</td><td class="tbl-num" style="color:${l.backorder ? 'var(--c-warning)' : 'inherit'};">${l.backorder ? fmi(l.backorder) : '-'}</td><td class="tbl-num">${fmi(whAvail(l.item_code, so.wh))}</td></tr>`; }).join('')}</tbody></table></div>
+    ${picks.length ? `<div style="padding: 10px 18px; border-top: 1px solid var(--c-border-soft); font-size: 12.5px;">ใบหยิบที่เกี่ยวข้อง: ${picks.map(p => `<a href="#" onclick="event.preventDefault(); closeModal(); navigate('view/${p.id}')" style="color:var(--c-primary);font-weight:600;" class="tbl-mono">${p.code}</a> ${pickPill(p.status)}`).join(' · ')}</div>` : ''}
+    <div style="padding: 12px 18px; background: var(--c-off-white); border-top: 1px solid var(--c-border-soft); display: flex; align-items: center; justify-content: flex-end; gap: 8px; border-radius: 0 0 var(--r-lg) var(--r-lg);"><span style="margin-right:auto;font-size:11.5px;color:var(--c-text-mute);">ข้อมูลจาก F-SALES-SO (read-only) · เปิด SO ในโมดูลใบสั่งขาย</span><button onclick="closeModal()" class="btn btn-ghost">ปิด</button>${g.ok && ['queue', 'partial'].includes(st) && soRemaining(so) > 0 && canManage() ? `<button onclick="closeModal(); navigate('create/${so.code}')" class="btn btn-primary"><i data-lucide="plus" class="w-4 h-4"></i><span>สร้างใบหยิบ</span></button>` : ''}</div></div>`); }
+
+// ---- ผู้หยิบ: search dropdown (avatar · ชื่อ · ตำแหน่ง · งานค้าง · badge เกิน) ----
+const WORKLOAD_MAX = 4;
+function workload(name) { return PICKS.filter(x => x.assignee === name && ['assigned', 'in_progress'].includes(x.status)).length; }
+function assigneeCombo(key, value, onPick) { const e = value ? EMP_BY_NAME[value] : null; window.__cbPick = window.__cbPick || {}; window.__cbPick[key] = onPick; return `<div style="position: relative;">${e ? `<div style="display:flex;align-items:center;gap:10px;height:38px;padding:0 10px;border:1px solid var(--c-border);border-radius:var(--r);background:#fff;"><span class="emp-av" style="width:26px;height:26px;font-size:10px;">${e.initials}</span><div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--c-navy);">${e.name}</div><div style="font-size:11px;color:var(--c-text-mute);">${e.role} · งานค้าง ${workload(e.name)}</div></div>${workload(e.name) >= WORKLOAD_MAX ? '<span class="pill rejected">เกิน</span>' : ''}<button class="btn btn-ghost sm" style="height:26px;padding:0 6px;" onclick="__cbPick['${key}']('')"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div>` : `<i data-lucide="search" class="w-3.5 h-3.5" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--c-text-soft);"></i><input type="text" id="cbi-${key}" autocomplete="off" placeholder="ค้นหาชื่อ / ตำแหน่ง / แผนก…" class="input" style="padding-left: 30px;" onfocus="cbOpen('${key}', '')" oninput="cbOpen('${key}', this.value)" onkeydown="cbKey(event, '${key}')">`}</div>`; }
+const cbState = { key: null, list: [], hi: 0 };
+function cbOpen(key, q) { document.querySelectorAll('.combo-pop').forEach(n => n.remove()); const input = document.getElementById('cbi-' + key); if (!input) return; q = (q || '').toLowerCase().trim(); cbState.key = key; cbState.list = PEOPLE.filter(p => p.role !== 'หัวหน้าคลัง' && (!q || (p.name + ' ' + p.role + ' ' + p.code).toLowerCase().includes(q))).map(p => ({ p, wl: workload(p.name) })).sort((a, b) => a.wl - b.wl); cbState.hi = 0; const rect = input.getBoundingClientRect(); const pop = document.createElement('div'); pop.className = 'combo-pop'; pop.id = 'combo-pop'; const up = window.innerHeight - rect.bottom < 300; pop.style.cssText = `left:${rect.left}px;width:${Math.max(rect.width, 340)}px;${up ? 'bottom:' + (window.innerHeight - rect.top + 2) + 'px;' : 'top:' + (rect.bottom + 2) + 'px;'}`; document.body.appendChild(pop); cbPaint(); const close = ev => { if (!pop.contains(ev.target) && ev.target !== input) { pop.remove(); document.removeEventListener('click', close); } }; setTimeout(() => document.addEventListener('click', close), 0); }
+function cbPaint() { const pop = document.getElementById('combo-pop'); if (!pop) return; pop.innerHTML = cbState.list.length ? cbState.list.map((it, k) => `<button type="button" class="${k === cbState.hi ? 'hi' : ''}" onmousedown="event.preventDefault()" onclick="cbPick('${cbState.key}','${it.p.name}')"><span class="emp-av" style="width:32px;height:32px;font-size:11px;">${it.p.initials}</span><div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--c-navy);display:flex;align-items:center;gap:6px;">${it.p.name}${it.wl === 0 ? ' <i data-lucide="star" class="w-3 h-3" style="color:var(--c-warning);"></i>' : ''}</div><div style="font-size:11px;color:var(--c-text-mute);">${it.p.role} · คลัง${WAREHOUSES['WH-01'].name.replace('คลัง', '')} · ${it.wl} งานค้าง</div></div>${it.wl >= WORKLOAD_MAX ? '<span class="pill rejected">เกิน</span>' : ''}</button>`).join('') : '<div style="padding:10px 12px;font-size:12px;color:var(--c-text-soft);">ไม่พบพนักงาน</div>'; renderIcons(); }
+function cbKey(e, key) { if (cbState.key !== key || !document.getElementById('combo-pop')) return; if (e.key === 'ArrowDown') { cbState.hi = Math.min(cbState.hi + 1, cbState.list.length - 1); cbPaint(); e.preventDefault(); } else if (e.key === 'ArrowUp') { cbState.hi = Math.max(cbState.hi - 1, 0); cbPaint(); e.preventDefault(); } else if (e.key === 'Enter') { const it = cbState.list[cbState.hi]; if (it) cbPick(key, it.p.name); e.preventDefault(); } else if (e.key === 'Escape') { document.querySelectorAll('.combo-pop').forEach(n => n.remove()); e.stopPropagation(); } }
+function cbPick(key, name) { document.querySelectorAll('.combo-pop').forEach(n => n.remove()); const fn = (window.__cbPick || {})[key]; if (fn) fn(name); }
+
+// ---------------- CREATE WIZARD (3 ขั้น) ----------------
+const wiz = { step: 1, data: null };
+function openCreateDrawer(from) { const codes = (from || '').split(',').filter(Boolean).filter(c => SO_BY[c] && gate(SO_BY[c]).ok && soRemaining(SO_BY[c]) > 0); if (!canManage()) { showToast('เฉพาะหัวหน้าคลังสร้างใบหยิบ', 'warning'); navigate('list'); return; } wiz.step = codes.length ? 2 : 1; wiz.data = { sos: codes, wh: codes.length ? SO_BY[codes[0]].wh : 'WH-01', strategy: 'AUTO', split: 'wave', assignee: '', equipment: EQUIPMENT[0], priority: codes.some(c => SO_BY[c].priority === 'high') ? 'high' : 'normal', note: '', lines: [] }; if (codes.length) recompute(); const overlay = document.getElementById('overlay-root'); overlay.innerHTML = `<div class="overlay-wrap"><div class="backdrop" onclick="closeCreateDrawer()"></div><div id="create-drawer" class="drawer-panel wide drawer-enter"><div id="create-drawer-content" style="display: flex; flex-direction: column; height: 100%;"></div></div></div>`; requestAnimationFrame(() => document.getElementById('create-drawer').classList.add('drawer-active')); renderCreateDrawer(); }
+function closeCreateDrawer() { const d = document.getElementById('create-drawer'); if (d) { d.classList.remove('drawer-active'); d.classList.add('drawer-enter'); } setTimeout(() => { document.getElementById('overlay-root').innerHTML = ''; if (getRoute().name === 'create') navigate('list'); }, 200); }
+function recompute() { const d = wiz.data; let acc = []; d.sos.forEach(c => { acc = acc.concat(allocateSO(SO_BY[c], 'AUTO', acc)); }); d.lines = routeSort(acc); }
+function stepItem(n, label) { const s = wiz.step; const cls = s === n ? 'active' : s > n ? 'done' : ''; return `<div class="stepper-item ${cls}" ${s > n ? `onclick="wiz.step=${n}; renderCreateDrawer();" style="cursor:pointer;"` : ''}><div class="stepper-circle">${s > n ? '<i data-lucide="check" class="w-4 h-4"></i>' : n}</div><div class="stepper-label">${label}</div></div>`; }
+const STEPH = (ico, title, hint) => `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: ${hint ? '6px' : '14px'};"><i data-lucide="${ico}" class="w-4 h-4" style="color: var(--c-text-mute);"></i><div style="font-size: 13px; font-weight: 600; color: var(--c-navy);">${title}</div></div>${hint ? `<div style="font-size: 11.5px; margin-bottom: 18px; margin-left: 24px; color: var(--c-text-mute);"><i data-lucide="info" class="w-3 h-3 inline"></i> ${hint}</div>` : ''}`;
+function renderCreateDrawer() { const c = document.getElementById('create-drawer-content'); if (!c) return; const s = wiz.step; const d = wiz.data;
+  c.innerHTML = `<div style="padding: 18px 24px 16px; border-bottom: 1px solid var(--c-border-soft); flex-shrink: 0;"><div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;"><div><div style="display: flex; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-text-mute); margin-bottom: 4px;"><i data-lucide="file-plus" class="w-3.5 h-3.5"></i> สร้างเอกสารใหม่</div><h2 style="font-size: 20px; font-weight: 700; color: var(--c-navy);">สร้างใบหยิบสินค้า${d.sos.length > 1 ? ' (wave ' + d.sos.length + ' SO)' : d.sos.length ? ' — ' + d.sos[0] : ''}</h2></div><button onclick="closeCreateDrawer()" class="top-icon-btn"><i data-lucide="x" class="w-5 h-5"></i></button></div><div class="stepper" style="margin-top: 18px;">${stepItem(1, 'เลือกใบสั่งขาย')}${stepItem(2, 'มอบหมายงาน')}${stepItem(3, 'ตรวจสอบรายการหยิบ')}</div></div>
+    <div style="flex: 1; overflow-y: auto; padding: 22px 24px;">${s === 1 ? step1() : s === 2 ? step2() : step3()}</div>
+    <div style="padding: 14px 24px; border-top: 1px solid var(--c-border-soft); background: var(--c-off-white); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;"><div>${s > 1 ? `<button onclick="wiz.step--; renderCreateDrawer();" class="btn btn-secondary"><i data-lucide="chevron-left" class="w-4 h-4"></i><span>ย้อนกลับ</span></button>` : ''}</div><div style="display: flex; align-items: center; gap: 8px;"><button onclick="closeCreateDrawer()" class="btn btn-ghost">ยกเลิก</button>${s < 3 ? `<button onclick="wizNext()" class="btn btn-primary"><span>ถัดไป</span><i data-lucide="chevron-right" class="w-4 h-4"></i></button>` : `<button onclick="savePick(false)" class="btn btn-secondary"><i data-lucide="save" class="w-4 h-4"></i><span>บันทึกร่าง</span></button><button onclick="savePick(true)" class="btn btn-primary" ${d.assignee ? '' : 'disabled title="เลือกผู้หยิบก่อน"'}><i data-lucide="user-check" class="w-4 h-4"></i><span>บันทึกและมอบหมาย</span></button>`}</div></div>`; renderIcons(); }
+function step1() { const d = wiz.data; const rows = SOS.filter(s => gate(s).ok && ['queue', 'partial'].includes(soPickStatus(s)) && soRemaining(s) > 0); return `${STEPH('shopping-cart', 'เลือกใบสั่งขายที่พร้อมหยิบ', 'เลือกได้หลายใบในคลังเดียวกัน = ใบหยิบรวม (wave) · SO ที่รอชำระ/พัก/หยิบครบแล้ว ไม่แสดง')}<div class="card"><table class="tbl" style="font-size:12.5px;"><thead><tr><th style="width:36px;"></th><th>SO</th><th>ลูกค้า</th><th>คลัง</th><th>กำหนดส่ง</th><th style="text-align:right;">รายการ</th><th style="text-align:right;">คงเหลือต้องหยิบ</th><th style="text-align:center;">Priority</th></tr></thead><tbody>${rows.map(so => `<tr onclick="toggleSO('${so.code}')" style="cursor:pointer;${d.sos.includes(so.code) ? 'background:var(--c-primary-08);' : ''}"><td style="text-align:center;"><input type="checkbox" class="chk" ${d.sos.includes(so.code) ? 'checked' : ''} ${d.sos.length && !d.sos.includes(so.code) && SO_BY[d.sos[0]].wh !== so.wh ? 'disabled' : ''} onclick="event.stopPropagation(); toggleSO('${so.code}')"></td><td class="tbl-mono" style="font-weight:600;color:var(--c-primary);">${so.code}</td><td>${CUSTS[so.customer]}</td><td class="tbl-mono">${so.wh}</td><td>${formatThaiDate(so.deliveryDate)}</td><td class="tbl-num">${soPickable(so).length}</td><td class="tbl-num">${fmi(soRemaining(so))}</td><td style="text-align:center;">${pill(PRIO[so.priority][0], PRIO[so.priority][1])}</td></tr>`).join('') || '<tr><td colspan="8" style="padding:24px;text-align:center;color:var(--c-text-soft);">ไม่มี SO พร้อมหยิบ</td></tr>'}</tbody></table></div>`; }
+function toggleSO(code) { const d = wiz.data; if (d.sos.includes(code)) d.sos = d.sos.filter(c => c !== code); else { if (d.sos.length && SO_BY[d.sos[0]].wh !== SO_BY[code].wh) return showToast('รวม wave ได้เฉพาะ SO คลังเดียวกัน', 'warning'); if (d.sos.length >= CFG.waveMax) return showToast('wave สูงสุด ' + CFG.waveMax + ' SO', 'warning'); d.sos.push(code); } if (d.sos.length) d.wh = SO_BY[d.sos[0]].wh; recompute(); renderCreateDrawer(); }
+function step2() { const d = wiz.data; const shortN = d.lines.filter(l => l.status === 'short').length; const locs = new Set(d.lines.filter(l => l.loc).map(l => l.loc)).size; return `${STEPH('user-check', 'มอบหมายงานหยิบ', 'ตำแหน่ง/ล็อตจัดสรรอัตโนมัติจาก master (สินค้ามีล็อต = FEFO · ไม่มี = FIFO · Pick Face ก่อน) — แก้รายบรรทัดได้ในขั้นถัดไป')}
+    <div class="card" style="margin-bottom:14px;"><div class="card-body" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px 24px;font-size:13px;"><div><div style="font-size:11px;color:var(--c-text-soft);">ใบสั่งขาย</div><div style="font-weight:600;">${d.sos.join(', ')}</div><div class="tbl-meta">${WAREHOUSES[d.wh].name}</div></div><div><div style="font-size:11px;color:var(--c-text-soft);">บรรทัดหยิบ · ตำแหน่ง</div><div style="font-weight:600;">${d.lines.length} บรรทัด · ${locs} ตำแหน่ง</div></div><div><div style="font-size:11px;color:var(--c-text-soft);">กำหนดส่งเร็วสุด</div><div style="font-weight:600;">${formatThaiDate(d.sos.map(c => SO_BY[c].deliveryDate).sort()[0])}</div></div><div><div style="font-size:11px;color:var(--c-text-soft);">สต๊อกที่หยิบได้</div><div style="font-weight:600;color:${shortN ? 'var(--c-danger)' : 'var(--c-teal)'};">${shortN ? 'ขาด ' + shortN + ' บรรทัด' : 'ครบ'}</div></div></div></div>
+    <div class="form-grid">
+    <div class="field"><label class="lbl">ผู้หยิบ <span style="font-weight:400;color:var(--c-text-soft);">(ว่างได้ = มอบหมายภายหลัง)</span></label>${assigneeCombo('wiz-asg', d.assignee, v => { wiz.data.assignee = v; renderCreateDrawer(); })}</div>
+    <div class="field"><label class="lbl">อุปกรณ์</label><select class="select" onchange="wiz.data.equipment=this.value">${EQUIPMENT.map(e => `<option ${d.equipment === e ? 'selected' : ''}>${e}</option>`).join('')}</select></div>
+    <div class="field"><label class="lbl">Priority</label><select class="select" onchange="wiz.data.priority=this.value"><option value="high" ${d.priority === 'high' ? 'selected' : ''}>ด่วน</option><option value="normal" ${d.priority === 'normal' ? 'selected' : ''}>ปกติ</option><option value="low" ${d.priority === 'low' ? 'selected' : ''}>ต่ำ</option></select></div>
+    <div class="field"><label class="lbl">หมายเหตุถึงผู้หยิบ</label><input class="input" value="${d.note}" placeholder="เช่น สินค้าแช่เย็นหยิบท้ายสุด" oninput="wiz.data.note=this.value"></div></div>`; }
+function linesTable(lines, editable, pickId) { return `<div class="card"><table class="tbl" style="font-size:12.5px;"><thead><tr><th style="width:36px;">ลำดับ</th><th>ตำแหน่ง (เส้นทาง)</th><th>สินค้า</th><th>ล็อต · หมดอายุ</th><th style="text-align:right;">จำนวน</th><th>อ้างอิง</th><th style="text-align:center;">สถานะ</th>${editable ? '<th style="width:' + (editable === 'wiz' ? '150' : '190') + 'px;"></th>' : ''}</tr></thead><tbody>${lines.map((l, i) => { const loc = l.loc ? LOCATIONS[l.loc] : null; const c = loc ? locCtx(loc) : null; const soon = l.exp && l.exp < '2026-09-30'; return `<tr style="${l.status === 'short' ? 'background:var(--c-danger-08);' : l.status === 'picked' ? 'background:var(--c-teal-08);' : ''}"><td style="text-align:center;"><span class="route-no">${i + 1}</span></td><td>${loc ? `<div style="font-weight:700;color:var(--c-navy);" class="tbl-mono">${loc.code}</div><div class="tbl-meta">${c.zone.name} › ${c.area.name}${c.rack ? ' › ' + c.rack.name : ''} · ${typeLabel(loc.type)}</div>` : '<span style="color:var(--c-danger);font-weight:600;">— ไม่มีตำแหน่ง —</span>'}</td><td><div style="font-weight:600;">${l.name}${l.is_free ? ' <span class="pill approved">ของแถม</span>' : ''}</div><div class="tbl-meta">${l.pid}</div></td><td>${l.lot ? `<span class="tbl-mono">${l.lot}</span><div class="tbl-meta" style="color:${soon ? 'var(--c-warning)' : 'inherit'};">หมดอายุ ${formatThaiDate(l.exp)}${l.rule ? ' · ' + l.rule : ''}</div>` : `<span style="color:var(--c-text-soft);">-</span>${l.rule ? '<div class="tbl-meta">' + l.rule + '</div>' : ''}`}</td><td class="tbl-num" style="font-weight:700;">${l.picked ? `<span style="color:var(--c-teal);">${fmi(l.picked)}</span> / ` : ''}${fmi(l.qty)} <span style="font-weight:500;color:var(--c-text-mute);">${PROD_BY[l.pid].uom}</span>${l.factor > 1 ? `<div class="tbl-meta">≈ ${l.qty / l.factor % 1 ? (l.qty / l.factor).toFixed(1) : l.qty / l.factor} ${l.unit}</div>` : ''}</td><td class="tbl-mono" style="font-size:11.5px;">${l.so}<div class="tbl-meta">${(SRC_TYPES[refLabel(l.so).type] || SRC_TYPES.SO)[0]}</div></td><td style="text-align:center;">${l.status === 'picked' ? pill('หยิบแล้ว', 'approved') : l.status === 'short' ? pill('ขาด', 'rejected') : l.status === 'partial' ? pill('หยิบบางส่วน', 'pending') : pill('รอหยิบ', 'draft')}${l.note ? `<div class="tbl-meta">${l.note}</div>` : ''}</td>${editable ? `<td onclick="event.stopPropagation()" style="text-align:right;white-space:nowrap;">${editable !== 'wiz' && l.status !== 'picked' && l.loc ? `<button class="btn btn-secondary sm" onclick="openPickLineModal('${pickId}','${l.id}')"><i data-lucide="scan-line" class="w-3.5 h-3.5"></i><span>บันทึกหยิบ</span></button>` : ''}${l.status !== 'picked' && !l.loc ? `<button class="btn btn-secondary sm" title="หาตำแหน่งใหม่ (สต๊อกอาจเข้าแล้ว) → จองระดับตำแหน่ง" onclick="refreshOne('${pickId || 'WIZ'}','${l.id}')"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i><span>หาใหม่</span></button><button class="btn btn-ghost sm" title="ขอเติม Pick Face / โอนจากคลังอื่น" onclick="requestReplenish('${pickId || 'WIZ'}','${l.id}')"><i data-lucide="arrow-down-to-line" class="w-3.5 h-3.5"></i></button>` : ''}${l.status !== 'picked' ? `<button class="btn btn-ghost sm" title="${l.loc ? 'เปลี่ยนตำแหน่ง/ล็อต' : 'เลือกตำแหน่งเอง (manual)'}" onclick="openRelocModal('${pickId || 'WIZ'}','${l.id}', ${l.loc ? 'false' : 'true'})"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i></button>` : ''}</td>` : ''}</tr>`; }).join('')}</tbody></table></div>`; }
+function step3() { const d = wiz.data; const shortN = d.lines.filter(l => l.status === 'short').length; return `${STEPH('list-checks', 'ตรวจสอบรายการหยิบ (เรียงตามเส้นทาง)', `${d.lines.length} บรรทัด · ${new Set(d.lines.filter(l => l.loc).map(l => l.loc)).size} ตำแหน่ง${d.assignee ? ' · ผู้หยิบ ' + d.assignee : ' · ยังไม่มอบหมาย'} · เปลี่ยนตำแหน่ง/ล็อตรายบรรทัดได้ (ปุ่ม 📍)`)}${linesTable(d.lines, 'wiz', null)}<div style="font-size:11.5px;color:var(--c-text-mute);margin-top:10px;">บันทึกแล้วระบบล็อกสต๊อกระดับตำแหน่ง (allocated) · หยิบครบ → ส่งต่อ Packing → Delivery Note</div>`; }
+function wizNext() { const d = wiz.data; if (wiz.step === 1 && !d.sos.length) return showToast('เลือกใบสั่งขายอย่างน้อย 1 ใบ', 'warning'); if (wiz.step === 2 && !d.lines.some(l => l.loc)) return showToast('ไม่มีบรรทัดที่หยิบได้ — ตรวจสต๊อก/เติม Pick Face ก่อน', 'error'); wiz.step++; renderCreateDrawer(); }
+function savePick(assign) { const d = wiz.data; const p = mkPick({ code: nextCode(), wh: d.wh, sos: d.sos.slice(), strategy: d.strategy, assignee: assign ? d.assignee : (d.assignee || null), equipment: d.equipment, priority: d.priority, note: d.note, status: assign && d.assignee ? 'assigned' : 'draft', createdBy: ME.name, createdAt: nowIso(), updatedAt: nowIso(), lines: d.lines.map(l => Object.assign({}, l)) }); p.lines.forEach(l => { if (l.bal) BAL.find(b => b.id === l.bal).alloc += l.qty; }); seedAudit(p, assign && d.assignee ? [{ act: `มอบหมาย ${d.assignee} · ${d.equipment}`, by: ME.name, at: nowIso() }] : []); PICKS.unshift(p); state.sel = {}; showToast(`สร้าง ${p.code} แล้ว${assign && d.assignee ? ' · มอบหมาย ' + d.assignee + ' (ENG-NOTIFY pick.assigned)' : ''}`, 'success'); document.getElementById('overlay-root').innerHTML = ''; navigate('view/' + p.id); }
+// ---------------- VIEW DRAWER ----------------
+const viewState = { tab: 'lines', id: null };
+function openViewDrawer(id) { viewState.tab = 'lines'; viewState.id = id; const overlay = document.getElementById('overlay-root'); overlay.innerHTML = `<div class="overlay-wrap"><div class="backdrop" onclick="closeViewDrawer()"></div><div id="view-drawer" class="drawer-panel wide drawer-enter"><div id="view-drawer-content" style="display: flex; flex-direction: column; height: 100%;"></div></div></div>`; requestAnimationFrame(() => document.getElementById('view-drawer').classList.add('drawer-active')); renderViewDrawer(); }
+function closeViewDrawer() { const d = document.getElementById('view-drawer'); if (d) { d.classList.remove('drawer-active'); d.classList.add('drawer-enter'); } setTimeout(() => { document.getElementById('overlay-root').innerHTML = ''; if (getRoute().name === 'view') navigate('list'); }, 200); }
+function tabBtn(key, label, icon) { return `<button onclick="viewState.tab='${key}'; renderViewDrawer();" class="tab ${viewState.tab === key ? 'on' : ''}"><i data-lucide="${icon}" class="w-4 h-4"></i>${label}</button>`; }
+const SEC = (ico, title, extra) => `<div style="font-size: 13px; font-weight: 700; color: var(--c-navy); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;"><i data-lucide="${ico}" class="w-4 h-4"></i> ${title}${extra || ''}</div>`;
+const KV = (l, v, sub, full) => `<div${full ? ' style="grid-column: 1 / -1;"' : ''}><div style="font-size: 11px; color: var(--c-text-soft);">${l}</div><div style="font-weight: 600;">${v == null || v === '' ? '<span style="color: var(--c-text-soft); font-weight: 400;">-</span>' : v}</div>${sub ? `<div style="font-size: 11px; color: var(--c-text-mute); margin-top: 2px;">${sub}</div>` : ''}</div>`;
+const SECWRAP = (inner, first) => `<section${first ? '' : ' style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--c-border-soft);"'}>${inner}</section>`;
+function renderViewDrawer() { const p = findPick(viewState.id); const c = document.getElementById('view-drawer-content'); if (!p) { c.innerHTML = '<div style="padding:24px;">ไม่พบข้อมูล</div>'; return; } const pr = pickProgress(p); const st = p.status; const allDone = p.lines.every(l => ['picked', 'short'].includes(l.status)) && p.lines.some(l => l.status === 'picked');
+  c.innerHTML = `<div style="padding: 18px 24px 12px; border-bottom: 1px solid var(--c-border-soft); flex-shrink: 0;"><div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;"><div><div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-text-mute); margin-bottom: 4px;">ใบหยิบสินค้า (Pick List)</div><div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><h2 style="font-size: 20px; font-weight: 700; color: var(--c-primary);" class="tbl-mono">${p.code}</h2>${pickPill(st)}${pill(PRIO[p.priority][0], PRIO[p.priority][1])}${p.sos.length > 1 ? '<span class="pill draft">wave ' + p.sos.length + ' SO</span>' : ''}</div><div style="font-size: 13px; margin-top: 4px; color: var(--c-text-mute);"><span class="pill ${(SRC_TYPES[p.srcType] || SRC_TYPES.SO)[1]}">${(SRC_TYPES[p.srcType] || SRC_TYPES.SO)[0]}</span> ${p.sos.map(s => `<span class="tbl-mono" style="color:var(--c-primary);font-weight:600;">${s}</span> (${refLabel(s).name})`).join(' · ')} · <span style="color:var(--c-text-soft);">คลัง</span> ${p.wh} · <span style="color:var(--c-text-soft);">ผู้หยิบ</span> ${p.assignee || '<span style="color:var(--c-warning);">ยังไม่มอบหมาย</span>'} · ${pr.doneLines}/${pr.lines} บรรทัด (${pr.pct}%)${pr.shortN ? ` · <span style="color:var(--c-danger);font-weight:600;">ขาด ${pr.shortN}</span>` : ''}</div></div>
+    <div style="display: flex; align-items: center; gap: 6px;">
+      ${['draft', 'assigned'].includes(st) && canManage() ? `<button onclick="openCancelModal('${p.id}')" class="btn btn-link" style="color: var(--c-danger); font-weight: 600;">ยกเลิก</button><button onclick="openAssignModal('${p.id}')" class="btn btn-secondary"><i data-lucide="user-check" class="w-3.5 h-3.5"></i><span>${p.assignee ? 'เปลี่ยนผู้หยิบ' : 'มอบหมาย'}</span></button>` : ''}
+      ${st === 'assigned' && canPick(p) ? `<button onclick="startPick('${p.id}')" class="btn btn-primary"><i data-lucide="play" class="w-3.5 h-3.5"></i><span>เริ่มหยิบ</span></button>` : ''}
+      ${st === 'in_progress' && canPick(p) ? `<button onclick="openHoldModal('${p.id}')" class="btn btn-secondary"><i data-lucide="pause" class="w-3.5 h-3.5"></i><span>พัก</span></button>${allDone ? `<button onclick="finishPick('${p.id}')" class="btn btn-success"><i data-lucide="check" class="w-3.5 h-3.5"></i><span>หยิบครบ · ส่งต่อ Packing</span></button>` : `<button class="btn btn-secondary" onclick="pickAllRemaining('${p.id}')" title="บันทึกหยิบครบทุกบรรทัดที่ยังค้าง (mock scan)"><i data-lucide="scan-line" class="w-3.5 h-3.5"></i><span>หยิบครบทั้งหมด</span></button>${p.lines.some(l => l.picked) ? `<button class="btn btn-secondary" onclick="openShortCloseModal('${p.id}')" title="ปิดงานตามที่หยิบได้ · ที่เหลือ = SO backorder"><i data-lucide="scissors" class="w-3.5 h-3.5"></i><span>ปิดงานแบบขาด</span></button>` : ''}`}` : ''}
+      ${st === 'on_hold' && canPick(p) ? `<button onclick="resumePick('${p.id}')" class="btn btn-primary"><i data-lucide="play" class="w-3.5 h-3.5"></i><span>หยิบต่อ</span></button>` : ''}
+      ${st === 'picked' && canManage() ? `<button onclick="toPack('${p.id}')" class="btn btn-primary"><i data-lucide="package" class="w-3.5 h-3.5"></i><span>ส่งต่อ Packing</span></button>` : ''}
+      <div style="width: 1px; height: 22px; background: var(--c-border); margin: 0 4px;"></div><button class="top-icon-btn" title="พิมพ์ใบหยิบ" onclick="viewState.tab='pdf'; renderViewDrawer();"><i data-lucide="printer" class="w-4 h-4"></i></button><button onclick="closeViewDrawer()" class="top-icon-btn"><i data-lucide="x" class="w-4 h-4"></i></button></div></div>
+    <div class="tabs" style="margin-top: 14px; margin-bottom: 0;">${tabBtn('lines', 'รายการหยิบ (เส้นทาง)', 'list-checks')}${tabBtn('detail', 'รายละเอียด · SO', 'file-text')}${tabBtn('pdf', 'ใบหยิบ (พิมพ์)', 'file')}${tabBtn('history', 'ประวัติ', 'history')}</div></div>
+    <div style="flex: 1; overflow-y: auto; padding: 20px 24px;">${viewState.tab === 'lines' ? linesTab(p) : viewState.tab === 'detail' ? detailTab(p) : viewState.tab === 'pdf' ? pdfTab(p) : historyTab(p)}</div>
+    <div style="padding: 12px 24px; border-top: 1px solid var(--c-border-soft); background: var(--c-off-white); flex-shrink: 0; font-size: 11px; color: var(--c-text-soft);">แก้ไขล่าสุด ${fdt(p.updatedAt)} · ${p.updatedBy}${p.packRef ? ' · Packing <span class="tbl-mono">' + p.packRef + '</span>' : ''}</div>`; renderIcons(); }
+function linesTab(p) { const pr = pickProgress(p); const editable = ['in_progress'].includes(p.status) && canPick(p) ? true : (['draft', 'assigned'].includes(p.status) && canManage() ? 'wiz' : false); const shortN = p.lines.filter(l => l.status === 'short' && !l.loc).length; return `${p.note ? `<div class="note" style="margin-bottom:12px;"><i data-lucide="message-square" class="w-4 h-4"></i><div><strong>หมายเหตุถึงผู้หยิบ:</strong> ${p.note}</div></div>` : ''}${p.status === 'on_hold' ? `<div class="note warn" style="margin-bottom:12px;"><i data-lucide="pause" class="w-4 h-4"></i><div><strong>พักงานหยิบ</strong> — ${p.holdReason || ''}</div></div>` : ''}<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;"><div class="prog" style="flex:1;height:8px;"><div class="${pr.shortN ? 'warn' : ''}" style="width:${pr.pct}%;"></div></div><span style="font-size:12px;color:var(--c-text-mute);white-space:nowrap;">${fmi(pr.done)}/${fmi(pr.tot)} หน่วย · ${pr.doneLines}/${pr.lines} บรรทัด · ${p.equipment}</span></div>${linesTable(p.lines, editable, p.id)}${editable !== true && p.status === 'assigned' ? `<div class="note" style="margin-top:12px;"><i data-lucide="info" class="w-4 h-4"></i><div>ผู้หยิบกด "เริ่มหยิบ" แล้วบันทึกหยิบทีละบรรทัด (สแกนตำแหน่ง/สินค้า/ล็อต) · ขาด = รายงานขาด → SO backorder + งานเติม Pick Face</div></div>` : ''}`; }
+function detailTab(p) { return `${SECWRAP(SEC('info', 'ข้อมูลใบหยิบ') + `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px 24px;font-size:13px;">${KV('เลขที่', `<span class="tbl-mono">${p.code}</span>`)}${KV('คลัง', p.wh + ' · ' + WAREHOUSES[p.wh].name)}${KV('การจัดสรร', 'อัตโนมัติจาก master (FEFO/FIFO) · Pick Face ก่อน')}${KV('ผู้หยิบ', p.assignee ? empChip(p.assignee, true) : '')}${KV('อุปกรณ์', p.equipment)}${KV('Priority', pill(PRIO[p.priority][0], PRIO[p.priority][1]))}${KV('เริ่มหยิบ', p.startedAt ? fdt(p.startedAt) : '')}${KV('หยิบครบ', p.pickedAt ? fdt(p.pickedAt) : '')}${KV('ส่งต่อ Packing', p.packRef ? `<span class="tbl-mono">${p.packRef}</span>` : '')}</div>`, true)}
+    ${p.sos.map(code => { const so = SO_BY[code]; if (!so) { const tr = TR_BY[code]; return SECWRAP(SEC('arrow-left-right', `ใบโอนระหว่างคลัง ${code}`) + `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px 24px;font-size:13px;">${KV('จาก → ไป', tr ? tr.from + ' → ' + tr.to : '')}${KV('เหตุผล', tr ? tr.reason : '')}${KV('กำหนด', tr ? formatThaiDate(tr.due) : '')}</div>`); } const g = gate(so); return SECWRAP(SEC('shopping-cart', `ใบสั่งขาย ${code} — ${CUSTS[so.customer]}`, `<span style="margin-left:auto;">${gatePill(so)}</span>`) + `<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px 24px;font-size:13px;margin-bottom:10px;">${KV('กำหนดส่ง', formatThaiDate(so.deliveryDate))}${KV('วิธีรับ', so.method === 'pickup' ? 'ลูกค้ามารับเอง' : 'จัดส่ง')}${KV('ที่ส่ง', so.shipTo, '', false)}${KV('เงื่อนไขชำระ · Warehouse trigger', so.term + ' · ' + { immediate: 'ทันที', after_deposit: 'หลังมัดจำ', after_full: 'หลังชำระเต็ม' }[so.trigger], g.ok ? 'ปล่อยแล้ว' : g.why)}</div><table class="tbl" style="font-size:12px;"><thead><tr><th>สินค้า</th><th style="text-align:right;">สั่ง</th><th style="text-align:right;">จอง</th><th style="text-align:right;">ในใบนี้</th><th style="text-align:right;">หยิบแล้ว (ใบนี้)</th><th style="text-align:right;">Backorder SO</th></tr></thead><tbody>${so.lines.map(l => { const mine = p.lines.filter(x => x.soLine === l.id); if (isService(l.item_code)) return `<tr><td>${l.item_name} <span class="pill draft">บริการ</span></td><td class="tbl-num">${fmi(l.qty)} ${l.unit}</td><td colspan="4" style="color:var(--c-text-soft);">ไม่หยิบ</td></tr>`; return `<tr><td>${l.item_name}${l.is_free ? ' <span class="pill approved">ของแถม</span>' : ''}</td><td class="tbl-num">${fmi(l.qty)} ${l.unit}</td><td class="tbl-num">${fmi(l.reserved)}</td><td class="tbl-num">${fmi(mine.reduce((s, x) => s + x.qty, 0))}</td><td class="tbl-num" style="color:var(--c-teal);font-weight:600;">${fmi(mine.reduce((s, x) => s + (x.picked || 0), 0))}</td><td class="tbl-num" style="color:${l.backorder ? 'var(--c-warning)' : 'inherit'};">${l.backorder ? fmi(l.backorder) : '-'}</td></tr>`; }).join('')}</tbody></table>`); }).join('')}`; }
+function pdfTab(p) { const byLoc = routeSort(p.lines); return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--c-off-white);border:1px solid var(--c-border-soft);border-radius:var(--r);margin-bottom:12px;font-size:12px;color:var(--c-text-mute);"><span>ใบหยิบสินค้า · A4 · เรียงตามเส้นทาง · barcode ตำแหน่ง/สินค้า/ล็อต (mock)</span><button class="btn btn-ghost sm" onclick="window.print()"><i data-lucide="printer" class="w-3.5 h-3.5"></i><span>พิมพ์</span></button></div><div style="background:#E5E7EB;padding:20px;border-radius:var(--r);display:flex;justify-content:center;"><div class="a4"><div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:10px;border-bottom:2px solid #111;"><div><div style="font-size:14px;font-weight:800;">ใบหยิบสินค้า / PICK LIST</div><div style="color:#555;">${WAREHOUSES[p.wh].name} · ${p.equipment}</div></div><div style="text-align:right;"><div style="font-size:12px;font-weight:700;">${p.code}</div><div style="color:#555;">ผู้หยิบ: ${p.assignee || '-'} · พิมพ์ ${fdt(nowIso())}</div><div style="color:#555;">SO: ${p.sos.join(', ')}</div></div></div>${p.note ? `<div style="margin:8px 0;padding:6px 8px;background:#FFF1DC;border:1px solid #F0C48A;">หมายเหตุ: ${p.note}</div>` : ''}<table style="margin-top:10px;"><thead><tr><th style="width:24px;">#</th><th>ตำแหน่ง</th><th>สินค้า</th><th>ล็อต</th><th style="width:70px;" class="r">จำนวน</th><th style="width:60px;">หน่วย</th><th style="width:80px;">SO</th><th style="width:60px;">✓ หยิบ</th></tr></thead><tbody>${byLoc.map((l, i) => `<tr><td>${i + 1}</td><td><strong>${l.loc ? LOCATIONS[l.loc].code : '—'}</strong><div style="color:#777;font-size:9.5px;">${l.loc ? locPath(LOCATIONS[l.loc]) : 'ไม่มีตำแหน่ง'}</div></td><td>${l.name}<div style="color:#777;font-size:9.5px;">${l.pid}${l.is_free ? ' · ของแถม' : ''}</div></td><td>${l.lot || '-'}${l.exp ? '<div style="color:#777;font-size:9.5px;">exp ' + formatThaiDate(l.exp) + '</div>' : ''}</td><td class="r"><strong>${fmi(l.qty)}</strong></td><td>${PROD_BY[l.pid].uom}${l.factor > 1 ? '<div style="color:#777;font-size:9.5px;">= ' + (l.qty / l.factor) + ' ' + l.unit + '</div>' : ''}</td><td>${l.so.replace('-2026-', '-')}</td><td style="border:1px solid #999;height:22px;"></td></tr>`).join('')}</tbody></table><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:32px;text-align:center;">${['ผู้หยิบ', 'ผู้ตรวจ (Packing)', 'หัวหน้าคลัง'].map(x => `<div><div style="border-bottom:1px solid #999;height:32px;"></div><div style="margin-top:4px;color:#555;">${x}</div></div>`).join('')}</div></div></div>`; }
+function historyTab(p) { return `${SEC('history', 'ประวัติ (append-only)')}<div class="tl">${p.audit.map(a => { const k = /มอบหมาย|เริ่ม/.test(a.act) ? 'warn' : /หยิบครบ|ส่งต่อ|บันทึกหยิบ/.test(a.act) ? 'ok' : /ยกเลิก|ขาด|พัก/.test(a.act) ? 'bad' : ''; return `<div class="tl-i ${k}"><div class="tl-t">${a.act}</div><div class="tl-s">${a.by} · ${fdt(a.at)}</div>${a.note ? `<div class="tl-q">${a.note}</div>` : ''}</div>`; }).join('')}</div>`; }
+// ---------------- ACTIONS / MODALS ----------------
+function reasonModal(title, icon, iconColor, iconBg, desc, extraFields, submitLabel, submitCls, onOk) { closeModal(); modalShell(`<div class="card" style="position: relative; max-width: 520px; width: 100%; box-shadow: var(--sh-xl);"><div style="padding: 18px; border-bottom: 1px solid var(--c-border-soft); display: flex; align-items: flex-start; gap: 12px;"><div style="width: 40px; height: 40px; border-radius: 50%; background: ${iconBg}; display: grid; place-items: center; flex-shrink: 0;"><i data-lucide="${icon}" class="w-5 h-5" style="color: ${iconColor};"></i></div><div><h3 style="font-size: 14px; font-weight: 700; color: var(--c-navy);">${title}</h3><p style="font-size: 13px; margin-top: 4px; color: var(--c-text-mute);">${desc}</p></div></div><div style="padding: 18px;">${extraFields || ''}<label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--c-navy);">เหตุผล / หมายเหตุ <span style="color: var(--c-danger);">*</span></label><textarea id="md-reason" rows="3" class="input" style="height: auto; padding: 10px 12px; resize: vertical;"></textarea></div><div style="padding: 12px 18px; background: var(--c-off-white); border-top: 1px solid var(--c-border-soft); display: flex; align-items: center; justify-content: flex-end; gap: 8px; border-radius: 0 0 var(--r-lg) var(--r-lg);"><button onclick="closeModal()" class="btn btn-ghost">ปิด</button><button id="md-ok" class="btn ${submitCls}"><i data-lucide="${icon}" class="w-4 h-4"></i><span>${submitLabel}</span></button></div></div>`); document.getElementById('md-ok').onclick = () => { const r = (document.getElementById('md-reason').value || '').trim(); if (!r) return showToast('กรุณาระบุเหตุผล', 'warning'); onOk(r); }; }
+function openAssignModal(id) { const p = findPick(id); window.__asWho = p.assignee || ''; closeModal(); modalShell(`<div class="card" style="position: relative; max-width: 520px; width: 100%; box-shadow: var(--sh-xl);"><div style="padding: 18px; border-bottom: 1px solid var(--c-border-soft);"><h3 style="font-size: 14px; font-weight: 700; color: var(--c-navy);">มอบหมายผู้หยิบ — ${p.code}</h3></div><div style="padding: 18px; display: grid; gap: 12px;"><div><label class="lbl">ผู้หยิบ</label><div id="as-who-wrap">${assigneeCombo('as-who', p.assignee, v => { window.__asWho = v; document.getElementById('as-who-wrap').innerHTML = assigneeCombo('as-who', v, window.__cbPick['as-who']); renderIcons(); })}</div></div><div><label class="lbl">อุปกรณ์</label><select id="as-eq" class="select">${EQUIPMENT.map(e => `<option ${p.equipment === e ? 'selected' : ''}>${e}</option>`).join('')}</select></div></div><div style="padding: 12px 18px; background: var(--c-off-white); border-top: 1px solid var(--c-border-soft); display: flex; justify-content: flex-end; gap: 8px; border-radius: 0 0 var(--r-lg) var(--r-lg);"><button onclick="closeModal()" class="btn btn-ghost">ยกเลิก</button><button onclick="confirmAssign('${id}')" class="btn btn-primary"><i data-lucide="user-check" class="w-4 h-4"></i><span>มอบหมาย</span></button></div></div>`); }
+function confirmAssign(id) { const p = findPick(id); if (!window.__asWho) return showToast('เลือกผู้หยิบ', 'warning'); p.assignee = window.__asWho; p.equipment = document.getElementById('as-eq').value; if (p.status === 'draft') p.status = 'assigned'; pushAudit(p, `มอบหมาย ${p.assignee} · ${p.equipment}`, 'ENG-NOTIFY pick.assigned'); closeModal(); showToast('มอบหมายแล้ว', 'success'); renderViewDrawer(); }
+function startPick(id) { const p = findPick(id); p.status = 'in_progress'; p.startedAt = nowIso(); pushAudit(p, 'เริ่มหยิบ'); showToast('เริ่มหยิบ — บันทึกทีละบรรทัด (สแกน)', 'info'); renderViewDrawer(); }
+function openPickLineModal(pid, lid) { const p = findPick(pid); const l = p.lines.find(x => x.id === lid); const loc = LOCATIONS[l.loc]; const b = BAL.find(x => x.id === l.bal); const remain = l.qty - (l.picked || 0); window.__pl = { qty: remain, remain, scanLoc: false, scanItem: false, reason: '', action: 'short' }; closeModal(); modalShell(`<div class="card" id="pl-modal" style="position: relative; max-width: 620px; width: 100%; box-shadow: var(--sh-xl);"></div>`); paintPickLine(pid, lid); }
+function paintPickLine(pid, lid) { const p = findPick(pid); const l = p.lines.find(x => x.id === lid); const loc = LOCATIONS[l.loc]; const b = BAL.find(x => x.id === l.bal); const st = window.__pl; const short = st.qty < st.remain; const card = document.getElementById('pl-modal'); if (!card) return; const uom = PROD_BY[l.pid].uom;
+  const tile = (ok, ico, label, val, sub, key) => `<button onclick="__pl.${key}=!__pl.${key}; paintPickLine('${pid}','${lid}')" style="text-align:left;padding:10px 12px;border-radius:var(--r);cursor:pointer;border:${ok ? '2px solid var(--c-teal)' : '1px solid var(--c-border)'};background:${ok ? 'var(--c-teal-08)' : '#fff'};display:flex;gap:10px;align-items:center;"><span style="width:30px;height:30px;border-radius:50%;background:${ok ? 'var(--c-teal)' : 'var(--c-off-white)'};color:${ok ? '#fff' : 'var(--c-text-mute)'};display:grid;place-items:center;flex-shrink:0;"><i data-lucide="${ok ? 'check' : ico}" class="w-4 h-4"></i></span><span style="min-width:0;"><span style="display:block;font-size:11px;color:var(--c-text-soft);">${label}${ok ? ' · สแกนแล้ว' : ' · แตะเพื่อสแกน'}</span><span style="display:block;font-size:13px;font-weight:700;color:var(--c-navy);" class="tbl-mono">${val}</span>${sub ? `<span style="display:block;font-size:11px;color:var(--c-text-mute);">${sub}</span>` : ''}</span></button>`;
+  card.innerHTML = `<div style="padding: 16px 18px; border-bottom: 1px solid var(--c-border-soft); display:flex; gap:12px; align-items:flex-start;"><div style="width: 40px; height: 40px; border-radius: 50%; background: var(--c-primary-08); display: grid; place-items: center; flex-shrink: 0;"><i data-lucide="scan-line" class="w-5 h-5" style="color: var(--c-primary);"></i></div><div style="flex:1;"><h3 style="font-size: 14px; font-weight: 700; color: var(--c-navy);">บันทึกหยิบ — ${l.name}${l.is_free ? ' <span class="pill approved">ของแถม</span>' : ''}</h3><p style="font-size: 12.5px; margin-top: 3px; color: var(--c-text-mute);">${refLabel(l.so).type === 'SO' ? 'ใบสั่งขาย' : 'อ้างอิง'} <span class="tbl-mono">${l.so}</span> · ต้องหยิบ <strong style="color:var(--c-navy);">${fmi(st.remain)} ${uom}</strong>${l.factor > 1 ? ' (≈ ' + (st.remain / l.factor % 1 ? (st.remain / l.factor).toFixed(1) : st.remain / l.factor) + ' ' + l.unit + ')' : ''} · มีในตำแหน่ง ${fmi(b ? b.on_hand : 0)}</p></div><button onclick="closeModal()" class="top-icon-btn"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+    <div style="padding: 16px 18px; display: grid; gap: 12px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">${tile(st.scanLoc, 'map-pin', 'ตำแหน่ง', loc.code, locPath(loc), 'scanLoc')}${tile(st.scanItem, 'package', 'สินค้า / ล็อต', l.pid + (l.lot ? ' · ' + l.lot : ''), l.exp ? 'หมดอายุ ' + formatThaiDate(l.exp) : PROD_BY[l.pid].name, 'scanItem')}</div>
+      <div style="border:1px solid var(--c-border);border-radius:var(--r);padding:12px 14px;"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;"><div style="font-size:12px;font-weight:600;color:var(--c-navy);">จำนวนที่หยิบได้จริง</div><div style="display:inline-flex;align-items:center;gap:6px;"><button class="btn btn-secondary sm" style="width:34px;padding:0;" onclick="__pl.qty=Math.max(0,__pl.qty-1); paintPickLine('${pid}','${lid}')"><i data-lucide="minus" class="w-4 h-4"></i></button><input type="number" min="0" max="${st.remain}" value="${st.qty}" class="input num" style="width:110px;height:36px;text-align:center;font-size:18px;font-weight:700;padding:0 6px;" oninput="__pl.qty=Math.max(0,Math.min(${st.remain},parseInt(this.value)||0)); paintPickLine('${pid}','${lid}'); this.focus();"><button class="btn btn-secondary sm" style="width:34px;padding:0;" onclick="__pl.qty=Math.min(${st.remain},__pl.qty+1); paintPickLine('${pid}','${lid}')"><i data-lucide="plus" class="w-4 h-4"></i></button><span style="font-size:12px;color:var(--c-text-mute);">${uom}</span><button class="btn ${st.qty === st.remain ? 'btn-primary' : 'btn-secondary'} sm" onclick="__pl.qty=${st.remain}; paintPickLine('${pid}','${lid}')">ครบ ${fmi(st.remain)}</button>${l.factor > 1 ? `<button class="btn btn-ghost sm" onclick="__pl.qty=Math.min(${st.remain}, Math.floor(__pl.qty/${l.factor})*${l.factor}); paintPickLine('${pid}','${lid}')" title="ปัดลงเป็นหน่วยขายเต็ม">เต็ม${l.unit.split(' ')[0]}</button>` : ''}</div></div>
+        ${short ? `<div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--c-border);"><div style="font-size:12px;font-weight:600;color:var(--c-warning);margin-bottom:8px;">หยิบได้ไม่ครบ — ขาด ${fmi(st.remain - st.qty)} ${uom} · เพราะอะไร</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">${['ของไม่พอที่ตำแหน่ง', 'สินค้าเสียหาย/หมดอายุ', 'หาไม่เจอ / ตำแหน่งผิด', 'ล็อตไม่ตรง'].map(r => `<button class="btn ${st.reason === r ? 'btn-primary' : 'btn-secondary'} sm" onclick="__pl.reason='${r}'; paintPickLine('${pid}','${lid}')">${r}</button>`).join('')}</div><div style="font-size:12px;font-weight:600;color:var(--c-navy);margin-bottom:6px;">ส่วนที่ขาดจะทำอย่างไร</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">${[['short', 'x-circle', 'รายงานขาด', 'SO backorder · แจ้งเติม/นับสต๊อก'], ['reloc', 'map-pin', 'ไปหยิบตำแหน่งอื่น', 'ระบบหาตำแหน่งที่มีของให้']].map(a => `<button onclick="__pl.action='${a[0]}'; paintPickLine('${pid}','${lid}')" style="text-align:left;padding:8px 10px;border-radius:var(--r);cursor:pointer;border:${st.action === a[0] ? '2px solid var(--c-primary)' : '1px solid var(--c-border)'};background:${st.action === a[0] ? 'var(--c-primary-08)' : '#fff'};display:flex;gap:8px;align-items:center;"><i data-lucide="${a[1]}" class="w-4 h-4" style="color:var(--c-text-mute);"></i><span><span style="display:block;font-size:12.5px;font-weight:600;color:var(--c-navy);">${a[2]}</span><span style="display:block;font-size:11px;color:var(--c-text-mute);">${a[3]}</span></span></button>`).join('')}</div></div>` : ''}</div></div>
+    <div style="padding: 12px 18px; background: var(--c-off-white); border-top: 1px solid var(--c-border-soft); display: flex; align-items:center; gap: 8px; border-radius: 0 0 var(--r-lg) var(--r-lg);"><span style="font-size:11.5px;color:var(--c-text-mute);margin-right:auto;">${st.scanLoc && st.scanItem ? 'สแกนครบ ✓' : 'สแกนตำแหน่ง+สินค้าก่อนยืนยัน (เดโม: แตะที่กล่อง)'}</span><button onclick="closeModal()" class="btn btn-ghost">ยกเลิก</button><button onclick="confirmPickLine('${pid}','${lid}')" class="btn ${short ? 'btn-primary' : 'btn-success'}" ${st.scanLoc && st.scanItem && (!short || st.reason) ? '' : 'disabled'}><i data-lucide="check" class="w-4 h-4"></i><span>${short ? (st.action === 'short' ? 'ยืนยัน · รายงานขาด' : 'ยืนยัน · เปลี่ยนตำแหน่ง') : 'ยืนยันหยิบครบ'}</span></button></div>`; renderIcons(); }
+function confirmPickLine(pid, lid) { const p = findPick(pid); const l = p.lines.find(x => x.id === lid); const st = window.__pl; const q = Math.max(0, Math.min(l.qty - (l.picked || 0), st.qty)); const b = BAL.find(x => x.id === l.bal); if (q > 0) { b.on_hand -= q; b.alloc = Math.max(0, b.alloc - q); l.picked = (l.picked || 0) + q; MOVEMENTS.push({ type: 'pick', pid: l.pid, loc: l.loc, lot: l.lot, qty: -q, ref: p.code, so: l.so, by: ME.name, at: nowIso() }); const so = SO_BY[l.so]; const sl = so ? so.lines.find(x => x.id === l.soLine) : null; if (sl) sl.picked += q; } const remain = l.qty - (l.picked || 0);
+  if (remain <= 0) { l.status = 'picked'; l.by = ME.name; l.at = nowIso(); if (q > 0) pushAudit(p, `หยิบ ${l.name} ${fmi(q)} ${PROD_BY[l.pid].uom} จาก ${LOCATIONS[l.loc].code}${l.lot ? ' ล็อต ' + l.lot : ''}`, 'Inventory movement pick · ' + l.so); }
+  else if (st.action === 'reloc') { if (q > 0) pushAudit(p, `หยิบ ${l.name} ${fmi(q)} จาก ${LOCATIONS[l.loc].code} (บางส่วน — ${st.reason})`); closeModal(); openRelocModal(pid, lid); return; }
+  else { b.alloc = Math.max(0, b.alloc - remain); const so = SO_BY[l.so]; const sl = so ? so.lines.find(x => x.id === l.soLine) : null; if (sl) { sl.reserved -= remain; sl.backorder += remain; } l.qty = l.picked || 0; l.status = l.picked ? 'picked' : 'short'; l.note = 'ขาด ' + fmi(remain) + ' — ' + st.reason; pushAudit(p, `รายงานขาด ${l.name} ${fmi(remain)} ${PROD_BY[l.pid].uom} ที่ ${LOCATIONS[l.loc].code} — ${st.reason}`, (so ? 'SO ' + l.so + ' backorder · ' : '') + 'ENG-NOTIFY pick.short · งานเติม/นับสต๊อก' + (q > 0 ? ' · หยิบได้ ' + fmi(q) : '')); }
+  closeModal(); showToast(q > 0 ? `บันทึกหยิบ ${fmi(q)} แล้ว` : 'บันทึกแล้ว', 'success'); renderViewDrawer(); }
+function pickAllRemaining(pid) { const p = findPick(pid); p.lines.forEach(l => { if (l.status === 'picked' || !l.loc) return; const q = l.qty - (l.picked || 0); const b = BAL.find(x => x.id === l.bal); if (b && q > 0) { b.on_hand -= q; b.alloc = Math.max(0, b.alloc - q); l.picked = l.qty; const sl = SO_BY[l.so].lines.find(x => x.id === l.soLine); if (sl) sl.picked += q; MOVEMENTS.push({ type: 'pick', pid: l.pid, loc: l.loc, lot: l.lot, qty: -q, ref: p.code, so: l.so, by: ME.name, at: nowIso() }); } l.status = 'picked'; l.by = ME.name; l.at = nowIso(); }); pushAudit(p, 'บันทึกหยิบครบทุกบรรทัด (mock scan)'); showToast('หยิบครบทุกบรรทัด', 'success'); renderViewDrawer(); }
+function openRelocModal(pid, lid, manual) { const p = pid === 'WIZ' ? wiz.data : findPick(pid); const l = p.lines.find(x => x.id === lid); const cands = candidatesFor(l.pid, p.wh, !!manual, l.bal); const other = Object.keys(WAREHOUSES).filter(w => w !== p.wh).map(w => ({ w, q: whAvail(l.pid, w) })).filter(x => x.q > 0); closeModal(); modalShell(`<div class="card" style="position: relative; max-width: 620px; width: 100%; box-shadow: var(--sh-xl);"><div style="padding: 18px; border-bottom: 1px solid var(--c-border-soft);"><h3 style="font-size: 14px; font-weight: 700; color: var(--c-navy);">เปลี่ยนตำแหน่ง/ล็อต — ${l.name} (${fmi(l.qty - (l.picked || 0))} ${PROD_BY[l.pid].uom})</h3><p style="font-size:12.5px;color:var(--c-text-mute);margin-top:4px;">${manual ? 'เลือกตำแหน่งเอง — ทุกตำแหน่งในคลังที่มีของ (รวม Hold/Staging · ต้องมีเหตุผล/audit)' : 'ตำแหน่งอื่นในคลังที่มีของหยิบได้ (เรียง ' + itemStrategy(l.pid) + ')'}${other.length ? ' · คลังอื่นมี: ' + other.map(x => x.w + ' ' + fmi(x.q)).join(', ') + ' (ขอโอน)' : ''}</p></div><div style="padding:0;">${cands.length ? `<table class="tbl" style="font-size:12.5px;"><thead><tr><th>ตำแหน่ง</th><th>ประเภท</th><th>ล็อต · หมดอายุ</th><th style="text-align:right;">หยิบได้</th><th></th></tr></thead><tbody>${cands.map(b => `<tr><td class="tbl-mono" style="font-weight:600;">${LOCATIONS[b.loc].code}<div class="tbl-meta">${locPath(LOCATIONS[b.loc])}</div></td><td>${typeLabel(LOCATIONS[b.loc].type)}${['HOLD', 'STAGING', 'PACK'].includes(LOCATIONS[b.loc].type) ? ' <span class="pill pending">ไม่ใช่ตำแหน่งหยิบ</span>' : ''}</td><td>${b.lot || '-'}${b.exp ? '<div class="tbl-meta">' + formatThaiDate(b.exp) + '</div>' : ''}</td><td class="tbl-num">${fmi(avail(b))}</td><td style="text-align:right;"><button class="btn btn-secondary sm" onclick="confirmReloc('${pid}','${lid}','${b.id}')">ใช้ตำแหน่งนี้</button></td></tr>`).join('')}</tbody></table>` : `<div style="padding:24px;text-align:center;color:var(--c-text-soft);">ไม่มีตำแหน่งในคลังนี้ที่มีของ${!manual ? ' — ลอง <a href="#" onclick="event.preventDefault(); openRelocModal(\'${pid}\',\'${lid}\', true)" style="color:var(--c-primary);font-weight:600;">เลือกตำแหน่งเอง (รวม Hold/Staging)</a>' : ''} · ขอเติม Pick Face / โอนจากคลังอื่น / รอ GRN</div>`}</div><div style="padding: 12px 18px; background: var(--c-off-white); border-top: 1px solid var(--c-border-soft); display: flex; justify-content: flex-end; gap: 8px; border-radius: 0 0 var(--r-lg) var(--r-lg);"><button onclick="closeModal()" class="btn btn-ghost">ปิด</button></div></div>`); }
+function confirmReloc(pid, lid, bid) { const isWiz = pid === 'WIZ'; const p = isWiz ? wiz.data : findPick(pid); const l = p.lines.find(x => x.id === lid); const nb = BAL.find(x => x.id === bid); const remain = l.qty - (l.picked || 0); const take = Math.min(remain, avail(nb)); const ob = l.bal && !isWiz ? BAL.find(x => x.id === l.bal) : null; if (ob) ob.alloc = Math.max(0, ob.alloc - remain); if (l.picked) { p.lines.push(Object.assign({}, l, { id: uid('PL'), qty: remain, picked: 0, status: 'pending', bal: nb.id, loc: nb.loc, lot: nb.lot, exp: nb.exp, note: 'ย้ายจาก ' + (ob ? LOCATIONS[ob.loc].code : '-') })); l.qty = l.picked; l.status = 'picked'; nb.alloc += take; } else { l.bal = nb.id; l.loc = nb.loc; l.lot = nb.lot; l.exp = nb.exp; l.status = 'pending'; l.note = 'เปลี่ยนตำแหน่ง'; nb.alloc += take; if (take < remain) { l.qty = take; p.lines.push(Object.assign({}, l, { id: uid('PL'), qty: remain - take, bal: null, loc: null, lot: null, exp: null, status: 'short', note: 'ยังขาด — รอเติม' })); } } p.lines = routeSort(p.lines); if (isWiz) { if (nb) nb.alloc -= take; closeModal(); showToast('เปลี่ยนตำแหน่งแล้ว (จองจริงเมื่อบันทึก)', 'success'); renderCreateDrawer(); return; } pushAudit(p, `เปลี่ยนตำแหน่ง ${l.name} → ${LOCATIONS[nb.loc].code}${nb.lot ? ' ล็อต ' + nb.lot : ''}`, 'override รายบรรทัด'); closeModal(); showToast('เปลี่ยนตำแหน่งแล้ว', 'success'); renderViewDrawer(); }
+function finishPick(id) { const p = findPick(id); p.status = 'picked'; p.pickedAt = nowIso(); const pr = pickProgress(p); pushAudit(p, `หยิบครบ ${pr.doneLines}/${pr.lines} บรรทัด (${fmi(pr.done)} หน่วยฐาน)${pr.shortN ? ' · ขาด ' + pr.shortN + ' บรรทัด' : ''}`, 'ENG-NOTIFY pick.done'); showToast('หยิบครบ — พร้อมส่งต่อ Packing', 'success'); renderViewDrawer(); }
+function toPack(id) { const p = findPick(id); p.status = 'to_pack'; p.packRef = 'PACK-2026-' + String(456 + PICKS.filter(x => x.packRef).length + Math.floor(Math.random() * 20)).padStart(4, '0'); p.sos.forEach(c => { const so = SO_BY[c]; if (so && soPickStatus(so) === 'done') so.status = 'picked'; }); pushAudit(p, `ส่งต่อ Packing ${p.packRef}${p.sos.length > 1 ? ' (แยกต่อ SO)' : ''}`, 'Packing → DN · SO สถานะจัดส่ง'); showToast(`ส่งต่อ Packing ${p.packRef} (mock)`, 'success'); renderViewDrawer(); }
+function openHoldModal(id) { const p = findPick(id); reasonModal(`พักงานหยิบ ${p.code}`, 'pause', 'var(--c-warning)', 'var(--c-warning-08)', 'การจองตำแหน่งยังคงไว้ · หยิบต่อได้ภายหลัง', '', 'พัก', 'btn-primary', r => { p.status = 'on_hold'; p.holdReason = r; pushAudit(p, 'พักงานหยิบ', r); closeModal(); renderViewDrawer(); }); }
+function resumePick(id) { const p = findPick(id); p.status = 'in_progress'; p.holdReason = ''; pushAudit(p, 'หยิบต่อ'); renderViewDrawer(); }
+function openCancelModal(id) { const p = findPick(id); reasonModal(`ยกเลิกใบหยิบ ${p.code}?`, 'x-circle', 'var(--c-danger)', 'var(--c-danger-08)', 'ปล่อยการจองตำแหน่ง · SO กลับเข้าคิวหยิบ · ย้อนกลับไม่ได้', '', 'ยืนยันยกเลิก', 'btn-danger', r => { p.lines.forEach(l => { if (l.bal && l.status !== 'picked') { const b = BAL.find(x => x.id === l.bal); if (b) b.alloc = Math.max(0, b.alloc - (l.qty - (l.picked || 0))); } }); p.status = 'cancelled'; p.cancel = { by: ME.name, at: nowIso(), reason: r }; pushAudit(p, 'ยกเลิกใบหยิบ · ปล่อยจองตำแหน่ง · SO กลับเข้าคิว', r); closeModal(); showToast('ยกเลิกแล้ว', 'success'); renderViewDrawer(); }); }
+
+function openShortCloseModal(id) { const p = findPick(id); const rem = p.lines.filter(l => l.status !== 'picked'); reasonModal(`ปิดงานแบบขาด ${p.code}`, 'scissors', 'var(--c-warning)', 'var(--c-warning-08)', `บรรทัดที่ยังไม่ครบ ${rem.length} บรรทัด จะถูกปิดเป็น "ขาด" · ปล่อยจองตำแหน่ง · SO backorder + แจ้ง Sales/เติมสต๊อก · ส่งต่อ Packing เฉพาะที่หยิบได้`, '', 'ปิดงานแบบขาด', 'btn-primary', r => { rem.forEach(l => { const remain = l.qty - (l.picked || 0); if (l.bal) { const b = BAL.find(x => x.id === l.bal); if (b) b.alloc = Math.max(0, b.alloc - remain); } const so = SO_BY[l.so]; const sl = so.lines.find(x => x.id === l.soLine); if (sl && remain > 0) { sl.reserved -= remain; sl.backorder += remain; } l.qty = l.picked || 0; l.status = l.picked ? 'picked' : 'short'; l.note = 'ปิดขาด ' + fmi(remain); }); p.status = 'picked'; p.pickedAt = nowIso(); pushAudit(p, `ปิดงานแบบขาด — ${rem.length} บรรทัด → SO backorder`, r + ' · ENG-NOTIFY pick.short_close'); closeModal(); showToast('ปิดงานแบบขาดแล้ว — พร้อมส่ง Packing', 'success'); renderViewDrawer(); }); }
+
+function refreshOne(pid, lid) { const p = pid === 'WIZ' ? wiz.data : findPick(pid); const l = p.lines.find(x => x.id === lid); const ok = refreshLine(p, l); p.lines = routeSort(p.lines); if (pid !== 'WIZ') { if (ok) pushAudit(p, `หาตำแหน่งใหม่ ${l.name} → ${LOCATIONS[l.loc].code}${l.lot ? ' ล็อต ' + l.lot : ''} · จองระดับตำแหน่ง (allocated) ${fmi(l.qty - (l.picked || 0))}`, 'Inventory allocation · ' + l.so); renderViewDrawer(); } else renderCreateDrawer(); showToast(ok ? `พบสต๊อกแล้ว → จองที่ ${LOCATIONS[l.loc].code} (hard allocate)` : 'ยังไม่มีสต๊อกที่หยิบได้ — ขอเติม/โอน หรือรอ GRN แล้วกดหาใหม่', ok ? 'success' : 'warning'); }
+function refreshAll(pid) { const p = pid === 'WIZ' ? wiz.data : findPick(pid); let n = 0; p.lines.filter(l => l.status === 'short' && !l.loc).forEach(l => { if (refreshLine(p, l)) n++; }); p.lines = routeSort(p.lines); if (pid !== 'WIZ') { if (n) pushAudit(p, `จัดสรรใหม่ — พบตำแหน่ง ${n} บรรทัด · จองระดับตำแหน่ง`, 'Inventory allocation'); renderViewDrawer(); } else renderCreateDrawer(); showToast(n ? `จัดสรรใหม่ได้ ${n} บรรทัด (hard allocate)` : 'ยังไม่มีสต๊อกที่หยิบได้', n ? 'success' : 'warning'); }
+function requestReplenish(pid, lid) { const p = pid === 'WIZ' ? wiz.data : findPick(pid); const shorts = p.lines.filter(l => l.status === 'short' && !l.loc && (!lid || l.id === lid)); const items = Array.from(new Set(shorts.map(l => l.pid))).map(pid2 => ({ p: PROD_BY[pid2], need: shorts.filter(l => l.pid === pid2).reduce((s, l) => s + l.qty - (l.picked || 0), 0), other: Object.keys(WAREHOUSES).filter(w => w !== p.wh).map(w => ({ w, q: whAvail(pid2, w) })).filter(x => x.q > 0), reserve: BAL.filter(b => b.pid === pid2 && locWh(LOCATIONS[b.loc]) === p.wh && !['PICK_FACE'].includes(LOCATIONS[b.loc].type) && avail(b) > 0).reduce((s, b) => s + avail(b), 0) })); closeModal(); modalShell(`<div class="card" style="position: relative; max-width: 620px; width: 100%; box-shadow: var(--sh-xl);"><div style="padding: 18px; border-bottom: 1px solid var(--c-border-soft);"><h3 style="font-size: 14px; font-weight: 700; color: var(--c-navy);">ขอเติม Pick Face / โอนจากคลังอื่น</h3><p style="font-size:12.5px;color:var(--c-text-mute);margin-top:4px;">สร้างงานให้ Inventory (Replenishment / Transfer) — ใบหยิบนี้กด "หาใหม่" เมื่อของเข้าแล้ว</p></div><div style="padding:0;"><table class="tbl" style="font-size:12.5px;"><thead><tr><th>สินค้า</th><th style="text-align:right;">ขาด</th><th style="text-align:right;">Reserve/Bulk ในคลัง</th><th>คลังอื่น</th><th>งานที่จะสร้าง</th></tr></thead><tbody>${items.map(x => `<tr><td style="font-weight:600;">${x.p.name}<div class="tbl-meta">${x.p.code}</div></td><td class="tbl-num">${fmi(x.need)} ${x.p.uom}</td><td class="tbl-num">${fmi(x.reserve)}</td><td>${x.other.length ? x.other.map(o => o.w + ' ' + fmi(o.q)).join(', ') : '-'}</td><td>${x.reserve > 0 ? '<span class="pill pending">เติม Pick Face</span>' : x.other.length ? '<span class="pill sent">โอนระหว่างคลัง</span>' : '<span class="pill rejected">รอ GRN / แจ้ง Sales</span>'}</td></tr>`).join('')}</tbody></table></div><div style="padding: 12px 18px; background: var(--c-off-white); border-top: 1px solid var(--c-border-soft); display: flex; justify-content: flex-end; gap: 8px; border-radius: 0 0 var(--r-lg) var(--r-lg);"><button onclick="closeModal()" class="btn btn-ghost">ปิด</button><button onclick="closeModal(); showToast('สร้างงานเติม/โอนแล้ว (Inventory) — ENG-NOTIFY inv.replenish_request', 'success'); ${pid !== 'WIZ' ? `pushAudit(findPick('${pid}'), 'ขอเติม Pick Face / โอนจากคลังอื่น สำหรับบรรทัดที่ขาด', 'Inventory: replenishment/transfer task'); renderViewDrawer();` : ''}" class="btn btn-primary"><i data-lucide="arrow-down-to-line" class="w-4 h-4"></i><span>สร้างงานเติม/โอน</span></button></div>
+    <div style="padding: 10px 18px; border-top: 1px dashed var(--c-border); background: #fff; display:flex; align-items:center; gap:10px; font-size:12px; color:var(--c-text-mute); border-radius: 0 0 var(--r-lg) var(--r-lg);"><i data-lucide="flask-conical" class="w-3.5 h-3.5"></i><span style="flex:1;">เดโม: จำลองว่า Inventory เติม/รับเข้าแล้ว (putaway เข้า Reserve) → กลับมากด <strong>หาใหม่</strong> ระบบจะจองตำแหน่งให้อัตโนมัติ</span><button class="btn btn-secondary sm" onclick="mockInbound('${pid}','${lid || ''}')"><i data-lucide="package-check" class="w-3.5 h-3.5"></i><span>จำลองของเข้า</span></button></div></div>`); }
+function mockInbound(pid, lid) { const p = pid === 'WIZ' ? wiz.data : findPick(pid); const shorts = p.lines.filter(l => l.status === 'short' && !l.loc && (!lid || l.id === lid)); if (!shorts.length) return closeModal(); const added = []; Array.from(new Set(shorts.map(l => l.pid))).forEach(pid2 => { const need = shorts.filter(l => l.pid === pid2).reduce((s, l) => s + l.qty - (l.picked || 0), 0); const prod = PROD_BY[pid2]; const loc = prod.cold ? 'L013' : 'L013'; const lot = prod.lot ? 'LOT-2608N1' : null; const exp = prod.lot ? '2026-11-15' : null; const ex = BAL.find(b => b.pid === pid2 && b.loc === loc && b.lot === lot); if (ex) ex.on_hand += need; else bal(pid2, loc, need, lot, exp); MOVEMENTS.push({ type: 'putaway', pid: pid2, loc, lot, qty: need, ref: 'GRN-2026-0431', by: 'สมชาย ใจดี', at: nowIso() }); added.push(prod.name + ' +' + fmi(need) + ' → ' + LOCATIONS[loc].code); }); closeModal(); showToast('Inventory รับเข้า/เติมแล้ว: ' + added.join(', ') + ' — กด "หาใหม่" หรือ "จัดสรรใหม่"', 'info'); if (pid !== 'WIZ') { pushAudit(p, 'Inventory แจ้งของเข้า (GRN-2026-0431 · putaway) สำหรับสินค้าที่ขาด', 'ENG-NOTIFY inv.replenished · กดหาใหม่เพื่อจอง'); renderViewDrawer(); } else renderCreateDrawer(); }
+
+  </script>
+</body>
+</html>
