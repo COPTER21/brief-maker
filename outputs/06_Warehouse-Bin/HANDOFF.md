@@ -21,8 +21,8 @@
 | 5 | **brd-generator-full** (Fresh/HTML-first) | `warehouse-bin.html` + Pack Brief (PREBRIEF/CHECKLIST) + Company ref + `_UX_CHECK_REPORT.md` + `_COVERAGE_REPORT.md` | `03_BRD/BRD_Warehouse_Bin.md` | Screen Inventory ตรงหน้าจอจริง · Scope Lock (ดูด้านล่าง) · Downstream Impact |
 | 6 | **frd-generator-v6** (HTML-first) | **BRD (step5)** + `warehouse-bin.html` | `04_FRD/FRD_F-LOCATION-MASTER-001_Pack/` (แยก layer UI/API/LOGIC/DB/Rules/Tests) | R8 traceability · R10 Data Class · Coverage Manifest · Section M (HTML alignment) |
 | 7 | **html-ui-brief** | `warehouse-bin.html` + FRD pack (step6) | `05_UI_BRIEF/UI_BRIEF_F-LOCATION-MASTER-001.md` | Extraction-based 1:1 (ทุกบรรทัด trace หา selector/function จริงใน HTML) · Drift Log |
-| 8 | **ai-testcase-md-generator** | FRD pack + BRD + `warehouse-bin.html` | `06_TESTCASES/testcases-F-LOCATION-MASTER-001.md` | anchor ด้วยข้อความบนจอ + route จริง · ครอบ happy/neg/edge/perm · trace กลับ 05_RULES/06_TESTS |
-| 9 | **qa-friendly-html-generator** (Lite-first) | **testcases md (step8)** (+ HTML) | `07_UAT/testcase-warehouse-bin.html` | คนไม่รู้ระบบทำตามได้ · คง TC id เดิม · ไม่มีค่า mock ค้าง |
+| 8 | **ai-testcase-md-generator** | FRD pack + BRD + `warehouse-bin.html` | `testcase_qa/testcases-F-LOCATION-MASTER-001.md` | anchor ด้วยข้อความบนจอ + route จริง · ครอบ happy/neg/edge/perm · trace กลับ 05_RULES/06_TESTS |
+| 9 | **qa-friendly-html-generator** (Lite-first) | **testcases md (step8)** (+ HTML) | `testcase_qa/testcase-warehouse-bin.html` | คนไม่รู้ระบบทำตามได้ · คง TC id เดิม · ไม่มีค่า mock ค้าง |
 | 10 | **feature-tldr-html** | FRD pack (+ HTML) | `08_TLDR/tldr-warehouse-bin.html` | ภาษาเด็ก 5 ขวบ · ไม่มี field/API/SQL |
 
 **Companion skills (doa/ntf/doccfg) = ไม่ต้องทำ** — feature นี้ไม่มี DOA (RBAC), ไม่ออกเอกสาร, ไม่มี notify event ของตัวเอง

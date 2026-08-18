@@ -8,8 +8,7 @@
 | 03 | `03_brd` | BRD ทั้ง Markdown และ Word |
 | 04 | `04_frd` | FRD Pack |
 | 05 | `05_ui-brief` | HTML UI Brief |
-| 06 | `06_testcases` | AI Test Cases และ QA coverage |
-| 07 | `07_uat` | UAT HTML สำหรับ Manual Tester |
+| 06–07 | `testcase_qa` | AI Test Cases, QA coverage และ UAT HTML สำหรับ Manual Tester |
 | 08 | `08_tldr` | สรุปฟีเจอร์อ่านง่าย |
 | 09 | `09_declarations` | DOA declaration |
 | 10 | `10_handoff` | Open questions และ handoff notes |

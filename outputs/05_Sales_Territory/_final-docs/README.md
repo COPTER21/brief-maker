@@ -8,9 +8,8 @@
 4. `03_brd/` — BRD Markdown และ DOCX
 5. `04_frd/` — FRD Pack จำนวน 7 ไฟล์
 6. `05_ui-brief/` — UI handoff สำหรับ dev
-7. `06_testcases/` — AI test cases ฉบับเต็ม
-8. `07_uat/` — QA-friendly/UAT HTML
-9. `08_tldr/` — สรุป Feature TL;DR
+7. `testcase_qa/` — AI test cases ฉบับเต็มและ QA-friendly/UAT HTML สำหรับ tester
+8. `08_tldr/` — สรุป Feature TL;DR
 
 ## Scope note
 

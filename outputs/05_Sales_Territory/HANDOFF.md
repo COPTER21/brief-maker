@@ -9,9 +9,8 @@
 | `03_BRD/` | BRD Markdown และ DOCX |
 | `04_FRD/` | FRD Pack |
 | `05_UI_BRIEF/` | UI brief สำหรับ dev |
-| `06_TESTCASES/` | AI test cases และ archive |
-| `07_UAT/` | QA-friendly/UAT HTML |
+| `testcase_qa/` | AI test cases และ QA-friendly/UAT HTML สำหรับ tester |
 | `08_TLDR/` | Feature TL;DR |
-| `_final-docs/` | สำเนาเอกสารที่จำเป็นสำหรับส่งต่อ แยกหมวด `00_context`–`08_tldr` |
+| `_final-docs/` | สำเนาเอกสารที่จำเป็นสำหรับส่งต่อ โดยรวม test cases และ UAT ไว้ใน `testcase_qa/` |
 
 Raw results, screenshots และไฟล์ build อยู่ที่ `test-artifacts/05_Sales_Territory/` และไม่รวมใน deliverable pack
