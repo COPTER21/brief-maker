@@ -1284,6 +1284,28 @@ def n(pg, sel):
     return len(pg.query_selector_all(sel))
 
 
+def unrendered_visible_icons(pg, root='body'):
+    """Return visible Lucide placeholders that were not replaced by SVG.
+
+    A missing/unknown icon name leaves an empty ``<i data-lucide>`` in the UI.
+    It still occupies 16×16 px, so geometry checks alone cannot see that the
+    user is looking at a blank space.
+    """
+    return pg.evaluate("""root => {
+      const host = document.querySelector(root) || document.body;
+      return [...host.querySelectorAll('[data-lucide]:not(svg)')].filter(el => {
+        const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+        return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none';
+      }).map(el => ({name: el.getAttribute('data-lucide') || '', tag: el.tagName,
+                    text: (el.closest('button')?.innerText || '').trim().slice(0, 50)}));
+    }""", root)
+
+
+def assert_icons_rendered(pg, root='body'):
+    missing = unrendered_visible_icons(pg, root)
+    assert not missing, f"visible Lucide icons were not rendered: {missing[:6]}"
+
+
 JS_HEAD_GEOM = r"""
 (a) => {
   const H = document.querySelector(a.head);
