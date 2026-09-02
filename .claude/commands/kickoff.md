@@ -71,7 +71,7 @@ find "<path ที่ผู้ใช้ยืนยัน>" -type f -not -name "
 |---|---|
 | `PREBRIEF_*.md` | **เนื้อธุรกิจ** — `qc-coverage-checker` ใช้เป็น contract |
 | `FUNCTION_CHECKLIST_*.md` | ตาราง `FN-01..FN-nn` + คอลัมน์ `WF/DEV/QA` + **`FN-40` = ของที่ห้ามมี** · **`e2e` (step 5) ต้องครอบทุก FN** |
-| `<Feature>.html` | หัวเชื้อจอ — **input ไม่ใช่ผลลัพธ์** ต้อง vibe ใหม่ผ่าน `html-generator-v8` |
+| `<Feature>.html` | หัวเชื้อจอ — **input ไม่ใช่ผลลัพธ์** ต้อง vibe ใหม่ผ่าน `html-generator-v9` |
 
 > แพ็กเก่าอาจเป็น `_SEED_NOTES.md` แทน `FUNCTION_CHECKLIST` — เจอแบบไหนใช้แบบนั้น
 > **ไม่มี checklist → สกัด FN จาก `PREBRIEF` เอง** แล้วเขียนรายการไว้หัวไฟล์ `e2e`

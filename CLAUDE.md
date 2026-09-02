@@ -20,7 +20,7 @@
 
 | # | step | skill | หมายเหตุ |
 |:--:|---|---|---|
-| 1 | ต้นแบบ HTML | `html-generator-v8` | vibe ต่อจากหัวเชื้อ · **grep ก่อน** · ปิดท้าย `self_audit.py` · `audit.sh` · `node --check` |
+| 1 | ต้นแบบ HTML | `html-generator-v9` | vibe ต่อจากหัวเชื้อ · **grep ก่อน** · ปิดท้าย `self_audit.py` · `audit.sh` · `node --check` |
 | 2 | เอกสารพิมพ์ A4 | `thai-doc-pdf-generator` | **ข้ามได้ตัวเดียวในทั้ง 12 step** — เฉพาะเมื่อ feature ไม่มีของพิมพ์ |
 | 3 | ตรวจ *ทำถูกมั้ย* | `qc-ux-html-checker` | → `_UX_CHECK_REPORT.md` |
 | 4 | ตรวจ *ทำครบมั้ย* รอบ 1 | `qc-coverage-checker` | HTML vs `PREBRIEF` + Global Contracts + ของที่ล็อกไว้ของ feature ที่อ้างถึง · **ติ๊กคอลัมน์ `WF`** |
@@ -64,13 +64,13 @@
 
 | ลำดับ | แหล่ง | ใช้ตัดสิน | **ห้าม**ใช้ตัดสิน |
 |:--:|---|---|---|
-| 1 | `.claude/skills/html-generator-v8` | หน้าตา · พฤติกรรมจอ · BASE-KIT · CI | เนื้อธุรกิจ |
+| 1 | `.claude/skills/html-generator-v9` | หน้าตา · พฤติกรรมจอ · BASE-KIT · CI | เนื้อธุรกิจ |
 | 2 | `{{OUTPUT_ROOT}}/<FEATURE>/` | มาตรฐานที่ล็อกแล้ว · สัญญาข้ามเอกสาร | เนื้อธุรกิจของ feature อื่น |
 | 3 | `{{CENTRAL_PLAN}}` | Global Contracts · node/edge · wave | รายละเอียดจอ |
 | 4 | `PREBRIEF_*.md` | เนื้อธุรกิจของ feature นี้ | เนื้อธุรกิจของ feature อื่น |
 | 5 | `FUNCTION_CHECKLIST` + HTML หัวเชื้อ | รายการ FN ที่ต้องทำได้ + `FN-40` ที่ห้ามมี | **หน้าตา/พฤติกรรมจอ** |
 
-**HTML หัวเชื้อเป็น input ไม่ใช่ผลลัพธ์** — เอาเจตนา+เนื้อธุรกิจ แต่ต้อง vibe ใหม่ผ่าน `html-generator-v8` ทุกครั้ง
+**HTML หัวเชื้อเป็น input ไม่ใช่ผลลัพธ์** — เอาเจตนา+เนื้อธุรกิจ แต่ต้อง vibe ใหม่ผ่าน `html-generator-v9` ทุกครั้ง
 
 ## C3.5 · 📋 `e2e` ต้องอิง `FUNCTION_CHECKLIST`
 
@@ -98,7 +98,7 @@
 
 ```bash
 .claude/venv/Scripts/python.exe <skill_dir>/scripts/<script>.py ...     # ทุกตัวที่ใช้ browser/รูป
-PYTHONIOENCODING=utf-8 python .claude/skills/html-generator-v8/scripts/self_audit.py <file.html>   # stdlib ล้วน
+PYTHONIOENCODING=utf-8 python .claude/skills/html-generator-v9/scripts/self_audit.py <file.html>   # stdlib ล้วน
 .claude/venv/Scripts/python.exe {{OUTPUT_ROOT}}/<FEATURE>/_e2e/e2e-<xx>.py <file.html>   # step 5
 ```
 

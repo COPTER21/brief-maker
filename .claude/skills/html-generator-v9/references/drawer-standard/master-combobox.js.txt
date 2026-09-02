@@ -1,0 +1,117 @@
+// ============================================================================
+//  MASTER COMBOBOX — canonical searchable dropdown for master-backed fields
+//  (Iron Rule #94: ทุก field ที่มี master รองรับ = search combobox เสมอ)
+//
+//  Verbatim example = "ผู้ขอ" (employee) combobox from the approved PR reference.
+//  BR (budget release), Vendor, and Item comboboxes in the same reference follow
+//  the identical contract — copy this shape and adapt only:
+//    - master array + filter fields
+//    - the 2-line item body (avatar | main 13px / sub 12px truncate) per Rule #65
+//    - id prefix (emp -> cus / prod / dept ...)
+//
+//  CONTRACT (never change):
+//    state    = { query, open, highlight }
+//    handlers = onXSearchInput / onXSearchFocus / onXSearchKey / selectX / clearX
+//    keyboard = ArrowDown/ArrowUp = move highlight · Enter = pick · Esc = close
+//               list first (stopPropagation — drawer stays open, Esc chain intact)
+//    markup   = .input + search icon left 36px + [X clear | chevron] right 36px
+//               + suggest list absolute z-30, max-height 280px, overflow-y auto
+//    close on = select / outside mousedown / Esc / focus loss   (Rule #65+#68)
+//    empty    = "ไม่พบ..." row in-menu — เมนูห้ามหายเฉย ๆ
+// ============================================================================
+
+// ---- 1. Master data (adapt) --------------------------------------------------
+
+    const mockEmployees = [
+      { id: 'E-001', name: 'Tadswan Chanyarakskul', position: 'Business Analyst', dept: 'พัฒนาธุรกิจ', initials: 'TC' },
+      { id: 'E-002', name: 'Rungtiwa Samanma',      position: 'Software Engineer', dept: 'Software Developer', initials: 'RS' },
+      { id: 'E-003', name: 'Patcharaphon Wong',     position: 'Marketing Lead',    dept: 'Marketing', initials: 'PW' },
+      { id: 'E-004', name: 'Manit Prasert',         position: 'Procurement Officer', dept: 'Procurement', initials: 'MP' },
+      { id: 'E-005', name: 'Wirat Khamfu',          position: 'IT Support',        dept: 'Software Developer', initials: 'WK' },
+      { id: 'E-006', name: 'Suchada Inthorn',       position: 'HR Officer',        dept: 'Human Resource', initials: 'SI' },
+    ];
+
+// ---- 2. State (one per combobox instance) -----------------------------------
+
+const empSearchState = { query: '', open: false, highlight: 0 };
+
+// ---- 3. Field markup (paste inside your form template string) ---------------
+
+/* --- Field markup (copy into your form template string) ---
+
+          <!-- ผู้ขอ — employee search dropdown (รูป/ชื่อ/ตำแหน่ง ตอนค้นหา; เลือกแล้วเก็บแค่ชื่อ) -->
+          <div class="form-field">
+            <label class="required"><i data-lucide="user" class="w-3.5 h-3.5"></i>ผู้ขอ</label>
+            <div style="position: relative;" id="empCombobox">
+              <i data-lucide="search" class="w-4 h-4" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--c-text-soft);"></i>
+              <input type="text" id="empSearchInput" autocomplete="off"
+                value="${selectedEmp ? selectedEmp.name : empSearchState.query}"
+                placeholder="ค้นหาพนักงาน..."
+                oninput="onEmpSearchInput(event)" onfocus="onEmpSearchFocus()" onkeydown="onEmpSearchKey(event)"
+                class="input" style="padding-left: 36px; padding-right: 36px;">
+              ${selectedEmp ? `
+                <button onclick="clearEmpSelection()" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: transparent; border: none; padding: 4px; cursor: pointer; color: var(--c-text-soft);" title="ล้างการเลือก"><i data-lucide="x" class="w-4 h-4"></i></button>
+              ` : `<i data-lucide="chevron-down" class="w-4 h-4" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--c-text-soft); pointer-events: none;"></i>`}
+              <div id="empSuggestList" class="${empSearchState.open ? '' : 'hidden'}"
+                   style="position: absolute; z-index: 30; left: 0; right: 0; margin-top: 4px; background: white; border: 1px solid var(--c-border); border-radius: var(--r); box-shadow: var(--sh-lg); max-height: 280px; overflow-y: auto;">
+                ${renderEmpSuggestions()}
+              </div>
+            </div>
+          </div>
+
+--- end markup --- */
+// ---- 4. Handlers (verbatim) -------------------------------------------------
+
+function renderEmpSuggestions() {
+      const q = (empSearchState.query || '').toLowerCase().trim();
+      const filtered = mockEmployees.filter(e => !q || e.name.toLowerCase().includes(q) || e.position.toLowerCase().includes(q) || e.dept.toLowerCase().includes(q));
+      if (filtered.length === 0) return `<div style="padding: 24px 16px; text-align: center; font-size: 13px; color: var(--c-text-mute);">ไม่พบพนักงานที่ตรงกับ "<strong>${q}</strong>"</div>`;
+      return filtered.map((e, i) => {
+        const active = i === empSearchState.highlight;
+        return `
+          <button type="button" onmousedown="event.preventDefault()" onclick="selectEmp('${e.id}')"
+            style="width: 100%; text-align: left; padding: 9px 12px; background: ${active ? 'var(--c-primary-08)' : 'transparent'}; border: none; cursor: pointer; display: flex; align-items: center; gap: 11px; border-bottom: 1px solid var(--c-border-soft);">
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--c-primary), var(--c-teal)); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 600; flex-shrink: 0;">${e.initials}</div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 13px; font-weight: 600; color: var(--c-navy);">${e.name}</div>
+              <div style="font-size: 11.5px; color: var(--c-text-mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${e.position} · ${e.dept}</div>
+            </div>
+          </button>`;
+      }).join('');
+    }
+
+function onEmpSearchInput(e) {
+      empSearchState.query = e.target.value; empSearchState.open = true; empSearchState.highlight = 0;
+      if (createWizard.data.requester && !mockEmployees.find(x => x.name === e.target.value)) createWizard.data.requester = '';
+      const list = document.getElementById('empSuggestList');
+      if (list) { list.classList.remove('hidden'); list.innerHTML = renderEmpSuggestions(); renderIcons(); }
+    }
+
+function onEmpSearchFocus() { empSearchState.open = true; const l = document.getElementById('empSuggestList'); if (l) { l.classList.remove('hidden'); l.innerHTML = renderEmpSuggestions(); renderIcons(); } }
+
+function onEmpSearchKey(e) {
+      const list = document.getElementById('empSuggestList'); if (!list) return;
+      const q = (empSearchState.query || '').toLowerCase().trim();
+      const filtered = mockEmployees.filter(x => !q || x.name.toLowerCase().includes(q) || x.position.toLowerCase().includes(q) || x.dept.toLowerCase().includes(q));
+      if (e.key === 'ArrowDown') { e.preventDefault(); empSearchState.highlight = Math.min(filtered.length - 1, empSearchState.highlight + 1); list.innerHTML = renderEmpSuggestions(); renderIcons(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); empSearchState.highlight = Math.max(0, empSearchState.highlight - 1); list.innerHTML = renderEmpSuggestions(); renderIcons(); }
+      else if (e.key === 'Enter') { e.preventDefault(); if (filtered[empSearchState.highlight]) selectEmp(filtered[empSearchState.highlight].id); }
+      else if (e.key === 'Escape') { e.stopPropagation(); empSearchState.open = false; list.classList.add('hidden'); }
+    }
+
+function selectEmp(id) {
+      const emp = mockEmployees.find(e => e.id === id);
+      if (emp) createWizard.data.requester = emp.name;   // เก็บแค่ชื่อ
+      empSearchState.open = false; empSearchState.query = '';
+      renderCreateDrawer();
+    }
+
+function clearEmpSelection() { createWizard.data.requester = ''; empSearchState.query = ''; empSearchState.open = true; renderCreateDrawer(); setTimeout(() => document.getElementById('empSearchInput')?.focus(), 0); }
+
+// ---- 5. Outside-click close (register ONCE per page, list every combobox) ---
+document.addEventListener('mousedown', (e) => {
+  [['empCombobox','empSuggestList',empSearchState]].forEach(([boxId, listId, st]) => {
+    const box = document.getElementById(boxId);
+    if (box && !box.contains(e.target)) { st.open = false; document.getElementById(listId)?.classList.add('hidden'); }
+  });
+});
