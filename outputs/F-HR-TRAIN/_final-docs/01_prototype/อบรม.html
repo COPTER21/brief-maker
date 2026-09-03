@@ -1,0 +1,3028 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>อบรม (Training) · CUBE NATIVE</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+
+<!-- Lucide Icons: loader ที่ท้าย body (ดู section "Lucide loader" ก่อน main <script>) -->
+<!-- เหตุผล:
+     1) ย้ายมาท้าย body หลีกเลี่ยง race กับ DOMContentLoaded
+     2) Multi-CDN fallback (unpkg → jsdelivr → cdnjs)
+     3) Pin version (เลิกใช้ @latest ที่ flaky — GitHub issue #2962)
+-->
+
+<style>
+/* ===== BASE-KIT v6.4 — DO NOT EDIT (Rule #69) — page CSS ต่อท้ายหลัง END marker ===== */
+/* ============== CSS VARIABLES (CUBE CI — v2.0 Warm Light rebrand) ============== */
+:root {
+  --c-navy: #111111;
+  --c-navy-2: #111111;
+  --c-primary: #FF3B30;
+  --c-primary-hover: #E62E24;
+  --c-teal: #FF9A1F;
+  --c-teal-light: #FFB763;
+  --c-ink: #111111;
+  --c-mute: #54565C;
+  --c-mute-2: #73757B;
+  --c-mute-3: #9A9CA2;
+  --c-line: #DEDAD4;
+  --c-line-2: #E9E5E0;
+  --c-line-3: #F1EEEA;
+  --c-bg-off: #FAF8F5;
+  --c-success: #1F9D55;
+  --c-warning: #E8870F;
+  --c-danger: #E62E24;
+  --sidebar-w: 232px;
+  --shell-h: 52px;
+  /* ============== Z-INDEX SCALE (ลำดับชั้นการซ้อน) ==============
+     BASE-KIT อ้าง var ชุดนี้ทุก overlay — ขาดไปแล้ว computed เป็น auto ทั้งหมด
+     ผลคือหัวตาราง sticky วาดทับลิ้นชัก · เจอจริง 2026-08-04 (F-COA-001) */
+  --z-shell: 20;      /* sidebar */
+  --z-sticky: 30;     /* shell-bar · thead sticky */
+  --z-dropdown: 40;   /* user menu · tooltip */
+  --z-backdrop: 50;   /* ฉากหลัง drawer/modal · search list */
+  --z-drawer: 55;     /* ตัวลิ้นชัก/หน้าต่าง */
+  --z-portal: 60;     /* เมนูที่ portal ออกไป #overlay-root (Rule #95) — ต้องเหนือลิ้นชัก */
+  --z-toast: 90;      /* สูงสุด — ต้องเห็นเหนือทุกอย่าง */
+  /* v3.13 — Fixed type scale (Iron Rule locked values) */
+  --fs-h1: 22px;        /* page title */
+  --fs-h2: 17px;        /* section title */
+  --fs-h3: 15px;        /* card / drawer title */
+  --fs-body: 14px;      /* body default */
+  --fs-sub: 13px;       /* secondary body / table cell */
+  --fs-meta: 12px;      /* meta / label */
+  --fs-cap: 11px;       /* uppercase section caption */
+  --fs-kpi: 28px;       /* stat value */
+  /* v3.13 — Fixed spacing scale */
+  --sp-xs: 4px; --sp-sm: 8px; --sp-md: 12px; --sp-lg: 20px; --sp-xl: 28px;
+  /* v3.13 — Fixed radius scale */
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-full: 999px;
+}
+
+/* ============== RESET ============== */
+* { box-sizing: border-box; }
+html, body { margin:0; padding:0; }
+/* Rule #35 — Layout Stability: จองพื้นที่ scrollbar ไว้เสมอ → เปิด modal/drawer หรือ
+   content โตขึ้นแล้ว scrollbar โผล่/หาย จะไม่ทำให้หน้าจอขยับซ้าย-ขวา (jank) */
+html { scrollbar-gutter: stable; }
+/* scroll lock — เปิด overlay แล้วพื้นหลังต้องไม่ scroll ตาม (ทำงานคู่กับ lockScroll ใน UTILS) */
+body.is-overlay-open { overflow: hidden; }
+
+/* ============== SCROLLBAR (Iron Rule #49 — minimal, ห้าม default) ============== */
+/* เส้นบางมาก 5px · track โปร่งใส · พื้นเข้ม (sidebar/panel) = ขาวโปร่ง · พื้นสว่าง = charcoal จาง */
+* { scrollbar-width: thin; scrollbar-color: rgba(17,17,17,.16) transparent; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(17,17,17,.14); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(17,17,17,.26); }
+.sidebar, .slide { scrollbar-color: rgba(255,255,255,.28) transparent; }
+.sidebar ::-webkit-scrollbar-thumb, .slide ::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb, .slide::-webkit-scrollbar-thumb { background: rgba(255,255,255,.28); }
+.sidebar ::-webkit-scrollbar-thumb:hover, .slide ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.42); }
+body {
+  font-family: 'Satoshi', 'Noto Sans Thai', system-ui, sans-serif;
+  background: var(--c-bg-off);
+  color: var(--c-ink);
+  font-size:14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  /* v7.1 Rule #97: desktop-base + adaptive — 768-1180 ปรับ layout ผ่าน media query,
+     <768 = horizontal scroll (ไม่ guarantee) */
+  min-width: 768px;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+[data-lucide] { flex-shrink: 0; }
+
+/* Hide number input spinner globally (Iron Rule #19) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin:0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ============== SIDEBAR ============== */
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sidebar-w);
+  background: #111111;
+  color: #E9E5E0;
+  z-index:var(--z-shell);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.sb-brand {
+  padding:18px;
+  display: flex;
+  align-items: center;
+  gap:12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+.sb-logo {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, #FF3B30, #FF9A1F);
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(255,59,48,0.3);
+}
+.sb-name { font-weight: 700; font-size:14px; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+.sb-sub { font-size:11px; color: #9A9CA2; letter-spacing: 0.06em; font-weight: 600; text-transform: uppercase; margin-top:2px; }
+.sb-nav { flex: 1; padding:12px 8px; overflow-y: auto; }
+
+/* Module = collapsible group (Iron Rule #27).
+   Header toggles expand/collapse only — NOT navigable.
+   Children = .sb-features (clickable feature items). */
+.sb-module { margin-bottom:4px; }
+.sb-module-header {
+  display: flex; align-items: center; gap:8px;
+  width: 100%;
+  padding:8px 10px;
+  border-radius: 6px;
+  background: transparent; border: 0;
+  color: #9A9CA2;
+  font-family: inherit;
+  font-size:11px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  cursor: pointer; transition: all 120ms;
+  text-align: left;
+}
+.sb-module-header:hover { background: rgba(255,255,255,0.04); color: #DEDAD4; }
+.sb-module-header .mod-icon { flex-shrink: 0; opacity: 0.7; }
+.sb-module-header .mod-label { flex: 1; }
+.sb-module-header .mod-chevron {
+  flex-shrink: 0;
+  transition: transform 200ms;
+  opacity: 0.7;
+}
+.sb-module[data-expanded="false"] .mod-chevron { transform: rotate(-90deg); }
+.sb-module[data-expanded="false"] .sb-features { display: none; }
+
+.sb-features { padding:2px 0 6px 0; }
+
+.sb-item {
+  display: flex; align-items: center; gap:10px;
+  padding:8px 12px 8px 16px;
+  border-radius: 6px;
+  color: #DEDAD4;
+  font-size:13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms;
+  margin-bottom:1px;
+  position: relative;
+  user-select: none;
+}
+.sb-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sb-item.is-active {
+  background: #FF3B30;
+  color: #fff;
+  font-weight: 600;
+}
+.sb-item.is-active::before {
+  content: '';
+  position: absolute;
+  left: -10px; top: 7px; bottom: 7px;
+  width: 3px;
+  background: #fff;
+  border-radius: 0 2px 2px 0;
+}
+.sb-item [data-lucide] { width: 16px; height: 16px; opacity: 0.85; }
+.sb-item.is-active [data-lucide] { opacity: 1; }
+.sb-badge {
+  margin-left:auto;
+  font-size:11px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.10);
+  color: #9A9CA2;
+  padding:2px 8px;
+  border-radius: 999px;
+}
+.sb-item.is-active .sb-badge { background: rgba(255,255,255,0.18); color: #fff; }
+.sb-item.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.sb-item.is-disabled:hover { background: transparent; color: #DEDAD4; }
+.sb-footer {
+  padding:12px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  gap:8px;
+  font-size:12px;
+  color: #9A9CA2;
+}
+.pulse-dot {
+  width: 7px; height: 7px;
+  background: var(--c-teal);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(255,154,31,0.20);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ============== MAIN ============== */
+.main {
+  margin-left:var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--c-bg-off);
+}
+
+/* ============== SHELL BAR ============== */
+.shell-bar {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  border-bottom: 1px solid var(--c-line-2);
+  height: var(--shell-h);
+  display: flex;
+  align-items: center;
+  padding:0 24px;
+  z-index:var(--z-sticky);
+  gap:12px;
+}
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap:8px;
+  font-size:13px;
+  color: var(--c-mute);
+}
+.breadcrumb a { cursor: pointer; transition: color 120ms; }
+.breadcrumb a:hover { color: var(--c-primary); }
+.breadcrumb .sep { color: var(--c-mute-3); font-size:11px; }
+.breadcrumb-current { color: var(--c-ink); font-weight: 500; }
+.icon-btn {
+  width: 34px; height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--c-mute);
+  border-radius: 7px;
+  position: relative;
+  transition: all 120ms;
+}
+.icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.icon-btn [data-lucide] { width: 17px; height: 17px; }
+.notif-dot {
+  position: absolute;
+  top: 7px; right: 8px;
+  width: 7px; height: 7px;
+  background: var(--c-danger);
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap:10px;
+  padding:6px 10px 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 120ms;
+}
+.user-chip:hover { background: var(--c-line-3); }
+.user-text { line-height: 1.2; text-align: right; }
+.user-name { font-size:12.5px; font-weight: 500; color: var(--c-ink); white-space: nowrap; }
+.user-role { font-size:11px; color: var(--c-mute-2); white-space: nowrap; margin-top:1px; }
+.avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* User dropdown menu */
+.user-menu {
+  position: absolute;
+  top: calc(var(--shell-h) - 4px);
+  right: 22px;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(17,17,17,0.12);
+  width: 240px;
+  z-index:var(--z-dropdown);
+  padding:6px;
+  display: none;
+}
+.user-menu.is-open { display: block; }
+.user-menu-item {
+  display: flex;
+  align-items: center;
+  gap:10px;
+  padding:8px 12px;
+  border-radius: 6px;
+  font-size:13px;
+  color: var(--c-ink);
+  cursor: pointer;
+  transition: background 120ms;
+}
+.user-menu-item:hover { background: var(--c-bg-off); }
+.user-menu-item [data-lucide] { width: 15px; height: 15px; color: var(--c-mute-2); }
+.user-menu-item.is-danger { color: var(--c-danger); }
+.user-menu-item.is-danger [data-lucide] { color: var(--c-danger); }
+.user-menu-divider { height: 1px; background: var(--c-line-2); margin:6px 0; }
+
+/* ============== CONTENT ============== */
+/* Fluid full-width — content stretches to fill viewport (Iron Rule #30).
+   Do NOT add max-width here; component-level constraints (modal/toast/wizard
+   internal cards) are responsible for their own readability bounds. */
+.content {
+  padding:24px;
+}
+
+/* ============== v7.1 RESPONSIVE — Rule #97 (desktop-base adaptive) ============== */
+.nav-toggle { display:none; }
+@media (max-width: 1180px){
+  .content { padding:16px; }
+  .drawer { width: min(920px, 100vw); }
+  .drawer.standard { width: min(680px, 100vw); }
+  .drawer.wide, .drawer-panel.wide { width: min(1290px, 100vw); }
+  /* generic shell: sidebar เป็น off-canvas — Pattern N shell ใช้ icon rail ของตัวเองแทน */
+  .main { margin-left: 0; }
+  .sidebar { transform: translateX(-100%); transition: transform .18s ease; }
+  .sidebar.open { transform: translateX(0); box-shadow: 0 8px 32px rgba(0,0,0,.24); }
+  .nav-toggle { display:inline-flex; align-items:center; justify-content:center;
+    width:32px; height:32px; border:none; background:transparent; border-radius:8px;
+    color:var(--c-ink); }
+  .nav-toggle:hover { background: rgba(17,17,17,.06); }
+}
+
+/* ============== v7.1 LIST FULL-HEIGHT — Rule #96 ============== */
+/* หน้า list หลัก: ตารางยืดเต็มพื้นที่เหลือ ติดขอบล่างเสมอ ทุกขนาดจอ */
+.page-fill { display:flex; flex-direction:column;
+  min-height: calc(100dvh - var(--shellbar-h, 52px) - 48px); } /* 48 = ระยะขอบบน+ล่างของ .content */
+@media (max-width:1180px){ .page-fill { min-height: calc(100dvh - var(--shellbar-h, 52px) - 32px); } }
+.page-fill > .card-list, .page-fill > .list-card { flex:1 1 auto; min-height:0;
+  display:flex; flex-direction:column; }
+.table-wrap { flex:1 1 auto; min-height:0; overflow:auto; }
+.table-wrap thead th { position:sticky; top:0; background:#fff; z-index:var(--z-sticky); }
+.table-foot { flex:0 0 auto; } /* pagination/count ติดล่างของ card เสมอ */
+
+/* ============== v7.1 OVERLAY PORTAL — Rule #95 ============== */
+/* เมนูที่ portal ออกจาก scroll container (ใช้คู่ portalMenu util) */
+.menu-fixed { position:fixed !important; z-index:var(--z-portal);
+  background:#fff; border:1px solid var(--c-line, #DEDAD4); border-radius:10px;
+  box-shadow:0 12px 32px rgba(17,17,17,.14); overflow-y:auto; }
+
+/* ============== PAGE HEADER ============== */
+.ph {
+  margin-bottom:18px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap:16px;
+}
+.ph > div:first-child { flex: 1 1 auto; min-width: 280px; }
+.ph-title-row {
+  display: flex;
+  align-items: baseline;
+  gap:10px;
+  margin-bottom:6px;
+}
+.ph-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:20px;
+  font-weight: 700;
+  color: var(--c-navy);
+  margin:0;
+  letter-spacing: -0.01em;
+}
+.ph-count {
+  font-size:12.5px;
+  font-weight: 600;
+  color: var(--c-mute-2);
+  background: var(--c-line-3);
+  padding:3px 10px;
+  border-radius: 999px;
+}
+.ph-sub { font-size:13px; color: var(--c-mute); margin:0; }
+.ph-actions { display: flex;align-items:center; gap:8px; flex-shrink: 0; }
+
+/* ============== BUTTONS ============== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;   /* Rule #36 — content กึ่งกลางแนวนอน */
+  gap:6px;
+  height: 36px;
+  /* Rule #36 — padding-top 2px = optical centering สำหรับฟอนต์ไทย (Noto Sans Thai):
+     baseline ของไทยลอยสูงเมื่อ flex-center เพราะ font เผื่อที่สระล่าง → นัดจ์ลง 2px ให้เข้ากลางจริง.
+     ✅ verified ด้วยการ render จริง — ทนทุกเบราว์เซอร์ (ต่างจาก text-box-trim ที่รองรับเฉพาะ Chrome 133+). */
+  padding:2px 16px 0;
+  border-radius: 8px;
+  font-size:13px;
+  font-weight: 500;
+  /* ⚠️ Rule #36 — ห้ามใส่ line-height:1 / overflow:hidden กับตัวปุ่มที่มีข้อความไทย
+     เพราะจะ "ตัดสระบน-วรรณยุกต์-สระล่าง" ทำให้ตัวอักษรเบี้ยว. ปล่อย line-height ตาม body (1.5). */
+  border: 1px solid transparent;
+  background: transparent;
+  white-space: nowrap;       /* label ไม่ตัดบรรทัด → ปุ่มในแถวเดียวสูงเท่ากัน */
+  transition: all 120ms;
+  user-select: none;
+  cursor: pointer;
+}
+.btn [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; }  /* Rule #36 — icon ไม่ถูกบีบ */
+.btn:disabled, .btn.is-disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+.btn-eq { min-width: 104px; }  /* Rule #36 — ปุ่มคู่ที่ควรสมมาตร → กว้างเท่ากัน */
+/* Rule #36 — label ยาวที่ "ต้อง" จำกัดความกว้าง: truncate ที่ span (.lbl) ไม่ใช่ที่ตัวปุ่ม.
+   line-height (1.5) สูงพอ → overflow:hidden ตัดเฉพาะแนวนอน (ไม่ตัดสระไทย). ปกติปล่อยปุ่มโตตาม label ดีกว่า. */
+.btn-truncate { max-width: 220px; }
+.btn-truncate .lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn-primary { background: var(--c-primary); color: #fff; }
+.btn-primary:hover { background: var(--c-primary-hover); box-shadow: 0 2px 8px rgba(255,59,48,0.30); }
+.btn-secondary { background: #fff; border-color: var(--c-line); color: var(--c-ink); }
+.btn-secondary:hover { background: var(--c-line-3); border-color: var(--c-mute-2); }
+.btn-ghost { color: var(--c-mute); }
+.btn-ghost:hover { background: var(--c-line-3); color: var(--c-ink); }
+.btn-danger { background: #fff; border-color: var(--c-line); color: var(--c-danger); }
+.btn-danger:hover { background: #FFE9E7; border-color: var(--c-danger); }
+.btn-link { background: transparent; border: 0; padding:0 4px; height: auto; color: var(--c-primary); font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn-sm { height: 30px; padding:2px 12px 0; font-size:12px; }
+
+/* ============== STATS (KPI Cards) ============== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap:12px;
+  margin-bottom:18px;
+}
+.stat {
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  padding:16px 16px;
+  transition: all 150ms;
+}
+.stat:hover { border-color: var(--c-line); box-shadow: 0 2px 8px rgba(17,17,17,0.05); }
+.stat-label {
+  display: flex;
+  align-items: center;
+  gap:6px;
+  font-size:12px;
+  font-weight: 500;
+  color: var(--c-mute);
+}
+.stat-label [data-lucide] { width: 13px; height: 13px; color: var(--c-primary); }
+.stat-value {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:26px;
+  font-weight: 700;
+  color: var(--c-navy);
+  margin-top:6px;
+  letter-spacing: -0.01em;
+}
+.stat-meta {
+  font-size:12px;
+  color: var(--c-mute-2);
+  margin-top:6px;
+  display: flex;
+  align-items: center;
+  gap:4px;
+}
+.stat-meta.is-up { color: var(--c-success); }
+.stat-meta.is-down { color: var(--c-danger); }
+.stat-meta [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== CARD ============== */
+.card {
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* ============== FILTER BAR ============== */
+.filter-bar {
+  padding:16px 18px;
+  display: flex;
+  gap:10px;
+  align-items: center;
+  border-bottom: 1px solid var(--c-line-2);
+  background: #fff;
+  flex-wrap: wrap;
+}
+
+/* ============== INPUTS ============== */
+.input, .select {
+  height: 36px;
+  padding:0 12px;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  font-size:13px;
+  background: #fff;
+  color: var(--c-ink);
+  font-family: inherit;
+  transition: all 120ms;
+  width: 100%;
+}
+.input:focus, .select:focus {
+  outline: none;
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px rgba(255,59,48,0.10);
+}
+.select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right:32px;
+  appearance: none;
+}
+.input-search { position: relative; flex: 1; max-width: 320px; }
+.input-search input { padding-left:36px; }
+.input-search .lead-icon {
+  position: absolute;
+  left: 11px; top: 50%;
+  transform: translateY(-50%);
+  width: 15px; height: 15px;
+  color: var(--c-mute-2);
+  pointer-events: none;
+}
+
+/* ===== SEARCH-SELECT (Iron Rule #34) — searchable dropdown แทน select ธรรมดา เมื่อ options เยอะ/lookup master =====
+   list = position:absolute overlay → ไม่ดันเนื้อหา (สอดคล้อง Rule #35) */
+.search-select { position: relative; width: 100%; }
+.search-select .ss-input { padding-left:32px; padding-right:32px; }
+.search-select .ss-lead {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px;   /* ⬅ ขนาดตายตัว — ไม่พึ่ง .w-4 (กัน Lucide เรนเดอร์ 24px default → placeholder ดูห่าง) */
+  color: var(--c-mute-3); pointer-events: none;
+}
+.search-select .ss-caret {
+  position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+  width: 15px; height: 15px; color: var(--c-mute-3); pointer-events: none;
+}
+.search-select .ss-clear {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  display: inline-flex; padding:3px; border: 0; background: transparent;
+  color: var(--c-mute-2); cursor: pointer; border-radius: 6px;
+}
+.search-select .ss-clear:hover { background: var(--c-line-3); color: var(--c-ink); }
+.ss-list {
+  position: absolute; z-index:var(--z-backdrop); left: 0; right: 0; margin-top:4px;
+  max-height: 280px; overflow-y: auto; background: #fff;
+  border: 1px solid var(--c-line); border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(17,17,17,0.10), 0 4px 10px rgba(17,17,17,0.05);
+}
+.ss-opt {
+  width: 100%; display: flex; align-items: center; gap:10px; padding:10px 12px;
+  border: 0; border-bottom: 1px solid var(--c-line-3); background: transparent;
+  cursor: pointer; text-align: left; font-family: inherit;
+}
+.ss-opt:last-child { border-bottom: 0; }
+.ss-opt:hover, .ss-opt.is-active { background: rgba(255,59,48,0.06); }
+.ss-opt-ic { width: 16px; height: 16px; color: var(--c-primary); flex-shrink: 0; }  /* ขนาดตายตัวเช่นกัน */
+.ss-opt-main { flex: 1; min-width: 0; }
+.ss-opt-label { display: block; font-size:13px; color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-sub { display: block; font-size:12px; color: var(--c-mute-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-right { flex-shrink: 0; font-size:12px; color: var(--c-mute); }
+.ss-opt mark { background: rgba(255,59,48,0.16); color: inherit; padding:0 1px; border-radius: 2px; }
+.ss-empty { padding:20px 16px; text-align: center; font-size:13px; color: var(--c-mute-2); }
+
+/* ============== TABLE ============== */
+.table-scroll { overflow-x: auto; }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size:13px;
+}
+.table thead { background: var(--c-bg-off); }
+.table th {
+  padding:12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--c-mute);
+  font-size:12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--c-line-2);
+  white-space: nowrap;
+}
+.table th.col-check { width: 40px; padding-right:0; }
+.table th.is-sortable { cursor: pointer; user-select: none; }
+.table th.is-sortable:hover { color: var(--c-ink); background: var(--c-line-3); }
+.table th .sort-arrow { display: inline-block; margin-left:4px; opacity: 0.4; }
+.table th.is-sorted .sort-arrow { opacity: 1; color: var(--c-primary); }
+.table td {
+  padding:12px 16px 12px;  /* Rule #38 — optical centering ไทย: pad-top มากกว่า bottom 2px */
+  border-bottom: 1px solid var(--c-line-2);
+  color: var(--c-ink);
+  vertical-align: middle;
+}
+.table tbody tr { transition: background 120ms; }
+.table tbody tr:hover { background: var(--c-bg-off); }
+.table tbody tr.is-selected { background: rgba(255,59,48,0.04); }
+.table tbody tr.is-selected:hover { background: rgba(255,59,48,0.07); }
+.table tbody tr:last-child td { border-bottom: 0; }
+/* Rule #41 — แถวกดได้ = เปิด view (ไม่มีไอคอนดวงตา). row ที่ clickable ต้องสื่อด้วย cursor */
+.table tbody tr.is-clickable { cursor: pointer; }
+/* Rule #42 — Long-list UX: sticky header (opt-in .is-sticky) — ตารางยาว scroll หัวค้าง */
+.table-scroll.is-sticky { max-height: 560px; overflow-y: auto; scrollbar-gutter: stable; }
+.table-scroll.is-sticky thead th {
+  position: sticky; top: 0; z-index: var(--z-sticky);
+  background: var(--c-bg-off);            /* ⚠️ ต้องทึบที่ตัว th (ไม่ใช่แค่ thead) — ไม่งั้น row เลื่อนทะลุซ้อนหัว */
+  box-shadow: inset 0 -1px 0 var(--c-line-2);  /* border-bottom สำหรับ sticky (border ปกติหายตอน sticky) */
+}
+/* Rule #42 — Thai-safe cell truncation: ตัดเฉพาะแนวนอน (… ) line-height พอ ไม่ตัดสระ. ใส่ title=ค่าเต็มเพื่อ hover ดู */
+.cell-truncate { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+/* Rule #43 — ตัวเลข tabular + คอลัมน์ตัวเลขชิดขวา */
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+th.col-num, td.col-num { text-align: right; }
+td.col-num .num, td.col-num { font-variant-numeric: tabular-nums; }
+
+/* ============== CHECKBOX ============== */
+.cb {
+  width: 16px; height: 16px;
+  border: 1.5px solid var(--c-line);
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: all 120ms;
+  flex-shrink: 0;
+}
+.cb.is-checked, .cb.is-partial {
+  background: var(--c-primary);
+  border-color: var(--c-primary);
+}
+.cb.is-checked::after {
+  content: '';
+  position: absolute;
+  left: 4px; top: 1px;
+  width: 5px; height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.cb.is-partial::after {
+  content: '';
+  position: absolute;
+  left: 3px; top: 6px;
+  width: 8px; height: 2px;
+  background: #fff;
+}
+.cb:hover { border-color: var(--c-primary); }
+
+/* ============== USER CELL ============== */
+.user-cell { display: flex; align-items: center; gap:10px; }
+.uc-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.uc-name { font-weight: 600; color: var(--c-ink); font-size:13px; line-height: 1.3; }
+.uc-email { font-size:12px; color: var(--c-mute-2); margin-top:1px; line-height: 1.3; }
+
+/* ============== PILLS ============== */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap:4px;
+  padding:4px 10px 3px;  /* Rule #38 — optical centering ไทย: pad-top มากกว่า bottom 1px กัน text ลอยสูง (verified) */
+  border-radius: 999px;
+  font-size:12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pill [data-lucide] { width: 11px; height: 11px; }
+.pill-registered { background: #E6F0FF; color: #1A5FCC; }
+.pill-active { background: #E6F0FF; color: #1A5FCC; }
+.pill-converted { background: #E4F4EB; color: #157A41; }
+.pill-suspended { background: #FFF1DD; color: #B8690B; }
+.pill-archived { background: var(--c-line-3); color: var(--c-mute-2); }
+/* v3.13 — Semantic pill aliases (ใช้ชุดนี้เป็นหลัก — mapping ดู knowledge/microcopy.md) */
+.pill-info    { background: #E6F0FF; color: #1A5FCC; }   /* กำลังดำเนินการ/ใช้งาน */
+.pill-success { background: #E4F4EB; color: #157A41; }   /* อนุมัติแล้ว/เสร็จสิ้น */
+.pill-warning { background: #FFF1DD; color: #B8690B; }   /* รอดำเนินการ/รออนุมัติ */
+.pill-danger  { background: #FFE9E7; color: #E62E24; }   /* ปฏิเสธ/ยกเลิก */
+.pill-muted   { background: var(--c-line-3); color: var(--c-mute-2); } /* ร่าง/ปิดใช้งาน/เก็บถาวร */
+
+/* v3.13 — Loading spinner (Iron Rule #44) */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.8s linear infinite; }
+
+/* v3.13 — Form Section Grouping (Iron Rule #45) */
+.form-section { margin-top:var(--sp-xl); }
+.form-section:first-child { margin-top:0; }
+.form-section-title {
+  font-size: var(--fs-cap); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--c-mute);
+  padding-bottom:var(--sp-sm); border-bottom: 1px solid var(--c-line-2);
+  margin-bottom:var(--sp-md);
+}
+
+/* v3.13 — Segmented control (ช่วงเวลา dashboard ฯลฯ — Pattern J) */
+.seg-control { display:inline-flex; background: var(--c-line-3); border-radius: var(--r-md); padding:2px; gap:2px; }
+.seg-item {
+  padding:6px 12px 3px; border-radius: var(--r-sm); border: none; background: transparent;
+  font-size: var(--fs-meta); font-weight: 500; color: var(--c-mute-2); cursor: pointer;
+  font-family: inherit; white-space: nowrap;
+}
+.seg-item.is-active { background: #fff; color: var(--c-ink); font-weight: 600; box-shadow: 0 1px 3px rgba(17,17,17,0.08); }
+.pill-danger { background: #FFE9E7; color: var(--c-danger); }
+
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot.is-active { background: #1A5FCC; box-shadow: 0 0 0 2.5px rgba(37,99,235,0.18); }
+.dot.is-converted { background: #157A41; box-shadow: 0 0 0 2.5px rgba(6,95,70,0.20); }
+.dot.is-suspended { background: var(--c-warning); }
+.dot.is-archived { background: var(--c-mute-3); }
+
+/* Mini-link cell (e.g. tenant link) */
+.tenant-link {
+  display: inline-flex;
+  align-items: center;
+  gap:4px;
+  color: var(--c-primary);
+  font-size:12.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.tenant-link:hover { text-decoration: underline; }
+.tenant-link [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== ROW ACTIONS ============== */
+.row-actions { display: inline-flex; gap:2px; }
+.ra-btn {
+  width: 28px; height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--c-mute-2);
+  border-radius: 6px;
+  transition: all 120ms;
+}
+.ra-btn:hover { background: var(--c-line-3); color: var(--c-primary); }
+.ra-btn.is-danger:hover { background: #FFE9E7; color: var(--c-danger); }
+.ra-btn.is-success:hover { background: rgba(255,154,31,0.12); color: var(--c-teal); }
+.ra-btn [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== TABLE FOOTER ============== */
+.table-footer {
+  padding:12px 18px;
+  background: var(--c-bg-off);
+  border-top: 1px solid var(--c-line-2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size:12.5px;
+  color: var(--c-mute);
+  flex-wrap: wrap;
+  gap:10px;
+}
+.pagination { display: inline-flex; gap:4px; align-items: center; }
+.pg-btn {
+  min-width: 30px; height: 30px;
+  padding:0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 6px;
+  color: var(--c-mute);
+  font-size:12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms;
+}
+.pg-btn:hover { border-color: var(--c-line); background: var(--c-bg-off); }
+.pg-btn.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.pg-btn.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn [data-lucide] { width: 13px; height: 13px; }
+
+/* ============== BULK BAR ============== */
+.bulk-bar {
+  background: var(--c-navy);
+  color: #fff;
+  padding:12px 18px;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  gap:12px;
+  border-bottom: 1px solid var(--c-line-2);
+  margin:-1px -1px 0;
+  font-size:13px;
+}
+.bulk-bar .btn { height: 30px; padding:2px 12px 0; font-size:12px; }
+.bulk-bar .btn-secondary {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.18);
+  color: #fff;
+}
+.bulk-bar .btn-secondary:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.30); }
+
+/* ============== DRAWER ============== */
+/* ---- v6.1 Pattern B drawer chrome (locked to references/drawer-standard/pr.html) ----
+   create/edit drawer ให้ใช้ชุดนี้: .dw-head (eyebrow + h2 20px + .top-icon-btn ปิด)
+   + .d-stepper (.stepper-item/.stepper-circle 32px — ไม่ใช่ .stepper กลางของ page wizard)
+   + .dw-footer (ย้อนกลับ secondary ซ้าย · ยกเลิก ghost + primary ชิดขวา) */
+.top-icon-btn { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border:0; background:transparent; border-radius: var(--r-sm); color: var(--c-mute-2); cursor:pointer; transition: all 120ms; flex-shrink:0; }
+.top-icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.dw-head { padding:18px 24px 16px; border-bottom: 1px solid var(--c-line-2); flex-shrink: 0; }
+.dw-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap:16px; }
+.dw-eyebrow { display: flex; align-items: center; gap:6px; font-size:11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-mute-2); margin-bottom:4px; font-weight: 600; }
+.dw-title { font-size:20px; font-weight: 700; color: var(--c-navy); margin:0; letter-spacing: -0.01em; }
+.dw-sub { font-size: var(--fs-meta); color: var(--c-mute-2); margin-top:4px; }
+.d-stepper { display: flex; align-items: flex-start; gap:0; width: 100%; margin-top:18px; }
+.stepper-item { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; min-width: 0; }
+.stepper-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size:13px; font-weight: 600; background: #fff; color: var(--c-mute-3); border: 2px solid var(--c-line); transition: all 200ms; z-index: 2; }
+.stepper-item.active .stepper-circle { background: var(--c-primary); color: #fff; border-color: var(--c-primary); box-shadow: 0 0 0 4px rgba(255,59,48,0.12); }
+.stepper-item.done .stepper-circle { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
+.stepper-label { margin-top:8px; font-size:12px; font-weight: 500; color: var(--c-mute-3); text-align: center; line-height: 1.3; transition: color 200ms; }
+.stepper-item.active .stepper-label { color: var(--c-navy); font-weight: 600; }
+.stepper-item.done .stepper-label { color: var(--c-mute); }
+.stepper-item:not(:last-child)::after { content: ''; position: absolute; top: 15px; left: 50%; right: -50%; height: 2px; background: var(--c-line-2); z-index: 1; }
+.stepper-item.done:not(:last-child)::after { background: var(--c-primary); }
+.dw-footer { padding:16px 24px; border-top: 1px solid var(--c-line-2); background: var(--c-bg-off); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap:8px; }
+.dw-footer-right { display: flex; align-items: center; gap:8px; }
+
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17,17,17,0.40);
+  z-index:var(--z-backdrop);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms;
+}
+.drawer-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 920px;           /* v2 standard (Iron Rule #11) — wide drawer */
+  max-width: 96vw;
+  background: #fff;
+  z-index:var(--z-drawer);
+  transform: translateX(100%);
+  transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -16px 0 40px rgba(17,17,17,0.18);
+}
+.drawer.is-open { transform: translateX(0); }
+.drawer.standard { width: 680px; }   /* simple forms / short view (Iron Rule #11) */
+
+/* ========== STEPPER STANDARD (Iron Rule #47) — ใช้ตัวเดียวทุก wizard ========== */
+.stepper { display:flex; align-items:center; gap:var(--sp-sm); }
+.step { display:flex; align-items:center; gap:var(--sp-sm); }
+.step-dot {
+  width:26px; height:26px; border-radius: var(--r-full);
+  display:flex; align-items:center; justify-content:center;
+  font-size: var(--fs-meta); font-weight:600; padding-top:1px; /* Thai rhythm */
+  border:1.5px solid var(--c-line); background:#fff; color: var(--c-mute-2);
+}
+.step-label { font-size: var(--fs-sub); color: var(--c-mute-2); font-weight:500; white-space:nowrap; }
+.step-connector { width:28px; height:1.5px; background: var(--c-line-2); flex:0 0 auto; }
+.step.is-current .step-dot { border-color: var(--c-primary); background: var(--c-primary); color:#fff; }
+.step.is-current .step-label { color: var(--c-ink); font-weight:600; }
+.step.is-done .step-dot { border-color: var(--c-teal); background:#fff; color: var(--c-teal); }
+.step.is-done .step-connector, .step.is-current ~ * {}
+.step.is-done + .step-connector { background: var(--c-teal); }
+/* placement: drawer wizard → .drawer-stepper-band (ใต้ header) / page wizard → .wizard-stepper-band */
+.drawer-stepper-band { padding:10px 24px; border-bottom: 1px solid var(--c-line-2); background: var(--c-bg-off); }
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  gap:16px;
+  padding:18px 24px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.drawer-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.drawer-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:20px;
+  font-weight: 600;
+  color: var(--c-navy);
+  margin:0;
+  letter-spacing: -0.01em;
+}
+.drawer-subtitle {
+  font-size:12px;
+  color: var(--c-mute);
+  margin-top:4px;
+  display: flex;
+  align-items: center;
+  gap:8px;
+  flex-wrap: wrap;
+}
+.drawer-tabs {
+  display: flex;align-items:center;
+  padding:0 24px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.drawer-tab {
+  padding:10px 16px;
+  font-size:13px;
+  font-weight: 500;
+  color: var(--c-mute);
+  border-bottom: 2px solid transparent;
+  transition: all 120ms;
+  margin-bottom:-1px;
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+}
+.drawer-tab:hover { color: var(--c-ink); }
+.drawer-tab.is-active { color: var(--c-primary); border-bottom-color: var(--c-primary); }
+.drawer-body { flex: 1; overflow-y: auto; padding:24px; scrollbar-gutter: stable; }
+.drawer-section { margin-bottom:24px; }
+.drawer-section-title {
+  font-size:11px;
+  font-weight: 700;
+  color: var(--c-mute);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin:0 0 10px;
+}
+.drawer-fields {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap:10px 16px;
+  font-size:13px;
+}
+.drawer-fields .lbl { color: var(--c-mute); }
+.drawer-fields .val { color: var(--c-ink); font-weight: 500; }
+.drawer-footer {
+  padding:12px 24px;
+  border-top: 1px solid var(--c-line-2);
+  display: flex;
+  gap:8px;
+  align-items: center;
+  background: var(--c-bg-off);
+}
+/* Drawer Button Contract (Iron Rule #31) helpers */
+.footer-spacer { flex: 1; }
+.drawer-footer-meta { font-size:12px; color: var(--c-mute-2); }
+.drawer-header-actions { display: flex; gap:6px; align-items: center; }
+.drawer-header-divider { width: 1px; height: 22px; background: var(--c-line-2); margin:0 4px; flex-shrink: 0; }
+
+/* ============== TIMELINE ============== */
+.timeline { position: relative; padding-left:24px; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--c-line-2);
+}
+.tl-item { position: relative; margin-bottom:16px; }
+.tl-item:last-child { margin-bottom:0; }
+.tl-dot {
+  position: absolute;
+  left: -20px;
+  top: 3px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--c-primary);
+}
+.tl-dot.is-success { border-color: var(--c-success); }
+.tl-dot.is-warning { border-color: var(--c-warning); }
+.tl-title { font-size:13px; font-weight: 600; color: var(--c-ink); }
+.tl-meta { font-size:12px; color: var(--c-mute-2); margin-top:2px; }
+
+/* ============== BOOKMARK / RELATED CARDS ============== */
+.bm-card {
+  display: flex;
+  gap:12px;
+  padding:12px 12px;
+  border: 1px solid var(--c-line-2);
+  border-radius: 8px;
+  margin-bottom:8px;
+  cursor: pointer;
+  transition: all 120ms;
+  align-items: center;
+}
+.bm-card:hover { border-color: var(--c-line); }
+.bm-icon {
+  width: 28px; height: 28px;
+  background: rgba(255,59,48,0.10);
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-primary);
+  flex-shrink: 0;
+}
+.bm-card [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== NOTES ============== */
+.notes-area {
+  width: 100%;
+  min-height: 130px;
+  padding:12px 16px;
+  background: #fff;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  resize: vertical;
+  font-family: inherit;
+  font-size:13px;
+  line-height: 1.55;
+}
+.notes-area:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(255,59,48,0.10); }
+
+/* ============== EMPTY STATE ============== */
+.empty {
+  padding:56px 24px;
+  text-align: center;
+  color: var(--c-mute);
+}
+.empty-icon {
+  width: 52px; height: 52px;
+  margin:0 auto 16px;
+  border-radius: 50%;
+  background: var(--c-line-3);
+  color: var(--c-mute-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.empty-icon [data-lucide] { width: 22px; height: 22px; }
+.empty-title {
+  font-size:16px;
+  font-weight: 600;
+  color: var(--c-ink);
+  margin-bottom:6px;
+  font-family: 'Noto Sans Thai', sans-serif;
+}
+.empty-desc { font-size:13px; color: var(--c-mute); max-width: 320px; margin:0 auto; }
+.empty .btn { margin-top:16px; }  /* Rule #39 — empty state ควรมีปุ่ม action หลัก */
+
+/* ============== MODAL ============== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17,17,17,0.50);
+  z-index:var(--z-portal); /* modal ต้องเหนือ drawer(55) · =portal(60) เพื่อให้ combobox portal menu ใน modal โผล่เหนือ modal ได้ตาม DOM order — ห้ามตั้ง > portal ไม่งั้น dropdown ใน modal จะจม */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 440px;
+  max-width: 92vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.96);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 24px 64px rgba(17,17,17,0.28);
+  overflow: hidden;
+}
+.modal-backdrop.is-open .modal { transform: scale(1); }
+.modal-header {
+  padding:18px 24px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap:12px;
+}
+.modal-header-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: rgba(255,59,48,0.10);
+  color: var(--c-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.modal-header-icon.is-danger { background: #FFE9E7; color: var(--c-danger); }
+.modal-header-icon.is-warning { background: #FFF1DD; color: var(--c-warning); }
+.modal-header-icon [data-lucide] { width: 18px; height: 18px; }
+.modal-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:16px;
+  font-weight: 600;
+  color: var(--c-navy);
+  margin:0 0 4px;
+}
+.modal-subtitle { font-size:13px; color: var(--c-mute); margin:0; line-height: 1.5; }
+.modal-body {
+  padding:6px 24px 18px;
+  font-size:13px;
+  color: var(--c-ink);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+.modal-footer {
+  padding:12px 24px;
+  background: var(--c-bg-off);
+  border-top: 1px solid var(--c-line-2);
+  display: flex;align-items:center;
+  justify-content: flex-end;
+  gap:8px;
+}
+
+/* ============== FIELDS ============== */
+.field { margin-bottom:16px; }
+.field-label { display: block; font-size:12.5px; font-weight: 500; color: var(--c-mute); margin-bottom:6px; }
+.field-label .req { color: var(--c-danger); margin-left:2px; }
+.field-input { width: 100%; }
+.field-help { font-size:12px; color: var(--c-mute-2); margin-top:4px; }
+/* Rule #43 — จองพื้นที่ error ไว้ (visibility แทน display) → error โผล่แล้วฟอร์มไม่กระตุก.
+   ถ้า field ไหนไม่ใส่ <div class="field-error"> ก็ไม่จองพื้นที่ (author เลือกเองรายตัว) */
+.field-error { font-size:12px; color: var(--c-danger); margin-top:4px; min-height: 15px; visibility: hidden; }
+.field.is-invalid .input,
+.field.is-invalid .select { border-color: var(--c-danger); }
+.field.is-invalid .field-error { visibility: visible; }
+
+/* Responsive form grid (Iron Rule #17) */
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap:12px;
+}
+
+/* ============== TOAST ============== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--c-navy);
+  color: #fff;
+  padding:12px 18px;
+  border-radius: 10px;
+  font-size:13px;
+  font-weight: 500;
+  z-index:var(--z-toast);
+  display: flex;
+  align-items: center;
+  gap:10px;
+  box-shadow: 0 12px 32px rgba(17,17,17,0.30);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 380px;
+}
+.toast.is-visible { transform: translateY(0); opacity: 1; }
+.toast.is-success { background: var(--c-success); }
+.toast.is-info { background: var(--c-primary); }
+.toast.is-warning { background: var(--c-warning); }
+.toast.is-error { background: var(--c-danger); }
+.toast [data-lucide] { width: 17px; height: 17px; }
+
+/* ============== LINE EXPAND ANIMATION (Pattern E) ============== */
+.line-expanded {
+  animation: lineExpand 220ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+@keyframes lineExpand {
+  from { max-height: 0; opacity: 0; transform: translateY(-8px); }
+  to { max-height: 600px; opacity: 1; transform: translateY(0); }
+}
+
+/* ============== WIZARD LAYOUT (Iron Rule #22) ============== */
+.page-content-host.has-wizard { display: flex; flex-direction: column; height: 100%; }
+.wizard-shell { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 100%; }
+.wizard-stepper-band {
+  flex: 0 0 auto; background: white;
+  padding:18px 32px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.wizard-body { flex: 1 1 auto; padding:24px 32px 28px; min-height: 0; background: var(--c-bg-off); }
+.wizard-card {
+  padding:28px 32px;
+  width: 100%;
+  max-width: 960px;
+  margin:0 auto;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+}
+.wizard-footer {
+  flex: 0 0 auto;
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding:12px 32px;
+  display: flex;align-items:center;
+  justify-content: space-between;
+  border-top: 1px solid var(--c-line-2);
+  box-shadow: 0 -2px 8px rgba(17,17,17,0.04);
+  z-index:var(--z-sticky);
+}
+.stepper-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+  max-width: 640px;
+  margin:0 auto;
+  gap:0;
+}
+.stepper-row .step-line {
+  flex: 1 1 auto;
+  min-width: 28px;
+  max-width: 80px;
+  height: 2px;
+  background: var(--c-line-2);
+}
+.stepper-row .step-line.is-done { background: var(--c-primary); }
+.step-dot {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--c-line-2);
+  color: var(--c-mute-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12.5px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.step-dot.is-active { background: var(--c-primary); color: #fff; }
+.step-dot.is-done { background: var(--c-primary); color: #fff; }
+
+/* ============== UTILITIES ============== */
+.hidden { display: none !important; }  /* v6.1 — search-select/overlay พึ่ง class นี้ (เดิมหายไป ทำให้ ss-list เปิดค้าง + ปุ่ม X โผล่) */
+.text-mute { color: var(--c-mute); }
+.text-mute-2 { color: var(--c-mute-2); }
+.text-primary { color: var(--c-primary); }
+.text-success { color: var(--c-success); }
+.text-danger { color: var(--c-danger); }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap:8px; }
+.gap-3 { gap:12px; }
+.gap-4 { gap:16px; }
+.mb-2 { margin-bottom:8px; }
+.mb-3 { margin-bottom:12px; }
+.mb-4 { margin-bottom:16px; }
+.mt-2 { margin-top:8px; }
+.mt-3 { margin-top:12px; }
+.mt-4 { margin-top:16px; }
+
+/* Icon utility classes (CSS-defined so no Tailwind dependency for these) */
+.w-2\.5 { width: 10px; }   .h-2\.5 { height: 10px; }
+.w-3   { width: 12px; }    .h-3   { height: 12px; }
+.w-3\.5 { width: 14px; }   .h-3\.5 { height: 14px; }
+.w-4   { width: 16px; }    .h-4   { height: 16px; }
+.w-5   { width: 20px; }    .h-5   { height: 20px; }
+
+/* ============================================================
+   Lucide SVG sizing fix
+   ------------------------------------------------------------
+   Lucide replaces <i data-lucide="..."> with <svg class="lucide ...">
+   ที่มี width="24" height="24" attributes ติดมาด้วย — attributes
+   เหล่านี้ override CSS class .w-N ทำให้ icons เด้งเป็น 24×24
+   ดัน pill/button สูงเกินขนาด design.
+
+   วิธีแก้: บังคับ svg.lucide ทุกตัวให้ width/height = 1em แล้ว
+   ปรับขนาดผ่าน font-size บน parent. Plus override สำหรับเคสที่
+   ใช้ .w-N/.h-N โดยตรงบน <i> (Lucide จะ copy class ไปยัง svg)
+   ============================================================ */
+svg.lucide {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: -0.125em;
+  flex-shrink: 0;
+}
+/* เมื่อ .w-N / .h-N ถูก copy ไปบน svg.lucide ให้บังคับ override
+   width/height attributes ที่ Lucide ใส่มา (specificity ชนะ attribute) */
+svg.lucide.w-2\.5 { width: 10px; }   svg.lucide.h-2\.5 { height: 10px; }
+svg.lucide.w-3    { width: 12px; }   svg.lucide.h-3    { height: 12px; }
+svg.lucide.w-3\.5 { width: 14px; }   svg.lucide.h-3\.5 { height: 14px; }
+svg.lucide.w-4    { width: 16px; }   svg.lucide.h-4    { height: 16px; }
+svg.lucide.w-5    { width: 20px; }   svg.lucide.h-5    { height: 20px; }
+
+/* ===== Tooltip (#33/#67 — hint เข้า ⓘ hover) ===== */
+.info-tip{display:inline-flex;align-items:center;margin-left:6px;color:var(--c-mute-2);cursor:help;position:relative}
+.info-tip svg,.info-tip i{width:14px;height:14px}
+.info-tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:var(--c-navy);color:#fff;font-size:12px;line-height:1.5;padding:8px 12px;border-radius:8px;
+  max-width:340px;width:max-content;white-space:normal;opacity:0;pointer-events:none;transition:opacity .12s;z-index:var(--z-dropdown)}
+.info-tip:hover::after{opacity:1}
+/* ===== Drop-up (#66) ===== */
+.drop-up{bottom:100%!important;top:auto!important;margin-bottom:4px}
+
+/* ===== END BASE-KIT — เขียน page-specific CSS ใต้บรรทัดนี้เท่านั้น ===== */
+
+/* ===== F-HR-TRAIN · page CSS (vibe) ===== */
+/* Feature tabs under page header (Iron Rule #104 — 1 feature = 1 menu, ส่วนย่อยเป็น tabs) */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--c-line-2);margin-bottom:18px;flex-wrap:wrap}
+.tab{display:inline-flex;align-items:center;gap:7px;padding:9px 15px 8px;font-size:13.5px;font-weight:500;color:var(--c-mute);
+  border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;background:transparent;border-top:0;border-left:0;border-right:0;transition:all 120ms;white-space:nowrap}
+.tab:hover{color:var(--c-ink)}
+.tab.is-active{color:var(--c-primary);border-bottom-color:var(--c-primary);font-weight:600}
+.tab [data-lucide]{width:15px;height:15px}
+.tab .tab-ct{font-size:11px;font-weight:600;color:var(--c-mute-2);background:var(--c-line-3);border-radius:999px;padding:1px 7px}
+.tab.is-active .tab-ct{background:rgba(255,59,48,.12);color:var(--c-primary)}
+
+/* Note / banner (คำเตือนของ action จริง — ไม่ใช่ hint, ดู #33 exception) */
+.note{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-radius:9px;font-size:12.5px;line-height:1.6;border:1px solid var(--c-line-2);background:#fff;color:var(--c-mute)}
+.note [data-lucide]{width:16px;height:16px;flex-shrink:0;margin-top:1px}
+.note.is-warn{background:#FFF1DD;border-color:#FFB763;color:#B8690B}
+.note.is-warn [data-lucide]{color:var(--c-warning)}
+.note.is-danger{background:#FFE9E7;border-color:#FFE9E7;color:#E62E24}
+.note.is-danger [data-lucide]{color:var(--c-danger)}
+.note.is-info{background:#E6F0FF;border-color:#E6F0FF;color:#1A5FCC}
+.note.is-info [data-lucide]{color:#1A5FCC}
+.note b{color:inherit;font-weight:700}
+.note-act{margin-left:auto;flex-shrink:0}
+
+/* KV grid (lean summary — #103) */
+.kv{display:grid;grid-template-columns:150px 1fr;gap:9px 16px;font-size:13px}
+.kv .k{color:var(--c-mute-2);font-size:12px}
+.kv .v{color:var(--c-ink);font-weight:500}
+.kv .v.mono{font-family:'Satoshi',monospace;font-variant-numeric:tabular-nums}
+
+/* Soft chips */
+.chip-soft{display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;border-radius:999px;font-size:11px;font-weight:600;
+  background:var(--c-line-3);color:var(--c-mute);white-space:nowrap}
+.chip-soft [data-lucide]{width:11px;height:11px}
+.chip-soft.is-cost{background:#FFF1DD;color:#B8690B}
+.chip-soft.is-free{background:#E4F4EB;color:#157A41}
+.chip-soft.is-cert{background:#E6F0FF;color:#1A5FCC}
+.chip-soft.is-gap{background:rgba(255,154,31,.14);color:#B8690B}
+.chip-soft.is-fail{background:#FFE9E7;color:#E62E24}
+
+/* Masked (RESTRICTED — FN-94) */
+.masked{display:inline-flex;align-items:center;gap:5px;color:var(--c-mute-2);font-variant-numeric:tabular-nums}
+.masked [data-lucide]{width:12px;height:12px;color:var(--c-mute-3)}
+
+/* Capacity bar (session จำนวนรับ) */
+.cap-bar{height:8px;background:var(--c-line-3);border-radius:99px;overflow:hidden;min-width:80px}
+.cap-fill{height:100%;background:linear-gradient(90deg,var(--c-primary),var(--c-teal));border-radius:99px;transition:width .4s}
+.cap-fill.is-full{background:var(--c-warning)}
+
+/* EC / Rate Card reference card (display-only — ห้าม hardcode ตัวเลข Rate Card) */
+.ec-ref{border:1px dashed var(--c-line);background:var(--c-bg-off);border-radius:10px;padding:13px 15px}
+.ec-ref .ec-h{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--c-mute);text-transform:uppercase;letter-spacing:.05em}
+.ec-ref .ec-h [data-lucide]{width:14px;height:14px;color:var(--c-teal)}
+.ec-ref .ec-row{display:flex;align-items:baseline;gap:8px;margin-top:9px;flex-wrap:wrap}
+.ec-ref .ec-val{font-size:20px;font-weight:700;color:var(--c-navy);font-variant-numeric:tabular-nums}
+.ec-ref .ec-src{font-size:11.5px;color:var(--c-mute-2)}
+
+/* Certificate soft-ref card */
+.cert-card{border:1px solid var(--c-line-2);background:#E6F0FF;border-radius:10px;padding:13px 15px;display:flex;gap:12px;align-items:flex-start}
+.cert-card .ci{width:34px;height:34px;border-radius:8px;background:#E6F0FF;color:#1A5FCC;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.cert-card .ci [data-lucide]{width:18px;height:18px}
+.cert-card .ct-name{font-size:13px;font-weight:700;color:#1A5FCC}
+.cert-card .ct-meta{font-size:11.5px;color:var(--c-mute-2);margin-top:2px}
+
+/* Slot picker (DOA) */
+.slot{border:1px solid var(--c-line-2);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#fff}
+.slot-h{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.slot-h .sn{width:22px;height:22px;border-radius:50%;background:var(--c-navy);color:#fff;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.slot-h .st{font-size:12.5px;font-weight:600;color:var(--c-ink)}
+.slot-h .sr{margin-left:auto;font-size:11px;color:var(--c-mute-2);font-family:monospace}
+
+/* Employee chip (approval timeline) */
+.emp-chip{display:inline-flex;align-items:center;gap:7px;padding:4px 10px 4px 5px;border:1px solid var(--c-line-2);border-radius:999px;background:#fff;font-size:12px}
+.emp-chip .uc-avatar{width:22px;height:22px;font-size:10px}
+.emp-chip .ec-pos{color:var(--c-mute-2);font-size:11px}
+
+/* Learner row (session ผู้เรียน tab) */
+.lrn{display:flex;align-items:center;gap:11px;padding:11px 12px;border:1px solid var(--c-line-2);border-radius:10px;margin-bottom:9px}
+.lrn .lrn-main{flex:1;min-width:0}
+.lrn .lrn-name{font-size:13px;font-weight:600;color:var(--c-ink)}
+.lrn .lrn-sub{font-size:11.5px;color:var(--c-mute-2);margin-top:1px}
+.lrn .lrn-act{display:flex;gap:6px;flex-shrink:0}
+
+/* Report funnel / bars */
+.funnel{display:flex;flex-direction:column;gap:9px}
+.funnel-row{display:grid;grid-template-columns:200px 1fr 110px;gap:12px;align-items:center}
+.funnel-row .fl{font-size:12.5px;font-weight:600;color:var(--c-ink)}
+.funnel-track{height:30px;background:var(--c-line-3);border-radius:7px;overflow:hidden;position:relative}
+.funnel-fill{height:100%;background:linear-gradient(90deg,var(--c-primary),var(--c-teal));border-radius:7px;min-width:2px;transition:width .4s}
+.funnel-row .fn{text-align:right;font-size:12.5px;font-weight:700;color:var(--c-navy);font-variant-numeric:tabular-nums}
+
+/* Pass/fail picker */
+.rf-pick{display:inline-flex;gap:8px}
+.rf-pick button{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px 0 12px;border:1px solid var(--c-line);background:#fff;border-radius:8px;font-size:13px;font-weight:600;color:var(--c-mute-2);cursor:pointer;transition:all 120ms}
+.rf-pick button [data-lucide]{width:15px;height:15px}
+.rf-pick button.on-pass{background:var(--c-success);border-color:var(--c-success);color:#fff}
+.rf-pick button.on-fail{background:var(--c-danger);border-color:var(--c-danger);color:#fff}
+
+/* File pill (soft attach) */
+.file-pill{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid var(--c-line-2);border-radius:8px;background:#fff;font-size:12.5px;color:var(--c-ink)}
+.file-pill [data-lucide]{width:14px;height:14px;color:var(--c-primary)}
+
+/* Unsupported (out-of-scope) list */
+.oos{display:flex;flex-direction:column;gap:8px}
+.oos-item{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px dashed var(--c-line);border-radius:8px;background:var(--c-bg-off);font-size:12.5px}
+.oos-item .x{font-weight:700;color:var(--c-danger);flex:none;font-family:'Satoshi'}
+.oos-item .why{color:var(--c-mute-2);font-size:11.5px;margin-left:auto;white-space:nowrap}
+
+/* Demo strip (Iron Rule #105 — persona/masking switch = prototype, ห้ามใน page header) */
+.demo-strip{position:fixed;left:16px;bottom:16px;z-index:var(--z-dropdown);background:var(--c-navy);color:#fff;border-radius:12px;
+  padding:9px 12px;display:flex;align-items:center;gap:12px;box-shadow:0 10px 30px rgba(17,17,17,.28);font-size:11.5px}
+.demo-strip .ds-tag{font-weight:700;letter-spacing:.03em;color:#fff;display:flex;align-items:center;gap:6px}
+.demo-strip .ds-tag [data-lucide]{width:13px;height:13px;color:var(--c-teal)}
+.demo-strip .ds-sep{width:1px;height:20px;background:rgba(255,255,255,.18)}
+.demo-strip .ds-lbl{color:#B4B6BB}
+.demo-strip .ds-seg{display:inline-flex;background:rgba(255,255,255,.08);border-radius:8px;padding:2px;gap:2px}
+.demo-strip .ds-seg button{border:0;background:transparent;color:#C7C9CE;font:600 11.5px inherit;padding:4px 9px 3px;border-radius:6px;cursor:pointer}
+.demo-strip .ds-seg button.on{background:var(--c-primary);color:#fff}
+
+/* Section wrap in drawer detail */
+.secwrap{border:1px solid var(--c-line-2);border-radius:10px;padding:15px 16px;margin-bottom:14px}
+.sec-h{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--c-mute);text-transform:uppercase;letter-spacing:.06em;margin:0 0 12px}
+.sec-h [data-lucide]{width:14px;height:14px;color:var(--c-primary)}
+.rc-list-intro{font-size:12.5px;color:var(--c-mute)}
+</style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- BODY CONTENT GOES HERE                       -->
+<!-- ============================================ -->
+<!-- For ERP: use templates/erp-shell.template.html -->
+<!-- For General: use templates/general-shell.template.html -->
+
+<!-- ===== SIDEBAR (Iron Rule #27 Module/Feature · #104 one feature = one menu) ===== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i data-lucide="box" class="w-4 h-4"></i></div>
+    <div>
+      <div class="sb-name">CUBE NATIVE</div>
+      <div class="sb-sub">ทรัพยากรบุคคล</div>
+    </div>
+  </div>
+  <nav class="sb-nav" id="sb-nav">
+    <div class="sb-module" data-module="hr" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="graduation-cap" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">พัฒนาบุคลากร</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <!-- feature นี้ = รายการเดียว (#104) · หน้าย่อยเป็น tabs ในหน้า -->
+        <a class="sb-item is-active" data-feature="train" onclick="go('train/course')">
+          <i data-lucide="book-open-check" class="w-4 h-4"></i><span>อบรม</span>
+        </a>
+        <!-- context features ของ module (placeholder — นอก scope รอบนี้) -->
+        <a class="sb-item" data-feature="perf" onclick="ctxStub('ประเมินผลงาน (Performance)')">
+          <i data-lucide="target" class="w-4 h-4"></i><span>ประเมินผลงาน</span>
+        </a>
+        <a class="sb-item" data-feature="expense" onclick="ctxStub('เบิกค่าใช้จ่าย (Expense Claim)')">
+          <i data-lucide="receipt" class="w-4 h-4"></i><span>เบิกค่าใช้จ่าย</span>
+        </a>
+        <a class="sb-item" data-feature="hr-config" onclick="ctxStub('ตั้งค่า HR (หมวดหลักสูตร / อัตรากลาง)')">
+          <i data-lucide="sliders-horizontal" class="w-4 h-4"></i><span>ตั้งค่า HR</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+  <div class="sb-footer"><div class="pulse-dot"></div><span>Prototype · v1.0.0</span></div>
+</aside>
+
+<main class="main">
+  <header class="shell-bar">
+    <button class="nav-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')" aria-label="เมนู"><i data-lucide="menu" class="w-4 h-4"></i></button>
+    <nav class="breadcrumb">
+      <a onclick="go('train/course')">พัฒนาบุคลากร</a>
+      <i data-lucide="chevron-right" class="w-3 h-3 sep"></i>
+      <span class="breadcrumb-current">อบรม</span>
+    </nav>
+    <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+      <div class="notif-wrap" style="position:relative;">
+        <button class="icon-btn" onclick="showToast('ศูนย์แจ้งเตือน (ENG-NOTIFY) — เชื่อมจริงตอน dev','info')" title="การแจ้งเตือน"><i data-lucide="bell" class="w-4 h-4"></i><span class="notif-dot"></span></button>
+      </div>
+      <div style="position:relative;">
+        <div class="user-chip" onclick="toggleUserMenu()">
+          <div class="user-text"><div class="user-name" id="uc-name">สิริพร ท.</div><div class="user-role" id="uc-role">เจ้าหน้าที่ฝึกอบรม · CUBE NATIVE</div></div>
+          <div class="avatar" id="uc-av">สท</div>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-item"><i data-lucide="user" class="w-3.5 h-3.5"></i><span>โปรไฟล์ของฉัน</span></div>
+          <div class="user-menu-item"><i data-lucide="settings" class="w-3.5 h-3.5"></i><span>ตั้งค่า</span></div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-item is-danger"><i data-lucide="log-out" class="w-3.5 h-3.5"></i><span>ออกจากระบบ</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="content" id="page-content"><!-- rendered by render() --></div>
+</main>
+
+<!-- Demo strip (Iron Rule #105 — persona/masking = prototype, ไม่อยู่ page header) -->
+<div class="demo-strip" id="demoStrip">
+  <span class="ds-tag"><i data-lucide="flask-conical" class="w-3.5 h-3.5"></i>Prototype</span>
+  <span class="ds-sep"></span>
+  <span class="ds-lbl">Demo · ดูในฐานะ</span>
+  <span class="ds-seg" id="personaSeg">
+    <button data-p="hr" class="on" onclick="setPersona('hr')">เจ้าหน้าที่อบรม</button>
+    <button data-p="manager" onclick="setPersona('manager')">หัวหน้า (ผู้อนุมัติ)</button>
+    <button data-p="viewer" onclick="setPersona('viewer')">ผู้ชมทั่วไป</button>
+  </span>
+</div>
+
+<!-- Drawer container (always include, even if no drawer used initially) -->
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <!-- Drawer content rendered by render() function -->
+</div>
+
+<!-- Modal container -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <!-- Modal content rendered by render() function -->
+  </div>
+</div>
+
+<!-- Overlay portal host (Rule #95 — portalMenu target) -->
+<div id="overlay-root"></div>
+
+<!-- Toast container -->
+<div class="toast" id="toast"></div>
+
+<!-- ============================================================
+     Lucide Icons Loader (multi-CDN fallback, pinned version)
+     ------------------------------------------------------------
+     ทำไมไม่ใช้ <script src="..."> ตรง ๆ:
+       - Single CDN = single point of failure (corp proxy/firewall block)
+       - @latest = breaking changes โดยไม่บอก (GitHub issue #2962)
+       - <script> ใน <head> โดยไม่มี defer ชน DOMContentLoaded
+     กลยุทธ์:
+       1) Pin version 0.469.0 (stable, ทดสอบแล้ว)
+       2) ลอง CDN 3 ตัวเรียงตามความน่าเชื่อถือ: unpkg → jsdelivr → cdnjs
+       3) ถ้าทุก CDN fail → log warning + ไม่ block render
+            (UI ยังใช้งานได้ แค่ไม่มี icons)
+     ============================================================ -->
+<script>
+(function loadLucide() {
+  var version = '0.469.0';
+  var cdns = [
+    'https://unpkg.com/lucide@' + version + '/dist/umd/lucide.min.js',
+    'https://cdn.jsdelivr.net/npm/lucide@' + version + '/dist/umd/lucide.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/lucide/' + version + '/lucide.min.js'
+  ];
+  var i = 0;
+  function tryNext() {
+    if (i >= cdns.length) {
+      console.warn('[Lucide] All CDNs failed. Icons จะไม่แสดง but UI ยังใช้งานได้');
+      window.lucide = window.lucide || { createIcons: function() {} }; // no-op fallback
+      window.dispatchEvent(new Event('lucide:ready'));
+      return;
+    }
+    var s = document.createElement('script');
+    s.src = cdns[i++];
+    s.onload = function() {
+      window.dispatchEvent(new Event('lucide:ready'));
+    };
+    s.onerror = tryNext;
+    document.head.appendChild(s);
+  }
+  tryNext();
+})();
+</script>
+
+<script>
+// ============================================
+// STATE
+// ============================================
+const state = {
+  currentRoute: 'home',
+  drawer: { open: false, mode: null, recordId: null, step: 1 },
+  modal: { open: false, type: null, data: null },
+  toast: { visible: false, message: '', variant: 'info' },
+  filters: { search: '', status: 'all' },
+  pagination: { page: 1, pageSize: 20 },
+  sort: { col: null, dir: 'asc' },
+  selectedIds: new Set(),
+  records: [],
+};
+
+// ============================================
+// SIDEBAR — Module collapse/expand (Iron Rule #27)
+// Module header is non-navigable; click toggles children visibility.
+// State persists in DOM (data-expanded) — future: persist per user.
+// ============================================
+function toggleModule(headerEl) {
+  const mod = headerEl.closest('.sb-module');
+  if (!mod) return;
+  const isExpanded = mod.getAttribute('data-expanded') !== 'false';
+  mod.setAttribute('data-expanded', isExpanded ? 'false' : 'true');
+}
+
+// ============================================
+// ROUTER (Hash-based, refresh-safe)
+// ============================================
+function getRoute() {
+  const hash = location.hash;
+  if (!hash || hash === '#' || hash === '#/') return 'home';
+  return hash.replace(/^#\//, '');
+}
+function navigate(route) {
+  location.hash = '#/' + route;
+}
+
+// ============================================
+// DRAWER / MODAL TOGGLES
+// ============================================
+function openDrawer(mode, recordId) {
+  state.drawer = { open: true, mode, recordId, step: 1 };
+  render();
+  // Trigger CSS animation
+  requestAnimationFrame(() => {
+    document.getElementById('drawerBackdrop').classList.add('is-open');
+    const dw = document.getElementById('drawer');
+    dw.classList.add('is-open');
+    dw.setAttribute('aria-hidden', 'false');
+    lockScroll(true);
+    trapFocus(dw);
+  });
+}
+function closeDrawer() {
+  document.getElementById('drawerBackdrop').classList.remove('is-open');
+  const dw = document.getElementById('drawer');
+  dw.classList.remove('is-open');
+  dw.setAttribute('aria-hidden', 'true');
+  releaseFocus(dw);
+  lockScroll(false);
+  setTimeout(() => {
+    state.drawer = { open: false, mode: null, recordId: null, step: 1 };
+  }, 280);
+}
+function openModal(type, data) {
+  state.modal = { open: true, type, data };
+  render();
+  requestAnimationFrame(() => {
+    const mb = document.getElementById('modalBackdrop');
+    mb.classList.add('is-open');
+    lockScroll(true);
+    trapFocus(mb.querySelector('.modal') || mb);
+  });
+}
+function closeModal() {
+  const mb = document.getElementById('modalBackdrop');
+  mb.classList.remove('is-open');
+  releaseFocus(mb.querySelector('.modal') || mb);
+  /* ลิ้นชักอาจยังเปิดอยู่ข้างหลัง — ปลดล็อกเฉพาะตอนไม่มี overlay เหลือแล้ว */
+  lockScroll(!!(window.state && state.drawer && state.drawer.open));
+  setTimeout(() => {
+    state.modal = { open: false, type: null, data: null };
+  }, 200);
+}
+
+// ============================================
+// TOAST
+// ============================================
+function showToast(message, variant = 'info', durationMs = 2800) {
+  const el = document.getElementById('toast');
+  const iconMap = { success: 'check-circle-2', info: 'info', warning: 'alert-triangle', error: 'x-circle' };
+  el.className = 'toast is-' + variant;
+  el.innerHTML = `<i data-lucide="${iconMap[variant] || 'info'}" class="w-4 h-4"></i><span>${message}</span>`;
+  renderIcons();
+  requestAnimationFrame(() => el.classList.add('is-visible'));
+  setTimeout(() => el.classList.remove('is-visible'), durationMs);
+}
+
+// ============================================
+// ESC key handler (close drawer/modal)
+// ============================================
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (state.modal.open) closeModal();
+    else if (state.drawer.open) closeDrawer();
+  }
+});
+
+// ============================================
+// RENDER (placeholder — replace per feature)
+// ============================================
+function render() {
+  // Specific feature should override this function.
+  //
+  // ⚠️ Iron Rule #29 — Render Preservation:
+  // If your render() does innerHTML rebuild (typical pattern), wrap with
+  // withRenderPreservation() OR use preserveRenderState()/restoreRenderState()
+  // to keep scroll position + focus across re-renders.
+  //
+  // Example:
+  //   function render() {
+  //     const snap = preserveRenderState();
+  //     document.getElementById('page-content').innerHTML = renderPage();
+  //     drawer.innerHTML = state.drawer.open ? renderDrawer() : '';
+  //     renderIcons();
+  //     restoreRenderState(snap);
+  //   }
+  //
+  // After every DOM update, call renderIcons() — safe wrapper ที่ทน race เมื่อ Lucide ยังไม่ load.
+  renderIcons();
+}
+
+// ============================================
+// INIT
+// ============================================
+// Helper: safe icon render — กัน race ก่อน lucide load เสร็จ
+function renderIcons() {
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// ============================================
+// SEARCH-SELECT (Iron Rule #34) — generic searchable dropdown
+// ------------------------------------------------
+// ใช้แทน select ธรรมดา เมื่อ options เยอะ (>8) หรือเป็น lookup จาก master อื่น.
+// list = position:absolute overlay → ไม่ดันเนื้อหา. แก้เฉพาะ list ตอนพิมพ์ →
+// ไม่ rebuild ทั้งหน้า (ไม่ชน Rule #29). decoupled — เรียก onSelect callback ไม่ผูก render().
+//
+// วิธีใช้ 2 ขั้น:
+//   1) ใส่ markup:  ${searchSelectHTML('country', { placeholder: 'เลือกประเทศ' })}
+//   2) หลัง markup อยู่ใน DOM แล้ว (เช่นท้าย render()):
+//        initSearchSelect('country', {
+//          options: countries.map(c => ({ value:c.code, label:c.name, sub:c.code, icon:'flag', right:'' })),
+//          value: state.form.country,
+//          onSelect: (val, opt) => { state.form.country = val; }
+//        });
+// option fields: { value, label, sub?, icon?, right? }
+// ============================================
+window.__ss = window.__ss || {};
+function ssId(p, k){ return p + k; }
+function ssGet(key){ return window.__ss[key]; }
+function ssEscapeReg(s){ return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+function searchSelectHTML(key, opt){
+  opt = opt || {};
+  var ph = opt.placeholder || 'ค้นหา...';
+  return ''
+    + '<div class="search-select" id="ss-' + key + '">'
+    +   '<i data-lucide="search" class="ss-lead w-4 h-4"></i>'
+    +   '<input type="text" class="input ss-input" id="ss-input-' + key + '" autocomplete="off" placeholder="' + ph + '"'
+    +     ' oninput="ssOnInput(\'' + key + '\', this.value)" onfocus="ssOpen(\'' + key + '\')" onkeydown="ssOnKey(\'' + key + '\', event)">'
+    +   '<button type="button" class="ss-clear hidden" id="ss-clear-' + key + '" tabindex="-1" onclick="ssClear(\'' + key + '\')"><i data-lucide="x" class="w-4 h-4"></i></button>'
+    +   '<i data-lucide="chevron-down" class="ss-caret" id="ss-caret-' + key + '"></i>'
+    +   '<div class="ss-list hidden" id="ss-list-' + key + '"></div>'
+    + '</div>';
+}
+function initSearchSelect(key, cfg){
+  cfg = cfg || {};
+  window.__ss[key] = {
+    options: cfg.options || [], value: (cfg.value != null ? cfg.value : null),
+    onSelect: cfg.onSelect || function(){}, emptyText: cfg.emptyText || 'ไม่พบรายการ',
+    query: '', open: false, hi: 0, portal: !!cfg.portal
+  };
+  ssSetText(key); ssSyncChrome(key); renderIcons();
+}
+function ssFiltered(key){
+  var s = ssGet(key); if(!s) return [];
+  var q = (s.query || '').toLowerCase().trim();
+  if(!q) return s.options;
+  return s.options.filter(function(o){
+    return String(o.label).toLowerCase().includes(q)
+      || String(o.value).toLowerCase().includes(q)
+      || String(o.sub || '').toLowerCase().includes(q);
+  });
+}
+function ssSyncChrome(key){
+  var s = ssGet(key); if(!s) return;
+  var sel = s.options.find(function(o){ return o.value === s.value; });
+  var c = document.getElementById(ssId('ss-clear-', key)); if(c) c.classList.toggle('hidden', !sel);
+  var k = document.getElementById(ssId('ss-caret-', key)); if(k) k.classList.toggle('hidden', !!sel);
+}
+function ssSetText(key){
+  var s = ssGet(key); if(!s) return;
+  var input = document.getElementById(ssId('ss-input-', key)); if(!input) return;
+  var sel = s.options.find(function(o){ return o.value === s.value; });
+  input.value = s.open ? s.query : (sel ? sel.label : '');
+}
+function ssRenderList(key){
+  var s = ssGet(key); if(!s) return;
+  var list = document.getElementById(ssId('ss-list-', key)); if(!list) return;
+  var items = ssFiltered(key);
+  if(items.length === 0){
+    list.innerHTML = '<div class="ss-empty">' + s.emptyText + '</div>';
+  } else {
+    var q = (s.query || '').toLowerCase().trim();
+    var hl = function(t){ return q ? String(t).replace(new RegExp('(' + ssEscapeReg(q) + ')', 'gi'), '<mark>$1</mark>') : String(t); };
+    list.innerHTML = items.map(function(o, i){
+      return '<button type="button" class="ss-opt ' + (i === s.hi ? 'is-active' : '') + '" onmousedown="event.preventDefault()" onclick="ssPick(\'' + key + '\', ' + i + ')">'
+        + (o.avatar ? '<span class="uc-avatar ss-opt-av">' + o.avatar + '</span>' : (o.icon ? '<i data-lucide="' + o.icon + '" class="ss-opt-ic w-4 h-4"></i>' : ''))
+        + '<span class="ss-opt-main"><span class="ss-opt-label">' + hl(o.label) + '</span>'
+        + (o.sub ? '<span class="ss-opt-sub">' + hl(o.sub) + '</span>' : '') + '</span>'
+        + (o.right ? '<span class="ss-opt-right">' + o.right + '</span>' : '')
+        + '</button>';
+    }).join('');
+  }
+  list.classList.toggle('hidden', !s.open);
+  if(s.portal)ssPortal(key, list, s.open);   /* FIX-07: ยก list เป็น portal ไม่ให้โดนขอบ modal clip (#95) */
+  renderIcons();
+}
+/* FIX-07 · Overlay Portal (#95) — ย้าย ss-list ไป #overlay-root ตอนเปิด · คืนที่เดิมตอนปิด
+   ต้องยก z-index ให้เท่า --z-portal (60) ไม่งั้น .ss-list (z=50) จม modal-backdrop (z=60) */
+function ssPortal(key, list, open){
+  var wrap = document.getElementById(ssId('ss-', key));
+  if(open){
+    list.classList.add('open');
+    portalMenu(wrap || list, list);
+    list.style.zIndex = 'var(--z-portal)';
+  } else {
+    list.classList.remove('menu-fixed','open');
+    list.style.cssText = '';
+    if(wrap && list.parentElement !== wrap) wrap.appendChild(list);
+  }
+}
+function ssOpen(key){ var s = ssGet(key); if(!s) return; s.open = true; s.query = ''; s.hi = 0; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+function ssOnInput(key, val){ var s = ssGet(key); if(!s) return; s.query = val; s.open = true; s.hi = 0; s.value = null; ssSyncChrome(key); ssRenderList(key); }
+function ssPick(key, i){ var s = ssGet(key); if(!s) return; var o = ssFiltered(key)[i]; if(!o) return; s.value = o.value; s.query = ''; s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); s.onSelect(o.value, o); }
+function ssClear(key){ var s = ssGet(key); if(!s) return; s.value = null; s.query = ''; s.open = true; ssSetText(key); ssSyncChrome(key); ssRenderList(key); var inp = document.getElementById(ssId('ss-input-', key)); if(inp) inp.focus(); s.onSelect(null, null); }
+function ssOnKey(key, e){
+  var s = ssGet(key); if(!s) return; var items = ssFiltered(key);
+  if(e.key === 'ArrowDown'){ e.preventDefault(); s.open = true; s.hi = Math.min(items.length - 1, s.hi + 1); ssRenderList(key); }
+  else if(e.key === 'ArrowUp'){ e.preventDefault(); s.hi = Math.max(0, s.hi - 1); ssRenderList(key); }
+  else if(e.key === 'Enter'){ e.preventDefault(); if(items[s.hi]) ssPick(key, s.hi); }
+  /* Esc ต้องปิดแค่เมนู ห้ามให้ event ทะลุไปปิดลิ้นชัก/หน้าต่างยืนยัน (Rule #94 ข้อ 3 — Esc chain)
+     แก้ 2026-08-03 โดยทีม ERP-Design · ดู CLAUDE.md หัวข้อ "แก้ที่ตัว skill" */
+  else if(e.key === 'Escape'){ e.stopPropagation(); s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+}
+document.addEventListener('click', function(e){
+  Object.keys(window.__ss || {}).forEach(function(key){
+    var wrap = document.getElementById(ssId('ss-', key)); var s = ssGet(key);
+    if(wrap && s && s.open && !wrap.contains(e.target)){ s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+  });
+});
+
+// ============================================
+// FORMAT HELPERS (Iron Rule #43) — Thai locale, consistent ทุก feature
+// ใช้ตัวเหล่านี้เสมอ ห้าม format ตัวเลข/วันที่เองรายจุด
+// ============================================
+function fmtNumber(n, dp){ if(n==null||n==='')return '—'; var x=Number(n); if(isNaN(x))return String(n);
+  return x.toLocaleString('th-TH', {minimumFractionDigits: dp||0, maximumFractionDigits: dp!=null?dp:2}); }
+function fmtMoney(n, dp){ if(n==null||n==='')return '—'; var x=Number(n); if(isNaN(x))return String(n);
+  return '฿' + x.toLocaleString('th-TH', {minimumFractionDigits: dp!=null?dp:2, maximumFractionDigits: dp!=null?dp:2}); }
+function fmtDate(iso, buddhist){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso);
+  var s=d.toLocaleDateString('th-TH', {year:'numeric', month:'short', day:'numeric'});
+  return buddhist===false ? d.toLocaleDateString('en-GB',{year:'numeric',month:'short',day:'numeric'}) : s; }
+function fmtDateTime(iso){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso);
+  return d.toLocaleString('th-TH', {year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+
+// ============================================
+// INLINE VALIDATION (Iron Rule #43) — validate ตอน blur, ไม่ใช่รอ submit อย่างเดียว
+// markup: <div class="field"><input class="input" onblur="validateField(this, v => v.trim()? '' : 'จำเป็นต้องกรอก')">
+//          <div class="field-error"></div></div>
+// validator คืน '' = ผ่าน / ข้อความ = error
+// ============================================
+function validateField(el, validator){
+  var field = el.closest('.field'); if(!field) return true;
+  var msg = '';
+  try { msg = validator ? validator(el.value, el) : ''; } catch(e){ msg=''; }
+  var errEl = field.querySelector('.field-error');
+  if(msg){ field.classList.add('is-invalid'); if(errEl) errEl.textContent = msg; return false; }
+  field.classList.remove('is-invalid'); return true;
+}
+function clearFieldError(el){ var f=el.closest('.field'); if(f) f.classList.remove('is-invalid'); }
+/* FIX-05: submit → ไฮไลต์ field ที่ขาด (ขอบแดง + ข้อความใต้ field) + focus ตัวแรก แทน toast ลอย */
+function markInvalidFields(ids){
+  document.querySelectorAll('.drawer .field.is-invalid').forEach(function(f){f.classList.remove('is-invalid');});
+  var first=null;
+  ids.forEach(function(id){var el=document.getElementById(id);if(!el)return;var f=el.closest('.field');if(f){f.classList.add('is-invalid');if(!first)first=el;}});
+  if(first)first.focus();
+}
+
+// ============================================
+// EMPTY STATE (Iron Rule #39) — list/section ว่าง ต้องมี icon + title + desc + (action)
+// ============================================
+function emptyStateHTML(cfg){
+  cfg = cfg || {};
+  var act = cfg.actionLabel ? '<button class="btn btn-primary" onclick="' + (cfg.onAction||'') + '">' +
+    (cfg.actionIcon ? '<i data-lucide="' + cfg.actionIcon + '" class="w-4 h-4"></i>' : '') +
+    '<span>' + cfg.actionLabel + '</span></button>' : '';
+  return '<div class="empty">'
+    + '<div class="empty-icon"><i data-lucide="' + (cfg.icon||'inbox') + '"></i></div>'
+    + '<div class="empty-title">' + (cfg.title||'ยังไม่มีข้อมูล') + '</div>'
+    + '<div class="empty-desc">' + (cfg.desc||'') + '</div>'
+    + act + '</div>';
+}
+
+// ============================================
+// RENDER PRESERVATION (Iron Rule #29)
+// ------------------------------------------------
+// ทุกครั้งที่ render() ทำ innerHTML = ... full DOM rebuild
+// scroll position + focus + cursor selection จะหาย —
+// user รู้สึก "เด้งกลับบน" ทุกครั้งที่ toggle/click.
+//
+// withRenderPreservation(renderFn) wraps a render function
+// to save state before innerHTML rebuild, then restore after.
+//
+// Preserves:
+//   - scrollTop ของ .drawer-body
+//   - scrollTop ของ .modal-body
+//   - window.scrollY (page-level scroll)
+//   - document.activeElement focus + selection range (input/textarea ที่กำลังพิมพ์)
+//
+// Usage:
+//   const render = withRenderPreservation(function actualRender() {
+//     content.innerHTML = ...
+//   });
+//
+// หรือเรียกตรง ๆ ใน render() ที่มีอยู่แล้ว:
+//   function render() {
+//     const snapshot = preserveRenderState();
+//     // ... innerHTML rebuilds ...
+//     restoreRenderState(snapshot);
+//   }
+// ============================================
+function preserveRenderState() {
+  const drawerBody = document.querySelector('.drawer-body');
+  const modalBody = document.querySelector('.modal-body');
+  const activeEl = document.activeElement;
+  const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+  return {
+    drawerScroll: drawerBody ? drawerBody.scrollTop : 0,
+    modalScroll: modalBody ? modalBody.scrollTop : 0,
+    pageScroll: window.scrollY,
+    focusKey: isInput ? {
+      placeholder: activeEl.placeholder || '',
+      type: activeEl.type || '',
+      name: activeEl.name || '',
+      selStart: activeEl.selectionStart,
+      selEnd: activeEl.selectionEnd,
+    } : null,
+  };
+}
+function restoreRenderState(snap) {
+  if (!snap) return;
+  requestAnimationFrame(function() {
+    const dBody = document.querySelector('.drawer-body');
+    if (dBody && snap.drawerScroll > 0) dBody.scrollTop = snap.drawerScroll;
+    const mBody = document.querySelector('.modal-body');
+    if (mBody && snap.modalScroll > 0) mBody.scrollTop = snap.modalScroll;
+    if (snap.pageScroll > 0) window.scrollTo(0, snap.pageScroll);
+
+    if (snap.focusKey) {
+      const candidates = document.querySelectorAll('input, textarea');
+      for (let i = 0; i < candidates.length; i++) {
+        const c = candidates[i];
+        if ((c.placeholder || '') === snap.focusKey.placeholder
+            && (c.type || '') === snap.focusKey.type
+            && (c.name || '') === snap.focusKey.name) {
+          c.focus();
+          if (snap.focusKey.selStart != null && typeof c.setSelectionRange === 'function') {
+            try { c.setSelectionRange(snap.focusKey.selStart, snap.focusKey.selEnd); } catch(e) {}
+          }
+          break;
+        }
+      }
+    }
+  });
+}
+function withRenderPreservation(renderFn) {
+  return function preservedRender() {
+    const snap = preserveRenderState();
+    const result = renderFn.apply(this, arguments);
+    restoreRenderState(snap);
+    return result;
+  };
+}
+
+window.addEventListener('hashchange', function () { render(); });  // v6.1 late-binding — ให้ชี้ render() ตัวที่ feature override (ผูกตรง ๆ จะ capture placeholder เดิม)
+
+// รอ DOM + Lucide ทั้งคู่ก่อน first render
+// (Lucide loader จะ dispatch 'lucide:ready' เมื่อ load สำเร็จ
+//  หรือเมื่อทุก CDN fail แล้ว fallback เป็น no-op)
+var domReady = false;
+var lucideReady = false;
+function bootIfReady() {
+  if (domReady && lucideReady) {
+    render();
+    renderIcons();
+  }
+}
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', function() { domReady = true; bootIfReady(); });
+} else {
+  domReady = true;
+}
+// Listen for ready event AND check ว่า lucide load ไปแล้วหรือยัง
+// (script ตัวนี้รันหลัง loader — ถ้า loader sync เสร็จก่อน, event อาจหายไปแล้ว)
+window.addEventListener('lucide:ready', function() { lucideReady = true; bootIfReady(); });
+if (window.lucide && typeof window.lucide.createIcons === 'function') {
+  lucideReady = true;
+}
+bootIfReady();
+// Safety net: ถ้า lucide:ready ไม่มาภายใน 5s ให้ render ไปก่อน (UI ยังใช้งานได้)
+setTimeout(function() {
+  if (!lucideReady) {
+    console.warn('[Lucide] Timeout — rendering without icons');
+    lucideReady = true;
+    bootIfReady();
+  }
+}, 5000);
+</script>
+
+
+<script>
+/* ===== BASE-KIT UTILS (#66/#68/#95) — DO NOT EDIT ===== */
+/* #95: เมนูใน scroll container (.table-wrap / drawer body / B2 line grid)
+   ต้อง portal ด้วย util นี้ — z-index อย่างเดียวช่วยไม่ได้เพราะโดน ancestor overflow clip */
+function portalMenu(trigger, menu){
+  let host = document.getElementById('overlay-root');
+  if(!host){ host = document.createElement('div'); host.id='overlay-root'; document.body.appendChild(host); }
+  if(menu.parentElement !== host) host.appendChild(menu);
+  menu.classList.add('menu-fixed');
+  const r = trigger.getBoundingClientRect();
+  const below = window.innerHeight - r.bottom - 12, above = r.top - 12;
+  const h = Math.min(menu.scrollHeight || 320, 320);
+  menu.style.left = r.left + 'px';
+  menu.style.width = r.width + 'px';
+  if(below < h && above > below){ menu.style.top='auto'; menu.style.bottom=(window.innerHeight-r.top+4)+'px';
+    menu.style.maxHeight = Math.min(h, above)+'px'; }
+  else { menu.style.bottom='auto'; menu.style.top=(r.bottom+4)+'px';
+    menu.style.maxHeight = Math.min(h, Math.max(below,120))+'px'; }
+  menu._trigger = trigger;
+  const reposition = ()=>{ if(menu.classList.contains('open')) portalMenu(trigger, menu); };
+  if(!menu._portalBound){ menu._portalBound = true;
+    window.addEventListener('scroll', reposition, true);
+    window.addEventListener('resize', reposition); }
+}
+function positionMenu(trigger,menu){const r=trigger.getBoundingClientRect();
+  const below=window.innerHeight-r.bottom-12, above=r.top-12, h=Math.min(menu.scrollHeight,320);
+  if(below<h && above>below){menu.classList.add('drop-up');menu.style.maxHeight=Math.min(h,above)+'px';}
+  else{menu.classList.remove('drop-up');menu.style.maxHeight=Math.min(h,Math.max(below,120))+'px';}}
+function openOverlay(menu,trigger){document.querySelectorAll('[data-overlay].open').forEach(m=>{if(m!==menu)closeOverlay(m);});
+  menu.classList.add('open');menu._trigger=trigger;if(trigger)positionMenu(trigger,menu);}
+function closeOverlay(menu){menu.classList.remove('open');if(menu._trigger)menu._trigger.focus();}
+document.addEventListener('click',e=>{document.querySelectorAll('[data-overlay].open').forEach(m=>{
+  if(!m.contains(e.target)&&!(m._trigger&&m._trigger.contains(e.target)))closeOverlay(m);});});
+
+/* --- scroll lock + focus trap (#a11y · เพิ่ม 2026-08-04) ---
+   lockScroll: กันพื้นหลังเลื่อนตอน overlay เปิด · นับชั้นได้ (modal ซ้อน drawer)
+   trapFocus : กัน Tab หลุดออกไปพื้นหลัง + โฟกัสตัวแรกในกล่อง + คืนโฟกัสเดิมตอนปิด */
+function lockScroll(on){ document.body.classList.toggle('is-overlay-open', !!on); }
+var __focusStack = [];
+function trapFocus(box){
+  if(!box) return;
+  var prev = document.activeElement;
+  var sel = 'a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  function onKey(e){
+    if(e.key !== 'Tab') return;
+    var f = [].slice.call(box.querySelectorAll(sel)).filter(function(el){ var r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; });
+    if(!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+  box.__trap = onKey; box.__prevFocus = prev;
+  document.addEventListener('keydown', onKey);
+  requestAnimationFrame(function(){
+    var f = box.querySelector(sel);
+    if(f) f.focus();
+  });
+}
+function releaseFocus(box){
+  if(!box || !box.__trap) return;
+  document.removeEventListener('keydown', box.__trap);
+  var prev = box.__prevFocus;
+  box.__trap = null; box.__prevFocus = null;
+  if(prev && typeof prev.focus === 'function') prev.focus();
+}
+/* ===== END BASE-KIT UTILS ===== */
+</script>
+
+<script>
+/* ============================================================
+   F-HR-TRAIN · อบรม (Training) — feature logic
+   archetype = master (แคตตาล็อกหลักสูตร + การลงทะเบียน · ไม่ใช่ Pattern Q เอกสาร)
+   vibe ใหม่ผ่าน html-generator-v9 BASE-KIT · ทุก FN wire จริงด้วย mock · วันที่ พ.ศ.
+   ============================================================ */
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* ---- persona / masking (Iron Rule #105 demo-strip · FN-94 RESTRICTED cost) ---- */
+const PERSONAS={
+  hr:{name:'สิริพร ท.',role:'เจ้าหน้าที่ฝึกอบรม · CUBE NATIVE',av:'สท',unmask:true,canApprove:false},
+  manager:{name:'ธีรภัทร ว.',role:'ผู้จัดการฝ่ายบุคคล (ผู้อนุมัติ) · CUBE NATIVE',av:'ธว',unmask:true,canApprove:true},
+  viewer:{name:'ผู้ชมทั่วไป',role:'สิทธิ์อ่านอย่างเดียว · CUBE NATIVE',av:'ผช',unmask:false,canApprove:false},
+};
+
+/* ---- mock: employees (ผู้เรียน / ผู้อนุมัติ) — GET /api/v1/employees?status=active&q= ---- */
+const EMPLOYEES=[
+  {id:'EMP-01',name:'ธนกฤต พงษ์ศิริ',position:'ช่างเทคนิค',dept:'ฝ่ายผลิต'},
+  {id:'EMP-02',name:'สุนิสา แก้วมณี',position:'เจ้าหน้าที่บัญชี',dept:'การเงินและบัญชี'},
+  {id:'EMP-03',name:'วิชัย ตันติกุล',position:'หัวหน้าทีมขาย',dept:'ฝ่ายขาย'},
+  {id:'EMP-04',name:'ปรียา วัฒนกิจ',position:'เจ้าหน้าที่ประสานงาน',dept:'ธุรการ'},
+  {id:'EMP-05',name:'อนุชา รักษ์ดี',position:'พนักงานคลัง',dept:'คลังสินค้า'},
+  {id:'EMP-06',name:'ธีรภัทร วงศ์ไพศาล',position:'ผู้จัดการฝ่ายบุคคล',dept:'ทรัพยากรบุคคล'},
+  {id:'EMP-07',name:'กาญจนา ทรัพย์เจริญ',position:'ผู้จัดการฝ่ายผลิต',dept:'ฝ่ายผลิต'},
+];
+function emp(id){return EMPLOYEES.find(e=>e.id===id)||null;}
+function empOpts(){return EMPLOYEES.map(e=>({value:e.id,label:e.name,sub:e.position+' · '+e.dept,icon:'user',avatar:personInitials(e.name)}));}
+function empSnap(id){const e=emp(id);return e?{id:e.id,name:e.name,position:e.position,dept:e.dept}:null;}
+function personInitials(name){const p=String(name).trim().split(/\s+/);return((p[0]||'').slice(0,1)+((p[1]||'').slice(0,1)))||'?';}
+
+/* ---- mock: หมวดหลักสูตรกลาง — อ่านจาก HR Configuration (#107) · ห้าม CRUD ในหน้านี้ (unsupported #5) ---- */
+const CATEGORIES=[
+  {value:'safety',label:'ความปลอดภัย & อาชีวอนามัย'},
+  {value:'leadership',label:'ภาวะผู้นำ / การบริหาร'},
+  {value:'technical',label:'ทักษะเฉพาะทาง'},
+  {value:'comm',label:'การสื่อสาร / Soft skills'},
+  {value:'orientation',label:'ปฐมนิเทศ / พนักงานใหม่'},
+];
+function catLabel(v){const c=CATEGORIES.find(x=>x.value===v);return c?c.label:v;}
+
+/* ---- mock: gap จากผลประเมินผลงาน (Performance) — hook display-only (FN-10) · อ่านอย่างเดียว ไม่สร้าง gap เอง ---- */
+const GAPS=[
+  {emp_id:'EMP-03',gap:'ทักษะภาวะผู้นำ (ผลประเมิน Q2/2569 ต่ำกว่าเกณฑ์)',courseId:'CO2',perf_ref:'PERF-2569-0451'},
+  {emp_id:'EMP-05',gap:'ทักษะการสื่อสารในทีม (ผลประเมิน Q2/2569)',courseId:'CO3',perf_ref:'PERF-2569-0388'},
+  {emp_id:'EMP-01',gap:'ความปลอดภัยในการทำงาน (แผนพัฒนารายบุคคล)',courseId:'CO1',perf_ref:'PERF-2569-0221'},
+];
+function gapsForCourse(courseId){return GAPS.map(g=>Object.assign({},g,{e:emp(g.emp_id)})).filter(g=>g.e&&(!courseId||g.courseId===courseId));}
+
+/* ---- mock: DOA resolved chain (อนุมัติเมื่อหลักสูตร has_cost) ----
+   ไม่มีวงเงิน · สายอนุมัติจริงมาจาก F-DLG-001 (Policy Center) — feature ประกาศเท่านั้น
+   [PENDING · DOA engine] ห้าม hardcode สายในโค้ด feature · ตรงนี้คือ mock resolved slots (FN-08) */
+function doaResolve(){
+  return {entry:'DOA-TRAIN-ENROLL-001',steps:[
+    {order:1,slot:'role-line-manager',slotName:'หัวหน้าสายงานของผู้เรียน'},
+    {order:2,slot:'role-hr-dev-head',slotName:'ผู้จัดการฝ่ายพัฒนาบุคลากร'},
+  ]};
+}
+
+/* ---- status maps ---- */
+const COURSE_STATUS={draft:{label:'ร่าง',pill:'pill-muted'},published:{label:'เผยแพร่',pill:'pill-success'},closed:{label:'ปิดหลักสูตร',pill:'pill-muted'}};
+const SESSION_STATUS={draft:{label:'ร่าง (ยังไม่เปิดรับ)',pill:'pill-muted'},open:{label:'เปิดรับสมัคร',pill:'pill-success'},closed:{label:'ปิดรอบ',pill:'pill-muted'}};
+const ENROLL_STATUS={
+  pending_doa:{label:'รออนุมัติ (DOA)',pill:'pill-warning'},
+  confirmed:{label:'ยืนยันลงทะเบียน',pill:'pill-info'},
+  passed:{label:'ผ่าน',pill:'pill-success'},
+  failed:{label:'ไม่ผ่าน',pill:'pill-danger'},
+  cancelled:{label:'ยกเลิก',pill:'pill-muted'},
+};
+
+/* ---- DB (mock) : 4 course (2 มีค่าใช้จ่าย · 2 ฟรี) · 2 session · 6 enroll · วันที่ พ.ศ. ---- */
+const DB={
+  courses:[
+    {id:'CO1',code:'CRS-2569-001',name:'ความปลอดภัยในการทำงาน (จป. ระดับหัวหน้างาน)',category:'safety',instructor:'สถาบันส่งเสริมความปลอดภัยฯ (วิทยากรภายนอก)',duration:'2 วัน (12 ชม.)',has_cost:true,budget:30000,status:'published',createdAt:'2026-07-10',
+     desc:'อบรมความปลอดภัย อาชีวอนามัย และสภาพแวดล้อมในการทำงาน สำหรับหัวหน้างานตามข้อกำหนดกฎหมาย',
+     history:[{at:'2026-07-10T09:00:00',by:'สิริพร ท.',action:'สร้างหลักสูตร + เผยแพร่',detail:'มีค่าใช้จ่าย · งบ 30,000',kind:'ok'}]},
+    {id:'CO2',code:'CRS-2569-002',name:'ภาวะผู้นำระดับต้น (Leadership 101)',category:'leadership',instructor:'อ.ธนพล ศ. (วิทยากรภายนอก)',duration:'3 วัน (18 ชม.)',has_cost:true,budget:50000,status:'published',createdAt:'2026-07-18',
+     desc:'พัฒนาทักษะภาวะผู้นำ การบริหารทีม และการสื่อสารสำหรับหัวหน้างานใหม่',
+     history:[{at:'2026-07-18T10:00:00',by:'สิริพร ท.',action:'สร้างหลักสูตร + เผยแพร่',detail:'มีค่าใช้จ่าย · งบ 50,000',kind:'ok'}]},
+    {id:'CO3',code:'CRS-2569-003',name:'การสื่อสารภายในองค์กรอย่างมีประสิทธิภาพ',category:'comm',instructor:'ทีม HR (ภายใน)',duration:'1 วัน (6 ชม.)',has_cost:false,budget:0,status:'published',createdAt:'2026-07-02',
+     desc:'เทคนิคการสื่อสาร การให้ฟีดแบ็ก และการทำงานร่วมกันภายในทีม',
+     history:[{at:'2026-07-02T09:30:00',by:'สิริพร ท.',action:'สร้างหลักสูตร + เผยแพร่',detail:'ไม่มีค่าใช้จ่าย (จัดภายใน)',kind:'ok'}]},
+    {id:'CO4',code:'CRS-2569-004',name:'ปฐมนิเทศพนักงานใหม่ (Orientation)',category:'orientation',instructor:'ทีม HR (ภายใน)',duration:'ครึ่งวัน (3 ชม.)',has_cost:false,budget:0,status:'published',createdAt:'2026-06-20',
+     desc:'แนะนำองค์กร วัฒนธรรม ระเบียบ และสวัสดิการสำหรับพนักงานใหม่',
+     history:[{at:'2026-06-20T09:00:00',by:'สิริพร ท.',action:'สร้างหลักสูตร + เผยแพร่',detail:'ไม่มีค่าใช้จ่าย (จัดภายใน)',kind:'ok'}]},
+  ],
+  sessions:[
+    {id:'SE1',code:'SES-2569-001',courseId:'CO1',start:'2026-10-15',end:'2026-10-16',time:'09:00–16:00',location:'ห้องอบรม A · ชั้น 5 สำนักงานใหญ่',capacity:20,status:'open',createdAt:'2026-09-01',
+     history:[{at:'2026-09-01T10:00:00',by:'สิริพร ท.',action:'เปิดรับสมัคร (รอบอบรม)',detail:'สถานะ → เปิดรับสมัคร · แจ้งเตือน (NTF)',kind:'ok'},
+              {at:'2026-09-01T09:40:00',by:'สิริพร ท.',action:'สร้างรอบอบรม',detail:'จำนวนรับ 20 · หลักสูตรมีค่าใช้จ่าย',kind:'ok'}]},
+    {id:'SE2',code:'SES-2569-002',courseId:'CO3',start:'2026-08-05',end:'2026-08-05',time:'09:00–16:00',location:'ห้องประชุมใหญ่ · ชั้น 3',capacity:30,status:'closed',createdAt:'2026-07-15',
+     history:[{at:'2026-08-06T09:00:00',by:'สิริพร ท.',action:'ปิดรอบ (จบการอบรม)',detail:'สถานะ → ปิดรอบ · บันทึกผลแล้ว',kind:'ok'},
+              {at:'2026-07-15T11:00:00',by:'สิริพร ท.',action:'เปิดรับสมัคร (รอบอบรม)',detail:'สถานะ → เปิดรับสมัคร · แจ้งเตือน (NTF)',kind:'ok'}]},
+  ],
+  enrolls:[
+    /* SE1 (จป. · มีค่าใช้จ่าย · upcoming) — เข้าสาย DOA */
+    {id:'EN1',sessionId:'SE1',emp:{id:'EMP-01',name:'ธนกฤต พงษ์ศิริ',position:'ช่างเทคนิค',dept:'ฝ่ายผลิต'},source:'gap',gap_ref:'PERF-2569-0221',status:'pending_doa',result:null,cert:null,expenseSent:false,attended:null,evalScore:null,evalComment:'',enrolledAt:'2026-09-02',
+     approval:{entry:'DOA-TRAIN-ENROLL-001',current:0,done:false,steps:[
+       {order:1,slotName:'หัวหน้าสายงานของผู้เรียน',approver_id:'EMP-07',result:'pending',at:null},
+       {order:2,slotName:'ผู้จัดการฝ่ายพัฒนาบุคลากร',approver_id:'EMP-06',result:'pending',at:null}]},
+     history:[{at:'2026-09-02T14:00:00',by:'สิริพร ท.',action:'ลงทะเบียนผู้เรียน + ส่งอนุมัติ (DOA)',detail:'หลักสูตรมีค่าใช้จ่าย → ต้องอนุมัติก่อนยืนยัน · มาจาก gap ประเมินผล',kind:'warn'}]},
+    {id:'EN2',sessionId:'SE1',emp:{id:'EMP-02',name:'สุนิสา แก้วมณี',position:'เจ้าหน้าที่บัญชี',dept:'การเงินและบัญชี'},source:'manual',gap_ref:null,status:'confirmed',result:null,cert:null,expenseSent:true,attended:null,evalScore:null,evalComment:'',enrolledAt:'2026-09-02',
+     approval:{entry:'DOA-TRAIN-ENROLL-001',current:2,done:true,steps:[
+       {order:1,slotName:'หัวหน้าสายงานของผู้เรียน',approver_id:'EMP-07',result:'approved',at:'2026-09-03'},
+       {order:2,slotName:'ผู้จัดการฝ่ายพัฒนาบุคลากร',approver_id:'EMP-06',result:'approved',at:'2026-09-03'}]},
+     history:[{at:'2026-09-03T11:20:00',by:'สิริพร ท.',action:'ส่งมูลค่าอบรม (EC) เข้า Expense Claim',detail:'display-only · ไม่จ่าย/ไม่ post เอง',kind:'ok'},
+              {at:'2026-09-03T10:00:00',by:'ธีรภัทร วงศ์ไพศาล',action:'อนุมัติลงทะเบียน (DOA ครบ 2/2) → ยืนยัน',detail:'แจ้งเตือนผู้เรียน (NTF)',kind:'ok'},
+              {at:'2026-09-02T14:10:00',by:'สิริพร ท.',action:'ลงทะเบียนผู้เรียน + ส่งอนุมัติ (DOA)',detail:'หลักสูตรมีค่าใช้จ่าย',kind:'ok'}]},
+    /* SE2 (การสื่อสาร · ไม่มีค่าใช้จ่าย · past/closed) — ข้าม DOA */
+    {id:'EN3',sessionId:'SE2',emp:{id:'EMP-04',name:'ปรียา วัฒนกิจ',position:'เจ้าหน้าที่ประสานงาน',dept:'ธุรการ'},source:'manual',gap_ref:null,status:'passed',result:'pass',cert:{id:'CERT-REF-2569-0007',issuedAt:'2026-08-06',note:'ใบรับรองอ้างอิง (soft ref)'},expenseSent:false,attended:true,evalScore:4,evalComment:'ผู้เรียนมีส่วนร่วมดี',enrolledAt:'2026-07-20',
+     approval:null,
+     history:[{at:'2026-08-06T15:00:00',by:'สิริพร ท.',action:'ออกใบรับรองผู้ผ่าน (soft ref)',detail:'ไม่มีเลขรัน / ไม่ออก PDF ทางการ',kind:'ok'},
+              {at:'2026-08-05T16:30:00',by:'สิริพร ท.',action:'บันทึกผล: ผ่าน + ประกาศผล',detail:'แจ้งเตือนผู้เรียน (NTF)',kind:'ok'},
+              {at:'2026-07-20T09:00:00',by:'สิริพร ท.',action:'ลงทะเบียนผู้เรียน (ยืนยันทันที)',detail:'หลักสูตรไม่มีค่าใช้จ่าย → ข้าม DOA',kind:'ok'}]},
+    {id:'EN4',sessionId:'SE2',emp:{id:'EMP-05',name:'อนุชา รักษ์ดี',position:'พนักงานคลัง',dept:'คลังสินค้า'},source:'gap',gap_ref:'PERF-2569-0388',status:'failed',result:'fail',cert:null,expenseSent:false,attended:true,evalScore:2,evalComment:'ขาดอบรมบางช่วง',enrolledAt:'2026-07-21',
+     approval:null,
+     history:[{at:'2026-08-05T16:30:00',by:'สิริพร ท.',action:'บันทึกผล: ไม่ผ่าน + ประกาศผล',detail:'ขาดอบรมบางช่วง · แจ้งเตือน (NTF)',kind:'warn'},
+              {at:'2026-07-21T09:00:00',by:'สิริพร ท.',action:'ลงทะเบียนผู้เรียน (ยืนยันทันที)',detail:'มาจาก gap ประเมินผล · ไม่มีค่าใช้จ่าย → ข้าม DOA',kind:'ok'}]},
+    {id:'EN5',sessionId:'SE2',emp:{id:'EMP-03',name:'วิชัย ตันติกุล',position:'หัวหน้าทีมขาย',dept:'ฝ่ายขาย'},source:'manual',gap_ref:null,status:'confirmed',result:null,cert:null,expenseSent:false,attended:null,evalScore:null,evalComment:'',enrolledAt:'2026-07-22',
+     approval:null,
+     history:[{at:'2026-07-22T10:00:00',by:'สิริพร ท.',action:'ลงทะเบียนผู้เรียน (ยืนยันทันที)',detail:'หลักสูตรไม่มีค่าใช้จ่าย → ข้าม DOA',kind:'ok'}]},
+    {id:'EN6',sessionId:'SE2',emp:{id:'EMP-06',name:'ธีรภัทร วงศ์ไพศาล',position:'ผู้จัดการฝ่ายบุคคล',dept:'ทรัพยากรบุคคล'},source:'manual',gap_ref:null,status:'confirmed',result:null,cert:null,expenseSent:false,attended:null,evalScore:null,evalComment:'',enrolledAt:'2026-07-22',
+     approval:null,
+     history:[{at:'2026-07-22T10:05:00',by:'สิริพร ท.',action:'ลงทะเบียนผู้เรียน (ยืนยันทันที)',detail:'หลักสูตรไม่มีค่าใช้จ่าย → ข้าม DOA',kind:'ok'}]},
+  ],
+};
+function getCourse(id){return DB.courses.find(c=>c.id===id);}
+function getSession(id){return DB.sessions.find(s=>s.id===id);}
+function getEnroll(id){return DB.enrolls.find(e=>e.id===id);}
+function courseOf(sess){return getCourse(sess.courseId)||{};}
+function courseOfEnroll(e){const s=getSession(e.sessionId);return s?courseOf(s):{};}
+/* FIX-04: parse ชั่วโมงอบรมจาก duration ของหลักสูตร (เช่น "2 วัน (12 ชม.)" → 12) */
+function courseHours(c){const m=String(c&&c.duration||'').match(/(\d+)\s*ชม/);return m?Number(m[1]):0;}
+/* FIX-01: ผลอบรมนับได้เฉพาะรายการจากรอบที่ปิดแล้ว (closed) */
+function isClosedResult(e){const s=getSession(e.sessionId);return !!(e.result&&s&&s.status==='closed');}
+function enrollsOfSession(sid){return DB.enrolls.filter(e=>e.sessionId===sid);}
+function activeEnrolls(sid){return enrollsOfSession(sid).filter(e=>e.status!=='cancelled');}
+function courseOpts(open){return DB.courses.filter(c=>c.status==='published').map(c=>({value:c.id,label:c.name,sub:c.code+' · '+catLabel(c.category)+(c.has_cost?' · มีค่าใช้จ่าย':' · ฟรี'),icon:'book-open'}));}
+
+/* ---- audit (FN-93 append-only) + notify (FN-12 · NTF_BRIEF) ---- */
+function audit(entity,action,detail,kind){entity.history=entity.history||[];entity.history.unshift({at:new Date().toISOString(),by:PERSONAS[TC.persona].name,action,detail:detail||'',kind:kind||'ok'});}
+/* NTF: 3 จุด — เปิดรับ (รอบอบรม) · ยืนยันลงทะเบียน · ประกาศผล — wire ENG-NOTIFY ตอน dev */
+function ntf(msg){showToast('แจ้งเตือน (NTF): '+msg,'info');}
+
+/* ---- money masking (FN-94 · งบ/มูลค่าอบรม = RESTRICTED บางบทบาท) ---- */
+function maskMoney(n){return PERSONAS[TC.persona].unmask?fmtMoney(n,0):'••••••';}
+
+/* ---- controller state ---- */
+const TC={tab:'course',persona:'hr',dctx:null,mctx:null,draft:{},busy:false,
+  f:{course:{q:'',cat:'all',status:'all'},plan:{q:'',status:'all'},result:{q:'',status:'all'},report:{course:'all'}}};
+
+/* ============================================================ NAV ============================================================ */
+function go(route){navigate(route);}
+function ctxStub(name){showToast(name+' — feature ข้างเคียงของ module (นอก scope รอบนี้)','warning');}
+function toggleUserMenu(){document.getElementById('userMenu').classList.toggle('is-open');}
+document.addEventListener('click',e=>{if(!e.target.closest('.user-chip')&&!e.target.closest('.user-menu')){const m=document.getElementById('userMenu');if(m)m.classList.remove('is-open');}});
+function setPersona(p){TC.persona=p;render();}
+function viewerRO(){if(TC.persona==='viewer'){showToast('สิทธิ์อ่านอย่างเดียว','warning');return true;}return false;}
+function syncPersonaChip(){
+  const pr=PERSONAS[TC.persona];
+  const n=document.getElementById('uc-name'),r=document.getElementById('uc-role'),a=document.getElementById('uc-av');
+  if(n)n.textContent=pr.name; if(r)r.textContent=pr.role; if(a)a.textContent=pr.av;
+  document.querySelectorAll('#personaSeg button').forEach(b=>b.classList.toggle('on',b.dataset.p===TC.persona));
+}
+
+/* ============================================================ RENDER ============================================================ */
+function render(){
+  const snap=preserveRenderState();
+  const rt=getRoute();
+  TC.tab=(rt.indexOf('train/')===0)?rt.split('/')[1]:'course';
+  if(['course','plan','result','report'].indexOf(TC.tab)<0)TC.tab='course';
+  document.getElementById('page-content').innerHTML=renderPage();
+  document.getElementById('drawer').innerHTML=(state.drawer.open&&TC.dctx)?renderDrawer():'';
+  const mh=document.querySelector('#modalBackdrop .modal');
+  if(mh)mh.innerHTML=(state.modal.open&&TC.mctx)?renderModal():'';
+  document.querySelectorAll('.sb-item').forEach(el=>el.classList.toggle('is-active',el.dataset.feature==='train'));
+  syncPersonaChip();
+  renderIcons();
+  mountCombos();
+  restoreRenderState(snap);
+}
+function renderPageOnly(){const snap=preserveRenderState();document.getElementById('page-content').innerHTML=renderPage();renderIcons();restoreRenderState(snap);}
+
+function renderPage(){
+  const recordable=DB.enrolls.filter(e=>e.status!=='cancelled').length;
+  const tabs=[
+    {id:'course',name:'หลักสูตร',icon:'book-open',ct:DB.courses.length},
+    {id:'plan',name:'แผน / ลงทะเบียน',icon:'calendar-days',ct:DB.sessions.length},
+    {id:'result',name:'ผล / ใบรับรอง',icon:'award',ct:recordable},
+    {id:'report',name:'รายงาน',icon:'bar-chart-3',ct:null},
+  ];
+  const titleMap={course:'หลักสูตร (Course Catalog)',plan:'แผน / ลงทะเบียน (Session & Enrollment)',result:'ผล / ใบรับรอง (Results & Certificates)',report:'รายงานการอบรม (Completion)'};
+  const subMap={course:'สร้างหลักสูตร · ระบุค่าใช้จ่าย/งบ · เผยแพร่ · ปิดหลักสูตร',plan:'สร้างรอบอบรม · เปิดรับ · ลงทะเบียน (จาก gap หรือเลือกเอง) · อนุมัติ DOA เมื่อมีค่าใช้จ่าย',result:'บันทึกผล (ผ่าน/ไม่ผ่าน) · ออกใบรับรอง (soft ref)',report:'อัตราการอบรมสำเร็จ (completion rate) · ขอบเขตที่ไม่รองรับ'};
+  let actions='';
+  if(TC.tab==='course'&&TC.persona!=='viewer')actions=`<button class="btn btn-primary" onclick="openCourseCreate()"><i data-lucide="plus" class="w-4 h-4"></i><span>สร้างหลักสูตร</span></button>`;
+  else if(TC.tab==='plan'&&TC.persona!=='viewer')actions=`<button class="btn btn-primary" onclick="openSessionCreate()"><i data-lucide="calendar-plus" class="w-4 h-4"></i><span>สร้างรอบอบรม</span></button>`;
+  else if(TC.tab==='report')actions=`<button class="btn btn-secondary" onclick="showToast('ส่งออกรายงาน (CSV) — ต่อ dev','info')"><i data-lucide="download" class="w-4 h-4"></i><span>Export CSV</span></button>`;
+  const ph=`<div class="ph"><div><div class="ph-title-row"><h1 class="ph-title">${titleMap[TC.tab]}</h1></div><p class="ph-sub">${subMap[TC.tab]}</p></div><div class="ph-actions">${actions}</div></div>`;
+  const tabbar=`<div class="tabs">${tabs.map(t=>`<button class="tab ${TC.tab===t.id?'is-active':''}" onclick="go('train/${t.id}')"><i data-lucide="${t.icon}" class="w-4 h-4"></i><span>${t.name}</span>${t.ct!=null?`<span class="tab-ct">${t.ct}</span>`:''}</button>`).join('')}</div>`;
+  let body='';
+  if(TC.tab==='course')body=renderCourseTab();
+  else if(TC.tab==='plan')body=renderPlanTab();
+  else if(TC.tab==='result')body=renderResultTab();
+  else body=renderReportTab();
+  return ph+tabbar+body;
+}
+
+/* -------- pills / chips -------- */
+function courseStatusPill(s){const m=COURSE_STATUS[s];return `<span class="pill ${m.pill}">${m.label}</span>`;}
+function sessionStatusPill(s){const m=SESSION_STATUS[s];return `<span class="pill ${m.pill}">${m.label}</span>`;}
+function enrollStatusPill(s){const m=ENROLL_STATUS[s];return `<span class="pill ${m.pill}">${m.label}</span>`;}
+function costChip(has){return has?`<span class="chip-soft is-cost"><i data-lucide="badge-dollar-sign"></i>มีค่าใช้จ่าย</span>`:`<span class="chip-soft is-free"><i data-lucide="gift"></i>ไม่มีค่าใช้จ่าย</span>`;}
+function resultChip(e){if(e.result==='pass')return `<span class="chip-soft is-free"><i data-lucide="check"></i>ผ่าน</span>`;if(e.result==='fail')return `<span class="chip-soft is-fail"><i data-lucide="x"></i>ไม่ผ่าน</span>`;return '<span style="color:var(--c-mute-3)">—</span>';}
+function certChip(e){return e.cert?`<span class="chip-soft is-cert"><i data-lucide="award"></i>ออกใบรับรองแล้ว</span>`:'<span style="color:var(--c-mute-3)">—</span>';}
+/* FIX-03: แสดงคะแนนประเมินหลังอบรม (1-5) */
+function evalChip(e){return e.evalScore?` <span class="chip-soft is-cert" title="${esc(e.evalComment||'')}"><i data-lucide="star"></i>ประเมิน ${e.evalScore}/5</span>`:'';}
+function attChip(e){return e.attended===true?'<span class="chip-soft is-free"><i data-lucide="user-check"></i>เข้าอบรม</span>':e.attended===false?'<span class="chip-soft is-fail"><i data-lucide="user-x"></i>ขาดอบรม</span>':'';}
+function capBar(sid){const s=getSession(sid),n=activeEnrolls(sid).length,pct=Math.min(100,Math.round(n/Math.max(1,s.capacity)*100)),full=n>=s.capacity;
+  return `<div style="display:flex;align-items:center;gap:8px"><div class="cap-bar"><div class="cap-fill ${full?'is-full':''}" style="width:${pct}%"></div></div><span class="num" style="font-size:12px;color:var(--c-mute-2)">${n}/${s.capacity}</span></div>`;}
+
+/* -------- TAB 1 : Courses (FN-01 · FN-90 · FN-91) -------- */
+function renderCourseTab(){
+  const q=TC.f.course.q.toLowerCase(),fc=TC.f.course.cat,fs=TC.f.course.status;
+  const rows=DB.courses.filter(c=>(fc==='all'||c.category===fc)&&(fs==='all'||c.status===fs)&&(!q||(c.name+c.code+c.instructor).toLowerCase().includes(q)));
+  const filterBar=`<div class="filter-bar">
+    <div class="input-search"><i data-lucide="search" class="lead-icon"></i><input class="input" placeholder="ค้นหาชื่อหลักสูตร / รหัส / ผู้สอน" value="${esc(TC.f.course.q)}" oninput="TC.f.course.q=this.value;renderPageOnly()"></div>
+    <select class="select" style="max-width:210px" onchange="TC.f.course.cat=this.value;renderPageOnly()">
+      <option value="all"${fc==='all'?' selected':''}>ทุกหมวด</option>${CATEGORIES.map(c=>`<option value="${c.value}"${fc===c.value?' selected':''}>${c.label}</option>`).join('')}
+    </select>
+    <select class="select" style="max-width:170px" onchange="TC.f.course.status=this.value;renderPageOnly()">
+      <option value="all"${fs==='all'?' selected':''}>ทุกสถานะ</option>${Object.keys(COURSE_STATUS).map(k=>`<option value="${k}"${fs===k?' selected':''}>${COURSE_STATUS[k].label}</option>`).join('')}
+    </select>
+    <button class="btn btn-ghost" style="margin-left:auto" onclick="TC.f.course={q:'',cat:'all',status:'all'};renderPageOnly()"><i data-lucide="rotate-ccw" class="w-4 h-4"></i><span>ล้างตัวกรอง</span></button>
+  </div>`;
+  let inner;
+  if(!rows.length){inner=emptyStateHTML({icon:'book-open',title:'ไม่พบหลักสูตร',desc:'ลองปรับคำค้นหรือล้างตัวกรอง แล้วลองอีกครั้ง',actionLabel:'ล้างตัวกรอง',actionIcon:'rotate-ccw',onAction:"TC.f.course={q:'',cat:'all',status:'all'};renderPageOnly()"});}
+  else{
+    inner=`<div class="table-wrap"><table class="table"><thead><tr>
+      <th>หลักสูตร / รหัส</th><th>หมวด</th><th>ผู้สอน</th><th>ระยะเวลา</th><th>ค่าใช้จ่าย</th><th class="col-num">งบ</th><th>สถานะ</th>
+    </tr></thead><tbody>${rows.map(c=>`<tr class="is-clickable" onclick="openCourseView('${c.id}')">
+        <td><div style="font-weight:600">${esc(c.name)}</div><div class="num" style="font-size:12px;color:var(--c-mute-2)">${esc(c.code)}</div></td>
+        <td>${esc(catLabel(c.category))}</td>
+        <td>${esc(c.instructor)}</td>
+        <td>${esc(c.duration)}</td>
+        <td>${costChip(c.has_cost)}</td>
+        <td class="col-num">${c.has_cost?'<span class="num">'+maskMoney(c.budget)+'</span>':'<span style="color:var(--c-mute-3)">—</span>'}</td>
+        <td>${courseStatusPill(c.status)}</td>
+      </tr>`).join('')}</tbody></table></div>
+      <div class="table-footer"><span></span><span>${rows.length} รายการ</span></div>`;
+  }
+  return `<div class="card page-fill">${filterBar}${inner}</div>`;
+}
+
+/* -------- TAB 2 : Sessions / Plan (FN-02 · FN-03/04/05/08 · FN-90) -------- */
+function renderPlanTab(){
+  const q=TC.f.plan.q.toLowerCase(),fs=TC.f.plan.status;
+  const pending=DB.enrolls.filter(e=>e.status==='pending_doa');
+  let approvalHook='';
+  if(TC.persona==='manager'&&pending.length){
+    approvalHook=`<div class="note is-info mb-3"><i data-lucide="inbox"></i><div><b>งานรออนุมัติของฉัน · ${pending.length} รายการ</b> — เปิดรอบอบรมที่มีผู้เรียน “รออนุมัติ (DOA)” เพื่ออนุมัติ/ไม่อนุมัติ (My Approval)</div></div>`;
+  }
+  const rows=DB.sessions.filter(s=>{const c=courseOf(s);return (fs==='all'||s.status===fs)&&(!q||(c.name+s.code+s.location).toLowerCase().includes(q));});
+  const filterBar=`<div class="filter-bar">
+    <div class="input-search"><i data-lucide="search" class="lead-icon"></i><input class="input" placeholder="ค้นหาหลักสูตร / รหัสรอบ / สถานที่" value="${esc(TC.f.plan.q)}" oninput="TC.f.plan.q=this.value;renderPageOnly()"></div>
+    <select class="select" style="max-width:200px" onchange="TC.f.plan.status=this.value;renderPageOnly()">
+      <option value="all"${fs==='all'?' selected':''}>ทุกสถานะ</option>${Object.keys(SESSION_STATUS).map(k=>`<option value="${k}"${fs===k?' selected':''}>${SESSION_STATUS[k].label}</option>`).join('')}
+    </select>
+    <button class="btn btn-ghost" style="margin-left:auto" onclick="TC.f.plan={q:'',status:'all'};renderPageOnly()"><i data-lucide="rotate-ccw" class="w-4 h-4"></i><span>ล้างตัวกรอง</span></button>
+  </div>`;
+  let inner;
+  if(!rows.length){inner=emptyStateHTML({icon:'calendar-days',title:'ไม่พบรอบอบรม',desc:'ลองปรับคำค้น/ตัวกรอง หรือสร้างรอบอบรมใหม่',actionLabel:'สร้างรอบอบรม',actionIcon:'calendar-plus',onAction:'openSessionCreate()'});}
+  else{
+    inner=`<div class="table-wrap"><table class="table"><thead><tr>
+      <th>หลักสูตร / รอบ</th><th>ประเภท</th><th>วันเวลา</th><th>สถานที่</th><th>ผู้เรียน</th><th>สถานะ</th>
+    </tr></thead><tbody>${rows.map(s=>{const c=courseOf(s);return `<tr class="is-clickable" onclick="openSessionView('${s.id}')">
+        <td><div style="font-weight:600">${esc(c.name)}</div><div class="num" style="font-size:12px;color:var(--c-mute-2)">${esc(s.code)}</div></td>
+        <td>${costChip(c.has_cost)}</td>
+        <td>${fmtDate(s.start)}${s.end&&s.end!==s.start?' – '+fmtDate(s.end):''}<div style="font-size:12px;color:var(--c-mute-2)">${esc(s.time)}</div></td>
+        <td><span class="cell-truncate" title="${esc(s.location)}">${esc(s.location)}</span></td>
+        <td>${capBar(s.id)}</td>
+        <td>${sessionStatusPill(s.status)}</td>
+      </tr>`;}).join('')}</tbody></table></div>
+      <div class="table-footer"><span></span><span>${rows.length} รอบ</span></div>`;
+  }
+  return approvalHook+`<div class="card page-fill">${filterBar}${inner}</div>`;
+}
+
+/* -------- TAB 3 : Results / Certificates (FN-06 · FN-07 · FN-90) -------- */
+function renderResultTab(){
+  const q=TC.f.result.q.toLowerCase(),fs=TC.f.result.status;
+  const rows=DB.enrolls.filter(e=>{const c=courseOfEnroll(e);return e.status!=='cancelled'&&(fs==='all'||e.status===fs)&&(!q||(e.emp.name+c.name).toLowerCase().includes(q));});
+  const filterBar=`<div class="filter-bar">
+    <div class="input-search"><i data-lucide="search" class="lead-icon"></i><input class="input" placeholder="ค้นหาผู้เรียน / หลักสูตร" value="${esc(TC.f.result.q)}" oninput="TC.f.result.q=this.value;renderPageOnly()"></div>
+    <select class="select" style="max-width:200px" onchange="TC.f.result.status=this.value;renderPageOnly()">
+      <option value="all"${fs==='all'?' selected':''}>ทุกสถานะ</option>${['pending_doa','confirmed','passed','failed'].map(k=>`<option value="${k}"${fs===k?' selected':''}>${ENROLL_STATUS[k].label}</option>`).join('')}
+    </select>
+    <button class="btn btn-ghost" style="margin-left:auto" onclick="TC.f.result={q:'',status:'all'};renderPageOnly()"><i data-lucide="rotate-ccw" class="w-4 h-4"></i><span>ล้างตัวกรอง</span></button>
+  </div>`;
+  let inner;
+  if(!rows.length){inner=emptyStateHTML({icon:'award',title:'ไม่พบรายการลงทะเบียน',desc:'ลองปรับคำค้น/ตัวกรอง — บันทึกผลได้เมื่อผู้เรียนยืนยันลงทะเบียนแล้ว'});}
+  else{
+    inner=`<div class="table-wrap"><table class="table"><thead><tr>
+      <th>ผู้เรียน</th><th>หลักสูตร / รอบ</th><th>สถานะลงทะเบียน</th><th>ผล</th><th>ใบรับรอง</th><th style="text-align:right">จัดการ</th>
+    </tr></thead><tbody>${rows.map(e=>{const c=courseOfEnroll(e),s=getSession(e.sessionId);
+      let act='<span style="color:var(--c-mute-3);font-size:12px">—</span>';
+      if(TC.persona!=='viewer'){
+        if(e.status==='confirmed'){
+          if(s.status!=='closed')act=`<span class="tt-wrap" title="บันทึกผลได้หลังปิดรอบ" style="display:inline-block"><button class="btn btn-sm btn-primary is-disabled" disabled title="บันทึกผลได้หลังปิดรอบ"><i data-lucide="clipboard-check" class="w-3.5 h-3.5"></i><span>บันทึกผล</span></button></span>`;
+          else if(e.attended!==true)act=`<span class="tt-wrap" title="ต้องเช็คชื่อเข้าอบรมก่อน (แท็บผู้เรียน)" style="display:inline-block"><button class="btn btn-sm btn-primary is-disabled" disabled title="ต้องเช็คชื่อเข้าอบรมก่อน (แท็บผู้เรียน)"><i data-lucide="clipboard-check" class="w-3.5 h-3.5"></i><span>บันทึกผล</span></button></span>`;
+          else act=`<button class="btn btn-sm btn-primary" onclick="event.stopPropagation();openResultModal('${e.id}')"><i data-lucide="clipboard-check" class="w-3.5 h-3.5"></i><span>บันทึกผล</span></button>`;
+        }
+        else if(e.status==='passed'&&!e.cert)act=`<button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();issueCert('${e.id}')"><i data-lucide="award" class="w-3.5 h-3.5"></i><span>ออกใบรับรอง</span></button>`;
+        else if(e.status==='pending_doa')act='<span class="chip-soft is-cost"><i data-lucide="clock"></i>รออนุมัติ</span>';
+      }
+      return `<tr class="is-clickable" onclick="openSessionView('${e.sessionId}','learner')">
+        <td><div class="user-cell"><div class="uc-avatar">${esc(personInitials(e.emp.name))}</div><div><div class="uc-name"><span class="lnk-name" onclick="event.stopPropagation();openEmpHistory('${e.emp.id}')" title="ดูประวัติอบรม">${esc(e.emp.name)}</span>${e.source==='gap'?' <span class="chip-soft is-gap"><i data-lucide="target"></i>จาก gap</span>':''}</div><div class="uc-email">${esc(e.emp.position)}</div></div></div></td>
+        <td>${esc(c.name)}<div class="num" style="font-size:12px;color:var(--c-mute-2)">${esc(s.code)}</div></td>
+        <td>${enrollStatusPill(e.status)}</td>
+        <td>${resultChip(e)}${evalChip(e)}</td>
+        <td>${certChip(e)}</td>
+        <td style="text-align:right">${act}</td>
+      </tr>`;}).join('')}</tbody></table></div>
+      <div class="table-footer"><span></span><span>${rows.length} รายการ</span></div>`;
+  }
+  return `<div class="card page-fill">${filterBar}${inner}</div>`;
+}
+
+/* -------- TAB 4 : Report (FN-13) + ขอบเขตที่ไม่รองรับ (unsupported 5) -------- */
+function renderReportTab(){
+  const scope=TC.f.report.course;
+  const pool=DB.enrolls.filter(e=>e.status!=='cancelled'&&(scope==='all'||courseOfEnroll(e).id===scope));
+  /* FIX-01: completion rate นับเฉพาะผลจากรอบที่ปิดแล้ว (closed) */
+  const passed=pool.filter(e=>isClosedResult(e)&&e.result==='pass').length;
+  const failed=pool.filter(e=>isClosedResult(e)&&e.result==='fail').length;
+  const recorded=passed+failed;
+  const inProgress=pool.filter(e=>e.status==='confirmed').length;
+  const pendingDoa=pool.filter(e=>e.status==='pending_doa').length;
+  const rate=recorded?Math.round(passed/recorded*100):0;
+  const stats=[
+    {ic:'book-open',l:'หลักสูตร',v:DB.courses.length},
+    {ic:'calendar-days',l:'รอบอบรม',v:DB.sessions.length},
+    {ic:'users',l:'ลงทะเบียนทั้งหมด',v:pool.length},
+    {ic:'award',l:'ผ่าน',v:passed},
+    {ic:'trending-up',l:'อัตราผ่าน (completion)',v:rate+'%'},
+  ];
+  const perCourse=DB.courses.map(c=>{const list=DB.enrolls.filter(e=>e.status!=='cancelled'&&courseOfEnroll(e).id===c.id);const p=list.filter(e=>isClosedResult(e)&&e.result==='pass').length;const rec=list.filter(e=>isClosedResult(e)).length;const rt=rec?Math.round(p/rec*100):0;return {c,p,rec,rt,total:list.length};}).filter(x=>scope==='all'||x.c.id===scope);
+  /* FIX-05: ต้นทุนต่อหัว (มุม EC) ต่อหลักสูตรมีค่าใช้จ่าย */
+  const costCourses=DB.courses.filter(c=>c.has_cost&&(scope==='all'||c.id===scope)).map(c=>{const list=DB.enrolls.filter(e=>e.status!=='cancelled'&&courseOfEnroll(e).id===c.id);const pass=list.filter(e=>isClosedResult(e)&&e.result==='pass').length;return {c,budget:c.budget,pass};});
+  const oos=[
+    {t:'จ่ายเงินค่าอบรมจริง / ลงบัญชี',w:'[OB-1] ส่ง hook Expense Claim เท่านั้น'},
+    {t:'ประเมินผลงาน / สร้าง gap เอง',w:'[OB-2] อ่านจาก Performance (hook)'},
+    {t:'eLearning content / SCORM · competency mapping',w:'[OQ NICE] ไม่รองรับรอบนี้'},
+    {t:'ใบรับรองเลขรัน / PDF ทางการ',w:'[ASSUMED] soft ref (ไม่ doccfg/pdfdoc)'},
+    {t:'สร้าง / แก้ config หมวดหลักสูตรกลาง',w:'[#107] อ่านจาก HR Configuration'},
+  ];
+  return `<div class="filter-bar" style="border-radius:10px 10px 0 0;border:1px solid var(--c-line-2)">
+      <span style="font-size:12.5px;color:var(--c-mute)">กรองตามหลักสูตร</span>
+      <select class="select" style="max-width:320px" onchange="TC.f.report.course=this.value;renderPageOnly()">
+        <option value="all"${scope==='all'?' selected':''}>ทุกหลักสูตร</option>
+        ${DB.courses.map(c=>`<option value="${c.id}"${scope===c.id?' selected':''}>${esc(c.name)}</option>`).join('')}
+      </select></div>
+    <div class="stats" style="margin-top:14px">${stats.map(s=>`<div class="stat"><div class="stat-label"><i data-lucide="${s.ic}" class="w-3 h-3"></i>${s.l}</div><div class="stat-value">${s.v}</div></div>`).join('')}</div>
+    <div class="card" style="padding:18px;margin-bottom:16px"><div class="sec-h"><i data-lucide="bar-chart-3"></i>อัตราการอบรมสำเร็จ (completion rate) ต่อหลักสูตร</div>
+      <div class="funnel">${perCourse.map(x=>`<div class="funnel-row"><span class="fl">${esc(x.c.name)}</span><div class="funnel-track"><div class="funnel-fill" style="width:${x.rt}%"></div></div><span class="fn">${x.rt}% <span style="font-weight:500;color:var(--c-mute-2)">(${x.p}/${x.rec||0})</span></span></div>`).join('')}</div>
+      <div class="note is-info" style="margin-top:16px"><i data-lucide="info"></i><div>ผลรวม: ผ่าน <b>${passed}</b> · ไม่ผ่าน <b>${failed}</b> · กำลังดำเนินการ <b>${inProgress}</b> · รออนุมัติ (DOA) <b>${pendingDoa}</b> · <span style="color:var(--c-mute-2)">นับเฉพาะผลจากรอบที่ปิดแล้ว</span></div></div>
+    </div>
+    <div class="card" style="padding:18px;margin-bottom:16px"><div class="sec-h"><i data-lucide="wallet"></i>ต้นทุนต่อหัว (มุม EC) — หลักสูตรมีค่าใช้จ่าย</div>
+      ${costCourses.length?`<div class="cph-grid">${costCourses.map(x=>{const per=(x.budget>0&&x.pass>0)?(PERSONAS[TC.persona].unmask?fmtMoney(Math.round(x.budget/x.pass),0):'••••••'):'—';return `<div class="cph-card"><div class="cph-name">${esc(x.c.name)}</div>
+        <div class="cph-row"><span class="cph-l">งบหลักสูตร</span><span class="cph-v num">${maskMoney(x.budget)}</span></div>
+        <div class="cph-row"><span class="cph-l">ผู้ผ่าน</span><span class="cph-v num">${x.pass}</span></div>
+        <div class="cph-row cph-total"><span class="cph-l">ต้นทุนต่อหัว</span><span class="cph-v num">${per}</span></div></div>`;}).join('')}</div>
+      <div class="note is-info" style="margin-top:12px"><i data-lucide="info"></i><div>อัตรากลางจริงอ่านจาก Rate Card เมื่อพร้อม — ไม่ hardcode · EC ไม่ลงบัญชี · ต้นทุนต่อหัว = งบ ÷ ผู้ผ่าน (ผู้ผ่าน = 0 หรือหลักสูตรฟรี → “—” กันหารศูนย์)</div></div>`:'<div class="rc-list-intro">ไม่มีหลักสูตรที่มีค่าใช้จ่ายในขอบเขตที่เลือก</div>'}
+    </div>
+    <div class="card" style="padding:18px"><div class="sec-h"><i data-lucide="shield-x"></i>ขอบเขตที่ไม่รองรับ — ตัดสินแล้ว (อย่าเผลอทำ)</div>
+      <p class="rc-list-intro" style="margin:0 0 12px">รายการนี้ถูกตัดออกจาก scope โดยมติ — ระบบไม่มีปุ่ม/ทางลัดให้ทำสิ่งเหล่านี้</p>
+      <div class="oos">${oos.map(o=>`<div class="oos-item"><span class="x">✕</span><span>${esc(o.t)}</span><span class="why">${esc(o.w)}</span></div>`).join('')}</div>
+    </div>`;
+}
+
+/* ============================================================ DRAWER ============================================================ */
+function tcOpen(mode,id){state.drawer={open:true,mode,recordId:id,step:1};render();requestAnimationFrame(()=>{document.getElementById('drawerBackdrop').classList.add('is-open');const dw=document.getElementById('drawer');dw.classList.add('is-open');lockScroll(true);trapFocus(dw);});}
+function openCourseView(id){TC.dctx={kind:'course',mode:'view',id};tcOpen('view',id);}
+function openCourseCreate(){if(viewerRO())return;TC.dctx={kind:'course',mode:'create',id:null};TC.draft={name:'',category:null,instructor:'',duration:'',has_cost:false,budget:'',desc:''};tcOpen('create',null);}
+function openCourseEdit(id){const c=getCourse(id);TC.dctx={kind:'course',mode:'edit',id};TC.draft={name:c.name,category:c.category,instructor:c.instructor,duration:c.duration,has_cost:c.has_cost,budget:c.has_cost?c.budget:'',desc:c.desc};tcOpen('edit',id);}
+function openSessionView(id,tab){TC.dctx={kind:'session',mode:'view',id,tab:tab||'detail'};tcOpen('view',id);}
+function openSessionCreate(){if(viewerRO())return;TC.dctx={kind:'session',mode:'create',id:null};TC.draft={courseId:null,start:'',end:'',time:'09:00–16:00',location:'',capacity:20};tcOpen('create',null);}
+function openSessionEdit(id){const s=getSession(id);TC.dctx={kind:'session',mode:'edit',id};TC.draft={courseId:s.courseId,start:s.start,end:s.end,time:s.time,location:s.location,capacity:s.capacity};tcOpen('edit',id);}
+function setSessionTab(t){const ok=['detail','learner','approval','history'];TC.dctx.tab=ok.includes(t)?t:'detail';render();}
+
+function renderDrawer(){
+  if(TC.dctx.kind==='course')return (TC.dctx.mode==='view')?courseViewDrawer():courseFormDrawer();
+  return (TC.dctx.mode==='view')?sessionViewDrawer():sessionFormDrawer();
+}
+
+/* ---- Course form (create/edit · FN-01/92) ---- */
+function courseFormDrawer(){
+  const isEdit=TC.dctx.mode==='edit',d=TC.draft;
+  return `<div class="dw-head"><div class="dw-head-row"><div>
+      <div class="dw-eyebrow"><i data-lucide="book-open" class="w-3.5 h-3.5"></i>${isEdit?'แก้ไขหลักสูตร':'สร้างหลักสูตรใหม่'}</div>
+      <h2 class="dw-title">${isEdit?esc(getCourse(TC.dctx.id).code):'หลักสูตรอบรม'}</h2></div>
+      <button class="top-icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-4 h-4"></i></button></div></div>
+    <div class="drawer-body">
+      <div class="form-section"><div class="form-section-title">ข้อมูลหลักสูตร</div>
+        <div class="field"><label class="field-label">ชื่อหลักสูตร <span class="req">*</span></label><input id="f-name" class="input" value="${esc(d.name)}" oninput="TC.draft.name=this.value" placeholder="เช่น ความปลอดภัยในการทำงาน (จป.)"><div class="field-error">กรุณากรอกชื่อหลักสูตร</div></div>
+        <div class="field-row">
+          <div class="field"><label class="field-label">หมวดหลักสูตร <span class="req">*</span></label>${searchSelectHTML('crs_cat',{placeholder:'เลือกหมวด...'})}<div class="field-help">อ่านจาก HR Configuration (ไม่แก้ในหน้านี้)</div></div>
+          <div class="field"><label class="field-label">ระยะเวลา <span class="req">*</span></label><input id="f-dur" class="input" value="${esc(d.duration)}" oninput="TC.draft.duration=this.value" placeholder="เช่น 2 วัน (12 ชม.)"><div class="field-error">กรุณาระบุระยะเวลา</div></div>
+        </div>
+        <div class="field"><label class="field-label">ผู้สอน / วิทยากร <span class="req">*</span></label><input id="f-inst" class="input" value="${esc(d.instructor)}" oninput="TC.draft.instructor=this.value" placeholder="เช่น อ.ธนพล (ภายนอก) หรือ ทีม HR (ภายใน)"><div class="field-error">กรุณาระบุผู้สอน</div></div>
+        <div class="field"><label class="field-label">รายละเอียด</label><textarea class="notes-area" oninput="TC.draft.desc=this.value" placeholder="วัตถุประสงค์ / เนื้อหา / กลุ่มเป้าหมาย">${esc(d.desc)}</textarea></div>
+      </div>
+      <div class="form-section"><div class="form-section-title">ค่าใช้จ่าย</div>
+        <div class="bm-card" style="cursor:pointer" onclick="TC.draft.has_cost=!TC.draft.has_cost;render()"><div class="bm-icon"><i data-lucide="${d.has_cost?'badge-dollar-sign':'gift'}"></i></div>
+          <div style="flex:1"><div style="font-weight:600;font-size:13px">${d.has_cost?'หลักสูตรมีค่าใช้จ่าย':'หลักสูตรไม่มีค่าใช้จ่าย (จัดภายใน)'}</div><div style="font-size:12px;color:var(--c-mute-2)">มีค่าใช้จ่าย = การลงทะเบียนต้องผ่านอนุมัติ (DOA) ก่อนยืนยัน · ไม่มี = ลงทะเบียนได้เลย</div></div>
+          <div class="cb ${d.has_cost?'is-checked':''}"></div></div>
+        ${d.has_cost?`<div class="field" style="margin-top:14px"><label class="field-label">งบประมาณหลักสูตร (บาท) <span class="req">*</span></label><input id="f-budget" type="number" min="0" class="input" value="${esc(d.budget)}" oninput="TC.draft.budget=this.value" placeholder="เช่น 30000"><div class="field-error">กรุณากรอกงบประมาณ</div><div class="field-help">งบภายในหลักสูตร (กรอกเอง) · คนละส่วนกับ EC (อัตรากลาง)</div></div>
+        <div class="ec-ref" style="margin-top:12px"><div class="ec-h"><i data-lucide="link"></i>มูลค่าอบรม (EC) — อ้างอิงอัตรากลาง</div>
+          <div class="ec-row"><span class="chip-soft is-cost"><i data-lucide="plug"></i>อ้างอิง Rate Card · เชื่อมเมื่อ Rate Card พร้อม</span></div>
+          <div class="ec-src" style="margin-top:6px">ยังไม่ผูกตัวเลข — Rate Card (อัตรากลาง) ยังไม่ถูกสร้าง · ระบบจะดึงมูลค่าเมื่อพร้อม (ไม่ hardcode)</div></div>`:''}
+      </div>
+    </div>
+    <div class="drawer-footer"><button class="btn btn-ghost" onclick="closeDrawer()">ยกเลิก</button><div class="footer-spacer"></div>
+      ${isEdit?'':`<button class="btn btn-secondary" onclick="submitCourse(true)"><i data-lucide="save" class="w-4 h-4"></i><span>บันทึกร่าง</span></button>`}
+      <button class="btn btn-primary" ${TC.busy?'disabled':''} onclick="submitCourse(false)"><i data-lucide="${TC.busy?'loader-2':'check'}" class="w-4 h-4${TC.busy?' spin':''}"></i><span>${isEdit?'บันทึกการแก้ไข':'เผยแพร่หลักสูตร'}</span></button></div>`;
+}
+function submitCourse(asDraft){
+  if(viewerRO())return; if(TC.busy)return;
+  const d=TC.draft,bad=[];
+  if(!String(d.name).trim())bad.push('f-name');
+  if(!String(d.duration).trim())bad.push('f-dur');
+  if(!String(d.instructor).trim())bad.push('f-inst');
+  if(d.has_cost&&!(Number(d.budget)>=0&&String(d.budget).trim()!==''))bad.push('f-budget');
+  if(bad.length||!d.category){markInvalidFields(bad);showToast(!bad.length&&!d.category?'กรุณาเลือกหมวดหลักสูตร':'กรุณากรอกข้อมูลที่ไฮไลต์ให้ครบ','warning');return;}
+  TC.busy=true;
+  if(TC.dctx.mode==='edit'){const c=getCourse(TC.dctx.id);Object.assign(c,{name:d.name,category:d.category,instructor:d.instructor,duration:d.duration,has_cost:d.has_cost,budget:d.has_cost?Number(d.budget):0});audit(c,'แก้ไขข้อมูลหลักสูตร','');closeDrawer();setTimeout(()=>{TC.busy=false;render();showToast('บันทึกการแก้ไขแล้ว','success');},300);return;}
+  const seq=String(DB.courses.length+1).padStart(3,'0');
+  const nc={id:'CO'+Date.now(),code:'CRS-2569-'+seq,name:d.name,category:d.category,instructor:d.instructor,duration:d.duration,has_cost:d.has_cost,budget:d.has_cost?Number(d.budget):0,status:asDraft?'draft':'published',createdAt:new Date().toISOString().slice(0,10),desc:d.desc,history:[]};
+  audit(nc,asDraft?'บันทึกร่างหลักสูตร':'สร้างหลักสูตร + เผยแพร่',d.has_cost?'มีค่าใช้จ่าย · งบ '+fmtNumber(d.budget):'ไม่มีค่าใช้จ่าย');
+  DB.courses.push(nc);closeDrawer();
+  setTimeout(()=>{TC.busy=false;render();showToast(asDraft?'บันทึกร่างแล้ว':'สร้างหลักสูตรแล้ว','success');},300);
+}
+
+/* ---- Course view (FN-91 close · EC ref display-only) ---- */
+function courseViewDrawer(){
+  const c=getCourse(TC.dctx.id);
+  const sess=DB.sessions.filter(s=>s.courseId===c.id);
+  let acts='';
+  if(TC.persona!=='viewer'){
+    if(c.status==='draft')acts+=`<button class="btn btn-sm btn-secondary" onclick="openCourseEdit('${c.id}')"><i data-lucide="pencil" class="w-3.5 h-3.5"></i><span>แก้ไข</span></button><button class="btn btn-sm btn-primary" onclick="coursePublish('${c.id}')"><i data-lucide="megaphone" class="w-3.5 h-3.5"></i><span>เผยแพร่</span></button>`;
+    else if(c.status==='published')acts+=`<button class="btn btn-sm btn-secondary" onclick="openCourseEdit('${c.id}')"><i data-lucide="pencil" class="w-3.5 h-3.5"></i><span>แก้ไข</span></button><button class="btn btn-sm btn-danger" onclick="courseClose('${c.id}')"><i data-lucide="archive" class="w-3.5 h-3.5"></i><span>ปิดหลักสูตร</span></button>`;
+  }
+  return `<div class="drawer-header"><div class="drawer-avatar"><i data-lucide="book-open" class="w-5 h-5"></i></div>
+      <div style="flex:1;min-width:0"><h2 class="drawer-title">${esc(c.name)}</h2><div class="drawer-subtitle"><span class="num">${esc(c.code)}</span> · ${esc(catLabel(c.category))} ${courseStatusPill(c.status)}</div></div>
+      <div class="drawer-header-actions">${acts}<span class="drawer-header-divider"></span><button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-4 h-4"></i></button></div></div>
+    <div class="drawer-body">
+      <div class="secwrap"><div class="sec-h"><i data-lucide="info"></i>ข้อมูลหลักสูตร</div>
+        <div class="kv"><div class="k">ชื่อหลักสูตร</div><div class="v">${esc(c.name)}</div>
+          <div class="k">หมวด</div><div class="v">${esc(catLabel(c.category))}</div>
+          <div class="k">ผู้สอน / วิทยากร</div><div class="v">${esc(c.instructor)}</div>
+          <div class="k">ระยะเวลา</div><div class="v">${esc(c.duration)}</div>
+          <div class="k">ค่าใช้จ่าย</div><div class="v">${costChip(c.has_cost)}</div>
+          ${c.has_cost?`<div class="k">งบประมาณ</div><div class="v num">${maskMoney(c.budget)} บาท</div>`:''}
+          <div class="k">รายละเอียด</div><div class="v" style="font-weight:400">${esc(c.desc||'—')}</div></div></div>
+      ${c.has_cost?`<div class="secwrap"><div class="sec-h"><i data-lucide="badge-dollar-sign"></i>มูลค่าอบรม (EC) — อ้างอิงอัตรากลาง (Rate Card)</div>
+        <div class="ec-ref"><div class="ec-h"><i data-lucide="link"></i>CSQ · Expense Category (EC)</div>
+          <div class="ec-row"><span class="chip-soft is-cost"><i data-lucide="plug"></i>อ้างอิง Rate Card · เชื่อมเมื่อ Rate Card พร้อม</span></div>
+          <div class="ec-src" style="margin-top:6px">มูลค่าอบรมยังไม่ผูกตัวเลข — Rate Card (อัตรากลาง) ยังไม่ถูกสร้าง · แสดงเป็น display-only ไม่ hardcode · งบภายในของหลักสูตร = ${maskMoney(c.budget)} บาท</div></div></div>`:''}
+      <div class="secwrap"><div class="sec-h"><i data-lucide="calendar-days"></i>รอบอบรมของหลักสูตรนี้ · ${sess.length} รอบ</div>
+        ${sess.length?sess.map(s=>`<div class="bm-card" onclick="closeDrawer();setTimeout(()=>openSessionView('${s.id}'),120)"><div class="bm-icon"><i data-lucide="calendar"></i></div><div style="flex:1"><div style="font-weight:600;font-size:13px">${fmtDate(s.start)} · ${esc(s.location)}</div><div style="font-size:12px;color:var(--c-mute-2)">${esc(s.code)} · ผู้เรียน ${activeEnrolls(s.id).length}/${s.capacity} · ${SESSION_STATUS[s.status].label}</div></div><i data-lucide="chevron-right" class="w-4 h-4"></i></div>`).join(''):'<div class="rc-list-intro">ยังไม่มีรอบอบรม — สร้างรอบได้ที่แท็บ “แผน / ลงทะเบียน”</div>'}</div>
+      ${historySection(c.history)}
+    </div>
+    <div class="drawer-footer"><div class="drawer-footer-meta">อัปเดตล่าสุด ${c.history&&c.history[0]?fmtDateTime(c.history[0].at):'—'}</div><div class="footer-spacer"></div><button class="btn btn-secondary" onclick="closeDrawer()">ปิด</button></div>`;
+}
+function historySection(h){
+  return `<div class="secwrap"><div class="sec-h"><i data-lucide="history"></i>ประวัติ (append-only)</div>
+    <div class="timeline">${(h&&h.length?h:[{at:null,by:'',action:'ยังไม่มีประวัติ',detail:'',kind:'ok'}]).map(x=>`<div class="tl-item"><div class="tl-dot ${x.kind==='warn'?'is-warning':x.kind==='bad'?'':'is-success'}"></div><div class="tl-title">${esc(x.action)}</div><div class="tl-meta">${x.by?esc(x.by)+' · ':''}${x.at?fmtDateTime(x.at):''}${x.detail?' · '+esc(x.detail):''}</div></div>`).join('')}</div></div>`;
+}
+function approvalSection(ap,label,bare){
+  const inner=`<div class="sec-h"><i data-lucide="git-branch-plus"></i>การอนุมัติ (DOA) — ${label}</div>
+    <div class="kv" style="margin-bottom:12px"><div class="k">DOA entry</div><div class="v num">${esc(ap.entry)}</div><div class="k">ความคืบหน้า</div><div class="v">${ap.done?'อนุมัติครบ':'ขั้น '+ap.current+' / '+ap.steps.length}</div></div>
+    <div class="timeline">${ap.steps.map(s=>{const e=emp(s.approver_id);const done=s.result==='approved';return `<div class="tl-item"><div class="tl-dot ${done?'is-success':s.result==='rejected'?'':'is-warning'}"></div><div class="tl-title">ขั้น ${s.order}: ${esc(s.slotName)}</div><div class="tl-meta">${e?'<span class="emp-chip"><span class="uc-avatar">'+esc(personInitials(e.name))+'</span>'+esc(e.name)+' <span class="ec-pos">· '+esc(e.position)+'</span></span>':'ยังไม่กำหนดผู้อนุมัติ'} ${done?'· อนุมัติ '+fmtDate(s.at):(s.result==='rejected'?'· ไม่อนุมัติ':'· รอ')}</div></div>`;}).join('')}</div>`;
+  return bare?inner:`<div class="secwrap">${inner}</div>`;
+}
+
+/* ---- Session form (create/edit · FN-02/92) ---- */
+function sessionFormDrawer(){
+  const isEdit=TC.dctx.mode==='edit',d=TC.draft,c=d.courseId?getCourse(d.courseId):null;
+  return `<div class="dw-head"><div class="dw-head-row"><div>
+      <div class="dw-eyebrow"><i data-lucide="calendar-plus" class="w-3.5 h-3.5"></i>${isEdit?'แก้ไขรอบอบรม':'สร้างรอบอบรมใหม่'}</div>
+      <h2 class="dw-title">${isEdit?esc(getSession(TC.dctx.id).code):'รอบอบรม (Session)'}</h2></div>
+      <button class="top-icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-4 h-4"></i></button></div></div>
+    <div class="drawer-body">
+      <div class="form-section"><div class="form-section-title">หลักสูตร</div>
+        <div class="field"><label class="field-label">หลักสูตร <span class="req">*</span></label>${searchSelectHTML('ses_course',{placeholder:'ค้นหาหลักสูตรที่เผยแพร่...'})}<div class="field-help">เลือกหลักสูตรที่จะเปิดรอบอบรม</div></div>
+        ${c?`<div class="note ${c.has_cost?'is-warn':'is-info'} mb-3"><i data-lucide="${c.has_cost?'badge-dollar-sign':'gift'}"></i><div>${c.has_cost?'<b>หลักสูตรมีค่าใช้จ่าย</b> — การลงทะเบียนในรอบนี้จะต้องผ่านอนุมัติ (DOA) ก่อนยืนยัน':'<b>หลักสูตรไม่มีค่าใช้จ่าย</b> — ลงทะเบียนได้เลย (ข้าม DOA)'}</div></div>`:''}
+      </div>
+      <div class="form-section"><div class="form-section-title">กำหนดการ</div>
+        <div class="field-row">
+          <div class="field"><label class="field-label">วันเริ่ม <span class="req">*</span></label><input id="f-start" type="date" class="input" value="${esc(d.start)}" onchange="TC.draft.start=this.value"><div class="field-error">กรุณาเลือกวันเริ่ม</div></div>
+          <div class="field"><label class="field-label">วันสิ้นสุด</label><input type="date" class="input" value="${esc(d.end)}" onchange="TC.draft.end=this.value"><div class="field-help">เว้นว่างได้ถ้าอบรมวันเดียว</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label class="field-label">ช่วงเวลา</label><input class="input" value="${esc(d.time)}" oninput="TC.draft.time=this.value" placeholder="เช่น 09:00–16:00"></div>
+          <div class="field"><label class="field-label">จำนวนที่รับ <span class="req">*</span></label><input id="f-cap" type="number" min="1" class="input" value="${esc(d.capacity)}" oninput="TC.draft.capacity=this.value"><div class="field-error">อย่างน้อย 1</div></div>
+        </div>
+        <div class="field"><label class="field-label">สถานที่ <span class="req">*</span></label><input id="f-loc" class="input" value="${esc(d.location)}" oninput="TC.draft.location=this.value" placeholder="เช่น ห้องอบรม A · ชั้น 5"><div class="field-error">กรุณาระบุสถานที่</div></div>
+      </div>
+    </div>
+    <div class="drawer-footer"><button class="btn btn-ghost" onclick="closeDrawer()">ยกเลิก</button><div class="footer-spacer"></div>
+      <button class="btn btn-primary" ${TC.busy?'disabled':''} onclick="submitSession()"><i data-lucide="${TC.busy?'loader-2':'check'}" class="w-4 h-4${TC.busy?' spin':''}"></i><span>${isEdit?'บันทึกการแก้ไข':'สร้างรอบ (ร่าง)'}</span></button></div>`;
+}
+function submitSession(){
+  if(viewerRO())return; if(TC.busy)return;
+  const d=TC.draft,bad=[];
+  if(!String(d.start).trim())bad.push('f-start');
+  if(!(Number(d.capacity)>=1))bad.push('f-cap');
+  if(!String(d.location).trim())bad.push('f-loc');
+  if(bad.length||!d.courseId){markInvalidFields(bad);showToast(!bad.length&&!d.courseId?'กรุณาเลือกหลักสูตร':'กรุณากรอกข้อมูลที่ไฮไลต์ให้ครบ','warning');return;}
+  /* FIX-02: สร้างรอบได้เฉพาะหลักสูตรที่เผยแพร่ (กันสร้างรอบให้หลักสูตร closed/draft) */
+  const _c=getCourse(d.courseId); if(!_c||_c.status!=='published'){showToast('สร้างรอบได้เฉพาะหลักสูตรที่เผยแพร่','warning');return;}
+  TC.busy=true;
+  if(TC.dctx.mode==='edit'){const s=getSession(TC.dctx.id);Object.assign(s,{courseId:d.courseId,start:d.start,end:d.end||d.start,time:d.time,location:d.location,capacity:Number(d.capacity)});audit(s,'แก้ไขข้อมูลรอบอบรม','');closeDrawer();setTimeout(()=>{TC.busy=false;render();showToast('บันทึกการแก้ไขแล้ว','success');},300);return;}
+  const seq=String(DB.sessions.length+1).padStart(3,'0');
+  const ns={id:'SE'+Date.now(),code:'SES-2569-'+seq,courseId:d.courseId,start:d.start,end:d.end||d.start,time:d.time||'09:00–16:00',location:d.location,capacity:Number(d.capacity),status:'draft',createdAt:new Date().toISOString().slice(0,10),history:[]};
+  audit(ns,'สร้างรอบอบรม (ร่าง)','จำนวนรับ '+ns.capacity);
+  DB.sessions.push(ns);closeDrawer();
+  setTimeout(()=>{TC.busy=false;render();showToast('สร้างรอบอบรมแล้ว (ร่าง) — กด “เปิดรับสมัคร” จากหน้ารายละเอียด','success');},300);
+}
+
+/* ---- Session view (tabs: รายละเอียด › ผู้เรียน › อนุมัติ/ค่าใช้จ่าย › ประวัติ) ---- */
+function sessionViewDrawer(){
+  const s=getSession(TC.dctx.id),c=courseOf(s),tab=TC.dctx.tab||'detail';
+  const tabs=[['detail','รายละเอียด','file-text'],['learner','ผู้เรียน','users'],['approval','อนุมัติ / ค่าใช้จ่าย','git-branch-plus'],['history','ประวัติ','history']];
+  let acts='';
+  if(TC.persona!=='viewer'){
+    if(s.status==='draft')acts+=`<button class="btn btn-sm btn-secondary" onclick="openSessionEdit('${s.id}')"><i data-lucide="pencil" class="w-3.5 h-3.5"></i><span>แก้ไข</span></button><button class="btn btn-sm btn-primary" onclick="sessionOpen('${s.id}')"><i data-lucide="megaphone" class="w-3.5 h-3.5"></i><span>เปิดรับสมัคร</span></button>`;
+    else if(s.status==='open')acts+=`<button class="btn btn-sm btn-danger" onclick="sessionClose('${s.id}')"><i data-lucide="archive" class="w-3.5 h-3.5"></i><span>ปิดรอบ</span></button>`;
+  }
+  return `<div class="drawer-header"><div class="drawer-avatar"><i data-lucide="calendar" class="w-5 h-5"></i></div>
+      <div style="flex:1;min-width:0"><h2 class="drawer-title">${esc(c.name)}</h2><div class="drawer-subtitle"><span class="num">${esc(s.code)}</span> · ${fmtDate(s.start)} ${sessionStatusPill(s.status)} ${costChip(c.has_cost)}</div></div>
+      <div class="drawer-header-actions">${acts}<span class="drawer-header-divider"></span><button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-4 h-4"></i></button></div></div>
+    <div class="drawer-tabs">${tabs.map(t=>`<button class="drawer-tab ${tab===t[0]?'is-active':''}" onclick="setSessionTab('${t[0]}')">${t[1]}</button>`).join('')}</div>
+    <div class="drawer-body">${tab==='detail'?sessionDetail(s,c):tab==='learner'?sessionLearners(s,c):tab==='approval'?sessionApproval(s,c):historySection(s.history)}</div>
+    <div class="drawer-footer"><div class="drawer-footer-meta">ผู้เรียน ${activeEnrolls(s.id).length}/${s.capacity} · อัปเดตล่าสุด ${s.history&&s.history[0]?fmtDateTime(s.history[0].at):'—'}</div><div class="footer-spacer"></div><button class="btn btn-secondary" onclick="closeDrawer()">ปิด</button></div>`;
+}
+function sessionDetail(s,c){
+  return `<div class="secwrap"><div class="sec-h"><i data-lucide="info"></i>รายละเอียดรอบอบรม</div>
+    <div class="kv"><div class="k">หลักสูตร</div><div class="v">${esc(c.name)} <span class="num" style="color:var(--c-mute-2);font-size:12px">(${esc(c.code)})</span></div>
+      <div class="k">หมวด</div><div class="v">${esc(catLabel(c.category))}</div>
+      <div class="k">ผู้สอน</div><div class="v">${esc(c.instructor)}</div>
+      <div class="k">วันเวลา</div><div class="v">${fmtDate(s.start)}${s.end&&s.end!==s.start?' – '+fmtDate(s.end):''} · ${esc(s.time)}</div>
+      <div class="k">สถานที่</div><div class="v">${esc(s.location)}</div>
+      <div class="k">จำนวนรับ</div><div class="v">${capBar(s.id)}</div>
+      <div class="k">ค่าใช้จ่าย</div><div class="v">${costChip(c.has_cost)}${c.has_cost?' · งบ <span class="num">'+maskMoney(c.budget)+'</span> บาท':''}</div>
+      <div class="k">สถานะ</div><div class="v">${sessionStatusPill(s.status)}</div></div></div>
+    ${c.desc?`<div class="secwrap"><div class="sec-h"><i data-lucide="book-open"></i>เกี่ยวกับหลักสูตร</div><div style="font-size:13px;color:var(--c-mute);line-height:1.7">${esc(c.desc)}</div></div>`:''}`;
+}
+function sessionLearners(s,c){
+  const list=enrollsOfSession(s.id);
+  const n=activeEnrolls(s.id).length,full=n>=s.capacity;
+  const canEnroll=TC.persona!=='viewer'&&s.status==='open';
+  const addBtn=canEnroll?`<button class="btn btn-secondary mb-3" ${full?'disabled':''} onclick="openEnrollModal('${s.id}')"><i data-lucide="user-plus" class="w-4 h-4"></i><span>${full?'จำนวนเต็มแล้ว':'ลงทะเบียนผู้เรียน'}</span></button>`:'';
+  const capNote=full?`<div class="note is-warn mb-3"><i data-lucide="alert-triangle"></i><div><b>จำนวนรับเต็มแล้ว (${n}/${s.capacity})</b> — ลงทะเบียนเพิ่มไม่ได้จนกว่าจะมีการยกเลิก</div></div>`:'';
+  const rows=list.length?list.map(e=>{
+    let ra='';
+    if(TC.persona!=='viewer'){
+      if(e.status==='pending_doa'){
+        if(PERSONAS[TC.persona].canApprove)ra=`<button class="btn btn-sm btn-danger" onclick="enrollReject('${e.id}')"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i></button><button class="btn btn-sm btn-primary" onclick="enrollApprove('${e.id}')"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i><span>อนุมัติ</span></button>`;
+        else ra=`<button class="btn btn-sm btn-danger" onclick="cancelEnroll('${e.id}')"><i data-lucide="x" class="w-3.5 h-3.5"></i><span>ยกเลิก</span></button>`;
+      } else if(e.status==='confirmed'){
+        const cancelBtn=`<button class="btn btn-sm btn-danger" onclick="cancelEnroll('${e.id}')"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>`;
+        if(s.status==='closed'){
+          /* FIX-03: รอบปิดแล้ว → เช็คชื่อเข้า/ขาด ก่อนบันทึกผล */
+          const att=`<div class="att-toggle"><button class="att-btn ${e.attended===true?'on-in':''}" onclick="setAttendance('${e.id}',true)"><i data-lucide="user-check" class="w-3.5 h-3.5"></i>เข้า</button><button class="att-btn ${e.attended===false?'on-out':''}" onclick="setAttendance('${e.id}',false)"><i data-lucide="user-x" class="w-3.5 h-3.5"></i>ขาด</button></div>`;
+          const resBtn=e.attended===true
+            ? `<button class="btn btn-sm btn-primary" onclick="openResultModal('${e.id}')"><i data-lucide="clipboard-check" class="w-3.5 h-3.5"></i><span>บันทึกผล</span></button>`
+            : `<span class="tt-wrap" title="ต้องเช็คชื่อเข้าอบรมก่อน" style="display:inline-block"><button class="btn btn-sm btn-primary is-disabled" disabled title="ต้องเช็คชื่อเข้าอบรมก่อน"><i data-lucide="clipboard-check" class="w-3.5 h-3.5"></i><span>บันทึกผล</span></button></span>`;
+          ra=att+resBtn+cancelBtn;
+        } else {
+          /* FIX-01: รอบยังไม่ปิด → บันทึกผลไม่ได้ */
+          ra=`<span class="tt-wrap" title="บันทึกผลได้หลังปิดรอบ" style="display:inline-block"><button class="btn btn-sm btn-primary is-disabled" disabled title="บันทึกผลได้หลังปิดรอบ"><i data-lucide="clipboard-check" class="w-3.5 h-3.5"></i><span>บันทึกผล</span></button></span>`+cancelBtn;
+        }
+      } else if(e.status==='passed'&&!e.cert){
+        ra=`<button class="btn btn-sm btn-secondary" onclick="issueCert('${e.id}')"><i data-lucide="award" class="w-3.5 h-3.5"></i><span>ออกใบรับรอง</span></button>`;
+      }
+    }
+    return `<div class="lrn"><div class="uc-avatar">${esc(personInitials(e.emp.name))}</div>
+      <div class="lrn-main"><div class="lrn-name"><span class="lnk-name" onclick="openEmpHistory('${e.emp.id}')" title="ดูประวัติอบรม">${esc(e.emp.name)}</span>${e.source==='gap'?' <span class="chip-soft is-gap"><i data-lucide="target"></i>จาก gap</span>':''}${e.cert?' <span class="chip-soft is-cert"><i data-lucide="award"></i>มีใบรับรอง</span>':''}</div>
+        <div class="lrn-sub">${esc(e.emp.position)} · ${esc(e.emp.dept)} · ${enrollStatusPill(e.status)} ${attChip(e)} ${e.result?resultChip(e):''}${evalChip(e)}</div></div>
+      <div class="lrn-act">${ra}</div></div>`;
+  }).join(''):'<div class="rc-list-intro" style="margin-bottom:12px">ยังไม่มีผู้เรียนในรอบนี้</div>';
+  const gapNote=canEnroll&&!full?`<div class="note is-info mb-3"><i data-lucide="target"></i><div>ลงทะเบียนได้จาก <b>ผลประเมิน (gap)</b> หรือเลือกพนักงานเอง · ${c.has_cost?'หลักสูตรนี้<b>มีค่าใช้จ่าย</b> → ต้องอนุมัติ (DOA) ก่อนยืนยัน':'หลักสูตรนี้<b>ไม่มีค่าใช้จ่าย</b> → ยืนยันลงทะเบียนได้เลย'}</div></div>`:'';
+  return capNote+gapNote+addBtn+`<div style="margin-top:2px">${rows}</div>`;
+}
+function sessionApproval(s,c){
+  const list=enrollsOfSession(s.id).filter(e=>e.status!=='cancelled');
+  const paid=c.has_cost;
+  let ecBlock=`<div class="secwrap"><div class="sec-h"><i data-lucide="badge-dollar-sign"></i>ค่าใช้จ่าย & มูลค่าอบรม (EC)</div>`;
+  if(paid){
+    ecBlock+=`<div class="ec-ref"><div class="ec-h"><i data-lucide="link"></i>มูลค่าอบรม (EC) — อ้างอิงอัตรากลาง</div>
+      <div class="ec-row"><span class="chip-soft is-cost"><i data-lucide="plug"></i>อ้างอิง Rate Card · เชื่อมเมื่อ Rate Card พร้อม</span></div>
+      <div class="ec-src" style="margin-top:6px">งบภายในหลักสูตร: <b>${maskMoney(c.budget)}</b> บาท · มูลค่าอบรม (EC) ยังไม่ผูกตัวเลข (Rate Card ยังไม่สร้าง) — display-only</div></div>
+      <div class="note is-info" style="margin-top:12px"><i data-lucide="receipt"></i><div><b>ค่าอบรม → ส่ง Expense Claim</b> (hook · display-only) — ไม่จ่ายเงินจริง / ไม่ลงบัญชีในหน้านี้ · ยิงมูลค่า EC เข้าโครงสร้างต้นทุน (CSQ) เมื่อยืนยันลงทะเบียน</div></div>`;
+  } else {
+    ecBlock+=`<div class="note is-info"><i data-lucide="gift"></i><div>หลักสูตรนี้<b>ไม่มีค่าใช้จ่าย</b> — ข้ามการอนุมัติ (DOA) และไม่มีการส่ง Expense Claim</div></div>`;
+  }
+  ecBlock+=`</div>`;
+  const approvals=list.filter(e=>e.approval).map(e=>`<div class="secwrap"><div class="sec-h"><i data-lucide="user"></i>${esc(e.emp.name)} · ${enrollStatusPill(e.status)}</div>
+    ${approvalSection(e.approval,'ลงทะเบียน',true)}
+    ${e.status==='confirmed'&&paid?`<div style="margin-top:10px;display:flex;justify-content:flex-end">${e.expenseSent?'<span class="chip-soft is-free"><i data-lucide="check"></i>ส่ง Expense Claim แล้ว</span>':(TC.persona!=='viewer'?`<button class="btn btn-sm btn-secondary" onclick="sendExpense('${e.id}')"><i data-lucide="receipt" class="w-3.5 h-3.5"></i><span>ส่ง Expense Claim (มูลค่า EC)</span></button>`:'')}</div>`:''}
+    </div>`).join('');
+  const none=paid&&!approvals?'<div class="rc-list-intro">ยังไม่มีการลงทะเบียนที่เข้าสายอนุมัติ</div>':'';
+  return ecBlock+approvals+none;
+}
+
+/* ============================================================ ENROLL / RESULT / CERT / APPROVE (FN-03..09,11) ============================================================ */
+function openEnrollModal(sid){if(viewerRO())return;const s=getSession(sid),c=courseOf(s);if(activeEnrolls(sid).length>=s.capacity){showToast('จำนวนรับเต็มแล้ว — ลงทะเบียนเพิ่มไม่ได้','warning');return;}TC.draft.enr={sid,emp_id:null,source:'manual',gap_ref:null};TC.mctx={type:'enroll',data:{sid}};tcOpenModal();}
+function pickGap(empId,gapRef){const s=TC.draft.enr;s.emp_id=empId;s.source='gap';s.gap_ref=gapRef;
+  if(document.getElementById(ssId('ss-','enr_emp')))initSearchSelect('enr_emp',{options:empOpts(),value:empId,emptyText:'ไม่พบพนักงาน',portal:true,onSelect:v=>{TC.draft.enr.emp_id=v;TC.draft.enr.source='manual';TC.draft.enr.gap_ref=null;}});
+  showToast('เลือกผู้เรียนจาก gap แล้ว','info');}
+function submitEnroll(){
+  if(viewerRO())return;
+  const en=TC.draft.enr,s=getSession(en.sid),c=courseOf(s);
+  if(!en.emp_id){showToast('กรุณาเลือกผู้เรียน','warning');return;}
+  if(activeEnrolls(en.sid).filter(e=>e.emp.id===en.emp_id).length){showToast('ผู้เรียนคนนี้ลงทะเบียนรอบนี้แล้ว','warning');return;}
+  if(activeEnrolls(en.sid).length>=s.capacity){showToast('จำนวนรับเต็มแล้ว','warning');return;}
+  const ne={id:'EN'+Date.now(),sessionId:en.sid,emp:empSnap(en.emp_id),source:en.source,gap_ref:en.gap_ref,status:c.has_cost?'pending_doa':'confirmed',result:null,cert:null,expenseSent:false,attended:null,evalScore:null,evalComment:'',enrolledAt:new Date().toISOString().slice(0,10),approval:null,history:[]};
+  DB.enrolls.push(ne);
+  if(c.has_cost){
+    audit(ne,'ลงทะเบียนผู้เรียน + ส่งอนุมัติ (DOA)','หลักสูตรมีค่าใช้จ่าย → ต้องอนุมัติก่อนยืนยัน'+(en.source==='gap'?' · มาจาก gap':''),'warn');
+    closeModal();
+    setTimeout(()=>{openDoaModal(ne.id);},240);
+  } else {
+    audit(ne,'ลงทะเบียนผู้เรียน (ยืนยันทันที)','หลักสูตรไม่มีค่าใช้จ่าย → ข้าม DOA'+(en.source==='gap'?' · มาจาก gap':''));
+    closeModal();
+    setTimeout(()=>{ntf('ยืนยันลงทะเบียน '+esc(ne.emp.name));render();showToast('ลงทะเบียนสำเร็จ (ยืนยันแล้ว)','success');},200);
+  }
+}
+function openResultModal(eid){if(viewerRO())return;const e=getEnroll(eid);
+  /* FIX-01: บันทึกผลได้เฉพาะเมื่อรอบอบรมปิดแล้ว (จบการอบรม) */
+  if(getSession(e.sessionId).status!=='closed'){showToast('บันทึกผลได้หลังปิดรอบอบรม (จบการอบรม)','warning');return;}
+  if(e.status!=='confirmed'){showToast('บันทึกผลได้เฉพาะผู้เรียนที่ยืนยันลงทะเบียนแล้ว','warning');return;}
+  /* FIX-03: ต้องเช็คชื่อเข้าอบรมก่อนจึงบันทึกผลได้ */
+  if(e.attended!==true){showToast('ต้องเช็คชื่อเข้าอบรมก่อน','warning');return;}
+  TC.draft.res={eid,result:null,comment:'',evalScore:null};TC.mctx={type:'result',data:{eid}};tcOpenModal();}
+function pickResult(v){TC.draft.res.result=v;document.querySelectorAll('.rf-pick button').forEach(b=>{b.classList.remove('on-pass','on-fail');if(b.dataset.v===v)b.classList.add(v==='pass'?'on-pass':'on-fail');});}
+/* FIX-03: เลือกคะแนนประเมินหลังอบรม 1-5 */
+function pickEval(n){TC.draft.res.evalScore=n;document.querySelectorAll('.ev-pick button').forEach(b=>b.classList.toggle('on',Number(b.dataset.n)===n));}
+function submitResult(){
+  if(viewerRO())return;
+  const r=TC.draft.res,e=getEnroll(r.eid);
+  /* FIX-01/03: กันบันทึกผลถ้ารอบยังไม่ปิด หรือยังไม่เช็คชื่อเข้า (defense-in-depth) */
+  if(getSession(e.sessionId).status!=='closed'){showToast('บันทึกผลได้หลังปิดรอบอบรม (จบการอบรม)','warning');return;}
+  if(e.attended!==true){showToast('ต้องเช็คชื่อเข้าอบรมก่อน','warning');return;}
+  if(!r.result){showToast('กรุณาเลือกผล (ผ่าน/ไม่ผ่าน)','warning');return;}
+  e.result=r.result;e.status=r.result==='pass'?'passed':'failed';
+  e.evalScore=r.evalScore||null;e.evalComment=r.comment||'';
+  audit(e,'บันทึกผล: '+(r.result==='pass'?'ผ่าน':'ไม่ผ่าน')+' + ประกาศผล',(r.evalScore?'ประเมิน '+r.evalScore+'/5':'')+(r.comment?(r.evalScore?' · ':'')+r.comment:''),'ok');
+  closeModal();
+  setTimeout(()=>{ntf('ประกาศผลอบรม '+esc(e.emp.name)+' — '+(r.result==='pass'?'ผ่าน':'ไม่ผ่าน'));render();showToast('บันทึกผลและประกาศผลแล้ว','success');},200);
+}
+function issueCert(eid){
+  if(viewerRO())return;const e=getEnroll(eid);
+  if(e.status!=='passed'){showToast('ออกใบรับรองได้เฉพาะผู้ผ่านการอบรม','warning');return;}
+  openConfirm({title:'ออกใบรับรองผู้ผ่าน (soft ref)?',body:'ใบรับรองนี้เป็นการอ้างอิงแบบ soft ref — ไม่มีเลขรันเอกสาร และไม่ออก PDF ทางการในรอบนี้ (ตามมติ)',confirmLabel:'ออกใบรับรอง',danger:false,onConfirm:()=>{
+    e.cert={id:'CERT-REF-'+Date.now(),issuedAt:new Date().toISOString().slice(0,10),note:'ใบรับรองอ้างอิง (soft ref)'};
+    audit(e,'ออกใบรับรองผู้ผ่าน (soft ref)','ไม่มีเลขรัน / ไม่ออก PDF ทางการ');
+    render();showToast('ออกใบรับรอง (soft ref) แล้ว','success');
+  }});
+}
+function cancelEnroll(eid){
+  if(viewerRO())return;const e=getEnroll(eid);
+  openConfirm({title:'ยกเลิกการลงทะเบียน?',body:'การลงทะเบียนของ '+e.emp.name+' จะถูกยกเลิก (soft archive) และคืนที่ว่างให้รอบอบรม — ประวัติยังอยู่ครบ',confirmLabel:'ยกเลิกการลงทะเบียน',danger:true,onConfirm:()=>{
+    e.status='cancelled';audit(e,'ยกเลิกการลงทะเบียน','คืนที่ว่างให้รอบอบรม','warn');
+    render();showToast('ยกเลิกการลงทะเบียนแล้ว','success');
+  }});
+}
+function enrollApprove(eid){
+  if(viewerRO())return;
+  if(!PERSONAS[TC.persona].canApprove){showToast('เฉพาะผู้อนุมัติ (DOA) เท่านั้น','warning');return;}
+  const e=getEnroll(eid);if(!e.approval)return;
+  const st=e.approval.steps.find(s=>s.result==='pending');if(st){st.result='approved';st.at=new Date().toISOString().slice(0,10);}
+  e.approval.current=e.approval.steps.filter(s=>s.result==='approved').length;
+  if(e.approval.steps.every(s=>s.result==='approved')){e.approval.done=true;e.status='confirmed';
+    audit(e,'อนุมัติลงทะเบียน (DOA ครบ '+e.approval.current+'/'+e.approval.steps.length+') → ยืนยัน','แจ้งเตือนผู้เรียน (NTF)');
+    ntf('ยืนยันลงทะเบียน '+esc(e.emp.name));
+    render();showToast('อนุมัติและยืนยันลงทะเบียนแล้ว','success');return;}
+  audit(e,'อนุมัติ (ขั้น '+e.approval.current+'/'+e.approval.steps.length+')','');
+  render();showToast('อนุมัติขั้นนี้แล้ว','success');
+}
+function enrollReject(eid){
+  if(viewerRO())return;
+  if(!PERSONAS[TC.persona].canApprove){showToast('เฉพาะผู้อนุมัติ (DOA) เท่านั้น','warning');return;}
+  openReasonModal({title:'ไม่อนุมัติการลงทะเบียน',label:'เหตุผลที่ไม่อนุมัติ',confirmLabel:'ไม่อนุมัติ',danger:true,onConfirm:(reason)=>{
+    const e=getEnroll(eid);if(e.approval){const st=e.approval.steps.find(s=>s.result==='pending');if(st)st.result='rejected';}
+    e.status='cancelled';audit(e,'ไม่อนุมัติการลงทะเบียน',reason,'bad');
+    render();showToast('ไม่อนุมัติแล้ว','info');
+  }});
+}
+function sendExpense(eid){
+  if(viewerRO())return;const e=getEnroll(eid);
+  /* FIX-02: ส่งได้หลังลงทะเบียนได้รับอนุมัติ + กันส่งซ้ำ */
+  if(!['confirmed','passed','failed'].includes(e.status)){showToast('ส่งได้หลังการลงทะเบียนได้รับอนุมัติ','warning');return;}
+  if(e.expenseSent){showToast('ส่ง Expense Claim ไปแล้ว','info');return;}
+  e.expenseSent=true;
+  audit(e,'ส่งมูลค่าอบรม (EC) เข้า Expense Claim','display-only · ไม่จ่าย/ไม่ post เอง');
+  render();showToast('ส่งไปยัง Expense Claim (hook) แล้ว — ไม่จ่าย/ไม่ post','info');
+}
+
+/* FIX-03: เช็คชื่อเข้า/ขาด (เฉพาะรอบที่ปิดแล้ว · append audit) */
+function setAttendance(eid,val){
+  if(viewerRO())return;const e=getEnroll(eid);const s=getSession(e.sessionId);
+  if(s.status!=='closed'){showToast('เช็คชื่อได้หลังปิดรอบอบรม','warning');return;}
+  if(e.status!=='confirmed'){showToast('เช็คชื่อได้เฉพาะผู้เรียนที่ยืนยันลงทะเบียน','warning');return;}
+  e.attended=val;
+  audit(e,'เช็คชื่อเข้าอบรม: '+(val?'เข้า':'ขาด'),'',val?'ok':'warn');
+  render();showToast(val?'บันทึกเช็คชื่อ: เข้าอบรม':'บันทึกเช็คชื่อ: ขาดอบรม',val?'success':'info');
+}
+
+/* FIX-04: ประวัติอบรมรายคน + ชั่วโมงสะสม (mock จาก DB.enrolls ที่มีอยู่) */
+function openEmpHistory(empId){TC.mctx={type:'emphist',data:{empId}};tcOpenModal();}
+function empHistoryHTML(empId){
+  const list=DB.enrolls.filter(e=>e.emp.id===empId&&e.status!=='cancelled');
+  const who=(list[0]&&list[0].emp)||empSnap(empId)||{name:'—',position:'',dept:''};
+  const passedList=list.filter(e=>e.status==='passed');
+  const totalHours=passedList.reduce((sum,e)=>sum+courseHours(courseOfEnroll(e)),0);
+  const header=`<div class="modal-header"><div class="modal-header-icon"><i data-lucide="graduation-cap" class="w-4 h-4"></i></div><div><h3 class="modal-title">ประวัติอบรม — ${esc(who.name)}</h3><p class="modal-subtitle">${esc(who.position||'')}${who.dept?' · '+esc(who.dept):''}</p></div></div>`;
+  let bodyInner;
+  if(!list.length){
+    bodyInner=emptyStateHTML({icon:'graduation-cap',title:'ยังไม่มีประวัติอบรม',desc:'พนักงานคนนี้ยังไม่มีการลงทะเบียนอบรมในระบบ'});
+  } else {
+    const rows=list.map(e=>{const c=courseOfEnroll(e),s=getSession(e.sessionId);
+      return `<div class="eh-item"><div class="eh-ic"><i data-lucide="book-open" class="w-4 h-4"></i></div>
+        <div class="eh-main"><div class="eh-title">${esc(c.name)}</div>
+          <div class="eh-meta"><span class="num">${esc(s?s.code:'')}</span> · ${s?fmtDate(s.start):'—'} · ${enrollStatusPill(e.status)} ${e.result?resultChip(e):''}${evalChip(e)}${e.cert?' <span class="chip-soft is-cert"><i data-lucide="award"></i>ใบรับรอง</span>':''}</div>
+          ${e.status==='passed'?`<div class="eh-hrs"><i data-lucide="clock" class="w-3 h-3"></i>+${courseHours(c)} ชม. (นับสะสม)</div>`:''}</div></div>`;
+    }).join('');
+    bodyInner=`<div class="eh-summary"><div class="eh-sum"><div class="eh-sum-l">ชั่วโมงสะสม (เฉพาะผ่าน)</div><div class="eh-sum-v num">${totalHours} ชม.</div></div><div class="eh-sum"><div class="eh-sum-l">หลักสูตรที่ผ่าน</div><div class="eh-sum-v num">${passedList.length}</div></div><div class="eh-sum"><div class="eh-sum-l">รายการทั้งหมด</div><div class="eh-sum-v num">${list.length}</div></div></div>
+      <div class="eh-list">${rows}</div>
+      <div class="note is-info" style="margin-top:12px"><i data-lucide="info"></i><div>ชั่วโมงสะสมนับเฉพาะรายการที่<b>ผ่าน</b> (parse จากระยะเวลาหลักสูตร) · อ้างอิงจากข้อมูลการลงทะเบียนที่มีในระบบ</div></div>`;
+  }
+  return header+`<div class="modal-body">${bodyInner}</div>
+    <div class="modal-footer"><button class="btn btn-primary" onclick="closeModal()">ปิด</button></div>`;
+}
+
+/* course / session lifecycle (FN-91 close · FN-02 open · FN-12 notify) */
+function coursePublish(id){if(viewerRO())return;const c=getCourse(id);c.status='published';audit(c,'เผยแพร่หลักสูตร','สถานะ → เผยแพร่');render();showToast('เผยแพร่หลักสูตรแล้ว','success');}
+function courseClose(id){if(viewerRO())return;openConfirm({title:'ปิดหลักสูตรนี้?',body:'หลักสูตรจะถูกปิด (soft archive) — ไม่เปิดรอบใหม่ได้ · ประวัติและรอบเดิมยังอยู่ครบ',confirmLabel:'ปิดหลักสูตร',danger:true,onConfirm:()=>{const c=getCourse(id);c.status='closed';audit(c,'ปิดหลักสูตร','สถานะ → ปิดหลักสูตร');render();showToast('ปิดหลักสูตรแล้ว','success');}});}
+function sessionOpen(id){if(viewerRO())return;const s=getSession(id);s.status='open';audit(s,'เปิดรับสมัคร (รอบอบรม)','สถานะ → เปิดรับสมัคร · แจ้งเตือน (NTF)');ntf('เปิดรับสมัครรอบอบรม '+esc(courseOf(s).name));render();showToast('เปิดรับสมัครแล้ว','success');}
+function sessionClose(id){if(viewerRO())return;openConfirm({title:'ปิดรอบอบรมนี้?',body:'รอบอบรมจะถูกปิด (soft archive) — ไม่รับลงทะเบียนเพิ่ม · ผู้เรียนและผลยังอยู่ครบ',confirmLabel:'ปิดรอบ',danger:true,onConfirm:()=>{const s=getSession(id);s.status='closed';audit(s,'ปิดรอบ (จบการอบรม)','สถานะ → ปิดรอบ');render();showToast('ปิดรอบแล้ว','success');}});}
+
+/* ============================================================ MODALS ============================================================ */
+function openConfirm(cfg){TC.mctx={type:'confirm',data:cfg};tcOpenModal();}
+function openReasonModal(cfg){TC.draft.reason='';TC.mctx={type:'reason',data:cfg};tcOpenModal();}
+function openDoaModal(eid){const r=doaResolve();TC.draft.slots={};TC.mctx={type:'doa',data:{eid,entry:r.entry,steps:r.steps}};tcOpenModal();}
+function tcOpenModal(){state.modal={open:true,type:TC.mctx.type,data:TC.mctx.data};render();requestAnimationFrame(()=>{const mb=document.getElementById('modalBackdrop');mb.classList.add('is-open');lockScroll(true);/* FIX-06: เรนเดอร์ไอคอน/avatar ครอบ modal ทุกครั้งหลังเปิด กันกล่องว่าง */renderIcons();const box=mb.querySelector('.modal');if(box)trapFocus(box);/* BUG-04: trapFocus auto-focus ช่องแรก ถ้าเป็น search-select จะเผลอเปิด dropdown เอง → ปิดคืนหลัง focus (ไม่แตะ base-kit) */requestAnimationFrame(()=>{const ae=document.activeElement;if(ae&&ae.classList&&ae.classList.contains('ss-input')){const key=ae.id.replace('ss-input-','');const s=window.__ss&&window.__ss[key];if(s)s.open=false;const l=document.getElementById('ss-list-'+key);if(l)l.classList.add('hidden');ae.blur();}});});}
+
+function renderModal(){
+  const t=TC.mctx.type,d=TC.mctx.data;
+  if(t==='confirm')return `<div class="modal-header"><div class="modal-header-icon ${d.danger?'is-danger':''}"><i data-lucide="${d.danger?'alert-triangle':'help-circle'}" class="w-4 h-4"></i></div><div><h3 class="modal-title">${esc(d.title)}</h3><p class="modal-subtitle">${esc(d.body)}</p></div></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn ${d.danger?'btn-danger':'btn-primary'}" onclick="tcConfirmYes()">${esc(d.confirmLabel||'ยืนยัน')}</button></div>`;
+  if(t==='reason')return `<div class="modal-header"><div class="modal-header-icon ${d.danger?'is-danger':'is-warning'}"><i data-lucide="message-square-warning" class="w-4 h-4"></i></div><div><h3 class="modal-title">${esc(d.title)}</h3><p class="modal-subtitle">${esc(d.label||'ระบุเหตุผล')}</p></div></div>
+    <div class="modal-body"><div class="field"><label class="field-label">เหตุผล <span class="req">*</span></label><textarea class="notes-area" oninput="TC.draft.reason=this.value" placeholder="ระบุเหตุผล" style="min-height:80px">${esc(TC.draft.reason||'')}</textarea></div></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn ${d.danger?'btn-danger':'btn-primary'}" onclick="tcReasonYes()">${esc(d.confirmLabel||'ยืนยัน')}</button></div>`;
+  if(t==='enroll'){
+    const s=getSession(d.sid),c=courseOf(s),gaps=gapsForCourse(c.id);
+    return `<div class="modal-header"><div class="modal-header-icon"><i data-lucide="user-plus" class="w-4 h-4"></i></div><div><h3 class="modal-title">ลงทะเบียนผู้เรียน</h3><p class="modal-subtitle">${esc(c.name)} · ${fmtDate(s.start)} · ที่ว่าง ${s.capacity-activeEnrolls(s.id).length}/${s.capacity}</p></div></div>
+      <div class="modal-body">
+        <div class="note ${c.has_cost?'is-warn':'is-info'} mb-3"><i data-lucide="${c.has_cost?'badge-dollar-sign':'gift'}"></i><div>${c.has_cost?'หลักสูตร<b>มีค่าใช้จ่าย</b> — เมื่อลงทะเบียนจะต้อง<b>ขออนุมัติ (DOA)</b> ก่อนยืนยัน':'หลักสูตร<b>ไม่มีค่าใช้จ่าย</b> — ลงทะเบียนแล้ว<b>ยืนยันได้เลย</b> (ข้าม DOA)'}</div></div>
+        ${gaps.length?`<div class="secwrap" style="margin-bottom:14px"><div class="sec-h"><i data-lucide="target"></i>แนะนำจากผลประเมิน (gap · Performance)</div>
+          <p class="rc-list-intro" style="margin:0 0 10px">อ่านจากระบบประเมินผลงาน (hook display-only) — คลิกเพื่อเลือกผู้เรียน</p>
+          ${gaps.map(g=>`<div class="bm-card" onclick="pickGap('${g.emp_id}','${g.perf_ref}')"><div class="bm-icon"><i data-lucide="user"></i></div><div style="flex:1"><div style="font-weight:600;font-size:13px">${esc(g.e.name)} <span class="chip-soft is-gap"><i data-lucide="target"></i>gap</span></div><div style="font-size:12px;color:var(--c-mute-2)">${esc(g.gap)} · <span class="num">${esc(g.perf_ref)}</span></div></div><i data-lucide="plus" class="w-4 h-4"></i></div>`).join('')}</div>`:''}
+        <div class="field"><label class="field-label">เลือกผู้เรียน <span class="req">*</span></label>${searchSelectHTML('enr_emp',{placeholder:'ค้นหาพนักงาน...'})}<div class="field-help">เลือกจาก gap ด้านบน หรือค้นหาพนักงานเอง</div></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" onclick="submitEnroll()"><i data-lucide="${c.has_cost?'send':'check'}" class="w-4 h-4"></i><span>${c.has_cost?'ลงทะเบียน + ส่งอนุมัติ':'ลงทะเบียน (ยืนยัน)'}</span></button></div>`;
+  }
+  if(t==='result'){
+    const e=getEnroll(d.eid),c=courseOfEnroll(e);
+    return `<div class="modal-header"><div class="modal-header-icon"><i data-lucide="clipboard-check" class="w-4 h-4"></i></div><div><h3 class="modal-title">บันทึกผลการอบรม</h3><p class="modal-subtitle">${esc(e.emp.name)} · ${esc(c.name)}</p></div></div>
+      <div class="modal-body">
+        <div class="note is-info mb-3"><i data-lucide="user-check"></i><div>เช็คชื่อแล้ว: <b>เข้าอบรม</b> — บันทึกผลได้</div></div>
+        <div class="field"><label class="field-label">ผลการอบรม <span class="req">*</span></label>
+          <div class="rf-pick"><button data-v="pass" onclick="pickResult('pass')"><i data-lucide="check"></i>ผ่าน</button><button data-v="fail" onclick="pickResult('fail')"><i data-lucide="x"></i>ไม่ผ่าน</button></div></div>
+        <div class="field"><label class="field-label">ประเมินหลังอบรม (คะแนน 1-5)</label>
+          <div class="ev-pick">${[1,2,3,4,5].map(n=>`<button type="button" data-n="${n}" onclick="pickEval(${n})">${n}</button>`).join('')}</div>
+          <div class="field-help">ให้คะแนนผลหลังอบรม (ไม่บังคับ) — เก็บลงประวัติผู้เรียน</div></div>
+        <div class="field"><label class="field-label">ความเห็น / บันทึกการประเมิน</label><textarea class="notes-area" oninput="TC.draft.res.comment=this.value" placeholder="ความเห็นหลังอบรม (ถ้ามี)" style="min-height:70px">${esc(TC.draft.res&&TC.draft.res.comment||'')}</textarea></div>
+        <div class="note is-info"><i data-lucide="bell"></i><div>เมื่อบันทึกผล ระบบจะ<b>ประกาศผล</b>และแจ้งเตือนผู้เรียน (NTF) · ผู้ผ่านสามารถออกใบรับรอง (soft ref) ได้</div></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" onclick="submitResult()"><i data-lucide="check" class="w-4 h-4"></i><span>บันทึก + ประกาศผล</span></button></div>`;
+  }
+  if(t==='emphist')return empHistoryHTML(d.empId);
+  if(t==='doa'){
+    const e=getEnroll(d.eid);
+    return `<div class="modal-header"><div class="modal-header-icon"><i data-lucide="git-branch-plus" class="w-4 h-4"></i></div><div><h3 class="modal-title">ส่งอนุมัติลงทะเบียน (DOA)</h3><p class="modal-subtitle">${esc(e.emp.name)} · DOA entry <span class="num">${esc(d.entry)}</span> · ไม่มีวงเงิน</p></div></div>
+      <div class="modal-body"><div class="note is-info mb-3"><i data-lucide="info"></i><div>หลักสูตรมีค่าใช้จ่าย — สายอนุมัติมาจากระบบ DOA กลาง (F-DLG-001) · เลือก “คน” ตามตำแหน่งในแต่ละขั้น (ไม่ hardcode สาย)</div></div>
+        ${d.steps.map((s,i)=>`<div class="slot"><div class="slot-h"><span class="sn">${i+1}</span><span class="st">${esc(s.slotName)}</span><span class="sr">${esc(s.slot)}</span></div>${searchSelectHTML('slot_'+(i+1),{placeholder:'เลือกผู้อนุมัติ...'})}</div>`).join('')}</div>
+      <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" onclick="submitDoa()"><i data-lucide="send" class="w-4 h-4"></i><span>ส่งอนุมัติ</span></button></div>`;
+  }
+  return '';
+}
+function tcConfirmYes(){const fn=TC.mctx.data.onConfirm;closeModal();setTimeout(()=>{if(fn)fn();},180);}
+function tcReasonYes(){const r=String(TC.draft.reason||'').trim();if(!r){showToast('กรุณาระบุเหตุผล','warning');return;}const d=TC.mctx.data;closeModal();setTimeout(()=>{if(d.onConfirm)d.onConfirm(r);},180);}
+function submitDoa(){
+  const d=TC.mctx.data;const chosen=d.steps.map((s,i)=>TC.draft.slots['slot_'+(i+1)]);
+  if(chosen.some(x=>!x)){showToast('กรุณาเลือกผู้อนุมัติให้ครบทุกขั้น','warning');return;}
+  const steps=d.steps.map((s,i)=>({order:s.order,slotName:s.slotName,approver_id:chosen[i],result:'pending',at:null}));
+  const e=getEnroll(d.eid);e.approval={entry:d.entry,current:0,done:false,steps};e.status='pending_doa';
+  audit(e,'ส่งอนุมัติลงทะเบียน (DOA)',d.entry);ntf('ส่งอนุมัติลงทะเบียน '+esc(e.emp.name));
+  closeModal();setTimeout(()=>{render();showToast('ส่งอนุมัติแล้ว — รอผู้อนุมัติ (DOA)','success');},180);
+}
+
+/* ============================================================ COMBOBOX MOUNTING ============================================================ */
+function mountCombos(){
+  if(state.drawer.open&&TC.dctx){
+    if(TC.dctx.kind==='course'&&(TC.dctx.mode==='create'||TC.dctx.mode==='edit')&&document.getElementById(ssId('ss-','crs_cat')))
+      initSearchSelect('crs_cat',{options:CATEGORIES.map(c=>({value:c.value,label:c.label,icon:'folder'})),value:TC.draft.category||null,emptyText:'ไม่พบหมวด',onSelect:v=>{TC.draft.category=v;}});
+    if(TC.dctx.kind==='session'&&(TC.dctx.mode==='create'||TC.dctx.mode==='edit')&&document.getElementById(ssId('ss-','ses_course')))
+      initSearchSelect('ses_course',{options:courseOpts(),value:TC.draft.courseId||null,emptyText:'ไม่พบหลักสูตร',onSelect:v=>{TC.draft.courseId=v;if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();render();}});
+  }
+  if(state.modal.open&&TC.mctx){
+    if(TC.mctx.type==='enroll'&&document.getElementById(ssId('ss-','enr_emp')))
+      initSearchSelect('enr_emp',{options:empOpts(),value:(TC.draft.enr||{}).emp_id||null,emptyText:'ไม่พบพนักงาน',portal:true,onSelect:v=>{TC.draft.enr.emp_id=v;TC.draft.enr.source='manual';TC.draft.enr.gap_ref=null;}});
+    if(TC.mctx.type==='doa'){TC.draft.slots=TC.draft.slots||{};TC.mctx.data.steps.forEach((s,i)=>{const k='slot_'+(i+1);if(document.getElementById(ssId('ss-',k)))initSearchSelect(k,{options:empOpts(),value:TC.draft.slots[k]||null,emptyText:'ไม่พบพนักงาน',onSelect:v=>{TC.draft.slots[k]=v;}});});}
+  }
+}
+/* clear ctx when overlay closes */
+const __origCloseDrawer=closeDrawer;closeDrawer=function(){__origCloseDrawer();setTimeout(()=>{TC.dctx=null;},300);};
+const __origCloseModal=closeModal;closeModal=function(){/* FIX-07: เก็บกวาด ss-list ที่ portal ออกไป #overlay-root กันซ้อน id/ค้างจอ */var host=document.getElementById('overlay-root');if(host)host.querySelectorAll('.ss-list').forEach(function(el){el.remove();});__origCloseModal();setTimeout(()=>{TC.mctx=null;},220);};
+</script>
+<style id="page-late">/* late additions เท่านั้น (#69) — ห้าม inline */
+/* FIX-04: ชื่อผู้เรียนคลิกได้ → ประวัติอบรม */
+.lnk-name{cursor:pointer;border-bottom:1px dashed var(--c-line);transition:color 120ms}
+.lnk-name:hover{color:var(--c-primary);border-bottom-color:var(--c-primary)}
+/* FIX-03: att-toggle เช็คชื่อเข้า/ขาด + eval score picker */
+.att-toggle{display:inline-flex;border:1px solid var(--c-line);border-radius:8px;overflow:hidden}
+.att-btn{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 10px;border:0;background:#fff;font-family:inherit;font-size:12px;font-weight:600;color:var(--c-mute-2);cursor:pointer;transition:all 120ms}
+.att-btn+.att-btn{border-left:1px solid var(--c-line)}
+.att-btn [data-lucide]{width:14px;height:14px}
+.att-btn:hover{background:var(--c-line-3);color:var(--c-ink)}
+.att-btn.on-in{background:var(--c-success);color:#fff}
+.att-btn.on-out{background:var(--c-danger);color:#fff}
+.ev-pick{display:inline-flex;gap:6px}
+.ev-pick button{width:38px;height:34px;border:1px solid var(--c-line);background:#fff;border-radius:8px;font-family:inherit;font-size:14px;font-weight:700;color:var(--c-mute-2);cursor:pointer;transition:all 120ms}
+.ev-pick button:hover{border-color:var(--c-primary);color:var(--c-primary)}
+.ev-pick button.on{background:var(--c-primary);border-color:var(--c-primary);color:#fff}
+/* FIX-03: lrn-act ให้ห่อบรรทัดได้ (att-toggle + ปุ่ม) */
+.lrn .lrn-act{flex-wrap:wrap;justify-content:flex-end;gap:6px;max-width:340px}
+/* FIX-04: emp history modal */
+.eh-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.eh-sum{background:var(--c-bg-off);border:1px solid var(--c-line-2);border-radius:10px;padding:10px 12px}
+.eh-sum-l{font-size:11px;color:var(--c-mute-2);font-weight:600}
+.eh-sum-v{font-size:20px;font-weight:700;color:var(--c-navy);margin-top:2px}
+.eh-list{display:flex;flex-direction:column;gap:9px}
+.eh-item{display:flex;gap:11px;padding:11px 12px;border:1px solid var(--c-line-2);border-radius:10px}
+.eh-ic{width:32px;height:32px;border-radius:8px;background:rgba(255,59,48,.08);color:var(--c-primary);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.eh-main{flex:1;min-width:0}
+.eh-title{font-size:13px;font-weight:600;color:var(--c-ink)}
+.eh-meta{font-size:11.5px;color:var(--c-mute-2);margin-top:3px;display:flex;flex-wrap:wrap;align-items:center;gap:5px}
+.eh-hrs{display:inline-flex;align-items:center;gap:4px;margin-top:5px;font-size:11.5px;font-weight:700;color:var(--c-success)}
+.eh-hrs [data-lucide]{width:12px;height:12px}
+/* FIX-05: cost per head cards */
+.cph-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.cph-card{border:1px solid var(--c-line-2);border-radius:10px;padding:14px 16px;background:#fff}
+.cph-name{font-size:13px;font-weight:600;color:var(--c-ink);margin-bottom:10px;line-height:1.4}
+.cph-row{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;padding:4px 0}
+.cph-l{color:var(--c-mute-2)}
+.cph-v{font-weight:600;color:var(--c-ink)}
+.cph-total{border-top:1px dashed var(--c-line);margin-top:4px;padding-top:8px}
+.cph-total .cph-l{color:var(--c-ink);font-weight:600}
+.cph-total .cph-v{font-size:16px;font-weight:800;color:var(--c-primary)}
+/* FIX-07: avatar initials ใน ss option (combobox คน #102) */
+.ss-opt-av{width:26px;height:26px;font-size:10px;flex-shrink:0}
+/* FIX-06: contrast ปุ่ม icon เล็ก (icon-only) ในแถวผู้เรียน — เห็นชัดทุก state */
+.lrn-act .btn-sm[disabled] [data-lucide],.lrn-act .btn-sm.is-disabled [data-lucide]{opacity:1}
+.lrn-act .btn-danger [data-lucide]{color:var(--c-danger)}
+.lrn-act .btn-primary [data-lucide]{color:#fff}
+</style>
+<!-- PREFLIGHT v6.4 — F-HR-TRAIN · อบรม (archetype: master · แคตตาล็อกหลักสูตร + การลงทะเบียน)
+  GATE: audit.sh FAIL=0 · WARN=3 (base-kit inherited: #21 icon-class มี CSS sizing · #40 .uc-email sub-line = user-cell meta · token font-size sidebar)
+  node --check (4 inline script blocks) = OK · pageerror=0 ทั้ง 4 แท็บ (Playwright) · acceptance FIX-01..07 ผ่านครบ
+  self_audit.py (NOT zero-tolerance · gate = audit.sh): spacing_off=28 font_off=3 font_count=11 flex_noalign=2 inline_layout=36 hex_off=5 stopprop_blanket=3 long_banners=15 custom_tabs=3 · naked_hints=0 missing_ids=1 (ss-list-<key> dynamic id · element มีจริง runtime · false-positive)
+  date: 2026-09-03 (review-fix รอบ 2 · FIX-01..07 · surgical)
+  RESIDUALS (documented · accepted — inherited จาก BASE-KIT/mock · แก้ = ต้องแตะ layout/behavior นอก scope):
+    · hex_off=5 → ALL false-positive: #103/#104/#105 = เลขกฎในคอมเมนต์ · #B4B6BB/#C7C9CE = demo-strip persona control บน charcoal sidebar (#105 prototype scaffolding) → business hex = 0 (cert/chip tints ใช้ whitelist warm/info)
+    · custom_tabs=3 (.tabs/.tab/.tab-ct) = feature tabs ในหน้า (#104 one-feature-one-menu) — pattern เดียวกับ sibling ที่ผ่าน 12 step
+    · long_banners=15 = .note action-context banners อธิบายกฎ DOA/EC/เช็คชื่อ/ต้นทุนต่อหัว (ไม่ใช่ naked hint) · stopprop_blanket=3 = event.stopPropagation() บนปุ่ม/ชื่อคลิกได้ในแถวที่คลิกได้ (กันเปิด view · เปิดประวัติอบรม FIX-04)
+    · spacing_off/font/flex/inline_layout=36 = compact component + render-fn residual (inherited BASE-KIT/mock · +FIX-04/05 template inline) — render สะอาด
+  (Rule #60: ตัวเลขจาก self_audit.py จริง · audit.sh FAIL=0 · render-check ผ่าน — ตราเปล่า = checker BLOCK) -->
+</body>
+</html>

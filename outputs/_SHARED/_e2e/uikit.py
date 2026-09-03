@@ -1493,3 +1493,145 @@ def stepper_geom(pg, sel='.d-stepper'):
     """
     r = pg.evaluate(JS_STEPPER_GEOM, sel)
     return r['n'], r['bad']
+
+
+# ⭐ เพิ่ม 2026-09-03 (F-HR-TRAIN) — ผู้ใช้เจอเอง 2 จุดที่ตัววัดเดิมมองไม่เห็นเลย
+#
+# (1) การ์ดผู้เรียนหลายคนในแท็บ "อนุมัติ/ค่าใช้จ่าย" ถูก nest ซ้อนกัน (secwrap ใน secwrap)
+#     แทนที่จะเป็น sibling ระดับเดียวกัน → อ่านเป็นกล่องเดียวที่เนื้อหาปนกัน
+#     ทำไมตัววัดเดิมมองไม่เห็น: JS_LAYOUT "element ซ้อนทับกัน" เทียบเฉพาะพี่น้องใน flex/grid
+#     box เดียวกัน · การ์ดที่ nest กัน "ถูกต้องตาม box model" (ลูกอยู่ในพ่อจริง ๆ) จึงไม่นับว่า
+#     overlap เลย · ไม่มีข้อไหนถามว่า "การ์ดระดับเดียวกันไป nest กันเองหรือเปล่า"
+JS_NESTED_CARDS = r"""
+(arg) => {
+  const host = document.querySelector(arg.root) || document.body;
+  const sel = arg.sel || '.secwrap';
+  const out = [];
+  host.querySelectorAll(sel).forEach(inner => {
+    const r = inner.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1) return;               // ซ่อนอยู่ ไม่นับ
+    // การ์ดชนิดเดียวกันที่เป็น "บรรพบุรุษที่ใกล้ที่สุด" = การ nest ที่ไม่ควรเกิด
+    let p = inner.parentElement, near = null;
+    while (p && p !== host && p !== document.body) {
+      if (p.matches(sel)) { near = p; break; }
+      p = p.parentElement;
+    }
+    if (near) out.push({
+      outer: (near.className || '').toString().slice(0, 44),
+      inner: (inner.className || '').toString().slice(0, 44),
+      text: (inner.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 40),
+    });
+  });
+  return out;
+}
+"""
+
+
+def nested_cards(pg, root='#drawer', sel='.secwrap'):
+    """คืนรายการการ์ด (`sel`) ที่ไป nest อยู่ใน การ์ดชนิดเดียวกันภายใน `root`
+
+    การ์ดระดับเดียวกัน (sibling) ต้อง "แบน" — พอ nest กันจะอ่านเป็นกล่องเดียวที่เนื้อหาปน
+    (F-HR-TRAIN 2026-09-03: การ์ดผู้เรียนหลายคนในแท็บอนุมัติซ้อนกัน) · คืน [] = สะอาด
+    ปรับ selector ได้ (`.secwrap`, `.card`, …) เผื่อ feature อื่นใช้ container คนละชื่อ
+    """
+    return pg.evaluate(JS_NESTED_CARDS, {'root': root, 'sel': sel})
+
+
+# (2) combobox: เลือก option แล้วเมนู "เด้งกางใหม่" (reopen-after-select)
+#     ที่มา: onSelect → refocus ช่องค้นหา → onfocus ยิง ssOpen() เปิดเมนูซ้ำ · ผู้ใช้เลือกไม่จบสักที
+#     (input โชว์ค่าว่างเพราะ open=true → ssSetText แสดง query แทน label)
+#     ทำไมตัววัดเดิมมองไม่เห็น: ทุกด้านวัด "ฉากนิ่ง" — ไม่มีตัวไหน "เลือกค่าแล้ววัดสถานะหลังเลือก"
+#     (Audit.combobox_sweep ตรวจแนวนี้ แต่ผูกกับ workflow ของ class Audit + ใช้ wait_for_timeout
+#      — ตัวนี้เป็น probe เดี่ยว ให้ Suite E2E เรียกได้ ไม่ต้องพึ่ง class Audit)
+JS_COMBO_AFTER_SELECT = r"""
+(arg) => {
+  const key = arg.key, index = (arg.index == null ? 0 : arg.index);
+  const ss = window.__ss || {};
+  if (!ss[key]) return { error: 'no-combo:' + key };
+  if (typeof ssPick !== 'function') return { error: 'no-ssPick' };
+  ssPick(key, index);                                     // render() ของ kit ทำงาน sync ตรงนี้
+  const s2 = (window.__ss || {})[key];
+  const list = document.getElementById('ss-list-' + key);
+  const input = document.getElementById('ss-input-' + key);
+  let listHidden = true;
+  if (list) {
+    const cs = getComputedStyle(list);
+    listHidden = list.classList.contains('hidden') || cs.display === 'none' ||
+                 cs.visibility === 'hidden' || parseFloat(cs.opacity || '1') < 0.05;
+  }
+  return {
+    open: !!(s2 && s2.open),
+    listHidden: listHidden,
+    inputValue: input ? input.value : '',
+    value: s2 ? (s2.value == null ? null : s2.value) : null,
+  };
+}
+"""
+
+
+def combobox_state_after_select(pg, key, index=0):
+    """เลือก option (`index`) ของ combobox `key` ผ่าน ssPick แล้วคืนสถานะหลังเลือก
+
+    → {open, listHidden, inputValue, value} · ssPick + render() ของ kit ทำงานแบบ sync
+    ภายใน evaluate นี้แล้ว จึงอ่านผลได้ทันที (ไม่ต้อง settle ก่อนอ่าน)
+    """
+    return pg.evaluate(JS_COMBO_AFTER_SELECT, {'key': key, 'index': index})
+
+
+def assert_combobox_closes_after_select(pg, key, index=0):
+    """กันบั๊ก reopen-after-select: เลือกแล้วเมนูต้องปิด + open flag=false + ช่องโชว์ค่าที่เลือก
+
+    (F-HR-TRAIN 2026-09-03 · BUG-02 ที่ ses_course) — คืน state dict ถ้าผ่าน · assert ถ้าพัง
+    """
+    r = combobox_state_after_select(pg, key, index)
+    assert 'error' not in r, f"combobox {key}: {r.get('error')}"
+    assert r['open'] is False, f"combobox {key} เลือกแล้ว open ยัง True (เมนูเด้งกางใหม่ — reopen-after-select)"
+    assert r['listHidden'] is True, f"combobox {key} เลือกแล้ว list ยังไม่ปิด (reopen-after-select)"
+    assert r['inputValue'], f"combobox {key} เลือกแล้วช่องไม่โชว์ค่า (value ไม่ติด/เมนูเด้งเปิดล้าง label)"
+    return r
+
+
+# (3) combobox กาง dropdown "เอง" ตอน overlay เพิ่งเปิด (auto-open on modal open)
+#     ที่มา (F-HR-TRAIN 2026-09-03 · BUG-04): trapFocus (Rule #29/#94) auto-focus ช่องแรกของ modal
+#     ถ้าช่องแรกเป็น search-select → onfocus ยิง ssOpen() → dropdown กางเองทันทีที่ modal โผล่
+#     ผู้ใช้ยังไม่ได้แตะอะไรเลยแต่เมนูเด้งค้างบังเนื้อหา
+#     ทำไมตัววัดเดิมมองไม่เห็น: probe เดิมทั้งคู่วัด "หลังผู้ใช้เลือก/interact" (reopen-after-select,
+#     combobox_sweep) — ไม่มีตัวไหนถามว่า "พอเปิด overlay ขึ้นมาเฉย ๆ มี combobox ไหนกางเองมั้ย"
+#     คืนรายชื่อ key ของ search-select ใน overlay ที่ dropdown กางเอง (open flag=true หรือ list ไม่ hidden)
+#     list อาจถูก portal ไป #overlay-root → หาแบบ global ด้วย id · [] = สะอาด
+JS_MODAL_COMBO_AUTOOPEN = r"""
+(arg) => {
+  const rootSel = arg.rootSel || '#modalBackdrop .modal';
+  const root = document.querySelector(rootSel);
+  if (!root) return { error: 'no-root:' + rootSel };
+  const ss = window.__ss || {};
+  const out = [];
+  root.querySelectorAll('.search-select').forEach(w => {
+    const key = (w.id || '').replace(/^ss-/, '');
+    if (!key) return;
+    const list = document.getElementById('ss-list-' + key);   // portal-safe (global id)
+    let listShown = false;
+    if (list) {
+      const cs = getComputedStyle(list);
+      listShown = !list.classList.contains('hidden') && cs.display !== 'none' &&
+                  cs.visibility !== 'hidden' && parseFloat(cs.opacity || '1') > 0.05;
+    }
+    const openFlag = !!(ss[key] && ss[key].open);
+    if (openFlag || listShown) out.push({ key: key, openFlag: openFlag, listShown: listShown });
+  });
+  return out;
+}
+"""
+
+
+def modal_autoopens_comboboxes(pg, root_sel='#modalBackdrop .modal'):
+    """คืนรายชื่อ combobox ใน overlay ที่ "กาง dropdown เอง" ตอนเพิ่งเปิด (auto-open on modal open)
+
+    (F-HR-TRAIN 2026-09-03 · BUG-04) — trapFocus auto-focus ช่องแรก ถ้าเป็น search-select →
+    onfocus ยิง ssOpen เปิดเมนูเองตอน overlay โผล่ · [] = ไม่มีตัวไหนกางเอง (สะอาด)
+    ต้องเรียก "หลัง" rAF ของ trapFocus + fix settle แล้ว (เรนเดอร์เสร็จ · ผู้ใช้ยังไม่แตะ)
+    """
+    r = pg.evaluate(JS_MODAL_COMBO_AUTOOPEN, {'rootSel': root_sel})
+    if isinstance(r, dict) and r.get('error'):
+        raise AssertionError(f"modal_autoopens_comboboxes: {r['error']}")
+    return r
