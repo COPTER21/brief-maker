@@ -1,0 +1,2870 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สรรหา (Recruit) · CUBE NATIVE</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+
+<!-- Lucide Icons: loader ที่ท้าย body (ดู section "Lucide loader" ก่อน main <script>) -->
+<!-- เหตุผล:
+     1) ย้ายมาท้าย body หลีกเลี่ยง race กับ DOMContentLoaded
+     2) Multi-CDN fallback (unpkg → jsdelivr → cdnjs)
+     3) Pin version (เลิกใช้ @latest ที่ flaky — GitHub issue #2962)
+-->
+
+<style>
+/* ===== BASE-KIT v6.4 — DO NOT EDIT (Rule #69) — page CSS ต่อท้ายหลัง END marker ===== */
+/* ============== CSS VARIABLES (CUBE CI — v2.0 Warm Light rebrand) ============== */
+:root {
+  --c-navy: #111111;
+  --c-navy-2: #111111;
+  --c-primary: #FF3B30;
+  --c-primary-hover: #E62E24;
+  --c-teal: #FF9A1F;
+  --c-teal-light: #FFB763;
+  --c-ink: #111111;
+  --c-mute: #54565C;
+  --c-mute-2: #73757B;
+  --c-mute-3: #9A9CA2;
+  --c-line: #DEDAD4;
+  --c-line-2: #E9E5E0;
+  --c-line-3: #F1EEEA;
+  --c-bg-off: #FAF8F5;
+  --c-success: #1F9D55;
+  --c-warning: #E8870F;
+  --c-danger: #E62E24;
+  --sidebar-w: 232px;
+  --shell-h: 52px;
+  /* ============== Z-INDEX SCALE (ลำดับชั้นการซ้อน) ==============
+     BASE-KIT อ้าง var ชุดนี้ทุก overlay — ขาดไปแล้ว computed เป็น auto ทั้งหมด
+     ผลคือหัวตาราง sticky วาดทับลิ้นชัก · เจอจริง 2026-08-04 (F-COA-001) */
+  --z-shell: 20;      /* sidebar */
+  --z-sticky: 30;     /* shell-bar · thead sticky */
+  --z-dropdown: 40;   /* user menu · tooltip */
+  --z-backdrop: 50;   /* ฉากหลัง drawer/modal · search list */
+  --z-drawer: 55;     /* ตัวลิ้นชัก/หน้าต่าง */
+  --z-portal: 60;     /* เมนูที่ portal ออกไป #overlay-root (Rule #95) — ต้องเหนือลิ้นชัก */
+  --z-toast: 90;      /* สูงสุด — ต้องเห็นเหนือทุกอย่าง */
+  /* v3.13 — Fixed type scale (Iron Rule locked values) */
+  --fs-h1: 22px;        /* page title */
+  --fs-h2: 17px;        /* section title */
+  --fs-h3: 15px;        /* card / drawer title */
+  --fs-body: 14px;      /* body default */
+  --fs-sub: 13px;       /* secondary body / table cell */
+  --fs-meta: 12px;      /* meta / label */
+  --fs-cap: 11px;       /* uppercase section caption */
+  --fs-kpi: 28px;       /* stat value */
+  /* v3.13 — Fixed spacing scale */
+  --sp-xs: 4px; --sp-sm: 8px; --sp-md: 12px; --sp-lg: 20px; --sp-xl: 28px;
+  /* v3.13 — Fixed radius scale */
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-full: 999px;
+}
+
+/* ============== RESET ============== */
+* { box-sizing: border-box; }
+html, body { margin:0; padding:0; }
+/* Rule #35 — Layout Stability: จองพื้นที่ scrollbar ไว้เสมอ → เปิด modal/drawer หรือ
+   content โตขึ้นแล้ว scrollbar โผล่/หาย จะไม่ทำให้หน้าจอขยับซ้าย-ขวา (jank) */
+html { scrollbar-gutter: stable; }
+/* scroll lock — เปิด overlay แล้วพื้นหลังต้องไม่ scroll ตาม (ทำงานคู่กับ lockScroll ใน UTILS) */
+body.is-overlay-open { overflow: hidden; }
+
+/* ============== SCROLLBAR (Iron Rule #49 — minimal, ห้าม default) ============== */
+/* เส้นบางมาก 5px · track โปร่งใส · พื้นเข้ม (sidebar/panel) = ขาวโปร่ง · พื้นสว่าง = charcoal จาง */
+* { scrollbar-width: thin; scrollbar-color: rgba(17,17,17,.16) transparent; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(17,17,17,.14); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(17,17,17,.26); }
+.sidebar, .slide { scrollbar-color: rgba(255,255,255,.28) transparent; }
+.sidebar ::-webkit-scrollbar-thumb, .slide ::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb, .slide::-webkit-scrollbar-thumb { background: rgba(255,255,255,.28); }
+.sidebar ::-webkit-scrollbar-thumb:hover, .slide ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.42); }
+body {
+  font-family: 'Satoshi', 'Noto Sans Thai', system-ui, sans-serif;
+  background: var(--c-bg-off);
+  color: var(--c-ink);
+  font-size:14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  /* v7.1 Rule #97: desktop-base + adaptive — 768-1180 ปรับ layout ผ่าน media query,
+     <768 = horizontal scroll (ไม่ guarantee) */
+  min-width: 768px;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+[data-lucide] { flex-shrink: 0; }
+
+/* Hide number input spinner globally (Iron Rule #19) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin:0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ============== SIDEBAR ============== */
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sidebar-w);
+  background: #111111;
+  color: #E9E5E0;
+  z-index:var(--z-shell);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.sb-brand {
+  padding:18px;
+  display: flex;
+  align-items: center;
+  gap:12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+.sb-logo {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, #FF3B30, #FF9A1F);
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(255,59,48,0.3);
+}
+.sb-name { font-weight: 700; font-size:14px; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+.sb-sub { font-size:11px; color: #9A9CA2; letter-spacing: 0.06em; font-weight: 600; text-transform: uppercase; margin-top:2px; }
+.sb-nav { flex: 1; padding:12px 8px; overflow-y: auto; }
+
+/* Module = collapsible group (Iron Rule #27).
+   Header toggles expand/collapse only — NOT navigable.
+   Children = .sb-features (clickable feature items). */
+.sb-module { margin-bottom:4px; }
+.sb-module-header {
+  display: flex; align-items: center; gap:8px;
+  width: 100%;
+  padding:8px 10px;
+  border-radius: 6px;
+  background: transparent; border: 0;
+  color: #9A9CA2;
+  font-family: inherit;
+  font-size:11px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  cursor: pointer; transition: all 120ms;
+  text-align: left;
+}
+.sb-module-header:hover { background: rgba(255,255,255,0.04); color: #DEDAD4; }
+.sb-module-header .mod-icon { flex-shrink: 0; opacity: 0.7; }
+.sb-module-header .mod-label { flex: 1; }
+.sb-module-header .mod-chevron {
+  flex-shrink: 0;
+  transition: transform 200ms;
+  opacity: 0.7;
+}
+.sb-module[data-expanded="false"] .mod-chevron { transform: rotate(-90deg); }
+.sb-module[data-expanded="false"] .sb-features { display: none; }
+
+.sb-features { padding:2px 0 6px 0; }
+
+.sb-item {
+  display: flex; align-items: center; gap:10px;
+  padding:8px 12px 8px 16px;
+  border-radius: 6px;
+  color: #DEDAD4;
+  font-size:13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms;
+  margin-bottom:1px;
+  position: relative;
+  user-select: none;
+}
+.sb-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sb-item.is-active {
+  background: #FF3B30;
+  color: #fff;
+  font-weight: 600;
+}
+.sb-item.is-active::before {
+  content: '';
+  position: absolute;
+  left: -10px; top: 7px; bottom: 7px;
+  width: 3px;
+  background: #fff;
+  border-radius: 0 2px 2px 0;
+}
+.sb-item [data-lucide] { width: 16px; height: 16px; opacity: 0.85; }
+.sb-item.is-active [data-lucide] { opacity: 1; }
+.sb-badge {
+  margin-left:auto;
+  font-size:11px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.10);
+  color: #9A9CA2;
+  padding:2px 8px;
+  border-radius: 999px;
+}
+.sb-item.is-active .sb-badge { background: rgba(255,255,255,0.18); color: #fff; }
+.sb-item.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.sb-item.is-disabled:hover { background: transparent; color: #DEDAD4; }
+.sb-footer {
+  padding:12px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  gap:8px;
+  font-size:12px;
+  color: #9A9CA2;
+}
+.pulse-dot {
+  width: 7px; height: 7px;
+  background: var(--c-teal);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(255,154,31,0.20);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ============== MAIN ============== */
+.main {
+  margin-left:var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--c-bg-off);
+}
+
+/* ============== SHELL BAR ============== */
+.shell-bar {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  border-bottom: 1px solid var(--c-line-2);
+  height: var(--shell-h);
+  display: flex;
+  align-items: center;
+  padding:0 24px;
+  z-index:var(--z-sticky);
+  gap:12px;
+}
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap:8px;
+  font-size:13px;
+  color: var(--c-mute);
+}
+.breadcrumb a { cursor: pointer; transition: color 120ms; }
+.breadcrumb a:hover { color: var(--c-primary); }
+.breadcrumb .sep { color: var(--c-mute-3); font-size:11px; }
+.breadcrumb-current { color: var(--c-ink); font-weight: 500; }
+.icon-btn {
+  width: 34px; height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--c-mute);
+  border-radius: 7px;
+  position: relative;
+  transition: all 120ms;
+}
+.icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.icon-btn [data-lucide] { width: 17px; height: 17px; }
+.notif-dot {
+  position: absolute;
+  top: 7px; right: 8px;
+  width: 7px; height: 7px;
+  background: var(--c-danger);
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap:10px;
+  padding:6px 10px 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 120ms;
+}
+.user-chip:hover { background: var(--c-line-3); }
+.user-text { line-height: 1.2; text-align: right; }
+.user-name { font-size:12.5px; font-weight: 500; color: var(--c-ink); white-space: nowrap; }
+.user-role { font-size:11px; color: var(--c-mute-2); white-space: nowrap; margin-top:1px; }
+.avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* User dropdown menu */
+.user-menu {
+  position: absolute;
+  top: calc(var(--shell-h) - 4px);
+  right: 22px;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(17,17,17,0.12);
+  width: 240px;
+  z-index:var(--z-dropdown);
+  padding:6px;
+  display: none;
+}
+.user-menu.is-open { display: block; }
+.user-menu-item {
+  display: flex;
+  align-items: center;
+  gap:10px;
+  padding:8px 12px;
+  border-radius: 6px;
+  font-size:13px;
+  color: var(--c-ink);
+  cursor: pointer;
+  transition: background 120ms;
+}
+.user-menu-item:hover { background: var(--c-bg-off); }
+.user-menu-item [data-lucide] { width: 15px; height: 15px; color: var(--c-mute-2); }
+.user-menu-item.is-danger { color: var(--c-danger); }
+.user-menu-item.is-danger [data-lucide] { color: var(--c-danger); }
+.user-menu-divider { height: 1px; background: var(--c-line-2); margin:6px 0; }
+
+/* ============== CONTENT ============== */
+/* Fluid full-width — content stretches to fill viewport (Iron Rule #30).
+   Do NOT add max-width here; component-level constraints (modal/toast/wizard
+   internal cards) are responsible for their own readability bounds. */
+.content {
+  padding:24px;
+}
+
+/* ============== v7.1 RESPONSIVE — Rule #97 (desktop-base adaptive) ============== */
+.nav-toggle { display:none; }
+@media (max-width: 1180px){
+  .content { padding:16px; }
+  .drawer { width: min(920px, 100vw); }
+  .drawer.standard { width: min(680px, 100vw); }
+  .drawer.wide, .drawer-panel.wide { width: min(1290px, 100vw); }
+  /* generic shell: sidebar เป็น off-canvas — Pattern N shell ใช้ icon rail ของตัวเองแทน */
+  .main { margin-left: 0; }
+  .sidebar { transform: translateX(-100%); transition: transform .18s ease; }
+  .sidebar.open { transform: translateX(0); box-shadow: 0 8px 32px rgba(0,0,0,.24); }
+  .nav-toggle { display:inline-flex; align-items:center; justify-content:center;
+    width:32px; height:32px; border:none; background:transparent; border-radius:8px;
+    color:var(--c-ink); }
+  .nav-toggle:hover { background: rgba(17,17,17,.06); }
+}
+
+/* ============== v7.1 LIST FULL-HEIGHT — Rule #96 ============== */
+/* หน้า list หลัก: ตารางยืดเต็มพื้นที่เหลือ ติดขอบล่างเสมอ ทุกขนาดจอ */
+.page-fill { display:flex; flex-direction:column;
+  min-height: calc(100dvh - var(--shellbar-h, 52px) - 48px); } /* 48 = ระยะขอบบน+ล่างของ .content */
+@media (max-width:1180px){ .page-fill { min-height: calc(100dvh - var(--shellbar-h, 52px) - 32px); } }
+.page-fill > .card-list, .page-fill > .list-card { flex:1 1 auto; min-height:0;
+  display:flex; flex-direction:column; }
+.table-wrap { flex:1 1 auto; min-height:0; overflow:auto; }
+.table-wrap thead th { position:sticky; top:0; background:#fff; z-index:var(--z-sticky); }
+.table-foot { flex:0 0 auto; } /* pagination/count ติดล่างของ card เสมอ */
+
+/* ============== v7.1 OVERLAY PORTAL — Rule #95 ============== */
+/* เมนูที่ portal ออกจาก scroll container (ใช้คู่ portalMenu util) */
+.menu-fixed { position:fixed !important; z-index:var(--z-portal);
+  background:#fff; border:1px solid var(--c-line, #DEDAD4); border-radius:10px;
+  box-shadow:0 12px 32px rgba(17,17,17,.14); overflow-y:auto; }
+
+/* ============== PAGE HEADER ============== */
+.ph {
+  margin-bottom:18px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap:16px;
+}
+.ph > div:first-child { flex: 1 1 auto; min-width: 280px; }
+.ph-title-row {
+  display: flex;
+  align-items: baseline;
+  gap:10px;
+  margin-bottom:6px;
+}
+.ph-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:20px;
+  font-weight: 700;
+  color: var(--c-navy);
+  margin:0;
+  letter-spacing: -0.01em;
+}
+.ph-count {
+  font-size:12.5px;
+  font-weight: 600;
+  color: var(--c-mute-2);
+  background: var(--c-line-3);
+  padding:3px 10px;
+  border-radius: 999px;
+}
+.ph-sub { font-size:13px; color: var(--c-mute); margin:0; }
+.ph-actions { display: flex;align-items:center; gap:8px; flex-shrink: 0; }
+
+/* ============== BUTTONS ============== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;   /* Rule #36 — content กึ่งกลางแนวนอน */
+  gap:6px;
+  height: 36px;
+  /* Rule #36 — padding-top 2px = optical centering สำหรับฟอนต์ไทย (Noto Sans Thai):
+     baseline ของไทยลอยสูงเมื่อ flex-center เพราะ font เผื่อที่สระล่าง → นัดจ์ลง 2px ให้เข้ากลางจริง.
+     ✅ verified ด้วยการ render จริง — ทนทุกเบราว์เซอร์ (ต่างจาก text-box-trim ที่รองรับเฉพาะ Chrome 133+). */
+  padding:2px 16px 0;
+  border-radius: 8px;
+  font-size:13px;
+  font-weight: 500;
+  /* ⚠️ Rule #36 — ห้ามใส่ line-height:1 / overflow:hidden กับตัวปุ่มที่มีข้อความไทย
+     เพราะจะ "ตัดสระบน-วรรณยุกต์-สระล่าง" ทำให้ตัวอักษรเบี้ยว. ปล่อย line-height ตาม body (1.5). */
+  border: 1px solid transparent;
+  background: transparent;
+  white-space: nowrap;       /* label ไม่ตัดบรรทัด → ปุ่มในแถวเดียวสูงเท่ากัน */
+  transition: all 120ms;
+  user-select: none;
+  cursor: pointer;
+}
+.btn [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; }  /* Rule #36 — icon ไม่ถูกบีบ */
+.btn:disabled, .btn.is-disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+.btn-eq { min-width: 104px; }  /* Rule #36 — ปุ่มคู่ที่ควรสมมาตร → กว้างเท่ากัน */
+/* Rule #36 — label ยาวที่ "ต้อง" จำกัดความกว้าง: truncate ที่ span (.lbl) ไม่ใช่ที่ตัวปุ่ม.
+   line-height (1.5) สูงพอ → overflow:hidden ตัดเฉพาะแนวนอน (ไม่ตัดสระไทย). ปกติปล่อยปุ่มโตตาม label ดีกว่า. */
+.btn-truncate { max-width: 220px; }
+.btn-truncate .lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn-primary { background: var(--c-primary); color: #fff; }
+.btn-primary:hover { background: var(--c-primary-hover); box-shadow: 0 2px 8px rgba(255,59,48,0.30); }
+.btn-secondary { background: #fff; border-color: var(--c-line); color: var(--c-ink); }
+.btn-secondary:hover { background: var(--c-line-3); border-color: var(--c-mute-2); }
+.btn-ghost { color: var(--c-mute); }
+.btn-ghost:hover { background: var(--c-line-3); color: var(--c-ink); }
+.btn-danger { background: #fff; border-color: var(--c-line); color: var(--c-danger); }
+.btn-danger:hover { background: #FFE9E7; border-color: var(--c-danger); }
+.btn-link { background: transparent; border: 0; padding:0 4px; height: auto; color: var(--c-primary); font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn-sm { height: 30px; padding:2px 12px 0; font-size:12px; }
+
+/* ============== STATS (KPI Cards) ============== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap:12px;
+  margin-bottom:18px;
+}
+.stat {
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  padding:16px 16px;
+  transition: all 150ms;
+}
+.stat:hover { border-color: var(--c-line); box-shadow: 0 2px 8px rgba(17,17,17,0.05); }
+.stat-label {
+  display: flex;
+  align-items: center;
+  gap:6px;
+  font-size:12px;
+  font-weight: 500;
+  color: var(--c-mute);
+}
+.stat-label [data-lucide] { width: 13px; height: 13px; color: var(--c-primary); }
+.stat-value {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:26px;
+  font-weight: 700;
+  color: var(--c-navy);
+  margin-top:6px;
+  letter-spacing: -0.01em;
+}
+.stat-meta {
+  font-size:12px;
+  color: var(--c-mute-2);
+  margin-top:6px;
+  display: flex;
+  align-items: center;
+  gap:4px;
+}
+.stat-meta.is-up { color: var(--c-success); }
+.stat-meta.is-down { color: var(--c-danger); }
+.stat-meta [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== CARD ============== */
+.card {
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* ============== FILTER BAR ============== */
+.filter-bar {
+  padding:16px 18px;
+  display: flex;
+  gap:10px;
+  align-items: center;
+  border-bottom: 1px solid var(--c-line-2);
+  background: #fff;
+  flex-wrap: wrap;
+}
+
+/* ============== INPUTS ============== */
+.input, .select {
+  height: 36px;
+  padding:0 12px;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  font-size:13px;
+  background: #fff;
+  color: var(--c-ink);
+  font-family: inherit;
+  transition: all 120ms;
+  width: 100%;
+}
+.input:focus, .select:focus {
+  outline: none;
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px rgba(255,59,48,0.10);
+}
+.select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right:32px;
+  appearance: none;
+}
+.input-search { position: relative; flex: 1; max-width: 320px; }
+.input-search input { padding-left:36px; }
+.input-search .lead-icon {
+  position: absolute;
+  left: 11px; top: 50%;
+  transform: translateY(-50%);
+  width: 15px; height: 15px;
+  color: var(--c-mute-2);
+  pointer-events: none;
+}
+
+/* ===== SEARCH-SELECT (Iron Rule #34) — searchable dropdown แทน select ธรรมดา เมื่อ options เยอะ/lookup master =====
+   list = position:absolute overlay → ไม่ดันเนื้อหา (สอดคล้อง Rule #35) */
+.search-select { position: relative; width: 100%; }
+.search-select .ss-input { padding-left:32px; padding-right:32px; }
+.search-select .ss-lead {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px;   /* ⬅ ขนาดตายตัว — ไม่พึ่ง .w-4 (กัน Lucide เรนเดอร์ 24px default → placeholder ดูห่าง) */
+  color: var(--c-mute-3); pointer-events: none;
+}
+.search-select .ss-caret {
+  position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+  width: 15px; height: 15px; color: var(--c-mute-3); pointer-events: none;
+}
+.search-select .ss-clear {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  display: inline-flex; padding:3px; border: 0; background: transparent;
+  color: var(--c-mute-2); cursor: pointer; border-radius: 6px;
+}
+.search-select .ss-clear:hover { background: var(--c-line-3); color: var(--c-ink); }
+.ss-list {
+  position: absolute; z-index:var(--z-backdrop); left: 0; right: 0; margin-top:4px;
+  max-height: 280px; overflow-y: auto; background: #fff;
+  border: 1px solid var(--c-line); border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(17,17,17,0.10), 0 4px 10px rgba(17,17,17,0.05);
+}
+.ss-opt {
+  width: 100%; display: flex; align-items: center; gap:10px; padding:10px 12px;
+  border: 0; border-bottom: 1px solid var(--c-line-3); background: transparent;
+  cursor: pointer; text-align: left; font-family: inherit;
+}
+.ss-opt:last-child { border-bottom: 0; }
+.ss-opt:hover, .ss-opt.is-active { background: rgba(255,59,48,0.06); }
+.ss-opt-ic { width: 16px; height: 16px; color: var(--c-primary); flex-shrink: 0; }  /* ขนาดตายตัวเช่นกัน */
+.ss-opt-main { flex: 1; min-width: 0; }
+.ss-opt-label { display: block; font-size:13px; color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-sub { display: block; font-size:12px; color: var(--c-mute-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-right { flex-shrink: 0; font-size:12px; color: var(--c-mute); }
+.ss-opt mark { background: rgba(255,59,48,0.16); color: inherit; padding:0 1px; border-radius: 2px; }
+.ss-empty { padding:20px 16px; text-align: center; font-size:13px; color: var(--c-mute-2); }
+
+/* ============== TABLE ============== */
+.table-scroll { overflow-x: auto; }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size:13px;
+}
+.table thead { background: var(--c-bg-off); }
+.table th {
+  padding:12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--c-mute);
+  font-size:12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--c-line-2);
+  white-space: nowrap;
+}
+.table th.col-check { width: 40px; padding-right:0; }
+.table th.is-sortable { cursor: pointer; user-select: none; }
+.table th.is-sortable:hover { color: var(--c-ink); background: var(--c-line-3); }
+.table th .sort-arrow { display: inline-block; margin-left:4px; opacity: 0.4; }
+.table th.is-sorted .sort-arrow { opacity: 1; color: var(--c-primary); }
+.table td {
+  padding:12px 16px 12px;  /* Rule #38 — optical centering ไทย: pad-top มากกว่า bottom 2px */
+  border-bottom: 1px solid var(--c-line-2);
+  color: var(--c-ink);
+  vertical-align: middle;
+}
+.table tbody tr { transition: background 120ms; }
+.table tbody tr:hover { background: var(--c-bg-off); }
+.table tbody tr.is-selected { background: rgba(255,59,48,0.04); }
+.table tbody tr.is-selected:hover { background: rgba(255,59,48,0.07); }
+.table tbody tr:last-child td { border-bottom: 0; }
+/* Rule #41 — แถวกดได้ = เปิด view (ไม่มีไอคอนดวงตา). row ที่ clickable ต้องสื่อด้วย cursor */
+.table tbody tr.is-clickable { cursor: pointer; }
+/* Rule #42 — Long-list UX: sticky header (opt-in .is-sticky) — ตารางยาว scroll หัวค้าง */
+.table-scroll.is-sticky { max-height: 560px; overflow-y: auto; scrollbar-gutter: stable; }
+.table-scroll.is-sticky thead th {
+  position: sticky; top: 0; z-index: var(--z-sticky);
+  background: var(--c-bg-off);            /* ⚠️ ต้องทึบที่ตัว th (ไม่ใช่แค่ thead) — ไม่งั้น row เลื่อนทะลุซ้อนหัว */
+  box-shadow: inset 0 -1px 0 var(--c-line-2);  /* border-bottom สำหรับ sticky (border ปกติหายตอน sticky) */
+}
+/* Rule #42 — Thai-safe cell truncation: ตัดเฉพาะแนวนอน (… ) line-height พอ ไม่ตัดสระ. ใส่ title=ค่าเต็มเพื่อ hover ดู */
+.cell-truncate { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+/* Rule #43 — ตัวเลข tabular + คอลัมน์ตัวเลขชิดขวา */
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+th.col-num, td.col-num { text-align: right; }
+td.col-num .num, td.col-num { font-variant-numeric: tabular-nums; }
+
+/* ============== CHECKBOX ============== */
+.cb {
+  width: 16px; height: 16px;
+  border: 1.5px solid var(--c-line);
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: all 120ms;
+  flex-shrink: 0;
+}
+.cb.is-checked, .cb.is-partial {
+  background: var(--c-primary);
+  border-color: var(--c-primary);
+}
+.cb.is-checked::after {
+  content: '';
+  position: absolute;
+  left: 4px; top: 1px;
+  width: 5px; height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.cb.is-partial::after {
+  content: '';
+  position: absolute;
+  left: 3px; top: 6px;
+  width: 8px; height: 2px;
+  background: #fff;
+}
+.cb:hover { border-color: var(--c-primary); }
+
+/* ============== USER CELL ============== */
+.user-cell { display: flex; align-items: center; gap:10px; }
+.uc-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.uc-name { font-weight: 600; color: var(--c-ink); font-size:13px; line-height: 1.3; }
+.uc-email { font-size:12px; color: var(--c-mute-2); margin-top:1px; line-height: 1.3; }
+
+/* ============== PILLS ============== */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap:4px;
+  padding:4px 10px 3px;  /* Rule #38 — optical centering ไทย: pad-top มากกว่า bottom 1px กัน text ลอยสูง (verified) */
+  border-radius: 999px;
+  font-size:12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pill [data-lucide] { width: 11px; height: 11px; }
+.pill-registered { background: #E6F0FF; color: #1A5FCC; }
+.pill-active { background: #E6F0FF; color: #1A5FCC; }
+.pill-converted { background: #E4F4EB; color: #157A41; }
+.pill-suspended { background: #FFF1DD; color: #B8690B; }
+.pill-archived { background: var(--c-line-3); color: var(--c-mute-2); }
+/* v3.13 — Semantic pill aliases (ใช้ชุดนี้เป็นหลัก — mapping ดู knowledge/microcopy.md) */
+.pill-info    { background: #E6F0FF; color: #1A5FCC; }   /* กำลังดำเนินการ/ใช้งาน */
+.pill-success { background: #E4F4EB; color: #157A41; }   /* อนุมัติแล้ว/เสร็จสิ้น */
+.pill-warning { background: #FFF1DD; color: #B8690B; }   /* รอดำเนินการ/รออนุมัติ */
+.pill-danger  { background: #FFE9E7; color: #E62E24; }   /* ปฏิเสธ/ยกเลิก */
+.pill-muted   { background: var(--c-line-3); color: var(--c-mute-2); } /* ร่าง/ปิดใช้งาน/เก็บถาวร */
+
+/* v3.13 — Loading spinner (Iron Rule #44) */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.8s linear infinite; }
+
+/* v3.13 — Form Section Grouping (Iron Rule #45) */
+.form-section { margin-top:var(--sp-xl); }
+.form-section:first-child { margin-top:0; }
+.form-section-title {
+  font-size: var(--fs-cap); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--c-mute);
+  padding-bottom:var(--sp-sm); border-bottom: 1px solid var(--c-line-2);
+  margin-bottom:var(--sp-md);
+}
+
+/* v3.13 — Segmented control (ช่วงเวลา dashboard ฯลฯ — Pattern J) */
+.seg-control { display:inline-flex; background: var(--c-line-3); border-radius: var(--r-md); padding:2px; gap:2px; }
+.seg-item {
+  padding:6px 12px 3px; border-radius: var(--r-sm); border: none; background: transparent;
+  font-size: var(--fs-meta); font-weight: 500; color: var(--c-mute-2); cursor: pointer;
+  font-family: inherit; white-space: nowrap;
+}
+.seg-item.is-active { background: #fff; color: var(--c-ink); font-weight: 600; box-shadow: 0 1px 3px rgba(17,17,17,0.08); }
+.pill-danger { background: #FFE9E7; color: var(--c-danger); }
+
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot.is-active { background: #1A5FCC; box-shadow: 0 0 0 2.5px rgba(37,99,235,0.18); }
+.dot.is-converted { background: #157A41; box-shadow: 0 0 0 2.5px rgba(6,95,70,0.20); }
+.dot.is-suspended { background: var(--c-warning); }
+.dot.is-archived { background: var(--c-mute-3); }
+
+/* Mini-link cell (e.g. tenant link) */
+.tenant-link {
+  display: inline-flex;
+  align-items: center;
+  gap:4px;
+  color: var(--c-primary);
+  font-size:12.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.tenant-link:hover { text-decoration: underline; }
+.tenant-link [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== ROW ACTIONS ============== */
+.row-actions { display: inline-flex; gap:2px; }
+.ra-btn {
+  width: 28px; height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--c-mute-2);
+  border-radius: 6px;
+  transition: all 120ms;
+}
+.ra-btn:hover { background: var(--c-line-3); color: var(--c-primary); }
+.ra-btn.is-danger:hover { background: #FFE9E7; color: var(--c-danger); }
+.ra-btn.is-success:hover { background: rgba(255,154,31,0.12); color: var(--c-teal); }
+.ra-btn [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== TABLE FOOTER ============== */
+.table-footer {
+  padding:12px 18px;
+  background: var(--c-bg-off);
+  border-top: 1px solid var(--c-line-2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size:12.5px;
+  color: var(--c-mute);
+  flex-wrap: wrap;
+  gap:10px;
+}
+.pagination { display: inline-flex; gap:4px; align-items: center; }
+.pg-btn {
+  min-width: 30px; height: 30px;
+  padding:0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 6px;
+  color: var(--c-mute);
+  font-size:12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms;
+}
+.pg-btn:hover { border-color: var(--c-line); background: var(--c-bg-off); }
+.pg-btn.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.pg-btn.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn [data-lucide] { width: 13px; height: 13px; }
+
+/* ============== BULK BAR ============== */
+.bulk-bar {
+  background: var(--c-navy);
+  color: #fff;
+  padding:12px 18px;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  gap:12px;
+  border-bottom: 1px solid var(--c-line-2);
+  margin:-1px -1px 0;
+  font-size:13px;
+}
+.bulk-bar .btn { height: 30px; padding:2px 12px 0; font-size:12px; }
+.bulk-bar .btn-secondary {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.18);
+  color: #fff;
+}
+.bulk-bar .btn-secondary:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.30); }
+
+/* ============== DRAWER ============== */
+/* ---- v6.1 Pattern B drawer chrome (locked to references/drawer-standard/pr.html) ----
+   create/edit drawer ให้ใช้ชุดนี้: .dw-head (eyebrow + h2 20px + .top-icon-btn ปิด)
+   + .d-stepper (.stepper-item/.stepper-circle 32px — ไม่ใช่ .stepper กลางของ page wizard)
+   + .dw-footer (ย้อนกลับ secondary ซ้าย · ยกเลิก ghost + primary ชิดขวา) */
+.top-icon-btn { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border:0; background:transparent; border-radius: var(--r-sm); color: var(--c-mute-2); cursor:pointer; transition: all 120ms; flex-shrink:0; }
+.top-icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.dw-head { padding:18px 24px 16px; border-bottom: 1px solid var(--c-line-2); flex-shrink: 0; }
+.dw-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap:16px; }
+.dw-eyebrow { display: flex; align-items: center; gap:6px; font-size:11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-mute-2); margin-bottom:4px; font-weight: 600; }
+.dw-title { font-size:20px; font-weight: 700; color: var(--c-navy); margin:0; letter-spacing: -0.01em; }
+.dw-sub { font-size: var(--fs-meta); color: var(--c-mute-2); margin-top:4px; }
+.d-stepper { display: flex; align-items: flex-start; gap:0; width: 100%; margin-top:18px; }
+.stepper-item { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; min-width: 0; }
+.stepper-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size:13px; font-weight: 600; background: #fff; color: var(--c-mute-3); border: 2px solid var(--c-line); transition: all 200ms; z-index: 2; }
+.stepper-item.active .stepper-circle { background: var(--c-primary); color: #fff; border-color: var(--c-primary); box-shadow: 0 0 0 4px rgba(255,59,48,0.12); }
+.stepper-item.done .stepper-circle { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
+.stepper-label { margin-top:8px; font-size:12px; font-weight: 500; color: var(--c-mute-3); text-align: center; line-height: 1.3; transition: color 200ms; }
+.stepper-item.active .stepper-label { color: var(--c-navy); font-weight: 600; }
+.stepper-item.done .stepper-label { color: var(--c-mute); }
+.stepper-item:not(:last-child)::after { content: ''; position: absolute; top: 15px; left: 50%; right: -50%; height: 2px; background: var(--c-line-2); z-index: 1; }
+.stepper-item.done:not(:last-child)::after { background: var(--c-primary); }
+.dw-footer { padding:16px 24px; border-top: 1px solid var(--c-line-2); background: var(--c-bg-off); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap:8px; }
+.dw-footer-right { display: flex; align-items: center; gap:8px; }
+
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17,17,17,0.40);
+  z-index:var(--z-backdrop);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms;
+}
+.drawer-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 920px;           /* v2 standard (Iron Rule #11) — wide drawer */
+  max-width: 96vw;
+  background: #fff;
+  z-index:var(--z-drawer);
+  transform: translateX(100%);
+  transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -16px 0 40px rgba(17,17,17,0.18);
+}
+.drawer.is-open { transform: translateX(0); }
+.drawer.standard { width: 680px; }   /* simple forms / short view (Iron Rule #11) */
+
+/* ========== STEPPER STANDARD (Iron Rule #47) — ใช้ตัวเดียวทุก wizard ========== */
+.stepper { display:flex; align-items:center; gap:var(--sp-sm); }
+.step { display:flex; align-items:center; gap:var(--sp-sm); }
+.step-dot {
+  width:26px; height:26px; border-radius: var(--r-full);
+  display:flex; align-items:center; justify-content:center;
+  font-size: var(--fs-meta); font-weight:600; padding-top:1px; /* Thai rhythm */
+  border:1.5px solid var(--c-line); background:#fff; color: var(--c-mute-2);
+}
+.step-label { font-size: var(--fs-sub); color: var(--c-mute-2); font-weight:500; white-space:nowrap; }
+.step-connector { width:28px; height:1.5px; background: var(--c-line-2); flex:0 0 auto; }
+.step.is-current .step-dot { border-color: var(--c-primary); background: var(--c-primary); color:#fff; }
+.step.is-current .step-label { color: var(--c-ink); font-weight:600; }
+.step.is-done .step-dot { border-color: var(--c-teal); background:#fff; color: var(--c-teal); }
+.step.is-done .step-connector, .step.is-current ~ * {}
+.step.is-done + .step-connector { background: var(--c-teal); }
+/* placement: drawer wizard → .drawer-stepper-band (ใต้ header) / page wizard → .wizard-stepper-band */
+.drawer-stepper-band { padding:10px 24px; border-bottom: 1px solid var(--c-line-2); background: var(--c-bg-off); }
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  gap:16px;
+  padding:18px 24px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.drawer-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.drawer-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:20px;
+  font-weight: 600;
+  color: var(--c-navy);
+  margin:0;
+  letter-spacing: -0.01em;
+}
+.drawer-subtitle {
+  font-size:12px;
+  color: var(--c-mute);
+  margin-top:4px;
+  display: flex;
+  align-items: center;
+  gap:8px;
+  flex-wrap: wrap;
+}
+.drawer-tabs {
+  display: flex;align-items:center;
+  padding:0 24px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.drawer-tab {
+  padding:10px 16px;
+  font-size:13px;
+  font-weight: 500;
+  color: var(--c-mute);
+  border-bottom: 2px solid transparent;
+  transition: all 120ms;
+  margin-bottom:-1px;
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+}
+.drawer-tab:hover { color: var(--c-ink); }
+.drawer-tab.is-active { color: var(--c-primary); border-bottom-color: var(--c-primary); }
+.drawer-body { flex: 1; overflow-y: auto; padding:24px; scrollbar-gutter: stable; }
+.drawer-section { margin-bottom:24px; }
+.drawer-section-title {
+  font-size:11px;
+  font-weight: 700;
+  color: var(--c-mute);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin:0 0 10px;
+}
+.drawer-fields {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap:10px 16px;
+  font-size:13px;
+}
+.drawer-fields .lbl { color: var(--c-mute); }
+.drawer-fields .val { color: var(--c-ink); font-weight: 500; }
+.drawer-footer {
+  padding:12px 24px;
+  border-top: 1px solid var(--c-line-2);
+  display: flex;
+  gap:8px;
+  align-items: center;
+  background: var(--c-bg-off);
+}
+/* Drawer Button Contract (Iron Rule #31) helpers */
+.footer-spacer { flex: 1; }
+.drawer-footer-meta { font-size:12px; color: var(--c-mute-2); }
+.drawer-header-actions { display: flex; gap:6px; align-items: center; }
+.drawer-header-divider { width: 1px; height: 22px; background: var(--c-line-2); margin:0 4px; flex-shrink: 0; }
+
+/* ============== TIMELINE ============== */
+.timeline { position: relative; padding-left:24px; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--c-line-2);
+}
+.tl-item { position: relative; margin-bottom:16px; }
+.tl-item:last-child { margin-bottom:0; }
+.tl-dot {
+  position: absolute;
+  left: -20px;
+  top: 3px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--c-primary);
+}
+.tl-dot.is-success { border-color: var(--c-success); }
+.tl-dot.is-warning { border-color: var(--c-warning); }
+.tl-title { font-size:13px; font-weight: 600; color: var(--c-ink); }
+.tl-meta { font-size:12px; color: var(--c-mute-2); margin-top:2px; }
+
+/* ============== BOOKMARK / RELATED CARDS ============== */
+.bm-card {
+  display: flex;
+  gap:12px;
+  padding:12px 12px;
+  border: 1px solid var(--c-line-2);
+  border-radius: 8px;
+  margin-bottom:8px;
+  cursor: pointer;
+  transition: all 120ms;
+  align-items: center;
+}
+.bm-card:hover { border-color: var(--c-line); }
+.bm-icon {
+  width: 28px; height: 28px;
+  background: rgba(255,59,48,0.10);
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-primary);
+  flex-shrink: 0;
+}
+.bm-card [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== NOTES ============== */
+.notes-area {
+  width: 100%;
+  min-height: 130px;
+  padding:12px 16px;
+  background: #fff;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  resize: vertical;
+  font-family: inherit;
+  font-size:13px;
+  line-height: 1.55;
+}
+.notes-area:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(255,59,48,0.10); }
+
+/* ============== EMPTY STATE ============== */
+.empty {
+  padding:56px 24px;
+  text-align: center;
+  color: var(--c-mute);
+}
+.empty-icon {
+  width: 52px; height: 52px;
+  margin:0 auto 16px;
+  border-radius: 50%;
+  background: var(--c-line-3);
+  color: var(--c-mute-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.empty-icon [data-lucide] { width: 22px; height: 22px; }
+.empty-title {
+  font-size:16px;
+  font-weight: 600;
+  color: var(--c-ink);
+  margin-bottom:6px;
+  font-family: 'Noto Sans Thai', sans-serif;
+}
+.empty-desc { font-size:13px; color: var(--c-mute); max-width: 320px; margin:0 auto; }
+.empty .btn { margin-top:16px; }  /* Rule #39 — empty state ควรมีปุ่ม action หลัก */
+
+/* ============== MODAL ============== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17,17,17,0.50);
+  z-index:var(--z-portal); /* modal ต้องเหนือ drawer(55) · =portal(60) เพื่อให้ combobox portal menu ใน modal โผล่เหนือ modal ได้ตาม DOM order — ห้ามตั้ง > portal ไม่งั้น dropdown ใน modal จะจม */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 440px;
+  max-width: 92vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.96);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 24px 64px rgba(17,17,17,0.28);
+  overflow: hidden;
+}
+.modal-backdrop.is-open .modal { transform: scale(1); }
+.modal-header {
+  padding:18px 24px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap:12px;
+}
+.modal-header-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: rgba(255,59,48,0.10);
+  color: var(--c-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.modal-header-icon.is-danger { background: #FFE9E7; color: var(--c-danger); }
+.modal-header-icon.is-warning { background: #FFF1DD; color: var(--c-warning); }
+.modal-header-icon [data-lucide] { width: 18px; height: 18px; }
+.modal-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:16px;
+  font-weight: 600;
+  color: var(--c-navy);
+  margin:0 0 4px;
+}
+.modal-subtitle { font-size:13px; color: var(--c-mute); margin:0; line-height: 1.5; }
+.modal-body {
+  padding:6px 24px 18px;
+  font-size:13px;
+  color: var(--c-ink);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+.modal-footer {
+  padding:12px 24px;
+  background: var(--c-bg-off);
+  border-top: 1px solid var(--c-line-2);
+  display: flex;align-items:center;
+  justify-content: flex-end;
+  gap:8px;
+}
+
+/* ============== FIELDS ============== */
+.field { margin-bottom:16px; }
+.field-label { display: block; font-size:12.5px; font-weight: 500; color: var(--c-mute); margin-bottom:6px; }
+.field-label .req { color: var(--c-danger); margin-left:2px; }
+.field-input { width: 100%; }
+.field-help { font-size:12px; color: var(--c-mute-2); margin-top:4px; }
+/* Rule #43 — จองพื้นที่ error ไว้ (visibility แทน display) → error โผล่แล้วฟอร์มไม่กระตุก.
+   ถ้า field ไหนไม่ใส่ <div class="field-error"> ก็ไม่จองพื้นที่ (author เลือกเองรายตัว) */
+.field-error { font-size:12px; color: var(--c-danger); margin-top:4px; min-height: 15px; visibility: hidden; }
+.field.is-invalid .input,
+.field.is-invalid .select { border-color: var(--c-danger); }
+.field.is-invalid .field-error { visibility: visible; }
+
+/* Responsive form grid (Iron Rule #17) */
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap:12px;
+}
+
+/* ============== TOAST ============== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--c-navy);
+  color: #fff;
+  padding:12px 18px;
+  border-radius: 10px;
+  font-size:13px;
+  font-weight: 500;
+  z-index:var(--z-toast);
+  display: flex;
+  align-items: center;
+  gap:10px;
+  box-shadow: 0 12px 32px rgba(17,17,17,0.30);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 380px;
+}
+.toast.is-visible { transform: translateY(0); opacity: 1; }
+.toast.is-success { background: var(--c-success); }
+.toast.is-info { background: var(--c-primary); }
+.toast.is-warning { background: var(--c-warning); }
+.toast.is-error { background: var(--c-danger); }
+.toast [data-lucide] { width: 17px; height: 17px; }
+
+/* ============== LINE EXPAND ANIMATION (Pattern E) ============== */
+.line-expanded {
+  animation: lineExpand 220ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+@keyframes lineExpand {
+  from { max-height: 0; opacity: 0; transform: translateY(-8px); }
+  to { max-height: 600px; opacity: 1; transform: translateY(0); }
+}
+
+/* ============== WIZARD LAYOUT (Iron Rule #22) ============== */
+.page-content-host.has-wizard { display: flex; flex-direction: column; height: 100%; }
+.wizard-shell { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 100%; }
+.wizard-stepper-band {
+  flex: 0 0 auto; background: white;
+  padding:18px 32px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.wizard-body { flex: 1 1 auto; padding:24px 32px 28px; min-height: 0; background: var(--c-bg-off); }
+.wizard-card {
+  padding:28px 32px;
+  width: 100%;
+  max-width: 960px;
+  margin:0 auto;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+}
+.wizard-footer {
+  flex: 0 0 auto;
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding:12px 32px;
+  display: flex;align-items:center;
+  justify-content: space-between;
+  border-top: 1px solid var(--c-line-2);
+  box-shadow: 0 -2px 8px rgba(17,17,17,0.04);
+  z-index:var(--z-sticky);
+}
+.stepper-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+  max-width: 640px;
+  margin:0 auto;
+  gap:0;
+}
+.stepper-row .step-line {
+  flex: 1 1 auto;
+  min-width: 28px;
+  max-width: 80px;
+  height: 2px;
+  background: var(--c-line-2);
+}
+.stepper-row .step-line.is-done { background: var(--c-primary); }
+.step-dot {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--c-line-2);
+  color: var(--c-mute-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12.5px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.step-dot.is-active { background: var(--c-primary); color: #fff; }
+.step-dot.is-done { background: var(--c-primary); color: #fff; }
+
+/* ============== UTILITIES ============== */
+.hidden { display: none !important; }  /* v6.1 — search-select/overlay พึ่ง class นี้ (เดิมหายไป ทำให้ ss-list เปิดค้าง + ปุ่ม X โผล่) */
+.text-mute { color: var(--c-mute); }
+.text-mute-2 { color: var(--c-mute-2); }
+.text-primary { color: var(--c-primary); }
+.text-success { color: var(--c-success); }
+.text-danger { color: var(--c-danger); }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap:8px; }
+.gap-3 { gap:12px; }
+.gap-4 { gap:16px; }
+.mb-2 { margin-bottom:8px; }
+.mb-3 { margin-bottom:12px; }
+.mb-4 { margin-bottom:16px; }
+.mt-2 { margin-top:8px; }
+.mt-3 { margin-top:12px; }
+.mt-4 { margin-top:16px; }
+
+/* Icon utility classes (CSS-defined so no Tailwind dependency for these) */
+.w-2\.5 { width: 10px; }   .h-2\.5 { height: 10px; }
+.w-3   { width: 12px; }    .h-3   { height: 12px; }
+.w-3\.5 { width: 14px; }   .h-3\.5 { height: 14px; }
+.w-4   { width: 16px; }    .h-4   { height: 16px; }
+.w-5   { width: 20px; }    .h-5   { height: 20px; }
+
+/* ============================================================
+   Lucide SVG sizing fix
+   ------------------------------------------------------------
+   Lucide replaces <i data-lucide="..."> with <svg class="lucide ...">
+   ที่มี width="24" height="24" attributes ติดมาด้วย — attributes
+   เหล่านี้ override CSS class .w-N ทำให้ icons เด้งเป็น 24×24
+   ดัน pill/button สูงเกินขนาด design.
+
+   วิธีแก้: บังคับ svg.lucide ทุกตัวให้ width/height = 1em แล้ว
+   ปรับขนาดผ่าน font-size บน parent. Plus override สำหรับเคสที่
+   ใช้ .w-N/.h-N โดยตรงบน <i> (Lucide จะ copy class ไปยัง svg)
+   ============================================================ */
+svg.lucide {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: -0.125em;
+  flex-shrink: 0;
+}
+/* เมื่อ .w-N / .h-N ถูก copy ไปบน svg.lucide ให้บังคับ override
+   width/height attributes ที่ Lucide ใส่มา (specificity ชนะ attribute) */
+svg.lucide.w-2\.5 { width: 10px; }   svg.lucide.h-2\.5 { height: 10px; }
+svg.lucide.w-3    { width: 12px; }   svg.lucide.h-3    { height: 12px; }
+svg.lucide.w-3\.5 { width: 14px; }   svg.lucide.h-3\.5 { height: 14px; }
+svg.lucide.w-4    { width: 16px; }   svg.lucide.h-4    { height: 16px; }
+svg.lucide.w-5    { width: 20px; }   svg.lucide.h-5    { height: 20px; }
+
+/* ===== Tooltip (#33/#67 — hint เข้า ⓘ hover) ===== */
+.info-tip{display:inline-flex;align-items:center;margin-left:6px;color:var(--c-mute-2);cursor:help;position:relative}
+.info-tip svg,.info-tip i{width:14px;height:14px}
+.info-tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:var(--c-navy);color:#fff;font-size:12px;line-height:1.5;padding:8px 12px;border-radius:8px;
+  max-width:340px;width:max-content;white-space:normal;opacity:0;pointer-events:none;transition:opacity .12s;z-index:var(--z-dropdown)}
+.info-tip:hover::after{opacity:1}
+/* ===== Drop-up (#66) ===== */
+.drop-up{bottom:100%!important;top:auto!important;margin-bottom:4px}
+
+/* ===== END BASE-KIT — เขียน page-specific CSS ใต้บรรทัดนี้เท่านั้น ===== */
+
+/* ===== F-HR-RECRUIT · page CSS (vibe) ===== */
+/* Feature tabs under page header (Iron Rule #104 — 1 feature = 1 menu, ส่วนย่อย = tabs) */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--c-line-2);margin-bottom:18px;flex-wrap:wrap}
+.tab{display:inline-flex;align-items:center;gap:7px;padding:9px 15px 8px;font-size:13.5px;font-weight:500;color:var(--c-mute);
+  border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;background:transparent;border-top:0;border-left:0;border-right:0;transition:all 120ms;white-space:nowrap}
+.tab:hover{color:var(--c-ink)}
+.tab.is-active{color:var(--c-primary);border-bottom-color:var(--c-primary);font-weight:600}
+.tab [data-lucide]{width:15px;height:15px}
+.tab .tab-ct{font-size:11px;font-weight:600;color:var(--c-mute-2);background:var(--c-line-3);border-radius:999px;padding:1px 7px}
+.tab.is-active .tab-ct{background:rgba(255,59,48,.12);color:var(--c-primary)}
+
+/* Note / banner (คำเตือนของ action จริง — ไม่ใช่ hint, ดู #33 exception) */
+.note{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-radius:9px;font-size:12.5px;line-height:1.6;border:1px solid var(--c-line-2);background:#fff;color:var(--c-mute)}
+.note [data-lucide]{width:16px;height:16px;flex-shrink:0;margin-top:1px}
+.note.is-warn{background:#FFF1DD;border-color:#FFB763;color:#B8690B}
+.note.is-warn [data-lucide]{color:var(--c-warning)}
+.note.is-danger{background:#FFE9E7;border-color:#FFE9E7;color:#E62E24}
+.note.is-danger [data-lucide]{color:var(--c-danger)}
+.note.is-info{background:#E6F0FF;border-color:#E6F0FF;color:#1A5FCC}
+.note.is-info [data-lucide]{color:#1A5FCC}
+.note b{color:inherit;font-weight:700}
+.note-act{margin-left:auto;flex-shrink:0}
+
+/* KV grid (lean summary — #103) */
+.kv{display:grid;grid-template-columns:132px 1fr;gap:9px 16px;font-size:13px}
+.kv .k{color:var(--c-mute-2);font-size:12px}
+.kv .v{color:var(--c-ink);font-weight:500}
+.kv .v.mono{font-family:'Satoshi',monospace;font-variant-numeric:tabular-nums}
+
+/* Soft chips */
+.chip-soft{display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;border-radius:999px;font-size:11px;font-weight:600;
+  background:var(--c-line-3);color:var(--c-mute);white-space:nowrap}
+.chip-soft [data-lucide]{width:11px;height:11px}
+.chip-soft.is-dup{background:#FFF1DD;color:#B8690B}
+.chip-soft.is-noconsent{background:#FFE9E7;color:#E62E24}
+.chip-soft.is-consent{background:#E4F4EB;color:#157A41}
+
+/* Masked (RESTRICTED — FN-94) */
+.masked{display:inline-flex;align-items:center;gap:5px;color:var(--c-mute-2);font-variant-numeric:tabular-nums}
+.masked [data-lucide]{width:12px;height:12px;color:var(--c-mute-3)}
+
+/* Person cell already via .user-cell/.uc-avatar */
+
+/* ===== Kanban (pipeline board — Pattern L) ===== */
+.kanban{display:grid;grid-template-columns:repeat(5,minmax(212px,1fr));gap:12px;align-items:start;overflow-x:auto;padding-bottom:6px}
+.kb-col{background:var(--c-bg-off);border:1px solid var(--c-line-2);border-radius:12px;display:flex;flex-direction:column;min-height:120px}
+.kb-col-head{display:flex;align-items:center;gap:8px;padding:12px 13px 10px;border-bottom:1px solid var(--c-line-2)}
+.kb-col-head .dotk{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.kb-col-head .nm{font-size:12.5px;font-weight:700;color:var(--c-navy)}
+.kb-col-head .kb-count{margin-left:auto;font-size:11px;font-weight:700;color:var(--c-mute-2);background:#fff;border:1px solid var(--c-line-2);border-radius:999px;padding:1px 8px}
+.kb-body{padding:10px;display:flex;flex-direction:column;gap:9px;flex:1}
+.kb-card{background:#fff;border:1px solid var(--c-line-2);border-radius:10px;padding:11px 12px;cursor:pointer;transition:all 120ms}
+.kb-card:hover{border-color:var(--c-line);box-shadow:0 3px 10px rgba(17,17,17,.06)}
+.kb-card .kc-top{display:flex;align-items:center;gap:9px}
+.kb-card .kc-name{font-size:13px;font-weight:600;color:var(--c-ink);line-height:1.3}
+.kb-card .kc-sub{font-size:11.5px;color:var(--c-mute-2);margin-top:1px}
+.kb-card .kc-meta{display:flex;align-items:center;gap:6px;margin-top:9px;flex-wrap:wrap}
+.kb-card .kc-move{display:flex;gap:5px;margin-top:10px;padding-top:9px;border-top:1px dashed var(--c-line-2)}
+/* FIX-04: ปุ่มย้อนกลับบนการ์ดต้องเห็นไอคอนชัด ทั้ง enabled/disabled */
+.kb-card .kc-move .btn{color:var(--c-ink);border:1px solid var(--c-line)}
+.kb-card .kc-move .btn:disabled{opacity:.45;color:var(--c-mute-3);border-color:var(--c-line-2)}
+.kb-empty{padding:16px 8px;text-align:center;font-size:12px;color:var(--c-mute-3)}
+.kb-score{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--c-warning)}
+.kb-score [data-lucide]{width:12px;height:12px}
+
+/* Band card (offer salary — soft ref, read-only) */
+.band-card{border:1px solid var(--c-line-2);background:var(--c-bg-off);border-radius:10px;padding:13px 15px}
+.band-scale{display:flex;gap:0;margin-top:11px}
+.band-seg{flex:1;text-align:center;padding:8px 4px;border-right:1px solid var(--c-line-2)}
+.band-seg:last-child{border-right:0}
+.band-seg .bl{font-size:10.5px;color:var(--c-mute-2);text-transform:uppercase;letter-spacing:.04em}
+.band-seg .bv{font-size:14px;font-weight:700;color:var(--c-navy);margin-top:3px;font-variant-numeric:tabular-nums}
+.band-seg.is-mid{background:rgba(255,154,31,.10);border-radius:6px}
+
+/* DOA slot picker */
+.slot{border:1px solid var(--c-line-2);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#fff}
+.slot-h{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.slot-h .sn{width:22px;height:22px;border-radius:50%;background:var(--c-navy);color:#fff;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.slot-h .st{font-size:12.5px;font-weight:600;color:var(--c-ink)}
+.slot-h .sr{margin-left:auto;font-size:11px;color:var(--c-mute-2);font-family:monospace}
+
+/* Timeline approval (reuse .timeline from kit; add chip) */
+.emp-chip{display:inline-flex;align-items:center;gap:7px;padding:4px 10px 4px 5px;border:1px solid var(--c-line-2);border-radius:999px;background:#fff;font-size:12px}
+.emp-chip .uc-avatar{width:22px;height:22px;font-size:10px}
+.emp-chip .ec-pos{color:var(--c-mute-2);font-size:11px}
+
+/* Funnel report */
+.funnel{display:flex;flex-direction:column;gap:9px}
+.funnel-row{display:grid;grid-template-columns:150px 1fr 92px;gap:12px;align-items:center}
+.funnel-row .fl{font-size:12.5px;font-weight:600;color:var(--c-ink)}
+.funnel-track{height:30px;background:var(--c-line-3);border-radius:7px;overflow:hidden;position:relative}
+.funnel-fill{height:100%;background:linear-gradient(90deg,var(--c-primary),var(--c-teal));border-radius:7px;min-width:2px;transition:width .4s}
+.funnel-row .fn{text-align:right;font-size:12.5px;font-weight:700;color:var(--c-navy);font-variant-numeric:tabular-nums}
+
+/* Upload zone (resume mock) */
+.upload-zone{border:1.5px dashed var(--c-line);border-radius:10px;padding:18px;text-align:center;color:var(--c-mute-2);font-size:12.5px;background:var(--c-bg-off)}
+.upload-zone [data-lucide]{width:20px;height:20px;color:var(--c-mute-3);margin-bottom:6px}
+.file-pill{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid var(--c-line-2);border-radius:8px;background:#fff;font-size:12.5px;color:var(--c-ink)}
+.file-pill [data-lucide]{width:14px;height:14px;color:var(--c-primary)}
+
+/* Score input */
+.score-pick{display:inline-flex;gap:4px}
+.score-pick button{width:30px;height:30px;border:1px solid var(--c-line);background:#fff;border-radius:7px;font-size:13px;font-weight:700;color:var(--c-mute-3);cursor:pointer;transition:all 120ms;padding:0}
+.score-pick button:hover{border-color:var(--c-warning)}
+.score-pick button.on{background:var(--c-warning);border-color:var(--c-warning);color:#fff}
+
+/* Demo strip (Iron Rule #105 — persona/masking switch = prototype, ห้ามใน page header) */
+.demo-strip{position:fixed;left:16px;bottom:16px;z-index:var(--z-dropdown);background:var(--c-navy);color:#fff;border-radius:12px;
+  padding:9px 12px;display:flex;align-items:center;gap:12px;box-shadow:0 10px 30px rgba(17,17,17,.28);font-size:11.5px}
+.demo-strip .ds-tag{font-weight:700;letter-spacing:.03em;color:#fff;display:flex;align-items:center;gap:6px}
+.demo-strip .ds-tag [data-lucide]{width:13px;height:13px;color:var(--c-teal)}
+.demo-strip .ds-sep{width:1px;height:20px;background:rgba(255,255,255,.18)}
+.demo-strip .ds-lbl{color:#B4B6BB}
+.demo-strip .ds-seg{display:inline-flex;background:rgba(255,255,255,.08);border-radius:8px;padding:2px;gap:2px}
+.demo-strip .ds-seg button{border:0;background:transparent;color:#C7C9CE;font:600 11.5px inherit;padding:4px 9px 3px;border-radius:6px;cursor:pointer}
+.demo-strip .ds-seg button.on{background:var(--c-primary);color:#fff}
+
+/* Section wrap in drawer detail */
+.secwrap{border:1px solid var(--c-line-2);border-radius:10px;padding:15px 16px;margin-bottom:14px}
+.sec-h{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--c-mute);text-transform:uppercase;letter-spacing:.06em;margin:0 0 12px}
+.sec-h [data-lucide]{width:14px;height:14px;color:var(--c-primary)}
+.rc-list-intro{font-size:12.5px;color:var(--c-mute)}
+</style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- BODY CONTENT GOES HERE                       -->
+<!-- ============================================ -->
+<!-- For ERP: use templates/erp-shell.template.html -->
+<!-- For General: use templates/general-shell.template.html -->
+
+<!-- ===== SIDEBAR (Iron Rule #27 Module/Feature · #104 one feature = one menu) ===== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i data-lucide="box" class="w-4 h-4"></i></div>
+    <div>
+      <div class="sb-name">CUBE NATIVE</div>
+      <div class="sb-sub">ทรัพยากรบุคคล</div>
+    </div>
+  </div>
+  <nav class="sb-nav" id="sb-nav">
+    <div class="sb-module" data-module="hr" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="users-round" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">บุคคล &amp; สรรหา</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <!-- feature นี้ = รายการเดียว (#104) · หน้าย่อยเป็น tabs ในหน้า -->
+        <a class="sb-item is-active" data-feature="recruit" onclick="go('recruit/req')">
+          <i data-lucide="user-search" class="w-4 h-4"></i><span>สรรหา</span>
+        </a>
+        <!-- context features ของ module (placeholder — นอก scope รอบนี้) -->
+        <a class="sb-item" data-feature="onboard" onclick="ctxStub('เข้า-ออกงาน (On/Offboard)')">
+          <i data-lucide="door-open" class="w-4 h-4"></i><span>เข้า-ออกงาน</span>
+        </a>
+        <a class="sb-item" data-feature="employee" onclick="ctxStub('ข้อมูลพนักงาน')">
+          <i data-lucide="contact" class="w-4 h-4"></i><span>ข้อมูลพนักงาน</span>
+        </a>
+        <a class="sb-item" data-feature="hr-config" onclick="ctxStub('ตั้งค่า HR (ระดับ/band เงินเดือน)')">
+          <i data-lucide="sliders-horizontal" class="w-4 h-4"></i><span>ตั้งค่า HR</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+  <div class="sb-footer"><div class="pulse-dot"></div><span>Prototype · v1.0.0</span></div>
+</aside>
+
+<main class="main">
+  <header class="shell-bar">
+    <button class="nav-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')" aria-label="เมนู"><i data-lucide="menu" class="w-4 h-4"></i></button>
+    <nav class="breadcrumb">
+      <a onclick="go('recruit/req')">บุคคล &amp; สรรหา</a>
+      <i data-lucide="chevron-right" class="w-3 h-3 sep"></i>
+      <span class="breadcrumb-current">สรรหา</span>
+    </nav>
+    <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+      <div class="notif-wrap" style="position:relative;">
+        <button class="icon-btn" onclick="showToast('ศูนย์แจ้งเตือน (ENG-NOTIFY) — เชื่อมจริงตอน dev','info')" title="การแจ้งเตือน"><i data-lucide="bell" class="w-4 h-4"></i><span class="notif-dot"></span></button>
+      </div>
+      <div style="position:relative;">
+        <div class="user-chip" onclick="toggleUserMenu()">
+          <div class="user-text"><div class="user-name" id="uc-name">มณีรัตน์ ก.</div><div class="user-role" id="uc-role">เจ้าหน้าที่สรรหา · CUBE NATIVE</div></div>
+          <div class="avatar" id="uc-av">มร</div>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-item"><i data-lucide="user" class="w-3.5 h-3.5"></i><span>โปรไฟล์ของฉัน</span></div>
+          <div class="user-menu-item"><i data-lucide="settings" class="w-3.5 h-3.5"></i><span>ตั้งค่า</span></div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-item is-danger"><i data-lucide="log-out" class="w-3.5 h-3.5"></i><span>ออกจากระบบ</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="content" id="page-content"><!-- rendered by render() --></div>
+</main>
+
+<!-- Demo strip (Iron Rule #105 — persona/masking = prototype, ไม่อยู่ page header) -->
+<div class="demo-strip" id="demoStrip">
+  <span class="ds-tag"><i data-lucide="flask-conical" class="w-3.5 h-3.5"></i>Prototype</span>
+  <span class="ds-sep"></span>
+  <span class="ds-lbl">Demo · ดูในฐานะ</span>
+  <span class="ds-seg" id="personaSeg">
+    <button data-p="recruiter" class="on" onclick="setPersona('recruiter')">เจ้าหน้าที่สรรหา</button>
+    <button data-p="manager" onclick="setPersona('manager')">ผู้จัดการสายงาน</button>
+    <button data-p="viewer" onclick="setPersona('viewer')">ผู้ชมทั่วไป</button>
+  </span>
+</div>
+
+<!-- Drawer container (always include, even if no drawer used initially) -->
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <!-- Drawer content rendered by render() function -->
+</div>
+
+<!-- Modal container -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <!-- Modal content rendered by render() function -->
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast" id="toast"></div>
+
+<!-- ============================================================
+     Lucide Icons Loader (multi-CDN fallback, pinned version)
+     ------------------------------------------------------------
+     ทำไมไม่ใช้ <script src="..."> ตรง ๆ:
+       - Single CDN = single point of failure (corp proxy/firewall block)
+       - @latest = breaking changes โดยไม่บอก (GitHub issue #2962)
+       - <script> ใน <head> โดยไม่มี defer ชน DOMContentLoaded
+     กลยุทธ์:
+       1) Pin version 0.469.0 (stable, ทดสอบแล้ว)
+       2) ลอง CDN 3 ตัวเรียงตามความน่าเชื่อถือ: unpkg → jsdelivr → cdnjs
+       3) ถ้าทุก CDN fail → log warning + ไม่ block render
+            (UI ยังใช้งานได้ แค่ไม่มี icons)
+     ============================================================ -->
+<script>
+(function loadLucide() {
+  var version = '0.469.0';
+  var cdns = [
+    'https://unpkg.com/lucide@' + version + '/dist/umd/lucide.min.js',
+    'https://cdn.jsdelivr.net/npm/lucide@' + version + '/dist/umd/lucide.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/lucide/' + version + '/lucide.min.js'
+  ];
+  var i = 0;
+  function tryNext() {
+    if (i >= cdns.length) {
+      console.warn('[Lucide] All CDNs failed. Icons จะไม่แสดง but UI ยังใช้งานได้');
+      window.lucide = window.lucide || { createIcons: function() {} }; // no-op fallback
+      window.dispatchEvent(new Event('lucide:ready'));
+      return;
+    }
+    var s = document.createElement('script');
+    s.src = cdns[i++];
+    s.onload = function() {
+      window.dispatchEvent(new Event('lucide:ready'));
+    };
+    s.onerror = tryNext;
+    document.head.appendChild(s);
+  }
+  tryNext();
+})();
+</script>
+
+<script>
+// ============================================
+// STATE
+// ============================================
+const state = {
+  currentRoute: 'home',
+  drawer: { open: false, mode: null, recordId: null, step: 1 },
+  modal: { open: false, type: null, data: null },
+  toast: { visible: false, message: '', variant: 'info' },
+  filters: { search: '', status: 'all' },
+  pagination: { page: 1, pageSize: 20 },
+  sort: { col: null, dir: 'asc' },
+  selectedIds: new Set(),
+  records: [],
+};
+
+// ============================================
+// SIDEBAR — Module collapse/expand (Iron Rule #27)
+// Module header is non-navigable; click toggles children visibility.
+// State persists in DOM (data-expanded) — future: persist per user.
+// ============================================
+function toggleModule(headerEl) {
+  const mod = headerEl.closest('.sb-module');
+  if (!mod) return;
+  const isExpanded = mod.getAttribute('data-expanded') !== 'false';
+  mod.setAttribute('data-expanded', isExpanded ? 'false' : 'true');
+}
+
+// ============================================
+// ROUTER (Hash-based, refresh-safe)
+// ============================================
+function getRoute() {
+  const hash = location.hash;
+  if (!hash || hash === '#' || hash === '#/') return 'home';
+  return hash.replace(/^#\//, '');
+}
+function navigate(route) {
+  location.hash = '#/' + route;
+}
+
+// ============================================
+// DRAWER / MODAL TOGGLES
+// ============================================
+function openDrawer(mode, recordId) {
+  state.drawer = { open: true, mode, recordId, step: 1 };
+  render();
+  // Trigger CSS animation
+  requestAnimationFrame(() => {
+    document.getElementById('drawerBackdrop').classList.add('is-open');
+    const dw = document.getElementById('drawer');
+    dw.classList.add('is-open');
+    dw.setAttribute('aria-hidden', 'false');
+    lockScroll(true);
+    trapFocus(dw);
+  });
+}
+function closeDrawer() {
+  document.getElementById('drawerBackdrop').classList.remove('is-open');
+  const dw = document.getElementById('drawer');
+  dw.classList.remove('is-open');
+  dw.setAttribute('aria-hidden', 'true');
+  releaseFocus(dw);
+  lockScroll(false);
+  setTimeout(() => {
+    state.drawer = { open: false, mode: null, recordId: null, step: 1 };
+  }, 280);
+}
+function openModal(type, data) {
+  state.modal = { open: true, type, data };
+  render();
+  requestAnimationFrame(() => {
+    const mb = document.getElementById('modalBackdrop');
+    mb.classList.add('is-open');
+    lockScroll(true);
+    trapFocus(mb.querySelector('.modal') || mb);
+  });
+}
+function closeModal() {
+  const mb = document.getElementById('modalBackdrop');
+  mb.classList.remove('is-open');
+  releaseFocus(mb.querySelector('.modal') || mb);
+  /* ลิ้นชักอาจยังเปิดอยู่ข้างหลัง — ปลดล็อกเฉพาะตอนไม่มี overlay เหลือแล้ว */
+  lockScroll(!!(window.state && state.drawer && state.drawer.open));
+  setTimeout(() => {
+    state.modal = { open: false, type: null, data: null };
+  }, 200);
+}
+
+// ============================================
+// TOAST
+// ============================================
+function showToast(message, variant = 'info', durationMs = 2800) {
+  const el = document.getElementById('toast');
+  const iconMap = { success: 'check-circle-2', info: 'info', warning: 'alert-triangle', error: 'x-circle' };
+  el.className = 'toast is-' + variant;
+  el.innerHTML = `<i data-lucide="${iconMap[variant] || 'info'}" class="w-4 h-4"></i><span>${message}</span>`;
+  renderIcons();
+  requestAnimationFrame(() => el.classList.add('is-visible'));
+  setTimeout(() => el.classList.remove('is-visible'), durationMs);
+}
+
+// ============================================
+// ESC key handler (close drawer/modal)
+// ============================================
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (state.modal.open) closeModal();
+    else if (state.drawer.open) closeDrawer();
+  }
+});
+
+// ============================================
+// RENDER (placeholder — replace per feature)
+// ============================================
+function render() {
+  // Specific feature should override this function.
+  //
+  // ⚠️ Iron Rule #29 — Render Preservation:
+  // If your render() does innerHTML rebuild (typical pattern), wrap with
+  // withRenderPreservation() OR use preserveRenderState()/restoreRenderState()
+  // to keep scroll position + focus across re-renders.
+  //
+  // Example:
+  //   function render() {
+  //     const snap = preserveRenderState();
+  //     document.getElementById('page-content').innerHTML = renderPage();
+  //     drawer.innerHTML = state.drawer.open ? renderDrawer() : '';
+  //     renderIcons();
+  //     restoreRenderState(snap);
+  //   }
+  //
+  // After every DOM update, call renderIcons() — safe wrapper ที่ทน race เมื่อ Lucide ยังไม่ load.
+  renderIcons();
+}
+
+// ============================================
+// INIT
+// ============================================
+// Helper: safe icon render — กัน race ก่อน lucide load เสร็จ
+function renderIcons() {
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// ============================================
+// SEARCH-SELECT (Iron Rule #34) — generic searchable dropdown
+// ------------------------------------------------
+// ใช้แทน select ธรรมดา เมื่อ options เยอะ (>8) หรือเป็น lookup จาก master อื่น.
+// list = position:absolute overlay → ไม่ดันเนื้อหา. แก้เฉพาะ list ตอนพิมพ์ →
+// ไม่ rebuild ทั้งหน้า (ไม่ชน Rule #29). decoupled — เรียก onSelect callback ไม่ผูก render().
+//
+// วิธีใช้ 2 ขั้น:
+//   1) ใส่ markup:  ${searchSelectHTML('country', { placeholder: 'เลือกประเทศ' })}
+//   2) หลัง markup อยู่ใน DOM แล้ว (เช่นท้าย render()):
+//        initSearchSelect('country', {
+//          options: countries.map(c => ({ value:c.code, label:c.name, sub:c.code, icon:'flag', right:'' })),
+//          value: state.form.country,
+//          onSelect: (val, opt) => { state.form.country = val; }
+//        });
+// option fields: { value, label, sub?, icon?, right? }
+// ============================================
+window.__ss = window.__ss || {};
+function ssId(p, k){ return p + k; }
+function ssGet(key){ return window.__ss[key]; }
+function ssEscapeReg(s){ return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+function searchSelectHTML(key, opt){
+  opt = opt || {};
+  var ph = opt.placeholder || 'ค้นหา...';
+  return ''
+    + '<div class="search-select" id="ss-' + key + '">'
+    +   '<i data-lucide="search" class="ss-lead w-4 h-4"></i>'
+    +   '<input type="text" class="input ss-input" id="ss-input-' + key + '" autocomplete="off" placeholder="' + ph + '"'
+    +     ' oninput="ssOnInput(\'' + key + '\', this.value)" onfocus="ssOpen(\'' + key + '\')" onkeydown="ssOnKey(\'' + key + '\', event)">'
+    +   '<button type="button" class="ss-clear hidden" id="ss-clear-' + key + '" tabindex="-1" onclick="ssClear(\'' + key + '\')"><i data-lucide="x" class="w-4 h-4"></i></button>'
+    +   '<i data-lucide="chevron-down" class="ss-caret" id="ss-caret-' + key + '"></i>'
+    +   '<div class="ss-list hidden" id="ss-list-' + key + '"></div>'
+    + '</div>';
+}
+function initSearchSelect(key, cfg){
+  cfg = cfg || {};
+  window.__ss[key] = {
+    options: cfg.options || [], value: (cfg.value != null ? cfg.value : null),
+    onSelect: cfg.onSelect || function(){}, emptyText: cfg.emptyText || 'ไม่พบรายการ',
+    query: '', open: false, hi: 0
+  };
+  ssSetText(key); ssSyncChrome(key); renderIcons();
+}
+function ssFiltered(key){
+  var s = ssGet(key); if(!s) return [];
+  var q = (s.query || '').toLowerCase().trim();
+  if(!q) return s.options;
+  return s.options.filter(function(o){
+    return String(o.label).toLowerCase().includes(q)
+      || String(o.value).toLowerCase().includes(q)
+      || String(o.sub || '').toLowerCase().includes(q);
+  });
+}
+function ssSyncChrome(key){
+  var s = ssGet(key); if(!s) return;
+  var sel = s.options.find(function(o){ return o.value === s.value; });
+  var c = document.getElementById(ssId('ss-clear-', key)); if(c) c.classList.toggle('hidden', !sel);
+  var k = document.getElementById(ssId('ss-caret-', key)); if(k) k.classList.toggle('hidden', !!sel);
+}
+function ssSetText(key){
+  var s = ssGet(key); if(!s) return;
+  var input = document.getElementById(ssId('ss-input-', key)); if(!input) return;
+  var sel = s.options.find(function(o){ return o.value === s.value; });
+  input.value = s.open ? s.query : (sel ? sel.label : '');
+}
+function ssRenderList(key){
+  var s = ssGet(key); if(!s) return;
+  var list = document.getElementById(ssId('ss-list-', key)); if(!list) return;
+  var items = ssFiltered(key);
+  if(items.length === 0){
+    list.innerHTML = '<div class="ss-empty">' + s.emptyText + '</div>';
+  } else {
+    var q = (s.query || '').toLowerCase().trim();
+    var hl = function(t){ return q ? String(t).replace(new RegExp('(' + ssEscapeReg(q) + ')', 'gi'), '<mark>$1</mark>') : String(t); };
+    list.innerHTML = items.map(function(o, i){
+      return '<button type="button" class="ss-opt ' + (i === s.hi ? 'is-active' : '') + '" onmousedown="event.preventDefault()" onclick="ssPick(\'' + key + '\', ' + i + ')">'
+        + (o.icon ? '<i data-lucide="' + o.icon + '" class="ss-opt-ic w-4 h-4"></i>' : '')
+        + '<span class="ss-opt-main"><span class="ss-opt-label">' + hl(o.label) + '</span>'
+        + (o.sub ? '<span class="ss-opt-sub">' + hl(o.sub) + '</span>' : '') + '</span>'
+        + (o.right ? '<span class="ss-opt-right">' + o.right + '</span>' : '')
+        + '</button>';
+    }).join('');
+  }
+  list.classList.toggle('hidden', !s.open);
+  renderIcons();
+}
+function ssOpen(key){ var s = ssGet(key); if(!s) return; s.open = true; s.query = ''; s.hi = 0; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+function ssOnInput(key, val){ var s = ssGet(key); if(!s) return; s.query = val; s.open = true; s.hi = 0; s.value = null; ssSyncChrome(key); ssRenderList(key); }
+function ssPick(key, i){ var s = ssGet(key); if(!s) return; var o = ssFiltered(key)[i]; if(!o) return; s.value = o.value; s.query = ''; s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); s.onSelect(o.value, o); }
+function ssClear(key){ var s = ssGet(key); if(!s) return; s.value = null; s.query = ''; s.open = true; ssSetText(key); ssSyncChrome(key); ssRenderList(key); var inp = document.getElementById(ssId('ss-input-', key)); if(inp) inp.focus(); s.onSelect(null, null); }
+function ssOnKey(key, e){
+  var s = ssGet(key); if(!s) return; var items = ssFiltered(key);
+  if(e.key === 'ArrowDown'){ e.preventDefault(); s.open = true; s.hi = Math.min(items.length - 1, s.hi + 1); ssRenderList(key); }
+  else if(e.key === 'ArrowUp'){ e.preventDefault(); s.hi = Math.max(0, s.hi - 1); ssRenderList(key); }
+  else if(e.key === 'Enter'){ e.preventDefault(); if(items[s.hi]) ssPick(key, s.hi); }
+  /* Esc ต้องปิดแค่เมนู ห้ามให้ event ทะลุไปปิดลิ้นชัก/หน้าต่างยืนยัน (Rule #94 ข้อ 3 — Esc chain)
+     แก้ 2026-08-03 โดยทีม ERP-Design · ดู CLAUDE.md หัวข้อ "แก้ที่ตัว skill" */
+  else if(e.key === 'Escape'){ e.stopPropagation(); s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+}
+document.addEventListener('click', function(e){
+  Object.keys(window.__ss || {}).forEach(function(key){
+    var wrap = document.getElementById(ssId('ss-', key)); var s = ssGet(key);
+    if(wrap && s && s.open && !wrap.contains(e.target)){ s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+  });
+});
+
+// ============================================
+// FORMAT HELPERS (Iron Rule #43) — Thai locale, consistent ทุก feature
+// ใช้ตัวเหล่านี้เสมอ ห้าม format ตัวเลข/วันที่เองรายจุด
+// ============================================
+function fmtNumber(n, dp){ if(n==null||n==='')return '—'; var x=Number(n); if(isNaN(x))return String(n);
+  return x.toLocaleString('th-TH', {minimumFractionDigits: dp||0, maximumFractionDigits: dp!=null?dp:2}); }
+function fmtMoney(n, dp){ if(n==null||n==='')return '—'; var x=Number(n); if(isNaN(x))return String(n);
+  return '฿' + x.toLocaleString('th-TH', {minimumFractionDigits: dp!=null?dp:2, maximumFractionDigits: dp!=null?dp:2}); }
+function fmtDate(iso, buddhist){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso);
+  var s=d.toLocaleDateString('th-TH', {year:'numeric', month:'short', day:'numeric'});
+  return buddhist===false ? d.toLocaleDateString('en-GB',{year:'numeric',month:'short',day:'numeric'}) : s; }
+function fmtDateTime(iso){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso);
+  return d.toLocaleString('th-TH', {year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+
+// ============================================
+// INLINE VALIDATION (Iron Rule #43) — validate ตอน blur, ไม่ใช่รอ submit อย่างเดียว
+// markup: <div class="field"><input class="input" onblur="validateField(this, v => v.trim()? '' : 'จำเป็นต้องกรอก')">
+//          <div class="field-error"></div></div>
+// validator คืน '' = ผ่าน / ข้อความ = error
+// ============================================
+function validateField(el, validator){
+  var field = el.closest('.field'); if(!field) return true;
+  var msg = '';
+  try { msg = validator ? validator(el.value, el) : ''; } catch(e){ msg=''; }
+  var errEl = field.querySelector('.field-error');
+  if(msg){ field.classList.add('is-invalid'); if(errEl) errEl.textContent = msg; return false; }
+  field.classList.remove('is-invalid'); return true;
+}
+function clearFieldError(el){ var f=el.closest('.field'); if(f) f.classList.remove('is-invalid'); }
+/* FIX-05: submit → ไฮไลต์ field ที่ขาด (ขอบแดง + ข้อความใต้ field) + focus ตัวแรก แทน toast ลอย */
+function markInvalidFields(ids){
+  document.querySelectorAll('.drawer .field.is-invalid').forEach(function(f){f.classList.remove('is-invalid');});
+  var first=null;
+  ids.forEach(function(id){var el=document.getElementById(id);if(!el)return;var f=el.closest('.field');if(f){f.classList.add('is-invalid');if(!first)first=el;}});
+  if(first)first.focus();
+}
+
+// ============================================
+// EMPTY STATE (Iron Rule #39) — list/section ว่าง ต้องมี icon + title + desc + (action)
+// ============================================
+function emptyStateHTML(cfg){
+  cfg = cfg || {};
+  var act = cfg.actionLabel ? '<button class="btn btn-primary" onclick="' + (cfg.onAction||'') + '">' +
+    (cfg.actionIcon ? '<i data-lucide="' + cfg.actionIcon + '" class="w-4 h-4"></i>' : '') +
+    '<span>' + cfg.actionLabel + '</span></button>' : '';
+  return '<div class="empty">'
+    + '<div class="empty-icon"><i data-lucide="' + (cfg.icon||'inbox') + '"></i></div>'
+    + '<div class="empty-title">' + (cfg.title||'ยังไม่มีข้อมูล') + '</div>'
+    + '<div class="empty-desc">' + (cfg.desc||'') + '</div>'
+    + act + '</div>';
+}
+
+// ============================================
+// RENDER PRESERVATION (Iron Rule #29)
+// ------------------------------------------------
+// ทุกครั้งที่ render() ทำ innerHTML = ... full DOM rebuild
+// scroll position + focus + cursor selection จะหาย —
+// user รู้สึก "เด้งกลับบน" ทุกครั้งที่ toggle/click.
+//
+// withRenderPreservation(renderFn) wraps a render function
+// to save state before innerHTML rebuild, then restore after.
+//
+// Preserves:
+//   - scrollTop ของ .drawer-body
+//   - scrollTop ของ .modal-body
+//   - window.scrollY (page-level scroll)
+//   - document.activeElement focus + selection range (input/textarea ที่กำลังพิมพ์)
+//
+// Usage:
+//   const render = withRenderPreservation(function actualRender() {
+//     content.innerHTML = ...
+//   });
+//
+// หรือเรียกตรง ๆ ใน render() ที่มีอยู่แล้ว:
+//   function render() {
+//     const snapshot = preserveRenderState();
+//     // ... innerHTML rebuilds ...
+//     restoreRenderState(snapshot);
+//   }
+// ============================================
+function preserveRenderState() {
+  const drawerBody = document.querySelector('.drawer-body');
+  const modalBody = document.querySelector('.modal-body');
+  const activeEl = document.activeElement;
+  const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+  return {
+    drawerScroll: drawerBody ? drawerBody.scrollTop : 0,
+    modalScroll: modalBody ? modalBody.scrollTop : 0,
+    pageScroll: window.scrollY,
+    focusKey: isInput ? {
+      placeholder: activeEl.placeholder || '',
+      type: activeEl.type || '',
+      name: activeEl.name || '',
+      selStart: activeEl.selectionStart,
+      selEnd: activeEl.selectionEnd,
+    } : null,
+  };
+}
+function restoreRenderState(snap) {
+  if (!snap) return;
+  requestAnimationFrame(function() {
+    const dBody = document.querySelector('.drawer-body');
+    if (dBody && snap.drawerScroll > 0) dBody.scrollTop = snap.drawerScroll;
+    const mBody = document.querySelector('.modal-body');
+    if (mBody && snap.modalScroll > 0) mBody.scrollTop = snap.modalScroll;
+    if (snap.pageScroll > 0) window.scrollTo(0, snap.pageScroll);
+
+    if (snap.focusKey) {
+      const candidates = document.querySelectorAll('input, textarea');
+      for (let i = 0; i < candidates.length; i++) {
+        const c = candidates[i];
+        if ((c.placeholder || '') === snap.focusKey.placeholder
+            && (c.type || '') === snap.focusKey.type
+            && (c.name || '') === snap.focusKey.name) {
+          c.focus();
+          if (snap.focusKey.selStart != null && typeof c.setSelectionRange === 'function') {
+            try { c.setSelectionRange(snap.focusKey.selStart, snap.focusKey.selEnd); } catch(e) {}
+          }
+          break;
+        }
+      }
+    }
+  });
+}
+function withRenderPreservation(renderFn) {
+  return function preservedRender() {
+    const snap = preserveRenderState();
+    const result = renderFn.apply(this, arguments);
+    restoreRenderState(snap);
+    return result;
+  };
+}
+
+window.addEventListener('hashchange', function () { render(); });  // v6.1 late-binding — ให้ชี้ render() ตัวที่ feature override (ผูกตรง ๆ จะ capture placeholder เดิม)
+
+// รอ DOM + Lucide ทั้งคู่ก่อน first render
+// (Lucide loader จะ dispatch 'lucide:ready' เมื่อ load สำเร็จ
+//  หรือเมื่อทุก CDN fail แล้ว fallback เป็น no-op)
+var domReady = false;
+var lucideReady = false;
+function bootIfReady() {
+  if (domReady && lucideReady) {
+    render();
+    renderIcons();
+  }
+}
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', function() { domReady = true; bootIfReady(); });
+} else {
+  domReady = true;
+}
+// Listen for ready event AND check ว่า lucide load ไปแล้วหรือยัง
+// (script ตัวนี้รันหลัง loader — ถ้า loader sync เสร็จก่อน, event อาจหายไปแล้ว)
+window.addEventListener('lucide:ready', function() { lucideReady = true; bootIfReady(); });
+if (window.lucide && typeof window.lucide.createIcons === 'function') {
+  lucideReady = true;
+}
+bootIfReady();
+// Safety net: ถ้า lucide:ready ไม่มาภายใน 5s ให้ render ไปก่อน (UI ยังใช้งานได้)
+setTimeout(function() {
+  if (!lucideReady) {
+    console.warn('[Lucide] Timeout — rendering without icons');
+    lucideReady = true;
+    bootIfReady();
+  }
+}, 5000);
+</script>
+
+
+<script>
+/* ===== BASE-KIT UTILS (#66/#68/#95) — DO NOT EDIT ===== */
+/* #95: เมนูใน scroll container (.table-wrap / drawer body / B2 line grid)
+   ต้อง portal ด้วย util นี้ — z-index อย่างเดียวช่วยไม่ได้เพราะโดน ancestor overflow clip */
+function portalMenu(trigger, menu){
+  let host = document.getElementById('overlay-root');
+  if(!host){ host = document.createElement('div'); host.id='overlay-root'; document.body.appendChild(host); }
+  if(menu.parentElement !== host) host.appendChild(menu);
+  menu.classList.add('menu-fixed');
+  const r = trigger.getBoundingClientRect();
+  const below = window.innerHeight - r.bottom - 12, above = r.top - 12;
+  const h = Math.min(menu.scrollHeight || 320, 320);
+  menu.style.left = r.left + 'px';
+  menu.style.width = r.width + 'px';
+  if(below < h && above > below){ menu.style.top='auto'; menu.style.bottom=(window.innerHeight-r.top+4)+'px';
+    menu.style.maxHeight = Math.min(h, above)+'px'; }
+  else { menu.style.bottom='auto'; menu.style.top=(r.bottom+4)+'px';
+    menu.style.maxHeight = Math.min(h, Math.max(below,120))+'px'; }
+  menu._trigger = trigger;
+  const reposition = ()=>{ if(menu.classList.contains('open')) portalMenu(trigger, menu); };
+  if(!menu._portalBound){ menu._portalBound = true;
+    window.addEventListener('scroll', reposition, true);
+    window.addEventListener('resize', reposition); }
+}
+function positionMenu(trigger,menu){const r=trigger.getBoundingClientRect();
+  const below=window.innerHeight-r.bottom-12, above=r.top-12, h=Math.min(menu.scrollHeight,320);
+  if(below<h && above>below){menu.classList.add('drop-up');menu.style.maxHeight=Math.min(h,above)+'px';}
+  else{menu.classList.remove('drop-up');menu.style.maxHeight=Math.min(h,Math.max(below,120))+'px';}}
+function openOverlay(menu,trigger){document.querySelectorAll('[data-overlay].open').forEach(m=>{if(m!==menu)closeOverlay(m);});
+  menu.classList.add('open');menu._trigger=trigger;if(trigger)positionMenu(trigger,menu);}
+function closeOverlay(menu){menu.classList.remove('open');if(menu._trigger)menu._trigger.focus();}
+document.addEventListener('click',e=>{document.querySelectorAll('[data-overlay].open').forEach(m=>{
+  if(!m.contains(e.target)&&!(m._trigger&&m._trigger.contains(e.target)))closeOverlay(m);});});
+
+/* --- scroll lock + focus trap (#a11y · เพิ่ม 2026-08-04) ---
+   lockScroll: กันพื้นหลังเลื่อนตอน overlay เปิด · นับชั้นได้ (modal ซ้อน drawer)
+   trapFocus : กัน Tab หลุดออกไปพื้นหลัง + โฟกัสตัวแรกในกล่อง + คืนโฟกัสเดิมตอนปิด */
+function lockScroll(on){ document.body.classList.toggle('is-overlay-open', !!on); }
+var __focusStack = [];
+function trapFocus(box){
+  if(!box) return;
+  var prev = document.activeElement;
+  var sel = 'a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  function onKey(e){
+    if(e.key !== 'Tab') return;
+    var f = [].slice.call(box.querySelectorAll(sel)).filter(function(el){ var r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; });
+    if(!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+  box.__trap = onKey; box.__prevFocus = prev;
+  document.addEventListener('keydown', onKey);
+  requestAnimationFrame(function(){
+    var f = box.querySelector(sel);
+    if(f) f.focus();
+  });
+}
+function releaseFocus(box){
+  if(!box || !box.__trap) return;
+  document.removeEventListener('keydown', box.__trap);
+  var prev = box.__prevFocus;
+  box.__trap = null; box.__prevFocus = null;
+  if(prev && typeof prev.focus === 'function') prev.focus();
+}
+/* ===== END BASE-KIT UTILS ===== */
+</script>
+
+<script>
+/* ============================================================
+   F-HR-RECRUIT · สรรหา (Recruit) — feature logic
+   archetype = master + kanban (ไม่ใช่ Pattern Q เอกสาร)
+   vibe ใหม่ผ่าน html-generator-v9 BASE-KIT · ทุก FN wire จริงด้วย mock
+   ============================================================ */
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* ---- persona / masking (Iron Rule #105 demo-strip · FN-94 RESTRICTED) ---- */
+const PERSONAS={
+  recruiter:{name:'มณีรัตน์ ก.',role:'เจ้าหน้าที่สรรหา · CUBE NATIVE',av:'มร',unmask:true,canApprove:false},
+  manager:{name:'ธีรภัทร ว.',role:'ผู้จัดการสายงาน · CUBE NATIVE',av:'ธว',unmask:false,canApprove:true},
+  viewer:{name:'ผู้ชมทั่วไป',role:'สิทธิ์อ่านอย่างเดียว · CUBE NATIVE',av:'ผช',unmask:false,canApprove:false},
+};
+
+/* ---- mock: employees (ผู้สัมภาษณ์/ผู้อนุมัติ) — GET /api/v1/employees?status=active&q= ---- */
+const EMPLOYEES=[
+  {id:'EMP-0012',code:'EMP-0012',name:'ธีรภัทร วงศ์ไพศาล',nickname:'บอส',position:'ผู้จัดการฝ่ายเทคโนโลยี',dept:'เทคโนโลยีสารสนเทศ',tier:'M'},
+  {id:'EMP-0031',code:'EMP-0031',name:'ปิยะนุช สมานมิตร',nickname:'นุช',position:'หัวหน้าฝ่ายสรรหา',dept:'ทรัพยากรบุคคล',tier:'M'},
+  {id:'EMP-0044',code:'EMP-0044',name:'อรรถพล ชัยมงคล',nickname:'บิ๊ก',position:'Senior Frontend Engineer',dept:'เทคโนโลยีสารสนเทศ',tier:'S'},
+  {id:'EMP-0058',code:'EMP-0058',name:'กาญจนา ทรัพย์เจริญ',nickname:'แนน',position:'ผู้จัดการฝ่ายบัญชี',dept:'การเงินและบัญชี',tier:'M'},
+  {id:'EMP-0067',code:'EMP-0067',name:'สมชาย ภักดี',nickname:'ชาย',position:'หัวหน้าคลังสินค้า',dept:'คลังสินค้า',tier:'S'},
+];
+function emp(id){return EMPLOYEES.find(e=>e.id===id)||null;}
+function empName(id){const e=emp(id);return e?e.name:'—';}
+function empOpts(){return EMPLOYEES.map(e=>({value:e.id,label:e.name,sub:e.position+' · '+e.dept,icon:'user'}));}
+function empSnapshot(id){const e=emp(id);return e?{id:e.id,name:e.name,position:e.position}:null;}
+
+/* ---- mock: salary bands — GET /api/v1/salary-structure/bands/resolve (อ่าน HR Config #107 · ไม่ CRUD) ----
+   ส่ง date(=วันเริ่มงาน) → คืน band + version_id · ต้อง snapshot version_id คู่ offer (freeze) */
+const BANDS=[
+  {grade_code:'G3',grade_name:'เจ้าหน้าที่อาวุโส',level_order:3,min:28000,mid:38000,max:52000,currency:'THB',version_id:'SS-2569-03'},
+  {grade_code:'G4',grade_name:'หัวหน้างาน / ชำนาญการ',level_order:4,min:45000,mid:62000,max:85000,currency:'THB',version_id:'SS-2569-03'},
+  {grade_code:'G5',grade_name:'ผู้จัดการ',level_order:5,min:75000,mid:105000,max:150000,currency:'THB',version_id:'SS-2569-03'},
+];
+function bandResolve(gradeCode,dateISO){const b=BANDS.find(x=>x.grade_code===gradeCode)||BANDS[0];return Object.assign({resolved_for:dateISO||null},b);}
+
+/* ---- mock: DOA resolved chain (เปิดอัตรา + ข้อเสนอ) ----
+   ไม่มีวงเงิน · สายอนุมัติจริงมาจาก F-DLG-001 (Policy Center) — feature ประกาศเท่านั้น
+   [PENDING · DOA engine] ห้าม hardcode สายในโค้ด feature · ตรงนี้คือ mock resolved object 1 ชั้น */
+function doaResolve(kind){
+  return {entry:'DOA-'+(kind==='req'?'REQ-OPEN':'OFFER')+'-001',steps:[
+    {order:1,slot:'role-hiring-manager',slotName:'ผู้จัดการสายงาน (Hiring Manager)'},
+    {order:2,slot:'role-hr-recruit-head',slotName:'หัวหน้าฝ่ายสรรหา'},
+  ]};
+}
+
+/* ---- stages / statuses ---- */
+const STAGES=[
+  {id:'applied',name:'สมัครใหม่',color:'#9A9CA2'},
+  {id:'screening',name:'คัดกรอง',color:'#1A5FCC'},
+  {id:'interview',name:'สัมภาษณ์',color:'#E8870F'},
+  {id:'offer',name:'ข้อเสนอ',color:'#FF9A1F'},
+  {id:'hired',name:'รับเข้าทำงาน',color:'#157A41'},
+];
+const TERMINAL={rejected:{label:'ไม่ผ่าน',pill:'pill-danger'},withdrawn:{label:'ถอนตัว',pill:'pill-muted'},talent_pool:{label:'เก็บ Talent Pool',pill:'pill-muted'}};
+function stageIdx(id){return STAGES.findIndex(s=>s.id===id);}
+function stageOf(id){return STAGES.find(s=>s.id===id);}
+function inPipeline(c){return stageIdx(c.stage)>=0;}
+const REQ_STATUS={
+  draft:{label:'ร่าง',pill:'pill-muted'},
+  pending:{label:'รออนุมัติเปิด',pill:'pill-warning'},
+  approved:{label:'อนุมัติแล้ว · รอประกาศ',pill:'pill-info'},
+  open:{label:'เปิดรับ',pill:'pill-success'},
+  closed:{label:'ปิดแล้ว',pill:'pill-muted'},
+};
+const OFFER_STATUS={
+  draft:{label:'ร่างข้อเสนอ',pill:'pill-muted'},
+  pending:{label:'รออนุมัติ',pill:'pill-warning'},
+  approved:{label:'อนุมัติแล้ว · พร้อมส่ง',pill:'pill-info'},
+  sent:{label:'ส่งข้อเสนอแล้ว',pill:'pill-info'},
+  accepted:{label:'ตอบรับ',pill:'pill-success'},
+  declined:{label:'ปฏิเสธข้อเสนอ',pill:'pill-danger'},
+};
+
+/* ---- DB (mock) : 3 req · 6 candidate · 2 offer · วันที่ พ.ศ. ---- */
+const DB={
+  reqs:[
+    {id:'REQ-1',code:'REQ-2569-0001',position:'Senior Frontend Developer',dept:'เทคโนโลยีสารสนเทศ',count:2,filled:0,grade:'G4',
+     hiring_manager_id:'EMP-0012',manpower_ref:'MP-2569-IT-07',status:'open',createdAt:'2026-07-02',
+     desc:'พัฒนาและดูแลระบบหน้าเว็บของผลิตภัณฑ์หลัก · ทำงานร่วมกับทีม UX',
+     approval:{entry:'DOA-REQ-OPEN-001',current:2,done:true,steps:[
+       {order:1,slotName:'ผู้จัดการสายงาน (Hiring Manager)',approver_id:'EMP-0012',result:'approved',at:'2026-07-01'},
+       {order:2,slotName:'หัวหน้าฝ่ายสรรหา',approver_id:'EMP-0031',result:'approved',at:'2026-07-02'}]},
+     history:[{at:'2026-07-02T09:20:00',by:'ปิยะนุช สมานมิตร',action:'ประกาศรับอัตรา',detail:'สถานะ → เปิดรับ',kind:'ok'},
+              {at:'2026-07-02T09:05:00',by:'ธีรภัทร วงศ์ไพศาล',action:'อนุมัติเปิดอัตรา (DOA ขั้น 2/2)',detail:'',kind:'ok'},
+              {at:'2026-06-30T15:40:00',by:'มณีรัตน์ ก.',action:'ส่งอนุมัติเปิดอัตรา',detail:'DOA-REQ-OPEN-001',kind:'ok'}]},
+    {id:'REQ-2',code:'REQ-2569-0002',position:'นักบัญชี',dept:'การเงินและบัญชี',count:1,filled:0,grade:'G3',
+     hiring_manager_id:'EMP-0058',manpower_ref:null,status:'approved',createdAt:'2026-08-05',
+     desc:'จัดทำบัญชีลูกหนี้-เจ้าหนี้ · ปิดงบรายเดือน',
+     approval:{entry:'DOA-REQ-OPEN-001',current:2,done:true,steps:[
+       {order:1,slotName:'ผู้จัดการสายงาน (Hiring Manager)',approver_id:'EMP-0058',result:'approved',at:'2026-08-06'},
+       {order:2,slotName:'หัวหน้าฝ่ายสรรหา',approver_id:'EMP-0031',result:'approved',at:'2026-08-06'}]},
+     history:[{at:'2026-08-06T11:00:00',by:'ปิยะนุช สมานมิตร',action:'อนุมัติเปิดอัตรา (DOA ขั้น 2/2)',detail:'',kind:'ok'},
+              {at:'2026-08-05T10:00:00',by:'มณีรัตน์ ก.',action:'ส่งอนุมัติเปิดอัตรา',detail:'ยังไม่มีแผนอัตรากำลัง (Manpower) — เปิดโดยเตือน',kind:'warn'}]},
+    {id:'REQ-3',code:'REQ-2569-0003',position:'หัวหน้าคลังสินค้า',dept:'คลังสินค้า',count:1,filled:1,grade:'G4',
+     hiring_manager_id:'EMP-0067',manpower_ref:'MP-2569-WH-02',status:'closed',createdAt:'2026-05-10',
+     desc:'บริหารคลังสินค้าและทีมจัดส่ง',
+     approval:{entry:'DOA-REQ-OPEN-001',current:2,done:true,steps:[
+       {order:1,slotName:'ผู้จัดการสายงาน (Hiring Manager)',approver_id:'EMP-0067',result:'approved',at:'2026-05-11'},
+       {order:2,slotName:'หัวหน้าฝ่ายสรรหา',approver_id:'EMP-0031',result:'approved',at:'2026-05-11'}]},
+     history:[{at:'2026-08-28T16:00:00',by:'มณีรัตน์ ก.',action:'ปิดอัตรา (รับครบ)',detail:'สถานะ → ปิดแล้ว',kind:'ok'}]},
+  ],
+  cands:[
+    {id:'C1',code:'APP-2569-0011',name:'ธนวัฒน์ ศรีสมบัติ',email:'thanawat.s@example.com',phone:'0812345678',
+     resume:'thanawat_frontend.pdf',reqId:'REQ-1',stage:'applied',score:null,consent:{ok:false,date:null},dup:false,
+     offer:null,interviews:[],onboardSent:false,appliedAt:'2026-08-24',
+     history:[{at:'2026-08-24T09:00:00',by:'มณีรัตน์ ก.',action:'เพิ่มผู้สมัครเข้าคลัง',detail:'ยังไม่ได้รับความยินยอม PDPA',kind:'warn'}]},
+    {id:'C2',code:'APP-2569-0012',name:'สุพิชญา อินทโชติ',email:'supichaya@example.com',phone:'0898887777',
+     resume:'supichaya_cv.pdf',reqId:'REQ-1',stage:'screening',score:null,consent:{ok:true,date:'2026-08-22'},dup:true,dupNote:'อีเมลตรงกับผู้สมัครเดิม APP-2568-0450',
+     offer:null,interviews:[],onboardSent:false,appliedAt:'2026-08-22',
+     history:[{at:'2026-08-23T10:15:00',by:'มณีรัตน์ ก.',action:'เลื่อนสถานะ → คัดกรอง',detail:'',kind:'ok'},
+              {at:'2026-08-22T14:00:00',by:'มณีรัตน์ ก.',action:'เพิ่มผู้สมัครเข้าคลัง',detail:'พบผู้สมัครซ้ำ/เคยสมัคร (เตือน)',kind:'warn'}]},
+    {id:'C3',code:'APP-2569-0009',name:'กิตติพงษ์ แซ่ลิ้ม',email:'kittipong.l@example.com',phone:'0865551234',
+     resume:'kittipong_resume.pdf',reqId:'REQ-1',stage:'interview',score:4,consent:{ok:true,date:'2026-08-18'},dup:false,
+     offer:null,onboardSent:false,appliedAt:'2026-08-18',
+     interviews:[{id:'IV1',date:'2026-08-27',time:'10:00',interviewer_id:'EMP-0044',interviewer_name:'อรรถพล ชัยมงคล',interviewer_position:'Senior Frontend Engineer',location:'ห้องประชุม 3 · Google Meet',scorecard:{score:4,comment:'พื้นฐานแน่น สื่อสารดี · แนะนำไปต่อรอบข้อเสนอ'}}],
+     history:[{at:'2026-08-27T11:30:00',by:'อรรถพล ชัยมงคล',action:'บันทึกผลประเมิน (scorecard)',detail:'คะแนน 4/5',kind:'ok'},
+              {at:'2026-08-25T09:00:00',by:'มณีรัตน์ ก.',action:'นัดสัมภาษณ์ + แจ้งเตือน',detail:'27 ส.ค. 2569 10:00',kind:'ok'},
+              {at:'2026-08-20T13:00:00',by:'มณีรัตน์ ก.',action:'เลื่อนสถานะ → สัมภาษณ์',detail:'',kind:'ok'}]},
+    {id:'C4',code:'APP-2569-0007',name:'อารยา พงษ์พิพัฒน์',email:'araya.p@example.com',phone:'0801112223',
+     resume:'araya_portfolio.pdf',reqId:'REQ-1',stage:'offer',score:5,consent:{ok:true,date:'2026-08-10'},dup:false,onboardSent:false,appliedAt:'2026-08-10',
+     interviews:[{id:'IV2',date:'2026-08-19',time:'14:00',interviewer_id:'EMP-0012',interviewer_name:'ธีรภัทร วงศ์ไพศาล',interviewer_position:'ผู้จัดการฝ่ายเทคโนโลยี',location:'ห้องประชุม 1',scorecard:{score:5,comment:'โดดเด่นมาก · เสนอจ้างทันที'}}],
+     offer:{position:'Senior Frontend Developer',grade:'G4',salary:70000,start:'2026-09-16',status:'sent',out_of_range_reason:null,
+       band:{grade_code:'G4',grade_name:'หัวหน้างาน / ชำนาญการ',min:45000,mid:62000,max:85000,currency:'THB',version_id:'SS-2569-03'},
+       approval:{entry:'DOA-OFFER-001',current:2,done:true,steps:[
+         {order:1,slotName:'ผู้จัดการสายงาน (Hiring Manager)',approver_id:'EMP-0012',result:'approved',at:'2026-08-28'},
+         {order:2,slotName:'หัวหน้าฝ่ายสรรหา',approver_id:'EMP-0031',result:'approved',at:'2026-08-29'}]}},
+     history:[{at:'2026-08-30T10:00:00',by:'มณีรัตน์ ก.',action:'ส่งข้อเสนอให้ผู้สมัคร + แจ้งเตือน',detail:'เงินเดือน 70,000 · เริ่ม 16 ก.ย. 2569',kind:'ok'},
+              {at:'2026-08-29T15:00:00',by:'ปิยะนุช สมานมิตร',action:'อนุมัติข้อเสนอ (DOA ขั้น 2/2)',detail:'',kind:'ok'},
+              {at:'2026-08-28T09:00:00',by:'มณีรัตน์ ก.',action:'สร้างข้อเสนอ + ส่งอนุมัติ',detail:'snapshot band SS-2569-03',kind:'ok'}]},
+    {id:'C5',code:'APP-2569-0003',name:'ณัฐพล เจริญสุข',email:'nattapon.j@example.com',phone:'0877778888',
+     resume:'nattapon_cv.pdf',reqId:'REQ-3',stage:'hired',score:5,consent:{ok:true,date:'2026-05-15'},dup:false,onboardSent:true,appliedAt:'2026-05-15',
+     interviews:[{id:'IV3',date:'2026-05-20',time:'09:30',interviewer_id:'EMP-0067',interviewer_name:'สมชาย ภักดี',interviewer_position:'หัวหน้าคลังสินค้า',location:'สำนักงานคลัง',scorecard:{score:5,comment:'ประสบการณ์ตรง'}}],
+     offer:{position:'หัวหน้าคลังสินค้า',grade:'G4',salary:88000,start:'2026-06-16',status:'accepted',out_of_range_reason:'ประสบการณ์ 9 ปี สูงกว่ามาตรฐานระดับ — อนุมัติโดยผู้จัดการสายงาน',
+       band:{grade_code:'G4',grade_name:'หัวหน้างาน / ชำนาญการ',min:45000,mid:62000,max:85000,currency:'THB',version_id:'SS-2569-02'},
+       approval:{entry:'DOA-OFFER-001',current:2,done:true,steps:[
+         {order:1,slotName:'ผู้จัดการสายงาน (Hiring Manager)',approver_id:'EMP-0067',result:'approved',at:'2026-05-28'},
+         {order:2,slotName:'หัวหน้าฝ่ายสรรหา',approver_id:'EMP-0031',result:'approved',at:'2026-05-29'}]}},
+     history:[{at:'2026-06-02T09:00:00',by:'มณีรัตน์ ก.',action:'รับเข้าทำงาน → ส่งเข้า On/Offboard',detail:'ส่ง event เริ่ม onboarding (soft-linkage) · ไม่สร้าง employee',kind:'ok'},
+              {at:'2026-06-01T16:00:00',by:'ณัฐพล เจริญสุข',action:'ผู้สมัครตอบรับข้อเสนอ',detail:'',kind:'ok'}]},
+    {id:'C6',code:'APP-2569-0006',name:'พีรพล ทองดี',email:'peerapon.t@example.com',phone:'0866665555',
+     resume:'peerapon_cv.pdf',reqId:'REQ-1',stage:'talent_pool',score:3,consent:{ok:true,date:'2026-08-12'},dup:false,onboardSent:false,appliedAt:'2026-08-12',reason:'ประสบการณ์ยังไม่ตรงตำแหน่งนี้ · เก็บไว้พิจารณาตำแหน่งอื่น',
+     interviews:[],offer:null,
+     history:[{at:'2026-08-21T11:00:00',by:'มณีรัตน์ ก.',action:'ไม่ผ่าน → เก็บ Talent Pool',detail:'ประสบการณ์ยังไม่ตรงตำแหน่ง',kind:'warn'}]},
+  ],
+};
+function getReq(id){return DB.reqs.find(r=>r.id===id);}
+function getCand(id){return DB.cands.find(c=>c.id===id);}
+function reqOpts(){return DB.reqs.filter(r=>r.status==='open'||r.status==='approved').map(r=>({value:r.id,label:r.code,sub:r.position+' · '+r.dept,icon:'file-text'}));}
+function reqOfCand(c){return getReq(c.reqId);}
+
+/* ---- audit (FN-93 append-only) + notify (FN-07 NTF_BRIEF) ---- */
+function audit(entity,action,detail,kind){entity.history=entity.history||[];entity.history.unshift({at:new Date().toISOString(),by:PERSONAS[RC.persona].name,action,detail:detail||'',kind:kind||'ok'});}
+/* NTF: event แจ้งเตือน (นัดสัมภาษณ์ · offer sent · offer result · stage changed) — wire ENG-NOTIFY ตอน dev */
+function ntf(msg){showToast(msg,'info');}
+
+/* ---- controller state ---- */
+const RC={tab:'req',persona:'recruiter',dctx:null,mctx:null,draft:{},busy:false,
+  f:{req:{q:'',status:'all'},pool:{q:'',stage:'all'},report:{req:'all'}}};
+
+/* ============================================================ NAV ============================================================ */
+function go(route){navigate(route);}
+function ctxStub(name){showToast(name+' — feature ข้างเคียงของ module (นอก scope รอบนี้)','warning');}
+function toggleUserMenu(){document.getElementById('userMenu').classList.toggle('is-open');}
+document.addEventListener('click',e=>{if(!e.target.closest('.user-chip')&&!e.target.closest('.user-menu')){const m=document.getElementById('userMenu');if(m)m.classList.remove('is-open');}});
+function setPersona(p){RC.persona=p;render();}
+/* FIX-02: viewer = อ่านอย่างเดียว · guard ต้นทุก mutation กันเส้นทางอ้อม */
+function viewerRO(){if(RC.persona==='viewer'){showToast('สิทธิ์อ่านอย่างเดียว','warning');return true;}return false;}
+/* FIX-03: ระยะเก็บ (retention) อ่านจาก Policy Center config — ห้าม hardcode ค่า · ระยะจริง = OQ-16 ยังไม่เคาะ */
+function retentionLabel(){return 'ตามนโยบาย Policy Center (รอกำหนดระยะ)';}
+function syncPersonaChip(){
+  const pr=PERSONAS[RC.persona];
+  const n=document.getElementById('uc-name'),r=document.getElementById('uc-role'),a=document.getElementById('uc-av');
+  if(n)n.textContent=pr.name; if(r)r.textContent=pr.role; if(a)a.textContent=pr.av;
+  document.querySelectorAll('#personaSeg button').forEach(b=>b.classList.toggle('on',b.dataset.p===RC.persona));
+}
+
+/* ============================================================ RENDER ============================================================ */
+function render(){
+  const snap=preserveRenderState();
+  const rt=getRoute();
+  RC.tab=(rt.indexOf('recruit/')===0)?rt.split('/')[1]:'req';
+  if(['req','pool','board','report'].indexOf(RC.tab)<0)RC.tab='req';
+  document.getElementById('page-content').innerHTML=renderPage();
+  document.getElementById('drawer').innerHTML=(state.drawer.open&&RC.dctx)?renderDrawer():'';
+  const mh=document.querySelector('#modalBackdrop .modal');
+  if(mh)mh.innerHTML=(state.modal.open&&RC.mctx)?renderModal():'';
+  document.querySelectorAll('.sb-item').forEach(el=>el.classList.toggle('is-active',el.dataset.feature==='recruit'));
+  syncPersonaChip();
+  renderIcons();
+  mountCombos();
+  restoreRenderState(snap);
+}
+
+function renderPage(){
+  const tabs=[
+    {id:'req',name:'ตำแหน่งที่เปิด',icon:'clipboard-list',ct:DB.reqs.length},
+    {id:'pool',name:'คลังผู้สมัคร',icon:'users',ct:DB.cands.length},
+    {id:'board',name:'บอร์ดสรรหา',icon:'columns-3',ct:DB.cands.filter(inPipeline).length},
+    {id:'report',name:'รายงาน',icon:'bar-chart-3',ct:null},
+  ];
+  const titleMap={req:'ตำแหน่งที่เปิด (Requisition)',pool:'คลังผู้สมัคร (Candidate Pool)',board:'บอร์ดสรรหา (Pipeline)',report:'รายงานการสรรหา (Funnel)'};
+  const subMap={req:'เปิดอัตรา · ส่งอนุมัติ (DOA) · ประกาศ · ปิดอัตรา',pool:'ทะเบียนผู้สมัคร · ความยินยอม PDPA · ข้อมูล RESTRICTED',board:'ลากสถานะผู้สมัคร: คัดกรอง → สัมภาษณ์ → ข้อเสนอ → รับเข้าทำงาน',report:'Funnel · time-to-hire · ผลการคัดเลือก'};
+  let actions='';
+  if(RC.tab==='req'&&RC.persona!=='viewer')actions=`<button class="btn btn-primary" onclick="openReqCreate()"><i data-lucide="plus" class="w-4 h-4"></i><span>เปิดอัตราใหม่</span></button>`;
+  else if(RC.tab==='pool'&&RC.persona!=='viewer')actions=`<button class="btn btn-primary" onclick="openCandCreate()"><i data-lucide="user-plus" class="w-4 h-4"></i><span>เพิ่มผู้สมัคร</span></button>`;
+  else if(RC.tab==='report')actions=`<button class="btn btn-secondary" onclick="showToast('ส่งออกรายงาน (CSV) — ต่อ dev','info')"><i data-lucide="download" class="w-4 h-4"></i><span>Export CSV</span></button>`;
+  const ph=`<div class="ph"><div><div class="ph-title-row"><h1 class="ph-title">${titleMap[RC.tab]}</h1></div><p class="ph-sub">${subMap[RC.tab]}</p></div><div class="ph-actions">${actions}</div></div>`;
+  const tabbar=`<div class="tabs">${tabs.map(t=>`<button class="tab ${RC.tab===t.id?'is-active':''}" onclick="go('recruit/${t.id}')"><i data-lucide="${t.icon}" class="w-4 h-4"></i><span>${t.name}</span>${t.ct!=null?`<span class="tab-ct">${t.ct}</span>`:''}</button>`).join('')}</div>`;
+  let body='';
+  if(RC.tab==='req')body=renderReqTab();
+  else if(RC.tab==='pool')body=renderPoolTab();
+  else if(RC.tab==='board')body=renderBoardTab();
+  else body=renderReportTab();
+  return ph+tabbar+body;
+}
+
+/* -------- TAB 1 : Requisitions -------- */
+function renderReqTab(){
+  const pendingMine=DB.reqs.filter(r=>r.status==='pending');
+  let approvalHook='';
+  if(RC.persona==='manager'&&pendingMine.length){
+    approvalHook=`<div class="note is-info mb-3"><i data-lucide="inbox"></i><div><b>งานรออนุมัติของฉัน · ${pendingMine.length} รายการ</b> — เปิดรายการสถานะ “รออนุมัติเปิด” เพื่ออนุมัติ/ไม่อนุมัติ (My Approval)</div></div>`;
+  }
+  const q=RC.f.req.q.toLowerCase(),fs=RC.f.req.status;
+  const rows=DB.reqs.filter(r=>(fs==='all'||r.status===fs)&&(!q||(r.position+r.code+r.dept).toLowerCase().includes(q)));
+  const filterBar=`<div class="filter-bar">
+    <div class="input-search"><i data-lucide="search" class="lead-icon"></i><input class="input" placeholder="ค้นหาตำแหน่ง / เลขที่ / แผนก" value="${esc(RC.f.req.q)}" oninput="RC.f.req.q=this.value;renderPageOnly()"></div>
+    <select class="select" style="max-width:190px" onchange="RC.f.req.status=this.value;renderPageOnly()">
+      <option value="all"${fs==='all'?' selected':''}>ทุกสถานะ</option>
+      ${Object.keys(REQ_STATUS).map(k=>`<option value="${k}"${fs===k?' selected':''}>${REQ_STATUS[k].label}</option>`).join('')}
+    </select>
+    <button class="btn btn-ghost" style="margin-left:auto" onclick="RC.f.req={q:'',status:'all'};renderPageOnly()"><i data-lucide="rotate-ccw" class="w-4 h-4"></i><span>ล้างตัวกรอง</span></button>
+  </div>`;
+  let inner;
+  if(!rows.length){inner=emptyStateHTML({icon:'clipboard-list',title:'ไม่พบอัตราที่เปิด',desc:'ลองปรับคำค้นหรือล้างตัวกรอง แล้วลองอีกครั้ง',actionLabel:'ล้างตัวกรอง',actionIcon:'rotate-ccw',onAction:"RC.f.req={q:'',status:'all'};renderPageOnly()"});}
+  else{
+    inner=`<div class="table-wrap"><table class="table"><thead><tr>
+      <th>เลขที่ / ตำแหน่ง</th><th>แผนก</th><th>ระดับ (band)</th><th class="col-num">อัตรา</th><th>ผู้จัดการสายงาน</th><th>Manpower</th><th>สถานะ</th>
+    </tr></thead><tbody>${rows.map(r=>{
+      const b=BANDS.find(x=>x.grade_code===r.grade)||{};
+      return `<tr class="is-clickable" onclick="openReqView('${r.id}')">
+        <td><div style="font-weight:600">${esc(r.position)}</div><div style="font-size:12px;color:var(--c-mute-2)" class="num">${esc(r.code)}</div></td>
+        <td>${esc(r.dept)}</td>
+        <td>${esc(r.grade)} · ${esc(b.grade_name||'')}</td>
+        <td class="col-num">${r.filled}/${r.count}</td>
+        <td>${esc(empName(r.hiring_manager_id))}</td>
+        <td>${r.manpower_ref?`<span class="num" style="font-size:12px">${esc(r.manpower_ref)}</span>`:`<span class="chip-soft is-dup"><i data-lucide="alert-triangle"></i>ไม่มีแผน</span>`}</td>
+        <td>${reqStatusPill(r.status)}</td>
+      </tr>`;}).join('')}</tbody></table></div>
+      <div class="table-footer"><span></span><span>${rows.length} รายการ</span></div>`;
+  }
+  return approvalHook+`<div class="card page-fill">${filterBar}${inner}</div>`;
+}
+function reqStatusPill(s){const m=REQ_STATUS[s];return `<span class="pill ${m.pill}">${m.label}</span>`;}
+
+/* -------- TAB 2 : Candidate pool -------- */
+function renderPoolTab(){
+  const q=RC.f.pool.q.toLowerCase(),fs=RC.f.pool.stage;
+  const rows=DB.cands.filter(c=>{
+    const st=(fs==='all')||(fs==='pipeline'?inPipeline(c):c.stage===fs);
+    return st&&(!q||(c.name+c.code+c.email).toLowerCase().includes(q));
+  });
+  const stageOpts=STAGES.map(s=>`<option value="${s.id}"${fs===s.id?' selected':''}>${s.name}</option>`).join('')+Object.keys(TERMINAL).map(k=>`<option value="${k}"${fs===k?' selected':''}>${TERMINAL[k].label}</option>`).join('');
+  const filterBar=`<div class="filter-bar">
+    <div class="input-search"><i data-lucide="search" class="lead-icon"></i><input class="input" placeholder="ค้นหาชื่อ / รหัส / อีเมล" value="${esc(RC.f.pool.q)}" oninput="RC.f.pool.q=this.value;renderPageOnly()"></div>
+    <select class="select" style="max-width:200px" onchange="RC.f.pool.stage=this.value;renderPageOnly()">
+      <option value="all"${fs==='all'?' selected':''}>ทุกระยะ</option>${stageOpts}
+    </select>
+    <button class="btn btn-ghost" style="margin-left:auto" onclick="RC.f.pool={q:'',stage:'all'};renderPageOnly()"><i data-lucide="rotate-ccw" class="w-4 h-4"></i><span>ล้างตัวกรอง</span></button>
+  </div>`;
+  let inner;
+  if(!rows.length){inner=emptyStateHTML({icon:'users',title:'ไม่พบผู้สมัคร',desc:'ลองปรับคำค้น/ตัวกรอง หรือเพิ่มผู้สมัครใหม่เข้าคลัง',actionLabel:'เพิ่มผู้สมัคร',actionIcon:'user-plus',onAction:'openCandCreate()'});}
+  else{
+    inner=`<div class="table-wrap"><table class="table"><thead><tr>
+      <th>ผู้สมัคร</th><th>ตำแหน่งที่สมัคร</th><th>ช่องทางติดต่อ</th><th>ระยะ</th><th>ความยินยอม</th><th class="col-num">คะแนน</th>
+    </tr></thead><tbody>${rows.map(c=>{
+      const r=reqOfCand(c);
+      return `<tr class="is-clickable" onclick="openCandView('${c.id}')">
+        <td><div class="user-cell"><div class="uc-avatar">${esc(personInitials(c.name))}</div><div>
+          <div class="uc-name">${esc(c.name)}${c.dup?' <span class="chip-soft is-dup"><i data-lucide="copy"></i>เคยสมัคร</span>':''}</div>
+          <div class="uc-email num">${esc(c.code)}</div></div></div></td>
+        <td>${r?esc(r.position):'—'}</td>
+        <td>${contactCell(c)}</td>
+        <td>${stagePill(c)}</td>
+        <td>${consentChip(c)}</td>
+        <td class="col-num">${c.score?`<span class="kb-score"><i data-lucide="star"></i>${c.score}/5</span>`:'—'}</td>
+      </tr>`;}).join('')}</tbody></table></div>
+      <div class="table-footer"><span></span><span>${rows.length} รายการ</span></div>`;
+  }
+  return `<div class="card page-fill">${filterBar}${inner}</div>`;
+}
+function personInitials(name){const p=String(name).trim().split(/\s+/);return((p[0]||'').slice(0,1)+((p[1]||'').slice(0,1)))||'?';}
+function stagePill(c){if(TERMINAL[c.stage])return `<span class="pill ${TERMINAL[c.stage].pill}">${TERMINAL[c.stage].label}</span>`;const s=stageOf(c.stage);return `<span class="pill" style="background:${s.color}1f;color:${s.color}">${s.name}</span>`;}
+function consentChip(c){return c.consent.ok?`<span class="chip-soft is-consent"><i data-lucide="shield-check"></i>ยินยอมแล้ว</span>`:`<span class="chip-soft is-noconsent"><i data-lucide="shield-alert"></i>รอความยินยอม</span>`;}
+function maskEmail(e){if(PERSONAS[RC.persona].unmask)return e;const parts=String(e).split('@');return parts[0].slice(0,1)+'•••@'+(parts[1]||'');}
+function maskPhone(p){if(PERSONAS[RC.persona].unmask)return p;const s=String(p).replace(/\D/g,'');return '•••-•••-'+s.slice(-4);}
+function contactCell(c){
+  if(!c.consent.ok)return '<span class="masked"><i data-lucide="lock"></i>ต้องได้รับความยินยอมก่อน</span>';
+  const um=PERSONAS[RC.persona].unmask;
+  const mailIc=um?'':'<i data-lucide="lock"></i>';
+  return `<div style="font-size:12.5px"><span class="masked">${mailIc}${esc(maskEmail(c.email))}</span></div><div style="font-size:12px;color:var(--c-mute-2)">${esc(maskPhone(c.phone))}</div>`;
+}
+
+/* -------- TAB 3 : Pipeline board (kanban · FN-06) -------- */
+function renderBoardTab(){
+  const cols=STAGES.map(s=>{
+    const list=DB.cands.filter(c=>c.stage===s.id);
+    const cards=list.length?list.map(c=>kbCard(c)).join(''):`<div class="kb-empty">— ว่าง —</div>`;
+    return `<div class="kb-col"><div class="kb-col-head"><span class="dotk" style="background:${s.color}"></span><span class="nm">${s.name}</span><span class="kb-count">${list.length}</span></div><div class="kb-body">${cards}</div></div>`;
+  }).join('');
+  const terminals=DB.cands.filter(c=>TERMINAL[c.stage]);
+  const term=terminals.length?`<div class="note is-info mt-4"><i data-lucide="archive"></i><div><b>นอกไปป์ไลน์ · ${terminals.length} รายการ</b> — ${terminals.map(c=>esc(c.name)+' ('+TERMINAL[c.stage].label+')').join(' · ')}</div></div>`:'';
+  return `<div class="card" style="padding:14px;background:transparent;border:0"><div class="kanban">${cols}</div></div>${term}`;
+}
+function kbCard(c){
+  const r=reqOfCand(c);
+  const idxC=stageIdx(c.stage);
+  const canFwd=idxC>=0&&idxC<STAGES.length-1&&c.consent.ok&&RC.persona!=='viewer';
+  const canBack=idxC>0&&RC.persona!=='viewer';
+  const move=`<div class="kc-move">
+    <button class="btn btn-sm btn-secondary" ${canBack?'':'disabled'} onclick="event.stopPropagation();candMoveStage('${c.id}',-1)"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i></button>
+    <button class="btn btn-sm btn-primary" ${canFwd?'':'disabled'} style="flex:1" onclick="event.stopPropagation();candMoveStage('${c.id}',1)"><span>ถัดไป</span><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+  </div>`;
+  return `<div class="kb-card" onclick="openCandView('${c.id}')">
+    <div class="kc-top"><div class="uc-avatar" style="width:28px;height:28px;font-size:11px">${esc(personInitials(c.name))}</div>
+      <div style="min-width:0"><div class="kc-name">${esc(c.name)}</div><div class="kc-sub">${r?esc(r.position):'—'}</div></div></div>
+    <div class="kc-meta">${consentChip(c)}${c.dup?'<span class="chip-soft is-dup"><i data-lucide="copy"></i>เคยสมัคร</span>':''}${c.score?`<span class="kb-score"><i data-lucide="star"></i>${c.score}/5</span>`:''}</div>
+    ${idxC<STAGES.length-1?move:'<div class="kc-move"><span style="font-size:11px;color:var(--c-success);font-weight:700">✓ รับเข้าทำงานแล้ว</span></div>'}
+  </div>`;
+}
+
+/* -------- TAB 4 : Report funnel (FN-15) -------- */
+function renderReportTab(){
+  const scope=RC.f.report.req;
+  const pool=DB.cands.filter(c=>scope==='all'||c.reqId===scope);
+  const reached=STAGES.map(s=>({s,n:pool.filter(c=>{const i=stageIdx(c.stage);return i>=0&&i>=stageIdx(s.id);}).length}));
+  const maxN=Math.max(1,...reached.map(x=>x.n));
+  const hired=pool.filter(c=>c.stage==='hired').length;
+  const rejected=pool.filter(c=>c.stage==='rejected'||c.stage==='talent_pool').length;
+  const withdrawn=pool.filter(c=>c.stage==='withdrawn').length;
+  const stats=[
+    {ic:'users',l:'ผู้สมัครทั้งหมด',v:pool.length},
+    {ic:'messages-square',l:'กำลังสัมภาษณ์',v:pool.filter(c=>c.stage==='interview').length},
+    {ic:'file-signature',l:'ข้อเสนอ',v:pool.filter(c=>c.stage==='offer').length},
+    {ic:'user-check',l:'รับเข้าทำงาน',v:hired},
+    {ic:'timer',l:'Time-to-hire เฉลี่ย',v:'23 วัน'},
+  ];
+  return `<div class="filter-bar" style="border-radius:10px 10px 0 0;border:1px solid var(--c-line-2)">
+      <span style="font-size:12.5px;color:var(--c-mute)">กรองตามอัตรา</span>
+      <select class="select" style="max-width:280px" onchange="RC.f.report.req=this.value;renderPageOnly()">
+        <option value="all"${scope==='all'?' selected':''}>ทุกอัตรา</option>
+        ${DB.reqs.map(r=>`<option value="${r.id}"${scope===r.id?' selected':''}>${esc(r.code)} · ${esc(r.position)}</option>`).join('')}
+      </select></div>
+    <div class="stats" style="margin-top:14px">${stats.map(s=>`<div class="stat"><div class="stat-label"><i data-lucide="${s.ic}" class="w-3 h-3"></i>${s.l}</div><div class="stat-value">${s.v}</div></div>`).join('')}</div>
+    <div class="card" style="padding:18px"><div class="sec-h"><i data-lucide="filter"></i>Funnel การสรรหา</div>
+      <div class="funnel">${reached.map(x=>`<div class="funnel-row"><span class="fl">${x.s.name}</span><div class="funnel-track"><div class="funnel-fill" style="width:${Math.round(x.n/maxN*100)}%"></div></div><span class="fn">${x.n} คน</span></div>`).join('')}</div>
+      <div class="note is-info" style="margin-top:16px"><i data-lucide="info"></i><div>ผลการคัดเลือก: รับเข้าทำงาน <b>${hired}</b> · ไม่ผ่าน/เก็บ Talent Pool <b>${rejected}</b> · ถอนตัว <b>${withdrawn}</b></div></div>
+    </div>`;
+}
+
+/* re-render page-content only (filter/sort — Rule #103 C) */
+function renderPageOnly(){const snap=preserveRenderState();document.getElementById('page-content').innerHTML=renderPage();renderIcons();restoreRenderState(snap);}
+
+/* ============================================================ DRAWER ============================================================ */
+function openReqView(id){RC.dctx={kind:'req',mode:'view',id};rcOpen('view',id);}
+function openReqCreate(){RC.dctx={kind:'req',mode:'create',id:null};RC.draft={position:'',dept:'',count:1,grade:'G3',hiring_manager_id:null,manpower_ref:'',desc:''};rcOpen('create',null);}
+function openReqEdit(id){const r=getReq(id);RC.dctx={kind:'req',mode:'edit',id};RC.draft={position:r.position,dept:r.dept,count:r.count,grade:r.grade,hiring_manager_id:r.hiring_manager_id,manpower_ref:r.manpower_ref||'',desc:r.desc};rcOpen('edit',id);}
+function openCandView(id){RC.dctx={kind:'cand',mode:'view',id,tab:'detail'};rcOpen('view',id);}
+function openCandCreate(){RC.dctx={kind:'cand',mode:'create',id:null};RC.draft={name:'',email:'',phone:'',reqId:null,consent:false,resume:''};rcOpen('create',null);}
+function setCandTab(t){const ok=['detail','assess','offer','history'];RC.dctx.tab=ok.includes(t)?t:'detail';render();}
+function rcOpen(mode,id){state.drawer={open:true,mode,recordId:id,step:1};render();requestAnimationFrame(()=>{document.getElementById('drawerBackdrop').classList.add('is-open');const dw=document.getElementById('drawer');dw.classList.add('is-open');lockScroll(true);trapFocus(dw);});}
+
+function renderDrawer(){
+  if(RC.dctx.kind==='req')return (RC.dctx.mode==='view')?reqViewDrawer():reqFormDrawer();
+  return (RC.dctx.mode==='view')?candViewDrawer():candFormDrawer();
+}
+
+/* ---- Requisition form (create/edit · FN-01/02/08) ----
+   [PENDING · Manpower F124] ระบบ Manpower ยังไม่มี · manpower_ref nullable · hook display-only
+   ไม่มี = เตือนแต่เปิดอัตราได้ (FN-02 · A-REC-01) */
+function reqFormDrawer(){
+  const isEdit=RC.dctx.mode==='edit';
+  const b=BANDS.find(x=>x.grade_code===RC.draft.grade)||BANDS[0];
+  const noMp=!String(RC.draft.manpower_ref||'').trim();
+  return `<div class="dw-head"><div class="dw-head-row"><div>
+      <div class="dw-eyebrow"><i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i>${isEdit?'แก้ไขอัตรา':'เปิดอัตราใหม่'}</div>
+      <h2 class="dw-title">${isEdit?esc(getReq(RC.dctx.id).code):'ใบขออัตรากำลัง (Requisition)'}</h2></div>
+      <button class="top-icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-4 h-4"></i></button></div></div>
+    <div class="drawer-body">
+      ${noMp?`<div class="note is-warn mb-3"><i data-lucide="alert-triangle"></i><div><b>ยังไม่ได้ระบุแผนอัตรากำลัง (Manpower)</b> — เปิดอัตราได้ แต่โปรดตรวจสอบกับแผนกำลังคน (hook · ไม่บังคับ)</div></div>`:''}
+      <div class="form-section"><div class="form-section-title">ข้อมูลอัตรา</div>
+        <div class="field-row">
+          <div class="field"><label class="field-label">ตำแหน่ง <span class="req">*</span></label><input id="f-position" class="input" value="${esc(RC.draft.position)}" oninput="RC.draft.position=this.value" placeholder="เช่น Senior Frontend Developer"><div class="field-error">กรุณากรอกตำแหน่ง</div></div>
+          <div class="field"><label class="field-label">แผนก <span class="req">*</span></label><input id="f-dept" class="input" value="${esc(RC.draft.dept)}" oninput="RC.draft.dept=this.value" placeholder="เช่น เทคโนโลยีสารสนเทศ"><div class="field-error">กรุณากรอกแผนก</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label class="field-label">จำนวนอัตรา <span class="req">*</span></label><input id="f-count" type="number" min="1" class="input" value="${esc(RC.draft.count)}" oninput="RC.draft.count=this.value"><div class="field-error">อย่างน้อย 1</div></div>
+          <div class="field"><label class="field-label">ระดับ (band เงินเดือน)</label>
+            <select class="select" onchange="RC.draft.grade=this.value;render()">${BANDS.map(x=>`<option value="${x.grade_code}"${RC.draft.grade===x.grade_code?' selected':''}>${x.grade_code} · ${x.grade_name}</option>`).join('')}</select>
+            <div class="field-help">อ่านจาก HR Configuration (ไม่แก้ในหน้านี้)</div></div>
+        </div>
+        <div class="band-card mb-3"><div style="font-size:12px;color:var(--c-mute-2)">ช่วงเงินเดือนของระดับ ${esc(b.grade_code)} · เวอร์ชัน <span class="num">${esc(b.version_id)}</span></div>
+          <div class="band-scale"><div class="band-seg"><div class="bl">ต่ำสุด</div><div class="bv">${fmtNumber(b.min)}</div></div><div class="band-seg is-mid"><div class="bl">กลาง</div><div class="bv">${fmtNumber(b.mid)}</div></div><div class="band-seg"><div class="bl">สูงสุด</div><div class="bv">${fmtNumber(b.max)}</div></div></div></div>
+      </div>
+      <div class="form-section"><div class="form-section-title">ผู้รับผิดชอบ &amp; อ้างอิง</div>
+        <div class="field"><label class="field-label">ผู้จัดการสายงาน (Hiring Manager) <span class="req">*</span></label>${searchSelectHTML('req_hm',{placeholder:'ค้นหาพนักงาน...'})}<div class="field-help">ผูกกับสายอนุมัติ (DOA) ตอนส่งอนุมัติเปิดอัตรา</div></div>
+        <div class="field"><label class="field-label">อ้างอิงแผนอัตรากำลัง (Manpower)</label><input id="f-mp" class="input" value="${esc(RC.draft.manpower_ref)}" oninput="RC.draft.manpower_ref=this.value;render()" placeholder="เช่น MP-2569-IT-07 (เว้นว่างได้)"><div class="field-help">ไม่บังคับ — ระบบ Manpower (F124) ยังไม่มี · hook display-only</div></div>
+        <div class="field"><label class="field-label">รายละเอียดงาน</label><textarea class="notes-area" oninput="RC.draft.desc=this.value" placeholder="หน้าที่หลัก / คุณสมบัติ">${esc(RC.draft.desc)}</textarea></div>
+      </div>
+    </div>
+    <div class="drawer-footer"><button class="btn btn-ghost" onclick="closeDrawer()">ยกเลิก</button><div class="footer-spacer"></div>
+      ${isEdit?'':`<button class="btn btn-secondary" onclick="submitReq(true)"><i data-lucide="save" class="w-4 h-4"></i><span>บันทึกร่าง</span></button>`}
+      <button class="btn btn-primary" ${RC.busy?'disabled':''} onclick="submitReq(false)"><i data-lucide="${RC.busy?'loader-2':'check'}" class="w-4 h-4${RC.busy?' spin':''}"></i><span>${isEdit?'บันทึกการแก้ไข':'ยืนยันสร้าง'}</span></button></div>`;
+}
+function submitReq(asDraft){
+  if(viewerRO())return;
+  if(RC.busy)return;
+  const d=RC.draft;
+  const badR=[];
+  if(!String(d.position).trim())badR.push('f-position');
+  if(!String(d.dept).trim())badR.push('f-dept');
+  if(!(Number(d.count)>=1))badR.push('f-count');
+  if(badR.length||!d.hiring_manager_id){markInvalidFields(badR);showToast(!badR.length&&!d.hiring_manager_id?'กรุณาเลือกผู้จัดการสายงาน':'กรุณากรอกข้อมูลที่ไฮไลต์ให้ครบ','warning');return;}
+  RC.busy=true;
+  if(RC.dctx.mode==='edit'){const r=getReq(RC.dctx.id);Object.assign(r,{position:d.position,dept:d.dept,count:Number(d.count),grade:d.grade,hiring_manager_id:d.hiring_manager_id,manpower_ref:d.manpower_ref||null,desc:d.desc});audit(r,'แก้ไขข้อมูลอัตรา','');closeDrawer();setTimeout(()=>{RC.busy=false;render();showToast('บันทึกการแก้ไขแล้ว','success');},300);return;}
+  const seq=String(DB.reqs.length+1).padStart(4,'0');
+  const nr={id:'REQ-'+Date.now(),code:'REQ-2569-'+seq,position:d.position,dept:d.dept,count:Number(d.count),filled:0,grade:d.grade,hiring_manager_id:d.hiring_manager_id,manpower_ref:d.manpower_ref||null,status:asDraft?'draft':'draft',createdAt:new Date().toISOString().slice(0,10),desc:d.desc,approval:null,history:[]};
+  audit(nr,asDraft?'บันทึกร่างอัตรา':'สร้างอัตรา (ร่าง)',d.manpower_ref?'':'ไม่มีแผน Manpower',d.manpower_ref?'ok':'warn');
+  DB.reqs.push(nr);closeDrawer();
+  setTimeout(()=>{RC.busy=false;render();showToast(asDraft?'บันทึกร่างแล้ว':'สร้างอัตราแล้ว (ร่าง) — ส่งอนุมัติเปิดได้จากหน้ารายละเอียด','success');},300);
+}
+
+/* ---- Requisition view (FN-08 DOA · FN-16 ปิด) ---- */
+function reqViewDrawer(){
+  const r=getReq(RC.dctx.id),b=BANDS.find(x=>x.grade_code===r.grade)||{},hm=emp(r.hiring_manager_id);
+  let acts='';
+  if(r.status==='draft')acts+=`<button class="btn btn-sm btn-secondary" onclick="openReqEdit('${r.id}')"><i data-lucide="pencil" class="w-3.5 h-3.5"></i><span>แก้ไข</span></button><button class="btn btn-sm btn-primary" onclick="reqSubmitApproval('${r.id}')"><i data-lucide="send" class="w-3.5 h-3.5"></i><span>ส่งอนุมัติเปิด</span></button>`;
+  else if(r.status==='pending'&&PERSONAS[RC.persona].canApprove)acts+=`<button class="btn btn-sm btn-danger" onclick="reqReject('${r.id}')"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i><span>ไม่อนุมัติ</span></button><button class="btn btn-sm btn-primary" onclick="reqApprove('${r.id}')"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i><span>อนุมัติ</span></button>`;
+  else if(r.status==='approved')acts+=`<button class="btn btn-sm btn-primary" onclick="reqAnnounce('${r.id}')"><i data-lucide="megaphone" class="w-3.5 h-3.5"></i><span>ประกาศรับ</span></button><button class="btn btn-sm btn-danger" onclick="reqClose('${r.id}')"><i data-lucide="archive" class="w-3.5 h-3.5"></i><span>ปิดอัตรา</span></button>`;
+  else if(r.status==='open')acts+=`<button class="btn btn-sm btn-danger" onclick="reqClose('${r.id}')"><i data-lucide="archive" class="w-3.5 h-3.5"></i><span>ปิดอัตรา</span></button>`;
+  const linked=DB.cands.filter(c=>c.reqId===r.id);
+  return `<div class="drawer-header"><div class="drawer-avatar"><i data-lucide="clipboard-list" class="w-5 h-5"></i></div>
+      <div style="flex:1;min-width:0"><h2 class="drawer-title">${esc(r.position)}</h2><div class="drawer-subtitle"><span class="num">${esc(r.code)}</span> · ${esc(r.dept)} ${reqStatusPill(r.status)}</div></div>
+      <div class="drawer-header-actions">${RC.persona==='viewer'?'':acts}<span class="drawer-header-divider"></span><button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-4 h-4"></i></button></div></div>
+    <div class="drawer-body">
+      <div class="secwrap"><div class="sec-h"><i data-lucide="info"></i>ข้อมูลอัตรา</div>
+        <div class="kv"><div class="k">ตำแหน่ง</div><div class="v">${esc(r.position)}</div>
+          <div class="k">แผนก</div><div class="v">${esc(r.dept)}</div>
+          <div class="k">จำนวนอัตรา</div><div class="v">${r.filled}/${r.count} (รับแล้ว/เปิด)</div>
+          <div class="k">ระดับ (band)</div><div class="v">${esc(r.grade)} · ${esc(b.grade_name||'')} · ช่วง ${fmtNumber(b.min)}–${fmtNumber(b.max)} <span class="num">(${esc(b.version_id||'')})</span></div>
+          <div class="k">ผู้จัดการสายงาน</div><div class="v">${hm?esc(hm.name)+' · '+esc(hm.position):'—'}</div>
+          <div class="k">Manpower</div><div class="v">${r.manpower_ref?'<span class="num">'+esc(r.manpower_ref)+'</span>':'<span class="chip-soft is-dup"><i data-lucide=\'alert-triangle\'></i>ไม่มีแผน (เปิดโดยเตือน)</span>'}</div>
+          <div class="k">วันที่สร้าง</div><div class="v">${fmtDate(r.createdAt)}</div>
+          <div class="k">รายละเอียด</div><div class="v" style="font-weight:400">${esc(r.desc||'—')}</div></div></div>
+      ${r.approval?approvalSection(r.approval,'เปิดอัตรา'):`<div class="note is-info"><i data-lucide="info"></i><div>อัตรานี้ยังเป็นร่าง — กด “ส่งอนุมัติเปิด” เพื่อเข้าสายอนุมัติ (DOA)</div></div>`}
+      <div class="secwrap"><div class="sec-h"><i data-lucide="users"></i>ผู้สมัครในอัตรานี้ · ${linked.length} คน</div>
+        ${linked.length?linked.map(c=>`<div class="bm-card" onclick="closeDrawer();setTimeout(()=>openCandView('${c.id}'),120)"><div class="bm-icon"><i data-lucide="user"></i></div><div style="flex:1"><div style="font-weight:600;font-size:13px">${esc(c.name)}</div><div style="font-size:12px;color:var(--c-mute-2)">${stagePill(c).replace(/class="pill[^"]*"/,'style="font-size:11px"')}</div></div><i data-lucide="chevron-right" class="w-4 h-4"></i></div>`).join(''):'<div class="rc-list-intro">ยังไม่มีผู้สมัครผูกกับอัตรานี้</div>'}</div>
+      ${historySection(r.history)}
+    </div>
+    <div class="drawer-footer"><div class="drawer-footer-meta">${r.approval&&r.approval.done?'<i data-lucide="lock" class="w-3.5 h-3.5" style="vertical-align:-2px"></i> อนุมัติแล้ว · ':''}อัปเดตล่าสุด ${r.history&&r.history[0]?fmtDateTime(r.history[0].at):'—'}</div><div class="footer-spacer"></div><button class="btn btn-secondary" onclick="closeDrawer()">ปิด</button></div>`;
+}
+function approvalSection(ap,label){
+  return `<div class="secwrap"><div class="sec-h"><i data-lucide="git-branch-plus"></i>การอนุมัติ (DOA) — ${label}</div>
+    <div class="kv" style="margin-bottom:12px"><div class="k">DOA entry</div><div class="v num">${esc(ap.entry)}</div><div class="k">ความคืบหน้า</div><div class="v">${ap.done?'อนุมัติครบ':'ขั้น '+ap.current+' / '+ap.steps.length}</div></div>
+    <div class="timeline">${ap.steps.map(s=>{const e=emp(s.approver_id);const done=s.result==='approved';return `<div class="tl-item"><div class="tl-dot ${done?'is-success':''}"></div><div class="tl-title">ขั้น ${s.order}: ${esc(s.slotName)}</div><div class="tl-meta">${e?'<span class="emp-chip"><span class="uc-avatar">'+esc(personInitials(e.name))+'</span>'+esc(e.name)+' <span class="ec-pos">· '+esc(e.position)+'</span></span>':'ยังไม่กำหนดผู้อนุมัติ'} ${done?'· อนุมัติ '+fmtDate(s.at):(s.result==='rejected'?'· ไม่อนุมัติ':'· รอ')}</div></div>`;}).join('')}</div></div>`;
+}
+function historySection(h){
+  return `<div class="secwrap"><div class="sec-h"><i data-lucide="history"></i>ประวัติ (append-only)</div>
+    <div class="timeline">${(h&&h.length?h:[{at:null,by:'',action:'ยังไม่มีประวัติ',detail:'',kind:'ok'}]).map(x=>`<div class="tl-item"><div class="tl-dot ${x.kind==='warn'?'is-warning':x.kind==='bad'?'':'is-success'}"></div><div class="tl-title">${esc(x.action)}</div><div class="tl-meta">${x.by?esc(x.by)+' · ':''}${x.at?fmtDateTime(x.at):''}${x.detail?' · '+esc(x.detail):''}</div></div>`).join('')}</div></div>`;
+}
+
+/* ---- Candidate form (create · FN-03/04/05/14) ---- */
+function candFormDrawer(){
+  const d=RC.draft;
+  const dupHit=findDuplicate(d.email,d.phone,null);
+  return `<div class="dw-head"><div class="dw-head-row"><div><div class="dw-eyebrow"><i data-lucide="user-plus" class="w-3.5 h-3.5"></i>เพิ่มผู้สมัครเข้าคลัง</div><h2 class="dw-title">ผู้สมัครใหม่</h2></div>
+      <button class="top-icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-4 h-4"></i></button></div></div>
+    <div class="drawer-body">
+      <div class="note is-danger mb-3"><i data-lucide="shield"></i><div>ข้อมูลผู้สมัครเป็นข้อมูลชั้นความลับ (RESTRICTED) · เก็บได้เมื่อได้รับความยินยอม PDPA และเก็บตามระยะเวลาที่ประกาศในนโยบายความเป็นส่วนตัว (ตั้งค่าที่ Policy Center)</div></div>
+      ${dupHit?`<div class="note is-warn mb-3"><i data-lucide="copy"></i><div><b>พบผู้สมัครซ้ำ/เคยสมัคร</b> — ${esc(dupHit.name)} (${esc(dupHit.code)}) มีอีเมล/เบอร์ตรงกัน · บันทึกต่อได้ (เตือนไม่บล็อก)</div></div>`:''}
+      <div class="form-section"><div class="form-section-title">ข้อมูลผู้สมัคร</div>
+        <div class="field"><label class="field-label">ชื่อ-นามสกุล <span class="req">*</span></label><input id="c-name" class="input" value="${esc(d.name)}" oninput="RC.draft.name=this.value" placeholder="ชื่อจริง นามสกุล"><div class="field-error">กรุณากรอกชื่อ</div></div>
+        <div class="field-row">
+          <div class="field"><label class="field-label">อีเมล <span class="req">*</span></label><input id="c-email" type="email" class="input" value="${esc(d.email)}" oninput="RC.draft.email=this.value" onblur="render()" placeholder="name@example.com"><div class="field-error">กรุณากรอกอีเมล</div></div>
+          <div class="field"><label class="field-label">เบอร์โทร <span class="req">*</span></label><input id="c-phone" class="input" value="${esc(d.phone)}" oninput="RC.draft.phone=this.value" onblur="render()" placeholder="08x-xxx-xxxx"><div class="field-error">กรุณากรอกเบอร์โทร</div></div>
+        </div>
+        <div class="field"><label class="field-label">ตำแหน่งที่สมัคร (อัตราที่เปิด)</label>${searchSelectHTML('cand_req',{placeholder:'ค้นหาอัตราที่เปิด...'})}<div class="field-help">ผูกผู้สมัครกับอัตรา (application) — เว้นว่างเพื่อเก็บเข้าคลังก่อน</div></div>
+        <div class="field"><label class="field-label">Resume / เอกสารแนบ</label><div class="upload-zone" onclick="RC.draft.resume='resume_'+(RC.draft.name||'candidate').replace(/\\s+/g,'_')+'.pdf';render()"><i data-lucide="upload-cloud"></i><div>${d.resume?'<span class="file-pill"><i data-lucide=\'file-text\'></i>'+esc(d.resume)+'</span>':'คลิกเพื่อแนบไฟล์ (mock)'}</div></div></div>
+      </div>
+      <div class="form-section"><div class="form-section-title">ความยินยอม PDPA (FN-05)</div>
+        <div class="bm-card" style="cursor:pointer" onclick="RC.draft.consent=!RC.draft.consent;render()"><div class="bm-icon"><i data-lucide="${d.consent?'shield-check':'shield-alert'}"></i></div>
+          <div style="flex:1"><div style="font-weight:600;font-size:13px">${d.consent?'ได้รับความยินยอมแล้ว':'ยังไม่ได้รับความยินยอม'}</div><div style="font-size:12px;color:var(--c-mute-2)">คลิกเพื่อสลับสถานะความยินยอม (ผู้สมัครลงนาม/ยืนยัน)</div></div>
+          <div class="cb ${d.consent?'is-checked':''}"></div></div>
+        ${d.consent?'':'<div class="note is-warn" style="margin-top:10px"><i data-lucide="alert-triangle"></i><div>ยังไม่ได้รับความยินยอม — บันทึกเข้าคลังได้ แต่จะ<b> ดำเนินการต่อ (คัดกรอง / สัมภาษณ์ / ข้อเสนอ) ไม่ได้ </b>จนกว่าจะได้รับความยินยอม</div></div>'}
+      </div>
+    </div>
+    <div class="drawer-footer"><button class="btn btn-ghost" onclick="closeDrawer()">ยกเลิก</button><div class="footer-spacer"></div>
+      <button class="btn btn-primary" ${RC.busy?'disabled':''} onclick="submitCand()"><i data-lucide="${RC.busy?'loader-2':'check'}" class="w-4 h-4${RC.busy?' spin':''}"></i><span>ยืนยันสร้าง</span></button></div>`;
+}
+function findDuplicate(email,phone,exceptId){email=String(email||'').trim().toLowerCase();phone=String(phone||'').replace(/\D/g,'');if(!email&&!phone)return null;return DB.cands.find(c=>c.id!==exceptId&&((email&&c.email.toLowerCase()===email)||(phone&&c.phone.replace(/\D/g,'')===phone)))||null;}
+function submitCand(){
+  if(viewerRO())return;
+  if(RC.busy)return;const d=RC.draft;
+  const badC=[];
+  if(!String(d.name).trim())badC.push('c-name');
+  if(!String(d.email).trim())badC.push('c-email');
+  if(!String(d.phone).trim())badC.push('c-phone');
+  if(badC.length){markInvalidFields(badC);showToast('กรุณากรอกข้อมูลที่ไฮไลต์ให้ครบ','warning');return;}
+  RC.busy=true;
+  const dup=findDuplicate(d.email,d.phone,null);
+  const seq=String(DB.cands.length+11).padStart(4,'0');
+  const nc={id:'C'+Date.now(),code:'APP-2569-'+seq,name:d.name,email:d.email,phone:d.phone,resume:d.resume||'',reqId:d.reqId||null,stage:'applied',score:null,consent:{ok:!!d.consent,date:d.consent?new Date().toISOString().slice(0,10):null},dup:!!dup,dupNote:dup?('ตรงกับ '+dup.code):'',offer:null,interviews:[],onboardSent:false,appliedAt:new Date().toISOString().slice(0,10),history:[]};
+  audit(nc,'เพิ่มผู้สมัครเข้าคลัง',(dup?'พบซ้ำ/เคยสมัคร · ':'')+(d.consent?'':'ยังไม่ได้รับความยินยอม PDPA'),d.consent?'ok':'warn');
+  DB.cands.push(nc);closeDrawer();
+  setTimeout(()=>{RC.busy=false;render();showToast('สร้างผู้สมัครสำเร็จ','success');},300);
+}
+
+/* ---- Candidate view (tabs: รายละเอียด › สัมภาษณ์/ประเมิน › ข้อเสนอ › ประวัติ) ---- */
+function candViewDrawer(){
+  const c=getCand(RC.dctx.id),r=reqOfCand(c),tab=RC.dctx.tab||'detail';
+  const tabs=[['detail','รายละเอียด','file-text'],['assess','สัมภาษณ์ / ประเมิน','clipboard-check'],['offer','ข้อเสนอ','file-signature'],['history','ประวัติ','history']];
+  let acts='';
+  if(RC.persona!=='viewer'){
+    if(TERMINAL[c.stage]){/* terminal: no forward actions */}
+    else if(c.stage==='hired'){}
+    else{
+      acts+=`<button class="btn btn-sm btn-danger" onclick="candTerminate('${c.id}')"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i><span>ไม่ผ่าน/ถอนตัว</span></button>`;
+    }
+  }
+  return `<div class="drawer-header"><div class="drawer-avatar">${esc(personInitials(c.name))}</div>
+      <div style="flex:1;min-width:0"><h2 class="drawer-title">${esc(c.name)}</h2><div class="drawer-subtitle"><span class="num">${esc(c.code)}</span> · ${r?esc(r.position):'ยังไม่ผูกอัตรา'} ${stagePill(c)}${c.onboardSent?' <span class="chip-soft is-consent"><i data-lucide="door-open"></i>ส่งเข้า onboarding แล้ว</span>':''}</div></div>
+      <div class="drawer-header-actions">${acts}<span class="drawer-header-divider"></span><button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-4 h-4"></i></button></div></div>
+    <div class="drawer-tabs">${tabs.map(t=>`<button class="drawer-tab ${tab===t[0]?'is-active':''}" onclick="setCandTab('${t[0]}')">${t[1]}</button>`).join('')}</div>
+    <div class="drawer-body">${tab==='detail'?candDetail(c,r):tab==='assess'?candAssess(c):tab==='offer'?candOffer(c):historySection(c.history)}</div>
+    <div class="drawer-footer"><div class="drawer-footer-meta">อัปเดตล่าสุด ${c.history&&c.history[0]?fmtDateTime(c.history[0].at):'—'}</div><div class="footer-spacer"></div><button class="btn btn-secondary" onclick="closeDrawer()">ปิด</button></div>`;
+}
+function candDetail(c,r){
+  const um=PERSONAS[RC.persona].unmask;
+  const consentBanner=c.consent.ok
+    ?`<div class="note is-info mb-3"><i data-lucide="shield-check"></i><div>ได้รับความยินยอม PDPA เมื่อ ${fmtDate(c.consent.date)} · เก็บข้อมูลตามระยะเวลาที่ประกาศในนโยบายความเป็นส่วนตัว (ตั้งค่าที่ Policy Center) · ระยะเก็บ (retention): <b>${retentionLabel()}</b></div></div>`
+    :`<div class="note is-danger mb-3"><i data-lucide="shield-alert"></i><div><b>ยังไม่ได้รับความยินยอม PDPA</b> — ดำเนินการต่อไม่ได้จนกว่าจะได้รับความยินยอม</div>${RC.persona==='viewer'?'':'<div class="note-act"><button class="btn btn-sm btn-primary" onclick="candSetConsent(\''+c.id+'\')"><i data-lucide="check" class="w-3.5 h-3.5"></i><span>บันทึกความยินยอม</span></button></div>'}</div>`;
+  const contact=c.consent.ok
+    ?`<div class="k">อีเมล</div><div class="v">${um?esc(c.email):'<span class="masked"><i data-lucide="lock"></i>'+esc(maskEmail(c.email))+'</span>'}</div>
+      <div class="k">เบอร์โทร</div><div class="v">${um?esc(c.phone):'<span class="masked"><i data-lucide="lock"></i>'+esc(maskPhone(c.phone))+'</span>'}</div>`
+    :`<div class="k">ช่องทางติดต่อ</div><div class="v"><span class="masked"><i data-lucide="lock"></i>ปิดบังจนกว่าจะได้รับความยินยอม</span></div>`;
+  return consentBanner
+    +(c.dup?`<div class="note is-warn mb-3"><i data-lucide="copy"></i><div><b>ผู้สมัครซ้ำ/เคยสมัคร</b> — ${esc(c.dupNote||'')}</div></div>`:'')
+    +`<div class="secwrap"><div class="sec-h"><i data-lucide="user"></i>ข้อมูลผู้สมัคร ${um?'':'<span class="chip-soft" style="margin-left:4px"><i data-lucide="lock"></i>RESTRICTED · ปิดบังตามบทบาท</span>'}</div>
+      <div class="kv"><div class="k">ชื่อ-นามสกุล</div><div class="v">${esc(c.name)}</div>
+        <div class="k">รหัสผู้สมัคร</div><div class="v num">${esc(c.code)}</div>
+        ${contact}
+        <div class="k">ตำแหน่งที่สมัคร</div><div class="v">${r?esc(r.position)+' · '+esc(r.code):'ยังไม่ผูกอัตรา'}</div>
+        <div class="k">ระยะปัจจุบัน</div><div class="v">${stagePill(c)}</div>
+        <div class="k">วันที่สมัคร</div><div class="v">${fmtDate(c.appliedAt)}</div>
+        <div class="k">Resume</div><div class="v">${c.resume?'<span class="file-pill"><i data-lucide=\'file-text\'></i>'+esc(c.resume)+'</span>':'—'}</div>
+        ${c.reason?'<div class="k">เหตุผล</div><div class="v" style="font-weight:400">'+esc(c.reason)+'</div>':''}</div></div>`;
+}
+function candAssess(c){
+  if(!c.consent.ok)return `<div class="note is-danger"><i data-lucide="shield-alert"></i><div>ยังไม่ได้รับความยินยอม PDPA — นัดสัมภาษณ์/ประเมินไม่ได้</div></div>`;
+  const canAct=RC.persona!=='viewer'&&!TERMINAL[c.stage]&&c.stage!=='hired';
+  const list=(c.interviews||[]).map(iv=>`<div class="secwrap"><div class="sec-h"><i data-lucide="calendar-clock"></i>สัมภาษณ์ · ${fmtDate(iv.date)} ${esc(iv.time)}</div>
+    <div class="kv" style="margin-bottom:10px"><div class="k">ผู้สัมภาษณ์</div><div class="v"><span class="emp-chip"><span class="uc-avatar">${esc(personInitials(iv.interviewer_name))}</span>${esc(iv.interviewer_name)} <span class="ec-pos">· ${esc(iv.interviewer_position)}</span></span></div>
+      <div class="k">สถานที่</div><div class="v" style="font-weight:400">${esc(iv.location||'—')}</div></div>
+    ${iv.scorecard?`<div class="band-card"><div style="font-size:12px;color:var(--c-mute-2)">ผลประเมิน (scorecard)</div><div style="margin-top:6px"><span class="kb-score"><i data-lucide="star"></i>${iv.scorecard.score}/5</span> · ${esc(iv.scorecard.comment||'')}</div></div>`
+      :(canAct?`<div class="score-row" data-iv="${iv.id}"><div style="font-size:12px;color:var(--c-mute-2);margin-bottom:6px">ให้คะแนน (ต่อผู้สัมภาษณ์)</div><div class="score-pick">${[1,2,3,4,5].map(n=>`<button onclick="pickScore('${c.id}','${iv.id}',${n})">${n}</button>`).join('')}</div><textarea class="notes-area" id="sc-${iv.id}" placeholder="ความเห็น" style="min-height:70px;margin-top:8px"></textarea><div style="margin-top:8px"><button class="btn btn-sm btn-primary" onclick="saveScore('${c.id}','${iv.id}')"><i data-lucide="check" class="w-3.5 h-3.5"></i><span>บันทึกผลประเมิน</span></button></div></div>`:'<div class="rc-list-intro">ยังไม่มีผลประเมิน</div>')}
+    </div>`).join('');
+  return (list||'<div class="rc-list-intro" style="margin-bottom:14px">ยังไม่มีการนัดสัมภาษณ์</div>')
+    +(canAct?`<button class="btn btn-secondary" onclick="openInterviewModal('${c.id}')"><i data-lucide="calendar-plus" class="w-4 h-4"></i><span>นัดสัมภาษณ์</span></button>`:'');
+}
+let __scorePick={};
+function pickScore(cid,ivid,n){__scorePick[ivid]=n;document.querySelectorAll('.score-row[data-iv="'+ivid+'"] .score-pick button').forEach((b,i)=>b.classList.toggle('on',i+1<=n));}
+function saveScore(cid,ivid){if(viewerRO())return;const c=getCand(cid),iv=c.interviews.find(x=>x.id===ivid);const score=__scorePick[ivid];if(!score){showToast('กรุณาให้คะแนนก่อน','warning');return;}const comment=(document.getElementById('sc-'+ivid)||{}).value||'';iv.scorecard={score,comment};c.score=score;audit(c,'บันทึกผลประเมิน (scorecard)','คะแนน '+score+'/5');render();showToast('บันทึกผลประเมินแล้ว','success');}
+function candOffer(c){
+  if(!c.consent.ok)return `<div class="note is-danger"><i data-lucide="shield-alert"></i><div>ยังไม่ได้รับความยินยอม PDPA — สร้างข้อเสนอไม่ได้</div></div>`;
+  if(c.offer){const o=c.offer,inRange=o.salary>=o.band.min&&o.salary<=o.band.max;
+    let oacts='';
+    if(RC.persona!=='viewer'){
+      if(o.status==='pending'&&PERSONAS[RC.persona].canApprove)oacts=`<button class="btn btn-sm btn-danger" onclick="offerReject('${c.id}')"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i><span>ไม่อนุมัติ</span></button><button class="btn btn-sm btn-primary" onclick="offerApprove('${c.id}')"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i><span>อนุมัติข้อเสนอ</span></button>`;
+      else if(o.status==='approved')oacts=`<button class="btn btn-sm btn-primary" onclick="offerSend('${c.id}')"><i data-lucide="send" class="w-3.5 h-3.5"></i><span>ส่งข้อเสนอให้ผู้สมัคร</span></button>`;
+      else if(o.status==='sent')oacts=`<button class="btn btn-sm btn-secondary" onclick="offerResult('${c.id}','declined')"><i data-lucide="x" class="w-3.5 h-3.5"></i><span>ผู้สมัครปฏิเสธ</span></button><button class="btn btn-sm btn-primary" onclick="offerResult('${c.id}','accepted')"><i data-lucide="check" class="w-3.5 h-3.5"></i><span>ผู้สมัครตอบรับ</span></button>`;
+      else if(o.status==='accepted'&&!c.onboardSent)oacts=`<button class="btn btn-sm btn-primary" onclick="candHireHandoff('${c.id}')"><i data-lucide="door-open" class="w-3.5 h-3.5"></i><span>รับเข้าทำงาน → ส่ง On/Offboard</span></button>`;
+    }
+    return `<div class="secwrap"><div class="sec-h"><i data-lucide="file-signature"></i>ข้อเสนอจ้าง ${OFFER_STATUS[o.status]?'<span class="pill '+OFFER_STATUS[o.status].pill+'" style="margin-left:6px">'+OFFER_STATUS[o.status].label+'</span>':''}</div>
+      <div class="kv" style="margin-bottom:12px"><div class="k">ตำแหน่ง</div><div class="v">${esc(o.position)}</div>
+        <div class="k">ระดับ (band)</div><div class="v">${esc(o.band.grade_code)} · ${esc(o.band.grade_name)} <span class="num">(freeze ${esc(o.band.version_id)})</span></div>
+        <div class="k">เงินเดือน</div><div class="v num">${fmtNumber(o.salary)} บาท</div>
+        <div class="k">วันเริ่มงาน</div><div class="v">${fmtDate(o.start)}</div></div>
+      <div class="band-card"><div style="font-size:12px;color:var(--c-mute-2)">ช่วง band (snapshot คู่ข้อเสนอ)</div>
+        <div class="band-scale"><div class="band-seg"><div class="bl">ต่ำสุด</div><div class="bv">${fmtNumber(o.band.min)}</div></div><div class="band-seg is-mid"><div class="bl">กลาง</div><div class="bv">${fmtNumber(o.band.mid)}</div></div><div class="band-seg"><div class="bl">สูงสุด</div><div class="bv">${fmtNumber(o.band.max)}</div></div></div></div>
+      ${inRange?'':`<div class="note is-warn" style="margin-top:12px"><i data-lucide="alert-triangle"></i><div><b>เงินเดือนอยู่นอกช่วง band</b> (เตือนไม่บล็อก) · เหตุผล: ${esc(o.out_of_range_reason||'—')}</div></div>`}
+      </div>
+      ${o.approval?approvalSection(o.approval,'ข้อเสนอ'):''}
+      ${oacts?`<div style="display:flex;gap:8px;justify-content:flex-end">${oacts}</div>`:''}`;
+  }
+  // no offer yet → create form
+  if(RC.persona==='viewer')return `<div class="rc-list-intro">ยังไม่มีข้อเสนอ</div>`;
+  const d=RC.draft.offer||(RC.draft.offer={grade:(reqOfCand(c)||{}).grade||'G3',start:'',salary:'',reason:''});
+  const b=bandResolve(d.grade,d.start);
+  const sal=Number(d.salary)||0;const out=sal>0&&(sal<b.min||sal>b.max);
+  return `<div class="secwrap"><div class="sec-h"><i data-lucide="file-plus"></i>สร้างข้อเสนอจ้าง</div>
+    <div class="field-row">
+      <div class="field"><label class="field-label">ระดับ (band)</label><select class="select" onchange="RC.draft.offer.grade=this.value;render()">${BANDS.map(x=>`<option value="${x.grade_code}"${d.grade===x.grade_code?' selected':''}>${x.grade_code} · ${x.grade_name}</option>`).join('')}</select></div>
+      <div class="field"><label class="field-label">วันเริ่มงาน <span class="req">*</span></label><input type="date" class="input" value="${esc(d.start)}" onchange="RC.draft.offer.start=this.value;render()"><div class="field-help">ใช้ resolve band ที่มีผล ณ วันเริ่มงาน</div></div>
+    </div>
+    <div class="band-card mb-3"><div style="font-size:12px;color:var(--c-mute-2)">ช่วงเงินเดือน ${esc(b.grade_code)} · เวอร์ชัน <span class="num">${esc(b.version_id)}</span> ${d.start?'· ณ '+fmtDate(d.start):''}</div>
+      <div class="band-scale"><div class="band-seg"><div class="bl">ต่ำสุด</div><div class="bv">${fmtNumber(b.min)}</div></div><div class="band-seg is-mid"><div class="bl">กลาง</div><div class="bv">${fmtNumber(b.mid)}</div></div><div class="band-seg"><div class="bl">สูงสุด</div><div class="bv">${fmtNumber(b.max)}</div></div></div></div>
+    <div class="field"><label class="field-label">เงินเดือนที่เสนอ <span class="req">*</span></label><input type="number" class="input" value="${esc(d.salary)}" oninput="RC.draft.offer.salary=this.value" onblur="render()" placeholder="เช่น 62000"></div>
+    ${out?`<div class="note is-warn mb-3"><i data-lucide="alert-triangle"></i><div>เงินนอกช่วง band (${fmtNumber(b.min)}–${fmtNumber(b.max)}) — เตือนไม่บล็อก แต่<b>ต้องระบุเหตุผล</b></div></div>
+      <div class="field"><label class="field-label">เหตุผลนอกช่วง (out_of_range_reason) <span class="req">*</span></label><textarea class="notes-area" oninput="RC.draft.offer.reason=this.value" style="min-height:64px" placeholder="เหตุผลที่เสนอเกิน/ต่ำกว่าช่วง band">${esc(d.reason)}</textarea></div>`:''}
+    <div style="display:flex;justify-content:flex-end;gap:8px"><button class="btn btn-primary" onclick="submitOffer('${c.id}')"><i data-lucide="send" class="w-4 h-4"></i><span>สร้างข้อเสนอ + ส่งอนุมัติ</span></button></div>
+    </div>`;
+}
+function submitOffer(cid){
+  if(viewerRO())return;
+  const c=getCand(cid),d=RC.draft.offer;const b=bandResolve(d.grade,d.start);const sal=Number(d.salary)||0;
+  if(!d.start||!(sal>0)){showToast('กรุณากรอกวันเริ่มงานและเงินเดือน','warning');return;}
+  const out=sal<b.min||sal>b.max;
+  if(out&&!String(d.reason).trim()){showToast('เงินนอกช่วง band — กรุณาระบุเหตุผล','warning');return;}
+  c.offer={position:(reqOfCand(c)||{}).position||'',grade:d.grade,salary:sal,start:d.start,status:'pending',out_of_range_reason:out?d.reason:null,
+    band:{grade_code:b.grade_code,grade_name:b.grade_name,min:b.min,mid:b.mid,max:b.max,currency:b.currency,version_id:b.version_id},approval:null};
+  c.stage='offer';RC.draft.offer=null;
+  audit(c,'สร้างข้อเสนอจ้าง + ส่งอนุมัติ','snapshot band '+b.version_id+(out?' · นอกช่วง (มีเหตุผล)':''));
+  // ส่งอนุมัติ (DOA)
+  openDoaModal('offer',cid);
+}
+
+/* ============================================================ ACTIONS ============================================================ */
+function candMoveStage(id,dir){
+  if(viewerRO())return;
+  const c=getCand(id),i=stageIdx(c.stage);if(i<0)return;
+  if(dir>0&&!c.consent.ok){showToast('ยังไม่ได้รับความยินยอม PDPA — เลื่อนสถานะไม่ได้','warning');return;}
+  const ni=i+dir;if(ni<0||ni>=STAGES.length)return;
+  if(STAGES[ni].id==='offer'&&dir>0&&!c.offer){showToast('ไปขั้น “ข้อเสนอ” ให้สร้างข้อเสนอในลิ้นชักผู้สมัคร','info');openCandView(id);RC.dctx.tab='offer';render();return;}
+  // FIX-01: ห้ามข้ามไป hired ตรง ๆ — ต้องตอบรับ offer ก่อน แล้ว route ผ่าน candHireHandoff() เส้นเดียวทั้งระบบ
+  if(STAGES[ni].id==='hired'&&dir>0){
+    if(!c.offer||c.offer.status!=='accepted'){showToast('ต้องให้ผู้สมัครตอบรับข้อเสนอก่อน','info');openCandView(id);RC.dctx.tab='offer';render();return;}
+    candHireHandoff(id);return;
+  }
+  c.stage=STAGES[ni].id;audit(c,'เลื่อนสถานะ → '+STAGES[ni].name,'');ntf('แจ้งเตือน: '+esc(c.name)+' → '+STAGES[ni].name);render();
+}
+function candSetConsent(id){if(viewerRO())return;const c=getCand(id);c.consent={ok:true,date:new Date().toISOString().slice(0,10)};audit(c,'บันทึกความยินยอม PDPA','');render();showToast('บันทึกความยินยอมแล้ว','success');}
+function candTerminate(id){
+  if(viewerRO())return;
+  openReasonModal({title:'ไม่ผ่าน / ถอนตัว',label:'เลือกผลและระบุเหตุผล',cid:id,withKind:true,confirmLabel:'บันทึก',onConfirm:(reason,kind)=>{
+    const c=getCand(id);c.stage=kind;c.reason=reason;
+    audit(c,kind==='talent_pool'?'ไม่ผ่าน → เก็บ Talent Pool':(kind==='withdrawn'?'ผู้สมัครถอนตัว':'ไม่ผ่าน'),reason,'warn');
+    ntf('แจ้งเตือน: อัปเดตผลผู้สมัคร '+esc(c.name));render();showToast('บันทึกแล้ว','success');
+  }});
+}
+function candHireHandoff(id){
+  if(viewerRO())return;
+  openConfirm({title:'รับเข้าทำงาน + ส่งเข้า On/Offboard?',body:'ระบบจะยิง event ส่งผู้สมัครเข้ากระบวนการ onboarding (soft-linkage) และตั้งสถานะ “ส่งเข้า onboarding แล้ว” — ไม่สร้าง employee และไม่เชื่อมจริงในรอบนี้',confirmLabel:'ยืนยันรับเข้าทำงาน',danger:false,onConfirm:()=>{
+    const c=getCand(id);c.stage='hired';c.onboardSent=true;const r=reqOfCand(c);if(r&&r.filled<r.count){r.filled++;if(r.filled>=r.count&&r.status==='open')r.status='closed';}
+    // [OQ-15 · PENDING] inbound handoff ยังไม่ออกแบบ · ยิง event ออก · ไม่สร้าง employee · ไม่ mock หน้าจอ On/Offboard
+    audit(c,'รับเข้าทำงาน → ส่งเข้า On/Offboard','ยิง event เริ่ม onboarding (soft-linkage)');
+    ntf('แจ้งเตือน: ส่ง '+esc(c.name)+' เข้ากระบวนการ onboarding');render();showToast('ส่งเข้า onboarding แล้ว','success');
+  }});
+}
+/* req approval flow */
+function reqSubmitApproval(id){openDoaModal('req',id);}
+function reqApprove(id){const r=getReq(id);if(!r.approval)return;const st=r.approval.steps.find(s=>s.result==='pending');if(st){st.result='approved';st.at=new Date().toISOString().slice(0,10);}
+  r.approval.current=r.approval.steps.filter(s=>s.result==='approved').length;
+  if(r.approval.steps.every(s=>s.result==='approved')){r.approval.done=true;r.status='approved';audit(r,'อนุมัติเปิดอัตรา (ครบทุกขั้น)','');ntf('แจ้งเตือน: อนุมัติเปิดอัตรา '+esc(r.code));}
+  else audit(r,'อนุมัติ (ขั้น '+r.approval.current+'/'+r.approval.steps.length+')','');
+  render();showToast('อนุมัติแล้ว','success');
+}
+function reqReject(id){openReasonModal({title:'ไม่อนุมัติเปิดอัตรา',label:'เหตุผลที่ไม่อนุมัติ',confirmLabel:'ไม่อนุมัติ',danger:true,onConfirm:(reason)=>{const r=getReq(id);r.status='draft';if(r.approval){const st=r.approval.steps.find(s=>s.result==='pending');if(st)st.result='rejected';}audit(r,'ไม่อนุมัติเปิดอัตรา',reason,'bad');render();showToast('ไม่อนุมัติแล้ว','info');}});}
+function reqAnnounce(id){const r=getReq(id);r.status='open';audit(r,'ประกาศรับอัตรา','สถานะ → เปิดรับ');ntf('แจ้งเตือน: ประกาศรับ '+esc(r.position));render();showToast('ประกาศรับแล้ว','success');}
+function reqClose(id){if(viewerRO())return;openConfirm({title:'ปิดอัตรานี้?',body:'อัตราจะถูกปิด (รับครบ/ยกเลิก) และเก็บถาวรแบบ soft archive — ประวัติยังอยู่ครบ',confirmLabel:'ปิดอัตรา',danger:true,onConfirm:()=>{const r=getReq(id);r.status='closed';audit(r,'ปิดอัตรา','สถานะ → ปิดแล้ว');render();showToast('ปิดอัตราแล้ว','success');}});}
+/* offer flow */
+function offerApprove(id){if(viewerRO())return;const c=getCand(id),o=c.offer;if(!o.approval)return;o.approval.steps.forEach(s=>{if(s.result==='pending'){s.result='approved';s.at=new Date().toISOString().slice(0,10);}});o.approval.done=true;o.approval.current=o.approval.steps.length;o.status='approved';audit(c,'อนุมัติข้อเสนอ (ครบทุกขั้น)','');ntf('แจ้งเตือน: อนุมัติข้อเสนอ '+esc(c.name));render();showToast('อนุมัติแล้ว','success');}
+function offerReject(id){if(viewerRO())return;openReasonModal({title:'ไม่อนุมัติข้อเสนอ',label:'เหตุผล',confirmLabel:'ไม่อนุมัติ',danger:true,onConfirm:(reason)=>{const c=getCand(id);c.offer.status='draft';if(c.offer.approval){const st=c.offer.approval.steps.find(s=>s.result==='pending');if(st)st.result='rejected';}audit(c,'ไม่อนุมัติข้อเสนอ',reason,'bad');render();showToast('ไม่อนุมัติแล้ว','info');}});}
+function offerSend(id){if(viewerRO())return;const c=getCand(id);c.offer.status='sent';audit(c,'ส่งข้อเสนอให้ผู้สมัคร + แจ้งเตือน','เงินเดือน '+fmtNumber(c.offer.salary));ntf('แจ้งเตือน: ส่งข้อเสนอให้ '+esc(c.name));render();showToast('ส่งข้อเสนอแล้ว','success');}
+function offerResult(id,res){if(viewerRO())return;const c=getCand(id);c.offer.status=res;audit(c,res==='accepted'?'ผู้สมัครตอบรับข้อเสนอ':'ผู้สมัครปฏิเสธข้อเสนอ','','ok');ntf('แจ้งเตือน: ผลข้อเสนอ '+esc(c.name)+' — '+(res==='accepted'?'ตอบรับ':'ปฏิเสธ'));if(res==='declined')c.stage='withdrawn';render();showToast('บันทึกผลข้อเสนอแล้ว','success');}
+
+/* ============================================================ MODALS ============================================================ */
+function openConfirm(cfg){RC.mctx={type:'confirm',data:cfg};rcOpenModal();}
+function openReasonModal(cfg){RC.draft.reason='';RC.draft.reasonKind=cfg.withKind?'talent_pool':null;RC.mctx={type:'reason',data:cfg};rcOpenModal();}
+function openInterviewModal(cid){RC.draft.iv={date:'',time:'',interviewer_id:null,loc:''};RC.mctx={type:'interview',data:{cid}};rcOpenModal();}
+function openDoaModal(kind,entId){const r=doaResolve(kind);RC.draft.slots={};RC.mctx={type:'doa',data:{kind,entId,entry:r.entry,steps:r.steps}};rcOpenModal();}
+function rcOpenModal(){state.modal={open:true,type:RC.mctx.type,data:RC.mctx.data};render();requestAnimationFrame(()=>{document.getElementById('modalBackdrop').classList.add('is-open');lockScroll(true);});}
+
+function renderModal(){
+  const t=RC.mctx.type,d=RC.mctx.data;
+  if(t==='confirm')return `<div class="modal-header"><div class="modal-header-icon ${d.danger?'is-danger':''}"><i data-lucide="${d.danger?'alert-triangle':'help-circle'}" class="w-4 h-4"></i></div><div><h3 class="modal-title">${esc(d.title)}</h3><p class="modal-subtitle">${esc(d.body)}</p></div></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn ${d.danger?'btn-danger':'btn-primary'}" onclick="rcConfirmYes()">${esc(d.confirmLabel||'ยืนยัน')}</button></div>`;
+  if(t==='reason')return `<div class="modal-header"><div class="modal-header-icon ${d.danger?'is-danger':'is-warning'}"><i data-lucide="message-square-warning" class="w-4 h-4"></i></div><div><h3 class="modal-title">${esc(d.title)}</h3><p class="modal-subtitle">${esc(d.label||'ระบุเหตุผล')}</p></div></div>
+    <div class="modal-body">${d.withKind?`<div class="field"><label class="field-label">ผลลัพธ์</label><select class="select" onchange="RC.draft.reasonKind=this.value"><option value="talent_pool">ไม่ผ่าน → เก็บ Talent Pool</option><option value="rejected">ไม่ผ่าน (ปฏิเสธ)</option><option value="withdrawn">ผู้สมัครถอนตัว</option></select></div>`:''}
+      <div class="field"><label class="field-label">เหตุผล <span class="req">*</span></label><textarea class="notes-area" oninput="RC.draft.reason=this.value" placeholder="ระบุเหตุผล" style="min-height:80px">${esc(RC.draft.reason||'')}</textarea></div></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn ${d.danger?'btn-danger':'btn-primary'}" onclick="rcReasonYes()">${esc(d.confirmLabel||'ยืนยัน')}</button></div>`;
+  if(t==='interview')return `<div class="modal-header"><div class="modal-header-icon"><i data-lucide="calendar-plus" class="w-4 h-4"></i></div><div><h3 class="modal-title">นัดสัมภาษณ์</h3><p class="modal-subtitle">ระบบจะแจ้งเตือนผู้สัมภาษณ์และผู้สมัคร (NTF)</p></div></div>
+    <div class="modal-body"><div class="field-row"><div class="field"><label class="field-label">วันที่ <span class="req">*</span></label><input type="date" class="input" onchange="RC.draft.iv.date=this.value"></div><div class="field"><label class="field-label">เวลา <span class="req">*</span></label><input type="time" class="input" onchange="RC.draft.iv.time=this.value"></div></div>
+      <div class="field"><label class="field-label">ผู้สัมภาษณ์ <span class="req">*</span></label>${searchSelectHTML('iv_emp',{placeholder:'ค้นหาพนักงาน...'})}<div class="field-help">เก็บ snapshot ชื่อ+ตำแหน่งผู้สัมภาษณ์คู่บันทึก</div></div>
+      <div class="field"><label class="field-label">สถานที่ / ช่องทาง</label><input class="input" oninput="RC.draft.iv.loc=this.value" placeholder="เช่น ห้องประชุม 3 · Google Meet"></div></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" onclick="saveInterview()"><i data-lucide="check" class="w-4 h-4"></i><span>นัดสัมภาษณ์</span></button></div>`;
+  if(t==='doa'){
+    return `<div class="modal-header"><div class="modal-header-icon"><i data-lucide="git-branch-plus" class="w-4 h-4"></i></div><div><h3 class="modal-title">ส่งอนุมัติ (DOA)</h3><p class="modal-subtitle">เลือกผู้อนุมัติแต่ละขั้น · DOA entry <span class="num">${esc(d.entry)}</span> · ไม่มีวงเงิน</p></div></div>
+      <div class="modal-body"><div class="note is-info mb-3"><i data-lucide="info"></i><div>สายอนุมัติมาจากระบบ DOA กลาง (F-DLG-001) — เลือก “คน” ในแต่ละ slot ที่ระบบ resolve มาให้</div></div>
+        ${d.steps.map((s,i)=>`<div class="slot"><div class="slot-h"><span class="sn">${i+1}</span><span class="st">${esc(s.slotName)}</span><span class="sr">${esc(s.slot)}</span></div>${searchSelectHTML('slot_'+(i+1),{placeholder:'เลือกผู้อนุมัติ...'})}</div>`).join('')}</div>
+      <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" onclick="submitDoa()"><i data-lucide="send" class="w-4 h-4"></i><span>ส่งอนุมัติ</span></button></div>`;
+  }
+  return '';
+}
+function rcConfirmYes(){const fn=RC.mctx.data.onConfirm;closeModal();setTimeout(()=>{if(fn)fn();},180);}
+function rcReasonYes(){const r=String(RC.draft.reason||'').trim();if(!r){showToast('กรุณาระบุเหตุผล','warning');return;}const d=RC.mctx.data,kind=RC.draft.reasonKind;closeModal();setTimeout(()=>{if(d.onConfirm)d.onConfirm(r,kind);},180);}
+function saveInterview(){if(viewerRO())return;const iv=RC.draft.iv,cid=RC.mctx.data.cid,c=getCand(cid);if(!iv.date||!iv.time||!iv.interviewer_id){showToast('กรุณากรอกข้อมูลให้ครบถ้วน','warning');return;}const e=emp(iv.interviewer_id);c.interviews=c.interviews||[];c.interviews.push({id:'IV'+Date.now(),date:iv.date,time:iv.time,interviewer_id:e.id,interviewer_name:e.name,interviewer_position:e.position,location:iv.loc||'',scorecard:null});if(c.stage==='screening'||c.stage==='applied')c.stage='interview';audit(c,'นัดสัมภาษณ์ + แจ้งเตือน',fmtDate(iv.date)+' '+iv.time+' · '+e.name);closeModal();setTimeout(()=>{ntf('แจ้งเตือน: นัดสัมภาษณ์ '+esc(c.name));render();showToast('นัดสัมภาษณ์แล้ว','success');},180);}
+function submitDoa(){
+  const d=RC.mctx.data;const chosen=d.steps.map((s,i)=>RC.draft.slots['slot_'+(i+1)]);
+  if(chosen.some(x=>!x)){showToast('กรุณาเลือกผู้อนุมัติให้ครบทุกขั้น','warning');return;}
+  const steps=d.steps.map((s,i)=>({order:s.order,slotName:s.slotName,approver_id:chosen[i],result:'pending',at:null}));
+  const approval={entry:d.entry,current:0,done:false,steps};
+  if(d.kind==='req'){const r=getReq(d.entId);r.approval=approval;r.status='pending';audit(r,'ส่งอนุมัติเปิดอัตรา',d.entry);ntf('แจ้งเตือน: ส่งอนุมัติเปิดอัตรา '+esc(r.code));}
+  else{const c=getCand(d.entId);c.offer.approval=approval;c.offer.status='pending';audit(c,'ส่งอนุมัติข้อเสนอ',d.entry);ntf('แจ้งเตือน: ส่งอนุมัติข้อเสนอ '+esc(c.name));}
+  closeModal();setTimeout(()=>{render();showToast('ส่งอนุมัติแล้ว','success');},180);
+}
+
+/* ============================================================ COMBOBOX MOUNTING ============================================================ */
+function mountCombos(){
+  if(state.drawer.open&&RC.dctx){
+    if(RC.dctx.kind==='req'&&(RC.dctx.mode==='create'||RC.dctx.mode==='edit')&&document.getElementById(ssId('ss-','req_hm')))
+      initSearchSelect('req_hm',{options:empOpts(),value:RC.draft.hiring_manager_id||null,emptyText:'ไม่พบพนักงาน',onSelect:v=>{RC.draft.hiring_manager_id=v;}});
+    if(RC.dctx.kind==='cand'&&RC.dctx.mode==='create'&&document.getElementById(ssId('ss-','cand_req')))
+      initSearchSelect('cand_req',{options:reqOpts(),value:RC.draft.reqId||null,emptyText:'ไม่พบอัตราที่เปิด',onSelect:v=>{RC.draft.reqId=v;}});
+  }
+  if(state.modal.open&&RC.mctx){
+    if(RC.mctx.type==='interview'&&document.getElementById(ssId('ss-','iv_emp')))
+      initSearchSelect('iv_emp',{options:empOpts(),value:(RC.draft.iv||{}).interviewer_id||null,emptyText:'ไม่พบพนักงาน',onSelect:v=>{RC.draft.iv.interviewer_id=v;}});
+    if(RC.mctx.type==='doa'){RC.draft.slots=RC.draft.slots||{};RC.mctx.data.steps.forEach((s,i)=>{const k='slot_'+(i+1);if(document.getElementById(ssId('ss-',k)))initSearchSelect(k,{options:empOpts(),value:RC.draft.slots[k]||null,emptyText:'ไม่พบพนักงาน',onSelect:v=>{RC.draft.slots[k]=v;}});});}
+  }
+}
+/* clear ctx when overlay closes */
+const __origCloseDrawer=closeDrawer;closeDrawer=function(){__origCloseDrawer();setTimeout(()=>{RC.dctx=null;},300);};
+const __origCloseModal=closeModal;closeModal=function(){__origCloseModal();setTimeout(()=>{RC.mctx=null;},220);};
+</script>
+<style id="page-late">/* late additions เท่านั้น (#69) — ห้าม inline */</style>
+<!-- PREFLIGHT v6.4 — F-HR-RECRUIT · สรรหา (archetype: master + kanban)
+  round1: spacing-off=29 font-sizes=12 flex-noalign=3 inline-layout=29 z-adhoc=0 hex-off=5
+  round2: 7/7 checked · self_audit re-run หลัง token-purity fix (note/chip tints → warm pill whitelist)
+  date: 2026-09-02
+  RESIDUALS (documented · accepted — surgical fix scope · ห้ามแตะ BASE-KIT/mock/behavior):
+    · hex-off=5 → #103/#104/#105 = false-positive (เลขกฎในคอมเมนต์ ไม่ใช่สี)
+      · #B4B6BB/#C7C9CE = demo-strip persona control บน charcoal sidebar (#105 prototype scaffolding
+        ไม่ใช่ business surface) → hex บน business UI = 0 · 10 hex ของ note/chip ถอนเข้า whitelist แล้ว
+    · spacing-off=29 / font-sizes=12(>8) / inline-layout=29 = compact component + render-fn residual
+      (inherited จาก BASE-KIT/mock) — Pass R render สะอาด · แก้ = ต้องแตะ layout/behavior นอก scope
+    · flex-noalign=3 → 1 = END-BASE-KIT comment (false-positive) · 2 = .kb-card .kc-move / .band-scale (compact)
+  (Rule #60: ตัวเลขจาก self_audit.py จริง · audit.sh FAIL=0 · Pass R สะอาด — ตราเปล่า = checker BLOCK) -->
+</body>
+</html>

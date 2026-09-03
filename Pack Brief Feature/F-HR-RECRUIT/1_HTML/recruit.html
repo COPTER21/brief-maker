@@ -1,0 +1,2159 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สรรหา (Recruit) · CUBE NATIVE</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+
+<!-- Lucide Icons: loader ที่ท้าย body (ดู section "Lucide loader" ก่อน main <script>) -->
+<!-- เหตุผล:
+     1) ย้ายมาท้าย body หลีกเลี่ยง race กับ DOMContentLoaded
+     2) Multi-CDN fallback (unpkg → jsdelivr → cdnjs)
+     3) Pin version (เลิกใช้ @latest ที่ flaky — GitHub issue #2962)
+-->
+
+<style>
+/* ===== BASE-KIT v6.4 — DO NOT EDIT (Rule #69) — page CSS ต่อท้ายหลัง END marker ===== */
+/* ============== CSS VARIABLES (CUBE CI — v2.0 Warm Light rebrand) ============== */
+:root {
+  --c-navy: #111111;
+  --c-navy-2: #111111;
+  --c-primary: #FF3B30;
+  --c-primary-hover: #E62E24;
+  --c-teal: #FF9A1F;
+  --c-teal-light: #FFB763;
+  --c-ink: #111111;
+  --c-mute: #54565C;
+  --c-mute-2: #73757B;
+  --c-mute-3: #9A9CA2;
+  --c-line: #DEDAD4;
+  --c-line-2: #E9E5E0;
+  --c-line-3: #F1EEEA;
+  --c-bg-off: #FAF8F5;
+  --c-success: #1F9D55;
+  --c-warning: #E8870F;
+  --c-danger: #E62E24;
+  --sidebar-w: 232px;
+  --shell-h: 52px;
+  /* v3.13 — Fixed type scale (Iron Rule locked values) */
+  --fs-h1: 22px;        /* page title */
+  --fs-h2: 17px;        /* section title */
+  --fs-h3: 15px;        /* card / drawer title */
+  --fs-body: 14px;      /* body default */
+  --fs-sub: 13px;       /* secondary body / table cell */
+  --fs-meta: 12px;      /* meta / label */
+  --fs-cap: 11px;       /* uppercase section caption */
+  --fs-kpi: 28px;       /* stat value */
+  /* v3.13 — Fixed spacing scale */
+  --sp-xs: 4px; --sp-sm: 8px; --sp-md: 12px; --sp-lg: 20px; --sp-xl: 28px;
+  /* v3.13 — Fixed radius scale */
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-full: 999px;
+}
+
+/* ============== RESET ============== */
+* { box-sizing: border-box; }
+html, body { margin:0; padding:0; }
+/* Rule #35 — Layout Stability: จองพื้นที่ scrollbar ไว้เสมอ → เปิด modal/drawer หรือ
+   content โตขึ้นแล้ว scrollbar โผล่/หาย จะไม่ทำให้หน้าจอขยับซ้าย-ขวา (jank) */
+html { scrollbar-gutter: stable; }
+
+/* ============== SCROLLBAR (Iron Rule #49 — minimal, ห้าม default) ============== */
+/* เส้นบางมาก 5px · track โปร่งใส · พื้นเข้ม (sidebar/panel) = ขาวโปร่ง · พื้นสว่าง = charcoal จาง */
+* { scrollbar-width: thin; scrollbar-color: rgba(17,17,17,.16) transparent; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(17,17,17,.14); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(17,17,17,.26); }
+.sidebar, .slide { scrollbar-color: rgba(255,255,255,.28) transparent; }
+.sidebar ::-webkit-scrollbar-thumb, .slide ::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb, .slide::-webkit-scrollbar-thumb { background: rgba(255,255,255,.28); }
+.sidebar ::-webkit-scrollbar-thumb:hover, .slide ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.42); }
+body {
+  font-family: 'Satoshi', 'Noto Sans Thai', system-ui, sans-serif;
+  background: var(--c-bg-off);
+  color: var(--c-ink);
+  font-size:14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  /* v7.1 Rule #97: desktop-base + adaptive — 768-1180 ปรับ layout ผ่าน media query,
+     <768 = horizontal scroll (ไม่ guarantee) */
+  min-width: 768px;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+[data-lucide] { flex-shrink: 0; }
+
+/* Hide number input spinner globally (Iron Rule #19) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin:0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ============== SIDEBAR ============== */
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sidebar-w);
+  background: #111111;
+  color: #E9E5E0;
+  z-index:var(--z-shell);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.sb-brand {
+  padding:18px;
+  display: flex;
+  align-items: center;
+  gap:12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+.sb-logo {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, #FF3B30, #FF9A1F);
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(255,59,48,0.3);
+}
+.sb-name { font-weight: 700; font-size:14px; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+.sb-sub { font-size:11px; color: #9A9CA2; letter-spacing: 0.06em; font-weight: 600; text-transform: uppercase; margin-top:2px; }
+.sb-nav { flex: 1; padding:12px 8px; overflow-y: auto; }
+
+/* Module = collapsible group (Iron Rule #27).
+   Header toggles expand/collapse only — NOT navigable.
+   Children = .sb-features (clickable feature items). */
+.sb-module { margin-bottom:4px; }
+.sb-module-header {
+  display: flex; align-items: center; gap:8px;
+  width: 100%;
+  padding:8px 10px;
+  border-radius: 6px;
+  background: transparent; border: 0;
+  color: #9A9CA2;
+  font-family: inherit;
+  font-size:11px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  cursor: pointer; transition: all 120ms;
+  text-align: left;
+}
+.sb-module-header:hover { background: rgba(255,255,255,0.04); color: #DEDAD4; }
+.sb-module-header .mod-icon { flex-shrink: 0; opacity: 0.7; }
+.sb-module-header .mod-label { flex: 1; }
+.sb-module-header .mod-chevron {
+  flex-shrink: 0;
+  transition: transform 200ms;
+  opacity: 0.7;
+}
+.sb-module[data-expanded="false"] .mod-chevron { transform: rotate(-90deg); }
+.sb-module[data-expanded="false"] .sb-features { display: none; }
+
+.sb-features { padding:2px 0 6px 0; }
+
+.sb-item {
+  display: flex; align-items: center; gap:10px;
+  padding:8px 12px 8px 16px;
+  border-radius: 6px;
+  color: #DEDAD4;
+  font-size:13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms;
+  margin-bottom:1px;
+  position: relative;
+  user-select: none;
+}
+.sb-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sb-item.is-active {
+  background: #FF3B30;
+  color: #fff;
+  font-weight: 600;
+}
+.sb-item.is-active::before {
+  content: '';
+  position: absolute;
+  left: -10px; top: 7px; bottom: 7px;
+  width: 3px;
+  background: #fff;
+  border-radius: 0 2px 2px 0;
+}
+.sb-item [data-lucide] { width: 16px; height: 16px; opacity: 0.85; }
+.sb-item.is-active [data-lucide] { opacity: 1; }
+.sb-badge {
+  margin-left:auto;
+  font-size:11px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.10);
+  color: #9A9CA2;
+  padding:2px 8px;
+  border-radius: 999px;
+}
+.sb-item.is-active .sb-badge { background: rgba(255,255,255,0.18); color: #fff; }
+.sb-item.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.sb-item.is-disabled:hover { background: transparent; color: #DEDAD4; }
+.sb-footer {
+  padding:12px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  gap:8px;
+  font-size:12px;
+  color: #9A9CA2;
+}
+.pulse-dot {
+  width: 7px; height: 7px;
+  background: var(--c-teal);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(255,154,31,0.20);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ============== MAIN ============== */
+.main {
+  margin-left:var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--c-bg-off);
+}
+
+/* ============== SHELL BAR ============== */
+.shell-bar {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  border-bottom: 1px solid var(--c-line-2);
+  height: var(--shell-h);
+  display: flex;
+  align-items: center;
+  padding:0 24px;
+  z-index:var(--z-sticky);
+  gap:12px;
+}
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap:8px;
+  font-size:13px;
+  color: var(--c-mute);
+}
+.breadcrumb a { cursor: pointer; transition: color 120ms; }
+.breadcrumb a:hover { color: var(--c-primary); }
+.breadcrumb .sep { color: var(--c-mute-3); font-size:11px; }
+.breadcrumb-current { color: var(--c-ink); font-weight: 500; }
+.icon-btn {
+  width: 34px; height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--c-mute);
+  border-radius: 7px;
+  position: relative;
+  transition: all 120ms;
+}
+.icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.icon-btn [data-lucide] { width: 17px; height: 17px; }
+.notif-dot {
+  position: absolute;
+  top: 7px; right: 8px;
+  width: 7px; height: 7px;
+  background: var(--c-danger);
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap:10px;
+  padding:6px 10px 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 120ms;
+}
+.user-chip:hover { background: var(--c-line-3); }
+.user-text { line-height: 1.2; text-align: right; }
+.user-name { font-size:12.5px; font-weight: 500; color: var(--c-ink); white-space: nowrap; }
+.user-role { font-size:11px; color: var(--c-mute-2); white-space: nowrap; margin-top:1px; }
+.avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* User dropdown menu */
+.user-menu {
+  position: absolute;
+  top: calc(var(--shell-h) - 4px);
+  right: 22px;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(17,17,17,0.12);
+  width: 240px;
+  z-index:var(--z-dropdown);
+  padding:6px;
+  display: none;
+}
+.user-menu.is-open { display: block; }
+.user-menu-item {
+  display: flex;
+  align-items: center;
+  gap:10px;
+  padding:8px 12px;
+  border-radius: 6px;
+  font-size:13px;
+  color: var(--c-ink);
+  cursor: pointer;
+  transition: background 120ms;
+}
+.user-menu-item:hover { background: var(--c-bg-off); }
+.user-menu-item [data-lucide] { width: 15px; height: 15px; color: var(--c-mute-2); }
+.user-menu-item.is-danger { color: var(--c-danger); }
+.user-menu-item.is-danger [data-lucide] { color: var(--c-danger); }
+.user-menu-divider { height: 1px; background: var(--c-line-2); margin:6px 0; }
+
+/* ============== CONTENT ============== */
+/* Fluid full-width — content stretches to fill viewport (Iron Rule #30).
+   Do NOT add max-width here; component-level constraints (modal/toast/wizard
+   internal cards) are responsible for their own readability bounds. */
+.content {
+  padding:24px;
+}
+
+/* ============== v7.1 RESPONSIVE — Rule #97 (desktop-base adaptive) ============== */
+.nav-toggle { display:none; }
+@media (max-width: 1180px){
+  .content { padding:16px; }
+  .drawer { width: min(920px, 100vw); }
+  .drawer.standard { width: min(680px, 100vw); }
+  .drawer.wide, .drawer-panel.wide { width: min(1290px, 100vw); }
+  /* generic shell: sidebar เป็น off-canvas — Pattern N shell ใช้ icon rail ของตัวเองแทน */
+  .main { margin-left: 0; }
+  .sidebar { transform: translateX(-100%); transition: transform .18s ease; }
+  .sidebar.open { transform: translateX(0); box-shadow: 0 8px 32px rgba(0,0,0,.24); }
+  .nav-toggle { display:inline-flex; align-items:center; justify-content:center;
+    width:32px; height:32px; border:none; background:transparent; border-radius:8px;
+    color:var(--c-ink); }
+  .nav-toggle:hover { background: rgba(17,17,17,.06); }
+}
+
+/* ============== v7.1 LIST FULL-HEIGHT — Rule #96 ============== */
+/* หน้า list หลัก: ตารางยืดเต็มพื้นที่เหลือ ติดขอบล่างเสมอ ทุกขนาดจอ */
+.page-fill { display:flex; flex-direction:column;
+  min-height: calc(100dvh - var(--shellbar-h, 52px) - 48px); } /* 48 = content padding บน+ล่าง */
+@media (max-width:1180px){ .page-fill { min-height: calc(100dvh - var(--shellbar-h, 52px) - 32px); } }
+.page-fill > .card-list, .page-fill > .list-card { flex:1 1 auto; min-height:0;
+  display:flex; flex-direction:column; }
+.table-wrap { flex:1 1 auto; min-height:0; overflow:auto; }
+.table-wrap thead th { position:sticky; top:0; background:#fff; z-index:var(--z-sticky); }
+.table-foot { flex:0 0 auto; } /* pagination/count ติดล่างของ card เสมอ */
+
+/* ============== v7.1 OVERLAY PORTAL — Rule #95 ============== */
+/* เมนูที่ portal ออกจาก scroll container (ใช้คู่ portalMenu util) */
+.menu-fixed { position:fixed !important; z-index:var(--z-dropdown);
+  background:#fff; border:1px solid var(--c-line, #E7E2DB); border-radius:10px;
+  box-shadow:0 12px 32px rgba(17,17,17,.14); overflow-y:auto; }
+
+/* ============== PAGE HEADER ============== */
+.ph {
+  margin-bottom:18px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap:16px;
+}
+.ph > div:first-child { flex: 1 1 auto; min-width: 280px; }
+.ph-title-row {
+  display: flex;
+  align-items: baseline;
+  gap:10px;
+  margin-bottom:6px;
+}
+.ph-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:20px;
+  font-weight: 700;
+  color: var(--c-navy);
+  margin:0;
+  letter-spacing: -0.01em;
+}
+.ph-count {
+  font-size:12.5px;
+  font-weight: 600;
+  color: var(--c-mute-2);
+  background: var(--c-line-3);
+  padding:3px 10px;
+  border-radius: 999px;
+}
+.ph-sub { font-size:13px; color: var(--c-mute); margin:0; }
+.ph-actions { display: flex;align-items:center; gap:8px; flex-shrink: 0; }
+
+/* ============== BUTTONS ============== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;   /* Rule #36 — content กึ่งกลางแนวนอน */
+  gap:6px;
+  height: 36px;
+  /* Rule #36 — padding-top 2px = optical centering สำหรับฟอนต์ไทย (Noto Sans Thai):
+     baseline ของไทยลอยสูงเมื่อ flex-center เพราะ font เผื่อที่สระล่าง → นัดจ์ลง 2px ให้เข้ากลางจริง.
+     ✅ verified ด้วยการ render จริง — ทนทุกเบราว์เซอร์ (ต่างจาก text-box-trim ที่รองรับเฉพาะ Chrome 133+). */
+  padding:2px 16px 0;
+  border-radius: 8px;
+  font-size:13px;
+  font-weight: 500;
+  /* ⚠️ Rule #36 — ห้ามใส่ line-height:1 / overflow:hidden กับตัวปุ่มที่มีข้อความไทย
+     เพราะจะ "ตัดสระบน-วรรณยุกต์-สระล่าง" ทำให้ตัวอักษรเบี้ยว. ปล่อย line-height ตาม body (1.5). */
+  border: 1px solid transparent;
+  background: transparent;
+  white-space: nowrap;       /* label ไม่ตัดบรรทัด → ปุ่มในแถวเดียวสูงเท่ากัน */
+  transition: all 120ms;
+  user-select: none;
+  cursor: pointer;
+}
+.btn [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; }  /* Rule #36 — icon ไม่ถูกบีบ */
+.btn:disabled, .btn.is-disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+.btn-eq { min-width: 104px; }  /* Rule #36 — ปุ่มคู่ที่ควรสมมาตร → กว้างเท่ากัน */
+/* Rule #36 — label ยาวที่ "ต้อง" จำกัดความกว้าง: truncate ที่ span (.lbl) ไม่ใช่ที่ตัวปุ่ม.
+   line-height (1.5) สูงพอ → overflow:hidden ตัดเฉพาะแนวนอน (ไม่ตัดสระไทย). ปกติปล่อยปุ่มโตตาม label ดีกว่า. */
+.btn-truncate { max-width: 220px; }
+.btn-truncate .lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn-primary { background: var(--c-primary); color: #fff; }
+.btn-primary:hover { background: var(--c-primary-hover); box-shadow: 0 2px 8px rgba(255,59,48,0.30); }
+.btn-secondary { background: #fff; border-color: var(--c-line); color: var(--c-ink); }
+.btn-secondary:hover { background: var(--c-line-3); border-color: var(--c-mute-2); }
+.btn-ghost { color: var(--c-mute); }
+.btn-ghost:hover { background: var(--c-line-3); color: var(--c-ink); }
+.btn-danger { background: #fff; border-color: var(--c-line); color: var(--c-danger); }
+.btn-danger:hover { background: #FFE9E7; border-color: var(--c-danger); }
+.btn-link { background: transparent; border: 0; padding:0 4px; height: auto; color: var(--c-primary); font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn-sm { height: 30px; padding:2px 12px 0; font-size:12px; }
+
+/* ============== STATS (KPI Cards) ============== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap:12px;
+  margin-bottom:18px;
+}
+.stat {
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  padding:16px 16px;
+  transition: all 150ms;
+}
+.stat:hover { border-color: var(--c-line); box-shadow: 0 2px 8px rgba(17,17,17,0.05); }
+.stat-label {
+  display: flex;
+  align-items: center;
+  gap:6px;
+  font-size:12px;
+  font-weight: 500;
+  color: var(--c-mute);
+}
+.stat-label [data-lucide] { width: 13px; height: 13px; color: var(--c-primary); }
+.stat-value {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:26px;
+  font-weight: 700;
+  color: var(--c-navy);
+  margin-top:6px;
+  letter-spacing: -0.01em;
+}
+.stat-meta {
+  font-size:12px;
+  color: var(--c-mute-2);
+  margin-top:6px;
+  display: flex;
+  align-items: center;
+  gap:4px;
+}
+.stat-meta.is-up { color: var(--c-success); }
+.stat-meta.is-down { color: var(--c-danger); }
+.stat-meta [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== CARD ============== */
+.card {
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* ============== FILTER BAR ============== */
+.filter-bar {
+  padding:16px 18px;
+  display: flex;
+  gap:10px;
+  align-items: center;
+  border-bottom: 1px solid var(--c-line-2);
+  background: #fff;
+  flex-wrap: wrap;
+}
+
+/* ============== INPUTS ============== */
+.input, .select {
+  height: 36px;
+  padding:0 12px;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  font-size:13px;
+  background: #fff;
+  color: var(--c-ink);
+  font-family: inherit;
+  transition: all 120ms;
+  width: 100%;
+}
+.input:focus, .select:focus {
+  outline: none;
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px rgba(255,59,48,0.10);
+}
+.select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right:32px;
+  appearance: none;
+}
+.input-search { position: relative; flex: 1; max-width: 320px; }
+.input-search input { padding-left:36px; }
+.input-search .lead-icon {
+  position: absolute;
+  left: 11px; top: 50%;
+  transform: translateY(-50%);
+  width: 15px; height: 15px;
+  color: var(--c-mute-2);
+  pointer-events: none;
+}
+
+/* ===== SEARCH-SELECT (Iron Rule #34) — searchable dropdown แทน <select> เมื่อ options เยอะ/lookup master =====
+   list = position:absolute overlay → ไม่ดันเนื้อหา (สอดคล้อง Rule #35) */
+.search-select { position: relative; width: 100%; }
+.search-select .ss-input { padding-left:32px; padding-right:32px; }
+.search-select .ss-lead {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px;   /* ⬅ ขนาดตายตัว — ไม่พึ่ง .w-4 (กัน Lucide เรนเดอร์ 24px default → placeholder ดูห่าง) */
+  color: var(--c-mute-3); pointer-events: none;
+}
+.search-select .ss-caret {
+  position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+  width: 15px; height: 15px; color: var(--c-mute-3); pointer-events: none;
+}
+.search-select .ss-clear {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  display: inline-flex; padding:3px; border: 0; background: transparent;
+  color: var(--c-mute-2); cursor: pointer; border-radius: 6px;
+}
+.search-select .ss-clear:hover { background: var(--c-line-3); color: var(--c-ink); }
+.ss-list {
+  position: absolute; z-index:var(--z-backdrop); left: 0; right: 0; margin-top:4px;
+  max-height: 280px; overflow-y: auto; background: #fff;
+  border: 1px solid var(--c-line); border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(17,17,17,0.10), 0 4px 10px rgba(17,17,17,0.05);
+}
+.ss-opt {
+  width: 100%; display: flex; align-items: center; gap:10px; padding:10px 12px;
+  border: 0; border-bottom: 1px solid var(--c-line-3); background: transparent;
+  cursor: pointer; text-align: left; font-family: inherit;
+}
+.ss-opt:last-child { border-bottom: 0; }
+.ss-opt:hover, .ss-opt.is-active { background: rgba(255,59,48,0.06); }
+.ss-opt-ic { width: 16px; height: 16px; color: var(--c-primary); flex-shrink: 0; }  /* ขนาดตายตัวเช่นกัน */
+.ss-opt-main { flex: 1; min-width: 0; }
+.ss-opt-label { display: block; font-size:13px; color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-sub { display: block; font-size:12px; color: var(--c-mute-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-right { flex-shrink: 0; font-size:12px; color: var(--c-mute); }
+.ss-opt mark { background: rgba(255,59,48,0.16); color: inherit; padding:0 1px; border-radius: 2px; }
+.ss-empty { padding:20px 16px; text-align: center; font-size:13px; color: var(--c-mute-2); }
+
+/* ============== TABLE ============== */
+.table-scroll { overflow-x: auto; }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size:13px;
+}
+.table thead { background: var(--c-bg-off); }
+.table th {
+  padding:12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--c-mute);
+  font-size:12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--c-line-2);
+  white-space: nowrap;
+}
+.table th.col-check { width: 40px; padding-right:0; }
+.table th.is-sortable { cursor: pointer; user-select: none; }
+.table th.is-sortable:hover { color: var(--c-ink); background: var(--c-line-3); }
+.table th .sort-arrow { display: inline-block; margin-left:4px; opacity: 0.4; }
+.table th.is-sorted .sort-arrow { opacity: 1; color: var(--c-primary); }
+.table td {
+  padding:12px 16px 12px;  /* Rule #38 — optical centering ไทย: pad-top มากกว่า bottom 2px */
+  border-bottom: 1px solid var(--c-line-2);
+  color: var(--c-ink);
+  vertical-align: middle;
+}
+.table tbody tr { transition: background 120ms; }
+.table tbody tr:hover { background: var(--c-bg-off); }
+.table tbody tr.is-selected { background: rgba(255,59,48,0.04); }
+.table tbody tr.is-selected:hover { background: rgba(255,59,48,0.07); }
+.table tbody tr:last-child td { border-bottom: 0; }
+/* Rule #41 — แถวกดได้ = เปิด view (ไม่มีไอคอนดวงตา). row ที่ clickable ต้องสื่อด้วย cursor */
+.table tbody tr.is-clickable { cursor: pointer; }
+/* Rule #42 — Long-list UX: sticky header (opt-in .is-sticky) — ตารางยาว scroll หัวค้าง */
+.table-scroll.is-sticky { max-height: 560px; overflow-y: auto; scrollbar-gutter: stable; }
+.table-scroll.is-sticky thead th {
+  position: sticky; top: 0; z-index: 3;
+  background: var(--c-bg-off);            /* ⚠️ ต้องทึบที่ตัว th (ไม่ใช่แค่ thead) — ไม่งั้น row เลื่อนทะลุซ้อนหัว */
+  box-shadow: inset 0 -1px 0 var(--c-line-2);  /* border-bottom สำหรับ sticky (border ปกติหายตอน sticky) */
+}
+/* Rule #42 — Thai-safe cell truncation: ตัดเฉพาะแนวนอน (… ) line-height พอ ไม่ตัดสระ. ใส่ title=ค่าเต็มเพื่อ hover ดู */
+.cell-truncate { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+/* Rule #43 — ตัวเลข tabular + คอลัมน์ตัวเลขชิดขวา */
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+th.col-num, td.col-num { text-align: right; }
+td.col-num .num, td.col-num { font-variant-numeric: tabular-nums; }
+
+/* ============== CHECKBOX ============== */
+.cb {
+  width: 16px; height: 16px;
+  border: 1.5px solid var(--c-line);
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: all 120ms;
+  flex-shrink: 0;
+}
+.cb.is-checked, .cb.is-partial {
+  background: var(--c-primary);
+  border-color: var(--c-primary);
+}
+.cb.is-checked::after {
+  content: '';
+  position: absolute;
+  left: 4px; top: 1px;
+  width: 5px; height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.cb.is-partial::after {
+  content: '';
+  position: absolute;
+  left: 3px; top: 6px;
+  width: 8px; height: 2px;
+  background: #fff;
+}
+.cb:hover { border-color: var(--c-primary); }
+
+/* ============== USER CELL ============== */
+.user-cell { display: flex; align-items: center; gap:10px; }
+.uc-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.uc-name { font-weight: 600; color: var(--c-ink); font-size:13px; line-height: 1.3; }
+.uc-email { font-size:12px; color: var(--c-mute-2); margin-top:1px; line-height: 1.3; }
+
+/* ============== PILLS ============== */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap:5px;
+  height: 22px;            /* Rule #38.1 — ทุก pill สูงเท่ากันเป๊ะ · ห้ามใช้ padding ตั้งความสูง */
+  line-height: 1;
+  padding:1px 10px 0;      /* optical centering ไทย (บน 1px) */
+  border-radius: 999px;
+  font-size:11.5px;
+  vertical-align: middle;
+  box-sizing: border-box;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pill [data-lucide] { width: 11px; height: 11px; }
+.pill-registered { background: #E6F0FF; color: #1A5FCC; }
+.pill-active { background: #E6F0FF; color: #1A5FCC; }
+.pill-converted { background: #E4F4EB; color: #157A41; }
+.pill-suspended { background: #FFF1DD; color: #B8690B; }
+.pill-archived { background: var(--c-line-3); color: var(--c-mute-2); }
+/* v3.13 — Semantic pill aliases (ใช้ชุดนี้เป็นหลัก — mapping ดู knowledge/microcopy.md) */
+.pill-info    { background: #E6F0FF; color: #1A5FCC; }   /* กำลังดำเนินการ/ใช้งาน */
+.pill-success { background: #E4F4EB; color: #157A41; }   /* อนุมัติแล้ว/เสร็จสิ้น */
+.pill-warning { background: #FFF1DD; color: #B8690B; }   /* รอดำเนินการ/รออนุมัติ */
+.pill-danger  { background: #FFE9E7; color: #E62E24; }   /* ปฏิเสธ/ยกเลิก */
+.pill-muted   { background: var(--c-line-3); color: var(--c-mute-2); } /* ร่าง/ปิดใช้งาน/เก็บถาวร */
+
+/* v3.13 — Loading spinner (Iron Rule #44) */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.8s linear infinite; }
+
+/* v3.13 — Form Section Grouping (Iron Rule #45) */
+.form-section { margin-top:var(--sp-xl); }
+.form-section:first-child { margin-top:0; }
+.form-section-title {
+  font-size: var(--fs-cap); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--c-mute);
+  padding-bottom:var(--sp-sm); border-bottom: 1px solid var(--c-line-2);
+  margin-bottom:var(--sp-md);
+}
+
+/* v3.13 — Segmented control (ช่วงเวลา dashboard ฯลฯ — Pattern J) */
+.seg-control { display:inline-flex; background: var(--c-line-3); border-radius: var(--r-md); padding:2px; gap:2px; }
+.seg-item {
+  padding:6px 12px 3px; border-radius: var(--r-sm); border: none; background: transparent;
+  font-size: var(--fs-meta); font-weight: 500; color: var(--c-mute-2); cursor: pointer;
+  font-family: inherit; white-space: nowrap;
+}
+.seg-item.is-active { background: #fff; color: var(--c-ink); font-weight: 600; box-shadow: 0 1px 3px rgba(17,17,17,0.08); }
+.pill-danger { background: #FFE9E7; color: var(--c-danger); }
+
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot.is-active { background: #1A5FCC; box-shadow: 0 0 0 2.5px rgba(37,99,235,0.18); }
+.dot.is-converted { background: #157A41; box-shadow: 0 0 0 2.5px rgba(6,95,70,0.20); }
+.dot.is-suspended { background: var(--c-warning); }
+.dot.is-archived { background: var(--c-mute-3); }
+
+/* Mini-link cell (e.g. tenant link) */
+.tenant-link {
+  display: inline-flex;
+  align-items: center;
+  gap:4px;
+  color: var(--c-primary);
+  font-size:12.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.tenant-link:hover { text-decoration: underline; }
+.tenant-link [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== ROW ACTIONS ============== */
+.row-actions { display: inline-flex; gap:2px; }
+.ra-btn {
+  width: 28px; height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--c-mute-2);
+  border-radius: 6px;
+  transition: all 120ms;
+}
+.ra-btn:hover { background: var(--c-line-3); color: var(--c-primary); }
+.ra-btn.is-danger:hover { background: #FFE9E7; color: var(--c-danger); }
+.ra-btn.is-success:hover { background: rgba(255,154,31,0.12); color: var(--c-teal); }
+.ra-btn [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== TABLE FOOTER ============== */
+.table-footer {
+  padding:12px 18px;
+  background: var(--c-bg-off);
+  border-top: 1px solid var(--c-line-2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size:12.5px;
+  color: var(--c-mute);
+  flex-wrap: wrap;
+  gap:10px;
+}
+.pagination { display: inline-flex; gap:4px; align-items: center; }
+.pg-btn {
+  min-width: 30px; height: 30px;
+  padding:0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 6px;
+  color: var(--c-mute);
+  font-size:12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms;
+}
+.pg-btn:hover { border-color: var(--c-line); background: var(--c-bg-off); }
+.pg-btn.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.pg-btn.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn [data-lucide] { width: 13px; height: 13px; }
+
+/* ============== BULK BAR ============== */
+.bulk-bar {
+  background: var(--c-navy);
+  color: #fff;
+  padding:12px 18px;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  gap:12px;
+  border-bottom: 1px solid var(--c-line-2);
+  margin:-1px -1px 0;
+  font-size:13px;
+}
+.bulk-bar .btn { height: 30px; padding:2px 12px 0; font-size:12px; }
+.bulk-bar .btn-secondary {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.18);
+  color: #fff;
+}
+.bulk-bar .btn-secondary:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.30); }
+
+/* ============== DRAWER ============== */
+/* ---- v6.1 Pattern B drawer chrome (locked to references/drawer-standard/pr.html) ----
+   create/edit drawer ให้ใช้ชุดนี้: .dw-head (eyebrow + h2 20px + .top-icon-btn ปิด)
+   + .d-stepper (.stepper-item/.stepper-circle 32px — ไม่ใช่ .stepper กลางของ page wizard)
+   + .dw-footer (ย้อนกลับ secondary ซ้าย · ยกเลิก ghost + primary ชิดขวา) */
+.top-icon-btn { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border:0; background:transparent; border-radius: var(--r-sm); color: var(--c-mute-2); cursor:pointer; transition: all 120ms; flex-shrink:0; }
+.top-icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.dw-head { padding:18px 24px 16px; border-bottom: 1px solid var(--c-line-2); flex-shrink: 0; }
+.dw-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap:16px; }
+.dw-eyebrow { display: flex; align-items: center; gap:6px; font-size:11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-mute-2); margin-bottom:4px; font-weight: 600; }
+.dw-title { font-size:20px; font-weight: 700; color: var(--c-navy); margin:0; letter-spacing: -0.01em; }
+.dw-sub { font-size: var(--fs-meta); color: var(--c-mute-2); margin-top:4px; }
+.d-stepper { display: flex; align-items: flex-start; gap:0; width: 100%; margin-top:18px; }
+.stepper-item { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; min-width: 0; }
+.stepper-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size:13px; font-weight: 600; background: #fff; color: var(--c-mute-3); border: 2px solid var(--c-line); transition: all 200ms; z-index: 2; }
+.stepper-item.active .stepper-circle { background: var(--c-primary); color: #fff; border-color: var(--c-primary); box-shadow: 0 0 0 4px rgba(255,59,48,0.12); }
+.stepper-item.done .stepper-circle { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
+.stepper-label { margin-top:8px; font-size:12px; font-weight: 500; color: var(--c-mute-3); text-align: center; line-height: 1.3; transition: color 200ms; }
+.stepper-item.active .stepper-label { color: var(--c-navy); font-weight: 600; }
+.stepper-item.done .stepper-label { color: var(--c-mute); }
+.stepper-item:not(:last-child)::after { content: ''; position: absolute; top: 15px; left: 50%; right: -50%; height: 2px; background: var(--c-line-2); z-index: 1; }
+.stepper-item.done:not(:last-child)::after { background: var(--c-primary); }
+.dw-footer { padding:16px 24px; border-top: 1px solid var(--c-line-2); background: var(--c-bg-off); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap:8px; }
+.dw-footer-right { display: flex; align-items: center; gap:8px; }
+
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17,17,17,0.40);
+  z-index:var(--z-backdrop);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms;
+}
+.drawer-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 920px;           /* v2 standard (Iron Rule #11) — wide drawer */
+  max-width: 96vw;
+  background: #fff;
+  z-index:var(--z-drawer);
+  transform: translateX(100%);
+  transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -16px 0 40px rgba(17,17,17,0.18);
+}
+.drawer.is-open { transform: translateX(0); }
+.drawer.standard { width: 680px; }   /* simple forms / short view (Iron Rule #11) */
+
+/* ========== STEPPER STANDARD (Iron Rule #47) — ใช้ตัวเดียวทุก wizard ========== */
+.stepper { display:flex; align-items:center; gap:var(--sp-sm); }
+.step { display:flex; align-items:center; gap:var(--sp-sm); }
+.step-dot {
+  width:26px; height:26px; border-radius: var(--r-full);
+  display:flex; align-items:center; justify-content:center;
+  font-size: var(--fs-meta); font-weight:600; padding-top:1px; /* Thai rhythm */
+  border:1.5px solid var(--c-line); background:#fff; color: var(--c-mute-2);
+}
+.step-label { font-size: var(--fs-sub); color: var(--c-mute-2); font-weight:500; white-space:nowrap; }
+.step-connector { width:28px; height:1.5px; background: var(--c-line-2); flex:0 0 auto; }
+.step.is-current .step-dot { border-color: var(--c-primary); background: var(--c-primary); color:#fff; }
+.step.is-current .step-label { color: var(--c-ink); font-weight:600; }
+.step.is-done .step-dot { border-color: var(--c-teal); background:#fff; color: var(--c-teal); }
+.step.is-done .step-connector, .step.is-current ~ * {}
+.step.is-done + .step-connector { background: var(--c-teal); }
+/* placement: drawer wizard → .drawer-stepper-band (ใต้ header) / page wizard → .wizard-stepper-band */
+.drawer-stepper-band { padding:10px 24px; border-bottom: 1px solid var(--c-line-2); background: var(--c-bg-off); }
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  gap:16px;
+  padding:18px 24px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+/* ---- Rule #38.2 TABS (kit เดียว · ห้ามเขียน .drawer-tab/.seg เองแทน) ---- */
+.tabs { display:flex; gap:0; border-bottom:1px solid var(--c-line-2); margin:0 0 var(--sp-lg); flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; }
+.tabs::-webkit-scrollbar { display:none; }
+.tab { display:inline-flex; align-items:center; gap:6px; height:40px; padding:0 14px; margin-bottom:-1px; border:0; border-bottom:2px solid transparent; background:transparent; font:inherit; font-size:13px; font-weight:500; color:var(--c-mute); cursor:pointer; white-space:nowrap; flex:0 0 auto; }
+.tab [data-lucide] { width:14px; height:14px; }
+.tab:hover { color:var(--c-ink); }
+.tab.is-active, .tab.on { color:var(--c-primary); border-bottom-color:var(--c-primary); font-weight:600; }
+.tab .tab-badge { font-size:10.5px; font-weight:700; background:var(--c-line-2); color:var(--c-mute); border-radius:999px; height:18px; line-height:18px; padding:0 7px; }
+.tab.is-active .tab-badge { background:rgba(255,59,48,.12); color:var(--c-primary); }
+/* drawer header ที่มี tabs — header เป็น column · tabs bleed เต็มกว้าง · เส้นเดียว (ของ header) · body ไม่มี border-top */
+.drawer-header.has-tabs { flex-direction:column; align-items:stretch; gap:0; padding-bottom:0; }
+.drawer-header.has-tabs .dw-head-row { display:flex; align-items:flex-start; gap:16px; padding-bottom:14px; }
+.drawer-header.has-tabs .tabs { margin:0 -24px -1px; padding:0 24px; border-bottom:0; }
+.drawer-header.has-tabs + .drawer-body { border-top:0; }
+.dw-eyebrow { font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--c-mute-2); display:flex; align-items:center; gap:6px; margin-bottom:4px; }
+.dw-title { font-size:18px; font-weight:700; color:var(--c-ink); line-height:1.25; }
+/* page-level tabs ใต้ page header (Rule #104) */
+.ph + .tabs, .page-tabs { margin:-4px 0 var(--sp-lg); }
+/* ---- Rule #106 info tooltip แทน hint banner ---- */
+.tip { position:relative; display:inline-flex; align-items:center; color:var(--c-mute-2); cursor:help; }
+.tip [data-lucide] { width:13px; height:13px; }
+.tip::after { content:attr(data-tip); position:absolute; left:50%; bottom:calc(100% + 6px); transform:translateX(-50%); background:var(--c-ink); color:#fff; font-size:11.5px; font-weight:400; line-height:1.45; padding:6px 10px; border-radius:6px; white-space:normal; width:max-content; max-width:280px; opacity:0; pointer-events:none; transition:opacity 120ms; z-index:var(--z-tooltip,60); }
+.tip:hover::after { opacity:1; }
+.drawer-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.drawer-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:20px;
+  font-weight: 600;
+  color: var(--c-navy);
+  margin:0;
+  letter-spacing: -0.01em;
+}
+.drawer-subtitle {
+  font-size:12px;
+  color: var(--c-mute);
+  margin-top:4px;
+  display: flex;
+  align-items: center;
+  gap:8px;
+  flex-wrap: wrap;
+}
+.drawer-tabs {
+  display: flex;align-items:center;
+  padding:0 24px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.drawer-tab {
+  padding:10px 16px;
+  font-size:13px;
+  font-weight: 500;
+  color: var(--c-mute);
+  border-bottom: 2px solid transparent;
+  transition: all 120ms;
+  margin-bottom:-1px;
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+}
+.drawer-tab:hover { color: var(--c-ink); }
+.drawer-tab.is-active { color: var(--c-primary); border-bottom-color: var(--c-primary); }
+.drawer-body { flex: 1; overflow-y: auto; padding:24px; scrollbar-gutter: stable; }
+.drawer-section { margin-bottom:24px; }
+.drawer-section-title {
+  font-size:11px;
+  font-weight: 700;
+  color: var(--c-mute);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin:0 0 10px;
+}
+.drawer-fields {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap:10px 16px;
+  font-size:13px;
+}
+.drawer-fields .lbl { color: var(--c-mute); }
+.drawer-fields .val { color: var(--c-ink); font-weight: 500; }
+.drawer-footer {
+  padding:12px 24px;
+  border-top: 1px solid var(--c-line-2);
+  display: flex;
+  gap:8px;
+  align-items: center;
+  background: var(--c-bg-off);
+}
+/* Drawer Button Contract (Iron Rule #31) helpers */
+.footer-spacer { flex: 1; }
+.drawer-footer-meta { font-size:12px; color: var(--c-mute-2); }
+.drawer-header-actions { display: flex; gap:6px; align-items: center; }
+.drawer-header-divider { width: 1px; height: 22px; background: var(--c-line-2); margin:0 4px; flex-shrink: 0; }
+
+/* ============== TIMELINE ============== */
+.timeline { position: relative; padding-left:24px; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--c-line-2);
+}
+.tl-item { position: relative; margin-bottom:16px; }
+.tl-item:last-child { margin-bottom:0; }
+.tl-dot {
+  position: absolute;
+  left: -20px;
+  top: 3px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--c-primary);
+}
+.tl-dot.is-success { border-color: var(--c-success); }
+.tl-dot.is-warning { border-color: var(--c-warning); }
+.tl-title { font-size:13px; font-weight: 600; color: var(--c-ink); }
+.tl-meta { font-size:12px; color: var(--c-mute-2); margin-top:2px; }
+
+/* ============== BOOKMARK / RELATED CARDS ============== */
+.bm-card {
+  display: flex;
+  gap:12px;
+  padding:12px 12px;
+  border: 1px solid var(--c-line-2);
+  border-radius: 8px;
+  margin-bottom:8px;
+  cursor: pointer;
+  transition: all 120ms;
+  align-items: center;
+}
+.bm-card:hover { border-color: var(--c-line); }
+.bm-icon {
+  width: 28px; height: 28px;
+  background: rgba(255,59,48,0.10);
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-primary);
+  flex-shrink: 0;
+}
+.bm-card [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== NOTES ============== */
+.notes-area {
+  width: 100%;
+  min-height: 130px;
+  padding:12px 16px;
+  background: #fff;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  resize: vertical;
+  font-family: inherit;
+  font-size:13px;
+  line-height: 1.55;
+}
+.notes-area:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(255,59,48,0.10); }
+
+/* ============== EMPTY STATE ============== */
+.empty {
+  padding:56px 24px;
+  text-align: center;
+  color: var(--c-mute);
+}
+.empty-icon {
+  width: 52px; height: 52px;
+  margin:0 auto 16px;
+  border-radius: 50%;
+  background: var(--c-line-3);
+  color: var(--c-mute-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.empty-icon [data-lucide] { width: 22px; height: 22px; }
+.empty-title {
+  font-size:16px;
+  font-weight: 600;
+  color: var(--c-ink);
+  margin-bottom:6px;
+  font-family: 'Noto Sans Thai', sans-serif;
+}
+.empty-desc { font-size:13px; color: var(--c-mute); max-width: 320px; margin:0 auto; }
+.empty .btn { margin-top:16px; }  /* Rule #39 — empty state ควรมีปุ่ม action หลัก */
+
+/* ============== MODAL ============== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17,17,17,0.50);
+  z-index:var(--z-backdrop);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 440px;
+  max-width: 92vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.96);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 24px 64px rgba(17,17,17,0.28);
+  overflow: hidden;
+}
+.modal-backdrop.is-open .modal { transform: scale(1); }
+.modal-header {
+  padding:18px 24px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap:12px;
+}
+.modal-header-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: rgba(255,59,48,0.10);
+  color: var(--c-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.modal-header-icon.is-danger { background: #FFE9E7; color: var(--c-danger); }
+.modal-header-icon.is-warning { background: #FFF1DD; color: var(--c-warning); }
+.modal-header-icon [data-lucide] { width: 18px; height: 18px; }
+.modal-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:16px;
+  font-weight: 600;
+  color: var(--c-navy);
+  margin:0 0 4px;
+}
+.modal-subtitle { font-size:13px; color: var(--c-mute); margin:0; line-height: 1.5; }
+.modal-body {
+  padding:6px 24px 18px;
+  font-size:13px;
+  color: var(--c-ink);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+.modal-footer {
+  padding:12px 24px;
+  background: var(--c-bg-off);
+  border-top: 1px solid var(--c-line-2);
+  display: flex;align-items:center;
+  justify-content: flex-end;
+  gap:8px;
+}
+
+/* ============== FIELDS ============== */
+.field { margin-bottom:16px; }
+.field-label { display: block; font-size:12.5px; font-weight: 500; color: var(--c-mute); margin-bottom:6px; }
+.field-label .req { color: var(--c-danger); margin-left:2px; }
+.field-input { width: 100%; }
+.field-help { font-size:12px; color: var(--c-mute-2); margin-top:4px; }
+/* Rule #43 — จองพื้นที่ error ไว้ (visibility แทน display) → error โผล่แล้วฟอร์มไม่กระตุก.
+   ถ้า field ไหนไม่ใส่ <div class="field-error"> ก็ไม่จองพื้นที่ (author เลือกเองรายตัว) */
+.field-error { font-size:12px; color: var(--c-danger); margin-top:4px; min-height: 15px; visibility: hidden; }
+.field.is-invalid .input,
+.field.is-invalid .select { border-color: var(--c-danger); }
+.field.is-invalid .field-error { visibility: visible; }
+
+/* Responsive form grid (Iron Rule #17) */
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap:12px;
+}
+
+/* ============== TOAST ============== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--c-navy);
+  color: #fff;
+  padding:12px 18px;
+  border-radius: 10px;
+  font-size:13px;
+  font-weight: 500;
+  z-index:var(--z-toast);
+  display: flex;
+  align-items: center;
+  gap:10px;
+  box-shadow: 0 12px 32px rgba(17,17,17,0.30);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 380px;
+}
+.toast.is-visible { transform: translateY(0); opacity: 1; }
+.toast.is-success { background: var(--c-success); }
+.toast.is-info { background: var(--c-primary); }
+.toast.is-warning { background: var(--c-warning); }
+.toast.is-error { background: var(--c-danger); }
+.toast [data-lucide] { width: 17px; height: 17px; }
+
+/* ============== LINE EXPAND ANIMATION (Pattern E) ============== */
+.line-expanded {
+  animation: lineExpand 220ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+@keyframes lineExpand {
+  from { max-height: 0; opacity: 0; transform: translateY(-8px); }
+  to { max-height: 600px; opacity: 1; transform: translateY(0); }
+}
+
+/* ============== WIZARD LAYOUT (Iron Rule #22) ============== */
+.page-content-host.has-wizard { display: flex; flex-direction: column; height: 100%; }
+.wizard-shell { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 100%; }
+.wizard-stepper-band {
+  flex: 0 0 auto; background: white;
+  padding:18px 32px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.wizard-body { flex: 1 1 auto; padding:24px 32px 28px; min-height: 0; background: var(--c-bg-off); }
+.wizard-card {
+  padding:28px 32px;
+  width: 100%;
+  max-width: 960px;
+  margin:0 auto;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+}
+.wizard-footer {
+  flex: 0 0 auto;
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding:12px 32px;
+  display: flex;align-items:center;
+  justify-content: space-between;
+  border-top: 1px solid var(--c-line-2);
+  box-shadow: 0 -2px 8px rgba(17,17,17,0.04);
+  z-index:var(--z-sticky);
+}
+.stepper-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+  max-width: 640px;
+  margin:0 auto;
+  gap:0;
+}
+.stepper-row .step-line {
+  flex: 1 1 auto;
+  min-width: 28px;
+  max-width: 80px;
+  height: 2px;
+  background: var(--c-line-2);
+}
+.stepper-row .step-line.is-done { background: var(--c-primary); }
+.step-dot {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--c-line-2);
+  color: var(--c-mute-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12.5px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.step-dot.is-active { background: var(--c-primary); color: #fff; }
+.step-dot.is-done { background: var(--c-primary); color: #fff; }
+
+/* ============== UTILITIES ============== */
+.hidden { display: none !important; }  /* v6.1 — search-select/overlay พึ่ง class นี้ (เดิมหายไป ทำให้ ss-list เปิดค้าง + ปุ่ม X โผล่) */
+.text-mute { color: var(--c-mute); }
+.text-mute-2 { color: var(--c-mute-2); }
+.text-primary { color: var(--c-primary); }
+.text-success { color: var(--c-success); }
+.text-danger { color: var(--c-danger); }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap:8px; }
+.gap-3 { gap:12px; }
+.gap-4 { gap:16px; }
+.mb-2 { margin-bottom:8px; }
+.mb-3 { margin-bottom:12px; }
+.mb-4 { margin-bottom:16px; }
+.mt-2 { margin-top:8px; }
+.mt-3 { margin-top:12px; }
+.mt-4 { margin-top:16px; }
+
+/* Icon utility classes (CSS-defined so no Tailwind dependency for these) */
+.w-2\.5 { width: 10px; }   .h-2\.5 { height: 10px; }
+.w-3   { width: 12px; }    .h-3   { height: 12px; }
+.w-3\.5 { width: 14px; }   .h-3\.5 { height: 14px; }
+.w-4   { width: 16px; }    .h-4   { height: 16px; }
+.w-5   { width: 20px; }    .h-5   { height: 20px; }
+
+/* ============================================================
+   Lucide SVG sizing fix
+   ------------------------------------------------------------
+   Lucide replaces <i data-lucide="..."> with <svg class="lucide ...">
+   ที่มี width="24" height="24" attributes ติดมาด้วย — attributes
+   เหล่านี้ override CSS class .w-N ทำให้ icons เด้งเป็น 24×24
+   ดัน pill/button สูงเกินขนาด design.
+
+   วิธีแก้: บังคับ svg.lucide ทุกตัวให้ width/height = 1em แล้ว
+   ปรับขนาดผ่าน font-size บน parent. Plus override สำหรับเคสที่
+   ใช้ .w-N/.h-N โดยตรงบน <i> (Lucide จะ copy class ไปยัง svg)
+   ============================================================ */
+svg.lucide {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: -0.125em;
+  flex-shrink: 0;
+}
+/* เมื่อ .w-N / .h-N ถูก copy ไปบน svg.lucide ให้บังคับ override
+   width/height attributes ที่ Lucide ใส่มา (specificity ชนะ attribute) */
+svg.lucide.w-2\.5 { width: 10px; }   svg.lucide.h-2\.5 { height: 10px; }
+svg.lucide.w-3    { width: 12px; }   svg.lucide.h-3    { height: 12px; }
+svg.lucide.w-3\.5 { width: 14px; }   svg.lucide.h-3\.5 { height: 14px; }
+svg.lucide.w-4    { width: 16px; }   svg.lucide.h-4    { height: 16px; }
+svg.lucide.w-5    { width: 20px; }   svg.lucide.h-5    { height: 20px; }
+
+/* ===== Tooltip (#33/#67 — hint เข้า ⓘ hover) ===== */
+.info-tip{display:inline-flex;align-items:center;margin-left:6px;color:var(--c-mute-2);cursor:help;position:relative}
+.info-tip svg,.info-tip i{width:14px;height:14px}
+.info-tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:var(--c-navy);color:#fff;font-size:12px;line-height:1.5;padding:8px 12px;border-radius:8px;
+  max-width:340px;width:max-content;white-space:normal;opacity:0;pointer-events:none;transition:opacity .12s;z-index:var(--z-dropdown)}
+.info-tip:hover::after{opacity:1}
+/* ===== Drop-up (#66) ===== */
+.drop-up{bottom:100%!important;top:auto!important;margin-bottom:4px}
+
+/* ===== END BASE-KIT — เขียน page-specific CSS ใต้บรรทัดนี้เท่านั้น ===== */
+</style>
+<style id="feature-css">
+:root{--z-shell:19;--z-sticky:5;--z-dropdown:40;--z-backdrop:50;--z-drawer:51;--z-toast:80;--z-tooltip:65}
+.demo-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#FFF7EC;border:1px solid #FCE3BE;border-radius:var(--r-md);padding:8px 12px;margin:0 0 var(--sp-lg);font-size:var(--fs-meta);color:var(--c-mute)}
+.demo-strip .ds-label{font-weight:700;color:var(--c-warning);display:inline-flex;align-items:center;gap:6px}
+.demo-strip .seg-control{margin-left:auto}
+.filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 var(--sp-md)}
+.filter-row .fr-grow{flex:1 1 240px;min-width:180px}
+.tbl{width:100%;border-collapse:collapse;font-size:var(--fs-sub)}
+.tbl thead th{text-align:left;font-size:var(--fs-cap);letter-spacing:.06em;text-transform:uppercase;color:var(--c-mute-2);font-weight:700;padding:8px 12px;border-bottom:1px solid var(--c-line-2);white-space:nowrap;position:sticky;top:0;background:#fff;z-index:2}
+.tbl tbody td{padding:8px 12px;border-bottom:1px solid var(--c-line-3);vertical-align:middle;height:52px}
+.tbl tbody tr{cursor:pointer}
+.tbl tbody tr:hover{background:var(--c-line-3)}
+.tbl td.num{text-align:right;font-variant-numeric:tabular-nums}
+.tbl td.center{text-align:center}
+.tbl-person{display:inline-flex;align-items:center;gap:8px;min-width:0}
+.tbl-person .av{width:28px;height:28px;border-radius:var(--r-full);flex:0 0 28px;background:#EDE8E1;color:var(--c-mute);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;overflow:hidden}
+.tbl-person .pp{min-width:0}
+.tbl-person .pp b{display:block;font-size:13px;font-weight:600;color:var(--c-ink);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbl-person .pp span{display:block;font-size:11px;color:var(--c-mute-2);line-height:1.2}
+.progress{height:6px;border-radius:99px;background:var(--c-line-2);overflow:hidden;min-width:80px}
+.progress>i{display:block;height:100%;background:var(--c-success);border-radius:99px}
+.progress.warn>i{background:var(--c-warning)}
+.progress.full>i{background:var(--c-danger)}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:8px 14px;font-size:var(--fs-sub)}
+.kv dt{color:var(--c-mute-2)}.kv dd{color:var(--c-ink);margin:0}
+.sec{border:1px solid var(--c-line-2);border-radius:var(--r-lg);padding:var(--sp-lg);margin:0 0 var(--sp-md);background:#fff}
+.sec>h4{margin:0 0 12px;font-size:var(--fs-h3);font-weight:600;color:var(--c-ink);display:flex;align-items:center;gap:8px}
+.upload-zone{border:1.5px dashed var(--c-line);border-radius:var(--r-md);padding:18px;text-align:center;color:var(--c-mute-2);font-size:var(--fs-sub);background:var(--c-line-3)}
+.slot-row{display:flex;align-items:center;gap:10px;border:1px solid var(--c-line-2);border-radius:var(--r-md);padding:8px 10px;margin-bottom:8px}
+.slot-row .slot-no{width:22px;height:22px;border-radius:var(--r-full);background:var(--c-navy);color:#fff;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex:0 0 22px}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{position:relative;padding:0 0 14px 22px;font-size:var(--fs-sub)}
+.tl li::before{content:"";position:absolute;left:5px;top:3px;width:8px;height:8px;border-radius:99px;background:var(--c-line)}
+.tl li.on::before{background:var(--c-success)}
+.tl li.no::before{background:var(--c-danger)}
+.tl li::after{content:"";position:absolute;left:8px;top:11px;bottom:0;width:1px;background:var(--c-line-2)}
+.tl li:last-child::after{display:none}
+.tl small{color:var(--c-mute-2);display:block}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip-tag{font-size:11px;background:var(--c-line-3);border:1px solid var(--c-line-2);border-radius:var(--r-full);padding:2px 9px;color:var(--c-mute)}
+.hookbox{border:1px dashed var(--c-line);border-radius:var(--r-md);padding:10px 12px;background:#FBFAF8;font-size:var(--fs-sub);color:var(--c-mute)}
+.eligrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--c-line-3)}
+.eligrow:last-child{border-bottom:0}
+.modal-head{display:flex;gap:12px;align-items:flex-start;padding:20px 20px 0}
+.modal-head h3{margin:0;font-size:var(--fs-h3)}
+.modal-icon{width:40px;height:40px;border-radius:10px;background:var(--c-line-3);display:inline-flex;align-items:center;justify-content:center;flex:0 0 40px}
+.modal-icon.is-danger{background:#FFE9E7;color:var(--c-danger)}
+.modal-body{padding:14px 20px}
+.modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:0 20px 20px}
+.drawer-panel{display:flex;flex-direction:column;height:100%}
+.drawer-body{flex:1 1 auto;overflow:auto;padding:var(--sp-lg)}
+.drawer-footer{flex:0 0 auto;display:flex;justify-content:flex-end;gap:8px;padding:14px var(--sp-lg);border-top:1px solid var(--c-line-2)}
+.field label{display:block;font-size:var(--fs-meta);color:var(--c-mute);margin-bottom:5px;font-weight:500}
+.field{margin-bottom:var(--sp-md)}
+
+.hdr-right{display:flex;align-items:center;gap:6px;margin-left:auto}
+.rel{position:relative}
+.w110{width:110px}.w140{width:140px}.w150{width:150px}.w160{width:160px}
+.flex8{display:flex;gap:8px}
+.mla{margin-left:auto}
+.mt4{margin-top:4px}.mt8{margin-top:8px}.mt10{margin-top:10px}
+.fx1{flex:1}
+.muted-sm{font-size:11px;color:var(--c-mute-2)}
+.h3t{font-size:var(--fs-h3);font-weight:600}
+.progbar{width:120px}
+.rowr{display:flex;align-items:center;gap:10px}
+.minw90{min-width:90px;text-align:right}
+.dgr{color:var(--c-danger)}
+.progress>i{width:var(--w,0%)}
+.mdesc{color:var(--c-mute);font-size:var(--fs-sub);margin-bottom:8px}
+.mnote{color:var(--c-mute);font-size:12px;margin-bottom:10px}
+.modal-backdrop{z-index:70}
+
+.hdr-right{display:flex;align-items:center;gap:6px;margin-left:auto}.rel{position:relative}
+.w130{width:130px}.w160{width:160px}.mla{margin-left:auto}.mt10{margin-top:10px}.mt8{margin-top:8px}.fx1{flex:1}
+.board{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;align-items:flex-start}
+.board .col{flex:0 0 220px;background:var(--c-line-3);border:1px solid var(--c-line-2);border-radius:var(--r-lg);padding:10px;min-height:120px}
+.board .col-h{display:flex;align-items:center;justify-content:space-between;font-size:var(--fs-meta);font-weight:700;color:var(--c-mute);margin-bottom:8px}
+.board .col-h .cnt{background:#fff;border:1px solid var(--c-line-2);border-radius:99px;padding:1px 8px;font-size:11px}
+.cand{background:#fff;border:1px solid var(--c-line-2);border-radius:var(--r-md);padding:9px 10px;margin-bottom:8px;cursor:pointer}
+.cand:hover{box-shadow:0 2px 8px rgba(17,17,17,.06)}
+.cand b{display:block;font-size:13px;color:var(--c-ink)}
+.cand .m{font-size:11px;color:var(--c-mute-2);margin-top:2px}
+.cand .mv{display:flex;gap:4px;margin-top:8px}
+.cand .mv button{flex:1;border:1px solid var(--c-line-2);background:#fff;border-radius:var(--r-sm);font-size:11px;padding:3px;cursor:pointer;color:var(--c-mute)}
+.cand .mv button:hover{border-color:var(--c-primary);color:var(--c-primary)}
+.stat-value{font-size:var(--fs-kpi);font-weight:700;color:var(--c-navy)}
+.funnel-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--c-line-3)}
+.funnel-bar{height:22px;background:var(--c-primary);border-radius:var(--r-sm);min-width:2px;opacity:.85}
+.w80{width:80px}.w90{width:90px}.flex8{display:flex;gap:8px}.funnel-bar{width:var(--fw,2px)}
+</style>
+
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sb-brand"><div class="sb-logo"><i data-lucide="box" class="w-4 h-4"></i></div><div><div class="sb-name">CUBE NATIVE</div><div class="sb-sub">ทรัพยากรบุคคล</div></div></div>
+  <nav class="sb-nav" id="sb-nav">
+    <div class="sb-module" data-module="hr" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)"><i data-lucide="users" class="mod-icon w-3.5 h-3.5"></i><span class="mod-label">ทรัพยากรบุคคล</span><i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i></button>
+      <div class="sb-features">
+        <a class="sb-item" data-feature="payroll"><i data-lucide="banknote" class="w-4 h-4"></i><span>เงินเดือน</span></a>
+        <a class="sb-item" data-feature="welfare"><i data-lucide="heart-handshake" class="w-4 h-4"></i><span>สวัสดิการ</span></a>
+        <a class="sb-item" data-feature="expense"><i data-lucide="receipt" class="w-4 h-4"></i><span>เบิกค่าใช้จ่าย</span></a>
+        <a class="sb-item is-active" data-feature="recruit"><i data-lucide="user-plus" class="w-4 h-4"></i><span>สรรหา</span></a>
+        <a class="sb-item" data-feature="performance"><i data-lucide="target" class="w-4 h-4"></i><span>ประเมินผลงาน</span></a>
+        <a class="sb-item" data-feature="training"><i data-lucide="graduation-cap" class="w-4 h-4"></i><span>อบรม</span></a>
+        <a class="sb-item" data-feature="manpower"><i data-lucide="layout-grid" class="w-4 h-4"></i><span>งบอัตรากำลัง</span></a>
+        <a class="sb-item" data-feature="succession"><i data-lucide="git-fork" class="w-4 h-4"></i><span>ตัวตายตัวแทน</span></a>
+        <a class="sb-item" data-feature="ess"><i data-lucide="user-round" class="w-4 h-4"></i><span>พนักงานทำเอง (ESS)</span></a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="system" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)"><i data-lucide="sliders-horizontal" class="mod-icon w-3.5 h-3.5"></i><span class="mod-label">ระบบ</span><i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i></button>
+      <div class="sb-features"><a class="sb-item" data-feature="hrconfig"><i data-lucide="settings-2" class="w-4 h-4"></i><span>ตั้งค่า HR</span></a></div>
+    </div>
+  </nav>
+  <div class="sb-footer"><div class="pulse-dot"></div><span>DEMO · v1.0.0</span></div>
+</aside>
+<main class="main">
+  <header class="shell-bar">
+    <nav class="breadcrumb"><a>ทรัพยากรบุคคล</a><i data-lucide="chevron-right" class="w-3 h-3 sep"></i><span class="breadcrumb-current">สรรหา</span></nav>
+    <div class="hdr-right">
+      <div class="rel"><button class="icon-btn" onclick="toggleNotif()" id="notifBtn"><i data-lucide="bell" class="w-4 h-4"></i><span class="notif-dot"></span></button></div>
+      <div class="rel"><div class="user-chip" onclick="toggleUserMenu()"><div class="user-text"><div class="user-name" id="uName">—</div><div class="user-role" id="uRole">—</div></div><div class="avatar" id="uAv">HR</div></div>
+        <div class="user-menu" id="userMenu"><div class="user-menu-item"><i data-lucide="user" class="w-3.5 h-3.5"></i><span>โปรไฟล์</span></div><div class="user-menu-divider"></div><div class="user-menu-item is-danger"><i data-lucide="log-out" class="w-3.5 h-3.5"></i><span>ออกจากระบบ</span></div></div>
+      </div>
+    </div>
+  </header>
+  <div class="content" id="page-content"></div>
+</main>
+
+
+<!-- ============================================ -->
+<!-- BODY CONTENT GOES HERE                       -->
+<!-- ============================================ -->
+<!-- For ERP: use templates/erp-shell.template.html -->
+<!-- For General: use templates/general-shell.template.html -->
+
+<!-- Drawer container (always include, even if no drawer used initially) -->
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <!-- Drawer content rendered by render() function -->
+</div>
+
+<!-- Modal container -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <!-- Modal content rendered by render() function -->
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast" id="toast"></div>
+
+<!-- ============================================================
+     Lucide Icons Loader (multi-CDN fallback, pinned version)
+     ------------------------------------------------------------
+     ทำไมไม่ใช้ <script src="..."> ตรง ๆ:
+       - Single CDN = single point of failure (corp proxy/firewall block)
+       - @latest = breaking changes โดยไม่บอก (GitHub issue #2962)
+       - <script> ใน <head> โดยไม่มี defer ชน DOMContentLoaded
+     กลยุทธ์:
+       1) Pin version 0.469.0 (stable, ทดสอบแล้ว)
+       2) ลอง CDN 3 ตัวเรียงตามความน่าเชื่อถือ: unpkg → jsdelivr → cdnjs
+       3) ถ้าทุก CDN fail → log warning + ไม่ block render
+            (UI ยังใช้งานได้ แค่ไม่มี icons)
+     ============================================================ -->
+<script>
+(function loadLucide() {
+  var version = '0.469.0';
+  var cdns = [
+    'https://unpkg.com/lucide@' + version + '/dist/umd/lucide.min.js',
+    'https://cdn.jsdelivr.net/npm/lucide@' + version + '/dist/umd/lucide.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/lucide/' + version + '/lucide.min.js'
+  ];
+  var i = 0;
+  function tryNext() {
+    if (i >= cdns.length) {
+      console.warn('[Lucide] All CDNs failed. Icons จะไม่แสดง but UI ยังใช้งานได้');
+      window.lucide = window.lucide || { createIcons: function() {} }; // no-op fallback
+      window.dispatchEvent(new Event('lucide:ready'));
+      return;
+    }
+    var s = document.createElement('script');
+    s.src = cdns[i++];
+    s.onload = function() {
+      window.dispatchEvent(new Event('lucide:ready'));
+    };
+    s.onerror = tryNext;
+    document.head.appendChild(s);
+  }
+  tryNext();
+})();
+</script>
+
+<script>
+// ============================================
+// STATE
+// ============================================
+const state = {
+  currentRoute: 'home',
+  drawer: { open: false, mode: null, recordId: null, step: 1 },
+  modal: { open: false, type: null, data: null },
+  toast: { visible: false, message: '', variant: 'info' },
+  filters: { search: '', status: 'all' },
+  pagination: { page: 1, pageSize: 20 },
+  sort: { col: null, dir: 'asc' },
+  selectedIds: new Set(),
+  records: [],
+};
+
+// ============================================
+// SIDEBAR — Module collapse/expand (Iron Rule #27)
+// Module header is non-navigable; click toggles children visibility.
+// State persists in DOM (data-expanded) — future: persist per user.
+// ============================================
+function toggleModule(headerEl) {
+  const mod = headerEl.closest('.sb-module');
+  if (!mod) return;
+  const isExpanded = mod.getAttribute('data-expanded') !== 'false';
+  mod.setAttribute('data-expanded', isExpanded ? 'false' : 'true');
+}
+
+// ============================================
+// ROUTER (Hash-based, refresh-safe)
+// ============================================
+function getRoute() {
+  const hash = location.hash;
+  if (!hash || hash === '#' || hash === '#/') return 'home';
+  return hash.replace(/^#\//, '');
+}
+function navigate(route) {
+  location.hash = '#/' + route;
+}
+
+// ============================================
+// DRAWER / MODAL TOGGLES
+// ============================================
+function openDrawer(mode, recordId) {
+  state.drawer = { open: true, mode, recordId, step: 1 };
+  render();
+  // Trigger CSS animation
+  requestAnimationFrame(() => {
+    document.getElementById('drawerBackdrop').classList.add('is-open');
+    document.getElementById('drawer').classList.add('is-open');
+  });
+}
+function closeDrawer() {
+  document.getElementById('drawerBackdrop').classList.remove('is-open');
+  document.getElementById('drawer').classList.remove('is-open');
+  setTimeout(() => {
+    state.drawer = { open: false, mode: null, recordId: null, step: 1 };
+  }, 280);
+}
+function openModal(type, data) {
+  state.modal = { open: true, type, data };
+  render();
+  requestAnimationFrame(() => {
+    document.getElementById('modalBackdrop').classList.add('is-open');
+  });
+}
+function closeModal() {
+  document.getElementById('modalBackdrop').classList.remove('is-open');
+  setTimeout(() => {
+    state.modal = { open: false, type: null, data: null };
+  }, 200);
+}
+
+// ============================================
+// TOAST
+// ============================================
+function showToast(message, variant = 'info', durationMs = 2800) {
+  const el = document.getElementById('toast');
+  const iconMap = { success: 'check-circle-2', info: 'info', warning: 'alert-triangle', error: 'x-circle' };
+  el.className = 'toast is-' + variant;
+  el.innerHTML = `<i data-lucide="${iconMap[variant] || 'info'}" class="w-4 h-4"></i><span>${message}</span>`;
+  renderIcons();
+  requestAnimationFrame(() => el.classList.add('is-visible'));
+  setTimeout(() => el.classList.remove('is-visible'), durationMs);
+}
+
+// ============================================
+// ESC key handler (close drawer/modal)
+// ============================================
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (state.modal.open) closeModal();
+    else if (state.drawer.open) closeDrawer();
+  }
+});
+
+// ============================================
+// RENDER (placeholder — replace per feature)
+// ============================================
+function render() {
+  // Specific feature should override this function.
+  //
+  // ⚠️ Iron Rule #29 — Render Preservation:
+  // If your render() does innerHTML rebuild (typical pattern), wrap with
+  // withRenderPreservation() OR use preserveRenderState()/restoreRenderState()
+  // to keep scroll position + focus across re-renders.
+  //
+  // Example:
+  //   function render() {
+  //     const snap = preserveRenderState();
+  //     document.getElementById('page-content').innerHTML = renderPage();
+  //     drawer.innerHTML = state.drawer.open ? renderDrawer() : '';
+  //     renderIcons();
+  //     restoreRenderState(snap);
+  //   }
+  //
+  // After every DOM update, call renderIcons() — safe wrapper ที่ทน race เมื่อ Lucide ยังไม่ load.
+  renderIcons();
+}
+
+// ============================================
+// INIT
+// ============================================
+// Helper: safe icon render — กัน race ก่อน lucide load เสร็จ
+function renderIcons() {
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// ============================================
+// SEARCH-SELECT (Iron Rule #34) — generic searchable dropdown
+// ------------------------------------------------
+// ใช้แทน <select> เมื่อ options เยอะ (>8) หรือเป็น lookup จาก master อื่น.
+// list = position:absolute overlay → ไม่ดันเนื้อหา. แก้เฉพาะ list ตอนพิมพ์ →
+// ไม่ rebuild ทั้งหน้า (ไม่ชน Rule #29). decoupled — เรียก onSelect callback ไม่ผูก render().
+//
+// วิธีใช้ 2 ขั้น:
+//   1) ใส่ markup:  ${searchSelectHTML('country', { placeholder: 'เลือกประเทศ' })}
+//   2) หลัง markup อยู่ใน DOM แล้ว (เช่นท้าย render()):
+//        initSearchSelect('country', {
+//          options: countries.map(c => ({ value:c.code, label:c.name, sub:c.code, icon:'flag', right:'' })),
+//          value: state.form.country,
+//          onSelect: (val, opt) => { state.form.country = val; }
+//        });
+// option fields: { value, label, sub?, icon?, right? }
+// ============================================
+window.__ss = window.__ss || {};
+function ssGet(key){ return window.__ss[key]; }
+function ssEscapeReg(s){ return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+function searchSelectHTML(key, opt){
+  opt = opt || {};
+  var ph = opt.placeholder || 'ค้นหา...';
+  return ''
+    + '<div class="search-select" id="ss-' + key + '">'
+    +   '<i data-lucide="search" class="ss-lead w-4 h-4"></i>'
+    +   '<input type="text" class="input ss-input" id="ss-input-' + key + '" autocomplete="off" placeholder="' + ph + '"'
+    +     ' oninput="ssOnInput(\'' + key + '\', this.value)" onfocus="ssOpen(\'' + key + '\')" onkeydown="ssOnKey(\'' + key + '\', event)">'
+    +   '<button type="button" class="ss-clear hidden" id="ss-clear-' + key + '" tabindex="-1" onclick="ssClear(\'' + key + '\')"><i data-lucide="x" class="w-4 h-4"></i></button>'
+    +   '<i data-lucide="chevron-down" class="ss-caret" id="ss-caret-' + key + '"></i>'
+    +   '<div class="ss-list hidden" id="ss-list-' + key + '"></div>'
+    + '</div>';
+}
+function initSearchSelect(key, cfg){
+  cfg = cfg || {};
+  window.__ss[key] = {
+    options: cfg.options || [], value: (cfg.value != null ? cfg.value : null),
+    onSelect: cfg.onSelect || function(){}, emptyText: cfg.emptyText || 'ไม่พบรายการ',
+    query: '', open: false, hi: 0
+  };
+  ssSetText(key); ssSyncChrome(key); renderIcons();
+}
+function ssFiltered(key){
+  var s = ssGet(key); if(!s) return [];
+  var q = (s.query || '').toLowerCase().trim();
+  if(!q) return s.options;
+  return s.options.filter(function(o){
+    return String(o.label).toLowerCase().includes(q)
+      || String(o.value).toLowerCase().includes(q)
+      || String(o.sub || '').toLowerCase().includes(q);
+  });
+}
+function ssSyncChrome(key){
+  var s = ssGet(key); if(!s) return;
+  var sel = s.options.find(function(o){ return o.value === s.value; });
+  var c = document.getElementById('ss-clear-' + key); if(c) c.classList.toggle('hidden', !sel);
+  var k = document.getElementById('ss-caret-' + key); if(k) k.classList.toggle('hidden', !!sel);
+}
+function ssSetText(key){
+  var s = ssGet(key); if(!s) return;
+  var input = document.getElementById('ss-input-' + key); if(!input) return;
+  var sel = s.options.find(function(o){ return o.value === s.value; });
+  input.value = s.open ? s.query : (sel ? sel.label : '');
+}
+function ssRenderList(key){
+  var s = ssGet(key); if(!s) return;
+  var list = document.getElementById('ss-list-' + key); if(!list) return;
+  var items = ssFiltered(key);
+  if(items.length === 0){
+    list.innerHTML = '<div class="ss-empty">' + s.emptyText + '</div>';
+  } else {
+    var q = (s.query || '').toLowerCase().trim();
+    var hl = function(t){ return q ? String(t).replace(new RegExp('(' + ssEscapeReg(q) + ')', 'gi'), '<mark>$1</mark>') : String(t); };
+    list.innerHTML = items.map(function(o, i){
+      return '<button type="button" class="ss-opt ' + (i === s.hi ? 'is-active' : '') + '" onmousedown="event.preventDefault()" onclick="ssPick(\'' + key + '\', ' + i + ')">'
+        + (o.icon ? '<i data-lucide="' + o.icon + '" class="ss-opt-ic w-4 h-4"></i>' : '')
+        + '<span class="ss-opt-main"><span class="ss-opt-label">' + hl(o.label) + '</span>'
+        + (o.sub ? '<span class="ss-opt-sub">' + hl(o.sub) + '</span>' : '') + '</span>'
+        + (o.right ? '<span class="ss-opt-right">' + o.right + '</span>' : '')
+        + '</button>';
+    }).join('');
+  }
+  list.classList.toggle('hidden', !s.open);
+  renderIcons();
+}
+function ssOpen(key){ var s = ssGet(key); if(!s) return; s.open = true; s.query = ''; s.hi = 0; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+function ssOnInput(key, val){ var s = ssGet(key); if(!s) return; s.query = val; s.open = true; s.hi = 0; s.value = null; ssSyncChrome(key); ssRenderList(key); }
+function ssPick(key, i){ var s = ssGet(key); if(!s) return; var o = ssFiltered(key)[i]; if(!o) return; s.value = o.value; s.query = ''; s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); s.onSelect(o.value, o); }
+function ssClear(key){ var s = ssGet(key); if(!s) return; s.value = null; s.query = ''; s.open = true; ssSetText(key); ssSyncChrome(key); ssRenderList(key); var inp = document.getElementById('ss-input-' + key); if(inp) inp.focus(); s.onSelect(null, null); }
+function ssOnKey(key, e){
+  var s = ssGet(key); if(!s) return; var items = ssFiltered(key);
+  if(e.key === 'ArrowDown'){ e.preventDefault(); s.open = true; s.hi = Math.min(items.length - 1, s.hi + 1); ssRenderList(key); }
+  else if(e.key === 'ArrowUp'){ e.preventDefault(); s.hi = Math.max(0, s.hi - 1); ssRenderList(key); }
+  else if(e.key === 'Enter'){ e.preventDefault(); if(items[s.hi]) ssPick(key, s.hi); }
+  else if(e.key === 'Escape'){ s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+}
+document.addEventListener('click', function(e){
+  Object.keys(window.__ss || {}).forEach(function(key){
+    var wrap = document.getElementById('ss-' + key); var s = ssGet(key);
+    if(wrap && s && s.open && !wrap.contains(e.target)){ s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+  });
+});
+
+// ============================================
+// FORMAT HELPERS (Iron Rule #43) — Thai locale, consistent ทุก feature
+// ใช้ตัวเหล่านี้เสมอ ห้าม format ตัวเลข/วันที่เองรายจุด
+// ============================================
+function fmtNumber(n, dp){ if(n==null||n==='')return '—'; var x=Number(n); if(isNaN(x))return String(n);
+  return x.toLocaleString('th-TH', {minimumFractionDigits: dp||0, maximumFractionDigits: dp!=null?dp:2}); }
+function fmtMoney(n, dp){ if(n==null||n==='')return '—'; var x=Number(n); if(isNaN(x))return String(n);
+  return '฿' + x.toLocaleString('th-TH', {minimumFractionDigits: dp!=null?dp:2, maximumFractionDigits: dp!=null?dp:2}); }
+function fmtDate(iso, buddhist){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso);
+  var s=d.toLocaleDateString('th-TH', {year:'numeric', month:'short', day:'numeric'});
+  return buddhist===false ? d.toLocaleDateString('en-GB',{year:'numeric',month:'short',day:'numeric'}) : s; }
+function fmtDateTime(iso){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso);
+  return d.toLocaleString('th-TH', {year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+
+// ============================================
+// INLINE VALIDATION (Iron Rule #43) — validate ตอน blur, ไม่ใช่รอ submit อย่างเดียว
+// markup: <div class="field"><input class="input" onblur="validateField(this, v => v.trim()? '' : 'จำเป็นต้องกรอก')">
+//          <div class="field-error"></div></div>
+// validator คืน '' = ผ่าน / ข้อความ = error
+// ============================================
+function validateField(el, validator){
+  var field = el.closest('.field'); if(!field) return true;
+  var msg = '';
+  try { msg = validator ? validator(el.value, el) : ''; } catch(e){ msg=''; }
+  var errEl = field.querySelector('.field-error');
+  if(msg){ field.classList.add('is-invalid'); if(errEl) errEl.textContent = msg; return false; }
+  field.classList.remove('is-invalid'); return true;
+}
+function clearFieldError(el){ var f=el.closest('.field'); if(f) f.classList.remove('is-invalid'); }
+
+// ============================================
+// EMPTY STATE (Iron Rule #39) — list/section ว่าง ต้องมี icon + title + desc + (action)
+// ============================================
+function emptyStateHTML(cfg){
+  cfg = cfg || {};
+  var act = cfg.actionLabel ? '<button class="btn btn-primary" onclick="' + (cfg.onAction||'') + '">' +
+    (cfg.actionIcon ? '<i data-lucide="' + cfg.actionIcon + '" class="w-4 h-4"></i>' : '') +
+    '<span>' + cfg.actionLabel + '</span></button>' : '';
+  return '<div class="empty">'
+    + '<div class="empty-icon"><i data-lucide="' + (cfg.icon||'inbox') + '"></i></div>'
+    + '<div class="empty-title">' + (cfg.title||'ยังไม่มีข้อมูล') + '</div>'
+    + '<div class="empty-desc">' + (cfg.desc||'') + '</div>'
+    + act + '</div>';
+}
+
+// ============================================
+// RENDER PRESERVATION (Iron Rule #29)
+// ------------------------------------------------
+// ทุกครั้งที่ render() ทำ innerHTML = ... full DOM rebuild
+// scroll position + focus + cursor selection จะหาย —
+// user รู้สึก "เด้งกลับบน" ทุกครั้งที่ toggle/click.
+//
+// withRenderPreservation(renderFn) wraps a render function
+// to save state before innerHTML rebuild, then restore after.
+//
+// Preserves:
+//   - scrollTop ของ .drawer-body
+//   - scrollTop ของ .modal-body
+//   - window.scrollY (page-level scroll)
+//   - document.activeElement focus + selection range (input/textarea ที่กำลังพิมพ์)
+//
+// Usage:
+//   const render = withRenderPreservation(function actualRender() {
+//     content.innerHTML = ...
+//   });
+//
+// หรือเรียกตรง ๆ ใน render() ที่มีอยู่แล้ว:
+//   function render() {
+//     const snapshot = preserveRenderState();
+//     // ... innerHTML rebuilds ...
+//     restoreRenderState(snapshot);
+//   }
+// ============================================
+function preserveRenderState() {
+  const drawerBody = document.querySelector('.drawer-body');
+  const modalBody = document.querySelector('.modal-body');
+  const activeEl = document.activeElement;
+  const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+  return {
+    drawerScroll: drawerBody ? drawerBody.scrollTop : 0,
+    modalScroll: modalBody ? modalBody.scrollTop : 0,
+    pageScroll: window.scrollY,
+    focusKey: isInput ? {
+      placeholder: activeEl.placeholder || '',
+      type: activeEl.type || '',
+      name: activeEl.name || '',
+      selStart: activeEl.selectionStart,
+      selEnd: activeEl.selectionEnd,
+    } : null,
+  };
+}
+function restoreRenderState(snap) {
+  if (!snap) return;
+  requestAnimationFrame(function() {
+    const dBody = document.querySelector('.drawer-body');
+    if (dBody && snap.drawerScroll > 0) dBody.scrollTop = snap.drawerScroll;
+    const mBody = document.querySelector('.modal-body');
+    if (mBody && snap.modalScroll > 0) mBody.scrollTop = snap.modalScroll;
+    if (snap.pageScroll > 0) window.scrollTo(0, snap.pageScroll);
+
+    if (snap.focusKey) {
+      const candidates = document.querySelectorAll('input, textarea');
+      for (let i = 0; i < candidates.length; i++) {
+        const c = candidates[i];
+        if ((c.placeholder || '') === snap.focusKey.placeholder
+            && (c.type || '') === snap.focusKey.type
+            && (c.name || '') === snap.focusKey.name) {
+          c.focus();
+          if (snap.focusKey.selStart != null && typeof c.setSelectionRange === 'function') {
+            try { c.setSelectionRange(snap.focusKey.selStart, snap.focusKey.selEnd); } catch(e) {}
+          }
+          break;
+        }
+      }
+    }
+  });
+}
+function withRenderPreservation(renderFn) {
+  return function preservedRender() {
+    const snap = preserveRenderState();
+    const result = renderFn.apply(this, arguments);
+    restoreRenderState(snap);
+    return result;
+  };
+}
+
+window.addEventListener('hashchange', function () { render(); });  // v6.1 late-binding — ให้ชี้ render() ตัวที่ feature override (ผูกตรง ๆ จะ capture placeholder เดิม)
+
+// รอ DOM + Lucide ทั้งคู่ก่อน first render
+// (Lucide loader จะ dispatch 'lucide:ready' เมื่อ load สำเร็จ
+//  หรือเมื่อทุก CDN fail แล้ว fallback เป็น no-op)
+var domReady = false;
+var lucideReady = false;
+function bootIfReady() {
+  if (domReady && lucideReady) {
+    render();
+    renderIcons();
+  }
+}
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', function() { domReady = true; bootIfReady(); });
+} else {
+  domReady = true;
+}
+// Listen for ready event AND check ว่า lucide load ไปแล้วหรือยัง
+// (script ตัวนี้รันหลัง loader — ถ้า loader sync เสร็จก่อน, event อาจหายไปแล้ว)
+window.addEventListener('lucide:ready', function() { lucideReady = true; bootIfReady(); });
+if (window.lucide && typeof window.lucide.createIcons === 'function') {
+  lucideReady = true;
+}
+bootIfReady();
+// Safety net: ถ้า lucide:ready ไม่มาภายใน 5s ให้ render ไปก่อน (UI ยังใช้งานได้)
+setTimeout(function() {
+  if (!lucideReady) {
+    console.warn('[Lucide] Timeout — rendering without icons');
+    lucideReady = true;
+    bootIfReady();
+  }
+}, 5000);
+</script>
+
+
+<script>
+/* ===== BASE-KIT UTILS (#66/#68/#95) — DO NOT EDIT ===== */
+/* #95: เมนูใน scroll container (.table-wrap / drawer body / B2 line grid)
+   ต้อง portal ด้วย util นี้ — z-index อย่างเดียวช่วยไม่ได้เพราะโดน ancestor overflow clip */
+function portalMenu(trigger, menu){
+  let host = document.getElementById('overlay-root');
+  if(!host){ host = document.createElement('div'); host.id='overlay-root'; document.body.appendChild(host); }
+  if(menu.parentElement !== host) host.appendChild(menu);
+  menu.classList.add('menu-fixed');
+  const r = trigger.getBoundingClientRect();
+  const below = window.innerHeight - r.bottom - 12, above = r.top - 12;
+  const h = Math.min(menu.scrollHeight || 320, 320);
+  menu.style.left = r.left + 'px';
+  menu.style.width = r.width + 'px';
+  if(below < h && above > below){ menu.style.top='auto'; menu.style.bottom=(window.innerHeight-r.top+4)+'px';
+    menu.style.maxHeight = Math.min(h, above)+'px'; }
+  else { menu.style.bottom='auto'; menu.style.top=(r.bottom+4)+'px';
+    menu.style.maxHeight = Math.min(h, Math.max(below,120))+'px'; }
+  menu._trigger = trigger;
+  const reposition = ()=>{ if(menu.classList.contains('open')) portalMenu(trigger, menu); };
+  if(!menu._portalBound){ menu._portalBound = true;
+    window.addEventListener('scroll', reposition, true);
+    window.addEventListener('resize', reposition); }
+}
+function positionMenu(trigger,menu){const r=trigger.getBoundingClientRect();
+  const below=window.innerHeight-r.bottom-12, above=r.top-12, h=Math.min(menu.scrollHeight,320);
+  if(below<h && above>below){menu.classList.add('drop-up');menu.style.maxHeight=Math.min(h,above)+'px';}
+  else{menu.classList.remove('drop-up');menu.style.maxHeight=Math.min(h,Math.max(below,120))+'px';}}
+function openOverlay(menu,trigger){document.querySelectorAll('[data-overlay].open').forEach(m=>{if(m!==menu)closeOverlay(m);});
+  menu.classList.add('open');menu._trigger=trigger;if(trigger)positionMenu(trigger,menu);}
+function closeOverlay(menu){menu.classList.remove('open');if(menu._trigger)menu._trigger.focus();}
+document.addEventListener('click',e=>{document.querySelectorAll('[data-overlay].open').forEach(m=>{
+  if(!m.contains(e.target)&&!(m._trigger&&m._trigger.contains(e.target)))closeOverlay(m);});});
+/* ===== END BASE-KIT UTILS ===== */
+</script>
+<style id="page-late">/* late additions เท่านั้น (#69) — ห้าม inline */</style>
+<!-- PREFLIGHT v6.4
+  round1: spacing-off=6 font-sizes=3 flex-noalign=1 inline-layout=0 z-adhoc=0 hex-off=3 (feature=0 · residual BASE-KIT verbatim #69/#136)
+  round2: 7/7 · audit FAIL=0
+  date: 2026-08-31
+  (Rule #60: กรอกตัวเลขจริงจาก self_audit.py — ตราเปล่า = checker BLOCK) -->
+<script>
+/* ===== RECRUIT APP (master + pipeline) ===== */
+Object.assign(state, { tab:'req', role:'admin', f:{search:'',status:'all'}, view:{tab:'detail'}, _busy:false });
+const STAGES=[['applied','สมัคร'],['screening','คัดกรอง'],['interview','สัมภาษณ์'],['offer','ข้อเสนอ'],['hired','รับแล้ว']];
+const REC={
+  roles:[{id:'admin',name:'พิมพ์ชนก ศรีสุข',role:'HR สรรหา',initials:'พศ',mask:false},{id:'mgr',name:'ก้องภพ วีระ',role:'Hiring Manager',initials:'กว',mask:true}],
+  reqs:[
+    {id:'R1',pos:'วิศวกรซอฟต์แวร์',count:2,level:'IC3',band:'45,000–65,000',hm:'ก้องภพ วีระ',status:'open',mp:false},
+    {id:'R2',pos:'นักบัญชีอาวุโส',count:1,level:'IC4',band:'55,000–75,000',hm:'วิไล ประสงค์',status:'pending',mp:true},
+    {id:'R3',pos:'เจ้าหน้าที่คลัง',count:3,level:'IC2',band:'18,000–24,000',hm:'สมพงษ์ อินทร์',status:'closed',mp:true}
+  ],
+  cands:[
+    {id:'C1',name:'อนุชา ตั้งใจ',email:'anucha@mail.com',pos:'วิศวกรซอฟต์แวร์',reqId:'R1',stage:'interview',consent:true,score:4},
+    {id:'C2',name:'เบญจมาศ ดี',email:'ben@mail.com',pos:'วิศวกรซอฟต์แวร์',reqId:'R1',stage:'offer',consent:true,score:5},
+    {id:'C3',name:'จิรายุ ทอง',email:'jira@mail.com',pos:'นักบัญชีอาวุโส',reqId:'R2',stage:'screening',consent:false,score:null},
+    {id:'C4',name:'ดวงใจ แสง',email:'duang@mail.com',pos:'วิศวกรซอฟต์แวร์',reqId:'R1',stage:'applied',consent:true,score:null},
+    {id:'C5',name:'อนุชา ตั้งใจ',email:'anucha@mail.com',pos:'นักบัญชีอาวุโส',reqId:'R2',stage:'applied',consent:true,score:null,dup:true},
+    {id:'C6',name:'ปิยะ มั่นคง',email:'piya@mail.com',pos:'เจ้าหน้าที่คลัง',reqId:'R3',stage:'hired',consent:true,score:5}
+  ],
+  audit:{C2:[{act:'ประเมินสัมภาษณ์ 5/5',who:'ก้องภพ วีระ',at:'2569-08-25 11:00'},{act:'ย้ายเข้าสัมภาษณ์',who:'พิมพ์ชนก ศรีสุข',at:'2569-08-22 09:30'},{act:'เพิ่มเข้าคลัง + ยินยอม PDPA',who:'พิมพ์ชนก ศรีสุข',at:'2569-08-20 14:10'}]}
+};
+function curRole(){return REC.roles.find(r=>r.id===state.role)||REC.roles[0];}
+function req(id){return REC.reqs.find(r=>r.id===id)||{};}
+function stageN(k){const s=STAGES.find(x=>x[0]===k);return s?s[1]:k;}
+function mask(v){return curRole().mask?'•••':v;}
+function applyRole(){const r=curRole();var n=document.getElementById('uName'),ro=document.getElementById('uRole'),av=document.getElementById('uAv');if(n)n.textContent=r.name;if(ro)ro.textContent=r.role;if(av)av.textContent=r.initials;}
+function setRole(id){state.role=id;render();}
+function toggleNotif(){}
+function toggleUserMenu(){document.getElementById('userMenu').classList.toggle('is-open');}
+document.addEventListener('click',e=>{if(!e.target.closest('.user-chip')&&!e.target.closest('.user-menu')){var u=document.getElementById('userMenu');if(u)u.classList.remove('is-open');}});
+const RST={open:['เปิดรับ','pill-success'],pending:['รออนุมัติ','pill-warning'],closed:['ปิด','pill-archived']};
+function reqPill(s){const m=RST[s]||[s,'pill-muted'];return '<span class="pill '+m[1]+'">'+m[0]+'</span>';}
+function personCell(name,sub){return '<span class="tbl-person"><span class="av">'+(name||'').slice(0,1)+'</span><span class="pp"><b>'+(name||'—')+'</b><span>'+(sub||'')+'</span></span></span>';}
+function pageHTML(){
+  const tabs=[['req','ตำแหน่งที่เปิด','briefcase'],['pool','คลังผู้สมัคร','users'],['board','บอร์ดสรรหา','kanban'],['report','รายงาน','bar-chart-3']];
+  return '<div class="demo-strip"><span class="ds-label"><i data-lucide="user-cog" class="w-3.5 h-3.5"></i>มุมมองสาธิต</span><span>ข้อมูลผู้สมัคร = RESTRICTED (PDPA)</span>'
+  +'<div class="seg-control">'+REC.roles.map(r=>'<button class="seg-item '+(state.role===r.id?'is-active':'')+'" onclick="setRole(\''+r.id+'\')">'+r.role+'</button>').join('')+'</div></div>'
+  +'<div class="ph"><div><div class="ph-title-row"><h1 class="ph-title">สรรหา</h1></div><p class="ph-sub">เปิดอัตรา · คลังผู้สมัคร · บอร์ดสรรหา · ข้อเสนอจ้าง — ผู้สมัครที่รับส่งต่อ "เข้า-ออกงาน" (ไม่ทำ onboarding เอง)</p></div>'
+  +'<div class="ph-actions">'+phA()+'</div></div>'
+  +'<div class="tabs page-tabs">'+tabs.map(t=>'<button class="tab '+(state.tab===t[0]?'is-active':'')+'" onclick="state.tab=\''+t[0]+'\';render()"><i data-lucide="'+t[2]+'"></i>'+t[1]+'</button>').join('')+'</div>'
+  +'<div id="view">'+viewHTML()+'</div>';
+}
+function phA(){if(state.tab==='req')return '<button class="btn btn-primary" onclick="openDrawer(\'newReq\')"><i data-lucide="plus" class="w-4 h-4"></i><span>เปิดอัตรา</span></button>';if(state.tab==='pool')return '<button class="btn btn-primary" onclick="openDrawer(\'newCand\')"><i data-lucide="plus" class="w-4 h-4"></i><span>เพิ่มผู้สมัคร</span></button>';return '';}
+function viewHTML(){return ({req:reqView,pool:poolView,board:boardView,report:repView}[state.tab]||reqView)();}
+function reqView(){
+  const q=state.f.search.toLowerCase();
+  let rows=REC.reqs.filter(r=>!q||r.pos.toLowerCase().includes(q));
+  const body=rows.length?'<div class="table-wrap"><table class="tbl"><thead><tr><th>รหัส</th><th>ตำแหน่ง</th><th class="center">จำนวน</th><th>ระดับ/ช่วงเงินเดือน</th><th>Hiring Manager</th><th class="center">ผู้สมัคร</th><th>สถานะ</th></tr></thead><tbody>'
+    +rows.map(r=>{const nc=REC.cands.filter(c=>c.reqId===r.id).length;return '<tr onclick="openDrawer(\'viewReq\',\''+r.id+'\')"><td>'+r.id+'</td><td><b>'+r.pos+'</b>'+(!r.mp?' <span class="chip-tag" style="color:var(--c-warning)">ไม่มีแผนอัตรากำลัง</span>':'')+'</td><td class="center">'+r.count+'</td><td>'+r.level+' · '+mask(r.band)+'</td><td>'+r.hm+'</td><td class="center">'+nc+'</td><td>'+reqPill(r.status)+'</td></tr>';}).join('')+'</tbody></table></div>'
+    :emptyStateHTML({icon:'briefcase',title:'ยังไม่มีตำแหน่งที่เปิด',desc:'เปิดอัตราเพื่อเริ่มการสรรหา',actionLabel:'เปิดอัตรา',actionIcon:'plus',onAction:"openDrawer('newReq')"});
+  return '<div class="card"><div class="filter-row"><div class="fr-grow"><input class="input" placeholder="ค้นหาตำแหน่ง…" value="'+state.f.search+'" oninput="state.f.search=this.value;refreshView()"></div></div>'+body+'</div>';
+}
+function poolView(){
+  const q=state.f.search.toLowerCase();
+  let rows=REC.cands.filter(c=>!q||c.name.toLowerCase().includes(q)||c.pos.toLowerCase().includes(q));
+  const body=rows.length?'<div class="table-wrap"><table class="tbl"><thead><tr><th>ผู้สมัคร</th><th>ตำแหน่งที่สนใจ</th><th>สถานะ pipeline</th><th class="center">คะแนน</th><th class="center">ยินยอม PDPA</th></tr></thead><tbody>'
+    +rows.map(c=>'<tr onclick="openDrawer(\'viewCand\',\''+c.id+'\')"><td>'+personCell(mask(c.name),mask(c.email))+(c.dup?' <span class="chip-tag" style="color:var(--c-warning)">อาจซ้ำ</span>':'')+'</td><td>'+c.pos+'</td><td>'+stageN(c.stage)+'</td><td class="center">'+(c.score?c.score+'/5':'—')+'</td><td class="center">'+(c.consent?'<i data-lucide="check" class="w-4 h-4" style="color:var(--c-success)"></i>':'<i data-lucide="x" class="w-4 h-4" style="color:var(--c-danger)"></i>')+'</td></tr>').join('')+'</tbody></table></div>'
+    :emptyStateHTML({icon:'users',title:'ยังไม่มีผู้สมัคร',desc:'เพิ่มผู้สมัครเข้าคลัง (ต้องมีความยินยอม PDPA)',actionLabel:'เพิ่มผู้สมัคร',actionIcon:'plus',onAction:"openDrawer('newCand')"});
+  return '<div class="card"><div class="filter-row"><div class="fr-grow"><input class="input" placeholder="ค้นหาผู้สมัคร/ตำแหน่ง…" value="'+state.f.search+'" oninput="state.f.search=this.value;refreshView()"></div></div>'+body+'</div>';
+}
+function refreshView(){const v=document.getElementById('view');if(v){const s=preserveRenderState();v.innerHTML=viewHTML();renderIcons();restoreRenderState(s);}}
+</script>
+<script>
+function boardView(){
+  return '<div class="card"><div class="board">'+STAGES.map(st=>{
+    const cs=REC.cands.filter(c=>c.stage===st[0]);
+    return '<div class="col"><div class="col-h"><span>'+st[1]+'</span><span class="cnt">'+cs.length+'</span></div>'
+      +cs.map(c=>{const idx=STAGES.findIndex(x=>x[0]===c.stage);
+        return '<div class="cand" onclick="openDrawer(\'viewCand\',\''+c.id+'\')"><b>'+mask(c.name)+'</b><div class="m">'+c.pos+(c.consent?'':' · <span style="color:var(--c-danger)">ยังไม่ยินยอม</span>')+'</div>'
+        +'<div class="mv" onclick="event.stopPropagation()">'+(idx>0?'<button onclick="moveCand(\''+c.id+'\',-1)">‹ ถอย</button>':'')+(idx<STAGES.length-1&&c.consent?'<button onclick="moveCand(\''+c.id+'\',1)">เลื่อน ›</button>':'')+'</div></div>';}).join('')
+      +'</div>';}).join('')+'</div></div>';
+}
+function repView(){
+  const funnel=STAGES.map(st=>({n:st[1],c:REC.cands.filter(x=>x.stage===st[0]).length}));
+  const max=Math.max(1,...funnel.map(f=>f.c));
+  return '<div class="stats"><div class="stat"><div class="stat-label"><i data-lucide="briefcase" class="w-3 h-3"></i>ตำแหน่งเปิดรับ</div><div class="stat-value">'+REC.reqs.filter(r=>r.status==='open').length+'</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="users" class="w-3 h-3"></i>ผู้สมัครในระบบ</div><div class="stat-value">'+REC.cands.length+'</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="user-check" class="w-3 h-3"></i>รับแล้ว</div><div class="stat-value">'+REC.cands.filter(c=>c.stage==='hired').length+'</div></div></div>'
+    +'<div class="card"><div class="filter-row"><b style="font-size:var(--fs-h3)">Funnel การสรรหา</b></div>'
+    +funnel.map(f=>'<div class="funnel-row"><span class="w80" style="font-size:var(--fs-sub)">'+f.n+'</span><div class="funnel-bar" style="--fw:'+(f.c/max*260)+'px"></div><b>'+f.c+'</b></div>').join('')+'</div>';
+}
+/* drawers */
+function drawerHTML(){return ({newReq:dwNewReq,viewReq:dwViewReq,newCand:dwNewCand,viewCand:dwViewCand}[state.drawer.mode]||(()=>''))();}
+function dwHead(eb,t,tabs){return '<div class="drawer-header'+(tabs?' has-tabs':'')+'">'+(tabs?'<div class="dw-head-row">':'')+'<div class="fx1"><div class="dw-eyebrow">'+eb+'</div><div class="dw-title">'+t+'</div></div><button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-4 h-4"></i></button>'+(tabs?'</div>'+tabs:'')+'</div>';}
+function dwNewReq(){
+  return '<div class="drawer-panel">'+dwHead('ตำแหน่งที่เปิด','เปิดอัตราใหม่')
+  +'<div class="drawer-body"><div class="sec"><div class="field"><label>ตำแหน่ง *</label><input class="input" id="q_pos" onblur="validateField(this,v=>v.trim()?\'\':\'จำเป็น\')"><div class="field-error"></div></div>'
+  +'<div class="field"><label>จำนวน · ระดับ</label><div class="flex8"><input class="input w90" type="number" placeholder="1"><select class="input"><option>IC1</option><option>IC2</option><option>IC3</option><option>IC4</option></select></div></div>'
+  +'<div class="field"><label>ช่วงเงินเดือน (อ้างระดับจาก HR Configuration)</label><input class="input" placeholder="เช่น 45,000–65,000"><div class="tip" title="ช่วงเงินเดือนอ้าง band ตามระดับ · จัดการที่ HR Configuration"><i data-lucide="info" class="w-3.5 h-3.5"></i></div></div>'
+  +'<div class="field"><label>Hiring Manager</label><input class="input" placeholder="ชื่อผู้จัดการ"></div>'
+  +'<div class="hookbox">อ้างแผนอัตรากำลัง (Manpower Planning) — <b>ยังไม่มีแผนก็เปิดได้</b> (hook display-only)</div></div></div>'
+  +'<div class="drawer-footer"><button class="btn btn-ghost" onclick="closeDrawer()">ยกเลิก</button><button class="btn btn-primary" onclick="openModal(\'doaReq\',{})"><i data-lucide="send" class="w-4 h-4"></i>ส่งอนุมัติเปิดอัตรา</button></div></div>';
+}
+function dwViewReq(){const r=req(state.drawer.recordId);const cs=REC.cands.filter(c=>c.reqId===r.id);
+  return '<div class="drawer-panel">'+dwHead('ตำแหน่งที่เปิด',r.pos+' '+reqPill(r.status))
+  +'<div class="drawer-body"><div class="sec"><dl class="kv"><dt>รหัส</dt><dd>'+r.id+'</dd><dt>จำนวน</dt><dd>'+r.count+'</dd><dt>ระดับ/ช่วงเงินเดือน</dt><dd>'+r.level+' · '+mask(r.band)+'</dd><dt>Hiring Manager</dt><dd>'+r.hm+'</dd><dt>แผนอัตรากำลัง</dt><dd>'+(r.mp?'อ้างแผน':'ไม่มีแผน (เปิดเอง · hook)')+'</dd></dl></div>'
+  +'<div class="sec"><h4><i data-lucide="users" class="w-4 h-4"></i>ผู้สมัคร ('+cs.length+')</h4>'+(cs.length?'<table class="tbl"><tbody>'+cs.map(c=>'<tr style="cursor:default"><td>'+mask(c.name)+'</td><td>'+stageN(c.stage)+'</td><td class="center">'+(c.score?c.score+'/5':'—')+'</td></tr>').join('')+'</tbody></table>':'<div class="hookbox">ยังไม่มีผู้สมัคร</div>')+'</div></div>'
+  +'<div class="drawer-footer"><button class="btn btn-ghost" onclick="closeDrawer()">ปิด</button>'+(r.status!=='closed'?'<button class="btn btn-secondary" onclick="openModal(\'closeReq\',{id:\''+r.id+'\'})">ปิดอัตรา</button>':'')+'</div></div>';
+}
+function dwNewCand(){
+  return '<div class="drawer-panel">'+dwHead('คลังผู้สมัคร','เพิ่มผู้สมัคร')
+  +'<div class="drawer-body"><div class="sec"><div class="field"><label>ชื่อ-นามสกุล *</label><input class="input" id="c_name" onblur="validateField(this,v=>v.trim()?\'\':\'จำเป็น\')"><div class="field-error"></div></div>'
+  +'<div class="field"><label>อีเมล/เบอร์ (ระบบตรวจซ้ำอัตโนมัติ)</label><input class="input" placeholder="email หรือเบอร์"></div>'
+  +'<div class="field"><label>ตำแหน่งที่สนใจ</label><select class="input">'+REC.reqs.map(r=>'<option>'+r.pos+'</option>').join('')+'</select></div>'
+  +'<div class="field"><label>Resume/แนบไฟล์</label><div class="upload-zone"><i data-lucide="upload-cloud" class="w-5 h-5"></i><div>แนบ resume</div></div></div>'
+  +'<div class="field"><label style="color:var(--c-danger)"><input type="checkbox" id="c_consent"> ผู้สมัครยินยอมให้เก็บข้อมูล (PDPA) *</label><div class="muted-sm">ไม่ยินยอม = เก็บ/ดำเนินการต่อไม่ได้</div></div></div></div>'
+  +'<div class="drawer-footer"><button class="btn btn-ghost" onclick="closeDrawer()">ยกเลิก</button><button class="btn btn-primary" onclick="saveCand()"><i data-lucide="check" class="w-4 h-4"></i>บันทึก</button></div></div>';
+}
+function dwViewCand(){const c=REC.cands.find(x=>x.id===state.drawer.recordId)||{};const tab=state.view.tab;
+  const tabs='<div class="tabs">'+['detail:รายละเอียด','eval:สัมภาษณ์/ประเมิน','offer:ข้อเสนอ','history:ประวัติ'].map(x=>{const p=x.split(':');return '<button class="tab '+(tab===p[0]?'is-active':'')+'" onclick="state.view.tab=\''+p[0]+'\';render()">'+p[1]+'</button>';}).join('')+'</div>';
+  let body='';
+  if(tab==='detail')body='<div class="sec"><dl class="kv"><dt>ผู้สมัคร</dt><dd>'+mask(c.name)+'</dd><dt>ติดต่อ</dt><dd>'+mask(c.email)+'</dd><dt>ตำแหน่ง</dt><dd>'+c.pos+'</dd><dt>สถานะ</dt><dd>'+stageN(c.stage)+'</dd><dt>ยินยอม PDPA</dt><dd>'+(c.consent?'ยินยอม':'<span style="color:var(--c-danger)">ยังไม่ยินยอม</span>')+'</dd></dl></div>'+(!c.consent?'<div class="hookbox" style="color:var(--c-danger)">ยังไม่มีความยินยอม PDPA — ต้องขอ consent ก่อนดำเนินการต่อ (SecC)</div>':'');
+  else if(tab==='eval')body='<div class="sec"><h4><i data-lucide="star" class="w-4 h-4"></i>ผลประเมิน</h4><div class="hookbox">คะแนนสัมภาษณ์: '+(c.score?c.score+'/5':'ยังไม่ประเมิน')+'</div><button class="btn btn-secondary btn-sm mt10" onclick="openModal(\'interview\',{id:\''+c.id+'\'})"><i data-lucide="calendar" class="w-3.5 h-3.5"></i>นัดสัมภาษณ์</button></div>';
+  else if(tab==='offer')body='<div class="sec"><h4><i data-lucide="file-text" class="w-4 h-4"></i>ข้อเสนอจ้าง</h4>'+(c.stage==='offer'||c.stage==='hired'?'<dl class="kv"><dt>ตำแหน่ง</dt><dd>'+c.pos+'</dd><dt>สถานะ</dt><dd>'+(c.stage==='hired'?'ตอบรับแล้ว → ส่ง onboarding':'รอผู้สมัครตอบรับ')+'</dd></dl>':'<div class="hookbox">ยังไม่ถึงขั้นข้อเสนอ</div>')+'</div>';
+  else body='<div class="sec"><h4><i data-lucide="history" class="w-4 h-4"></i>ประวัติ (audit · append-only)</h4><ul class="tl">'+((REC.audit[c.id]||[{act:'เพิ่มเข้าคลัง',who:'HR',at:'—'}]).map(a=>'<li class="on"><b>'+a.act+'</b><small>'+a.who+' · '+a.at+'</small></li>').join(''))+'</ul></div>';
+  let foot='<div class="drawer-footer"><button class="btn btn-ghost" onclick="closeDrawer()">ปิด</button>';
+  if(c.stage==='offer')foot+='<button class="btn btn-secondary" onclick="openModal(\'declined\',{id:\''+c.id+'\'})">ปฏิเสธ</button><button class="btn btn-primary" onclick="openModal(\'hire\',{id:\''+c.id+'\'})"><i data-lucide="user-check" class="w-4 h-4"></i>รับ → onboarding</button>';
+  else if(c.stage==='interview')foot+='<button class="btn btn-danger" onclick="openModal(\'reject\',{id:\''+c.id+'\'})">ไม่ผ่าน</button><button class="btn btn-primary" onclick="openModal(\'doaOffer\',{id:\''+c.id+'\'})"><i data-lucide="send" class="w-4 h-4"></i>ทำข้อเสนอ (DOA)</button>';
+  foot+='</div>';
+  return '<div class="drawer-panel">'+dwHead('ผู้สมัคร',mask(c.name),tabs)+'<div class="drawer-body">'+body+'</div>'+foot+'</div>';
+}
+</script>
+<script>
+function modalHTML(){const m=state.modal;if(!m.type)return '';
+  if(m.type==='doaReq')return doaSlots('ส่งอนุมัติเปิดอัตรา',[['1','Hiring Manager','ก้องภพ วีระ'],['2','HR สรรหา (หัวหน้า)','พิมพ์ชนก ศรีสุข']],"doReqApprove()");
+  if(m.type==='doaOffer')return doaSlots('ส่งอนุมัติข้อเสนอจ้าง',[['1','Hiring Manager','ก้องภพ วีระ'],['2','HR สรรหา (หัวหน้า)','พิมพ์ชนก ศรีสุข']],"doOffer('"+m.data.id+"')");
+  if(m.type==='closeReq')return modShell('archive','ปิดอัตรา?','ตำแหน่งนี้จะปิดรับ (soft archive)','btn-danger','ปิดอัตรา',"doCloseReq('"+m.data.id+"')");
+  if(m.type==='interview')return modShell('calendar','นัดสัมภาษณ์','ระบบจะส่งแจ้งเตือนผู้สัมภาษณ์และผู้สมัคร','btn-primary','นัดและแจ้งเตือน',"doInterview('"+m.data.id+"')");
+  if(m.type==='reject')return modInput('ไม่ผ่านการคัดเลือก','เหตุผล (เก็บใน talent pool)','btn-danger','ยืนยัน',"doReject('"+m.data.id+"')");
+  if(m.type==='declined')return modShell('x-circle','ผู้สมัครปฏิเสธ?','บันทึกการปฏิเสธข้อเสนอ','btn-danger','บันทึก',"doDeclined('"+m.data.id+"')");
+  if(m.type==='hire')return modShell('user-check','รับผู้สมัคร → onboarding?','ส่งผู้สมัครเข้า "เข้า-ออกงาน" เพื่อเริ่ม onboarding (Recruit ไม่สร้าง employee เอง)','btn-primary','รับและส่งต่อ',"doHire('"+m.data.id+"')");
+  return '';
+}
+function doaSlots(title,slots,onok){return '<div class="modal-head"><h3>'+title+'</h3></div><div class="modal-body"><p class="mnote">สายอนุมัติ resolve จาก DOA ตามตำแหน่ง (ไม่ hardcode · มติ 17 ส.ค.)</p>'+slots.map(s=>'<div class="slot-row"><span class="slot-no">'+s[0]+'</span><span class="tbl-person"><span class="av">'+s[2].slice(0,1)+'</span><span class="pp"><b>'+s[2]+'</b><span>'+s[1]+'</span></span></span></div>').join('')+'</div><div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" onclick="'+onok+'"><i data-lucide="send" class="w-4 h-4"></i>ส่งอนุมัติ</button></div>';}
+function modShell(ic,t,d,cls,l,ok){return '<div class="modal-head"><div class="modal-icon '+(cls==='btn-danger'?'is-danger':'')+'"><i data-lucide="'+ic+'" class="w-5 h-5"></i></div><div><h3>'+t+'</h3></div></div><div class="modal-body"><p class="mdesc">'+d+'</p></div><div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn '+cls+'" onclick="'+ok+'">'+l+'</button></div>';}
+function modInput(t,d,cls,l,ok){return '<div class="modal-head"><h3>'+t+'</h3></div><div class="modal-body"><p class="mdesc">'+d+'</p><textarea class="input" id="m_r" rows="3"></textarea></div><div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn '+cls+'" onclick="'+ok+'">'+l+'</button></div>';}
+function moveCand(id,dir){const c=REC.cands.find(x=>x.id===id);if(!c)return;if(!c.consent&&dir>0){showToast('ต้องมีความยินยอม PDPA ก่อนดำเนินการต่อ','warning');return;}const i=STAGES.findIndex(x=>x[0]===c.stage);const ni=i+dir;if(ni<0||ni>=STAGES.length)return;c.stage=STAGES[ni][0];render();showToast('ย้าย '+c.name+' → '+stageN(c.stage),'info');}
+function saveCand(){if(state._busy)return;const nm=document.getElementById('c_name');if(!validateField(nm,v=>v.trim()?'':'จำเป็น'))return;const consent=document.getElementById('c_consent');if(!consent||!consent.checked){showToast('ต้องได้ความยินยอม PDPA ก่อนบันทึก','warning');return;}state._busy=true;setTimeout(()=>{state._busy=false;closeDrawer();showToast('เพิ่มผู้สมัครแล้ว','success');},200);}
+function doReqApprove(){closeModal();closeDrawer();showToast('ส่งอนุมัติเปิดอัตราแล้ว','success');}
+function doOffer(id){const c=REC.cands.find(x=>x.id===id);if(c)c.stage='offer';closeModal();render();showToast('ส่งอนุมัติข้อเสนอ + แจ้งผู้สมัครแล้ว','success');}
+function doCloseReq(id){const r=req(id);if(r)r.status='closed';closeModal();render();showToast('ปิดอัตราแล้ว','info');}
+function doInterview(id){closeModal();render();showToast('นัดสัมภาษณ์ + แจ้งเตือนแล้ว','success');}
+function doReject(id){const c=REC.cands.find(x=>x.id===id);if(c)c.stage='screening';closeModal();render();showToast('บันทึกไม่ผ่าน → เก็บ talent pool','info');}
+function doDeclined(id){closeModal();render();showToast('บันทึกการปฏิเสธข้อเสนอ','info');}
+function doHire(id){const c=REC.cands.find(x=>x.id===id);if(c)c.stage='hired';closeModal();render();showToast('รับแล้ว → ส่งเข้า "เข้า-ออกงาน" (onboarding handoff)','success');}
+function render(){const snap=preserveRenderState();applyRole();const pc=document.getElementById('page-content');if(pc)pc.innerHTML=pageHTML();const dw=document.getElementById('drawer');if(dw)dw.innerHTML=state.drawer.open?drawerHTML():'';const mb=document.querySelector('#modalBackdrop .modal');if(mb)mb.innerHTML=state.modal.open?modalHTML():'';renderIcons();restoreRenderState(snap);}
+</script>
+
+</body>
+</html>

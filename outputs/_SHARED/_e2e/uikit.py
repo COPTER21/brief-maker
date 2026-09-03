@@ -607,6 +607,41 @@ JS_OVERLAY_STACK = """
 }
 """
 
+# ⭐ เพิ่ม 2026-09-02 (F-HR-RECRUIT) — ผู้ใช้เจอ modal โดน drawer ทับ "ทุกอัน"
+#
+# สาเหตุจริง: BASE-KIT ให้ .modal-backdrop = var(--z-backdrop) 50 แต่ .drawer = var(--z-drawer) 55
+# → เปิด modal จากในลิ้นชัก (confirm/reason/interview/DOA) modal จมใต้ drawer ทุกครั้ง
+#
+# ทำไม JS_OVERLAY_STACK เดิมมองไม่เห็น: มันใส่ overlay "ทุกชนิด" ไว้ใน SEL_OK (drawer/modal/backdrop)
+# เพื่อกัน false-positive ของ menu-fixed → ผลคือ "drawer วาดทับ modal" ถูกนับว่า OK เงียบ ๆ
+# ตัวนี้จึงตรวจ invariant เฉพาะ: ถ้า modal + drawer เปิดพร้อมกัน → modal z ต้อง > drawer z เสมอ
+JS_MODAL_UNDER_DRAWER = """
+() => {
+  const vis = el => { const r=el.getBoundingClientRect(), cs=getComputedStyle(el);
+    return r.width>40 && r.height>40 && cs.visibility!=='hidden' &&
+           parseFloat(cs.opacity)>0.05 && cs.pointerEvents!=='none'; };
+  const zi = el => { const z=parseInt(getComputedStyle(el).zIndex,10); return isNaN(z)?0:z; };
+  const drawers = [...document.querySelectorAll('.drawer')].filter(vis);
+  const modals  = [...document.querySelectorAll('.modal-backdrop')].filter(vis);
+  if(!drawers.length || !modals.length) return [];
+  const dzMax = Math.max(...drawers.map(zi));
+  const topDrawer = drawers.find(d=>zi(d)===dzMax) || drawers[0];
+  const out=[];
+  modals.forEach(mc=>{
+    const mz = zi(mc);
+    if(mz <= dzMax){
+      const r = mc.getBoundingClientRect();
+      const hit = document.elementFromPoint(r.left+r.width/2, r.top+r.height/2);
+      out.push({ mz:String(mz), dz:String(dzMax),
+        modal:(mc.className||mc.tagName).toString().slice(0,24),
+        drawer:(topDrawer.className||topDrawer.tagName).toString().slice(0,20),
+        centerHit: hit ? (hit.className||hit.tagName).toString().slice(0,30) : 'none' });
+    }
+  });
+  return out;
+}
+"""
+
 # CSS var ที่ใช้แต่ไม่มีใครประกาศ — ต้นตอชั้นลึกของเคสข้างบน
 # ตรวจแบบ static จับได้ทุกตัวแปร ไม่ใช่แค่ z-index (สี/ระยะ/ฟอนต์ก็หายเงียบแบบเดียวกันได้)
 JS_CSSVAR = """
@@ -763,6 +798,13 @@ class Audit:
                          f"{x['by']} (position:{x['pos']} z:{x['z']}) ทับ {x['over']} (z:{x['ovz']})")
         except Exception as e:
             self.add('1 Layout', scene, 'ตรวจการซ้อนของ overlay ไม่สำเร็จ', str(e)[:90])
+        # ⭐ modal เปิดพร้อม drawer → modal ต้องเหนือ drawer (F-HR-RECRUIT 2026-09-02)
+        try:
+            for x in pg.evaluate(JS_MODAL_UNDER_DRAWER):
+                self.add('1 Layout', scene, 'modal เปิดอยู่แต่จมใต้ลิ้นชัก (z ≤ drawer)',
+                         f"modal {x['modal']} (z:{x['mz']}) ≤ drawer {x['drawer']} (z:{x['dz']}) · จุดกลางโดน {x['centerHit']}")
+        except Exception as e:
+            self.add('1 Layout', scene, 'ตรวจ modal เหนือลิ้นชักไม่สำเร็จ', str(e)[:90])
         # ⭐ CSS var ที่ใช้แต่ไม่ประกาศ — ตรวจครั้งเดียวพอ (เป็นคุณสมบัติของไฟล์ ไม่ใช่ของฉาก)
         if not getattr(self, '_cssvar_done', False):
             self._cssvar_done = True

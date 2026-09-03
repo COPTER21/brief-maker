@@ -1,0 +1,3498 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ตั้งค่า HR · CUBE NATIVE</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+
+<!-- Lucide Icons: loader ที่ท้าย body (ดู section "Lucide loader" ก่อน main <script>) -->
+<!-- เหตุผล:
+     1) ย้ายมาท้าย body หลีกเลี่ยง race กับ DOMContentLoaded
+     2) Multi-CDN fallback (unpkg → jsdelivr → cdnjs)
+     3) Pin version (เลิกใช้ @latest ที่ flaky — GitHub issue #2962)
+-->
+
+<style>
+/* ===== BASE-KIT v6.4 — DO NOT EDIT (Rule #69) — page CSS ต่อท้ายหลัง END marker ===== */
+/* ============== CSS VARIABLES (CUBE CI — v2.0 Warm Light rebrand) ============== */
+:root {
+  --c-navy: #111111;
+  --c-navy-2: #111111;
+  --c-primary: #FF3B30;
+  --c-primary-hover: #E62E24;
+  --c-teal: #FF9A1F;
+  --c-teal-light: #FFB763;
+  --c-ink: #111111;
+  --c-mute: #54565C;
+  --c-mute-2: #73757B;
+  --c-mute-3: #9A9CA2;
+  --c-line: #DEDAD4;
+  --c-line-2: #E9E5E0;
+  --c-line-3: #F1EEEA;
+  --c-bg-off: #FAF8F5;
+  --c-success: #1F9D55;
+  --c-warning: #E8870F;
+  --c-danger: #E62E24;
+  --sidebar-w: 232px;
+  --shell-h: 52px;
+  /* v3.13 — Fixed type scale (Iron Rule locked values) */
+  --fs-h1: 22px;        /* page title */
+  --fs-h2: 17px;        /* section title */
+  --fs-h3: 15px;        /* card / drawer title */
+  --fs-body: 14px;      /* body default */
+  --fs-sub: 13px;       /* secondary body / table cell */
+  --fs-meta: 12px;      /* meta / label */
+  --fs-cap: 11px;       /* uppercase section caption */
+  --fs-kpi: 28px;       /* stat value */
+  /* v3.13 — Fixed spacing scale */
+  --sp-xs: 4px; --sp-sm: 8px; --sp-md: 12px; --sp-lg: 20px; --sp-xl: 28px;
+  /* v3.13 — Fixed radius scale */
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-full: 999px;
+}
+
+/* ============== RESET ============== */
+* { box-sizing: border-box; }
+html, body { margin:0; padding:0; }
+/* Rule #35 — Layout Stability: จองพื้นที่ scrollbar ไว้เสมอ → เปิด modal/drawer หรือ
+   content โตขึ้นแล้ว scrollbar โผล่/หาย จะไม่ทำให้หน้าจอขยับซ้าย-ขวา (jank) */
+html { scrollbar-gutter: stable; }
+
+/* ============== SCROLLBAR (Iron Rule #49 — minimal, ห้าม default) ============== */
+/* เส้นบางมาก 5px · track โปร่งใส · พื้นเข้ม (sidebar/panel) = ขาวโปร่ง · พื้นสว่าง = charcoal จาง */
+* { scrollbar-width: thin; scrollbar-color: rgba(17,17,17,.16) transparent; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(17,17,17,.14); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(17,17,17,.26); }
+.sidebar, .slide { scrollbar-color: rgba(255,255,255,.28) transparent; }
+.sidebar ::-webkit-scrollbar-thumb, .slide ::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb, .slide::-webkit-scrollbar-thumb { background: rgba(255,255,255,.28); }
+.sidebar ::-webkit-scrollbar-thumb:hover, .slide ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.42); }
+body {
+  font-family: 'Satoshi', 'Noto Sans Thai', system-ui, sans-serif;
+  background: var(--c-bg-off);
+  color: var(--c-ink);
+  font-size:14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  /* v7.1 Rule #97: desktop-base + adaptive — 768-1180 ปรับ layout ผ่าน media query,
+     <768 = horizontal scroll (ไม่ guarantee) */
+  min-width: 768px;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+[data-lucide] { flex-shrink: 0; }
+
+/* Hide number input spinner globally (Iron Rule #19) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin:0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ============== SIDEBAR ============== */
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sidebar-w);
+  background: #111111;
+  color: #E9E5E0;
+  z-index:var(--z-shell);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.sb-brand {
+  padding:18px;
+  display: flex;
+  align-items: center;
+  gap:12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+.sb-logo {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, #FF3B30, #FF9A1F);
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(255,59,48,0.3);
+}
+.sb-name { font-weight: 700; font-size:14px; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+.sb-sub { font-size:11px; color: #9A9CA2; letter-spacing: 0.06em; font-weight: 600; text-transform: uppercase; margin-top:2px; }
+.sb-nav { flex: 1; padding:12px 8px; overflow-y: auto; }
+
+/* Module = collapsible group (Iron Rule #27).
+   Header toggles expand/collapse only — NOT navigable.
+   Children = .sb-features (clickable feature items). */
+.sb-module { margin-bottom:4px; }
+.sb-module-header {
+  display: flex; align-items: center; gap:8px;
+  width: 100%;
+  padding:8px 10px;
+  border-radius: 6px;
+  background: transparent; border: 0;
+  color: #9A9CA2;
+  font-family: inherit;
+  font-size:11px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  cursor: pointer; transition: all 120ms;
+  text-align: left;
+}
+.sb-module-header:hover { background: rgba(255,255,255,0.04); color: #DEDAD4; }
+.sb-module-header .mod-icon { flex-shrink: 0; opacity: 0.7; }
+.sb-module-header .mod-label { flex: 1; }
+.sb-module-header .mod-chevron {
+  flex-shrink: 0;
+  transition: transform 200ms;
+  opacity: 0.7;
+}
+.sb-module[data-expanded="false"] .mod-chevron { transform: rotate(-90deg); }
+.sb-module[data-expanded="false"] .sb-features { display: none; }
+
+.sb-features { padding:2px 0 6px 0; }
+
+.sb-item {
+  display: flex; align-items: center; gap:10px;
+  padding:8px 12px 8px 16px;
+  border-radius: 6px;
+  color: #DEDAD4;
+  font-size:13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms;
+  margin-bottom:1px;
+  position: relative;
+  user-select: none;
+}
+.sb-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sb-item.is-active {
+  background: #FF3B30;
+  color: #fff;
+  font-weight: 600;
+}
+.sb-item.is-active::before {
+  content: '';
+  position: absolute;
+  left: -10px; top: 7px; bottom: 7px;
+  width: 3px;
+  background: #fff;
+  border-radius: 0 2px 2px 0;
+}
+.sb-item [data-lucide] { width: 16px; height: 16px; opacity: 0.85; }
+.sb-item.is-active [data-lucide] { opacity: 1; }
+.sb-badge {
+  margin-left:auto;
+  font-size:11px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.10);
+  color: #9A9CA2;
+  padding:2px 8px;
+  border-radius: 999px;
+}
+.sb-item.is-active .sb-badge { background: rgba(255,255,255,0.18); color: #fff; }
+.sb-item.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.sb-item.is-disabled:hover { background: transparent; color: #DEDAD4; }
+.sb-footer {
+  padding:12px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  gap:8px;
+  font-size:12px;
+  color: #9A9CA2;
+}
+.pulse-dot {
+  width: 7px; height: 7px;
+  background: var(--c-teal);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(255,154,31,0.20);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ============== MAIN ============== */
+.main {
+  margin-left:var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--c-bg-off);
+}
+
+/* ============== SHELL BAR ============== */
+.shell-bar {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  border-bottom: 1px solid var(--c-line-2);
+  height: var(--shell-h);
+  display: flex;
+  align-items: center;
+  padding:0 24px;
+  z-index:var(--z-sticky);
+  gap:12px;
+}
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap:8px;
+  font-size:13px;
+  color: var(--c-mute);
+}
+.breadcrumb a { cursor: pointer; transition: color 120ms; }
+.breadcrumb a:hover { color: var(--c-primary); }
+.breadcrumb .sep { color: var(--c-mute-3); font-size:11px; }
+.breadcrumb-current { color: var(--c-ink); font-weight: 500; }
+.icon-btn {
+  width: 34px; height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--c-mute);
+  border-radius: 7px;
+  position: relative;
+  transition: all 120ms;
+}
+.icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.icon-btn [data-lucide] { width: 17px; height: 17px; }
+.notif-dot {
+  position: absolute;
+  top: 7px; right: 8px;
+  width: 7px; height: 7px;
+  background: var(--c-danger);
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap:10px;
+  padding:6px 10px 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 120ms;
+}
+.user-chip:hover { background: var(--c-line-3); }
+.user-text { line-height: 1.2; text-align: right; }
+.user-name { font-size:12.5px; font-weight: 500; color: var(--c-ink); white-space: nowrap; }
+.user-role { font-size:11px; color: var(--c-mute-2); white-space: nowrap; margin-top:1px; }
+.avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* User dropdown menu */
+.user-menu {
+  position: absolute;
+  top: calc(var(--shell-h) - 4px);
+  right: 22px;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(17,17,17,0.12);
+  width: 240px;
+  z-index:var(--z-dropdown);
+  padding:6px;
+  display: none;
+}
+.user-menu.is-open { display: block; }
+.user-menu-item {
+  display: flex;
+  align-items: center;
+  gap:10px;
+  padding:8px 12px;
+  border-radius: 6px;
+  font-size:13px;
+  color: var(--c-ink);
+  cursor: pointer;
+  transition: background 120ms;
+}
+.user-menu-item:hover { background: var(--c-bg-off); }
+.user-menu-item [data-lucide] { width: 15px; height: 15px; color: var(--c-mute-2); }
+.user-menu-item.is-danger { color: var(--c-danger); }
+.user-menu-item.is-danger [data-lucide] { color: var(--c-danger); }
+.user-menu-divider { height: 1px; background: var(--c-line-2); margin:6px 0; }
+
+/* ============== CONTENT ============== */
+/* Fluid full-width — content stretches to fill viewport (Iron Rule #30).
+   Do NOT add max-width here; component-level constraints (modal/toast/wizard
+   internal cards) are responsible for their own readability bounds. */
+.content {
+  padding:24px;
+}
+
+/* ============== v7.1 RESPONSIVE — Rule #97 (desktop-base adaptive) ============== */
+.nav-toggle { display:none; }
+@media (max-width: 1180px){
+  .content { padding:16px; }
+  .drawer { width: min(920px, 100vw); }
+  .drawer.standard { width: min(680px, 100vw); }
+  .drawer.wide, .drawer-panel.wide { width: min(1290px, 100vw); }
+  /* generic shell: sidebar เป็น off-canvas — Pattern N shell ใช้ icon rail ของตัวเองแทน */
+  .main { margin-left: 0; }
+  .sidebar { transform: translateX(-100%); transition: transform .18s ease; }
+  .sidebar.open { transform: translateX(0); box-shadow: 0 8px 32px rgba(0,0,0,.24); }
+  .nav-toggle { display:inline-flex; align-items:center; justify-content:center;
+    width:32px; height:32px; border:none; background:transparent; border-radius:8px;
+    color:var(--c-ink); }
+  .nav-toggle:hover { background: rgba(17,17,17,.06); }
+}
+
+/* ============== v7.1 LIST FULL-HEIGHT — Rule #96 ============== */
+/* หน้า list หลัก: ตารางยืดเต็มพื้นที่เหลือ ติดขอบล่างเสมอ ทุกขนาดจอ */
+.page-fill { display:flex; flex-direction:column;
+  min-height: calc(100dvh - var(--shellbar-h, 52px) - 48px); } /* 48 = content padding บน+ล่าง */
+@media (max-width:1180px){ .page-fill { min-height: calc(100dvh - var(--shellbar-h, 52px) - 32px); } }
+.page-fill > .card-list, .page-fill > .list-card { flex:1 1 auto; min-height:0;
+  display:flex; flex-direction:column; }
+.table-wrap { flex:1 1 auto; min-height:0; overflow:auto; }
+.table-wrap thead th { position:sticky; top:0; background:#fff; z-index:var(--z-sticky); }
+.table-foot { flex:0 0 auto; } /* pagination/count ติดล่างของ card เสมอ */
+
+/* ============== v7.1 OVERLAY PORTAL — Rule #95 ============== */
+/* เมนูที่ portal ออกจาก scroll container (ใช้คู่ portalMenu util) */
+.menu-fixed { position:fixed !important; z-index:var(--z-dropdown);
+  background:#fff; border:1px solid var(--c-line, #E7E2DB); border-radius:10px;
+  box-shadow:0 12px 32px rgba(17,17,17,.14); overflow-y:auto; }
+
+/* ============== PAGE HEADER ============== */
+.ph {
+  margin-bottom:18px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap:16px;
+}
+.ph > div:first-child { flex: 1 1 auto; min-width: 280px; }
+.ph-title-row {
+  display: flex;
+  align-items: baseline;
+  gap:10px;
+  margin-bottom:6px;
+}
+.ph-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:20px;
+  font-weight: 700;
+  color: var(--c-navy);
+  margin:0;
+  letter-spacing: -0.01em;
+}
+.ph-count {
+  font-size:12.5px;
+  font-weight: 600;
+  color: var(--c-mute-2);
+  background: var(--c-line-3);
+  padding:3px 10px;
+  border-radius: 999px;
+}
+.ph-sub { font-size:13px; color: var(--c-mute); margin:0; }
+.ph-actions { display: flex;align-items:center; gap:8px; flex-shrink: 0; }
+
+/* ============== BUTTONS ============== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;   /* Rule #36 — content กึ่งกลางแนวนอน */
+  gap:6px;
+  height: 36px;
+  /* Rule #36 — padding-top 2px = optical centering สำหรับฟอนต์ไทย (Noto Sans Thai):
+     baseline ของไทยลอยสูงเมื่อ flex-center เพราะ font เผื่อที่สระล่าง → นัดจ์ลง 2px ให้เข้ากลางจริง.
+     ✅ verified ด้วยการ render จริง — ทนทุกเบราว์เซอร์ (ต่างจาก text-box-trim ที่รองรับเฉพาะ Chrome 133+). */
+  padding:2px 16px 0;
+  border-radius: 8px;
+  font-size:13px;
+  font-weight: 500;
+  /* ⚠️ Rule #36 — ห้ามใส่ line-height:1 / overflow:hidden กับตัวปุ่มที่มีข้อความไทย
+     เพราะจะ "ตัดสระบน-วรรณยุกต์-สระล่าง" ทำให้ตัวอักษรเบี้ยว. ปล่อย line-height ตาม body (1.5). */
+  border: 1px solid transparent;
+  background: transparent;
+  white-space: nowrap;       /* label ไม่ตัดบรรทัด → ปุ่มในแถวเดียวสูงเท่ากัน */
+  transition: all 120ms;
+  user-select: none;
+  cursor: pointer;
+}
+.btn [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; }  /* Rule #36 — icon ไม่ถูกบีบ */
+.btn:disabled, .btn.is-disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+.btn-eq { min-width: 104px; }  /* Rule #36 — ปุ่มคู่ที่ควรสมมาตร → กว้างเท่ากัน */
+/* Rule #36 — label ยาวที่ "ต้อง" จำกัดความกว้าง: truncate ที่ span (.lbl) ไม่ใช่ที่ตัวปุ่ม.
+   line-height (1.5) สูงพอ → overflow:hidden ตัดเฉพาะแนวนอน (ไม่ตัดสระไทย). ปกติปล่อยปุ่มโตตาม label ดีกว่า. */
+.btn-truncate { max-width: 220px; }
+.btn-truncate .lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn-primary { background: var(--c-primary); color: #fff; }
+.btn-primary:hover { background: var(--c-primary-hover); box-shadow: 0 2px 8px rgba(255,59,48,0.30); }
+.btn-secondary { background: #fff; border-color: var(--c-line); color: var(--c-ink); }
+.btn-secondary:hover { background: var(--c-line-3); border-color: var(--c-mute-2); }
+.btn-ghost { color: var(--c-mute); }
+.btn-ghost:hover { background: var(--c-line-3); color: var(--c-ink); }
+.btn-danger { background: #fff; border-color: var(--c-line); color: var(--c-danger); }
+.btn-danger:hover { background: #FFE9E7; border-color: var(--c-danger); }
+.btn-link { background: transparent; border: 0; padding:0 4px; height: auto; color: var(--c-primary); font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn-sm { height: 30px; padding:2px 12px 0; font-size:12px; }
+
+/* ============== STATS (KPI Cards) ============== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap:12px;
+  margin-bottom:18px;
+}
+.stat {
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  padding:16px 16px;
+  transition: all 150ms;
+}
+.stat:hover { border-color: var(--c-line); box-shadow: 0 2px 8px rgba(17,17,17,0.05); }
+.stat-label {
+  display: flex;
+  align-items: center;
+  gap:6px;
+  font-size:12px;
+  font-weight: 500;
+  color: var(--c-mute);
+}
+.stat-label [data-lucide] { width: 13px; height: 13px; color: var(--c-primary); }
+.stat-value {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:26px;
+  font-weight: 700;
+  color: var(--c-navy);
+  margin-top:6px;
+  letter-spacing: -0.01em;
+}
+.stat-meta {
+  font-size:12px;
+  color: var(--c-mute-2);
+  margin-top:6px;
+  display: flex;
+  align-items: center;
+  gap:4px;
+}
+.stat-meta.is-up { color: var(--c-success); }
+.stat-meta.is-down { color: var(--c-danger); }
+.stat-meta [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== CARD ============== */
+.card {
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* ============== FILTER BAR ============== */
+.filter-bar {
+  padding:16px 18px;
+  display: flex;
+  gap:10px;
+  align-items: center;
+  border-bottom: 1px solid var(--c-line-2);
+  background: #fff;
+  flex-wrap: wrap;
+}
+
+/* ============== INPUTS ============== */
+.input, .select {
+  height: 36px;
+  padding:0 12px;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  font-size:13px;
+  background: #fff;
+  color: var(--c-ink);
+  font-family: inherit;
+  transition: all 120ms;
+  width: 100%;
+}
+.input:focus, .select:focus {
+  outline: none;
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px rgba(255,59,48,0.10);
+}
+.select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right:32px;
+  appearance: none;
+}
+.input-search { position: relative; flex: 1; max-width: 320px; }
+.input-search input { padding-left:36px; }
+.input-search .lead-icon {
+  position: absolute;
+  left: 11px; top: 50%;
+  transform: translateY(-50%);
+  width: 15px; height: 15px;
+  color: var(--c-mute-2);
+  pointer-events: none;
+}
+
+/* ===== SEARCH-SELECT (Iron Rule #34) — searchable dropdown แทน <select> เมื่อ options เยอะ/lookup master =====
+   list = position:absolute overlay → ไม่ดันเนื้อหา (สอดคล้อง Rule #35) */
+.search-select { position: relative; width: 100%; }
+.search-select .ss-input { padding-left:32px; padding-right:32px; }
+.search-select .ss-lead {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px;   /* ⬅ ขนาดตายตัว — ไม่พึ่ง .w-4 (กัน Lucide เรนเดอร์ 24px default → placeholder ดูห่าง) */
+  color: var(--c-mute-3); pointer-events: none;
+}
+.search-select .ss-caret {
+  position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+  width: 15px; height: 15px; color: var(--c-mute-3); pointer-events: none;
+}
+.search-select .ss-clear {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  display: inline-flex; padding:3px; border: 0; background: transparent;
+  color: var(--c-mute-2); cursor: pointer; border-radius: 6px;
+}
+.search-select .ss-clear:hover { background: var(--c-line-3); color: var(--c-ink); }
+.ss-list {
+  position: absolute; z-index:var(--z-backdrop); left: 0; right: 0; margin-top:4px;
+  max-height: 280px; overflow-y: auto; background: #fff;
+  border: 1px solid var(--c-line); border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(17,17,17,0.10), 0 4px 10px rgba(17,17,17,0.05);
+}
+.ss-opt {
+  width: 100%; display: flex; align-items: center; gap:10px; padding:10px 12px;
+  border: 0; border-bottom: 1px solid var(--c-line-3); background: transparent;
+  cursor: pointer; text-align: left; font-family: inherit;
+}
+.ss-opt:last-child { border-bottom: 0; }
+.ss-opt:hover, .ss-opt.is-active { background: rgba(255,59,48,0.06); }
+.ss-opt-ic { width: 16px; height: 16px; color: var(--c-primary); flex-shrink: 0; }  /* ขนาดตายตัวเช่นกัน */
+.ss-opt-main { flex: 1; min-width: 0; }
+.ss-opt-label { display: block; font-size:13px; color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-sub { display: block; font-size:12px; color: var(--c-mute-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-right { flex-shrink: 0; font-size:12px; color: var(--c-mute); }
+.ss-opt mark { background: rgba(255,59,48,0.16); color: inherit; padding:0 1px; border-radius: 2px; }
+.ss-empty { padding:20px 16px; text-align: center; font-size:13px; color: var(--c-mute-2); }
+
+/* ============== TABLE ============== */
+.table-scroll { overflow-x: auto; }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size:13px;
+}
+.table thead { background: var(--c-bg-off); }
+.table th {
+  padding:12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--c-mute);
+  font-size:12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--c-line-2);
+  white-space: nowrap;
+}
+.table th.col-check { width: 40px; padding-right:0; }
+.table th.is-sortable { cursor: pointer; user-select: none; }
+.table th.is-sortable:hover { color: var(--c-ink); background: var(--c-line-3); }
+.table th .sort-arrow { display: inline-block; margin-left:4px; opacity: 0.4; }
+.table th.is-sorted .sort-arrow { opacity: 1; color: var(--c-primary); }
+.table td {
+  padding:12px 16px 12px;  /* Rule #38 — optical centering ไทย: pad-top มากกว่า bottom 2px */
+  border-bottom: 1px solid var(--c-line-2);
+  color: var(--c-ink);
+  vertical-align: middle;
+}
+.table tbody tr { transition: background 120ms; }
+.table tbody tr:hover { background: var(--c-bg-off); }
+.table tbody tr.is-selected { background: rgba(255,59,48,0.04); }
+.table tbody tr.is-selected:hover { background: rgba(255,59,48,0.07); }
+.table tbody tr:last-child td { border-bottom: 0; }
+/* Rule #41 — แถวกดได้ = เปิด view (ไม่มีไอคอนดวงตา). row ที่ clickable ต้องสื่อด้วย cursor */
+.table tbody tr.is-clickable { cursor: pointer; }
+/* Rule #42 — Long-list UX: sticky header (opt-in .is-sticky) — ตารางยาว scroll หัวค้าง */
+.table-scroll.is-sticky { max-height: 560px; overflow-y: auto; scrollbar-gutter: stable; }
+.table-scroll.is-sticky thead th {
+  position: sticky; top: 0; z-index: 3;
+  background: var(--c-bg-off);            /* ⚠️ ต้องทึบที่ตัว th (ไม่ใช่แค่ thead) — ไม่งั้น row เลื่อนทะลุซ้อนหัว */
+  box-shadow: inset 0 -1px 0 var(--c-line-2);  /* border-bottom สำหรับ sticky (border ปกติหายตอน sticky) */
+}
+/* Rule #42 — Thai-safe cell truncation: ตัดเฉพาะแนวนอน (… ) line-height พอ ไม่ตัดสระ. ใส่ title=ค่าเต็มเพื่อ hover ดู */
+.cell-truncate { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+/* Rule #43 — ตัวเลข tabular + คอลัมน์ตัวเลขชิดขวา */
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+th.col-num, td.col-num { text-align: right; }
+td.col-num .num, td.col-num { font-variant-numeric: tabular-nums; }
+
+/* ============== CHECKBOX ============== */
+.cb {
+  width: 16px; height: 16px;
+  border: 1.5px solid var(--c-line);
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: all 120ms;
+  flex-shrink: 0;
+}
+.cb.is-checked, .cb.is-partial {
+  background: var(--c-primary);
+  border-color: var(--c-primary);
+}
+.cb.is-checked::after {
+  content: '';
+  position: absolute;
+  left: 4px; top: 1px;
+  width: 5px; height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.cb.is-partial::after {
+  content: '';
+  position: absolute;
+  left: 3px; top: 6px;
+  width: 8px; height: 2px;
+  background: #fff;
+}
+.cb:hover { border-color: var(--c-primary); }
+
+/* ============== USER CELL ============== */
+.user-cell { display: flex; align-items: center; gap:10px; }
+.uc-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.uc-name { font-weight: 600; color: var(--c-ink); font-size:13px; line-height: 1.3; }
+.uc-email { font-size:12px; color: var(--c-mute-2); margin-top:1px; line-height: 1.3; }
+
+/* ============== PILLS ============== */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap:5px;
+  height: 22px;            /* Rule #38.1 — ทุก pill สูงเท่ากันเป๊ะ · ห้ามใช้ padding ตั้งความสูง */
+  line-height: 1;
+  padding:1px 10px 0;      /* optical centering ไทย (บน 1px) */
+  border-radius: 999px;
+  font-size:11.5px;
+  vertical-align: middle;
+  box-sizing: border-box;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pill [data-lucide] { width: 11px; height: 11px; }
+.pill-registered { background: #E6F0FF; color: #1A5FCC; }
+.pill-active { background: #E6F0FF; color: #1A5FCC; }
+.pill-converted { background: #E4F4EB; color: #157A41; }
+.pill-suspended { background: #FFF1DD; color: #B8690B; }
+.pill-archived { background: var(--c-line-3); color: var(--c-mute-2); }
+/* v3.13 — Semantic pill aliases (ใช้ชุดนี้เป็นหลัก — mapping ดู knowledge/microcopy.md) */
+.pill-info    { background: #E6F0FF; color: #1A5FCC; }   /* กำลังดำเนินการ/ใช้งาน */
+.pill-success { background: #E4F4EB; color: #157A41; }   /* อนุมัติแล้ว/เสร็จสิ้น */
+.pill-warning { background: #FFF1DD; color: #B8690B; }   /* รอดำเนินการ/รออนุมัติ */
+.pill-danger  { background: #FFE9E7; color: #E62E24; }   /* ปฏิเสธ/ยกเลิก */
+.pill-muted   { background: var(--c-line-3); color: var(--c-mute-2); } /* ร่าง/ปิดใช้งาน/เก็บถาวร */
+
+/* v3.13 — Loading spinner (Iron Rule #44) */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.8s linear infinite; }
+
+/* v3.13 — Form Section Grouping (Iron Rule #45) */
+.form-section { margin-top:var(--sp-xl); }
+.form-section:first-child { margin-top:0; }
+.form-section-title {
+  font-size: var(--fs-cap); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--c-mute);
+  padding-bottom:var(--sp-sm); border-bottom: 1px solid var(--c-line-2);
+  margin-bottom:var(--sp-md);
+}
+
+/* v3.13 — Segmented control (ช่วงเวลา dashboard ฯลฯ — Pattern J) */
+.seg-control { display:inline-flex; background: var(--c-line-3); border-radius: var(--r-md); padding:2px; gap:2px; }
+.seg-item {
+  padding:6px 12px 3px; border-radius: var(--r-sm); border: none; background: transparent;
+  font-size: var(--fs-meta); font-weight: 500; color: var(--c-mute-2); cursor: pointer;
+  font-family: inherit; white-space: nowrap;
+}
+.seg-item.is-active { background: #fff; color: var(--c-ink); font-weight: 600; box-shadow: 0 1px 3px rgba(17,17,17,0.08); }
+.pill-danger { background: #FFE9E7; color: var(--c-danger); }
+
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot.is-active { background: #1A5FCC; box-shadow: 0 0 0 2.5px rgba(37,99,235,0.18); }
+.dot.is-converted { background: #157A41; box-shadow: 0 0 0 2.5px rgba(6,95,70,0.20); }
+.dot.is-suspended { background: var(--c-warning); }
+.dot.is-archived { background: var(--c-mute-3); }
+
+/* Mini-link cell (e.g. tenant link) */
+.tenant-link {
+  display: inline-flex;
+  align-items: center;
+  gap:4px;
+  color: var(--c-primary);
+  font-size:12.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.tenant-link:hover { text-decoration: underline; }
+.tenant-link [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== ROW ACTIONS ============== */
+.row-actions { display: inline-flex; gap:2px; }
+.ra-btn {
+  width: 28px; height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--c-mute-2);
+  border-radius: 6px;
+  transition: all 120ms;
+}
+.ra-btn:hover { background: var(--c-line-3); color: var(--c-primary); }
+.ra-btn.is-danger:hover { background: #FFE9E7; color: var(--c-danger); }
+.ra-btn.is-success:hover { background: rgba(255,154,31,0.12); color: var(--c-teal); }
+.ra-btn [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== TABLE FOOTER ============== */
+.table-footer {
+  padding:12px 18px;
+  background: var(--c-bg-off);
+  border-top: 1px solid var(--c-line-2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size:12.5px;
+  color: var(--c-mute);
+  flex-wrap: wrap;
+  gap:10px;
+}
+.pagination { display: inline-flex; gap:4px; align-items: center; }
+.pg-btn {
+  min-width: 30px; height: 30px;
+  padding:0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 6px;
+  color: var(--c-mute);
+  font-size:12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms;
+}
+.pg-btn:hover { border-color: var(--c-line); background: var(--c-bg-off); }
+.pg-btn.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.pg-btn.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn [data-lucide] { width: 13px; height: 13px; }
+
+/* ============== BULK BAR ============== */
+.bulk-bar {
+  background: var(--c-navy);
+  color: #fff;
+  padding:12px 18px;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  gap:12px;
+  border-bottom: 1px solid var(--c-line-2);
+  margin:-1px -1px 0;
+  font-size:13px;
+}
+.bulk-bar .btn { height: 30px; padding:2px 12px 0; font-size:12px; }
+.bulk-bar .btn-secondary {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.18);
+  color: #fff;
+}
+.bulk-bar .btn-secondary:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.30); }
+
+/* ============== DRAWER ============== */
+/* ---- v6.1 Pattern B drawer chrome (locked to references/drawer-standard/pr.html) ----
+   create/edit drawer ให้ใช้ชุดนี้: .dw-head (eyebrow + h2 20px + .top-icon-btn ปิด)
+   + .d-stepper (.stepper-item/.stepper-circle 32px — ไม่ใช่ .stepper กลางของ page wizard)
+   + .dw-footer (ย้อนกลับ secondary ซ้าย · ยกเลิก ghost + primary ชิดขวา) */
+.top-icon-btn { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border:0; background:transparent; border-radius: var(--r-sm); color: var(--c-mute-2); cursor:pointer; transition: all 120ms; flex-shrink:0; }
+.top-icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.dw-head { padding:18px 24px 16px; border-bottom: 1px solid var(--c-line-2); flex-shrink: 0; }
+.dw-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap:16px; }
+.dw-eyebrow { display: flex; align-items: center; gap:6px; font-size:11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-mute-2); margin-bottom:4px; font-weight: 600; }
+.dw-title { font-size:20px; font-weight: 700; color: var(--c-navy); margin:0; letter-spacing: -0.01em; }
+.dw-sub { font-size: var(--fs-meta); color: var(--c-mute-2); margin-top:4px; }
+.d-stepper { display: flex; align-items: flex-start; gap:0; width: 100%; margin-top:18px; }
+.stepper-item { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; min-width: 0; }
+.stepper-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size:13px; font-weight: 600; background: #fff; color: var(--c-mute-3); border: 2px solid var(--c-line); transition: all 200ms; z-index: 2; }
+.stepper-item.active .stepper-circle { background: var(--c-primary); color: #fff; border-color: var(--c-primary); box-shadow: 0 0 0 4px rgba(255,59,48,0.12); }
+.stepper-item.done .stepper-circle { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
+.stepper-label { margin-top:8px; font-size:12px; font-weight: 500; color: var(--c-mute-3); text-align: center; line-height: 1.3; transition: color 200ms; }
+.stepper-item.active .stepper-label { color: var(--c-navy); font-weight: 600; }
+.stepper-item.done .stepper-label { color: var(--c-mute); }
+.stepper-item:not(:last-child)::after { content: ''; position: absolute; top: 15px; left: 50%; right: -50%; height: 2px; background: var(--c-line-2); z-index: 1; }
+.stepper-item.done:not(:last-child)::after { background: var(--c-primary); }
+.dw-footer { padding:16px 24px; border-top: 1px solid var(--c-line-2); background: var(--c-bg-off); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap:8px; }
+.dw-footer-right { display: flex; align-items: center; gap:8px; }
+
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17,17,17,0.40);
+  z-index:var(--z-backdrop);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms;
+}
+.drawer-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 920px;           /* v2 standard (Iron Rule #11) — wide drawer */
+  max-width: 96vw;
+  background: #fff;
+  z-index:var(--z-drawer);
+  transform: translateX(100%);
+  transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -16px 0 40px rgba(17,17,17,0.18);
+}
+.drawer.is-open { transform: translateX(0); }
+.drawer.standard { width: 680px; }   /* simple forms / short view (Iron Rule #11) */
+
+/* ========== STEPPER STANDARD (Iron Rule #47) — ใช้ตัวเดียวทุก wizard ========== */
+.stepper { display:flex; align-items:center; gap:var(--sp-sm); }
+.step { display:flex; align-items:center; gap:var(--sp-sm); }
+.step-dot {
+  width:26px; height:26px; border-radius: var(--r-full);
+  display:flex; align-items:center; justify-content:center;
+  font-size: var(--fs-meta); font-weight:600; padding-top:1px; /* Thai rhythm */
+  border:1.5px solid var(--c-line); background:#fff; color: var(--c-mute-2);
+}
+.step-label { font-size: var(--fs-sub); color: var(--c-mute-2); font-weight:500; white-space:nowrap; }
+.step-connector { width:28px; height:1.5px; background: var(--c-line-2); flex:0 0 auto; }
+.step.is-current .step-dot { border-color: var(--c-primary); background: var(--c-primary); color:#fff; }
+.step.is-current .step-label { color: var(--c-ink); font-weight:600; }
+.step.is-done .step-dot { border-color: var(--c-teal); background:#fff; color: var(--c-teal); }
+.step.is-done .step-connector, .step.is-current ~ * {}
+.step.is-done + .step-connector { background: var(--c-teal); }
+/* placement: drawer wizard → .drawer-stepper-band (ใต้ header) / page wizard → .wizard-stepper-band */
+.drawer-stepper-band { padding:10px 24px; border-bottom: 1px solid var(--c-line-2); background: var(--c-bg-off); }
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  gap:16px;
+  padding:18px 24px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+/* ---- Rule #38.2 TABS (kit เดียว · ห้ามเขียน .drawer-tab/.seg เองแทน) ---- */
+.tabs { display:flex; gap:0; border-bottom:1px solid var(--c-line-2); margin:0 0 var(--sp-lg); flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; }
+.tabs::-webkit-scrollbar { display:none; }
+.tab { display:inline-flex; align-items:center; gap:6px; height:40px; padding:0 14px; margin-bottom:-1px; border:0; border-bottom:2px solid transparent; background:transparent; font:inherit; font-size:13px; font-weight:500; color:var(--c-mute); cursor:pointer; white-space:nowrap; flex:0 0 auto; }
+.tab [data-lucide] { width:14px; height:14px; }
+.tab:hover { color:var(--c-ink); }
+.tab.is-active, .tab.on { color:var(--c-primary); border-bottom-color:var(--c-primary); font-weight:600; }
+.tab .tab-badge { font-size:10.5px; font-weight:700; background:var(--c-line-2); color:var(--c-mute); border-radius:999px; height:18px; line-height:18px; padding:0 7px; }
+.tab.is-active .tab-badge { background:rgba(255,59,48,.12); color:var(--c-primary); }
+/* drawer header ที่มี tabs — header เป็น column · tabs bleed เต็มกว้าง · เส้นเดียว (ของ header) · body ไม่มี border-top */
+.drawer-header.has-tabs { flex-direction:column; align-items:stretch; gap:0; padding-bottom:0; }
+.drawer-header.has-tabs .dw-head-row { display:flex; align-items:flex-start; gap:16px; padding-bottom:14px; }
+.drawer-header.has-tabs .tabs { margin:0 -24px -1px; padding:0 24px; border-bottom:0; }
+.drawer-header.has-tabs + .drawer-body { border-top:0; }
+.dw-eyebrow { font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--c-mute-2); display:flex; align-items:center; gap:6px; margin-bottom:4px; }
+.dw-title { font-size:18px; font-weight:700; color:var(--c-ink); line-height:1.25; }
+/* page-level tabs ใต้ page header (Rule #104) */
+.ph + .tabs, .page-tabs { margin:-4px 0 var(--sp-lg); }
+/* ---- Rule #106 info tooltip แทน hint banner ---- */
+.tip { position:relative; display:inline-flex; align-items:center; color:var(--c-mute-2); cursor:help; }
+.tip [data-lucide] { width:13px; height:13px; }
+.tip::after { content:attr(data-tip); position:absolute; left:50%; bottom:calc(100% + 6px); transform:translateX(-50%); background:var(--c-ink); color:#fff; font-size:11.5px; font-weight:400; line-height:1.45; padding:6px 10px; border-radius:6px; white-space:normal; width:max-content; max-width:280px; opacity:0; pointer-events:none; transition:opacity 120ms; z-index:var(--z-tooltip,60); }
+.tip:hover::after { opacity:1; }
+.drawer-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.drawer-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:20px;
+  font-weight: 600;
+  color: var(--c-navy);
+  margin:0;
+  letter-spacing: -0.01em;
+}
+.drawer-subtitle {
+  font-size:12px;
+  color: var(--c-mute);
+  margin-top:4px;
+  display: flex;
+  align-items: center;
+  gap:8px;
+  flex-wrap: wrap;
+}
+.drawer-tabs {
+  display: flex;align-items:center;
+  padding:0 24px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.drawer-tab {
+  padding:10px 16px;
+  font-size:13px;
+  font-weight: 500;
+  color: var(--c-mute);
+  border-bottom: 2px solid transparent;
+  transition: all 120ms;
+  margin-bottom:-1px;
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+}
+.drawer-tab:hover { color: var(--c-ink); }
+.drawer-tab.is-active { color: var(--c-primary); border-bottom-color: var(--c-primary); }
+.drawer-body { flex: 1; overflow-y: auto; padding:24px; scrollbar-gutter: stable; }
+.drawer-section { margin-bottom:24px; }
+.drawer-section-title {
+  font-size:11px;
+  font-weight: 700;
+  color: var(--c-mute);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin:0 0 10px;
+}
+.drawer-fields {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap:10px 16px;
+  font-size:13px;
+}
+.drawer-fields .lbl { color: var(--c-mute); }
+.drawer-fields .val { color: var(--c-ink); font-weight: 500; }
+.drawer-footer {
+  padding:12px 24px;
+  border-top: 1px solid var(--c-line-2);
+  display: flex;
+  gap:8px;
+  align-items: center;
+  background: var(--c-bg-off);
+}
+/* Drawer Button Contract (Iron Rule #31) helpers */
+.footer-spacer { flex: 1; }
+.drawer-footer-meta { font-size:12px; color: var(--c-mute-2); }
+.drawer-header-actions { display: flex; gap:6px; align-items: center; }
+.drawer-header-divider { width: 1px; height: 22px; background: var(--c-line-2); margin:0 4px; flex-shrink: 0; }
+
+/* ============== TIMELINE ============== */
+.timeline { position: relative; padding-left:24px; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--c-line-2);
+}
+.tl-item { position: relative; margin-bottom:16px; }
+.tl-item:last-child { margin-bottom:0; }
+.tl-dot {
+  position: absolute;
+  left: -20px;
+  top: 3px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--c-primary);
+}
+.tl-dot.is-success { border-color: var(--c-success); }
+.tl-dot.is-warning { border-color: var(--c-warning); }
+.tl-title { font-size:13px; font-weight: 600; color: var(--c-ink); }
+.tl-meta { font-size:12px; color: var(--c-mute-2); margin-top:2px; }
+
+/* ============== BOOKMARK / RELATED CARDS ============== */
+.bm-card {
+  display: flex;
+  gap:12px;
+  padding:12px 12px;
+  border: 1px solid var(--c-line-2);
+  border-radius: 8px;
+  margin-bottom:8px;
+  cursor: pointer;
+  transition: all 120ms;
+  align-items: center;
+}
+.bm-card:hover { border-color: var(--c-line); }
+.bm-icon {
+  width: 28px; height: 28px;
+  background: rgba(255,59,48,0.10);
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-primary);
+  flex-shrink: 0;
+}
+.bm-card [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== NOTES ============== */
+.notes-area {
+  width: 100%;
+  min-height: 130px;
+  padding:12px 16px;
+  background: #fff;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  resize: vertical;
+  font-family: inherit;
+  font-size:13px;
+  line-height: 1.55;
+}
+.notes-area:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(255,59,48,0.10); }
+
+/* ============== EMPTY STATE ============== */
+.empty {
+  padding:56px 24px;
+  text-align: center;
+  color: var(--c-mute);
+}
+.empty-icon {
+  width: 52px; height: 52px;
+  margin:0 auto 16px;
+  border-radius: 50%;
+  background: var(--c-line-3);
+  color: var(--c-mute-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.empty-icon [data-lucide] { width: 22px; height: 22px; }
+.empty-title {
+  font-size:16px;
+  font-weight: 600;
+  color: var(--c-ink);
+  margin-bottom:6px;
+  font-family: 'Noto Sans Thai', sans-serif;
+}
+.empty-desc { font-size:13px; color: var(--c-mute); max-width: 320px; margin:0 auto; }
+.empty .btn { margin-top:16px; }  /* Rule #39 — empty state ควรมีปุ่ม action หลัก */
+
+/* ============== MODAL ============== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17,17,17,0.50);
+  z-index:var(--z-backdrop);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 440px;
+  max-width: 92vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.96);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 24px 64px rgba(17,17,17,0.28);
+  overflow: hidden;
+}
+.modal-backdrop.is-open .modal { transform: scale(1); }
+.modal-header {
+  padding:18px 24px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap:12px;
+}
+.modal-header-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: rgba(255,59,48,0.10);
+  color: var(--c-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.modal-header-icon.is-danger { background: #FFE9E7; color: var(--c-danger); }
+.modal-header-icon.is-warning { background: #FFF1DD; color: var(--c-warning); }
+.modal-header-icon [data-lucide] { width: 18px; height: 18px; }
+.modal-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:16px;
+  font-weight: 600;
+  color: var(--c-navy);
+  margin:0 0 4px;
+}
+.modal-subtitle { font-size:13px; color: var(--c-mute); margin:0; line-height: 1.5; }
+.modal-body {
+  padding:6px 24px 18px;
+  font-size:13px;
+  color: var(--c-ink);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+.modal-footer {
+  padding:12px 24px;
+  background: var(--c-bg-off);
+  border-top: 1px solid var(--c-line-2);
+  display: flex;align-items:center;
+  justify-content: flex-end;
+  gap:8px;
+}
+
+/* ============== FIELDS ============== */
+.field { margin-bottom:16px; }
+.field-label { display: block; font-size:12.5px; font-weight: 500; color: var(--c-mute); margin-bottom:6px; }
+.field-label .req { color: var(--c-danger); margin-left:2px; }
+.field-input { width: 100%; }
+.field-help { font-size:12px; color: var(--c-mute-2); margin-top:4px; }
+/* Rule #43 — จองพื้นที่ error ไว้ (visibility แทน display) → error โผล่แล้วฟอร์มไม่กระตุก.
+   ถ้า field ไหนไม่ใส่ <div class="field-error"> ก็ไม่จองพื้นที่ (author เลือกเองรายตัว) */
+.field-error { font-size:12px; color: var(--c-danger); margin-top:4px; min-height: 15px; visibility: hidden; }
+.field.is-invalid .input,
+.field.is-invalid .select { border-color: var(--c-danger); }
+.field.is-invalid .field-error { visibility: visible; }
+
+/* Responsive form grid (Iron Rule #17) */
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap:12px;
+}
+
+/* ============== TOAST ============== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--c-navy);
+  color: #fff;
+  padding:12px 18px;
+  border-radius: 10px;
+  font-size:13px;
+  font-weight: 500;
+  z-index:var(--z-toast);
+  display: flex;
+  align-items: center;
+  gap:10px;
+  box-shadow: 0 12px 32px rgba(17,17,17,0.30);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 380px;
+}
+.toast.is-visible { transform: translateY(0); opacity: 1; }
+.toast.is-success { background: var(--c-success); }
+.toast.is-info { background: var(--c-primary); }
+.toast.is-warning { background: var(--c-warning); }
+.toast.is-error { background: var(--c-danger); }
+.toast [data-lucide] { width: 17px; height: 17px; }
+
+/* ============== LINE EXPAND ANIMATION (Pattern E) ============== */
+.line-expanded {
+  animation: lineExpand 220ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+@keyframes lineExpand {
+  from { max-height: 0; opacity: 0; transform: translateY(-8px); }
+  to { max-height: 600px; opacity: 1; transform: translateY(0); }
+}
+
+/* ============== WIZARD LAYOUT (Iron Rule #22) ============== */
+.page-content-host.has-wizard { display: flex; flex-direction: column; height: 100%; }
+.wizard-shell { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 100%; }
+.wizard-stepper-band {
+  flex: 0 0 auto; background: white;
+  padding:18px 32px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.wizard-body { flex: 1 1 auto; padding:24px 32px 28px; min-height: 0; background: var(--c-bg-off); }
+.wizard-card {
+  padding:28px 32px;
+  width: 100%;
+  max-width: 960px;
+  margin:0 auto;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+}
+.wizard-footer {
+  flex: 0 0 auto;
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding:12px 32px;
+  display: flex;align-items:center;
+  justify-content: space-between;
+  border-top: 1px solid var(--c-line-2);
+  box-shadow: 0 -2px 8px rgba(17,17,17,0.04);
+  z-index:var(--z-sticky);
+}
+.stepper-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+  max-width: 640px;
+  margin:0 auto;
+  gap:0;
+}
+.stepper-row .step-line {
+  flex: 1 1 auto;
+  min-width: 28px;
+  max-width: 80px;
+  height: 2px;
+  background: var(--c-line-2);
+}
+.stepper-row .step-line.is-done { background: var(--c-primary); }
+.step-dot {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--c-line-2);
+  color: var(--c-mute-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12.5px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.step-dot.is-active { background: var(--c-primary); color: #fff; }
+.step-dot.is-done { background: var(--c-primary); color: #fff; }
+
+/* ============== UTILITIES ============== */
+.hidden { display: none !important; }  /* v6.1 — search-select/overlay พึ่ง class นี้ (เดิมหายไป ทำให้ ss-list เปิดค้าง + ปุ่ม X โผล่) */
+.text-mute { color: var(--c-mute); }
+.text-mute-2 { color: var(--c-mute-2); }
+.text-primary { color: var(--c-primary); }
+.text-success { color: var(--c-success); }
+.text-danger { color: var(--c-danger); }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap:8px; }
+.gap-3 { gap:12px; }
+.gap-4 { gap:16px; }
+.mb-2 { margin-bottom:8px; }
+.mb-3 { margin-bottom:12px; }
+.mb-4 { margin-bottom:16px; }
+.mt-2 { margin-top:8px; }
+.mt-3 { margin-top:12px; }
+.mt-4 { margin-top:16px; }
+
+/* Icon utility classes (CSS-defined so no Tailwind dependency for these) */
+.w-2\.5 { width: 10px; }   .h-2\.5 { height: 10px; }
+.w-3   { width: 12px; }    .h-3   { height: 12px; }
+.w-3\.5 { width: 14px; }   .h-3\.5 { height: 14px; }
+.w-4   { width: 16px; }    .h-4   { height: 16px; }
+.w-5   { width: 20px; }    .h-5   { height: 20px; }
+
+/* ============================================================
+   Lucide SVG sizing fix
+   ------------------------------------------------------------
+   Lucide replaces <i data-lucide="..."> with <svg class="lucide ...">
+   ที่มี width="24" height="24" attributes ติดมาด้วย — attributes
+   เหล่านี้ override CSS class .w-N ทำให้ icons เด้งเป็น 24×24
+   ดัน pill/button สูงเกินขนาด design.
+
+   วิธีแก้: บังคับ svg.lucide ทุกตัวให้ width/height = 1em แล้ว
+   ปรับขนาดผ่าน font-size บน parent. Plus override สำหรับเคสที่
+   ใช้ .w-N/.h-N โดยตรงบน <i> (Lucide จะ copy class ไปยัง svg)
+   ============================================================ */
+svg.lucide {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: -0.125em;
+  flex-shrink: 0;
+}
+/* เมื่อ .w-N / .h-N ถูก copy ไปบน svg.lucide ให้บังคับ override
+   width/height attributes ที่ Lucide ใส่มา (specificity ชนะ attribute) */
+svg.lucide.w-2\.5 { width: 10px; }   svg.lucide.h-2\.5 { height: 10px; }
+svg.lucide.w-3    { width: 12px; }   svg.lucide.h-3    { height: 12px; }
+svg.lucide.w-3\.5 { width: 14px; }   svg.lucide.h-3\.5 { height: 14px; }
+svg.lucide.w-4    { width: 16px; }   svg.lucide.h-4    { height: 16px; }
+svg.lucide.w-5    { width: 20px; }   svg.lucide.h-5    { height: 20px; }
+
+/* ===== Tooltip (#33/#67 — hint เข้า ⓘ hover) ===== */
+.info-tip{display:inline-flex;align-items:center;margin-left:6px;color:var(--c-mute-2);cursor:help;position:relative}
+.info-tip svg,.info-tip i{width:14px;height:14px}
+.info-tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:var(--c-navy);color:#fff;font-size:12px;line-height:1.5;padding:8px 12px;border-radius:8px;
+  max-width:340px;width:max-content;white-space:normal;opacity:0;pointer-events:none;transition:opacity .12s;z-index:var(--z-dropdown)}
+.info-tip:hover::after{opacity:1}
+/* ===== Drop-up (#66) ===== */
+.drop-up{bottom:100%!important;top:auto!important;margin-bottom:4px}
+
+/* ===== END BASE-KIT — เขียน page-specific CSS ใต้บรรทัดนี้เท่านั้น ===== */
+
+/* ============================================================
+   PAGE CSS — F-HR-CONFIG · ตั้งค่า HR (page-specific, ใต้ END BASE-KIT)
+   ============================================================ */
+button.sb-item{width:100%;background:transparent;border:0;font:inherit;text-align:left;}
+.card{background:#fff;border:1px solid var(--c-line-2);border-radius:12px;}
+.list-card{display:flex;flex-direction:column;overflow:hidden;}
+.filter-row{display:flex;align-items:center;gap:12px;padding:8px 12px;height:52px;border-bottom:1px solid var(--c-line-2);background:#fff;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;flex:0 0 auto;}
+.filter-row .input-search{flex:0 0 auto;width:286px;max-width:286px;}
+.filter-row .select{width:auto;min-width:130px;max-width:176px;flex:0 0 auto;}
+.filter-row .input.dt{width:148px;flex:0 0 auto;}
+.fr-lb{font-size:11.5px;color:var(--c-mute-2);white-space:nowrap;flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;}
+.fr-sp{flex:1 1 auto;min-width:4px;}
+.table td{padding:8px 12px;}
+.table th{padding:8px 12px;}
+.table-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border-top:1px solid var(--c-line-2);background:#fff;font-size:12.5px;color:var(--c-mute-2);}
+.tbl-item{display:inline-flex;align-items:center;gap:8px;min-width:0;}
+.ti-ico{width:26px;height:26px;border-radius:7px;background:var(--c-line-3);color:var(--c-mute);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;}
+.ti-main{min-width:0;line-height:1.28;}
+.ti-name{display:block;font-size:12.5px;font-weight:600;color:var(--c-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:252px;}
+.ti-code{display:block;font-size:11px;color:var(--c-mute-2);letter-spacing:.03em;}
+.tbl-person{display:inline-flex;align-items:center;gap:8px;min-width:0;}
+.emp-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--c-primary),var(--c-teal));color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex:0 0 auto;}
+.emp-main{min-width:0;line-height:1.28;}
+.emp-nm{display:block;font-size:12.5px;font-weight:600;color:var(--c-ink);white-space:nowrap;}
+.emp-mt{display:block;font-size:11px;color:var(--c-mute-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;}
+.cell-sub{display:block;font-size:11px;color:var(--c-mute-2);line-height:1.25;}
+.cell-main{display:block;font-size:12.5px;color:var(--c-ink);line-height:1.28;}
+.stat.is-click{cursor:pointer;}
+.stat.is-on{border-color:var(--c-primary);box-shadow:0 0 0 3px rgba(255,59,48,.10);}
+.stat-value{font-size:24px;margin-top:4px;}
+.stat{padding:12px;}
+.demo-strip{position:fixed;left:12px;bottom:12px;z-index:var(--z-demo);display:inline-flex;align-items:center;gap:12px;background:var(--c-navy);color:#fff;border-radius:999px;padding:4px 8px 4px 12px;font-size:11.5px;font-weight:500;box-shadow:0 8px 24px rgba(17,17,17,.24);}
+.demo-strip .ds-tag{opacity:.62;letter-spacing:.04em;white-space:nowrap;}
+.demo-strip .ds-sel{height:26px;border:0;border-radius:999px;background:rgba(255,255,255,.16);color:#fff;font-family:inherit;font-size:11.5px;font-weight:600;padding:0 10px;outline:none;}
+.demo-strip .ds-sel option{color:#111111;}
+.sec{border:1px solid var(--c-line-2);border-radius:10px;padding:12px;margin-bottom:12px;background:#fff;}
+.sec-h{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:var(--c-ink);margin-bottom:10px;}
+.sec-h [data-lucide]{color:var(--c-primary);}
+.sec-h .sec-r{margin-left:auto;font-weight:500;font-size:11.5px;color:var(--c-mute-2);}
+.kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 20px;}
+.kv.c3{grid-template-columns:repeat(3,minmax(0,1fr));}
+.kv-k{font-size:11px;color:var(--c-mute-2);font-weight:500;display:flex;align-items:center;gap:4px;}
+.kv-v{font-size:12.5px;color:var(--c-ink);font-weight:600;margin-top:2px;word-break:break-word;}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px;}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 16px;}
+.span2{grid-column:1 / -1;}
+.note{display:flex;gap:8px;align-items:flex-start;padding:8px 12px;border-radius:8px;font-size:12.5px;line-height:1.5;margin-bottom:12px;}
+.note [data-lucide]{margin-top:2px;flex:0 0 auto;}
+.note-danger{background:#FFE9E7;color:var(--c-danger);border:1px solid var(--c-line);}
+.note-warn{background:#FFF1DD;color:#B8690B;border:1px solid var(--c-line);}
+.note .note-act{margin-left:auto;flex:0 0 auto;}
+.mini-tbl{width:100%;border-collapse:collapse;font-size:12.5px;}
+.mini-tbl th{text-align:left;font-size:11px;color:var(--c-mute-2);font-weight:600;padding:4px 8px;border-bottom:1px solid var(--c-line-2);white-space:nowrap;}
+.mini-tbl td{padding:4px 8px;border-bottom:1px solid var(--c-line-3);vertical-align:middle;color:var(--c-ink);}
+.mini-tbl tr:last-child td{border-bottom:0;}
+.mini-tbl .input,.mini-tbl .select{height:30px;font-size:12.5px;padding:0 8px;}
+.mini-wrap{overflow-x:auto;}
+.wu-row{display:flex;align-items:center;gap:12px;padding:8px 4px;border-bottom:1px solid var(--c-line-3);}
+.wu-row:last-child{border-bottom:0;}
+.wu-nm{font-size:12.5px;font-weight:600;color:var(--c-ink);}
+.wu-mt{font-size:11px;color:var(--c-mute-2);margin-top:1px;}
+.ro{background:var(--c-line-3);color:var(--c-mute-2);cursor:not-allowed;}
+.dt-band{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;background:rgba(255,154,31,.12);color:#B8690B;font-size:12px;font-weight:600;margin-bottom:12px;}
+.ver-val{font-family:'Satoshi',sans-serif;font-variant-numeric:tabular-nums;}
+.chip-btn{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 12px;border-radius:999px;border:1px solid var(--c-line);background:#fff;font:inherit;font-size:11.5px;font-weight:600;color:var(--c-mute);cursor:pointer;}
+.chip-btn.is-on{border-color:var(--c-primary);color:var(--c-primary);background:rgba(255,59,48,.06);}
+.tabs.page-tabs{margin:-2px 0 16px;}
+.rev-dl{display:grid;grid-template-columns:180px 1fr;gap:8px 16px;font-size:12.5px;}
+.rev-dl dt{color:var(--c-mute-2);font-size:11.5px;}
+.rev-dl dd{margin:0;color:var(--c-ink);font-weight:600;}
+.drawer-body .field{margin-bottom:14px;}
+.hint-inline{font-size:11.5px;color:var(--c-mute-2);margin-top:4px;}
+.sw{position:relative;display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;color:var(--c-ink);}
+.sw-box{width:34px;height:20px;border-radius:999px;background:var(--c-line);position:relative;transition:background 140ms;flex:0 0 auto;}
+.sw-box::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform 140ms;}
+.sw.on .sw-box{background:var(--c-success);}
+.sw.on .sw-box::after{transform:translateX(14px);}
+.sw.is-ro{opacity:.55;cursor:not-allowed;}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo">C</div>
+    <div>
+      <div class="sb-name">CUBE NATIVE</div>
+      <div class="sb-sub">2BSimple ERP</div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-module" data-module="hr" data-expanded="true">
+      <button class="sb-module-header" onclick="toggleModule(this)">
+        <i data-lucide="users" class="mod-icon w-4 h-4"></i>
+        <span class="mod-label">ทรัพยากรบุคคล</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-4 h-4"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item is-active" data-feature="hr-config" href="#/hr-config"><i data-lucide="sliders-horizontal" class="w-4 h-4"></i><span>ตั้งค่า HR</span></a>
+        <button class="sb-item" data-feature="employee" onclick="outOfScope('ทะเบียนพนักงาน')"><i data-lucide="id-card" class="w-4 h-4"></i><span>ทะเบียนพนักงาน</span></button>
+        <button class="sb-item" data-feature="leave" onclick="outOfScope('การลา')"><i data-lucide="calendar-check" class="w-4 h-4"></i><span>การลา</span></button>
+        <button class="sb-item" data-feature="ot-shift" onclick="outOfScope('OT และกะ')"><i data-lucide="clock" class="w-4 h-4"></i><span>OT และกะ</span></button>
+        <button class="sb-item" data-feature="attendance" onclick="outOfScope('ลงเวลาทำงาน')"><i data-lucide="fingerprint" class="w-4 h-4"></i><span>ลงเวลาทำงาน</span></button>
+        <button class="sb-item" data-feature="payroll" onclick="outOfScope('เงินเดือน')"><i data-lucide="banknote" class="w-4 h-4"></i><span>เงินเดือน</span></button>
+      </div>
+    </div>
+    <div class="sb-module" data-module="policy" data-expanded="false">
+      <button class="sb-module-header" onclick="toggleModule(this)">
+        <i data-lucide="shield-check" class="mod-icon w-4 h-4"></i>
+        <span class="mod-label">Policy Center</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-4 h-4"></i>
+      </button>
+      <div class="sb-features">
+        <button class="sb-item" data-feature="roles" onclick="outOfScope('สิทธิ์ผู้ใช้งาน')"><i data-lucide="key-round" class="w-4 h-4"></i><span>สิทธิ์ผู้ใช้งาน</span></button>
+        <button class="sb-item" data-feature="audit" onclick="outOfScope('ประวัติการใช้งานระบบ')"><i data-lucide="scroll-text" class="w-4 h-4"></i><span>ประวัติการใช้งานระบบ</span></button>
+      </div>
+    </div>
+    <div class="sb-module" data-module="org" data-expanded="false">
+      <button class="sb-module-header" onclick="toggleModule(this)">
+        <i data-lucide="building-2" class="mod-icon w-4 h-4"></i>
+        <span class="mod-label">องค์กร</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-4 h-4"></i>
+      </button>
+      <div class="sb-features">
+        <button class="sb-item" data-feature="company" onclick="outOfScope('ทะเบียนบริษัท')"><i data-lucide="landmark" class="w-4 h-4"></i><span>ทะเบียนบริษัท</span></button>
+      </div>
+    </div>
+  </nav>
+  <div class="sb-footer">
+    <span class="pulse-dot"></span>
+    <span>เชื่อมต่อระบบแล้ว</span>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="shell-bar">
+    <button class="nav-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')"><i data-lucide="menu" class="w-4 h-4"></i></button>
+    <div class="breadcrumb">
+      <a onclick="outOfScope('ทรัพยากรบุคคล')">ทรัพยากรบุคคล</a>
+      <i data-lucide="chevron-right" class="sep w-3 h-3"></i>
+      <span class="breadcrumb-current">ตั้งค่า HR</span>
+    </div>
+    <div class="bar-right">
+      <button class="icon-btn" class="pos-rel" onclick="outOfScope('การแจ้งเตือน')"><i data-lucide="bell" class="w-4 h-4"></i><span class="notif-dot"></span></button>
+      <div class="user-chip" onclick="outOfScope('บัญชีผู้ใช้')">
+        <div class="user-text">
+          <div class="user-name" id="chip-name">สุภาพร วงศ์ทอง</div>
+          <div class="user-role" id="chip-role">HR Admin</div>
+        </div>
+        <div class="avatar">สว</div>
+      </div>
+    </div>
+  </div>
+  <div class="content" id="page-content"></div>
+</div>
+
+<div class="demo-strip">
+  <span class="ds-tag">Prototype · v1.0.0</span>
+  <span class="ds-tag">บทบาททดสอบ</span>
+  <select class="ds-sel" id="ds-persona" onchange="setPersona(this.value)">
+    <option value="admin">HR Admin</option>
+    <option value="staff">HR Staff (อ่านอย่างเดียว)</option>
+  </select>
+</div>
+
+<div id="overlay-root"></div>
+<div id="toast-root"></div>
+<!-- Drawer container (always include, even if no drawer used initially) -->
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <!-- Drawer content rendered by render() function -->
+</div>
+
+<!-- Modal container -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <!-- Modal content rendered by render() function -->
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast" id="toast"></div>
+
+<!-- ============================================================
+     Lucide Icons Loader (multi-CDN fallback, pinned version)
+     ------------------------------------------------------------
+     ทำไมไม่ใช้ <script src="..."> ตรง ๆ:
+       - Single CDN = single point of failure (corp proxy/firewall block)
+       - @latest = breaking changes โดยไม่บอก (GitHub issue #2962)
+       - <script> ใน <head> โดยไม่มี defer ชน DOMContentLoaded
+     กลยุทธ์:
+       1) Pin version 0.469.0 (stable, ทดสอบแล้ว)
+       2) ลอง CDN 3 ตัวเรียงตามความน่าเชื่อถือ: unpkg → jsdelivr → cdnjs
+       3) ถ้าทุก CDN fail → log warning + ไม่ block render
+            (UI ยังใช้งานได้ แค่ไม่มี icons)
+     ============================================================ -->
+<script>
+(function loadLucide() {
+  var version = '0.469.0';
+  var cdns = [
+    'https://unpkg.com/lucide@' + version + '/dist/umd/lucide.min.js',
+    'https://cdn.jsdelivr.net/npm/lucide@' + version + '/dist/umd/lucide.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/lucide/' + version + '/lucide.min.js'
+  ];
+  var i = 0;
+  function tryNext() {
+    if (i >= cdns.length) {
+      console.warn('[Lucide] All CDNs failed. Icons จะไม่แสดง but UI ยังใช้งานได้');
+      window.lucide = window.lucide || { createIcons: function() {} }; // no-op fallback
+      window.dispatchEvent(new Event('lucide:ready'));
+      return;
+    }
+    var s = document.createElement('script');
+    s.src = cdns[i++];
+    s.onload = function() {
+      window.dispatchEvent(new Event('lucide:ready'));
+    };
+    s.onerror = tryNext;
+    document.head.appendChild(s);
+  }
+  tryNext();
+})();
+</script>
+
+<script>
+// ============================================
+// STATE
+// ============================================
+const state = {
+  currentRoute: 'home',
+  drawer: { open: false, mode: null, recordId: null, step: 1 },
+  modal: { open: false, type: null, data: null },
+  toast: { visible: false, message: '', variant: 'info' },
+  filters: { search: '', status: 'all' },
+  pagination: { page: 1, pageSize: 20 },
+  sort: { col: null, dir: 'asc' },
+  selectedIds: new Set(),
+  records: [],
+};
+
+// ============================================
+// SIDEBAR — Module collapse/expand (Iron Rule #27)
+// Module header is non-navigable; click toggles children visibility.
+// State persists in DOM (data-expanded) — future: persist per user.
+// ============================================
+function toggleModule(headerEl) {
+  const mod = headerEl.closest('.sb-module');
+  if (!mod) return;
+  const isExpanded = mod.getAttribute('data-expanded') !== 'false';
+  mod.setAttribute('data-expanded', isExpanded ? 'false' : 'true');
+}
+
+// ============================================
+// ROUTER (Hash-based, refresh-safe)
+// ============================================
+function getRoute() {
+  const hash = location.hash;
+  if (!hash || hash === '#' || hash === '#/') return 'home';
+  return hash.replace(/^#\//, '');
+}
+function navigate(route) {
+  location.hash = '#/' + route;
+}
+
+// ============================================
+// DRAWER / MODAL TOGGLES
+// ============================================
+function openDrawer(mode, recordId) {
+  state.drawer = { open: true, mode, recordId, step: 1 };
+  render();
+  // Trigger CSS animation
+  requestAnimationFrame(() => {
+    document.getElementById('drawerBackdrop').classList.add('is-open');
+    document.getElementById('drawer').classList.add('is-open');
+  });
+}
+function closeDrawer() {
+  document.getElementById('drawerBackdrop').classList.remove('is-open');
+  document.getElementById('drawer').classList.remove('is-open');
+  setTimeout(() => {
+    state.drawer = { open: false, mode: null, recordId: null, step: 1 };
+  }, 280);
+}
+function openModal(type, data) {
+  state.modal = { open: true, type, data };
+  render();
+  requestAnimationFrame(() => {
+    document.getElementById('modalBackdrop').classList.add('is-open');
+  });
+}
+function closeModal() {
+  document.getElementById('modalBackdrop').classList.remove('is-open');
+  setTimeout(() => {
+    state.modal = { open: false, type: null, data: null };
+  }, 200);
+}
+
+// ============================================
+// TOAST
+// ============================================
+function showToast(message, variant = 'info', durationMs = 2800) {
+  const el = document.getElementById('toast');
+  const iconMap = { success: 'check-circle-2', info: 'info', warning: 'alert-triangle', error: 'x-circle' };
+  el.className = 'toast is-' + variant;
+  el.innerHTML = `<i data-lucide="${iconMap[variant] || 'info'}" class="w-4 h-4"></i><span>${message}</span>`;
+  renderIcons();
+  requestAnimationFrame(() => el.classList.add('is-visible'));
+  setTimeout(() => el.classList.remove('is-visible'), durationMs);
+}
+
+// ============================================
+// ESC key handler (close drawer/modal)
+// ============================================
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (state.modal.open) closeModal();
+    else if (state.drawer.open) closeDrawer();
+  }
+});
+
+// ============================================
+// RENDER (placeholder — replace per feature)
+// ============================================
+function render() {
+  // Specific feature should override this function.
+  //
+  // ⚠️ Iron Rule #29 — Render Preservation:
+  // If your render() does innerHTML rebuild (typical pattern), wrap with
+  // withRenderPreservation() OR use preserveRenderState()/restoreRenderState()
+  // to keep scroll position + focus across re-renders.
+  //
+  // Example:
+  //   function render() {
+  //     const snap = preserveRenderState();
+  //     document.getElementById('page-content').innerHTML = renderPage();
+  //     drawer.innerHTML = state.drawer.open ? renderDrawer() : '';
+  //     renderIcons();
+  //     restoreRenderState(snap);
+  //   }
+  //
+  // After every DOM update, call renderIcons() — safe wrapper ที่ทน race เมื่อ Lucide ยังไม่ load.
+  renderIcons();
+}
+
+// ============================================
+// INIT
+// ============================================
+// Helper: safe icon render — กัน race ก่อน lucide load เสร็จ
+function renderIcons() {
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// ============================================
+// SEARCH-SELECT (Iron Rule #34) — generic searchable dropdown
+// ------------------------------------------------
+// ใช้แทน <select> เมื่อ options เยอะ (>8) หรือเป็น lookup จาก master อื่น.
+// list = position:absolute overlay → ไม่ดันเนื้อหา. แก้เฉพาะ list ตอนพิมพ์ →
+// ไม่ rebuild ทั้งหน้า (ไม่ชน Rule #29). decoupled — เรียก onSelect callback ไม่ผูก render().
+//
+// วิธีใช้ 2 ขั้น:
+//   1) ใส่ markup:  ${searchSelectHTML('country', { placeholder: 'เลือกประเทศ' })}
+//   2) หลัง markup อยู่ใน DOM แล้ว (เช่นท้าย render()):
+//        initSearchSelect('country', {
+//          options: countries.map(c => ({ value:c.code, label:c.name, sub:c.code, icon:'flag', right:'' })),
+//          value: state.form.country,
+//          onSelect: (val, opt) => { state.form.country = val; }
+//        });
+// option fields: { value, label, sub?, icon?, right? }
+// ============================================
+window.__ss = window.__ss || {};
+function ssGet(key){ return window.__ss[key]; }
+function ssEscapeReg(s){ return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+function searchSelectHTML(key, opt){
+  opt = opt || {};
+  var ph = opt.placeholder || 'ค้นหา...';
+  return ''
+    + '<div class="search-select" id="ss-' + key + '">'
+    +   '<i data-lucide="search" class="ss-lead w-4 h-4"></i>'
+    +   '<input type="text" class="input ss-input" id="ss-input-' + key + '" autocomplete="off" placeholder="' + ph + '"'
+    +     ' oninput="ssOnInput(\'' + key + '\', this.value)" onfocus="ssOpen(\'' + key + '\')" onkeydown="ssOnKey(\'' + key + '\', event)">'
+    +   '<button type="button" class="ss-clear hidden" id="ss-clear-' + key + '" tabindex="-1" onclick="ssClear(\'' + key + '\')"><i data-lucide="x" class="w-4 h-4"></i></button>'
+    +   '<i data-lucide="chevron-down" class="ss-caret" id="ss-caret-' + key + '"></i>'
+    +   '<div class="ss-list hidden" id="ss-list-' + key + '"></div>'
+    + '</div>';
+}
+function initSearchSelect(key, cfg){
+  cfg = cfg || {};
+  window.__ss[key] = {
+    options: cfg.options || [], value: (cfg.value != null ? cfg.value : null),
+    onSelect: cfg.onSelect || function(){}, emptyText: cfg.emptyText || 'ไม่พบรายการ',
+    query: '', open: false, hi: 0
+  };
+  ssSetText(key); ssSyncChrome(key); renderIcons();
+}
+function ssFiltered(key){
+  var s = ssGet(key); if(!s) return [];
+  var q = (s.query || '').toLowerCase().trim();
+  if(!q) return s.options;
+  return s.options.filter(function(o){
+    return String(o.label).toLowerCase().includes(q)
+      || String(o.value).toLowerCase().includes(q)
+      || String(o.sub || '').toLowerCase().includes(q);
+  });
+}
+function ssSyncChrome(key){
+  var s = ssGet(key); if(!s) return;
+  var sel = s.options.find(function(o){ return o.value === s.value; });
+  var c = document.getElementById('ss-clear-' + key); if(c) c.classList.toggle('hidden', !sel);
+  var k = document.getElementById('ss-caret-' + key); if(k) k.classList.toggle('hidden', !!sel);
+}
+function ssSetText(key){
+  var s = ssGet(key); if(!s) return;
+  var input = document.getElementById('ss-input-' + key); if(!input) return;
+  var sel = s.options.find(function(o){ return o.value === s.value; });
+  input.value = s.open ? s.query : (sel ? sel.label : '');
+}
+function ssRenderList(key){
+  var s = ssGet(key); if(!s) return;
+  var list = document.getElementById('ss-list-' + key); if(!list) return;
+  var items = ssFiltered(key);
+  if(items.length === 0){
+    list.innerHTML = '<div class="ss-empty">' + s.emptyText + '</div>';
+  } else {
+    var q = (s.query || '').toLowerCase().trim();
+    var hl = function(t){ return q ? String(t).replace(new RegExp('(' + ssEscapeReg(q) + ')', 'gi'), '<mark>$1</mark>') : String(t); };
+    list.innerHTML = items.map(function(o, i){
+      return '<button type="button" class="ss-opt ' + (i === s.hi ? 'is-active' : '') + '" onmousedown="event.preventDefault()" onclick="ssPick(\'' + key + '\', ' + i + ')">'
+        + (o.icon ? '<i data-lucide="' + o.icon + '" class="ss-opt-ic w-4 h-4"></i>' : '')
+        + '<span class="ss-opt-main"><span class="ss-opt-label">' + hl(o.label) + '</span>'
+        + (o.sub ? '<span class="ss-opt-sub">' + hl(o.sub) + '</span>' : '') + '</span>'
+        + (o.right ? '<span class="ss-opt-right">' + o.right + '</span>' : '')
+        + '</button>';
+    }).join('');
+  }
+  list.classList.toggle('hidden', !s.open);
+  renderIcons();
+}
+function ssOpen(key){ var s = ssGet(key); if(!s) return; s.open = true; s.query = ''; s.hi = 0; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+function ssOnInput(key, val){ var s = ssGet(key); if(!s) return; s.query = val; s.open = true; s.hi = 0; s.value = null; ssSyncChrome(key); ssRenderList(key); }
+function ssPick(key, i){ var s = ssGet(key); if(!s) return; var o = ssFiltered(key)[i]; if(!o) return; s.value = o.value; s.query = ''; s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); s.onSelect(o.value, o); }
+function ssClear(key){ var s = ssGet(key); if(!s) return; s.value = null; s.query = ''; s.open = true; ssSetText(key); ssSyncChrome(key); ssRenderList(key); var inp = document.getElementById('ss-input-' + key); if(inp) inp.focus(); s.onSelect(null, null); }
+function ssOnKey(key, e){
+  var s = ssGet(key); if(!s) return; var items = ssFiltered(key);
+  if(e.key === 'ArrowDown'){ e.preventDefault(); s.open = true; s.hi = Math.min(items.length - 1, s.hi + 1); ssRenderList(key); }
+  else if(e.key === 'ArrowUp'){ e.preventDefault(); s.hi = Math.max(0, s.hi - 1); ssRenderList(key); }
+  else if(e.key === 'Enter'){ e.preventDefault(); if(items[s.hi]) ssPick(key, s.hi); }
+  else if(e.key === 'Escape'){ s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+}
+document.addEventListener('click', function(e){
+  Object.keys(window.__ss || {}).forEach(function(key){
+    var wrap = document.getElementById('ss-' + key); var s = ssGet(key);
+    if(wrap && s && s.open && !wrap.contains(e.target)){ s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+  });
+});
+
+// ============================================
+// FORMAT HELPERS (Iron Rule #43) — Thai locale, consistent ทุก feature
+// ใช้ตัวเหล่านี้เสมอ ห้าม format ตัวเลข/วันที่เองรายจุด
+// ============================================
+function fmtNumber(n, dp){ if(n==null||n==='')return '—'; var x=Number(n); if(isNaN(x))return String(n);
+  return x.toLocaleString('th-TH', {minimumFractionDigits: dp||0, maximumFractionDigits: dp!=null?dp:2}); }
+function fmtMoney(n, dp){ if(n==null||n==='')return '—'; var x=Number(n); if(isNaN(x))return String(n);
+  return '฿' + x.toLocaleString('th-TH', {minimumFractionDigits: dp!=null?dp:2, maximumFractionDigits: dp!=null?dp:2}); }
+function fmtDate(iso, buddhist){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso);
+  var s=d.toLocaleDateString('th-TH', {year:'numeric', month:'short', day:'numeric'});
+  return buddhist===false ? d.toLocaleDateString('en-GB',{year:'numeric',month:'short',day:'numeric'}) : s; }
+function fmtDateTime(iso){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso);
+  return d.toLocaleString('th-TH', {year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+
+// ============================================
+// INLINE VALIDATION (Iron Rule #43) — validate ตอน blur, ไม่ใช่รอ submit อย่างเดียว
+// markup: <div class="field"><input class="input" onblur="validateField(this, v => v.trim()? '' : 'จำเป็นต้องกรอก')">
+//          <div class="field-error"></div></div>
+// validator คืน '' = ผ่าน / ข้อความ = error
+// ============================================
+function validateField(el, validator){
+  var field = el.closest('.field'); if(!field) return true;
+  var msg = '';
+  try { msg = validator ? validator(el.value, el) : ''; } catch(e){ msg=''; }
+  var errEl = field.querySelector('.field-error');
+  if(msg){ field.classList.add('is-invalid'); if(errEl) errEl.textContent = msg; return false; }
+  field.classList.remove('is-invalid'); return true;
+}
+function clearFieldError(el){ var f=el.closest('.field'); if(f) f.classList.remove('is-invalid'); }
+
+// ============================================
+// EMPTY STATE (Iron Rule #39) — list/section ว่าง ต้องมี icon + title + desc + (action)
+// ============================================
+function emptyStateHTML(cfg){
+  cfg = cfg || {};
+  var act = cfg.actionLabel ? '<button class="btn btn-primary" onclick="' + (cfg.onAction||'') + '">' +
+    (cfg.actionIcon ? '<i data-lucide="' + cfg.actionIcon + '" class="w-4 h-4"></i>' : '') +
+    '<span>' + cfg.actionLabel + '</span></button>' : '';
+  return '<div class="empty">'
+    + '<div class="empty-icon"><i data-lucide="' + (cfg.icon||'inbox') + '"></i></div>'
+    + '<div class="empty-title">' + (cfg.title||'ยังไม่มีข้อมูล') + '</div>'
+    + '<div class="empty-desc">' + (cfg.desc||'') + '</div>'
+    + act + '</div>';
+}
+
+// ============================================
+// RENDER PRESERVATION (Iron Rule #29)
+// ------------------------------------------------
+// ทุกครั้งที่ render() ทำ innerHTML = ... full DOM rebuild
+// scroll position + focus + cursor selection จะหาย —
+// user รู้สึก "เด้งกลับบน" ทุกครั้งที่ toggle/click.
+//
+// withRenderPreservation(renderFn) wraps a render function
+// to save state before innerHTML rebuild, then restore after.
+//
+// Preserves:
+//   - scrollTop ของ .drawer-body
+//   - scrollTop ของ .modal-body
+//   - window.scrollY (page-level scroll)
+//   - document.activeElement focus + selection range (input/textarea ที่กำลังพิมพ์)
+//
+// Usage:
+//   const render = withRenderPreservation(function actualRender() {
+//     content.innerHTML = ...
+//   });
+//
+// หรือเรียกตรง ๆ ใน render() ที่มีอยู่แล้ว:
+//   function render() {
+//     const snapshot = preserveRenderState();
+//     // ... innerHTML rebuilds ...
+//     restoreRenderState(snapshot);
+//   }
+// ============================================
+function preserveRenderState() {
+  const drawerBody = document.querySelector('.drawer-body');
+  const modalBody = document.querySelector('.modal-body');
+  const activeEl = document.activeElement;
+  const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+  return {
+    drawerScroll: drawerBody ? drawerBody.scrollTop : 0,
+    modalScroll: modalBody ? modalBody.scrollTop : 0,
+    pageScroll: window.scrollY,
+    focusKey: isInput ? {
+      placeholder: activeEl.placeholder || '',
+      type: activeEl.type || '',
+      name: activeEl.name || '',
+      selStart: activeEl.selectionStart,
+      selEnd: activeEl.selectionEnd,
+    } : null,
+  };
+}
+function restoreRenderState(snap) {
+  if (!snap) return;
+  requestAnimationFrame(function() {
+    const dBody = document.querySelector('.drawer-body');
+    if (dBody && snap.drawerScroll > 0) dBody.scrollTop = snap.drawerScroll;
+    const mBody = document.querySelector('.modal-body');
+    if (mBody && snap.modalScroll > 0) mBody.scrollTop = snap.modalScroll;
+    if (snap.pageScroll > 0) window.scrollTo(0, snap.pageScroll);
+
+    if (snap.focusKey) {
+      const candidates = document.querySelectorAll('input, textarea');
+      for (let i = 0; i < candidates.length; i++) {
+        const c = candidates[i];
+        if ((c.placeholder || '') === snap.focusKey.placeholder
+            && (c.type || '') === snap.focusKey.type
+            && (c.name || '') === snap.focusKey.name) {
+          c.focus();
+          if (snap.focusKey.selStart != null && typeof c.setSelectionRange === 'function') {
+            try { c.setSelectionRange(snap.focusKey.selStart, snap.focusKey.selEnd); } catch(e) {}
+          }
+          break;
+        }
+      }
+    }
+  });
+}
+function withRenderPreservation(renderFn) {
+  return function preservedRender() {
+    const snap = preserveRenderState();
+    const result = renderFn.apply(this, arguments);
+    restoreRenderState(snap);
+    return result;
+  };
+}
+
+window.addEventListener('hashchange', function () { render(); });  // v6.1 late-binding — ให้ชี้ render() ตัวที่ feature override (ผูกตรง ๆ จะ capture placeholder เดิม)
+
+// รอ DOM + Lucide ทั้งคู่ก่อน first render
+// (Lucide loader จะ dispatch 'lucide:ready' เมื่อ load สำเร็จ
+//  หรือเมื่อทุก CDN fail แล้ว fallback เป็น no-op)
+var domReady = false;
+var lucideReady = false;
+function bootIfReady() {
+  if (domReady && lucideReady) {
+    render();
+    renderIcons();
+  }
+}
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', function() { domReady = true; bootIfReady(); });
+} else {
+  domReady = true;
+}
+// Listen for ready event AND check ว่า lucide load ไปแล้วหรือยัง
+// (script ตัวนี้รันหลัง loader — ถ้า loader sync เสร็จก่อน, event อาจหายไปแล้ว)
+window.addEventListener('lucide:ready', function() { lucideReady = true; bootIfReady(); });
+if (window.lucide && typeof window.lucide.createIcons === 'function') {
+  lucideReady = true;
+}
+bootIfReady();
+// Safety net: ถ้า lucide:ready ไม่มาภายใน 5s ให้ render ไปก่อน (UI ยังใช้งานได้)
+setTimeout(function() {
+  if (!lucideReady) {
+    console.warn('[Lucide] Timeout — rendering without icons');
+    lucideReady = true;
+    bootIfReady();
+  }
+}, 5000);
+</script>
+
+
+<script>
+/* ===== BASE-KIT UTILS (#66/#68/#95) — DO NOT EDIT ===== */
+/* #95: เมนูใน scroll container (.table-wrap / drawer body / B2 line grid)
+   ต้อง portal ด้วย util นี้ — z-index อย่างเดียวช่วยไม่ได้เพราะโดน ancestor overflow clip */
+function portalMenu(trigger, menu){
+  let host = document.getElementById('overlay-root');
+  if(!host){ host = document.createElement('div'); host.id='overlay-root'; document.body.appendChild(host); }
+  if(menu.parentElement !== host) host.appendChild(menu);
+  menu.classList.add('menu-fixed');
+  const r = trigger.getBoundingClientRect();
+  const below = window.innerHeight - r.bottom - 12, above = r.top - 12;
+  const h = Math.min(menu.scrollHeight || 320, 320);
+  menu.style.left = r.left + 'px';
+  menu.style.width = r.width + 'px';
+  if(below < h && above > below){ menu.style.top='auto'; menu.style.bottom=(window.innerHeight-r.top+4)+'px';
+    menu.style.maxHeight = Math.min(h, above)+'px'; }
+  else { menu.style.bottom='auto'; menu.style.top=(r.bottom+4)+'px';
+    menu.style.maxHeight = Math.min(h, Math.max(below,120))+'px'; }
+  menu._trigger = trigger;
+  const reposition = ()=>{ if(menu.classList.contains('open')) portalMenu(trigger, menu); };
+  if(!menu._portalBound){ menu._portalBound = true;
+    window.addEventListener('scroll', reposition, true);
+    window.addEventListener('resize', reposition); }
+}
+function positionMenu(trigger,menu){const r=trigger.getBoundingClientRect();
+  const below=window.innerHeight-r.bottom-12, above=r.top-12, h=Math.min(menu.scrollHeight,320);
+  if(below<h && above>below){menu.classList.add('drop-up');menu.style.maxHeight=Math.min(h,above)+'px';}
+  else{menu.classList.remove('drop-up');menu.style.maxHeight=Math.min(h,Math.max(below,120))+'px';}}
+function openOverlay(menu,trigger){document.querySelectorAll('[data-overlay].open').forEach(m=>{if(m!==menu)closeOverlay(m);});
+  menu.classList.add('open');menu._trigger=trigger;if(trigger)positionMenu(trigger,menu);}
+function closeOverlay(menu){menu.classList.remove('open');if(menu._trigger)menu._trigger.focus();}
+document.addEventListener('click',e=>{document.querySelectorAll('[data-overlay].open').forEach(m=>{
+  if(!m.contains(e.target)&&!(m._trigger&&m._trigger.contains(e.target)))closeOverlay(m);});});
+/* ===== END BASE-KIT UTILS ===== */
+</script>
+
+<script>
+/* ============================================================
+   F-HR-CONFIG · ตั้งค่า HR — feature script (html-generator-v9 · master/config A+B+C)
+   ============================================================ */
+const TODAY = '2026-08-28';
+
+const TABS = [
+  { k:'leave',     label:'ประเภทการลา',   icon:'palmtree',          route:'#/hr-config/leave' },
+  { k:'ot',        label:'อัตรา OT / กะ',  icon:'timer',             route:'#/hr-config/ot' },
+  { k:'holiday',   label:'ปฏิทินวันหยุด',  icon:'calendar-days',     route:'#/hr-config/holiday' },
+  { k:'period',    label:'รอบเวลา / รอบจ่าย', icon:'calendar-clock', route:'#/hr-config/period' },
+  { k:'appraisal', label:'รอบประเมิน',     icon:'target',            route:'#/hr-config/appraisal' },
+  { k:'company',   label:'ขอบเขตบริษัท',   icon:'building-2',        route:'#/hr-config/company' }
+];
+
+const COMPANIES = [
+  { id:'C-2BS', name:'2BSimple Group',    code:'2BS',  meta:'บริษัทแม่' },
+  { id:'C-MFG', name:'2BS Manufacturing', code:'2BSM', meta:'บริษัทลูก · โรงงานระยอง' },
+  { id:'C-SVC', name:'2BS Services',      code:'2BSS', meta:'บริษัทลูก · สำนักงานใหญ่' },
+  { id:'C-LOG', name:'2BS Logistics',     code:'2BSL', meta:'บริษัทลูก · คลังบางนา' }
+];
+
+const EMPLOYEES = [
+  { id:'E-1001', name:'สุภาพร วงศ์ทอง',      pos:'ผู้จัดการฝ่ายบุคคล',      dept:'ทรัพยากรบุคคล' },
+  { id:'E-1002', name:'ธนกฤต ศรีสวัสดิ์',     pos:'เจ้าหน้าที่บุคคลอาวุโส',   dept:'ทรัพยากรบุคคล' },
+  { id:'E-1003', name:'ปิยะนุช แก้วประเสริฐ', pos:'เจ้าหน้าที่ค่าตอบแทน',    dept:'ทรัพยากรบุคคล' },
+  { id:'E-1004', name:'อนุชา พรหมมินทร์',     pos:'ผู้อำนวยการฝ่ายปฏิบัติการ', dept:'ปฏิบัติการ' },
+  { id:'E-1005', name:'กมลชนก ใจดี',         pos:'เจ้าหน้าที่สรรหา',        dept:'ทรัพยากรบุคคล' },
+  { id:'E-1006', name:'วิศรุต ตั้งมั่น',       pos:'หัวหน้าแผนกโรงงาน',      dept:'ผลิต' }
+];
+
+const CONSUMERS = [
+  { code:'F-LEAVE',   name:'การลา',              wave:'W2', ready:false, uses:['leave'] },
+  { code:'F-OT',      name:'OT / กะทำงาน',        wave:'W2', ready:false, uses:['ot'] },
+  { code:'F-ROSTER',  name:'จัดกะและตารางเวร',    wave:'W2', ready:false, uses:['ot','holiday'] },
+  { code:'F-ATT',     name:'ลงเวลาทำงาน',         wave:'W1', ready:false, uses:['holiday','ot','period'] },
+  { code:'F-PAYROLL', name:'เงินเดือน',           wave:'W4', ready:false, uses:['period','ot'] },
+  { code:'F-PERF',    name:'ประเมินผลงาน',        wave:'W5', ready:false, uses:['appraisal'] },
+  { code:'F-WELFARE', name:'สวัสดิการ',           wave:'W4', ready:false, uses:['leave'] },
+  { code:'F-SALARY',  name:'โครงสร้างเงินเดือน',  wave:'W1', ready:true,  uses:['period','ot'] }
+];
+
+const ST = {
+  draft:      { lb:'ร่าง',   cls:'pill-muted' },
+  scheduled:  { lb:'รอมีผล', cls:'pill-warning' },
+  active:     { lb:'ใช้อยู่', cls:'pill-success' },
+  superseded: { lb:'ถูกแทน', cls:'pill-muted' },
+  inactive:   { lb:'ปิดใช้',  cls:'pill-danger' },
+  cancelled:  { lb:'ยกเลิก',  cls:'pill-muted' }
+};
+
+const OT_MIN = { 'OT วันทำงาน':1.5, 'ทำงานวันหยุด':1.0, 'OT วันหยุด':3.0 };
+const LEAVE_MIN_VAC = 6;
+
+function P(o){ return JSON.parse(JSON.stringify(o)); }
+function ini(n){ const p=String(n||'').trim().split(/\s+/); return ((p[0]||'').slice(0,1)+(p[1]||'').slice(0,1))||'?'; }
+function emp(id){ return EMPLOYEES.find(e=>e.id===id) || { id:id, name:'—', pos:'', dept:'' }; }
+function comp(id){ return COMPANIES.find(c=>c.id===id) || { id:id, name:'—', code:'', meta:'' }; }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function d2(n){ return String(n).padStart(2,'0'); }
+function be(iso){ if(!iso) return '—'; const d=new Date(iso); if(isNaN(d)) return String(iso); return d2(d.getDate())+'/'+d2(d.getMonth()+1)+'/'+(d.getFullYear()+543); }
+
+function mk(id, group, code, nameTh, nameEn, opt){
+  return Object.assign({ id:id, group:group, sub:null, code:code, nameTh:nameTh, nameEn:nameEn||'',
+    scope:'shared', companies:[], appliesTo:'ทั้งบริษัท', payrollCode:'', owner:'E-1001',
+    note:'', archived:false, versions:[] }, opt||{});
+}
+function v(n, eff, st, payload, by, at, reason){
+  return { v:n, eff:eff, state:st, payload:payload, by:by||'E-1002', at:at||'2026-01-10T09:15', reason:reason||'' };
+}
+</script>
+<script>
+/* ===== Mock data — ครอบทุก scenario S-01..S-32 (ห้าม lorem) ===== */
+const RECORDS = [];
+RECORDS.push(
+  mk('R01','leave','LV-VAC','ลาพักร้อน','Annual Leave',{ payrollCode:'LV01', owner:'E-1001', versions:[
+    v(1,'2025-01-01','superseded',{ unit:'วัน', paid:'จ่าย', paidPct:100, quota:6, unlimited:false, accrual:'ต้นปี', prorate:'ตามเดือน', rounding:'ครึ่งวันใกล้สุด', carry:0, carryExp:'', needDoc:false, docNote:'', advDays:3, maxConsec:0, negative:0, countHoliday:false, halfDay:true, milestones:[] },'E-1002','2024-11-12T09:20',''),
+    v(2,'2026-01-01','active',{ unit:'วัน', paid:'จ่าย', paidPct:100, quota:6, unlimited:false, accrual:'ตามอายุงาน', prorate:'ตามเดือน', rounding:'ครึ่งวันใกล้สุด', carry:5, carryExp:'31/03', needDoc:false, docNote:'', advDays:3, maxConsec:0, negative:0, countHoliday:false, halfDay:true,
+      milestones:[{from:0,to:2,days:6},{from:3,to:5,days:8},{from:6,to:99,days:10}] },'E-1001','2025-11-20T14:05','ปรับให้สอดคล้องนโยบายรักษาพนักงานระยะยาว เพิ่มขั้นตามอายุงาน'),
+    v(3,'2027-01-01','scheduled',{ unit:'วัน', paid:'จ่าย', paidPct:100, quota:8, unlimited:false, accrual:'ตามอายุงาน', prorate:'ตามเดือน', rounding:'ครึ่งวันใกล้สุด', carry:5, carryExp:'31/03', needDoc:false, docNote:'', advDays:3, maxConsec:0, negative:0, countHoliday:false, halfDay:true,
+      milestones:[{from:0,to:2,days:8},{from:3,to:5,days:10},{from:6,to:99,days:12}] },'E-1001','2026-08-14T11:32','มติที่ประชุมคณะกรรมการ 2569/07 เพิ่มโควตาขั้นต่ำเป็น 8 วัน')
+  ]}),
+  mk('R02','leave','LV-SICK','ลาป่วย','Sick Leave',{ payrollCode:'LV02', owner:'E-1002', versions:[
+    v(1,'2025-01-01','active',{ unit:'วัน', paid:'จ่าย', paidPct:100, quota:30, unlimited:false, accrual:'ต้นปี', prorate:'ไม่ prorate', rounding:'ปัดขึ้น', carry:0, carryExp:'', needDoc:true, docNote:'ใบรับรองแพทย์ เมื่อลาต่อเนื่องเกิน 3 วัน', advDays:0, maxConsec:0, negative:0, countHoliday:false, halfDay:true, milestones:[] },'E-1002','2024-12-02T10:00','')
+  ]}),
+  mk('R03','leave','LV-PERSONAL','ลากิจส่วนตัว','Personal Leave',{ payrollCode:'LV03', owner:'E-1002', versions:[
+    v(1,'2025-01-01','active',{ unit:'วัน', paid:'จ่าย', paidPct:100, quota:3, unlimited:false, accrual:'ต้นปี', prorate:'ตามเดือน', rounding:'ปัดลง', carry:0, carryExp:'', needDoc:false, docNote:'', advDays:3, maxConsec:2, negative:0, countHoliday:false, halfDay:true, milestones:[] },'E-1002','2024-12-02T10:12','')
+  ]}),
+  mk('R04','leave','LV-MATERNITY','ลาคลอดบุตร','Maternity Leave',{ owner:'E-1003', versions:[
+    v(1,'','draft',{ unit:'วัน', paid:'จ่ายบางส่วน', paidPct:50, quota:98, unlimited:false, accrual:'ต้นปี', prorate:'ไม่ prorate', rounding:'ปัดขึ้น', carry:0, carryExp:'', needDoc:true, docNote:'ใบรับรองแพทย์', advDays:30, maxConsec:98, negative:0, countHoliday:true, halfDay:false, milestones:[] },'E-1003','2026-08-20T16:40','')
+  ]}),
+  mk('R05','leave','LV-STERILIZE','ลาเพื่อทำหมัน','Sterilization Leave',{ archived:true, owner:'E-1002', versions:[
+    v(1,'2025-01-01','inactive',{ unit:'วัน', paid:'จ่าย', paidPct:100, quota:3, unlimited:true, accrual:'ต้นปี', prorate:'ไม่ prorate', rounding:'ปัดขึ้น', carry:0, carryExp:'', needDoc:true, docNote:'ใบรับรองแพทย์', advDays:7, maxConsec:0, negative:0, countHoliday:true, halfDay:false, milestones:[] },'E-1001','2026-06-18T09:05','ไม่มีการใช้สิทธิ์ต่อเนื่อง 3 ปี ปิดใช้ตามมติฝ่ายบุคคล')
+  ]}),
+  mk('R06','leave','LV-ORDINATION','ลาอุปสมบท','Ordination Leave',{ owner:'E-1002', versions:[
+    v(1,'2025-01-01','active',{ unit:'วัน', paid:'ไม่จ่าย', paidPct:0, quota:15, unlimited:false, accrual:'ตามอายุงาน', prorate:'ไม่ prorate', rounding:'ปัดลง', carry:0, carryExp:'', needDoc:true, docNote:'หนังสือรับรองจากวัด', advDays:30, maxConsec:15, negative:0, countHoliday:true, halfDay:false, milestones:[] },'E-1002','2024-12-02T10:30','')
+  ]}),
+  mk('R07','leave','LV-MILITARY','ลารับราชการทหาร','Military Service Leave',{ owner:'E-1002', versions:[
+    v(1,'2025-01-01','active',{ unit:'วัน', paid:'จ่ายบางส่วน', paidPct:50, quota:60, unlimited:false, accrual:'ต้นปี', prorate:'ไม่ prorate', rounding:'ปัดขึ้น', carry:0, carryExp:'', needDoc:true, docNote:'หมายเรียกพล', advDays:15, maxConsec:60, negative:0, countHoliday:true, halfDay:false, milestones:[] },'E-1002','2024-12-02T10:35','')
+  ]})
+);
+</script>
+<script>
+RECORDS.push(
+  mk('R10','ot','OT-WORKDAY','OT วันทำงาน','Overtime — Working Day',{ sub:'rate', payrollCode:'OT01', owner:'E-1003', versions:[
+    v(1,'2025-01-01','active',{ rateType:'OT วันทำงาน', mult:1.5, base:'ค่าจ้างรายชั่วโมง', cap:36 },'E-1003','2024-12-05T13:20','')
+  ]}),
+  mk('R11','ot','OT-HOLIDAY','OT วันหยุด','Overtime — Holiday',{ sub:'rate', payrollCode:'OT03', owner:'E-1003', versions:[
+    v(1,'2025-01-01','active',{ rateType:'OT วันหยุด', mult:3, base:'ค่าจ้างรายชั่วโมง', cap:36 },'E-1003','2024-12-05T13:24','')
+  ]}),
+  mk('R12','ot','WORK-HOLIDAY','ทำงานในวันหยุด','Work on Holiday',{ sub:'rate', payrollCode:'HL01', owner:'E-1003', versions:[
+    v(1,'2025-01-01','active',{ rateType:'ทำงานวันหยุด', mult:1, base:'ค่าจ้างรายวัน', cap:36 },'E-1003','2024-12-05T13:28','')
+  ]}),
+  mk('R13','ot','SHIFT-DAY','กะเช้า','Day Shift',{ sub:'shift', owner:'E-1006', versions:[
+    v(1,'2025-01-01','active',{ shiftIn:'08:00', shiftOut:'17:00', overnight:false, breakFrom:'12:00', breakTo:'13:00', days:['จ','อ','พ','พฤ','ศ'] },'E-1006','2024-12-06T08:40','')
+  ]}),
+  mk('R14','ot','SHIFT-NIGHT','กะดึก','Night Shift',{ sub:'shift', scope:'company', companies:['C-MFG'], owner:'E-1006', versions:[
+    v(1,'2025-01-01','active',{ shiftIn:'22:00', shiftOut:'06:00', overnight:true, breakFrom:'02:00', breakTo:'03:00', days:['จ','อ','พ','พฤ','ศ','ส'] },'E-1006','2024-12-06T08:52',''),
+    v(2,'2027-01-01','scheduled',{ shiftIn:'22:00', shiftOut:'06:00', overnight:true, breakFrom:'01:30', breakTo:'02:30', days:['จ','อ','พ','พฤ','ศ'] },'E-1006','2026-08-05T15:10','ลดวันทำงานกะดึกเหลือ 5 วันต่อสัปดาห์ ตามข้อตกลงสภาพการจ้าง')
+  ]}),
+  mk('R30','period','CUT-MONTHLY','รอบตัดเวลาและรอบจ่าย รายเดือน','Monthly Cut-off & Pay Period',{ owner:'E-1003', versions:[
+    v(1,'2026-01-01','active',{ freq:'รายเดือน', cutDay:25, payDay:30, lockClosed:true, workPeriod:'ใช้รอบเดียวกับรอบจ่าย', periods:[
+      {no:'2569-01',from:'2025-12-26',to:'2026-01-25',pay:'2026-01-30',status:'closed',by:'E-1003',at:'2026-02-02'},
+      {no:'2569-02',from:'2026-01-26',to:'2026-02-25',pay:'2026-02-27',status:'closed',by:'E-1003',at:'2026-03-02'},
+      {no:'2569-03',from:'2026-02-26',to:'2026-03-25',pay:'2026-03-30',status:'closed',by:'E-1003',at:'2026-04-01'},
+      {no:'2569-04',from:'2026-03-26',to:'2026-04-25',pay:'2026-04-30',status:'closed',by:'E-1003',at:'2026-05-04'},
+      {no:'2569-05',from:'2026-04-26',to:'2026-05-25',pay:'2026-05-29',status:'closed',by:'E-1003',at:'2026-06-01'},
+      {no:'2569-06',from:'2026-05-26',to:'2026-06-25',pay:'2026-06-30',status:'closed',by:'E-1003',at:'2026-07-01'},
+      {no:'2569-07',from:'2026-06-26',to:'2026-07-25',pay:'2026-07-30',status:'closed',by:'E-1003',at:'2026-08-03'},
+      {no:'2569-08',from:'2026-07-26',to:'2026-08-25',pay:'2026-08-31',status:'open',by:'',at:''},
+      {no:'2569-09',from:'2026-08-26',to:'2026-09-25',pay:'2026-09-30',status:'open',by:'',at:''},
+      {no:'2569-10',from:'2026-09-26',to:'2026-10-25',pay:'2026-10-30',status:'open',by:'',at:''},
+      {no:'2569-11',from:'2026-10-26',to:'2026-11-25',pay:'2026-11-30',status:'open',by:'',at:''},
+      {no:'2569-12',from:'2026-11-26',to:'2026-12-25',pay:'2026-12-30',status:'open',by:'',at:''}
+    ] },'E-1003','2025-11-28T09:40','')
+  ]}),
+  mk('R31','period','CUT-SEMI','รอบตัดเวลาครึ่งเดือน โรงงาน','Semi-monthly Cut-off — Plant',{ scope:'company', companies:['C-MFG'], owner:'E-1003', versions:[
+    v(1,'2027-01-01','scheduled',{ freq:'ครึ่งเดือน', cutDay:15, payDay:20, lockClosed:true, workPeriod:'รายปักษ์', periods:[] },'E-1003','2026-08-21T10:05','')
+  ]}),
+  mk('R40','appraisal','APR-2026-H2','รอบประเมินครึ่งปีหลัง 2569','Appraisal 2026 H2',{ owner:'E-1005', versions:[
+    v(1,'2026-07-01','active',{ year:2026, from:'2026-07-01', to:'2026-12-31', openFrom:'2027-01-01', openTo:'2027-01-15', freq:'ปีละ 2' },'E-1005','2026-05-14T09:00','')
+  ]}),
+  mk('R41','appraisal','APR-2027-H1','รอบประเมินครึ่งปีแรก 2570','Appraisal 2027 H1',{ owner:'E-1005', versions:[
+    v(1,'2027-01-01','scheduled',{ year:2027, from:'2027-01-01', to:'2027-06-30', openFrom:'2027-07-01', openTo:'2027-07-15', freq:'ปีละ 2' },'E-1005','2026-08-19T13:22','')
+  ]}),
+  mk('R42','appraisal','APR-2027-H2','รอบประเมินครึ่งปีหลัง 2570','Appraisal 2027 H2',{ owner:'E-1005', versions:[
+    v(1,'2027-07-01','scheduled',{ year:2027, from:'2027-07-01', to:'2027-12-31', openFrom:'2028-01-01', openTo:'2028-01-15', freq:'ปีละ 2' },'E-1005','2026-08-19T13:26','')
+  ]})
+);
+</script>
+<script>
+function hd(dt,nm,tp,sc){ return { date:dt, name:nm, type:tp, src:sc||'' }; }
+RECORDS.push(
+  mk('R20','holiday','HOL-2026-HQ','ปฏิทินวันหยุด 2569 สำนักงานใหญ่','Company Holidays 2026 — HQ',{ owner:'E-1002', versions:[
+    v(1,'2026-01-01','active',{ year:2026, location:'สำนักงานใหญ่', days:[
+      hd('2026-01-01','วันขึ้นปีใหม่','วันหยุดราชการ'),
+      hd('2026-03-03','วันมาฆบูชา','วันหยุดราชการ'),
+      hd('2026-04-06','วันจักรี','วันหยุดราชการ'),
+      hd('2026-04-13','วันสงกรานต์','วันหยุดราชการ'),
+      hd('2026-04-14','วันสงกรานต์','วันหยุดราชการ'),
+      hd('2026-04-15','วันสงกรานต์','วันหยุดราชการ'),
+      hd('2026-05-01','วันแรงงานแห่งชาติ','วันหยุดราชการ'),
+      hd('2026-05-04','วันฉัตรมงคล','วันหยุดราชการ'),
+      hd('2026-06-03','วันเฉลิมพระชนมพรรษาสมเด็จพระนางเจ้าฯ','วันหยุดราชการ'),
+      hd('2026-07-28','วันเฉลิมพระชนมพรรษาพระบาทสมเด็จพระเจ้าอยู่หัว','วันหยุดราชการ'),
+      hd('2026-08-12','วันแม่แห่งชาติ','วันหยุดราชการ'),
+      hd('2026-10-13','วันนวมินทรมหาราช','วันหยุดราชการ'),
+      hd('2026-10-23','วันปิยมหาราช','วันหยุดราชการ'),
+      hd('2026-12-07','ชดเชยวันพ่อแห่งชาติ','วันหยุดชดเชย','2026-12-05'),
+      hd('2026-12-31','วันสิ้นปี','วันหยุดบริษัท')
+    ] },'E-1002','2025-10-02T11:00','')
+  ]}),
+  mk('R21','holiday','HOL-2027-HQ','ปฏิทินวันหยุด 2570 สำนักงานใหญ่','Company Holidays 2027 — HQ',{ owner:'E-1002', versions:[
+    v(1,'2027-01-01','scheduled',{ year:2027, location:'สำนักงานใหญ่', days:[
+      hd('2027-01-01','วันขึ้นปีใหม่','วันหยุดราชการ'),
+      hd('2027-02-21','วันมาฆบูชา','วันหยุดราชการ'),
+      hd('2027-02-22','ชดเชยวันมาฆบูชา','วันหยุดชดเชย','2027-02-21'),
+      hd('2027-04-06','วันจักรี','วันหยุดราชการ'),
+      hd('2027-04-13','วันสงกรานต์','วันหยุดราชการ'),
+      hd('2027-04-14','วันสงกรานต์','วันหยุดราชการ'),
+      hd('2027-04-15','วันสงกรานต์','วันหยุดราชการ'),
+      hd('2027-05-01','วันแรงงานแห่งชาติ','วันหยุดราชการ'),
+      hd('2027-05-03','ชดเชยวันแรงงานแห่งชาติ','วันหยุดชดเชย','2027-05-01'),
+      hd('2027-05-04','วันฉัตรมงคล','วันหยุดราชการ'),
+      hd('2027-06-03','วันเฉลิมพระชนมพรรษาสมเด็จพระนางเจ้าฯ','วันหยุดราชการ'),
+      hd('2027-07-28','วันเฉลิมพระชนมพรรษาพระบาทสมเด็จพระเจ้าอยู่หัว','วันหยุดราชการ'),
+      hd('2027-08-12','วันแม่แห่งชาติ','วันหยุดราชการ'),
+      hd('2027-10-13','วันนวมินทรมหาราช','วันหยุดราชการ'),
+      hd('2027-10-23','วันปิยมหาราช','วันหยุดราชการ'),
+      hd('2027-12-31','วันสิ้นปี','วันหยุดบริษัท')
+    ] },'E-1002','2026-08-11T10:20','')
+  ]}),
+  mk('R22','holiday','HOL-2027-MFG','ปฏิทินวันหยุด 2570 โรงงานระยอง','Company Holidays 2027 — Rayong Plant',{ scope:'company', companies:['C-MFG'], owner:'E-1006', versions:[
+    v(1,'2027-01-01','scheduled',{ year:2027, location:'โรงงานระยอง', days:[
+      hd('2027-01-01','วันขึ้นปีใหม่','วันหยุดราชการ'),
+      hd('2027-04-13','วันสงกรานต์','วันหยุดราชการ'),
+      hd('2027-04-14','วันสงกรานต์','วันหยุดราชการ'),
+      hd('2027-04-15','วันสงกรานต์','วันหยุดราชการ'),
+      hd('2027-04-16','หยุดยาวสงกรานต์ โรงงาน','วันหยุดบริษัท'),
+      hd('2027-05-01','วันแรงงานแห่งชาติ','วันหยุดราชการ'),
+      hd('2027-05-03','ชดเชยวันแรงงานแห่งชาติ','วันหยุดชดเชย','2027-05-01'),
+      hd('2027-07-28','วันเฉลิมพระชนมพรรษาพระบาทสมเด็จพระเจ้าอยู่หัว','วันหยุดราชการ'),
+      hd('2027-08-12','วันแม่แห่งชาติ','วันหยุดราชการ'),
+      hd('2027-10-23','วันปิยมหาราช','วันหยุดราชการ'),
+      hd('2027-12-30','หยุดสิ้นปี โรงงาน','วันหยุดบริษัท'),
+      hd('2027-12-31','วันสิ้นปี','วันหยุดบริษัท')
+    ] },'E-1006','2026-08-18T14:45','')
+  ]})
+);
+</script>
+<script>
+/* ===== state (ต่อยอดจาก state ของ kit — ห้ามประกาศซ้ำ) ===== */
+state.tab = 'leave';
+state.asOf = '';
+state.persona = 'admin';
+state.filters = { search:'', status:'all', company:'all' };
+state.sort = { col:'name', dir:'asc' };
+state.pagination = { page:1, pageSize:12 };
+state.drawer = { open:false, mode:null, recordId:null, step:1, tab:'detail', form:null, err:{}, busy:false };
+state.modal = { open:false, type:null, data:null, reason:'', busy:false };
+
+function canEdit(){ return state.persona === 'admin'; }
+function rec(id){ return RECORDS.find(r=>r.id===id); }
+function grpOf(k){ return TABS.find(t=>t.k===k) || TABS[0]; }
+
+function verAt(r, iso){
+  const list = r.versions.filter(x=>x.eff && x.state!=='draft' && x.state!=='cancelled' && x.eff <= iso)
+                         .sort((a,b)=>a.eff < b.eff ? -1 : 1);
+  return list.length ? list[list.length-1] : null;
+}
+function curVer(r){ return verAt(r, state.asOf || TODAY); }
+function nextVer(r){ return r.versions.find(x=>x.state==='scheduled') || null; }
+function lastVer(r){ return r.versions[r.versions.length-1] || null; }
+function itemStatus(r){
+  if(r.archived) return 'inactive';
+  const cv = curVer(r);
+  if(cv) return cv.state === 'superseded' ? 'active' : cv.state;
+  if(r.versions.some(x=>x.state==='scheduled')) return 'scheduled';
+  return 'draft';
+}
+function pill(st){ const s = ST[st] || ST.draft; return '<span class="pill '+s.cls+'">'+s.lb+'</span>'; }
+function scopeText(r){
+  if(r.scope === 'shared') return 'ค่ากลาง';
+  return r.companies.map(c=>comp(c).name).join(' · ') || 'เฉพาะบริษัท';
+}
+function usedBy(r){ return CONSUMERS.filter(c=>c.uses.indexOf(r.group)>=0); }
+
+/* งวดที่ปิดแล้ว = นิยามของ BR-04 (ฐานมาจาก S-31/BR-21) */
+function closedPeriods(){
+  const p = RECORDS.find(x=>x.id==='R30');
+  const cv = p ? (verAt(p, TODAY) || p.versions[0]) : null;
+  return cv ? (cv.payload.periods||[]).filter(x=>x.status==='closed') : [];
+}
+function lockedUntil(){
+  const cp = closedPeriods();
+  if(!cp.length) return '';
+  const last = cp.map(x=>x.to).sort()[cp.length-1];
+  return addDays(last, 1);
+}
+function lockedPeriodOf(iso){
+  return closedPeriods().find(p=>iso >= p.from && iso <= p.to) || null;
+}
+
+/* ค่าปัจจุบันแบบย่อ (1 ข้อมูล = 1 คอลัมน์) */
+function sumOf(r){
+  const cv = curVer(r) || lastVer(r); if(!cv) return '—';
+  const p = cv.payload;
+  if(r.group === 'leave'){
+    const q = p.unlimited ? 'ไม่จำกัด' : (fmtNumber(p.quota,0)+' '+p.unit+'/ปี');
+    const pay = p.paid === 'จ่ายบางส่วน' ? ('จ่าย '+p.paidPct+'%') : p.paid;
+    return q+' · '+pay;
+  }
+  if(r.group === 'ot'){
+    if(r.sub === 'rate') return (+p.mult).toFixed(1)+'x · เพดาน '+p.cap+' ชม./สัปดาห์';
+    return p.shiftIn+'–'+p.shiftOut+' · '+shiftHours(p).toFixed(1)+' ชม./วัน';
+  }
+  if(r.group === 'holiday') return (p.days||[]).length+' วัน · '+(p.location||'ทุกสถานที่');
+  if(r.group === 'period') return 'ตัด '+p.cutDay+' · จ่าย '+p.payDay+' · '+p.freq;
+  if(r.group === 'appraisal') return be(p.from)+' – '+be(p.to)+' · '+p.freq;
+  return '—';
+}
+function shiftHours(p){
+  const a = (+p.shiftIn.slice(0,2))*60 + (+p.shiftIn.slice(3,5));
+  let b = (+p.shiftOut.slice(0,2))*60 + (+p.shiftOut.slice(3,5));
+  if(p.overnight || b <= a) b += 1440;
+  let br = 0;
+  if(p.breakFrom && p.breakTo){
+    const c = (+p.breakFrom.slice(0,2))*60 + (+p.breakFrom.slice(3,5));
+    let d = (+p.breakTo.slice(0,2))*60 + (+p.breakTo.slice(3,5));
+    if(d <= c) d += 1440;
+    br = d - c;
+  }
+  return Math.max(0, (b - a - br)/60);
+}
+function comboPerson(id){
+  const e = emp(id);
+  return '<span class="tbl-person"><span class="emp-av">'+esc(ini(e.name))+'</span><span class="emp-main">'
+    + '<span class="emp-nm">'+esc(e.name)+'</span><span class="emp-mt">'+esc(e.pos)+' · '+esc(e.dept)+'</span></span></span>';
+}
+function empOptions(){
+  return EMPLOYEES.map(e=>({ value:e.id, label:e.name, sub:e.pos+' · '+e.dept, icon:'user' }));
+}
+function companyOptions(){
+  return COMPANIES.map(c=>({ value:c.id, label:c.name, sub:c.code+' · '+c.meta, icon:'building-2' }));
+}
+function outOfScope(name){ showToast('“'+name+'” อยู่นอกขอบเขตต้นแบบรอบนี้', 'info'); }
+function setPersona(p){
+  state.persona = p;
+  document.getElementById('chip-role').textContent = (p === 'admin') ? 'HR Admin' : 'HR Staff';
+  document.getElementById('chip-name').textContent = (p === 'admin') ? 'สุภาพร วงศ์ทอง' : 'ธนกฤต ศรีสวัสดิ์';
+  document.querySelector('.avatar').textContent = (p === 'admin') ? 'สว' : 'ธศ';
+  render();
+  showToast(p === 'admin' ? 'สลับเป็น HR Admin — แก้ไขได้' : 'สลับเป็น HR Staff — อ่านอย่างเดียว', 'info');
+}
+</script>
+<script>
+/* ===== LIST (Pattern A · #70 anatomy · #40.1 geometry) ===== */
+const SCOPE_TIP = 'ลำดับการใช้ค่า: ค่าของบริษัทลูกทับค่ากลางเสมอ';
+const OUT_TIP = 'ขอบเขตรอบนี้: ไม่มีขั้นอนุมัติ · ไม่คำนวณย้อนหลัง · ไม่มีสูตรเงินเดือน · ไม่มียอดวันลารายคน · ไม่มีตัวสลับบริษัทบนหัวจอ · ไม่ดึงวันหยุดราชการให้ · ไม่แจ้งเตือนพนักงาน · ไม่มีนำเข้า/ส่งออกค่าเป็นชุด · ไม่มีระยะทดลองงาน · ไม่มีความถี่คำนวณจ่าย · ไม่มีการมัดชุดค่าให้กลุ่มพนักงาน';
+
+function baseRows(){
+  return (state.tab === 'company') ? RECORDS.slice() : RECORDS.filter(r=>r.group === state.tab);
+}
+function filteredRows(){
+  const q = state.filters.search.trim().toLowerCase();
+  let rows = baseRows().filter(function(r){
+    if(q && (r.nameTh+' '+r.nameEn+' '+r.code).toLowerCase().indexOf(q) < 0) return false;
+    if(state.filters.status !== 'all' && itemStatus(r) !== state.filters.status) return false;
+    if(state.filters.company === 'shared' && r.scope !== 'shared') return false;
+    if(state.filters.company !== 'all' && state.filters.company !== 'shared'
+       && r.companies.indexOf(state.filters.company) < 0) return false;
+    return true;
+  });
+  const c = state.sort.col, dir = state.sort.dir === 'asc' ? 1 : -1;
+  rows.sort(function(a,b){
+    let x, y;
+    if(c === 'status'){ x = ST[itemStatus(a)].lb; y = ST[itemStatus(b)].lb; }
+    else if(c === 'eff'){ x = (curVer(a)||{}).eff || ''; y = (curVer(b)||{}).eff || ''; }
+    else if(c === 'scope'){ x = scopeText(a); y = scopeText(b); }
+    else if(c === 'used'){ x = usedBy(a).length; y = usedBy(b).length; }
+    else { x = a.nameTh; y = b.nameTh; }
+    return (x > y ? 1 : x < y ? -1 : 0) * dir;
+  });
+  return rows;
+}
+function sortBy(col){
+  if(state.sort.col === col) state.sort.dir = state.sort.dir === 'asc' ? 'desc' : 'asc';
+  else { state.sort.col = col; state.sort.dir = 'asc'; }
+  render();
+}
+function setStatFilter(st){
+  state.filters.status = (state.filters.status === st) ? 'all' : st;
+  state.pagination.page = 1; render();
+}
+function resetFilters(){
+  state.filters = { search:'', status:'all', company:'all' };
+  state.asOf = ''; state.pagination.page = 1; render();
+  showToast('ล้างตัวกรองแล้ว', 'info');
+}
+function setAsOf(val){ state.asOf = val || ''; state.pagination.page = 1; render(); }
+function goTab(k){ const t = TABS.find(x=>x.k===k); if(t) location.hash = t.route; }
+
+function statCards(rows){
+  const c = { active:0, scheduled:0, draft:0, inactive:0 };
+  rows.forEach(function(r){ const s = itemStatus(r); if(c[s] != null) c[s]++; });
+  const defs = [
+    { k:'active',    lb:'ค่าที่ใช้อยู่',  ic:'check-circle-2' },
+    { k:'scheduled', lb:'รอมีผล',        ic:'clock-4' },
+    { k:'draft',     lb:'ร่าง',           ic:'file-pen-line' },
+    { k:'inactive',  lb:'ปิดใช้',          ic:'archive' }
+  ];
+  return '<div class="stats">' + defs.map(function(d){
+    return '<div class="stat is-click '+(state.filters.status===d.k?'is-on':'')+'" onclick="setStatFilter(\''+d.k+'\')">'
+      + '<div class="stat-label"><i data-lucide="'+d.ic+'" class="w-3.5 h-3.5"></i><span>'+d.lb+'</span></div>'
+      + '<div class="stat-value">'+fmtNumber(c[d.k],0)+'</div>'
+      + '<div class="stat-meta">'+(state.filters.status===d.k?'กำลังกรองอยู่':'กดเพื่อกรอง')+'</div></div>';
+  }).join('') + '</div>';
+}
+function COLS(){
+  const base = [
+    { k:'name',  lb:'ค่า',            s:true  },
+    { k:'value', lb:'ค่าปัจจุบัน',     s:false },
+    { k:'scope', lb:'ขอบเขต',         s:true, tip:SCOPE_TIP },
+    { k:'status',lb:'สถานะ',          s:true  },
+    { k:'eff',   lb:'วันมีผล',         s:true  },
+    { k:'next',  lb:'เวอร์ชันถัดไป',   s:false },
+    { k:'used',  lb:'ใช้ค่านี้',        s:true, right:true },
+    { k:'act',   lb:'',               s:false, right:true }
+  ];
+  if(state.tab === 'company') base[1] = { k:'group', lb:'กลุ่มค่า', s:false };
+  return base;
+}
+function cellHTML(r, k){
+  const cv = curVer(r), nv = nextVer(r), t = grpOf(r.group);
+  if(k === 'name') return '<span class="tbl-item"><span class="ti-ico"><i data-lucide="'+t.icon+'" class="w-3.5 h-3.5"></i></span>'
+    + '<span class="ti-main"><span class="ti-name" title="'+esc(r.nameTh)+'">'+esc(r.nameTh)+'</span>'
+    + '<span class="ti-code">'+esc(r.code)+'</span></span></span>';
+  if(k === 'value') return '<span class="cell-main ver-val">'+esc(sumOf(r))+'</span>';
+  if(k === 'group') return '<span class="cell-main">'+esc(t.label)+'</span>';
+  if(k === 'scope') return '<span class="cell-main">'+esc(scopeText(r))+'</span>';
+  if(k === 'status') return pill(itemStatus(r));
+  if(k === 'eff') return '<span class="cell-main ver-val">'+(cv ? be(cv.eff) : '—')+'</span>';
+  if(k === 'next') return nv ? '<span class="cell-main ver-val">'+be(nv.eff)+'</span>' : '<span class="cell-main text-mute-2">—</span>';
+  if(k === 'used') return '<span class="cell-main num">'+usedBy(r).length+'</span>';
+  if(k === 'act'){
+    const dis = canEdit() ? '' : ' is-disabled';
+    let h = '<div class="row-actions">';
+    if(!r.archived) h += '<button class="ra-btn'+dis+'" title="แก้ไข (สร้างเวอร์ชันใหม่)" onclick="event.stopPropagation();openEdit(\''+r.id+'\')"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>';
+    if(nextVer(r) && !r.archived) h += '<button class="ra-btn'+dis+'" title="ยกเลิกเวอร์ชันที่รอมีผล" onclick="event.stopPropagation();askCancelVersion(\''+r.id+'\')"><i data-lucide="calendar-x" class="w-3.5 h-3.5"></i></button>';
+    if(r.archived) h += '<button class="ra-btn'+dis+'" title="เปิดใช้กลับ" onclick="event.stopPropagation();askReactivate(\''+r.id+'\')"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i></button>';
+    else h += '<button class="ra-btn is-danger'+dis+'" title="ปิดใช้" onclick="event.stopPropagation();askDeactivate(\''+r.id+'\')"><i data-lucide="archive" class="w-3.5 h-3.5"></i></button>';
+    return h + '</div>';
+  }
+  return '';
+}
+</script>
+<script>
+function renderPage(){
+  const rows = filteredRows();
+  const total = rows.length;                    /* #40.1 — header กับ footer ใช้ตัวแปรเดียว */
+  const ps = state.pagination.pageSize;
+  const maxPage = Math.max(1, Math.ceil(total/ps));
+  if(state.pagination.page > maxPage) state.pagination.page = maxPage;
+  const pg = state.pagination.page;
+  const view = rows.slice((pg-1)*ps, pg*ps);
+  const cols = COLS();
+
+  let h = '<div class="page-fill">';
+  h += '<div class="ph"><div><div class="ph-title-row">'
+     + '<h1 class="ph-title">ตั้งค่า HR</h1>'
+     + '<span class="ph-count">'+fmtNumber(total,0)+' รายการ</span>'
+     + '<span class="tip" data-tip="'+esc(OUT_TIP)+'"><i data-lucide="info" class="w-3.5 h-3.5"></i></span>'
+     + '</div></div>'
+     + '<div class="ph-actions">'
+     + '<button class="btn btn-primary'+(canEdit()?'':' is-disabled')+'" onclick="openCreate()"><i data-lucide="plus" class="w-4 h-4"></i><span>สร้างค่าใหม่</span></button>'
+     + '</div></div>';
+
+  h += '<div class="tabs page-tabs">' + TABS.map(function(t){
+        const n = ((t.k==='company') ? RECORDS.length : RECORDS.filter(r=>r.group===t.k).length);
+        return '<button class="tab '+(state.tab===t.k?'is-active':'')+'" onclick="goTab(\''+t.k+'\')">'
+          + '<i data-lucide="'+t.icon+'" class="w-3.5 h-3.5"></i><span>'+t.label+'</span>'
+          + '<span class="tab-badge">'+n+'</span></button>';
+      }).join('') + '</div>';
+
+  if(state.asOf) h += '<div class="dt-band"><i data-lucide="history" class="w-4 h-4"></i>'
+     + '<span>กำลังดูค่าที่มีผล ณ '+be(state.asOf)+'</span>'
+     + '<button class="btn btn-ghost btn-sm" class="mla" onclick="setAsOf(\'\')"><span>กลับมาวันนี้</span></button></div>';
+
+  h += statCards(baseRows());
+
+  h += '<div class="card list-card">';
+  h += '<div class="filter-row">'
+     + '<div class="input-search"><i data-lucide="search" class="lead-icon w-4 h-4"></i>'
+     + '<input class="input" type="text" name="q" placeholder="ค้นหาชื่อค่าหรือรหัส" value="'+esc(state.filters.search)+'" oninput="state.filters.search=this.value;state.pagination.page=1;render();"></div>'
+     + '<select class="select" onchange="state.filters.status=this.value;state.pagination.page=1;render();">'
+     +   ['all','active','scheduled','draft','superseded','inactive'].map(function(s){
+           const lb = s==='all' ? 'ทุกสถานะ' : ST[s].lb;
+           return '<option value="'+s+'" '+(state.filters.status===s?'selected':'')+'>'+lb+'</option>';
+         }).join('')
+     + '</select>'
+     + '<select class="select" onchange="state.filters.company=this.value;state.pagination.page=1;render();">'
+     +   '<option value="all" '+(state.filters.company==='all'?'selected':'')+'>ทุกขอบเขต</option>'
+     +   '<option value="shared" '+(state.filters.company==='shared'?'selected':'')+'>ค่ากลาง</option>'
+     +   COMPANIES.map(c=>'<option value="'+c.id+'" '+(state.filters.company===c.id?'selected':'')+'>'+esc(c.name)+'</option>').join('')
+     + '</select>'
+     + '<span class="fr-lb">มีผล ณ วันที่<span class="tip" data-tip="เลือกวันย้อนหลังเพื่อดูว่าวันนั้นบริษัทใช้ค่าอะไร"><i data-lucide="info" class="w-3 h-3"></i></span></span>'
+     + '<input class="input dt" type="date" name="asof" value="'+esc(state.asOf)+'" onchange="setAsOf(this.value)">'
+     + '<span class="fr-sp"></span>'
+     + '<button class="btn btn-ghost btn-sm" onclick="resetFilters()"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i><span>รีเซ็ต</span></button>'
+     + '</div>';
+
+  h += '<div class="table-wrap"><table class="table"><thead><tr>' + cols.map(function(c){
+        const on = state.sort.col === c.k;
+        const arrow = c.s ? ' <span class="sort-arrow">'+(on ? (state.sort.dir==='asc'?'↑':'↓') : '↕')+'</span>' : '';
+        const tip = c.tip ? '<span class="tip" data-tip="'+esc(c.tip)+'"><i data-lucide="info" class="w-3 h-3"></i></span>' : '';
+        return '<th class="'+(c.s?'is-sortable ':'')+(on?'is-sorted ':'')+'" '+(c.right?'class="tar"':'')+' '
+          + (c.s?'onclick="sortBy(\''+c.k+'\')"':'') + '>'+esc(c.lb)+tip+arrow+'</th>';
+      }).join('') + '</tr></thead><tbody>';
+
+  if(!view.length){
+    h += '<tr><td colspan="'+cols.length+'">' + emptyStateHTML({
+      icon:'search-x', title:'ไม่พบค่าที่ตรงกับตัวกรอง',
+      desc:'ลองล้างตัวกรอง หรือสร้างค่าใหม่ในกลุ่ม '+grpOf(state.tab).label,
+      actionLabel:'ล้างตัวกรอง', actionIcon:'rotate-ccw', onAction:'resetFilters()'
+    }) + '</td></tr>';
+  } else {
+    h += view.map(function(r){
+      return '<tr class="is-clickable" onclick="openView(\''+r.id+'\')">' + cols.map(function(c){
+        return '<td '+(c.right?'class="tar"':'')+'>'+cellHTML(r, c.k)+'</td>';
+      }).join('') + '</tr>';
+    }).join('');
+  }
+  h += '</tbody></table></div>';
+
+  const from = total ? (pg-1)*ps + 1 : 0, to = Math.min(total, pg*ps);
+  h += '<div class="table-foot"><div class="pagination">'
+     + '<button class="pg-btn '+(pg<=1?'is-disabled':'')+'" onclick="goPage('+(pg-1)+')"><i data-lucide="chevron-left" class="w-3 h-3"></i></button>'
+     + Array.from({length:maxPage}, function(_,i){
+         return '<button class="pg-btn '+(pg===i+1?'is-active':'')+'" onclick="goPage('+(i+1)+')">'+(i+1)+'</button>'; }).join('')
+     + '<button class="pg-btn '+(pg>=maxPage?'is-disabled':'')+'" onclick="goPage('+(pg+1)+')"><i data-lucide="chevron-right" class="w-3 h-3"></i></button>'
+     + '</div><div>แสดง '+from+'–'+to+' จาก '+fmtNumber(total,0)+' รายการ</div></div>';
+
+  h += '</div></div>';
+  return h;
+}
+function goPage(n){
+  const total = filteredRows().length, maxPage = Math.max(1, Math.ceil(total/state.pagination.pageSize));
+  state.pagination.page = Math.min(maxPage, Math.max(1, n)); render();
+}
+</script>
+<script>
+/* ===== VIEW DRAWER (Pattern C · #38.2 has-tabs · #72 identity header) ===== */
+function KV(k, v, tip){
+  return '<div><div class="kv-k">'+esc(k)+(tip?'<span class="tip" data-tip="'+esc(tip)+'"><i data-lucide="info" class="w-3 h-3"></i></span>':'')+'</div>'
+       + '<div class="kv-v">'+(v==null||v===''?'—':v)+'</div></div>';
+}
+function SEC(icon, title, body, right){
+  return '<div class="sec"><div class="sec-h"><i data-lucide="'+icon+'" class="w-4 h-4"></i><span>'+esc(title)+'</span>'
+       + (right?'<span class="sec-r">'+right+'</span>':'') + '</div>'+body+'</div>';
+}
+function isoOf(y, m, d){
+  const last = new Date(Date.UTC(y, m+1, 0)).getUTCDate();
+  const dt = new Date(Date.UTC(y, m, Math.min(d, last)));
+  return dt.getUTCFullYear()+'-'+d2(dt.getUTCMonth()+1)+'-'+d2(dt.getUTCDate());
+}
+function addDays(iso, k){
+  const dt = new Date(iso+'T00:00:00Z'); dt.setUTCDate(dt.getUTCDate()+k);
+  return dt.toISOString().slice(0,10);
+}
+function effTo(r, ver){
+  const list = r.versions.filter(x=>x.eff).sort((a,b)=>a.eff<b.eff?-1:1);
+  const i = list.findIndex(x=>x.v===ver.v);
+  if(i < 0 || i === list.length-1) return '';
+  return addDays(list[i+1].eff, -1);
+}
+function payloadSections(r, cv){
+  const p = cv.payload;
+  if(r.group === 'leave'){
+    let h = SEC('scale','กติกาสิทธิ์และการให้โควตา',
+      '<div class="kv c3">'
+      + KV('หน่วยนับ', esc(p.unit))
+      + KV('จ่ายค่าจ้าง', esc(p.paid === 'จ่ายบางส่วน' ? ('จ่ายบางส่วน '+p.paidPct+'%') : p.paid))
+      + KV('โควตาต่อปี', p.unlimited ? 'ไม่จำกัด' : (fmtNumber(p.quota,0)+' '+p.unit))
+      + KV('ความถี่การให้สิทธิ์', esc(p.accrual))
+      + KV('prorate พนักงานเข้าใหม่', esc(p.prorate))
+      + KV('วิธีปัดเศษ', esc(p.rounding))
+      + KV('ยกยอดสูงสุด', fmtNumber(p.carry,0)+' '+p.unit)
+      + KV('วันหมดอายุยกยอด', esc(p.carryExp), 'ยกยอดที่ยังไม่ใช้จะหมดสิทธิ์ในวันนี้ของปีถัดไป')
+      + KV('ลาล่วงหน้าอย่างน้อย', fmtNumber(p.advDays,0)+' วัน')
+      + '</div>');
+    if((p.milestones||[]).length) h += SEC('trending-up','ขั้นโควตาตามอายุงาน',
+      '<div class="mini-wrap"><table class="mini-tbl"><thead><tr><th>อายุงาน (ปี)</th><th>จำนวนวัน</th></tr></thead><tbody>'
+      + p.milestones.map(m=>'<tr><td>'+m.from+' – '+(m.to>=99?'ขึ้นไป':m.to)+'</td><td>'+m.days+' '+esc(p.unit)+'</td></tr>').join('')
+      + '</tbody></table></div>', p.milestones.length+' ขั้น');
+    h += SEC('calculator','กติกาการนับวันลา',
+      '<div class="kv c3">'
+      + KV('นับวันหยุดในช่วงลา', p.countHoliday ? 'นับ' : 'ไม่นับ')
+      + KV('อนุญาตครึ่งวัน', p.halfDay ? 'อนุญาต' : 'ไม่อนุญาต')
+      + KV('ลาต่อเนื่องสูงสุด/ครั้ง', p.maxConsec ? (p.maxConsec+' '+p.unit) : 'ไม่จำกัด')
+      + KV('ติดลบได้ถึง', fmtNumber(p.negative,0)+' '+p.unit)
+      + KV('ต้องแนบเอกสาร', p.needDoc ? 'ต้องแนบ' : 'ไม่ต้องแนบ')
+      + KV('เอกสารที่ต้องแนบ', esc(p.docNote))
+      + '</div>');
+    return h;
+  }
+  if(r.group === 'ot' && r.sub === 'rate'){
+    return SEC('percent','อัตราและฐานคำนวณ',
+      '<div class="kv c3">'
+      + KV('ประเภทอัตรา', esc(p.rateType))
+      + KV('ตัวคูณ', '<span class="ver-val">'+(+p.mult).toFixed(1)+'x</span>', 'ขั้นต่ำตามกฎหมายแรงงาน '+OT_MIN[p.rateType].toFixed(1)+'x')
+      + KV('ฐานคำนวณ', esc(p.base))
+      + KV('เพดานชั่วโมง', fmtNumber(p.cap,0)+' ชม./สัปดาห์')
+      + KV('รหัสอ้างอิงจ่ายเงิน', esc(r.payrollCode), 'ช่องอ้างอิงเท่านั้น การคำนวณเงินอยู่ที่โครงสร้างเงินเดือน')
+      + '</div>');
+  }
+  if(r.group === 'ot' && r.sub === 'shift'){
+    return SEC('clock','เวลาทำงานของกะ',
+      '<div class="kv c3">'
+      + KV('เวลาเข้า', esc(p.shiftIn)) + KV('เวลาออก', esc(p.shiftOut))
+      + KV('กะข้ามวัน', p.overnight ? 'ข้ามวัน' : 'ไม่ข้ามวัน')
+      + KV('ช่วงพัก', esc(p.breakFrom)+' – '+esc(p.breakTo))
+      + KV('ชั่วโมงทำงาน/วัน', '<span class="ver-val">'+shiftHours(p).toFixed(1)+' ชม.</span>')
+      + KV('วันทำงานในสัปดาห์', (p.days||[]).join(' · '))
+      + '</div>');
+  }
+  if(r.group === 'holiday'){
+    const days = p.days||[];
+    return SEC('calendar-days','วันหยุดในชุดปฏิทิน',
+      '<div class="mini-wrap"><table class="mini-tbl"><thead><tr><th>วันที่</th><th>ชื่อวันหยุด</th><th>ประเภท</th><th>วันหยุดต้นทาง</th></tr></thead><tbody>'
+      + days.map(d=>'<tr><td class="ver-val">'+be(d.date)+'</td><td>'+esc(d.name)+'</td><td>'+esc(d.type)+'</td><td class="ver-val">'+(d.src?be(d.src):'—')+'</td></tr>').join('')
+      + '</tbody></table></div>', days.length+' วัน · '+esc(p.location||'ทุกสถานที่'));
+  }
+  if(r.group === 'period'){
+    const per = p.periods||[];
+    let h = SEC('calendar-clock','กติการอบตัดเวลาและรอบจ่าย',
+      '<div class="kv c3">'
+      + KV('ความถี่', esc(p.freq)) + KV('วันตัดเวลา', p.cutDay) + KV('วันจ่าย', p.payDay)
+      + KV('ล็อกงวดที่ปิดแล้ว', p.lockClosed ? 'ล็อก' : 'ไม่ล็อก', 'งวดที่ปิดแล้วแก้ค่าที่กระทบงวดนั้นไม่ได้')
+      + KV('ความถี่รอบบันทึกเวลา', esc(p.workPeriod))
+      + '</div>');
+    h += SEC('list-checks','งวดที่สร้างแล้ว',
+      (per.length
+        ? '<div class="mini-wrap"><table class="mini-tbl"><thead><tr><th>งวด</th><th>ช่วงงวด</th><th>วันจ่าย</th><th>สถานะ</th><th>ผู้ปิดงวด</th><th></th></tr></thead><tbody>'
+          + per.map(function(x,i){
+              const perPill = (x.status === 'closed') ? '<span class="pill pill-muted">ปิดแล้ว</span>'
+                                                     : '<span class="pill pill-success">เปิดอยู่</span>';
+            return '<tr><td class="ver-val">'+esc(x.no)+'</td><td class="ver-val">'+be(x.from)+' – '+be(x.to)+'</td><td class="ver-val">'+be(x.pay)+'</td>'
+                + '<td>'+perPill+'</td>'
+                + '<td>'+(x.by?esc(emp(x.by).name)+' · '+be(x.at):'—')+'</td>'
+                + '<td class="tar">'+(x.status==='open'
+                    ? '<button class="btn btn-secondary btn-sm'+(canEdit()?'':' is-disabled')+'" onclick="askClosePeriod(\''+r.id+'\','+i+')"><i data-lucide="lock" class="w-3 h-3"></i><span>ปิดงวด</span></button>'
+                    : '<button class="btn btn-ghost btn-sm'+(canEdit()?'':' is-disabled')+'" onclick="askReopenPeriod(\''+r.id+'\','+i+')"><i data-lucide="unlock" class="w-3 h-3"></i><span>เปิดกลับ</span></button>')+'</td></tr>';
+            }).join('') + '</tbody></table></div>'
+        : emptyStateHTML({ icon:'calendar-plus', title:'ยังไม่มีงวดในปีนี้', desc:'สร้างงวดทั้งปีจากกติกาวันตัดเวลาและวันจ่ายที่ตั้งไว้',
+            actionLabel:'สร้างงวดทั้งปี', actionIcon:'wand-2', onAction:'genPeriods(\''+r.id+'\')' })),
+      (per.length ? '<button class="btn btn-secondary btn-sm'+(canEdit()?'':' is-disabled')+'" onclick="genPeriods(\''+r.id+'\')"><i data-lucide="wand-2" class="w-3 h-3"></i><span>สร้างงวดทั้งปี</span></button>' : ''));
+    return h;
+  }
+  if(r.group === 'appraisal'){
+    return SEC('target','ช่วงรอบประเมิน',
+      '<div class="kv c3">'
+      + KV('ปี', p.year) + KV('ช่วงประเมิน', be(p.from)+' – '+be(p.to))
+      + KV('ช่วงเปิดกรอก', be(p.openFrom)+' – '+be(p.openTo))
+      + KV('ความถี่', esc(p.freq))
+      + '</div>');
+  }
+  return '';
+}
+</script>
+<script>
+function renderViewDrawer(r){
+  if(!r) return '';
+  const cv = curVer(r) || lastVer(r), nv = nextVer(r), st = itemStatus(r);
+  const dis = canEdit() ? '' : ' is-disabled';
+  const tabs = [
+    { k:'detail',  lb:'รายละเอียด',      ic:'file-text', n:null },
+    { k:'history', lb:'ประวัติเวอร์ชัน', ic:'history',   n:r.versions.length },
+    { k:'usage',   lb:'ใครใช้ค่านี้',    ic:'share-2',   n:usedBy(r).length }
+  ];
+  let h = '<div class="drawer-header has-tabs"><div class="dw-head-row"><div class="min0">'
+    + '<div class="dw-eyebrow"><i data-lucide="'+grpOf(r.group).icon+'" class="w-3.5 h-3.5"></i><span>'+esc(grpOf(r.group).label)+' · '+esc(r.code)+'</span></div>'
+    + '<div class="row-wrap"><span class="dw-title">'+esc(r.nameTh)+'</span>'+pill(st)+'</div>'
+    + '<div class="dw-sub">'+esc(sumOf(r))+' · มีผล '+(cv?be(cv.eff):'—')+' · '+esc(scopeText(r))+'</div>'
+    + '</div><div class="drawer-header-actions">'
+    + (!r.archived ? '<button class="btn btn-secondary'+dis+'" onclick="openEdit(\''+r.id+'\')"><i data-lucide="pencil" class="w-4 h-4"></i><span>แก้ไข</span></button>' : '')
+    + (nv && !r.archived ? '<button class="btn btn-secondary'+dis+'" onclick="askCancelVersion(\''+r.id+'\')"><i data-lucide="calendar-x" class="w-4 h-4"></i><span>ยกเลิกเวอร์ชันที่รอมีผล</span></button>' : '')
+    + (r.archived
+        ? '<button class="btn btn-secondary'+dis+'" onclick="askReactivate(\''+r.id+'\')"><i data-lucide="rotate-ccw" class="w-4 h-4"></i><span>เปิดใช้กลับ</span></button>'
+        : '<button class="btn btn-danger'+dis+'" onclick="askDeactivate(\''+r.id+'\')"><i data-lucide="archive" class="w-4 h-4"></i><span>ปิดใช้</span></button>')
+    + '<span class="drawer-header-divider"></span>'
+    + '<button class="top-icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-4 h-4"></i></button>'
+    + '</div></div>';
+  const bodyOpen = '<div class="drawer-body">';
+  h += '<div class="tabs">' + tabs.map(function(t){
+        return '<button class="tab '+(state.drawer.tab===t.k?'is-active':'')+'" onclick="setDrawerTab(\''+t.k+'\')">'
+          + '<i data-lucide="'+t.ic+'" class="w-3.5 h-3.5"></i><span>'+t.lb+'</span>'
+          + (t.n!=null?'<span class="tab-badge">'+t.n+'</span>':'') + '</button>';
+      }).join('') + '</div></div>';
+
+  h += bodyOpen;
+  if(state.drawer.tab === 'detail'){
+    if(nv) h += '<div class="note note-warn"><i data-lucide="clock-4" class="w-4 h-4"></i>'
+      + '<div>มีเวอร์ชันรอมีผล '+be(nv.eff)+'</div>'
+      + '<button class="btn btn-secondary btn-sm note-act" onclick="setDrawerTab(\'history\')"><span>ดูประวัติเวอร์ชัน</span></button></div>';
+    if(r.archived) h += '<div class="note note-danger"><i data-lucide="archive" class="w-4 h-4"></i>'
+      + '<div>ปิดใช้แล้ว — เลือกใหม่ไม่ได้</div>'
+      + '<button class="btn btn-secondary btn-sm note-act'+dis+'" onclick="askReactivate(\''+r.id+'\')"><span>เปิดใช้กลับ</span></button></div>';
+    h += SEC('info','ข้อมูลค่า', '<div class="kv c3">'
+      + KV('รหัสค่า', '<span class="ver-val">'+esc(r.code)+'</span>')
+      + KV('ชื่อค่า (ไทย)', esc(r.nameTh))
+      + KV('ชื่อค่า (EN)', esc(r.nameEn))
+      + KV('กลุ่มค่า', esc(grpOf(r.group).label))
+      + KV('ขอบเขตบริษัท', esc(scopeText(r)), SCOPE_TIP)
+      + KV('ขอบเขตการใช้', esc(r.appliesTo), 'รอบนี้กำหนดได้ระดับบริษัทเท่านั้น ยังไม่เปิดให้เลือกกลุ่มพนักงาน')
+      + KV('รหัสอ้างอิงจ่ายเงิน', esc(r.payrollCode), 'ช่องอ้างอิงเท่านั้น ไม่ผูกสูตรคำนวณเงิน')
+      + KV('สถานะการใช้งาน', r.archived ? 'ปิดใช้' : 'ใช้งาน')
+      + KV('หมายเหตุ', esc(r.note))
+      + '</div>');
+    h += SEC('calendar-check','เวอร์ชันที่มีผล', '<div class="kv c3">'
+      + KV('เวอร์ชันที่', cv ? cv.v : '—')
+      + KV('วันมีผล', cv ? '<span class="ver-val">'+be(cv.eff)+'</span>' : '—')
+      + KV('วันสิ้นสุดผล', cv ? (effTo(r,cv) ? '<span class="ver-val">'+be(effTo(r,cv))+'</span>' : 'ยังไม่สิ้นสุด') : '—')
+      + KV('สถานะเวอร์ชัน', cv ? pill(cv.state) : '—')
+      + KV('เหตุผลการเปลี่ยน', cv ? esc(cv.reason) : '—')
+      + KV('เวอร์ชันถัดไป', nv ? '<span class="ver-val">'+be(nv.eff)+'</span>' : 'ไม่มี')
+      + '</div>');
+    if(cv) h += payloadSections(r, cv);
+    h += SEC('user-cog','ผู้รับผิดชอบและข้อมูลระบบ', '<div class="kv c3">'
+      + KV('ผู้รับผิดชอบ', comboPerson(r.owner))
+      + KV('แก้ไขล่าสุดโดย', comboPerson((lastVer(r)||{}).by || r.owner))
+      + KV('แก้ไขล่าสุดเมื่อ', fmtDateTime((lastVer(r)||{}).at))
+      + '</div>');
+  }
+  if(state.drawer.tab === 'history'){
+    const list = r.versions.slice().sort((a,b)=>b.v-a.v);
+    h += SEC('history','ประวัติเวอร์ชัน (บันทึกเพิ่มอย่างเดียว ย้อนกลับไม่ได้)',
+      '<div class="timeline">' + list.map(function(x,i){
+        const prev = list[i+1];
+        const before = prev ? sumOfPayload(r, prev.payload) : '';
+        const after = sumOfPayload(r, x.payload);
+        const cls = x.state === 'active' ? 'is-success' : (x.state === 'scheduled' ? 'is-warning' : '');
+        return '<div class="tl-item"><span class="tl-dot '+cls+'"></span>'
+          + '<div class="tl-title">เวอร์ชัน '+x.v+' · '+(x.eff?be(x.eff):'ยังไม่ตั้งวันมีผล')+' '+pill(x.state)+'</div>'
+          + '<div class="tl-meta">'+(before?('ค่าเดิม '+esc(before)+'  →  '):'')+'ค่าใหม่ '+esc(after)+'</div>'
+          + '<div class="tl-meta">'+esc(emp(x.by).name)+' · '+esc(emp(x.by).pos)+' · '+fmtDateTime(x.at)+'</div>'
+          + (x.reason?'<div class="tl-meta">เหตุผล: '+esc(x.reason)+'</div>':'')
+          + '</div>';
+      }).join('') + '</div>', list.length+' เวอร์ชัน');
+  }
+  if(state.drawer.tab === 'usage'){
+    const list = usedBy(r);
+    const cvU = curVer(r);
+    h += SEC('git-commit-horizontal','เวอร์ชันที่ปลายทางอ่านอยู่ตอนนี้',
+      '<div class="kv c3">'
+      + KV('เวอร์ชันที่ส่งให้ปลายทาง', cvU ? ('เวอร์ชัน '+cvU.v+' · มีผล '+be(cvU.eff)) : 'ยังไม่ส่ง — ยังไม่มีเวอร์ชันที่มีผล')
+      + KV('เวอร์ชันรอมีผล', nv ? (be(nv.eff)+' · ปลายทางยังไม่เห็น') : 'ไม่มี')
+      + KV('ร่างที่ค้างอยู่', r.versions.filter(x=>x.state==='draft').length + ' ฉบับ · ไม่ส่งให้ปลายทาง')
+      + '</div>');
+    h += SEC('share-2','feature ที่อ่านค่านี้ไปใช้',
+      (list.length ? list.map(function(c){
+        return '<div class="wu-row"><i data-lucide="corner-down-right" class="w-4 h-4 text-mute-2"></i>'
+          + '<div class="min0"><div class="wu-nm">'+esc(c.name)+'</div><div class="wu-mt">'+esc(c.code)+' · แผนพัฒนา '+c.wave+'</div></div>'
+          + '<div class="bar-right">'
+          + (c.ready?'<span class="pill pill-success">พร้อมใช้</span>':'<span class="pill pill-muted">ยังไม่ทำ</span>')
+          + '<button class="btn btn-ghost btn-sm" onclick="outOfScope(\''+esc(c.name)+'\')"><i data-lucide="external-link" class="w-3 h-3"></i><span>เปิด</span></button>'
+          + '</div></div>';
+      }).join('') : emptyStateHTML({ icon:'unlink', title:'ยังไม่มี feature ใดอ้างค่านี้', desc:'ปิดใช้ได้ทันทีโดยไม่กระทบงานปลายทาง' })),
+      list.length+' feature');
+  }
+  h += '</div>';
+  h += '<div class="drawer-footer"><span class="drawer-footer-meta">แก้ไขล่าสุด '+fmtDateTime((lastVer(r)||{}).at)+'</span>'
+     + '<span class="footer-spacer"></span><button class="btn btn-secondary" onclick="closeDrawer()"><span>ปิด</span></button></div>';
+  return h;
+}
+function sumOfPayload(r, p){
+  if(r.group === 'leave') return (p.unlimited?'ไม่จำกัด':(p.quota+' '+p.unit+'/ปี'));
+  if(r.group === 'ot' && r.sub === 'rate') return (+p.mult).toFixed(1)+'x · เพดาน '+p.cap+' ชม.';
+  if(r.group === 'ot') return p.shiftIn+'–'+p.shiftOut+' · '+shiftHours(p).toFixed(1)+' ชม.';
+  if(r.group === 'holiday') return (p.days||[]).length+' วัน';
+  if(r.group === 'period') return 'ตัด '+p.cutDay+' · จ่าย '+p.payDay;
+  if(r.group === 'appraisal') return be(p.from)+' – '+be(p.to);
+  return '—';
+}
+function setDrawerTab(k){ state.drawer.tab = k; render(); }
+</script>
+<script>
+/* ===== CREATE / EDIT DRAWER (Pattern B · wizard 3 steps · #47 stepper kit) ===== */
+const STEPS = ['ข้อมูลค่า','ค่าที่ใช้','ตรวจสอบและยืนยัน'];
+
+function fval(cfg){ const f = state.drawer.form; return (cfg.p ? f.payload : f)[cfg.k]; }
+function setF(k, val, p, re){
+  const f = state.drawer.form; (p ? f.payload : f)[k] = val;
+  if(k === 'subLb') f.payload = blankPayload('ot', val === 'กะมาตรฐาน' ? 'shift' : 'rate');
+  delete state.drawer.err[k];
+  if(re) render();
+}
+function FLD(cfg){
+  const val = fval(cfg), err = state.drawer.err[cfg.k];
+  const w = cfg.w === 'full' ? ' class="field span2"' : ' class="field"';
+  const ro = cfg.ro ? ' disabled' : '';
+  const on = 'onchange="setF(\''+cfg.k+'\', this.value, '+(cfg.p?'true':'false')+', '+(cfg.re?'true':'false')+')"';
+  const onIn = 'oninput="setF(\''+cfg.k+'\', this.value, '+(cfg.p?'true':'false')+', false)"';
+  let inp = '';
+  if(cfg.t === 'select'){
+    inp = '<select class="select'+(cfg.ro?' ro':'')+'" name="'+cfg.k+'"'+ro+' '+on+'>'
+        + cfg.opts.map(o=>'<option value="'+esc(o)+'" '+(String(val)===String(o)?'selected':'')+'>'+esc(o)+'</option>').join('')
+        + '</select>';
+  } else if(cfg.t === 'textarea'){
+    inp = '<textarea class="input" name="'+cfg.k+'" rows="2" class="ta-auto" placeholder="'+esc(cfg.ph||'')+'" '+onIn+'>'+esc(val||'')+'</textarea>';
+  } else if(cfg.t === 'check'){
+    return '<div'+w+'><label class="sw '+(val?'on':'')+(cfg.ro?' is-ro':'')+'" onclick="'+(cfg.ro?'':'setF(\''+cfg.k+'\','+(!val)+','+(cfg.p?'true':'false')+',true)')+'">'
+      + '<span class="sw-box"></span><span>'+esc(cfg.lb)+'</span>'
+      + (cfg.tip?'<span class="tip" data-tip="'+esc(cfg.tip)+'"><i data-lucide="info" class="w-3 h-3"></i></span>':'')
+      + '</label></div>';
+  } else {
+    const type = cfg.t === 'num' ? 'number' : (cfg.t === 'date' ? 'date' : (cfg.t === 'time' ? 'time' : 'text'));
+    inp = '<input class="input'+(cfg.ro?' ro':'')+'" type="'+type+'" name="'+cfg.k+'" value="'+esc(val==null?'':val)+'" placeholder="'+esc(cfg.ph||'')+'"'+ro+' '+onIn+' '+(cfg.t==='date'||cfg.t==='time'?on:'')+'>';
+  }
+  return '<div'+w+(err?'':'')+'>'
+    + '<label class="field-label">'+esc(cfg.lb)+(cfg.req?'<span class="req">*</span>':'')
+    + (cfg.tip?'<span class="tip" data-tip="'+esc(cfg.tip)+'"><i data-lucide="info" class="w-3 h-3"></i></span>':'')+'</label>'
+    + inp
+    + (cfg.hint?'<div class="hint-inline">'+esc(cfg.hint)+'</div>':'')
+    + (err?'<div class="field-error" class="on">'+esc(err)+'</div>':'')
+    + '</div>';
+}
+function errNote(){
+  const ks = Object.keys(state.drawer.err);
+  if(!ks.length) return '';
+  return '<div class="note note-danger"><i data-lucide="alert-octagon" class="w-4 h-4"></i><div>'
+    + ks.map(k=>esc(state.drawer.err[k])).join('<br>') + '</div></div>';
+}
+function stepBand(){
+  const s = state.drawer.step;
+  let h = '<div class="drawer-stepper-band"><div class="stepper-row">';
+  STEPS.forEach(function(lb, i){
+    const n = i+1;
+    if(i) h += '<span class="step-line '+(s>n-1?'is-done':'')+'"></span>';
+    h += '<span class="step-dot '+(s===n?'is-active':(s>n?'is-done':''))+'" onclick="gotoStep('+n+')">'+n+'</span>';
+  });
+  h += '</div></div>';
+  return h;
+}
+function weekChips(){
+  const p = state.drawer.form.payload, all = ['จ','อ','พ','พฤ','ศ','ส','อา'];
+  return '<div class="field span2"><label class="field-label">วันทำงานในสัปดาห์<span class="req">*</span></label>'
+    + '<div class="chips">' + all.map(function(d){
+        const on = (p.days||[]).indexOf(d) >= 0;
+        return '<button type="button" class="chip-btn '+(on?'is-on':'')+'" onclick="toggleDay(\''+d+'\')">'+d+'</button>';
+      }).join('') + '</div>'
+    + (state.drawer.err.days?'<div class="field-error" class="on">'+esc(state.drawer.err.days)+'</div>':'')
+    + '</div>';
+}
+function toggleDay(d){
+  const p = state.drawer.form.payload; p.days = p.days||[];
+  const i = p.days.indexOf(d);
+  if(i >= 0) p.days.splice(i,1); else p.days.push(d);
+  delete state.drawer.err.days; render();
+}
+function msGrid(){
+  const p = state.drawer.form.payload, ms = p.milestones||[];
+  return '<div class="sec"><div class="sec-h"><i data-lucide="trending-up" class="w-4 h-4"></i><span>ขั้นโควตาตามอายุงาน</span><span class="tip" data-tip="ถ้าใส่ ช่วงอายุงานต้องต่อเนื่อง ไม่ทับซ้อน และไม่มีช่องว่าง"><i data-lucide="info" class="w-3 h-3"></i></span>'
+    + '<span class="sec-r"><button type="button" class="btn btn-secondary btn-sm" onclick="msAdd()"><i data-lucide="plus" class="w-3 h-3"></i><span>เพิ่มขั้น</span></button></span></div>'
+    + (ms.length
+      ? '<div class="mini-wrap"><table class="mini-tbl"><thead><tr><th class="w110">จาก (ปี)</th><th class="w110">ถึง (ปี)</th><th class="w120">จำนวนวัน</th><th class="w44"></th></tr></thead><tbody>'
+        + ms.map(function(m,i){
+            return '<tr><td><input class="input" type="number" name="ms-from-'+i+'" value="'+m.from+'" oninput="msSet('+i+',\'from\',this.value)"></td>'
+              + '<td><input class="input" type="number" name="ms-to-'+i+'" value="'+m.to+'" oninput="msSet('+i+',\'to\',this.value)"></td>'
+              + '<td><input class="input" type="number" name="ms-days-'+i+'" value="'+m.days+'" oninput="msSet('+i+',\'days\',this.value)"></td>'
+              + '<td class="tar"><button type="button" class="ra-btn is-danger" onclick="msDel('+i+')"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></td></tr>';
+          }).join('') + '</tbody></table></div>'
+      : '<div class="hint-inline">ไม่ใส่ก็ได้</div>')
+    + (state.drawer.err.milestones?'<div class="field-error" class="on">'+esc(state.drawer.err.milestones)+'</div>':'')
+    + '</div>';
+}
+function msAdd(){ const p = state.drawer.form.payload; p.milestones = p.milestones||[];
+  const last = p.milestones[p.milestones.length-1];
+  p.milestones.push({ from: last ? (+last.to)+1 : 0, to: last ? (+last.to)+3 : 2, days: 6 });
+  delete state.drawer.err.milestones; render(); }
+function msSet(i,k,v){ state.drawer.form.payload.milestones[i][k] = (v === '' ? '' : +v); delete state.drawer.err.milestones; }
+function msDel(i){ state.drawer.form.payload.milestones.splice(i,1); delete state.drawer.err.milestones; render(); }
+</script>
+<script>
+function hdGrid(){
+  const p = state.drawer.form.payload, days = p.days||[];
+  const seen = {}; const dup = {};
+  days.forEach(function(d,i){ if(d.date){ if(seen[d.date] != null) dup[i] = seen[d.date]+1; else seen[d.date] = i; } });
+  return '<div class="sec"><div class="sec-h"><i data-lucide="calendar-days" class="w-4 h-4"></i><span>วันหยุดในชุดปฏิทิน</span>'
+    + '<span class="sec-r"><button type="button" class="btn btn-secondary btn-sm" onclick="hdAdd()"><i data-lucide="plus" class="w-3 h-3"></i><span>เพิ่มวันหยุด</span></button></span></div>'
+    + (days.length
+      ? '<div class="mini-wrap"><table class="mini-tbl"><thead><tr><th class="w150">วันที่</th><th>ชื่อวันหยุด</th><th class="w168">ประเภท</th><th class="w150">วันหยุดต้นทาง</th><th class="w44"></th></tr></thead><tbody>'
+        + days.map(function(d,i){
+            const bad = dup[i] ? ' class="row-bad"' : '';
+            return '<tr'+bad+'><td><input class="input" type="date" name="hd-date-'+i+'" value="'+esc(d.date)+'" onchange="hdSet('+i+',\'date\',this.value)"></td>'
+              + '<td><input class="input" type="text" name="hd-name-'+i+'" value="'+esc(d.name)+'" oninput="hdSet('+i+',\'name\',this.value)"></td>'
+              + '<td><select class="select" onchange="hdSet('+i+',\'type\',this.value)">'
+                + ['วันหยุดราชการ','วันหยุดบริษัท','วันหยุดชดเชย'].map(o=>'<option '+(d.type===o?'selected':'')+'>'+o+'</option>').join('')
+                + '</select></td>'
+              + '<td>'+(d.type === 'วันหยุดชดเชย'
+                  ? '<input class="input" type="date" name="hd-src-'+i+'" value="'+esc(d.src)+'" onchange="hdSet('+i+',\'src\',this.value)">'
+                  : '<span class="hint-inline">—</span>')+'</td>'
+              + '<td class="tar"><button type="button" class="ra-btn is-danger" onclick="hdDel('+i+')"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></td></tr>';
+          }).join('') + '</tbody></table></div>'
+      : emptyStateHTML({ icon:'calendar-plus', title:'ยังไม่มีวันหยุดในชุดนี้', desc:'เพิ่มวันหยุดประจำปีทีละวัน หรือเพิ่มวันหยุดชดเชยโดยอ้างวันหยุดต้นทาง', actionLabel:'เพิ่มวันหยุด', actionIcon:'plus', onAction:'hdAdd()' }))
+    + (state.drawer.err.days?'<div class="field-error" class="on">'+esc(state.drawer.err.days)+'</div>':'')
+    + '</div>';
+}
+function hdAdd(){ const p = state.drawer.form.payload; p.days = p.days||[];
+  p.days.push({ date:(p.year||2027)+'-01-01', name:'', type:'วันหยุดราชการ', src:'' });
+  delete state.drawer.err.days; render(); }
+function hdSet(i,k,v){ state.drawer.form.payload.days[i][k] = v; delete state.drawer.err.days; render(); }
+function hdDel(i){ state.drawer.form.payload.days.splice(i,1); delete state.drawer.err.days; render(); }
+
+function stepFields(){
+  const f = state.drawer.form, s = state.drawer.step, g = f.group;
+  if(s === 1){
+    let h = '<div class="sec"><div class="sec-h"><i data-lucide="tag" class="w-4 h-4"></i><span>ชื่อและรหัสของค่า</span></div><div class="grid2">'
+      + FLD({ k:'nameTh', lb:'ชื่อค่า (ไทย)', t:'text', req:true, ph:'เช่น ลาพักร้อน' })
+      + FLD({ k:'nameEn', lb:'ชื่อค่า (EN)', t:'text' })
+      + FLD({ k:'code', lb:'รหัสค่า', t:'text', req:true, hint:'ตัวพิมพ์ใหญ่และตัวเลข ห้ามซ้ำในกลุ่มเดียวกัน' })
+      + FLD({ k:'groupLb', lb:'กลุ่มค่า', t:'text', ro:true })
+      + '</div></div>';
+    if(g === 'ot') h += '<div class="sec"><div class="sec-h"><i data-lucide="shapes" class="w-4 h-4"></i><span>ประเภทค่าในกลุ่มนี้</span></div><div class="grid2">'
+      + FLD({ k:'subLb', lb:'ประเภท', t:'select', opts:['อัตรา OT','กะมาตรฐาน'], req:true, re:true })
+      + '</div></div>';
+    h += '<div class="sec"><div class="sec-h"><i data-lucide="building-2" class="w-4 h-4"></i><span>ขอบเขตการใช้ค่า</span></div><div class="grid2">'
+      + FLD({ k:'scopeLb', lb:'ขอบเขตบริษัท', t:'select', opts:['ค่ากลาง (ทุกบริษัท)','เฉพาะบริษัท'], req:true, re:true, tip:SCOPE_TIP })
+      + (f.scopeLb === 'เฉพาะบริษัท'
+          ? '<div class="field"><label class="field-label">บริษัทที่ใช้ค่านี้<span class="req">*</span></label>'
+            + searchSelectHTML('company', { placeholder:'ค้นหาบริษัท' })
+            + '<div class="chips">'+(f.companies.length ? f.companies.map(c=>'<button type="button" class="chip-btn is-on" onclick="dropCompany(\''+c+'\')">'+esc(comp(c).name)+'<i data-lucide="x" class="w-3 h-3"></i></button>').join('') : '<span class="hint-inline">ยังไม่ได้เลือกบริษัท</span>')+'</div>'
+            + (state.drawer.err.companies?'<div class="field-error" class="on">'+esc(state.drawer.err.companies)+'</div>':'')+'</div>'
+          : '')
+      + FLD({ k:'appliesTo', lb:'ขอบเขตการใช้', t:'text', ro:true, tip:'รอบนี้กำหนดได้ระดับบริษัทเท่านั้น ยังไม่เปิดให้เลือกกลุ่มพนักงาน' })
+      + FLD({ k:'payrollCode', lb:'รหัสอ้างอิงจ่ายเงิน', t:'text', tip:'ช่องอ้างอิงเท่านั้น ไม่ผูกสูตรคำนวณเงิน' })
+      + '</div></div>';
+    h += '<div class="sec"><div class="sec-h"><i data-lucide="user-cog" class="w-4 h-4"></i><span>ผู้รับผิดชอบ</span></div><div class="grid2">'
+      + '<div class="field"><label class="field-label">ผู้รับผิดชอบ<span class="req">*</span></label>'
+      + searchSelectHTML('owner', { placeholder:'ค้นหาพนักงาน' })
+      + '<div class="hint-inline">'+esc(emp(f.owner).name)+' · '+esc(emp(f.owner).pos)+'</div></div>'
+      + FLD({ k:'note', lb:'หมายเหตุ', t:'textarea', w:'full' })
+      + '</div></div>';
+    return h;
+  }
+  if(s === 2){
+    if(g === 'leave'){
+      let h = '<div class="sec"><div class="sec-h"><i data-lucide="scale" class="w-4 h-4"></i><span>สิทธิ์และโควตา</span></div><div class="grid3">'
+        + FLD({ k:'unit', lb:'หน่วยนับ', t:'select', opts:['วัน','ชั่วโมง'], req:true, p:true })
+        + FLD({ k:'paid', lb:'จ่ายค่าจ้าง', t:'select', opts:['จ่าย','ไม่จ่าย','จ่ายบางส่วน'], req:true, p:true, re:true })
+        + (state.drawer.form.payload.paid === 'จ่ายบางส่วน' ? FLD({ k:'paidPct', lb:'จ่ายกี่เปอร์เซ็นต์', t:'num', req:true, p:true, hint:'1–99' }) : '')
+        + FLD({ k:'quota', lb:'โควตาต่อปี', t:'num', req:true, p:true })
+        + FLD({ k:'accrual', lb:'ความถี่การให้สิทธิ์', t:'select', opts:['ต้นปี','รายเดือนสะสม','ตามอายุงาน'], req:true, p:true })
+        + FLD({ k:'unlimited', lb:'ไม่จำกัดโควตา', t:'check', p:true })
+        + '</div></div>';
+      h += msGrid();
+      h += '<div class="sec"><div class="sec-h"><i data-lucide="archive-restore" class="w-4 h-4"></i><span>ยกยอดและ prorate</span></div><div class="grid3">'
+        + FLD({ k:'carry', lb:'ยกยอดสูงสุด', t:'num', req:true, p:true })
+        + FLD({ k:'carryExp', lb:'วันหมดอายุยกยอด', t:'text', p:true, ph:'31/03', hint:'วัน/เดือน ของปีถัดไป' })
+        + FLD({ k:'prorate', lb:'prorate พนักงานเข้าใหม่', t:'select', opts:['ตามเดือน','ตามวัน','ไม่ prorate'], req:true, p:true })
+        + FLD({ k:'rounding', lb:'วิธีปัดเศษ', t:'select', opts:['ปัดขึ้น','ปัดลง','ครึ่งวันใกล้สุด'], req:true, p:true })
+        + FLD({ k:'advDays', lb:'ลาล่วงหน้าอย่างน้อย (วัน)', t:'num', p:true })
+        + FLD({ k:'maxConsec', lb:'ลาต่อเนื่องสูงสุดต่อครั้ง', t:'num', p:true, hint:'0 = ไม่จำกัด' })
+        + '</div></div>';
+      h += '<div class="sec"><div class="sec-h"><i data-lucide="calculator" class="w-4 h-4"></i><span>กติกาการนับวันลาและเอกสาร</span></div><div class="grid3">'
+        + FLD({ k:'countHoliday', lb:'นับวันหยุดที่คร่อมช่วงลา', t:'check', p:true })
+        + FLD({ k:'halfDay', lb:'อนุญาตลาครึ่งวัน', t:'check', p:true })
+        + FLD({ k:'needDoc', lb:'ต้องแนบเอกสาร', t:'check', p:true, re:true })
+        + FLD({ k:'negative', lb:'ติดลบได้ถึง', t:'num', p:true })
+        + (state.drawer.form.payload.needDoc ? FLD({ k:'docNote', lb:'เอกสารที่ต้องแนบ', t:'text', req:true, p:true, w:'full', ph:'เช่น ใบรับรองแพทย์ เมื่อลาต่อเนื่องเกิน 3 วัน' }) : '')
+        + '</div></div>';
+      return h;
+    }
+    if(g === 'ot' && f.subLb === 'อัตรา OT'){
+      return '<div class="sec"><div class="sec-h"><i data-lucide="percent" class="w-4 h-4"></i><span>อัตราและฐานคำนวณ</span></div><div class="grid3">'
+        + FLD({ k:'rateType', lb:'ประเภทอัตรา', t:'select', opts:['OT วันทำงาน','ทำงานวันหยุด','OT วันหยุด'], req:true, p:true, re:true })
+        + FLD({ k:'mult', lb:'ตัวคูณ (เท่า)', t:'num', req:true, p:true, tip:'ขั้นต่ำตามกฎหมายแรงงาน: OT วันทำงาน 1.5 · ทำงานวันหยุด 1.0 · OT วันหยุด 3.0' })
+        + FLD({ k:'base', lb:'ฐานคำนวณ', t:'select', opts:['ค่าจ้างรายชั่วโมง','ค่าจ้างรายวัน'], req:true, p:true })
+        + FLD({ k:'cap', lb:'เพดานชั่วโมงต่อสัปดาห์', t:'num', req:true, p:true })
+        + '</div></div>';
+    }
+    if(g === 'ot'){
+      f.hoursRO = shiftHours(f.payload).toFixed(1) + ' ชม.';
+      return '<div class="sec"><div class="sec-h"><i data-lucide="clock" class="w-4 h-4"></i><span>เวลาทำงานของกะ</span></div><div class="grid3">'
+        + FLD({ k:'shiftIn', lb:'เวลาเข้า', t:'time', req:true, p:true })
+        + FLD({ k:'shiftOut', lb:'เวลาออก', t:'time', req:true, p:true })
+        + FLD({ k:'overnight', lb:'กะข้ามวัน', t:'check', p:true })
+        + FLD({ k:'breakFrom', lb:'เริ่มพัก', t:'time', p:true })
+        + FLD({ k:'breakTo', lb:'สิ้นสุดพัก', t:'time', p:true })
+        + FLD({ k:'hoursRO', lb:'ชั่วโมงทำงานต่อวัน', t:'text', ro:true })
+        + weekChips()
+        + '</div></div>';
+    }
+    if(g === 'holiday'){
+      return '<div class="sec"><div class="sec-h"><i data-lucide="map-pin" class="w-4 h-4"></i><span>ชุดปฏิทิน</span></div><div class="grid3">'
+        + FLD({ k:'year', lb:'ปี (ค.ศ.)', t:'num', req:true, p:true })
+        + FLD({ k:'location', lb:'สถานที่ / สาขา', t:'text', p:true, hint:'เว้นว่างได้ = ใช้ทุกสถานที่' })
+        + '</div></div>' + hdGrid();
+    }
+    if(g === 'period'){
+      return '<div class="sec"><div class="sec-h"><i data-lucide="calendar-clock" class="w-4 h-4"></i><span>กติการอบตัดเวลาและรอบจ่าย</span></div><div class="grid3">'
+        + FLD({ k:'freq', lb:'ความถี่', t:'select', opts:['รายเดือน','ครึ่งเดือน'], req:true, p:true })
+        + FLD({ k:'cutDay', lb:'วันตัดเวลา', t:'num', req:true, p:true, hint:'1–31' })
+        + FLD({ k:'payDay', lb:'วันจ่าย', t:'num', req:true, p:true, hint:'1–31 และต้องไม่น้อยกว่าวันตัดเวลา' })
+        + FLD({ k:'workPeriod', lb:'ความถี่รอบบันทึกเวลา', t:'select', opts:['ใช้รอบเดียวกับรอบจ่าย','รายสัปดาห์','รายปักษ์'], req:true, p:true })
+        + FLD({ k:'lockClosed', lb:'ล็อกงวดที่ปิดแล้ว', t:'check', p:true, tip:'งวดที่ปิดแล้วจะแก้ค่าที่กระทบงวดนั้นไม่ได้' })
+        + '</div><div class="hint-inline">สร้างงวดจริงทั้งปีได้จากหน้ารายละเอียดหลังบันทึก</div></div>';
+    }
+    if(g === 'appraisal'){
+      return '<div class="sec"><div class="sec-h"><i data-lucide="target" class="w-4 h-4"></i><span>ช่วงรอบประเมิน</span></div><div class="grid3">'
+        + FLD({ k:'year', lb:'ปี (ค.ศ.)', t:'num', req:true, p:true })
+        + FLD({ k:'freq', lb:'ความถี่', t:'select', opts:['ปีละ 1','ปีละ 2','รายไตรมาส'], req:true, p:true })
+        + FLD({ k:'from', lb:'ช่วงประเมิน — เริ่ม', t:'date', req:true, p:true })
+        + FLD({ k:'to', lb:'ช่วงประเมิน — ถึง', t:'date', req:true, p:true })
+        + FLD({ k:'openFrom', lb:'ช่วงเปิดกรอก — เริ่ม', t:'date', req:true, p:true })
+        + FLD({ k:'openTo', lb:'ช่วงเปิดกรอก — ถึง', t:'date', req:true, p:true })
+        + '</div></div>';
+    }
+    return '';
+  }
+  return '';
+}
+</script>
+<script>
+function reviewDL(){
+  const f = state.drawer.form, p = f.payload;
+  let rows = [
+    ['ชื่อค่า (ไทย)', f.nameTh], ['รหัสค่า', f.code], ['กลุ่มค่า', f.groupLb],
+    ['ขอบเขตบริษัท', f.scopeLb === 'เฉพาะบริษัท' ? f.companies.map(c=>comp(c).name).join(' · ') : 'ค่ากลาง (ทุกบริษัท)'],
+    ['ขอบเขตการใช้', f.appliesTo], ['รหัสอ้างอิงจ่ายเงิน', f.payrollCode || '—'],
+    ['ผู้รับผิดชอบ', emp(f.owner).name + ' · ' + emp(f.owner).pos]
+  ];
+  if(f.group === 'leave') rows = rows.concat([
+    ['หน่วยนับ', p.unit], ['จ่ายค่าจ้าง', p.paid === 'จ่ายบางส่วน' ? ('จ่ายบางส่วน '+p.paidPct+'%') : p.paid],
+    ['โควตาต่อปี', p.unlimited ? 'ไม่จำกัด' : (p.quota+' '+p.unit)],
+    ['ขั้นตามอายุงาน', (p.milestones||[]).length ? (p.milestones.map(m=>m.from+'-'+(m.to>=99?'ขึ้นไป':m.to)+' ปี = '+m.days+' '+p.unit).join(' · ')) : 'ไม่ใช้'],
+    ['ยกยอดสูงสุด', p.carry+' '+p.unit+(p.carry>0?(' · หมดอายุ '+(p.carryExp||'—')):'')],
+    ['prorate / ปัดเศษ', p.prorate+' · '+p.rounding],
+    ['กติกาการนับวัน', (p.countHoliday?'นับวันหยุด':'ไม่นับวันหยุด')+' · '+(p.halfDay?'ลาครึ่งวันได้':'ไม่มีครึ่งวัน')],
+    ['เอกสารแนบ', p.needDoc ? (p.docNote||'ต้องแนบ') : 'ไม่ต้องแนบ']
+  ]);
+  if(f.group === 'ot' && f.subLb === 'อัตรา OT') rows = rows.concat([
+    ['ประเภทอัตรา', p.rateType], ['ตัวคูณ', (+p.mult).toFixed(1)+'x'],
+    ['ฐานคำนวณ', p.base], ['เพดานชั่วโมง', p.cap+' ชม./สัปดาห์']
+  ]);
+  if(f.group === 'ot' && f.subLb === 'กะมาตรฐาน') rows = rows.concat([
+    ['เวลาทำงาน', p.shiftIn+' – '+p.shiftOut+(p.overnight?' (ข้ามวัน)':'')],
+    ['ช่วงพัก', (p.breakFrom||'—')+' – '+(p.breakTo||'—')],
+    ['ชั่วโมงทำงาน/วัน', shiftHours(p).toFixed(1)+' ชม.'],
+    ['วันทำงานในสัปดาห์', (p.days||[]).join(' · ') || '—']
+  ]);
+  if(f.group === 'holiday') rows = rows.concat([
+    ['ปี', p.year], ['สถานที่ / สาขา', p.location || 'ทุกสถานที่'], ['จำนวนวันหยุด', (p.days||[]).length+' วัน']
+  ]);
+  if(f.group === 'period') rows = rows.concat([
+    ['ความถี่', p.freq], ['วันตัดเวลา / วันจ่าย', p.cutDay+' / '+p.payDay],
+    ['รอบบันทึกเวลา', p.workPeriod], ['ล็อกงวดที่ปิดแล้ว', p.lockClosed?'ล็อก':'ไม่ล็อก']
+  ]);
+  if(f.group === 'appraisal') rows = rows.concat([
+    ['ปี', p.year], ['ช่วงประเมิน', be(p.from)+' – '+be(p.to)],
+    ['ช่วงเปิดกรอก', be(p.openFrom)+' – '+be(p.openTo)], ['ความถี่', p.freq]
+  ]);
+  rows.push(['วันมีผล', f.eff ? be(f.eff) : 'ยังไม่กำหนด']);
+  if(f.isNewVersion) rows.push(['เหตุผลการเปลี่ยน', f.reason || '—']);
+  return '<dl class="rev-dl">' + rows.map(r=>'<dt>'+esc(r[0])+'</dt><dd>'+esc(r[1]==null||r[1]===''?'—':r[1])+'</dd>').join('') + '</dl>';
+}
+function step3(){
+  const f = state.drawer.form, lu = lockedUntil();
+  let h = '<div class="sec"><div class="sec-h"><i data-lucide="calendar-check" class="w-4 h-4"></i><span>วันที่ค่านี้เริ่มมีผล</span></div><div class="grid2">'
+    + FLD({ k:'eff', lb:'วันมีผล', t:'date', req:true, tip:'ทุกค่าต้องมีวันมีผล เพื่อย้อนดูได้ว่าวันนั้นบริษัทใช้กติกาอะไร' })
+    + (f.isNewVersion ? FLD({ k:'reason', lb:'เหตุผลการเปลี่ยน', t:'textarea', req:true, ph:'อย่างน้อย 10 ตัวอักษร' }) : '')
+    + '</div>'
+    + (lu ? '<div class="hint-inline">ตั้งได้เร็วสุด '+be(lu)+'</div>' : '')
+    + '</div>';
+  h += '<div class="sec"><div class="sec-h"><i data-lucide="list-checks" class="w-4 h-4"></i><span>ตรวจสอบก่อนบันทึก</span></div>' + reviewDL() + '</div>';
+  return h;
+}
+function renderEditDrawer(){
+  const f = state.drawer.form, s = state.drawer.step, last = s === STEPS.length;
+  const busy = state.drawer.busy;
+  let h = '<div class="drawer-header"><div class="dw-head-row"><div class="min0">'
+    + '<div class="dw-eyebrow"><i data-lucide="'+grpOf(f.group).icon+'" class="w-3.5 h-3.5"></i><span>'+esc(f.groupLb)+'</span></div>'
+    + '<div class="dw-title">'+(f.isNewVersion ? 'สร้างเวอร์ชันใหม่ · '+esc(f.nameTh) : 'สร้างค่าใหม่')+'</div>'
+    + '<div class="dw-sub">ขั้นที่ '+s+' จาก '+STEPS.length+' · '+esc(STEPS[s-1])+(f.isNewVersion?(' · เวอร์ชันที่ '+f.verNo):'')+'</div>'
+    + '</div><div class="drawer-header-actions">'
+    + '<button class="top-icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-4 h-4"></i></button>'
+    + '</div></div></div>';
+  h += stepBand();
+  h += '<div class="drawer-body">' + errNote()
+     + (s === 3 ? step3() : stepFields())
+     + '</div>';
+  h += '<div class="drawer-footer">'
+     + '<button class="btn btn-ghost" onclick="closeDrawer()"><span>ยกเลิก</span></button>'
+     + (s > 1 ? '<button class="btn btn-secondary" onclick="gotoStep('+(s-1)+')"><i data-lucide="chevron-left" class="w-4 h-4"></i><span>ย้อนกลับ</span></button>' : '')
+     + '<span class="footer-spacer"></span><div class="dw-footer-right">'
+     + '<button class="btn btn-secondary'+(busy?' is-disabled':'')+'" onclick="saveDraft()"><i data-lucide="file-pen-line" class="w-4 h-4"></i><span>บันทึกร่าง</span></button>'
+     + (last
+        ? '<button class="btn btn-primary'+(busy?' is-disabled':'')+'" onclick="submitVersion()">'
+          + (busy ? '<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังบันทึก…</span>' : '<i data-lucide="check" class="w-4 h-4"></i><span>บันทึกและตั้งวันมีผล</span>') + '</button>'
+        : '<button class="btn btn-primary" onclick="gotoStep('+(s+1)+')"><span>ถัดไป</span><i data-lucide="chevron-right" class="w-4 h-4"></i></button>')
+     + '</div></div>';
+  return h;
+}
+</script>
+<script>
+/* ===== OPEN / VALIDATE / SAVE ===== */
+function blankPayload(g, sub){
+  if(g === 'leave') return { unit:'วัน', paid:'จ่าย', paidPct:100, quota:6, unlimited:false, accrual:'ต้นปี',
+    prorate:'ตามเดือน', rounding:'ครึ่งวันใกล้สุด', carry:0, carryExp:'', needDoc:false, docNote:'',
+    advDays:0, maxConsec:0, negative:0, countHoliday:false, halfDay:true, milestones:[] };
+  if(g === 'ot' && sub === 'shift') return { shiftIn:'08:00', shiftOut:'17:00', overnight:false, breakFrom:'12:00', breakTo:'13:00', days:['จ','อ','พ','พฤ','ศ'] };
+  if(g === 'ot') return { rateType:'OT วันทำงาน', mult:1.5, base:'ค่าจ้างรายชั่วโมง', cap:36 };
+  if(g === 'holiday') return { year:2027, location:'', days:[] };
+  if(g === 'period') return { freq:'รายเดือน', cutDay:25, payDay:30, lockClosed:true, workPeriod:'ใช้รอบเดียวกับรอบจ่าย', periods:[] };
+  if(g === 'appraisal') return { year:2027, from:'2027-01-01', to:'2027-06-30', openFrom:'2027-07-01', openTo:'2027-07-15', freq:'ปีละ 2' };
+  return {};
+}
+function defaultEff(){
+  const dt = new Date(TODAY+'T00:00:00Z');
+  const iso = isoOf(dt.getUTCFullYear(), dt.getUTCMonth()+1, 1);
+  const lu = lockedUntil();
+  return (lu && iso < lu) ? lu : iso;
+}
+function openCreate(){
+  if(!canEdit()) return showToast('บทบาท HR Staff ดูได้อย่างเดียว', 'warning');
+  const g = (state.tab === 'company') ? 'leave' : state.tab;
+  state.drawer = { open:true, mode:'create', recordId:null, step:1, tab:'detail', err:{}, busy:false,
+    form: { mode:'create', id:null, group:g, groupLb:grpOf(g).label, subLb:'อัตรา OT', code:'', nameTh:'', nameEn:'',
+      scopeLb:'ค่ากลาง (ทุกบริษัท)', companies:[], appliesTo:'ทั้งบริษัท', payrollCode:'', owner:'E-1001',
+      note:'', eff:defaultEff(), reason:'', isNewVersion:false, verNo:1, payload: blankPayload(g,'rate') } };
+  openPanel();
+}
+function openEdit(id){
+  if(!canEdit()) return showToast('บทบาท HR Staff ดูได้อย่างเดียว', 'warning');
+  const r = rec(id); if(!r) return;
+  const cv = curVer(r) || lastVer(r);
+  state.drawer = { open:true, mode:'edit', recordId:id, step:1, tab:'detail', err:{}, busy:false,
+    form: { mode:'edit', id:id, group:r.group, groupLb:grpOf(r.group).label,
+      subLb: r.sub === 'shift' ? 'กะมาตรฐาน' : 'อัตรา OT',
+      code:r.code, nameTh:r.nameTh, nameEn:r.nameEn,
+      scopeLb: r.scope === 'shared' ? 'ค่ากลาง (ทุกบริษัท)' : 'เฉพาะบริษัท',
+      companies:r.companies.slice(), appliesTo:r.appliesTo, payrollCode:r.payrollCode, owner:r.owner,
+      note:r.note, eff:defaultEff(), reason:'', isNewVersion:true, verNo:(lastVer(r)||{v:0}).v + 1,
+      payload: P(cv.payload) } };
+  openPanel();
+}
+function openView(id){
+  const r = rec(id); if(!r) return;
+  state.drawer = { open:true, mode:'view', recordId:id, step:1, tab:'detail', form:null, err:{}, busy:false };
+  openPanel();
+}
+function openPanel(){
+  render();
+  requestAnimationFrame(function(){
+    document.getElementById('drawerBackdrop').classList.add('is-open');
+    document.getElementById('drawer').classList.add('is-open');
+  });
+}
+function closeDrawer(){
+  const b = document.getElementById('drawerBackdrop'), d = document.getElementById('drawer');
+  if(b) b.classList.remove('is-open'); if(d) d.classList.remove('is-open');
+  setTimeout(function(){ state.drawer = { open:false, mode:null, recordId:null, step:1, tab:'detail', form:null, err:{}, busy:false }; render(); }, 280);
+}
+function gotoStep(n){
+  if(n > state.drawer.step && !validateStep(state.drawer.step)){ render(); showToast('ยังกรอกไม่ครบ ตรวจข้อความสีแดง', 'error'); return; }
+  state.drawer.step = Math.min(STEPS.length, Math.max(1, n));
+  state.drawer.err = {}; render();
+}
+function validateStep(s){
+  const f = state.drawer.form, p = f.payload, e = {};
+  if(s === 1){
+    if(!String(f.nameTh||'').trim()) e.nameTh = 'กรอกชื่อค่า (ไทย)';
+    if(!String(f.code||'').trim()) e.code = 'กรอกรหัสค่า';
+    else if(!/^[A-Z0-9-]+$/.test(f.code)) e.code = 'รหัสค่าใช้ได้เฉพาะตัวพิมพ์ใหญ่ ตัวเลข และเครื่องหมาย -';
+    else if(RECORDS.some(r=>r.code === f.code && r.id !== f.id && r.group === f.group)) e.code = 'รหัสค่านี้มีอยู่แล้วในกลุ่ม '+f.groupLb;
+    if(f.scopeLb === 'เฉพาะบริษัท' && !f.companies.length) e.companies = 'เลือกบริษัทอย่างน้อย 1 บริษัท';
+  }
+  if(s === 2){
+    if(f.group === 'leave'){
+      if(!p.unlimited && (p.quota === '' || +p.quota < 0)) e.quota = 'โควตาต้องไม่ติดลบ';
+      if(p.paid === 'จ่ายบางส่วน' && (+p.paidPct < 1 || +p.paidPct > 99)) e.paidPct = 'เปอร์เซ็นต์ที่จ่ายต้องอยู่ระหว่าง 1–99';
+      if(+p.carry < 0) e.carry = 'ยกยอดต้องไม่ติดลบ';
+      if(+p.carry > 0 && !String(p.carryExp||'').trim()) e.carryExp = 'ยกยอดมากกว่า 0 ต้องระบุวันหมดอายุยกยอด';
+      if(p.needDoc && !String(p.docNote||'').trim()) e.docNote = 'ระบุเอกสารที่ต้องแนบ';
+      const ms = (p.milestones||[]).slice().sort((a,b)=>a.from-b.from);
+      for(let i=0;i<ms.length;i++){
+        if(+ms[i].to < +ms[i].from) e.milestones = 'ขั้นที่ '+(i+1)+' มีปีสิ้นสุดน้อยกว่าปีเริ่ม';
+        if(i && +ms[i].from <= +ms[i-1].to) e.milestones = 'ช่วงอายุงานทับซ้อนกันที่ขั้นที่ '+(i+1);
+        else if(i && +ms[i].from > +ms[i-1].to + 1) e.milestones = 'ช่วงอายุงานมีช่องว่างระหว่างขั้นที่ '+i+' กับ '+(i+1);
+      }
+    }
+    if(f.group === 'ot' && f.subLb === 'อัตรา OT'){
+      const min = OT_MIN[p.rateType];
+      if(p.mult === '' || isNaN(+p.mult)) e.mult = 'กรอกตัวคูณ';
+      else if(+p.mult < min) e.mult = 'ตัวคูณต่ำกว่าขั้นต่ำตามกฎหมายแรงงาน — '+p.rateType+' ต้องไม่น้อยกว่า '+min.toFixed(1)+' เท่า';
+      if(!(+p.cap > 0)) e.cap = 'เพดานชั่วโมงต้องมากกว่า 0';
+    }
+    if(f.group === 'ot' && f.subLb === 'กะมาตรฐาน'){
+      if(!p.overnight && p.shiftOut <= p.shiftIn) e.shiftOut = 'เวลาออกต้องมากกว่าเวลาเข้า หรือติ๊ก “กะข้ามวัน”';
+      if(p.breakFrom && p.breakTo){
+        const inShift = p.overnight ? true : (p.breakFrom >= p.shiftIn && p.breakTo <= p.shiftOut);
+        if(!inShift) e.breakFrom = 'ช่วงพักต้องอยู่ในช่วงเวลาของกะ';
+      }
+      if(!(p.days||[]).length) e.days = 'เลือกวันทำงานอย่างน้อย 1 วัน';
+    }
+    if(f.group === 'holiday'){
+      if(!(+p.year > 0)) e.year = 'กรอกปี';
+      const seen = {}; let dupMsg = '';
+      (p.days||[]).forEach(function(d){
+        if(!d.date || !String(d.name||'').trim()) dupMsg = dupMsg || 'กรอกวันที่และชื่อวันหยุดให้ครบทุกแถว';
+        else if(seen[d.date]) dupMsg = 'วันที่ '+be(d.date)+' ซ้ำกับ “'+seen[d.date]+'” ในชุดปฏิทินนี้';
+        else seen[d.date] = d.name;
+        if(d.type === 'วันหยุดชดเชย' && !d.src) dupMsg = dupMsg || 'วันหยุดชดเชยต้องอ้างวันหยุดต้นทาง';
+      });
+      if(dupMsg) e.days = dupMsg;
+      const other = RECORDS.filter(r=>r.group==='holiday' && r.id!==f.id && (r.scope==='shared') === (f.scopeLb!=='เฉพาะบริษัท'));
+      other.forEach(function(r){
+        const cv2 = lastVer(r); if(!cv2 || cv2.payload.year !== +p.year) return;
+        if((cv2.payload.location||'') !== (p.location||'')) return;
+        (p.days||[]).forEach(function(d){
+          if((cv2.payload.days||[]).some(x=>x.date === d.date))
+            e.days = 'วันที่ '+be(d.date)+' มีอยู่แล้วในชุด “'+r.nameTh+'” ของบริษัทและปีเดียวกัน';
+        });
+      });
+    }
+    if(f.group === 'period'){
+      if(!(+p.cutDay >= 1 && +p.cutDay <= 31)) e.cutDay = 'วันตัดเวลาต้องอยู่ระหว่าง 1–31';
+      if(!(+p.payDay >= 1 && +p.payDay <= 31)) e.payDay = 'วันจ่ายต้องอยู่ระหว่าง 1–31';
+      if(+p.cutDay > +p.payDay) e.payDay = 'วันตัดเวลาต้องไม่เกินวันจ่ายในงวดเดียวกัน';
+    }
+    if(f.group === 'appraisal'){
+      if(!(p.from && p.to && p.from < p.to)) e.to = 'ช่วงประเมินต้องเริ่มก่อนสิ้นสุด';
+      if(!(p.openFrom && p.openTo && p.openFrom <= p.openTo)) e.openTo = 'ช่วงเปิดกรอกต้องเริ่มก่อนสิ้นสุด';
+      if(p.openFrom && p.from && p.openFrom < p.from) e.openFrom = 'ช่วงเปิดกรอกต้องอยู่หลังหรือคร่อมช่วงประเมิน';
+      RECORDS.filter(r=>r.group==='appraisal' && r.id!==f.id).forEach(function(r){
+        const q = lastVer(r); if(!q) return;
+        if(+q.payload.year !== +p.year) return;
+        if(p.from <= q.payload.to && q.payload.from <= p.to)
+          e.from = 'ช่วงวันทับซ้อนกับรอบ “'+r.nameTh+'” ('+be(q.payload.from)+' – '+be(q.payload.to)+')';
+      });
+    }
+  }
+  if(s === 3){
+    if(!f.eff) e.eff = 'ต้องกรอกวันมีผลก่อนบันทึก (บันทึกร่างไว้ก่อนได้)';
+    else {
+      const lp = lockedPeriodOf(f.eff);
+      if(lp) e.eff = 'ตั้งวันมีผลย้อนเข้างวด '+lp.no+' ที่ปิดแล้วไม่ได้ — วันที่ตั้งได้เร็วที่สุดคือ '+be(lockedUntil());
+      const r = f.id ? rec(f.id) : null;
+      if(r && r.versions.some(x=>x.eff === f.eff && x.state !== 'draft' && x.state !== 'cancelled'))
+        e.eff = 'มีเวอร์ชันที่ใช้วันมีผลนี้อยู่แล้ว — เลือกวันอื่น';
+    }
+    if(f.isNewVersion && String(f.reason||'').trim().length < 10) e.reason = 'กรอกเหตุผลการเปลี่ยนอย่างน้อย 10 ตัวอักษร';
+  }
+  state.drawer.err = e;
+  return Object.keys(e).length === 0;
+}
+</script>
+<script>
+function applyHeader(r, f){
+  r.nameTh = f.nameTh; r.nameEn = f.nameEn; r.code = f.code;
+  r.scope = (f.scopeLb === 'เฉพาะบริษัท') ? 'company' : 'shared';
+  r.companies = (r.scope === 'company') ? f.companies.slice() : [];
+  r.appliesTo = f.appliesTo; r.payrollCode = f.payrollCode; r.owner = f.owner; r.note = f.note;
+  if(f.group === 'ot') r.sub = (f.subLb === 'กะมาตรฐาน') ? 'shift' : 'rate';
+}
+function saveDraft(){
+  const f = state.drawer.form;
+  if(!String(f.nameTh||'').trim()){ state.drawer.err = { nameTh:'กรอกชื่อค่าก่อนบันทึกร่าง' }; state.drawer.step = 1; render(); return; }
+  let r = f.id ? rec(f.id) : null;
+  if(!r){
+    r = mk('R'+Date.now().toString().slice(-5), f.group, f.code || 'NEW-'+Date.now().toString().slice(-4), f.nameTh, f.nameEn, {});
+    RECORDS.push(r); f.id = r.id;
+  }
+  applyHeader(r, f);
+  r.versions.push(v((lastVer(r)||{v:0}).v + 1, '', 'draft', normPayload(P(f.payload)), 'E-1001', new Date().toISOString().slice(0,16), ''));
+  closeDrawer();
+  setTimeout(function(){ showToast('บันทึกร่างแล้ว — ยังไม่มีผลกับ feature ใด', 'success'); }, 300);
+}
+function submitVersion(){
+  if(!validateStep(3)){ render(); showToast('ยังตั้งวันมีผลไม่ได้ ตรวจข้อความสีแดง', 'error'); return; }
+  const f = state.drawer.form, p = f.payload;
+  const lowQuota = (f.group === 'leave' && f.code.indexOf('VAC') >= 0 && !p.unlimited && +p.quota < LEAVE_MIN_VAC);
+  if(lowQuota && !f.quotaAck){ openModal('quota', { quota:+p.quota }); return; }
+  state.drawer.busy = true; render();
+  setTimeout(function(){
+    let r = f.id ? rec(f.id) : null;
+    if(!r){
+      r = mk('R'+Date.now().toString().slice(-5), f.group, f.code, f.nameTh, f.nameEn, {});
+      RECORDS.push(r); f.id = r.id;
+    }
+    applyHeader(r, f);
+    r.versions.filter(x=>x.state === 'draft').forEach(x=>{ x.state = 'cancelled'; });
+    const st = (f.eff <= TODAY) ? 'active' : 'scheduled';
+    if(st === 'active') r.versions.filter(x=>x.state === 'active').forEach(x=>{ x.state = 'superseded'; });
+    r.versions.push(v((lastVer(r)||{v:0}).v + 1, f.eff, st, normPayload(P(p)), 'E-1001', new Date().toISOString().slice(0,16), f.reason));
+    r.archived = false;
+    state.drawer.busy = false;
+    closeDrawer();
+    setTimeout(function(){ showToast(st === 'active' ? 'บันทึกแล้ว — มีผลตั้งแต่วันนี้' : ('บันทึกแล้ว — จะมีผล '+be(f.eff)), 'success'); }, 300);
+  }, 650);
+}
+function genPeriods(id){
+  if(!canEdit()) return showToast('บทบาท HR Staff ดูได้อย่างเดียว', 'warning');
+  const r = rec(id), cv = curVer(r) || lastVer(r); if(!cv) return;
+  const p = cv.payload;
+  const yr = (new Date((cv.eff||TODAY)+'T00:00:00Z')).getUTCFullYear() + 1;
+  const list = [];
+  for(let m = 0; m < 12; m++){
+    const to = isoOf(yr, m, +p.cutDay);
+    const from = addDays(isoOf(yr, m-1, +p.cutDay), 1);
+    const pay = isoOf(yr, m, +p.payDay);
+    list.push({ no:(yr+543).toString().slice(1)+'-'+d2(m+1), from:from, to:to, pay:pay, status:'open', by:'', at:'' });
+  }
+  p.periods = list;
+  render();
+  showToast('สร้างงวดปี '+(yr+543)+' ครบ 12 งวดแล้ว', 'success');
+}
+function normPayload(p){
+  ['quota','paidPct','carry','advDays','maxConsec','negative','mult','cap','year','cutDay','payDay'].forEach(function(k){
+    if(p[k] !== undefined && p[k] !== '' && !isNaN(+p[k])) p[k] = +p[k];
+  });
+  (p.milestones||[]).forEach(function(m){ m.from = +m.from; m.to = +m.to; m.days = +m.days; });
+  return p;
+}
+/* ===== MODALS (Pattern D) ===== */
+function askDeactivate(id){ if(!canEdit()) return showToast('บทบาท HR Staff ดูได้อย่างเดียว','warning'); openModal('deactivate', { id:id }); }
+function askReactivate(id){ if(!canEdit()) return showToast('บทบาท HR Staff ดูได้อย่างเดียว','warning'); openModal('reactivate', { id:id }); }
+function askCancelVersion(id){ if(!canEdit()) return showToast('บทบาท HR Staff ดูได้อย่างเดียว','warning'); openModal('cancelver', { id:id }); }
+function askClosePeriod(id, i){ if(!canEdit()) return showToast('บทบาท HR Staff ดูได้อย่างเดียว','warning'); openModal('closeper', { id:id, i:i }); }
+function askReopenPeriod(id, i){ if(!canEdit()) return showToast('บทบาท HR Staff ดูได้อย่างเดียว','warning'); openModal('reopenper', { id:id, i:i }); }
+function mReason(ph){
+  return '<div class="field"><label class="field-label">เหตุผล<span class="req">*</span></label>'
+    + '<textarea class="input" name="mreason" rows="2" class="ta-auto" placeholder="'+esc(ph)+'" oninput="state.modal.reason=this.value"></textarea>'
+    + (state.modal.err?'<div class="field-error" class="on">'+esc(state.modal.err)+'</div>':'')+'</div>';
+}
+function renderModal(){
+  const m = state.modal; if(!m.open) return '';
+  const r = m.data && m.data.id ? rec(m.data.id) : null;
+  if(m.type === 'deactivate'){
+    const list = usedBy(r);
+    return '<div class="modal-header"><div class="modal-header-icon is-warning"><i data-lucide="archive" class="w-5 h-5"></i></div>'
+      + '<div><h3 class="modal-title">ปิดใช้ “'+esc(r.nameTh)+'”</h3>'
+      + '<p class="modal-subtitle">ค่านี้จะถูกเก็บถาวรแบบปิดใช้ เลือกใหม่ไม่ได้ แต่ข้อมูลเดิมที่อ้างค่านี้ยังเปิดอ่านได้ และไม่มีการลบถาวร</p></div></div>'
+      + '<div class="modal-body">'
+      + (list.length ? '<div class="note note-warn"><i data-lucide="share-2" class="w-4 h-4"></i><div>มี '+list.length+' feature ที่ใช้ค่านี้อยู่</div></div>'
+          + list.map(c=>'<div class="wu-row"><i data-lucide="corner-down-right" class="w-4 h-4 text-mute-2"></i>'
+            + '<div><div class="wu-nm">'+esc(c.name)+'</div><div class="wu-mt">'+esc(c.code)+' · แผนพัฒนา '+c.wave+'</div></div>'
+            + '<div class="mla">'+(c.ready?'<span class="pill pill-success">พร้อมใช้</span>':'<span class="pill pill-muted">ยังไม่ทำ</span>')+'</div></div>').join('')
+          : '<div class="hint-inline">ยังไม่มี feature ใดอ้างค่านี้</div>')
+      + mReason('เช่น ไม่มีการใช้สิทธิ์ต่อเนื่อง 3 ปี') + '</div>'
+      + '<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()"><span>ยกเลิก</span></button>'
+      + '<button class="btn btn-danger btn-eq" onclick="doDeactivate()"><i data-lucide="archive" class="w-4 h-4"></i><span>ปิดใช้</span></button></div>';
+  }
+  if(m.type === 'reactivate'){
+    return '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="rotate-ccw" class="w-5 h-5"></i></div>'
+      + '<div><h3 class="modal-title">เปิดใช้ “'+esc(r.nameTh)+'” กลับ</h3>'
+      + '<p class="modal-subtitle">การเปิดใช้กลับต้องสร้างเวอร์ชันใหม่พร้อมวันมีผล เพื่อให้ย้อนดูได้ว่าเปิดกลับตั้งแต่วันไหน</p></div></div>'
+      + '<div class="modal-body"><div class="hint-inline">กดต่อไปเพื่อกรอกค่าและวันมีผลของเวอร์ชันใหม่</div></div>'
+      + '<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()"><span>ยกเลิก</span></button>'
+      + '<button class="btn btn-primary btn-eq" onclick="doReactivate()"><i data-lucide="chevron-right" class="w-4 h-4"></i><span>ต่อไป</span></button></div>';
+  }
+  if(m.type === 'cancelver'){
+    const nv = nextVer(r);
+    return '<div class="modal-header"><div class="modal-header-icon is-warning"><i data-lucide="calendar-x" class="w-5 h-5"></i></div>'
+      + '<div><h3 class="modal-title">ยกเลิกเวอร์ชันที่รอมีผล</h3>'
+      + '<p class="modal-subtitle">'+esc(r.nameTh)+' · เวอร์ชัน '+(nv?nv.v:'')+' ที่ตั้งไว้ให้มีผล '+(nv?be(nv.eff):'')+' ค่าที่ใช้อยู่ปัจจุบันจะใช้ต่อไป</p></div></div>'
+      + '<div class="modal-body">' + mReason('เช่น เลื่อนการบังคับใช้ตามมติที่ประชุม') + '</div>'
+      + '<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()"><span>ไม่ยกเลิก</span></button>'
+      + '<button class="btn btn-danger btn-eq" onclick="doCancelVersion()"><span>ยกเลิกเวอร์ชัน</span></button></div>';
+  }
+  if(m.type === 'closeper' || m.type === 'reopenper'){
+    const cv = curVer(r) || lastVer(r), x = cv.payload.periods[m.data.i], closing = (m.type === 'closeper');
+    return '<div class="modal-header"><div class="modal-header-icon '+(closing?'':'is-warning')+'"><i data-lucide="'+(closing?'lock':'unlock')+'" class="w-5 h-5"></i></div>'
+      + '<div><h3 class="modal-title">'+(closing?'ปิดงวด ':'เปิดงวด ')+esc(x.no)+(closing?'':' กลับ')+'</h3>'
+      + '<p class="modal-subtitle">'+be(x.from)+' – '+be(x.to)+' · จ่าย '+be(x.pay)+'</p></div></div>'
+      + '<div class="modal-body">'
+      + (closing ? '<div class="note note-warn"><i data-lucide="alert-triangle" class="w-4 h-4"></i><div>ปิดแล้วตั้งวันมีผลย้อนเข้างวดนี้ไม่ได้อีก</div></div>' : mReason('เหตุผลที่ต้องเปิดงวดกลับ'))
+      + '</div>'
+      + '<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()"><span>ยกเลิก</span></button>'
+      + '<button class="btn '+(closing?'btn-primary':'btn-danger')+' btn-eq" onclick="doPeriod('+(closing?'true':'false')+')"><span>'+(closing?'ปิดงวด':'เปิดงวดกลับ')+'</span></button></div>';
+  }
+  if(m.type === 'quota'){
+    return '<div class="modal-header"><div class="modal-header-icon is-warning"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div>'
+      + '<div><h3 class="modal-title">โควตาต่ำกว่าขั้นต่ำตามกฎหมาย</h3>'
+      + '<p class="modal-subtitle">โควตาลาพักร้อน '+m.data.quota+' วันต่อปี ต่ำกว่าขั้นต่ำ '+LEAVE_MIN_VAC+' วันต่อปี สำหรับพนักงานที่ทำงานครบ 1 ปี ยืนยันเพื่อบันทึกต่อได้</p></div></div>'
+      + '<div class="modal-body"><div class="hint-inline">รายการนี้จะถูกบันทึกไว้ในประวัติเวอร์ชันพร้อมผู้ยืนยัน</div></div>'
+      + '<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()"><span>กลับไปแก้</span></button>'
+      + '<button class="btn btn-primary btn-eq" onclick="ackQuota()"><span>ยืนยันบันทึก</span></button></div>';
+  }
+  return '';
+}
+</script>
+<script>
+function needReason(){
+  if(String(state.modal.reason||'').trim().length < 10){ state.modal.err = 'กรอกเหตุผลอย่างน้อย 10 ตัวอักษร'; render(); return false; }
+  return true;
+}
+function doDeactivate(){
+  if(!needReason()) return;
+  const r = rec(state.modal.data.id);
+  r.archived = true;
+  r.versions.filter(x=>x.state === 'active' || x.state === 'scheduled').forEach(x=>{ x.state = 'inactive'; });
+  const lv = lastVer(r); if(lv){ lv.reason = state.modal.reason; lv.by = 'E-1001'; lv.at = new Date().toISOString().slice(0,16); }
+  closeModal(); render();
+  showToast('ปิดใช้แล้ว — ข้อมูลเดิมที่อ้างค่านี้ยังอ่านได้', 'success');
+}
+function doReactivate(){
+  const id = state.modal.data.id;
+  closeModal();
+  setTimeout(function(){ const r = rec(id); r.archived = false; openEdit(id); state.drawer.form.reason = 'เปิดใช้ค่ากลับตามมติฝ่ายบุคคล'; render(); }, 220);
+}
+function doCancelVersion(){
+  if(!needReason()) return;
+  const r = rec(state.modal.data.id), nv = nextVer(r);
+  if(nv){ nv.state = 'cancelled'; nv.reason = state.modal.reason; nv.by = 'E-1001'; nv.at = new Date().toISOString().slice(0,16); }
+  closeModal(); render();
+  showToast('ยกเลิกเวอร์ชันที่รอมีผลแล้ว', 'success');
+}
+function doPeriod(closing){
+  if(!closing && !needReason()) return;
+  const r = rec(state.modal.data.id), cv = curVer(r) || lastVer(r), x = cv.payload.periods[state.modal.data.i];
+  if(closing){ x.status = 'closed'; x.by = 'E-1001'; x.at = TODAY; }
+  else { x.status = 'open'; x.by = ''; x.at = ''; }
+  closeModal(); render();
+  showToast(closing ? ('ปิดงวด '+x.no+' แล้ว') : ('เปิดงวด '+x.no+' กลับแล้ว'), 'success');
+}
+function ackQuota(){
+  state.drawer.form.quotaAck = true;
+  closeModal();
+  setTimeout(submitVersion, 220);
+}
+function openModal(type, data){
+  state.modal = { open:true, type:type, data:data, reason:'', busy:false, err:'' };
+  render();
+  requestAnimationFrame(function(){ document.getElementById('modalBackdrop').classList.add('is-open'); });
+}
+function closeModal(){
+  const b = document.getElementById('modalBackdrop'); if(b) b.classList.remove('is-open');
+  setTimeout(function(){ state.modal = { open:false, type:null, data:null, reason:'', busy:false, err:'' }; }, 200);
+}
+
+/* ===== ROUTER + RENDER ===== */
+function routeTab(){
+  const m = (location.hash || '').match(/^#\/hr-config\/([a-z]+)/);
+  return (m && TABS.some(t=>t.k === m[1])) ? m[1] : 'leave';
+}
+function initCombos(){
+  if(!(state.drawer.open && state.drawer.mode !== 'view' && state.drawer.step === 1)) return;
+  const f = state.drawer.form;
+  if(document.getElementById('ss-owner')) initSearchSelect('owner', {
+    options: empOptions(), value: f.owner,
+    onSelect: function(val){ if(val){ f.owner = val; render(); } } });
+  if(document.getElementById('ss-company')) initSearchSelect('company', {
+    options: companyOptions().filter(o=>f.companies.indexOf(o.value) < 0), value: null,
+    emptyText: 'เลือกครบทุกบริษัทแล้ว',
+    onSelect: function(val){ if(val && f.companies.indexOf(val) < 0){ f.companies.push(val); delete state.drawer.err.companies; render(); } } });
+}
+function dropCompany(id){
+  const f = state.drawer.form, i = f.companies.indexOf(id);
+  if(i >= 0) f.companies.splice(i, 1);
+  render();
+}
+function render(){
+  const snap = preserveRenderState();
+  state.tab = routeTab();
+  const pc = document.getElementById('page-content');
+  if(pc) pc.innerHTML = renderPage();
+  const dr = document.getElementById('drawer');
+  if(dr) dr.innerHTML = state.drawer.open
+      ? (state.drawer.mode === 'view' ? renderViewDrawer(rec(state.drawer.recordId)) : renderEditDrawer())
+      : '';
+  const mo = document.querySelector('#modalBackdrop .modal');
+  if(mo) mo.innerHTML = renderModal();
+  renderIcons();
+  initCombos();
+  restoreRenderState(snap);
+}
+window.addEventListener('hashchange', function(){ state.pagination.page = 1; render(); });
+</script>
+<style id="page-late">/* late additions เท่านั้น (#69) — ห้าม inline */
+:root{--z-demo:45;}
+.content{padding-bottom:56px;}
+.page-fill{min-height:calc(100dvh - 148px);max-height:calc(100dvh - 148px);}
+@media (max-width:1180px){ .page-fill{min-height:calc(100dvh - 140px);max-height:calc(100dvh - 140px);} }
+.bar-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.mla{margin-left:auto;}
+.min0{min-width:0;}
+.tar{text-align:right;}
+.pos-rel{position:relative;}
+.ta-auto{height:auto;padding:8px 12px;}
+.row-wrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+.field-error.on{visibility:visible;}
+.row-bad{background:#FFE9E7;}
+.w110{width:110px;} .w120{width:120px;} .w150{width:150px;} .w168{width:168px;} .w44{width:44px;}
+</style>
+<!-- PREFLIGHT v6.4
+  round1: spacing-off=7 font-sizes=5 flex-noalign=1 inline-layout=0 z-adhoc=0 hex-off=3
+  round2: 7/7 checked
+  date: 2026-08-28
+  feature: F-HR-CONFIG HR Configuration (tang-kha-HR) archetype master/config A+B+C
+  note: spacing-off/font/flex/hex ที่เหลือทั้งหมดอยู่ใน BASE-KIT (Rule #69 ห้ามแก้) — page CSS = 0 ทุกตัวนับ
+  gates: audit.sh FAIL=0 WARN=3 (kit) · node --check OK · render gate GEOMETRY_BLOCK=0 pageerror=0
+  -->
+</body>
+</html>

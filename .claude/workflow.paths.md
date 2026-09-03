@@ -7,7 +7,7 @@
 
 | บทบาท | path จริง | สถานะ |
 |---|---|---|
-| `CENTRAL_PLAN` | `Central Plan v2/` | ✅ ยืนยันแล้ว 2026-08-18 |
+| `CENTRAL_PLAN` | `Cube_Feature_List/` | ✅ PM สั่งเปลี่ยน 2026-09-02 (เดิม `Central Plan v2/` = เลิกใช้) |
 | `BRIEF_ROOT` | `Pack Brief Feature/` | ✅ ยืนยันแล้ว 2026-08-18 |
 | `OUTPUT_ROOT` | `outputs/` | ✅ ยืนยันแล้ว 2026-08-18 |
 | `SHARED_E2E` | `outputs/_SHARED/_e2e/` | ✅ (มี `uikit.py`) |
@@ -19,6 +19,7 @@
 ## กติกาการอ้างถึง
 
 - อ่าน `CENTRAL_PLAN` = **`ls` ก่อนเสมอ แล้วอ่านทุกไฟล์ที่เจอ** — ห้ามล็อกรายชื่อไฟล์ไว้ในเอกสารใด ๆ
+  - ⚠️ ตั้งแต่ 2026-09-02 `CENTRAL_PLAN` = `Cube_Feature_List/` (ทะเบียน feature: แต่ละแถวมี `wave·st·dec·dep·arch`) — **contract ระดับแผนของ feature = แถวของมันเอง + `dep`** (ไม่มี edge flow เข้า/ออก + Global Contracts ละเอียดแบบ Central Plan v2 เดิมแล้ว)
 - `BRIEF_ROOT` เป็นแค่ **ที่ตั้งต้นของการค้นหา** — โฟลเดอร์ย่อยของแต่ละ feature ยัง **ต้องถามผู้ใช้ทุกครั้ง**
 - feature หนึ่งตัว = 1 โฟลเดอร์ใน `OUTPUT_ROOT` ชื่อเดียวกับรหัส feature
 
