@@ -1635,3 +1635,178 @@ def modal_autoopens_comboboxes(pg, root_sel='#modalBackdrop .modal'):
     if isinstance(r, dict) and r.get('error'):
         raise AssertionError(f"modal_autoopens_comboboxes: {r['error']}")
     return r
+
+
+# ⭐ เพิ่ม 2026-09-08 (F-HR-WELFARE) — ผู้ใช้เจอ "NaN" โผล่เป็นข้อความบนจอที่ตัววัดเดิมมองไม่เห็น (§C3.8)
+#
+# ที่มา: มุมมองสวัสดิการ (benefit-view drawer) แถว "ครอบผู้ติดตาม" เรนเดอร์คำว่า `NaN` ตรง ๆ
+#   ต้นเหตุคือ unary `+` หลง (`... + + kv(...)`) บีบสตริง HTML ที่ kv() คืนมาให้เป็น Number → NaN
+#   แล้ว NaN ถูก concat กลับเป็นสตริง → ผู้ใช้เห็นคำว่า "NaN" คาช่องค่า
+#
+# เป็น "คลาส" ของบั๊ก ไม่ใช่จุดเดียว: NaN / undefined / null / [object Object] / Invalid Date
+#   รั่วออกมาเป็น **ข้อความที่มองเห็น** เพราะ JS coercion/typo — เรนเดอร์ออกมาปกติทุกอย่าง
+#   แต่เนื้อหาเป็นขยะ
+#
+# ทำไมตัววัดเดิมมองไม่เห็นเลยสักตัว:
+#   · self_audit / audit.sh เทียบ "ข้อความต้นฉบับในไฟล์" — คำว่า NaN ไม่ได้อยู่ในซอร์ส
+#     มันเกิด "ตอนรันไทม์" จากการคำนวณ จึงไม่มีสตริงให้ grep เจอ
+#   · JS_LAYOUT / JS_OVERLAY_STACK / affordance ฯลฯ วัด "เรขาคณิต/พฤติกรรม" ไม่เคยอ่าน
+#     "เนื้อความ" ว่าเป็นค่าที่มีความหมายมั้ย — NaN กินพื้นที่ 26px เหมือนข้อความปกติทุกประการ
+#   · e2e เดิม assert เฉพาะฟิลด์ที่มันจงใจเช็ค — ช่องที่ไม่ได้ระบุใน assertion รอดสายตาหมด
+# ตัวนี้จึงกวาด "text node ที่มองเห็นจริง" ทั้งฉาก แล้วถามตรง ๆ ว่ามี garbage token คา DOM มั้ย
+#
+# กันสัญญาณหลอก: ข้าม <script>/<style>/<textarea>/<template> · ข้าม node ที่ซ่อน (display/
+#   visibility/opacity หรือ Range rect = 0) · จับเป็น "คำเดี่ยว" (\b) ไม่ใช่ substring
+#   (เช่น "annuller"/"nullable" ไม่โดน) · มี allowlist opt-in เผื่อข้อความที่ตั้งใจมีคำพวกนี้จริง
+JS_GARBAGE_TEXT = r"""
+(arg) => {
+  const scopeSel = arg && arg.scope;
+  const allow = (arg && arg.allow) || [];
+  const root = scopeSel ? document.querySelector(scopeSel) : document.body;
+  if (!root) return { error: 'no-scope:' + scopeSel };
+  // garbage token ที่รั่วเป็นข้อความเพราะ coercion/typo (จับเป็นคำเดี่ยว ไม่ใช่ substring)
+  const TOKENS = [
+    { re: /\bNaN\b/, name: 'NaN' },
+    { re: /\bundefined\b/, name: 'undefined' },
+    { re: /\bnull\b/, name: 'null' },
+    { re: /\[object Object\]/, name: '[object Object]' },
+    { re: /\bInvalid Date\b/, name: 'Invalid Date' },
+  ];
+  const SKIP_TAGS = new Set(['SCRIPT', 'STYLE', 'TEXTAREA', 'NOSCRIPT', 'TEMPLATE']);
+  const hidden = el => {
+    for (let p = el; p && p.nodeType === 1; p = p.parentElement) {
+      const cs = getComputedStyle(p);
+      if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity || '1') < 0.05)
+        return true;
+    }
+    return false;
+  };
+  const out = [], seen = new Set();
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+  let node;
+  while ((node = walker.nextNode())) {
+    const t = node.nodeValue || '';
+    if (!t.trim()) continue;
+    const parent = node.parentElement;
+    if (!parent || SKIP_TAGS.has(parent.tagName)) continue;
+    if (allow.some(a => t.includes(a))) continue;           // allowlist opt-in
+    let visible = !hidden(parent);
+    if (visible) {                                           // Range rect กัน node ที่กว้าง/สูง 0
+      try {
+        const rg = document.createRange(); rg.selectNodeContents(node);
+        const r = rg.getBoundingClientRect();
+        if (r.width < 1 && r.height < 1) visible = false;
+      } catch (e) {}
+    }
+    if (!visible) continue;
+    for (const tok of TOKENS) {
+      if (!tok.re.test(t)) continue;
+      const key = tok.name + '|' + t.trim().slice(0, 40) + '|' + (parent.className || parent.tagName);
+      if (seen.has(key)) continue; seen.add(key);
+      out.push({
+        token: tok.name,
+        text: t.trim().replace(/\s+/g, ' ').slice(0, 60),
+        tag: parent.tagName.toLowerCase(),
+        cls: (parent.className || '').toString().slice(0, 44),
+      });
+    }
+  }
+  return out;
+}
+"""
+
+
+def garbage_text_leaks(pg, scope=None, allow=None):
+    """คืนรายการ garbage token (NaN/undefined/null/[object Object]/Invalid Date) ที่รั่วเป็น
+    "ข้อความที่มองเห็น" บนหน้า/overlay/drawer ปัจจุบัน
+
+    (F-HR-WELFARE 2026-09-08 · §C3.8 — NaN leak ในช่อง "ครอบผู้ติดตาม" ของ benefit-view drawer)
+    สแกน text node ที่เรนเดอร์จริงเท่านั้น — ข้าม <script>/<style>/<textarea>, ข้าม node ที่ซ่อน,
+    จับเป็นคำเดี่ยว (word boundary) ไม่ใช่ substring · คืน [] = สะอาด
+
+    scope : selector จำกัดขอบเขต (เช่น '#drawer' · '#modalBackdrop .modal') · None = ทั้ง body
+    allow : list สตริงที่ยอมให้มี (opt-in) — ข้าม text node ที่มีสตริงนั้นเป็น substring
+    """
+    r = pg.evaluate(JS_GARBAGE_TEXT, {'scope': scope, 'allow': allow or []})
+    if isinstance(r, dict) and r.get('error'):
+        raise AssertionError(f"garbage_text_leaks: {r['error']}")
+    return r
+
+
+def assert_no_garbage_text(pg, scope=None, allow=None):
+    """assert ว่าไม่มี garbage token (NaN/undefined/null/[object Object]/Invalid Date) รั่วเป็น
+    ข้อความบนจอ — คืน [] ถ้าผ่าน · โยน AssertionError พร้อมจุดที่เจอถ้าพัง (F-HR-WELFARE §C3.8)
+    """
+    leaks = garbage_text_leaks(pg, scope=scope, allow=allow)
+    assert not leaks, f"garbage text รั่วเป็นข้อความบนจอ: {leaks[:8]}"
+    return leaks
+
+
+# ⭐ เพิ่ม 2026-09-08 (F-HR-WELFARE) — ผู้ใช้เจอชื่อคนกับตำแหน่ง/แผนกในเซลล์บุคคลชนกันบรรทัดเดียว (§C3.8)
+#
+# ที่มา: เซลล์บุคคลในรายการคำขอ (.tbl-person) ประกอบด้วย .pmain ที่ห่อ .pn (ชื่อ) และ .pm (ตำแหน่ง·แผนก)
+#   .pn / .pm เป็น <span> = inline → ต้องพึ่ง .pmain เป็น flex-direction:column ถึงจะขึ้นบรรทัดใหม่
+#   .pmain หล่น display:flex;flex-direction:column ไป → .pn กับ .pm ไหลต่อกันบรรทัดเดียว
+#   ("สุนิสา วงศ์ทองนักบัญชี · ฝ่ายบัญชี") ชื่อชนตำแหน่งอ่านเป็นก้อนเดียว
+#
+# ทำไมตัววัดเดิมมองไม่เห็น:
+#   · JS_LAYOUT ข้อ 8 (deadStyle) จับ inline ที่มี margin/width ตายเฉพาะที่ *ตัว inline เอง* ตั้ง style ไว้
+#     — เคสนี้ .pn/.pm ไม่ได้ตั้ง margin แนวตั้ง การขึ้นบรรทัดมาจาก "พ่อ" (.pmain) จึงรอด
+#   · textOverflow/cellOverflow วัด "ล้นกรอบ" — ที่นี่ไม่ล้น แค่ "อยู่บรรทัดเดียวกัน" ซึ่งไม่มีข้อไหนถาม
+#   · rowTopMix เทียบเฉพาะ input/select/button ในแถวตาราง ไม่แตะ span ในเซลล์บุคคล
+# ตัวนี้ถามตรง ๆ ว่า "บรรทัดตำแหน่ง (.pm) อยู่ใต้บรรทัดชื่อ (.pn) จริงมั้ย" — meta.top ต้อง ≥ name.bottom
+JS_PERSON_CELL_COLLISION = r"""
+(arg) => {
+  const scopeSel = arg && arg.scope;
+  const root = scopeSel ? document.querySelector(scopeSel) : document.body;
+  if (!root) return { error: 'no-scope:' + scopeSel };
+  const vis = el => { const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+    return r.width > 0 && r.height > 0 && cs.display !== 'none' && cs.visibility !== 'hidden'
+           && parseFloat(cs.opacity || '1') >= 0.05; };
+  const out = [], seen = new Set();
+  root.querySelectorAll('.tbl-person').forEach(cell => {
+    if (!vis(cell)) return;
+    const nameEl = cell.querySelector('.pn');
+    const metaEl = cell.querySelector('.pm');
+    if (!nameEl || !metaEl) return;            // ไม่มีบรรทัด meta = ไม่มีอะไรให้ชน
+    if (!vis(nameEl) || !vis(metaEl)) return;  // meta ว่าง/ซ่อน ไม่นับ
+    const nr = nameEl.getBoundingClientRect();
+    const mr = metaEl.getBoundingClientRect();
+    if (nr.width < 1 || mr.width < 1) return;
+    // meta ต้องเริ่มต่ำกว่าจุดจบของชื่อ (คนละบรรทัด · meta อยู่ใต้ name) — เผื่อ 1px กันปัดเศษ
+    if (mr.top < nr.bottom - 1) {
+      const name = (nameEl.textContent || '').trim().slice(0, 30);
+      const meta = (metaEl.textContent || '').trim().slice(0, 30);
+      const key = name + '|' + meta;
+      if (seen.has(key)) return; seen.add(key);
+      out.push({ name, meta });
+    }
+  });
+  return out;
+}
+"""
+
+
+def person_cell_line_collision(pg, scope=None):
+    """คืนรายการเซลล์บุคคล (.tbl-person) ที่บรรทัดชื่อ (.pn) กับบรรทัดตำแหน่ง·แผนก (.pm) ชนกัน
+    บรรทัดเดียว/ซ้อนกัน — คือ meta.top < name.bottom (meta ไม่ได้อยู่ "ใต้" name)
+
+    (F-HR-WELFARE 2026-09-08 · §C3.8 — .pmain หล่น display:flex;flex-direction:column
+    → ชื่อกับตำแหน่งไหลต่อกันบรรทัดเดียว เช่น "สุนิสา วงศ์ทองนักบัญชี · ฝ่ายบัญชี")
+    ตรวจเฉพาะเซลล์ที่มองเห็นจริง · คืน [{name, meta}] ของเซลล์ที่ชน · [] = สะอาด
+
+    scope : selector จำกัดขอบเขต (เช่น '#page-content' · '#drawer') · None = ทั้ง body
+    """
+    r = pg.evaluate(JS_PERSON_CELL_COLLISION, {'scope': scope})
+    if isinstance(r, dict) and r.get('error'):
+        raise AssertionError(f"person_cell_line_collision: {r['error']}")
+    return r
+
+
+def assert_no_person_cell_collision(pg, scope=None):
+    """assert ว่าไม่มีเซลล์บุคคล (.tbl-person) ที่ชื่อกับตำแหน่ง·แผนกชนกันบรรทัดเดียว —
+    คืน [] ถ้าผ่าน · โยน AssertionError พร้อมเซลล์ที่ชนถ้าพัง (F-HR-WELFARE §C3.8)
+    """
+    hits = person_cell_line_collision(pg, scope=scope)
+    assert not hits, f"เซลล์บุคคลชื่อ/ตำแหน่งชนบรรทัดเดียว: {hits[:8]}"
+    return hits
