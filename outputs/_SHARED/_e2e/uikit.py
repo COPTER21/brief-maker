@@ -1810,3 +1810,101 @@ def assert_no_person_cell_collision(pg, scope=None):
     hits = person_cell_line_collision(pg, scope=scope)
     assert not hits, f"เซลล์บุคคลชื่อ/ตำแหน่งชนบรรทัดเดียว: {hits[:8]}"
     return hits
+
+
+# ⭐ เพิ่ม 2026-09-09 (F-HR-Performance) — ผู้ใช้เจอ footer ลิ้นชักลอยกลางแผงมีที่ว่างข้างล่าง (§C3.8)
+#
+# ที่มา (BUG-1): `.drawer` เป็น display:flex;flex-direction:column เต็มความสูง แต่ innerHTML ห่อ
+#   header/body/footer ไว้ใน `<div class="drawer-panel">` เดียว — และ `.drawer-panel` ไม่มี layout CSS
+#   (มีแค่ .wide override ความกว้างใน media query) → panel ยุบเหลือความสูงเท่าเนื้อหา →
+#   `.drawer-body{flex:1}` ขยายไม่ได้ (พ่อไม่ใช่ flex เต็มสูง) → footer ไปเกาะใต้เนื้อหากลางลิ้นชัก
+#   มีที่ว่างโล่งข้างล่าง อ่านเป็น "ฟอร์มลอยไม่เต็ม" โดยเฉพาะฟอร์มเนื้อหาสั้น (newCycle)
+#   แก้ด้วย: .drawer-panel{ display:flex; flex-direction:column; flex:1 1 auto; min-height:0; }
+#
+# ทำไมตัววัดเดิมมองไม่เห็น: JS_LAYOUT วัดล้น/ทับ/สูงไม่เท่า — footer ที่ลอยกลางแผง "ไม่ล้น ไม่ทับ"
+#   แค่ไม่ได้ถูกดันไปก้นลิ้นชัก · head_geom วัดเฉพาะ "หัว" · ไม่มีข้อไหนถามว่า "footer เกาะก้น
+#   ลิ้นชักจริงมั้ย" · เนื้อหาสั้น = ยิ่งมองไม่เห็นเพราะช่องว่างใหญ่ดูเหมือน padding ตั้งใจ
+# ตัวนี้ถามตรง ๆ ว่า ระยะจากขอบล่างของ .drawer-footer ถึงขอบล่างของ .drawer เล็ก (≤ tol) มั้ย
+JS_DRAWER_FOOTER_GAP = r"""
+(arg) => {
+  const drawerSel = (arg && arg.drawer) || '.drawer';
+  const footerSel = (arg && arg.footer) || '.drawer-footer';
+  const vis = el => { const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+    return r.width > 40 && r.height > 40 && cs.display !== 'none' && cs.visibility !== 'hidden'
+           && parseFloat(cs.opacity || '1') >= 0.05; };
+  const drawers = [...document.querySelectorAll(drawerSel)].filter(vis);
+  if (!drawers.length) return { error: 'no-drawer:' + drawerSel };
+  // ลิ้นชักที่เปิดอยู่ (transform เข้าจอแล้ว) — เอาตัวขวาสุดที่เห็นจริง
+  const drawer = drawers.find(d => d.classList.contains('is-open')) || drawers[drawers.length - 1];
+  const dr = drawer.getBoundingClientRect();
+  const foot = [...drawer.querySelectorAll(footerSel)].filter(vis)[0];
+  if (!foot) return { error: 'no-footer:' + footerSel };
+  const fr = foot.getBoundingClientRect();
+  // ช่องว่างใต้ footer จนถึงก้นลิ้นชัก — footer ปักก้น = ค่านี้ ~0 · footer ลอยกลาง = ค่านี้ใหญ่
+  return {
+    gapBelow: Math.round(dr.bottom - fr.bottom),
+    drawerBottom: Math.round(dr.bottom),
+    footerBottom: Math.round(fr.bottom),
+    drawerHeight: Math.round(dr.height),
+    footerTop: Math.round(fr.top),
+  };
+}
+"""
+
+
+def drawer_footer_gap(pg, drawer_sel='.drawer', footer_sel='.drawer-footer'):
+    """คืนระยะช่องว่างใต้ .drawer-footer จนถึงก้น .drawer (px) ของลิ้นชักที่เปิดอยู่
+
+    footer ปักก้นถูกต้อง = gapBelow ~0 · footer ลอยกลางแผง (panel ยุบ) = gapBelow ใหญ่
+    คืน dict {gapBelow, drawerBottom, footerBottom, drawerHeight, footerTop} (F-HR-Performance §C3.8)
+    """
+    r = pg.evaluate(JS_DRAWER_FOOTER_GAP, {'drawer': drawer_sel, 'footer': footer_sel})
+    if isinstance(r, dict) and r.get('error'):
+        raise AssertionError(f"drawer_footer_gap: {r['error']}")
+    return r
+
+
+def assert_drawer_footer_pinned(pg, drawer_sel='.drawer', footer_sel='.drawer-footer', tol=4):
+    """assert ว่า .drawer-footer ปักอยู่ก้น .drawer จริง (ไม่ลอยกลางแผงมีที่ว่างข้างล่าง)
+
+    (F-HR-Performance 2026-09-09 · BUG-1 — .drawer-panel ไม่มี flex layout → panel ยุบ →
+    drawer-body ขยายไม่ได้ → footer เกาะใต้เนื้อหากลางลิ้นชัก) · gapBelow ต้อง ≤ tol px
+    เรียกตอนเปิดลิ้นชักที่เนื้อหา "สั้น" (เช่น newCycle) จะเห็นชัดสุด · คืน dict ถ้าผ่าน
+    """
+    r = drawer_footer_gap(pg, drawer_sel=drawer_sel, footer_sel=footer_sel)
+    assert r['gapBelow'] <= tol, (
+        f"drawer-footer ลอยไม่ปักก้นลิ้นชัก (BUG-1): ช่องว่างใต้ footer {r['gapBelow']}px "
+        f"(footerBottom {r['footerBottom']} · drawerBottom {r['drawerBottom']} · "
+        f"drawerHeight {r['drawerHeight']}) — .drawer-panel ไม่ได้ fill drawer")
+    return r
+
+
+# ⭐ เพิ่ม 2026-09-09 (F-HR-Performance · FIX-03/FIX-04) — "role-gated absence"
+#
+# ที่มา: BA gate จับได้ว่าการปิดบังด้วย mask() ปิดแค่ "ตัวเลขคะแนน" — persona พนักงานยังเห็น
+#   ปุ่มสอบทาน/PIP/ส่ง* และเห็น decision + Gap ของเพื่อนร่วมงานทุกคน (RESTRICTED leak).
+#   ของที่ role หนึ่ง "ต้องไม่เห็น" ต้อง **ไม่อยู่ใน DOM จริง** ไม่ใช่แค่ซ่อน/mask.
+#
+# ทำไมตัววัดเดิมมองไม่เห็น: JS_LAYOUT/affordance วัดเรขาคณิต · garbage_text วัดขยะ token —
+#   ไม่มีตัวไหนถามว่า "สตริงที่ scope นี้ห้ามมี ยังโผล่ใน textContent มั้ย".
+# generic reusable: ใช้เช็คปุ่มที่ถูก gate ตามสิทธิ์ (FIX-03) และชื่อ/decision/gap ข้ามคน (FIX-04)
+def dom_text_absent(pg, needles, scope=None):
+    """คืน list ของ needle (สตริง) ที่ยัง 'พบ' ใน textContent ของ scope — [] = ไม่พบเลย (สะอาด)
+
+    scope : selector จำกัดขอบเขต (เช่น '#page-content' · '#drawer') · None = ทั้ง body
+    """
+    return pg.evaluate(
+        """(arg) => { const root = arg.scope ? document.querySelector(arg.scope) : document.body;
+             const t = root ? (root.textContent || '') : '';
+             return (arg.needles || []).filter(n => t.indexOf(n) >= 0); }""",
+        {"scope": scope, "needles": list(needles)})
+
+
+def assert_text_absent(pg, needles, scope=None):
+    """assert ว่าไม่มี needle ใดปรากฏใน DOM ของ scope — role-gated absence (FIX-03/FIX-04)
+
+    คืน [] ถ้าผ่าน · โยน AssertionError พร้อม needle ที่ยังโผล่ถ้าพัง (F-HR-Performance 2026-09-09)
+    """
+    found = dom_text_absent(pg, needles, scope=scope)
+    assert not found, f"พบข้อความที่ role นี้ไม่ควรเห็นใน DOM (role-gated absence): {found}"
+    return found

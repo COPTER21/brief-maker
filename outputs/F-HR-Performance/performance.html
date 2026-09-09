@@ -1,0 +1,2810 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ประเมินผลงาน (Performance) · CUBE NATIVE</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+
+<!-- Lucide Icons: loader ที่ท้าย body (ดู section "Lucide loader" ก่อน main <script>) -->
+<!-- เหตุผล:
+     1) ย้ายมาท้าย body หลีกเลี่ยง race กับ DOMContentLoaded
+     2) Multi-CDN fallback (unpkg → jsdelivr → cdnjs)
+     3) Pin version (เลิกใช้ @latest ที่ flaky — GitHub issue #2962)
+-->
+
+<style>
+/* ===== BASE-KIT v6.4 — DO NOT EDIT (Rule #69) — page CSS ต่อท้ายหลัง END marker ===== */
+/* ============== CSS VARIABLES (CUBE CI — v2.0 Warm Light rebrand) ============== */
+:root {
+  --c-navy: #111111;
+  --c-navy-2: #111111;
+  --c-primary: #FF3B30;
+  --c-primary-hover: #E62E24;
+  --c-teal: #FF9A1F;
+  --c-teal-light: #FFB763;
+  --c-ink: #111111;
+  --c-mute: #54565C;
+  --c-mute-2: #73757B;
+  --c-mute-3: #9A9CA2;
+  --c-line: #DEDAD4;
+  --c-line-2: #E9E5E0;
+  --c-line-3: #F1EEEA;
+  --c-bg-off: #FAF8F5;
+  --c-success: #1F9D55;
+  --c-warning: #E8870F;
+  --c-danger: #E62E24;
+  --sidebar-w: 232px;
+  --shell-h: 52px;
+  /* ============== Z-INDEX SCALE (ลำดับชั้นการซ้อน) ==============
+     BASE-KIT อ้าง var ชุดนี้ทุก overlay — ขาดไปแล้ว computed เป็น auto ทั้งหมด
+     ผลคือหัวตาราง sticky วาดทับลิ้นชัก · เจอจริง 2026-08-04 (F-COA-001) */
+  --z-shell: 20;      /* sidebar */
+  --z-sticky: 30;     /* shell-bar · thead sticky */
+  --z-dropdown: 40;   /* user menu · tooltip */
+  --z-backdrop: 50;   /* ฉากหลัง drawer/modal · search list */
+  --z-drawer: 55;     /* ตัวลิ้นชัก/หน้าต่าง */
+  --z-portal: 60;     /* เมนูที่ portal ออกไป #overlay-root (Rule #95) — ต้องเหนือลิ้นชัก */
+  --z-toast: 90;      /* สูงสุด — ต้องเห็นเหนือทุกอย่าง */
+  /* v3.13 — Fixed type scale (Iron Rule locked values) */
+  --fs-h1: 22px;        /* page title */
+  --fs-h2: 17px;        /* section title */
+  --fs-h3: 15px;        /* card / drawer title */
+  --fs-body: 14px;      /* body default */
+  --fs-sub: 13px;       /* secondary body / table cell */
+  --fs-meta: 12px;      /* meta / label */
+  --fs-cap: 11px;       /* uppercase section caption */
+  --fs-kpi: 28px;       /* stat value */
+  /* v3.13 — Fixed spacing scale */
+  --sp-xs: 4px; --sp-sm: 8px; --sp-md: 12px; --sp-lg: 20px; --sp-xl: 28px;
+  /* v3.13 — Fixed radius scale */
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-full: 999px;
+}
+
+/* ============== RESET ============== */
+* { box-sizing: border-box; }
+html, body { margin:0; padding:0; }
+/* Rule #35 — Layout Stability: จองพื้นที่ scrollbar ไว้เสมอ → เปิด modal/drawer หรือ
+   content โตขึ้นแล้ว scrollbar โผล่/หาย จะไม่ทำให้หน้าจอขยับซ้าย-ขวา (jank) */
+html { scrollbar-gutter: stable; }
+/* scroll lock — เปิด overlay แล้วพื้นหลังต้องไม่ scroll ตาม (ทำงานคู่กับ lockScroll ใน UTILS) */
+body.is-overlay-open { overflow: hidden; }
+
+/* ============== SCROLLBAR (Iron Rule #49 — minimal, ห้าม default) ============== */
+/* เส้นบางมาก 5px · track โปร่งใส · พื้นเข้ม (sidebar/panel) = ขาวโปร่ง · พื้นสว่าง = charcoal จาง */
+* { scrollbar-width: thin; scrollbar-color: rgba(17,17,17,.16) transparent; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(17,17,17,.14); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(17,17,17,.26); }
+.sidebar, .slide { scrollbar-color: rgba(255,255,255,.28) transparent; }
+.sidebar ::-webkit-scrollbar-thumb, .slide ::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb, .slide::-webkit-scrollbar-thumb { background: rgba(255,255,255,.28); }
+.sidebar ::-webkit-scrollbar-thumb:hover, .slide ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.42); }
+body {
+  font-family: 'Satoshi', 'Noto Sans Thai', system-ui, sans-serif;
+  background: var(--c-bg-off);
+  color: var(--c-ink);
+  font-size:14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  /* v7.1 Rule #97: desktop-base + adaptive — 768-1180 ปรับ layout ผ่าน media query,
+     <768 = horizontal scroll (ไม่ guarantee) */
+  min-width: 768px;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+[data-lucide] { flex-shrink: 0; }
+
+/* Hide number input spinner globally (Iron Rule #19) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin:0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ============== SIDEBAR ============== */
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sidebar-w);
+  background: #111111;
+  color: #E9E5E0;
+  z-index:var(--z-shell);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.sb-brand {
+  padding:18px;
+  display: flex;
+  align-items: center;
+  gap:12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+.sb-logo {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, #FF3B30, #FF9A1F);
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(255,59,48,0.3);
+}
+.sb-name { font-weight: 700; font-size:14px; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+.sb-sub { font-size:11px; color: #9A9CA2; letter-spacing: 0.06em; font-weight: 600; text-transform: uppercase; margin-top:2px; }
+.sb-nav { flex: 1; padding:12px 8px; overflow-y: auto; }
+
+/* Module = collapsible group (Iron Rule #27).
+   Header toggles expand/collapse only — NOT navigable.
+   Children = .sb-features (clickable feature items). */
+.sb-module { margin-bottom:4px; }
+.sb-module-header {
+  display: flex; align-items: center; gap:8px;
+  width: 100%;
+  padding:8px 10px;
+  border-radius: 6px;
+  background: transparent; border: 0;
+  color: #9A9CA2;
+  font-family: inherit;
+  font-size:11px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  cursor: pointer; transition: all 120ms;
+  text-align: left;
+}
+.sb-module-header:hover { background: rgba(255,255,255,0.04); color: #DEDAD4; }
+.sb-module-header .mod-icon { flex-shrink: 0; opacity: 0.7; }
+.sb-module-header .mod-label { flex: 1; }
+.sb-module-header .mod-chevron {
+  flex-shrink: 0;
+  transition: transform 200ms;
+  opacity: 0.7;
+}
+.sb-module[data-expanded="false"] .mod-chevron { transform: rotate(-90deg); }
+.sb-module[data-expanded="false"] .sb-features { display: none; }
+
+.sb-features { padding:2px 0 6px 0; }
+
+.sb-item {
+  display: flex; align-items: center; gap:10px;
+  padding:8px 12px 8px 16px;
+  border-radius: 6px;
+  color: #DEDAD4;
+  font-size:13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms;
+  margin-bottom:1px;
+  position: relative;
+  user-select: none;
+}
+.sb-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sb-item.is-active {
+  background: #FF3B30;
+  color: #fff;
+  font-weight: 600;
+}
+.sb-item.is-active::before {
+  content: '';
+  position: absolute;
+  left: -10px; top: 7px; bottom: 7px;
+  width: 3px;
+  background: #fff;
+  border-radius: 0 2px 2px 0;
+}
+.sb-item [data-lucide] { width: 16px; height: 16px; opacity: 0.85; }
+.sb-item.is-active [data-lucide] { opacity: 1; }
+.sb-badge {
+  margin-left:auto;
+  font-size:11px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.10);
+  color: #9A9CA2;
+  padding:2px 8px;
+  border-radius: 999px;
+}
+.sb-item.is-active .sb-badge { background: rgba(255,255,255,0.18); color: #fff; }
+.sb-item.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.sb-item.is-disabled:hover { background: transparent; color: #DEDAD4; }
+.sb-footer {
+  padding:12px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  gap:8px;
+  font-size:12px;
+  color: #9A9CA2;
+}
+.pulse-dot {
+  width: 7px; height: 7px;
+  background: var(--c-teal);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(255,154,31,0.20);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ============== MAIN ============== */
+.main {
+  margin-left:var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--c-bg-off);
+}
+
+/* ============== SHELL BAR ============== */
+.shell-bar {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  border-bottom: 1px solid var(--c-line-2);
+  height: var(--shell-h);
+  display: flex;
+  align-items: center;
+  padding:0 24px;
+  z-index:var(--z-sticky);
+  gap:12px;
+}
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap:8px;
+  font-size:13px;
+  color: var(--c-mute);
+}
+.breadcrumb a { cursor: pointer; transition: color 120ms; }
+.breadcrumb a:hover { color: var(--c-primary); }
+.breadcrumb .sep { color: var(--c-mute-3); font-size:11px; }
+.breadcrumb-current { color: var(--c-ink); font-weight: 500; }
+.icon-btn {
+  width: 34px; height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--c-mute);
+  border-radius: 7px;
+  position: relative;
+  transition: all 120ms;
+}
+.icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.icon-btn [data-lucide] { width: 17px; height: 17px; }
+.notif-dot {
+  position: absolute;
+  top: 7px; right: 8px;
+  width: 7px; height: 7px;
+  background: var(--c-danger);
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap:10px;
+  padding:6px 10px 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 120ms;
+}
+.user-chip:hover { background: var(--c-line-3); }
+.user-text { line-height: 1.2; text-align: right; }
+.user-name { font-size:12.5px; font-weight: 500; color: var(--c-ink); white-space: nowrap; }
+.user-role { font-size:11px; color: var(--c-mute-2); white-space: nowrap; margin-top:1px; }
+.avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* User dropdown menu */
+.user-menu {
+  position: absolute;
+  top: calc(var(--shell-h) - 4px);
+  right: 22px;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(17,17,17,0.12);
+  width: 240px;
+  z-index:var(--z-dropdown);
+  padding:6px;
+  display: none;
+}
+.user-menu.is-open { display: block; }
+.user-menu-item {
+  display: flex;
+  align-items: center;
+  gap:10px;
+  padding:8px 12px;
+  border-radius: 6px;
+  font-size:13px;
+  color: var(--c-ink);
+  cursor: pointer;
+  transition: background 120ms;
+}
+.user-menu-item:hover { background: var(--c-bg-off); }
+.user-menu-item [data-lucide] { width: 15px; height: 15px; color: var(--c-mute-2); }
+.user-menu-item.is-danger { color: var(--c-danger); }
+.user-menu-item.is-danger [data-lucide] { color: var(--c-danger); }
+.user-menu-divider { height: 1px; background: var(--c-line-2); margin:6px 0; }
+
+/* ============== CONTENT ============== */
+/* Fluid full-width — content stretches to fill viewport (Iron Rule #30).
+   Do NOT add max-width here; component-level constraints (modal/toast/wizard
+   internal cards) are responsible for their own readability bounds. */
+.content {
+  padding:24px;
+}
+
+/* ============== v7.1 RESPONSIVE — Rule #97 (desktop-base adaptive) ============== */
+.nav-toggle { display:none; }
+@media (max-width: 1180px){
+  .content { padding:16px; }
+  .drawer { width: min(920px, 100vw); }
+  .drawer.standard { width: min(680px, 100vw); }
+  .drawer.wide, .drawer-panel.wide { width: min(1290px, 100vw); }
+  /* generic shell: sidebar เป็น off-canvas — Pattern N shell ใช้ icon rail ของตัวเองแทน */
+  .main { margin-left: 0; }
+  .sidebar { transform: translateX(-100%); transition: transform .18s ease; }
+  .sidebar.open { transform: translateX(0); box-shadow: 0 8px 32px rgba(0,0,0,.24); }
+  .nav-toggle { display:inline-flex; align-items:center; justify-content:center;
+    width:32px; height:32px; border:none; background:transparent; border-radius:8px;
+    color:var(--c-ink); }
+  .nav-toggle:hover { background: rgba(17,17,17,.06); }
+}
+
+/* ============== v7.1 LIST FULL-HEIGHT — Rule #96 ============== */
+/* หน้า list หลัก: ตารางยืดเต็มพื้นที่เหลือ ติดขอบล่างเสมอ ทุกขนาดจอ */
+.page-fill { display:flex; flex-direction:column;
+  min-height: calc(100dvh - var(--shellbar-h, 52px) - 48px); } /* 48 = ระยะขอบบน+ล่างของ .content */
+@media (max-width:1180px){ .page-fill { min-height: calc(100dvh - var(--shellbar-h, 52px) - 32px); } }
+.page-fill > .card-list, .page-fill > .list-card { flex:1 1 auto; min-height:0;
+  display:flex; flex-direction:column; }
+.table-wrap { flex:1 1 auto; min-height:0; overflow:auto; }
+.table-wrap thead th { position:sticky; top:0; background:#fff; z-index:var(--z-sticky); }
+.table-foot { flex:0 0 auto; } /* pagination/count ติดล่างของ card เสมอ */
+
+/* ============== v7.1 OVERLAY PORTAL — Rule #95 ============== */
+/* เมนูที่ portal ออกจาก scroll container (ใช้คู่ portalMenu util) */
+.menu-fixed { position:fixed !important; z-index:var(--z-portal);
+  background:#fff; border:1px solid var(--c-line, #DEDAD4); border-radius:10px;
+  box-shadow:0 12px 32px rgba(17,17,17,.14); overflow-y:auto; }
+
+/* ============== PAGE HEADER ============== */
+.ph {
+  margin-bottom:18px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap:16px;
+}
+.ph > div:first-child { flex: 1 1 auto; min-width: 280px; }
+.ph-title-row {
+  display: flex;
+  align-items: baseline;
+  gap:10px;
+  margin-bottom:6px;
+}
+.ph-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:20px;
+  font-weight: 700;
+  color: var(--c-navy);
+  margin:0;
+  letter-spacing: -0.01em;
+}
+.ph-count {
+  font-size:12.5px;
+  font-weight: 600;
+  color: var(--c-mute-2);
+  background: var(--c-line-3);
+  padding:3px 10px;
+  border-radius: 999px;
+}
+.ph-sub { font-size:13px; color: var(--c-mute); margin:0; }
+.ph-actions { display: flex;align-items:center; gap:8px; flex-shrink: 0; }
+
+/* ============== BUTTONS ============== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;   /* Rule #36 — content กึ่งกลางแนวนอน */
+  gap:6px;
+  height: 36px;
+  /* Rule #36 — padding-top 2px = optical centering สำหรับฟอนต์ไทย (Noto Sans Thai):
+     baseline ของไทยลอยสูงเมื่อ flex-center เพราะ font เผื่อที่สระล่าง → นัดจ์ลง 2px ให้เข้ากลางจริง.
+     ✅ verified ด้วยการ render จริง — ทนทุกเบราว์เซอร์ (ต่างจาก text-box-trim ที่รองรับเฉพาะ Chrome 133+). */
+  padding:2px 16px 0;
+  border-radius: 8px;
+  font-size:13px;
+  font-weight: 500;
+  /* ⚠️ Rule #36 — ห้ามใส่ line-height:1 / overflow:hidden กับตัวปุ่มที่มีข้อความไทย
+     เพราะจะ "ตัดสระบน-วรรณยุกต์-สระล่าง" ทำให้ตัวอักษรเบี้ยว. ปล่อย line-height ตาม body (1.5). */
+  border: 1px solid transparent;
+  background: transparent;
+  white-space: nowrap;       /* label ไม่ตัดบรรทัด → ปุ่มในแถวเดียวสูงเท่ากัน */
+  transition: all 120ms;
+  user-select: none;
+  cursor: pointer;
+}
+.btn [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; }  /* Rule #36 — icon ไม่ถูกบีบ */
+.btn:disabled, .btn.is-disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+.btn-eq { min-width: 104px; }  /* Rule #36 — ปุ่มคู่ที่ควรสมมาตร → กว้างเท่ากัน */
+/* Rule #36 — label ยาวที่ "ต้อง" จำกัดความกว้าง: truncate ที่ span (.lbl) ไม่ใช่ที่ตัวปุ่ม.
+   line-height (1.5) สูงพอ → overflow:hidden ตัดเฉพาะแนวนอน (ไม่ตัดสระไทย). ปกติปล่อยปุ่มโตตาม label ดีกว่า. */
+.btn-truncate { max-width: 220px; }
+.btn-truncate .lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn-primary { background: var(--c-primary); color: #fff; }
+.btn-primary:hover { background: var(--c-primary-hover); box-shadow: 0 2px 8px rgba(255,59,48,0.30); }
+.btn-secondary { background: #fff; border-color: var(--c-line); color: var(--c-ink); }
+.btn-secondary:hover { background: var(--c-line-3); border-color: var(--c-mute-2); }
+.btn-ghost { color: var(--c-mute); }
+.btn-ghost:hover { background: var(--c-line-3); color: var(--c-ink); }
+.btn-danger { background: #fff; border-color: var(--c-line); color: var(--c-danger); }
+.btn-danger:hover { background: #FFE9E7; border-color: var(--c-danger); }
+.btn-link { background: transparent; border: 0; padding:0 4px; height: auto; color: var(--c-primary); font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn-sm { height: 30px; padding:2px 12px 0; font-size:12px; }
+
+/* ============== STATS (KPI Cards) ============== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap:12px;
+  margin-bottom:18px;
+}
+.stat {
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  padding:16px 16px;
+  transition: all 150ms;
+}
+.stat:hover { border-color: var(--c-line); box-shadow: 0 2px 8px rgba(17,17,17,0.05); }
+.stat-label {
+  display: flex;
+  align-items: center;
+  gap:6px;
+  font-size:12px;
+  font-weight: 500;
+  color: var(--c-mute);
+}
+.stat-label [data-lucide] { width: 13px; height: 13px; color: var(--c-primary); }
+.stat-value {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:26px;
+  font-weight: 700;
+  color: var(--c-navy);
+  margin-top:6px;
+  letter-spacing: -0.01em;
+}
+.stat-meta {
+  font-size:12px;
+  color: var(--c-mute-2);
+  margin-top:6px;
+  display: flex;
+  align-items: center;
+  gap:4px;
+}
+.stat-meta.is-up { color: var(--c-success); }
+.stat-meta.is-down { color: var(--c-danger); }
+.stat-meta [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== CARD ============== */
+.card {
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* ============== FILTER BAR ============== */
+.filter-bar {
+  padding:16px 18px;
+  display: flex;
+  gap:10px;
+  align-items: center;
+  border-bottom: 1px solid var(--c-line-2);
+  background: #fff;
+  flex-wrap: wrap;
+}
+
+/* ============== INPUTS ============== */
+.input, .select {
+  height: 36px;
+  padding:0 12px;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  font-size:13px;
+  background: #fff;
+  color: var(--c-ink);
+  font-family: inherit;
+  transition: all 120ms;
+  width: 100%;
+}
+.input:focus, .select:focus {
+  outline: none;
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px rgba(255,59,48,0.10);
+}
+.select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right:32px;
+  appearance: none;
+}
+.input-search { position: relative; flex: 1; max-width: 320px; }
+.input-search input { padding-left:36px; }
+.input-search .lead-icon {
+  position: absolute;
+  left: 11px; top: 50%;
+  transform: translateY(-50%);
+  width: 15px; height: 15px;
+  color: var(--c-mute-2);
+  pointer-events: none;
+}
+
+/* ===== SEARCH-SELECT (Iron Rule #34) — searchable dropdown แทน select ธรรมดา เมื่อ options เยอะ/lookup master =====
+   list = position:absolute overlay → ไม่ดันเนื้อหา (สอดคล้อง Rule #35) */
+.search-select { position: relative; width: 100%; }
+.search-select .ss-input { padding-left:32px; padding-right:32px; }
+.search-select .ss-lead {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px;   /* ⬅ ขนาดตายตัว — ไม่พึ่ง .w-4 (กัน Lucide เรนเดอร์ 24px default → placeholder ดูห่าง) */
+  color: var(--c-mute-3); pointer-events: none;
+}
+.search-select .ss-caret {
+  position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+  width: 15px; height: 15px; color: var(--c-mute-3); pointer-events: none;
+}
+.search-select .ss-clear {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  display: inline-flex; padding:3px; border: 0; background: transparent;
+  color: var(--c-mute-2); cursor: pointer; border-radius: 6px;
+}
+.search-select .ss-clear:hover { background: var(--c-line-3); color: var(--c-ink); }
+.ss-list {
+  position: absolute; z-index:var(--z-backdrop); left: 0; right: 0; margin-top:4px;
+  max-height: 280px; overflow-y: auto; background: #fff;
+  border: 1px solid var(--c-line); border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(17,17,17,0.10), 0 4px 10px rgba(17,17,17,0.05);
+}
+.ss-opt {
+  width: 100%; display: flex; align-items: center; gap:10px; padding:10px 12px;
+  border: 0; border-bottom: 1px solid var(--c-line-3); background: transparent;
+  cursor: pointer; text-align: left; font-family: inherit;
+}
+.ss-opt:last-child { border-bottom: 0; }
+.ss-opt:hover, .ss-opt.is-active { background: rgba(255,59,48,0.06); }
+.ss-opt-ic { width: 16px; height: 16px; color: var(--c-primary); flex-shrink: 0; }  /* ขนาดตายตัวเช่นกัน */
+.ss-opt-main { flex: 1; min-width: 0; }
+.ss-opt-label { display: block; font-size:13px; color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-sub { display: block; font-size:12px; color: var(--c-mute-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-right { flex-shrink: 0; font-size:12px; color: var(--c-mute); }
+.ss-opt mark { background: rgba(255,59,48,0.16); color: inherit; padding:0 1px; border-radius: 2px; }
+.ss-empty { padding:20px 16px; text-align: center; font-size:13px; color: var(--c-mute-2); }
+
+/* ============== TABLE ============== */
+.table-scroll { overflow-x: auto; }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size:13px;
+}
+.table thead { background: var(--c-bg-off); }
+.table th {
+  padding:12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--c-mute);
+  font-size:12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--c-line-2);
+  white-space: nowrap;
+}
+.table th.col-check { width: 40px; padding-right:0; }
+.table th.is-sortable { cursor: pointer; user-select: none; }
+.table th.is-sortable:hover { color: var(--c-ink); background: var(--c-line-3); }
+.table th .sort-arrow { display: inline-block; margin-left:4px; opacity: 0.4; }
+.table th.is-sorted .sort-arrow { opacity: 1; color: var(--c-primary); }
+.table td {
+  padding:12px 16px 12px;  /* Rule #38 — optical centering ไทย: pad-top มากกว่า bottom 2px */
+  border-bottom: 1px solid var(--c-line-2);
+  color: var(--c-ink);
+  vertical-align: middle;
+}
+.table tbody tr { transition: background 120ms; }
+.table tbody tr:hover { background: var(--c-bg-off); }
+.table tbody tr.is-selected { background: rgba(255,59,48,0.04); }
+.table tbody tr.is-selected:hover { background: rgba(255,59,48,0.07); }
+.table tbody tr:last-child td { border-bottom: 0; }
+/* Rule #41 — แถวกดได้ = เปิด view (ไม่มีไอคอนดวงตา). row ที่ clickable ต้องสื่อด้วย cursor */
+.table tbody tr.is-clickable { cursor: pointer; }
+/* Rule #42 — Long-list UX: sticky header (opt-in .is-sticky) — ตารางยาว scroll หัวค้าง */
+.table-scroll.is-sticky { max-height: 560px; overflow-y: auto; scrollbar-gutter: stable; }
+.table-scroll.is-sticky thead th {
+  position: sticky; top: 0; z-index: var(--z-sticky);
+  background: var(--c-bg-off);            /* ⚠️ ต้องทึบที่ตัว th (ไม่ใช่แค่ thead) — ไม่งั้น row เลื่อนทะลุซ้อนหัว */
+  box-shadow: inset 0 -1px 0 var(--c-line-2);  /* border-bottom สำหรับ sticky (border ปกติหายตอน sticky) */
+}
+/* Rule #42 — Thai-safe cell truncation: ตัดเฉพาะแนวนอน (… ) line-height พอ ไม่ตัดสระ. ใส่ title=ค่าเต็มเพื่อ hover ดู */
+.cell-truncate { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+/* Rule #43 — ตัวเลข tabular + คอลัมน์ตัวเลขชิดขวา */
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+th.col-num, td.col-num { text-align: right; }
+td.col-num .num, td.col-num { font-variant-numeric: tabular-nums; }
+
+/* ============== CHECKBOX ============== */
+.cb {
+  width: 16px; height: 16px;
+  border: 1.5px solid var(--c-line);
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: all 120ms;
+  flex-shrink: 0;
+}
+.cb.is-checked, .cb.is-partial {
+  background: var(--c-primary);
+  border-color: var(--c-primary);
+}
+.cb.is-checked::after {
+  content: '';
+  position: absolute;
+  left: 4px; top: 1px;
+  width: 5px; height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.cb.is-partial::after {
+  content: '';
+  position: absolute;
+  left: 3px; top: 6px;
+  width: 8px; height: 2px;
+  background: #fff;
+}
+.cb:hover { border-color: var(--c-primary); }
+
+/* ============== USER CELL ============== */
+.user-cell { display: flex; align-items: center; gap:10px; }
+.uc-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.uc-name { font-weight: 600; color: var(--c-ink); font-size:13px; line-height: 1.3; }
+
+/* ============== PILLS ============== */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap:4px;
+  padding:4px 10px 3px;  /* Rule #38 — optical centering ไทย: pad-top มากกว่า bottom 1px กัน text ลอยสูง (verified) */
+  border-radius: 999px;
+  font-size:12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pill [data-lucide] { width: 11px; height: 11px; }
+.pill-registered { background: #E6F0FF; color: #1A5FCC; }
+.pill-active { background: #E6F0FF; color: #1A5FCC; }
+.pill-converted { background: #E4F4EB; color: #157A41; }
+.pill-suspended { background: #FFF1DD; color: #B8690B; }
+.pill-archived { background: var(--c-line-3); color: var(--c-mute-2); }
+/* v3.13 — Semantic pill aliases (ใช้ชุดนี้เป็นหลัก — mapping ดู knowledge/microcopy.md) */
+.pill-info    { background: #E6F0FF; color: #1A5FCC; }   /* กำลังดำเนินการ/ใช้งาน */
+.pill-success { background: #E4F4EB; color: #157A41; }   /* อนุมัติแล้ว/เสร็จสิ้น */
+.pill-warning { background: #FFF1DD; color: #B8690B; }   /* รอดำเนินการ/รออนุมัติ */
+.pill-danger  { background: #FFE9E7; color: #E62E24; }   /* ปฏิเสธ/ยกเลิก */
+.pill-muted   { background: var(--c-line-3); color: var(--c-mute-2); } /* ร่าง/ปิดใช้งาน/เก็บถาวร */
+
+/* v3.13 — Loading spinner (Iron Rule #44) */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.8s linear infinite; }
+
+/* v3.13 — Form Section Grouping (Iron Rule #45) */
+.form-section { margin-top:var(--sp-xl); }
+.form-section:first-child { margin-top:0; }
+.form-section-title {
+  font-size: var(--fs-cap); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--c-mute);
+  padding-bottom:var(--sp-sm); border-bottom: 1px solid var(--c-line-2);
+  margin-bottom:var(--sp-md);
+}
+
+/* v3.13 — Segmented control (ช่วงเวลา dashboard ฯลฯ — Pattern J) */
+.seg-control { display:inline-flex; background: var(--c-line-3); border-radius: var(--r-md); padding:2px; gap:2px; }
+.seg-item {
+  padding:6px 12px 3px; border-radius: var(--r-sm); border: none; background: transparent;
+  font-size: var(--fs-meta); font-weight: 500; color: var(--c-mute-2); cursor: pointer;
+  font-family: inherit; white-space: nowrap;
+}
+.seg-item.is-active { background: #fff; color: var(--c-ink); font-weight: 600; box-shadow: 0 1px 3px rgba(17,17,17,0.08); }
+.pill-danger { background: #FFE9E7; color: var(--c-danger); }
+
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot.is-active { background: #1A5FCC; box-shadow: 0 0 0 2.5px rgba(37,99,235,0.18); }
+.dot.is-converted { background: #157A41; box-shadow: 0 0 0 2.5px rgba(6,95,70,0.20); }
+.dot.is-suspended { background: var(--c-warning); }
+.dot.is-archived { background: var(--c-mute-3); }
+
+/* Mini-link cell (e.g. tenant link) */
+.tenant-link {
+  display: inline-flex;
+  align-items: center;
+  gap:4px;
+  color: var(--c-primary);
+  font-size:12.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.tenant-link:hover { text-decoration: underline; }
+.tenant-link [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== ROW ACTIONS ============== */
+.row-actions { display: inline-flex; gap:2px; }
+.ra-btn {
+  width: 28px; height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--c-mute-2);
+  border-radius: 6px;
+  transition: all 120ms;
+}
+.ra-btn:hover { background: var(--c-line-3); color: var(--c-primary); }
+.ra-btn.is-danger:hover { background: #FFE9E7; color: var(--c-danger); }
+.ra-btn.is-success:hover { background: rgba(255,154,31,0.12); color: var(--c-teal); }
+.ra-btn [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== TABLE FOOTER ============== */
+.table-footer {
+  padding:12px 18px;
+  background: var(--c-bg-off);
+  border-top: 1px solid var(--c-line-2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size:12.5px;
+  color: var(--c-mute);
+  flex-wrap: wrap;
+  gap:10px;
+}
+.pagination { display: inline-flex; gap:4px; align-items: center; }
+.pg-btn {
+  min-width: 30px; height: 30px;
+  padding:0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 6px;
+  color: var(--c-mute);
+  font-size:12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms;
+}
+.pg-btn:hover { border-color: var(--c-line); background: var(--c-bg-off); }
+.pg-btn.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.pg-btn.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn [data-lucide] { width: 13px; height: 13px; }
+
+/* ============== BULK BAR ============== */
+.bulk-bar {
+  background: var(--c-navy);
+  color: #fff;
+  padding:12px 18px;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  gap:12px;
+  border-bottom: 1px solid var(--c-line-2);
+  margin:-1px -1px 0;
+  font-size:13px;
+}
+.bulk-bar .btn { height: 30px; padding:2px 12px 0; font-size:12px; }
+.bulk-bar .btn-secondary {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.18);
+  color: #fff;
+}
+.bulk-bar .btn-secondary:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.30); }
+
+/* ============== DRAWER ============== */
+/* ---- v6.1 Pattern B drawer chrome (locked to references/drawer-standard/pr.html) ----
+   create/edit drawer ให้ใช้ชุดนี้: .dw-head (eyebrow + h2 20px + .top-icon-btn ปิด)
+   + .d-stepper (.stepper-item/.stepper-circle 32px — ไม่ใช่ .stepper กลางของ page wizard)
+   + .dw-footer (ย้อนกลับ secondary ซ้าย · ยกเลิก ghost + primary ชิดขวา) */
+.top-icon-btn { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border:0; background:transparent; border-radius: var(--r-sm); color: var(--c-mute-2); cursor:pointer; transition: all 120ms; flex-shrink:0; }
+.top-icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.dw-head { padding:18px 24px 16px; border-bottom: 1px solid var(--c-line-2); flex-shrink: 0; }
+.dw-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap:16px; }
+.dw-eyebrow { display: flex; align-items: center; gap:6px; font-size:11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-mute-2); margin-bottom:4px; font-weight: 600; }
+.dw-title { font-size:20px; font-weight: 700; color: var(--c-navy); margin:0; letter-spacing: -0.01em; }
+.dw-sub { font-size: var(--fs-meta); color: var(--c-mute-2); margin-top:4px; }
+.d-stepper { display: flex; align-items: flex-start; gap:0; width: 100%; margin-top:18px; }
+.stepper-item { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; min-width: 0; }
+.stepper-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size:13px; font-weight: 600; background: #fff; color: var(--c-mute-3); border: 2px solid var(--c-line); transition: all 200ms; z-index: 2; }
+.stepper-item.active .stepper-circle { background: var(--c-primary); color: #fff; border-color: var(--c-primary); box-shadow: 0 0 0 4px rgba(255,59,48,0.12); }
+.stepper-item.done .stepper-circle { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
+.stepper-label { margin-top:8px; font-size:12px; font-weight: 500; color: var(--c-mute-3); text-align: center; line-height: 1.3; transition: color 200ms; }
+.stepper-item.active .stepper-label { color: var(--c-navy); font-weight: 600; }
+.stepper-item.done .stepper-label { color: var(--c-mute); }
+.stepper-item:not(:last-child)::after { content: ''; position: absolute; top: 15px; left: 50%; right: -50%; height: 2px; background: var(--c-line-2); z-index: 1; }
+.stepper-item.done:not(:last-child)::after { background: var(--c-primary); }
+.dw-footer { padding:16px 24px; border-top: 1px solid var(--c-line-2); background: var(--c-bg-off); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap:8px; }
+.dw-footer-right { display: flex; align-items: center; gap:8px; }
+
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17,17,17,0.40);
+  z-index:var(--z-backdrop);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms;
+}
+.drawer-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 920px;           /* v2 standard (Iron Rule #11) — wide drawer */
+  max-width: 96vw;
+  background: #fff;
+  z-index:var(--z-drawer);
+  transform: translateX(100%);
+  transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -16px 0 40px rgba(17,17,17,0.18);
+}
+.drawer.is-open { transform: translateX(0); }
+.drawer.standard { width: 680px; }   /* simple forms / short view (Iron Rule #11) */
+
+/* ========== STEPPER STANDARD (Iron Rule #47) — ใช้ตัวเดียวทุก wizard ========== */
+.stepper { display:flex; align-items:center; gap:var(--sp-sm); }
+.step { display:flex; align-items:center; gap:var(--sp-sm); }
+.step-dot {
+  width:26px; height:26px; border-radius: var(--r-full);
+  display:flex; align-items:center; justify-content:center;
+  font-size: var(--fs-meta); font-weight:600; padding-top:1px; /* Thai rhythm */
+  border:1.5px solid var(--c-line); background:#fff; color: var(--c-mute-2);
+}
+.step-label { font-size: var(--fs-sub); color: var(--c-mute-2); font-weight:500; white-space:nowrap; }
+.step-connector { width:28px; height:1.5px; background: var(--c-line-2); flex:0 0 auto; }
+.step.is-current .step-dot { border-color: var(--c-primary); background: var(--c-primary); color:#fff; }
+.step.is-current .step-label { color: var(--c-ink); font-weight:600; }
+.step.is-done .step-dot { border-color: var(--c-teal); background:#fff; color: var(--c-teal); }
+.step.is-done .step-connector, .step.is-current ~ * {}
+.step.is-done + .step-connector { background: var(--c-teal); }
+/* placement: drawer wizard → .drawer-stepper-band (ใต้ header) / page wizard → .wizard-stepper-band */
+.drawer-stepper-band { padding:10px 24px; border-bottom: 1px solid var(--c-line-2); background: var(--c-bg-off); }
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  gap:16px;
+  padding:18px 24px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.drawer-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.drawer-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:20px;
+  font-weight: 600;
+  color: var(--c-navy);
+  margin:0;
+  letter-spacing: -0.01em;
+}
+.drawer-subtitle {
+  font-size:12px;
+  color: var(--c-mute);
+  margin-top:4px;
+  display: flex;
+  align-items: center;
+  gap:8px;
+  flex-wrap: wrap;
+}
+.drawer-tabs {
+  display: flex;align-items:center;
+  padding:0 24px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.drawer-tab {
+  padding:10px 16px;
+  font-size:13px;
+  font-weight: 500;
+  color: var(--c-mute);
+  border-bottom: 2px solid transparent;
+  transition: all 120ms;
+  margin-bottom:-1px;
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+}
+.drawer-tab:hover { color: var(--c-ink); }
+.drawer-tab.is-active { color: var(--c-primary); border-bottom-color: var(--c-primary); }
+.drawer-body { flex: 1; overflow-y: auto; padding:24px; scrollbar-gutter: stable; }
+.drawer-section { margin-bottom:24px; }
+.drawer-section-title {
+  font-size:11px;
+  font-weight: 700;
+  color: var(--c-mute);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin:0 0 10px;
+}
+.drawer-fields {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap:10px 16px;
+  font-size:13px;
+}
+.drawer-fields .lbl { color: var(--c-mute); }
+.drawer-fields .val { color: var(--c-ink); font-weight: 500; }
+.drawer-footer {
+  padding:12px 24px;
+  border-top: 1px solid var(--c-line-2);
+  display: flex;
+  gap:8px;
+  align-items: center;
+  background: var(--c-bg-off);
+}
+/* Drawer Button Contract (Iron Rule #31) helpers */
+.footer-spacer { flex: 1; }
+.drawer-footer-meta { font-size:12px; color: var(--c-mute-2); }
+.drawer-header-actions { display: flex; gap:6px; align-items: center; }
+.drawer-header-divider { width: 1px; height: 22px; background: var(--c-line-2); margin:0 4px; flex-shrink: 0; }
+/* panel fills the drawer so .drawer-body{flex:1} can expand → footer pins to the bottom (BUG-1) */
+.drawer-panel{ display:flex; flex-direction:column; flex:1 1 auto; min-height:0; }
+
+/* ============== TIMELINE ============== */
+.timeline { position: relative; padding-left:24px; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--c-line-2);
+}
+.tl-item { position: relative; margin-bottom:16px; }
+.tl-item:last-child { margin-bottom:0; }
+.tl-dot {
+  position: absolute;
+  left: -20px;
+  top: 3px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--c-primary);
+}
+.tl-dot.is-success { border-color: var(--c-success); }
+.tl-dot.is-warning { border-color: var(--c-warning); }
+.tl-title { font-size:13px; font-weight: 600; color: var(--c-ink); }
+.tl-meta { font-size:12px; color: var(--c-mute-2); margin-top:2px; }
+
+/* ============== BOOKMARK / RELATED CARDS ============== */
+.bm-card {
+  display: flex;
+  gap:12px;
+  padding:12px 12px;
+  border: 1px solid var(--c-line-2);
+  border-radius: 8px;
+  margin-bottom:8px;
+  cursor: pointer;
+  transition: all 120ms;
+  align-items: center;
+}
+.bm-card:hover { border-color: var(--c-line); }
+.bm-icon {
+  width: 28px; height: 28px;
+  background: rgba(255,59,48,0.10);
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-primary);
+  flex-shrink: 0;
+}
+.bm-card [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== NOTES ============== */
+.notes-area {
+  width: 100%;
+  min-height: 130px;
+  padding:12px 16px;
+  background: #fff;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  resize: vertical;
+  font-family: inherit;
+  font-size:13px;
+  line-height: 1.55;
+}
+.notes-area:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(255,59,48,0.10); }
+
+/* ============== EMPTY STATE ============== */
+.empty {
+  padding:56px 24px;
+  text-align: center;
+  color: var(--c-mute);
+}
+.empty-icon {
+  width: 52px; height: 52px;
+  margin:0 auto 16px;
+  border-radius: 50%;
+  background: var(--c-line-3);
+  color: var(--c-mute-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.empty-icon [data-lucide] { width: 22px; height: 22px; }
+.empty-title {
+  font-size:16px;
+  font-weight: 600;
+  color: var(--c-ink);
+  margin-bottom:6px;
+  font-family: 'Noto Sans Thai', sans-serif;
+}
+.empty-desc { font-size:13px; color: var(--c-mute); max-width: 320px; margin:0 auto; }
+.empty .btn { margin-top:16px; }  /* Rule #39 — empty state ควรมีปุ่ม action หลัก */
+
+/* ============== MODAL ============== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17,17,17,0.50);
+  z-index:var(--z-portal); /* DSP-01 fix (สำเนา feature): modal ต้องเหนือ drawer(55) — เดิม --z-backdrop(50) จม · =portal(60) ให้ portal menu ใน modal ยังโผล่เหนือได้ตาม DOM order · latent BASE-KIT bug ยังไม่แก้ต้นทาง */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 440px;
+  max-width: 92vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.96);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 24px 64px rgba(17,17,17,0.28);
+  overflow: hidden;
+}
+.modal-backdrop.is-open .modal { transform: scale(1); }
+.modal-header {
+  padding:18px 24px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap:12px;
+}
+.modal-header-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: rgba(255,59,48,0.10);
+  color: var(--c-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.modal-header-icon.is-danger { background: #FFE9E7; color: var(--c-danger); }
+.modal-header-icon.is-warning { background: #FFF1DD; color: var(--c-warning); }
+.modal-header-icon [data-lucide] { width: 18px; height: 18px; }
+.modal-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:16px;
+  font-weight: 600;
+  color: var(--c-navy);
+  margin:0 0 4px;
+}
+.modal-subtitle { font-size:13px; color: var(--c-mute); margin:0; line-height: 1.5; }
+.modal-body {
+  padding:6px 24px 18px;
+  font-size:13px;
+  color: var(--c-ink);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+.modal-footer {
+  padding:12px 24px;
+  background: var(--c-bg-off);
+  border-top: 1px solid var(--c-line-2);
+  display: flex;align-items:center;
+  justify-content: flex-end;
+  gap:8px;
+}
+
+/* ============== FIELDS ============== */
+.field { margin-bottom:16px; }
+.field-label { display: block; font-size:12.5px; font-weight: 500; color: var(--c-mute); margin-bottom:6px; }
+.field-label .req { color: var(--c-danger); margin-left:2px; }
+.field-input { width: 100%; }
+.field-help { font-size:12px; color: var(--c-mute-2); margin-top:4px; }
+/* Rule #43 — จองพื้นที่ error ไว้ (visibility แทน display) → error โผล่แล้วฟอร์มไม่กระตุก.
+   ถ้า field ไหนไม่ใส่ <div class="field-error"> ก็ไม่จองพื้นที่ (author เลือกเองรายตัว) */
+.field-error { font-size:12px; color: var(--c-danger); margin-top:4px; min-height: 15px; visibility: hidden; }
+.field.is-invalid .input,
+.field.is-invalid .select,
+.field.is-invalid .notes-area { border-color: var(--c-danger); }
+.field.is-invalid .field-error { visibility: visible; }
+.modal-note-list { margin:0 0 12px; padding-left:18px; font-size:13px; line-height:1.9; color:var(--c-mute); }
+
+/* Responsive form grid (Iron Rule #17) */
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap:12px;
+}
+
+/* ============== TOAST ============== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--c-navy);
+  color: #fff;
+  padding:12px 18px;
+  border-radius: 10px;
+  font-size:13px;
+  font-weight: 500;
+  z-index:var(--z-toast);
+  display: flex;
+  align-items: center;
+  gap:10px;
+  box-shadow: 0 12px 32px rgba(17,17,17,0.30);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 380px;
+}
+.toast.is-visible { transform: translateY(0); opacity: 1; }
+.toast.is-success { background: var(--c-success); }
+.toast.is-info { background: var(--c-primary); }
+.toast.is-warning { background: var(--c-warning); }
+.toast.is-error { background: var(--c-danger); }
+.toast [data-lucide] { width: 17px; height: 17px; }
+
+/* ============== LINE EXPAND ANIMATION (Pattern E) ============== */
+.line-expanded {
+  animation: lineExpand 220ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+@keyframes lineExpand {
+  from { max-height: 0; opacity: 0; transform: translateY(-8px); }
+  to { max-height: 600px; opacity: 1; transform: translateY(0); }
+}
+
+/* ============== WIZARD LAYOUT (Iron Rule #22) ============== */
+.page-content-host.has-wizard { display: flex; flex-direction: column; height: 100%; }
+.wizard-shell { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 100%; }
+.wizard-stepper-band {
+  flex: 0 0 auto; background: white;
+  padding:18px 32px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.wizard-body { flex: 1 1 auto; padding:24px 32px 28px; min-height: 0; background: var(--c-bg-off); }
+.wizard-card {
+  padding:28px 32px;
+  width: 100%;
+  max-width: 960px;
+  margin:0 auto;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+}
+.wizard-footer {
+  flex: 0 0 auto;
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding:12px 32px;
+  display: flex;align-items:center;
+  justify-content: space-between;
+  border-top: 1px solid var(--c-line-2);
+  box-shadow: 0 -2px 8px rgba(17,17,17,0.04);
+  z-index:var(--z-sticky);
+}
+.stepper-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+  max-width: 640px;
+  margin:0 auto;
+  gap:0;
+}
+.stepper-row .step-line {
+  flex: 1 1 auto;
+  min-width: 28px;
+  max-width: 80px;
+  height: 2px;
+  background: var(--c-line-2);
+}
+.stepper-row .step-line.is-done { background: var(--c-primary); }
+.step-dot {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--c-line-2);
+  color: var(--c-mute-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12.5px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.step-dot.is-active { background: var(--c-primary); color: #fff; }
+.step-dot.is-done { background: var(--c-primary); color: #fff; }
+
+/* ============== UTILITIES ============== */
+.hidden { display: none !important; }  /* v6.1 — search-select/overlay พึ่ง class นี้ (เดิมหายไป ทำให้ ss-list เปิดค้าง + ปุ่ม X โผล่) */
+.text-mute { color: var(--c-mute); }
+.text-mute-2 { color: var(--c-mute-2); }
+.text-primary { color: var(--c-primary); }
+.text-success { color: var(--c-success); }
+.text-danger { color: var(--c-danger); }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap:8px; }
+.gap-3 { gap:12px; }
+.gap-4 { gap:16px; }
+.mb-2 { margin-bottom:8px; }
+.mb-3 { margin-bottom:12px; }
+.mb-4 { margin-bottom:16px; }
+.mt-2 { margin-top:8px; }
+.mt-3 { margin-top:12px; }
+.mt-4 { margin-top:16px; }
+
+/* Icon utility classes (CSS-defined so no Tailwind dependency for these) */
+.w-2\.5 { width: 10px; }   .h-2\.5 { height: 10px; }
+.w-3   { width: 12px; }    .h-3   { height: 12px; }
+.w-3\.5 { width: 14px; }   .h-3\.5 { height: 14px; }
+.w-4   { width: 16px; }    .h-4   { height: 16px; }
+.w-5   { width: 20px; }    .h-5   { height: 20px; }
+
+/* ============================================================
+   Lucide SVG sizing fix
+   ------------------------------------------------------------
+   Lucide replaces <i data-lucide="..."> with <svg class="lucide ...">
+   ที่มี width="24" height="24" attributes ติดมาด้วย — attributes
+   เหล่านี้ override CSS class .w-N ทำให้ icons เด้งเป็น 24×24
+   ดัน pill/button สูงเกินขนาด design.
+
+   วิธีแก้: บังคับ svg.lucide ทุกตัวให้ width/height = 1em แล้ว
+   ปรับขนาดผ่าน font-size บน parent. Plus override สำหรับเคสที่
+   ใช้ .w-N/.h-N โดยตรงบน <i> (Lucide จะ copy class ไปยัง svg)
+   ============================================================ */
+svg.lucide {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: -0.125em;
+  flex-shrink: 0;
+}
+/* เมื่อ .w-N / .h-N ถูก copy ไปบน svg.lucide ให้บังคับ override
+   width/height attributes ที่ Lucide ใส่มา (specificity ชนะ attribute) */
+svg.lucide.w-2\.5 { width: 10px; }   svg.lucide.h-2\.5 { height: 10px; }
+svg.lucide.w-3    { width: 12px; }   svg.lucide.h-3    { height: 12px; }
+svg.lucide.w-3\.5 { width: 14px; }   svg.lucide.h-3\.5 { height: 14px; }
+svg.lucide.w-4    { width: 16px; }   svg.lucide.h-4    { height: 16px; }
+svg.lucide.w-5    { width: 20px; }   svg.lucide.h-5    { height: 20px; }
+
+/* ===== Tooltip (#33/#67 — hint เข้า ⓘ hover) ===== */
+.info-tip{display:inline-flex;align-items:center;margin-left:6px;color:var(--c-mute-2);cursor:help;position:relative}
+.info-tip svg,.info-tip i{width:14px;height:14px}
+.info-tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:var(--c-navy);color:#fff;font-size:12px;line-height:1.5;padding:8px 12px;border-radius:8px;
+  max-width:340px;width:max-content;white-space:normal;opacity:0;pointer-events:none;transition:opacity .12s;z-index:var(--z-dropdown)}
+.info-tip:hover::after{opacity:1}
+/* ===== Drop-up (#66) ===== */
+.drop-up{bottom:100%!important;top:auto!important;margin-bottom:4px}
+
+/* ===== END BASE-KIT — เขียน page-specific CSS ใต้บรรทัดนี้เท่านั้น ===== */
+
+/* ===== FEATURE CSS (page-specific) ===== */
+
+/* ============== FEATURE: Performance (master + cycle) ============== */
+/* demo/persona (RESTRICTED masking) — Rule 105: อยู่ใน .demo-strip เท่านั้น */
+.demo-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#FFF1DD;border:1px solid var(--c-line-2);border-radius:var(--r-md);padding:8px 12px;margin:0 0 var(--sp-lg);font-size:var(--fs-meta);color:var(--c-mute)}
+.demo-strip .ds-label{font-weight:700;color:var(--c-warning);display:inline-flex;align-items:center;gap:6px}
+.demo-strip .seg-control{margin-left:auto}
+
+/* page-level tabs (Rule 104 · 38.2) — feature เดียว = เมนูเดียว, ส่วนย่อยเป็น tab ในหน้า */
+.tabs{display:flex;align-items:center;gap:0;border-bottom:1px solid var(--c-line-2);margin:0 0 var(--sp-lg);flex-wrap:nowrap;overflow-x:auto}
+.tab{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 16px;margin-bottom:-1px;border:0;border-bottom:2px solid transparent;background:transparent;font:inherit;font-size:var(--fs-sub);font-weight:500;color:var(--c-mute);cursor:pointer;white-space:nowrap;flex:0 0 auto}
+.tab [data-lucide]{width:15px;height:15px}
+.tab:hover{color:var(--c-ink)}
+.tab.is-active{color:var(--c-primary);border-bottom-color:var(--c-primary);font-weight:600}
+.tab .tab-badge{font-size:var(--fs-cap);font-weight:700;background:var(--c-line-2);color:var(--c-mute);border-radius:var(--r-full);min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 6px}
+.tab.is-active .tab-badge{background:#FFE9E7;color:var(--c-primary)}
+.page-tabs{margin:0 0 var(--sp-lg)}
+.drawer-header.has-tabs{flex-direction:column;align-items:stretch;gap:0;padding-bottom:0}
+.drawer-header.has-tabs .dw-head-row{display:flex;align-items:flex-start;gap:16px;padding:0 0 12px}
+.drawer-header.has-tabs .tabs{margin:0 -24px -1px;padding:0 24px;border-bottom:0}
+
+/* filter row (Rule 40.1) */
+.filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:16px 18px;border-bottom:1px solid var(--c-line-2);background:#fff}
+.filter-row .fr-grow{flex:1 1 240px;min-width:180px;position:relative}
+.filter-row .fr-spacer{flex:1}
+
+/* compact list table (Rule 40 · 103 — 1 ข้อมูล 1 คอลัมน์, row le 52px) */
+.tbl{width:100%;border-collapse:collapse;font-size:var(--fs-sub)}
+.tbl thead th{text-align:left;font-size:var(--fs-cap);letter-spacing:.06em;text-transform:uppercase;color:var(--c-mute-2);font-weight:700;padding:10px 16px;border-bottom:1px solid var(--c-line-2);white-space:nowrap;background:#fff}
+.tbl tbody td{padding:8px 16px;border-bottom:1px solid var(--c-line-3);vertical-align:middle;height:52px;color:var(--c-ink)}
+.tbl tbody tr.is-clickable{cursor:pointer}
+.tbl tbody tr.is-clickable:hover{background:var(--c-bg-off)}
+.tbl tbody tr:last-child td{border-bottom:0}
+.tbl td.center,.tbl th.center{text-align:center}
+.tbl td.num,.tbl th.num{text-align:right;font-variant-numeric:tabular-nums}
+.tbl-person{display:inline-flex;align-items:center;gap:8px;min-width:0}
+.tbl-person .av{width:28px;height:28px;border-radius:var(--r-full);flex:0 0 28px;background:var(--c-line-3);color:var(--c-mute);display:inline-flex;align-items:center;justify-content:center;font-size:var(--fs-cap);font-weight:700}
+.tbl-person .pp{min-width:0}
+.tbl-person .pp b{display:block;font-size:var(--fs-sub);font-weight:600;color:var(--c-ink);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbl-person .pp span{display:block;font-size:var(--fs-cap);color:var(--c-mute-2);line-height:1.3}
+.mono{font-variant-numeric:tabular-nums;color:var(--c-mute)}
+.sub-note{font-size:var(--fs-cap);color:var(--c-mute-3)}
+
+/* section card (drawer / result) */
+.sec{border:1px solid var(--c-line-2);border-radius:var(--r-lg);padding:var(--sp-lg);margin:0 0 var(--sp-md);background:#fff}
+.sec>h4{margin:0 0 12px;font-size:var(--fs-h3);font-weight:600;color:var(--c-ink);display:flex;align-items:center;gap:8px}
+.sec>h4 .mla{margin-left:auto;display:inline-flex;gap:6px}
+
+/* key-value */
+.kv{display:grid;grid-template-columns:150px 1fr;gap:8px 16px;font-size:var(--fs-sub)}
+.kv dt{color:var(--c-mute-2)}
+.kv dd{color:var(--c-ink);margin:0;font-weight:500}
+
+/* KPI editor + scoring table */
+.kpitbl{width:100%;border-collapse:collapse;font-size:var(--fs-sub)}
+.kpitbl thead th{text-align:left;font-size:var(--fs-cap);text-transform:uppercase;letter-spacing:.04em;color:var(--c-mute-2);font-weight:700;padding:8px;border-bottom:1px solid var(--c-line-2);white-space:nowrap}
+.kpitbl td{padding:8px;border-bottom:1px solid var(--c-line-3);vertical-align:middle}
+.kpitbl td.center,.kpitbl th.center{text-align:center}
+.kpitbl .in{height:32px;padding:0 8px;border:1px solid var(--c-line);border-radius:var(--r-sm);font-family:inherit;font-size:var(--fs-sub);width:100%;background:#fff;color:var(--c-ink)}
+.kpitbl .in:focus{outline:none;border-color:var(--c-primary);box-shadow:0 0 0 3px rgba(255,59,48,.10)}
+.kpitbl .in.w{width:64px;text-align:center}
+.kpitbl .in.s{width:56px;text-align:center}
+.kpitbl .in.ro{background:var(--c-line-3);color:var(--c-mute-2)}
+.kpi-del{width:28px;height:28px;border:0;background:transparent;color:var(--c-mute-2);border-radius:var(--r-sm);cursor:pointer}
+.kpi-del:hover{background:#FFE9E7;color:var(--c-danger)}
+.wtag{font-size:var(--fs-cap);font-weight:700;border-radius:var(--r-full);padding:2px 10px}
+.wtag.ok{background:#E4F4EB;color:#157A41}
+.wtag.bad{background:#FFF1DD;color:#B8690B}
+.totbox{text-align:right;font-size:var(--fs-sub);color:var(--c-mute);margin-top:12px}
+.totbox b{color:var(--c-ink)}
+
+/* progress */
+.progress{height:6px;border-radius:var(--r-full);background:var(--c-line-2);overflow:hidden;min-width:96px}
+.progress>i{display:block;height:100%;background:var(--c-success);border-radius:var(--r-full);width:var(--w,0%)}
+.progress.warn>i{background:var(--c-warning)}
+
+/* DOA slot picker (role-based · ไม่ hardcode chain) */
+.slot-row{display:flex;align-items:center;gap:10px;border:1px solid var(--c-line-2);border-radius:var(--r-md);padding:10px;margin-bottom:8px}
+.slot-row .slot-no{width:24px;height:24px;border-radius:var(--r-full);background:var(--c-navy);color:#fff;font-size:var(--fs-cap);font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex:0 0 24px}
+.slot-row .slot-role{flex:0 0 128px;font-size:var(--fs-meta);color:var(--c-mute);font-weight:600}
+.slot-row .slot-pick{flex:1 1 auto;min-width:0}
+/* FIX-11 · placeholder ผู้สอบทานไม่ถูกตัดกลางคำ — ช่องกว้างขึ้น + ellipsis */
+.slot-row .slot-pick .ss-input{text-overflow:ellipsis}
+
+/* timeline (สอบทาน / audit) */
+.tl{list-style:none;margin:0;padding:0}
+.tl li{position:relative;padding:0 0 16px 20px;font-size:var(--fs-sub);color:var(--c-ink)}
+.tl li b{font-weight:600}
+.tl li::before{content:"";position:absolute;left:4px;top:4px;width:9px;height:9px;border-radius:var(--r-full);background:var(--c-line);border:2px solid #fff;box-shadow:0 0 0 1px var(--c-line)}
+.tl li.on::before{background:var(--c-success);box-shadow:0 0 0 1px var(--c-success)}
+.tl li.wait::before{background:var(--c-warning);box-shadow:0 0 0 1px var(--c-warning)}
+.tl li::after{content:"";position:absolute;left:8px;top:13px;bottom:0;width:1px;background:var(--c-line-2)}
+.tl li:last-child::after{display:none}
+.tl small{color:var(--c-mute-2);display:block;margin-top:2px}
+
+/* hooks (display-only surfaces — Movement event / Training) */
+.hookbox{border:1px dashed var(--c-line);border-radius:var(--r-md);padding:12px;background:var(--c-bg-off);font-size:var(--fs-sub);color:var(--c-mute);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.hookbox .hb-body{flex:1;min-width:200px}
+.hookbox b{color:var(--c-ink)}
+.hookbox .hb-acts{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* chips */
+.chips{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.chip-tag{font-size:var(--fs-cap);background:var(--c-line-3);border:1px solid var(--c-line-2);border-radius:var(--r-full);padding:2px 10px;color:var(--c-mute)}
+
+/* banners (warn — action-bound, not a hint) */
+.note{border-radius:var(--r-md);padding:10px 12px;font-size:var(--fs-sub);display:flex;align-items:center;gap:8px;margin:0 0 var(--sp-md)}
+.note.is-warn{background:#FFF1DD;color:#B8690B;border:1px solid rgba(184,105,11,.28)}
+.note [data-lucide]{width:16px;height:16px;flex:0 0 16px}
+.note .note-act{margin-left:auto}
+
+/* report distribution */
+.funnel-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--c-line-3)}
+.funnel-row:last-child{border-bottom:0}
+.funnel-label{flex:0 0 150px;font-size:var(--fs-sub);color:var(--c-mute)}
+.funnel-track{flex:1;height:24px;background:var(--c-line-3);border-radius:var(--r-sm);overflow:hidden}
+.funnel-bar{height:100%;background:var(--c-primary);border-radius:var(--r-sm);min-width:2px;opacity:.85;width:var(--fw,2px)}
+.funnel-val{flex:0 0 40px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* notification panel (FN-12) */
+.notif-panel{position:absolute;top:calc(var(--shell-h) - 4px);right:0;width:320px;background:#fff;border:1px solid var(--c-line-2);border-radius:var(--r-lg);box-shadow:0 12px 32px rgba(17,17,17,.12);z-index:var(--z-dropdown);padding:6px;display:none}
+.notif-panel.is-open{display:block}
+.notif-head{padding:8px 10px;font-size:var(--fs-cap);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c-mute)}
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:10px;border-radius:var(--r-md);cursor:default}
+.notif-item:hover{background:var(--c-bg-off)}
+.notif-item .ni-ic{width:30px;height:30px;border-radius:var(--r-md);background:#FFE9E7;color:var(--c-primary);display:inline-flex;align-items:center;justify-content:center;flex:0 0 30px}
+.notif-item .ni-b{font-size:var(--fs-sub);color:var(--c-ink);font-weight:600}
+.notif-item .ni-m{font-size:var(--fs-cap);color:var(--c-mute-2);margin-top:2px}
+
+/* masked value */
+.masked{color:var(--c-mute-3);letter-spacing:.12em}
+
+/* misc utils used by feature */
+.mla{margin-left:auto}
+.fx1{flex:1}
+.rel{position:relative}
+.hdr-right{display:flex;align-items:center;gap:6px;margin-left:auto}
+.stack-8{display:flex;flex-direction:column;gap:8px}
+.rowbtw{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.rb-acts{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.field label{display:block;font-size:var(--fs-meta);color:var(--c-mute);margin-bottom:6px;font-weight:500}
+
+/* layout utils (แทน inline style — Rule inline-layout) */
+.w180{width:180px}.w220{width:220px}.m0{margin:0}.pad-lr{padding:16px 18px}.pw120{min-width:120px}
+.mt-3{margin-top:12px}.mt-4{margin-top:16px}.mb-3{margin-bottom:12px}
+.h3t{font-size:var(--fs-h3);font-weight:600}
+.req{color:var(--c-danger);margin-left:2px}
+/* Rule #103A — overdue flag เป็นคอลัมน์ของตัวเอง (ไม่ซ้อน pill ในคอลัมน์สถานะ) */
+.due-ok{font-size:var(--fs-cap);color:var(--c-mute-3)}
+
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i data-lucide="box" class="w-4 h-4"></i></div>
+    <div><div class="sb-name">CUBE NATIVE</div><div class="sb-sub">ทรัพยากรบุคคล</div></div>
+  </div>
+  <nav class="sb-nav" id="sb-nav">
+    <div class="sb-module" data-module="hr" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)"><i data-lucide="users" class="mod-icon w-3.5 h-3.5"></i><span class="mod-label">ทรัพยากรบุคคล</span><i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i></button>
+      <div class="sb-features">
+        <a class="sb-item" data-feature="payroll"><i data-lucide="banknote" class="w-4 h-4"></i><span>เงินเดือน</span></a>
+        <a class="sb-item" data-feature="welfare"><i data-lucide="heart-handshake" class="w-4 h-4"></i><span>สวัสดิการ</span></a>
+        <a class="sb-item" data-feature="recruit"><i data-lucide="user-plus" class="w-4 h-4"></i><span>สรรหา</span></a>
+        <a class="sb-item is-active" data-feature="performance"><i data-lucide="target" class="w-4 h-4"></i><span>ประเมินผลงาน</span></a>
+        <a class="sb-item" data-feature="training"><i data-lucide="graduation-cap" class="w-4 h-4"></i><span>อบรม</span></a>
+        <a class="sb-item" data-feature="movement"><i data-lucide="arrow-left-right" class="w-4 h-4"></i><span>โยกย้าย/ปรับตำแหน่ง</span></a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="system" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)"><i data-lucide="sliders-horizontal" class="mod-icon w-3.5 h-3.5"></i><span class="mod-label">ระบบ</span><i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i></button>
+      <div class="sb-features"><a class="sb-item" data-feature="hrconfig"><i data-lucide="settings-2" class="w-4 h-4"></i><span>ตั้งค่า HR</span></a></div>
+    </div>
+  </nav>
+  <div class="sb-footer"><div class="pulse-dot"></div><span>DEMO · v1.0.0</span></div>
+</aside>
+
+<main class="main">
+  <header class="shell-bar">
+    <button class="nav-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')"><i data-lucide="menu" class="w-5 h-5"></i></button>
+    <nav class="breadcrumb"><a>ทรัพยากรบุคคล</a><i data-lucide="chevron-right" class="w-3 h-3 sep"></i><span class="breadcrumb-current">ประเมินผลงาน</span></nav>
+    <div class="hdr-right">
+      <div class="rel">
+        <button class="icon-btn" onclick="toggleNotif(event)" id="notifBtn"><i data-lucide="bell" class="w-4 h-4"></i><span class="notif-dot"></span></button>
+        <div class="notif-panel" id="notifPanel"></div>
+      </div>
+      <div class="rel">
+        <div class="user-chip" onclick="toggleUserMenu()"><div class="user-text"><div class="user-name" id="uName">—</div><div class="user-role" id="uRole">—</div></div><div class="avatar" id="uAv">HR</div></div>
+        <div class="user-menu" id="userMenu"><div class="user-menu-item"><i data-lucide="user" class="w-3.5 h-3.5"></i><span>โปรไฟล์</span></div><div class="user-menu-item"><i data-lucide="settings" class="w-3.5 h-3.5"></i><span>ตั้งค่าส่วนตัว</span></div><div class="user-menu-divider"></div><div class="user-menu-item is-danger"><i data-lucide="log-out" class="w-3.5 h-3.5"></i><span>ออกจากระบบ</span></div></div>
+      </div>
+    </div>
+  </header>
+  <div class="content" id="page-content"></div>
+</main>
+
+<!-- SEC: scope_type — staff=SELF · mgr=DEPT(เฉพาะแผนกตัวเอง) · hr(manage)=ALL — ประกาศใน SEC_BRIEF (OQ-PERF-03 resolved: หัวหน้าเห็นเฉพาะแผนกตัวเอง) -->
+<!-- OQ-PERF-01 resolved: อนุญาต re-open ผลที่เผยแพร่แล้ว — authorized (manage) + open cycle + published เท่านั้น · append-only audit บันทึก "ใครแก้" (มติ PM/BA: แก้ไขได้แต่ต้องเก็บ logs ว่าใครแก้) -->
+<!-- CSQ hook: perf.result.published → ยิงท่อ 7C ตอนเผยแพร่ผลรายคน — มติ OQ-PERF-02 (RESOLVED: per-person publish) · EC valuation detail = architect item (คงรอสถาปนิก) · ห้ามประกาศ OC/DC ซ้ำ -->
+
+
+
+<!-- ============================================ -->
+<!-- BODY CONTENT GOES HERE                       -->
+<!-- ============================================ -->
+<!-- For ERP: use templates/erp-shell.template.html -->
+<!-- For General: use templates/general-shell.template.html -->
+
+<!-- Drawer container (always include, even if no drawer used initially) -->
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <!-- Drawer content rendered by render() function -->
+</div>
+
+<!-- Modal container -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <!-- Modal content rendered by render() function -->
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast" id="toast"></div>
+
+<!-- ============================================================
+     Lucide Icons Loader (multi-CDN fallback, pinned version)
+     ------------------------------------------------------------
+     ทำไมไม่ใช้ <script src="..."> ตรง ๆ:
+       - Single CDN = single point of failure (corp proxy/firewall block)
+       - @latest = breaking changes โดยไม่บอก (GitHub issue #2962)
+       - <script> ใน <head> โดยไม่มี defer ชน DOMContentLoaded
+     กลยุทธ์:
+       1) Pin version 0.469.0 (stable, ทดสอบแล้ว)
+       2) ลอง CDN 3 ตัวเรียงตามความน่าเชื่อถือ: unpkg → jsdelivr → cdnjs
+       3) ถ้าทุก CDN fail → log warning + ไม่ block render
+            (UI ยังใช้งานได้ แค่ไม่มี icons)
+     ============================================================ -->
+<script>
+(function loadLucide() {
+  var version = '0.469.0';
+  var cdns = [
+    'https://unpkg.com/lucide@' + version + '/dist/umd/lucide.min.js',
+    'https://cdn.jsdelivr.net/npm/lucide@' + version + '/dist/umd/lucide.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/lucide/' + version + '/lucide.min.js'
+  ];
+  var i = 0;
+  function tryNext() {
+    if (i >= cdns.length) {
+      console.warn('[Lucide] All CDNs failed. Icons จะไม่แสดง but UI ยังใช้งานได้');
+      window.lucide = window.lucide || { createIcons: function() {} }; // no-op fallback
+      window.dispatchEvent(new Event('lucide:ready'));
+      return;
+    }
+    var s = document.createElement('script');
+    s.src = cdns[i++];
+    s.onload = function() {
+      window.dispatchEvent(new Event('lucide:ready'));
+    };
+    s.onerror = tryNext;
+    document.head.appendChild(s);
+  }
+  tryNext();
+})();
+</script>
+
+<script>
+// ============================================
+// STATE
+// ============================================
+const state = {
+  currentRoute: 'home',
+  drawer: { open: false, mode: null, recordId: null, step: 1 },
+  modal: { open: false, type: null, data: null },
+  toast: { visible: false, message: '', variant: 'info' },
+  filters: { search: '', status: 'all' },
+  pagination: { page: 1, pageSize: 20 },
+  sort: { col: null, dir: 'asc' },
+  selectedIds: new Set(),
+  records: [],
+};
+
+// ============================================
+// SIDEBAR — Module collapse/expand (Iron Rule #27)
+// Module header is non-navigable; click toggles children visibility.
+// State persists in DOM (data-expanded) — future: persist per user.
+// ============================================
+function toggleModule(headerEl) {
+  const mod = headerEl.closest('.sb-module');
+  if (!mod) return;
+  const isExpanded = mod.getAttribute('data-expanded') !== 'false';
+  mod.setAttribute('data-expanded', isExpanded ? 'false' : 'true');
+}
+
+// ============================================
+// ROUTER (Hash-based, refresh-safe)
+// ============================================
+function getRoute() {
+  const hash = location.hash;
+  if (!hash || hash === '#' || hash === '#/') return 'home';
+  return hash.replace(/^#\//, '');
+}
+function navigate(route) {
+  location.hash = '#/' + route;
+}
+
+// ============================================
+// DRAWER / MODAL TOGGLES
+// ============================================
+function openDrawer(mode, recordId) {
+  state.drawer = { open: true, mode, recordId, step: 1 };
+  render();
+  // Trigger CSS animation
+  requestAnimationFrame(() => {
+    document.getElementById('drawerBackdrop').classList.add('is-open');
+    const dw = document.getElementById('drawer');
+    dw.classList.add('is-open');
+    dw.setAttribute('aria-hidden', 'false');
+    lockScroll(true);
+    trapFocus(dw);
+    guardOverlayAutoCombo();
+  });
+}
+function closeDrawer() {
+  document.getElementById('drawerBackdrop').classList.remove('is-open');
+  const dw = document.getElementById('drawer');
+  dw.classList.remove('is-open');
+  dw.setAttribute('aria-hidden', 'true');
+  releaseFocus(dw);
+  lockScroll(false);
+  setTimeout(() => {
+    state.drawer = { open: false, mode: null, recordId: null, step: 1 };
+  }, 280);
+}
+function openModal(type, data) {
+  state.modal = { open: true, type, data };
+  render();
+  requestAnimationFrame(() => {
+    const mb = document.getElementById('modalBackdrop');
+    mb.classList.add('is-open');
+    lockScroll(true);
+    trapFocus(mb.querySelector('.modal') || mb);
+    guardOverlayAutoCombo();
+  });
+}
+/* DSP-02b (สำเนา feature): trapFocus (BASE-KIT) auto-focus ช่องแรกของ overlay ถ้าเป็น ss-input →
+   onfocus=ssOpen เปิด dropdown เอง → ปิดคืนหลัง trapFocus (rAF ตามหลัง rAF ของ trapFocus)
+   ไม่แตะ BASE-KIT trapFocus (mirror F-HR-WELFARE) · latent BASE-KIT bug ยังไม่แก้ต้นทาง */
+function guardOverlayAutoCombo(){
+  requestAnimationFrame(function(){
+    var ae=document.activeElement;
+    if(ae&&ae.classList&&ae.classList.contains('ss-input')){
+      var key=(ae.id||'').replace('ss-input-','');
+      var s=window.__ss&&window.__ss[key]; if(s)s.open=false;
+      var l=document.getElementById(ssId('ss-list-',key)); if(l)l.classList.add('hidden');
+      if(ae.blur)ae.blur();
+    }
+  });
+}
+function closeModal() {
+  const mb = document.getElementById('modalBackdrop');
+  mb.classList.remove('is-open');
+  releaseFocus(mb.querySelector('.modal') || mb);
+  /* ลิ้นชักอาจยังเปิดอยู่ข้างหลัง — ปลดล็อกเฉพาะตอนไม่มี overlay เหลือแล้ว */
+  lockScroll(!!(window.state && state.drawer && state.drawer.open));
+  setTimeout(() => {
+    state.modal = { open: false, type: null, data: null };
+  }, 200);
+}
+
+// ============================================
+// TOAST
+// ============================================
+function showToast(message, variant = 'info', durationMs = 2800) {
+  const el = document.getElementById('toast');
+  const iconMap = { success: 'check-circle-2', info: 'info', warning: 'alert-triangle', error: 'x-circle' };
+  el.className = 'toast is-' + variant;
+  el.innerHTML = `<i data-lucide="${iconMap[variant] || 'info'}" class="w-4 h-4"></i><span>${message}</span>`;
+  renderIcons();
+  requestAnimationFrame(() => el.classList.add('is-visible'));
+  setTimeout(() => el.classList.remove('is-visible'), durationMs);
+}
+
+// ============================================
+// ESC key handler (close drawer/modal)
+// ============================================
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (state.modal.open) closeModal();
+    else if (state.drawer.open) closeDrawer();
+  }
+});
+
+// ============================================
+// RENDER (placeholder — replace per feature)
+// ============================================
+function render() {
+  // Specific feature should override this function.
+  //
+  // ⚠️ Iron Rule #29 — Render Preservation:
+  // If your render() does innerHTML rebuild (typical pattern), wrap with
+  // withRenderPreservation() OR use preserveRenderState()/restoreRenderState()
+  // to keep scroll position + focus across re-renders.
+  //
+  // Example:
+  //   function render() {
+  //     const snap = preserveRenderState();
+  //     document.getElementById('page-content').innerHTML = renderPage();
+  //     drawer.innerHTML = state.drawer.open ? renderDrawer() : '';
+  //     renderIcons();
+  //     restoreRenderState(snap);
+  //   }
+  //
+  // After every DOM update, call renderIcons() — safe wrapper ที่ทน race เมื่อ Lucide ยังไม่ load.
+  renderIcons();
+}
+
+// ============================================
+// INIT
+// ============================================
+// Helper: safe icon render — กัน race ก่อน lucide load เสร็จ
+function renderIcons() {
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// ============================================
+// SEARCH-SELECT (Iron Rule #34) — generic searchable dropdown
+// ------------------------------------------------
+// ใช้แทน select ธรรมดา เมื่อ options เยอะ (>8) หรือเป็น lookup จาก master อื่น.
+// list = position:absolute overlay → ไม่ดันเนื้อหา. แก้เฉพาะ list ตอนพิมพ์ →
+// ไม่ rebuild ทั้งหน้า (ไม่ชน Rule #29). decoupled — เรียก onSelect callback ไม่ผูก render().
+//
+// วิธีใช้ 2 ขั้น:
+//   1) ใส่ markup:  ${searchSelectHTML('country', { placeholder: 'เลือกประเทศ' })}
+//   2) หลัง markup อยู่ใน DOM แล้ว (เช่นท้าย render()):
+//        initSearchSelect('country', {
+//          options: countries.map(c => ({ value:c.code, label:c.name, sub:c.code, icon:'flag', right:'' })),
+//          value: state.form.country,
+//          onSelect: (val, opt) => { state.form.country = val; }
+//        });
+// option fields: { value, label, sub?, icon?, right? }
+// ============================================
+window.__ss = window.__ss || {};
+function ssId(p, k){ return p + k; }
+function ssGet(key){ return window.__ss[key]; }
+function ssEscapeReg(s){ return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+function searchSelectHTML(key, opt){
+  opt = opt || {};
+  var ph = opt.placeholder || 'ค้นหา...';
+  return ''
+    + '<div class="search-select" id="ss-' + key + '">'
+    +   '<i data-lucide="search" class="ss-lead w-4 h-4"></i>'
+    +   '<input type="text" class="input ss-input" id="ss-input-' + key + '" autocomplete="off" placeholder="' + ph + '"'
+    +     ' oninput="ssOnInput(\'' + key + '\', this.value)" onfocus="ssOpen(\'' + key + '\')" onkeydown="ssOnKey(\'' + key + '\', event)">'
+    +   '<button type="button" class="ss-clear hidden" id="ss-clear-' + key + '" tabindex="-1" onclick="ssClear(\'' + key + '\')"><i data-lucide="x" class="w-4 h-4"></i></button>'
+    +   '<i data-lucide="chevron-down" class="ss-caret w-4 h-4" id="ss-caret-' + key + '"></i>'
+    +   '<div class="ss-list hidden" id="ss-list-' + key + '"></div>'
+    + '</div>';
+}
+function initSearchSelect(key, cfg){
+  cfg = cfg || {};
+  window.__ss[key] = {
+    options: cfg.options || [], value: (cfg.value != null ? cfg.value : null),
+    onSelect: cfg.onSelect || function(){}, emptyText: cfg.emptyText || 'ไม่พบรายการ',
+    query: '', open: false, hi: 0
+  };
+  ssSetText(key); ssSyncChrome(key); renderIcons();
+}
+function ssFiltered(key){
+  var s = ssGet(key); if(!s) return [];
+  var q = (s.query || '').toLowerCase().trim();
+  if(!q) return s.options;
+  return s.options.filter(function(o){
+    return String(o.label).toLowerCase().includes(q)
+      || String(o.value).toLowerCase().includes(q)
+      || String(o.sub || '').toLowerCase().includes(q);
+  });
+}
+function ssSyncChrome(key){
+  var s = ssGet(key); if(!s) return;
+  var sel = s.options.find(function(o){ return o.value === s.value; });
+  var c = document.getElementById(ssId('ss-clear-', key)); if(c) c.classList.toggle('hidden', !sel);
+  var k = document.getElementById(ssId('ss-caret-', key)); if(k) k.classList.toggle('hidden', !!sel);
+}
+function ssSetText(key){
+  var s = ssGet(key); if(!s) return;
+  var input = document.getElementById(ssId('ss-input-', key)); if(!input) return;
+  var sel = s.options.find(function(o){ return o.value === s.value; });
+  input.value = s.open ? s.query : (sel ? sel.label : '');
+}
+function ssRenderList(key){
+  var s = ssGet(key); if(!s) return;
+  var list = document.getElementById(ssId('ss-list-', key)); if(!list) return;
+  var items = ssFiltered(key);
+  if(items.length === 0){
+    list.innerHTML = '<div class="ss-empty">' + s.emptyText + '</div>';
+  } else {
+    var q = (s.query || '').toLowerCase().trim();
+    var hl = function(t){ return q ? String(t).replace(new RegExp('(' + ssEscapeReg(q) + ')', 'gi'), '<mark>$1</mark>') : String(t); };
+    list.innerHTML = items.map(function(o, i){
+      return '<button type="button" class="ss-opt ' + (i === s.hi ? 'is-active' : '') + '" onmousedown="event.preventDefault()" onclick="ssPick(\'' + key + '\', ' + i + ')">'
+        + (o.icon ? '<i data-lucide="' + o.icon + '" class="ss-opt-ic w-4 h-4"></i>' : '')
+        + '<span class="ss-opt-main"><span class="ss-opt-label">' + hl(o.label) + '</span>'
+        + (o.sub ? '<span class="ss-opt-sub">' + hl(o.sub) + '</span>' : '') + '</span>'
+        + (o.right ? '<span class="ss-opt-right">' + o.right + '</span>' : '')
+        + '</button>';
+    }).join('');
+  }
+  list.classList.toggle('hidden', !s.open);
+  renderIcons();
+}
+function ssOpen(key){ var s = ssGet(key); if(!s) return; s.open = true; s.query = ''; s.hi = 0; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+function ssOnInput(key, val){ var s = ssGet(key); if(!s) return; s.query = val; s.open = true; s.hi = 0; s.value = null; ssSyncChrome(key); ssRenderList(key); }
+function ssPick(key, i){ var s = ssGet(key); if(!s) return; var o = ssFiltered(key)[i]; if(!o) return; s.value = o.value; s.query = ''; s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); s.onSelect(o.value, o); }
+function ssClear(key){ var s = ssGet(key); if(!s) return; s.value = null; s.query = ''; s.open = true; ssSetText(key); ssSyncChrome(key); ssRenderList(key); var inp = document.getElementById(ssId('ss-input-', key)); if(inp) inp.focus(); s.onSelect(null, null); }
+function ssOnKey(key, e){
+  var s = ssGet(key); if(!s) return; var items = ssFiltered(key);
+  if(e.key === 'ArrowDown'){ e.preventDefault(); s.open = true; s.hi = Math.min(items.length - 1, s.hi + 1); ssRenderList(key); }
+  else if(e.key === 'ArrowUp'){ e.preventDefault(); s.hi = Math.max(0, s.hi - 1); ssRenderList(key); }
+  else if(e.key === 'Enter'){ e.preventDefault(); if(items[s.hi]) ssPick(key, s.hi); }
+  /* Esc ต้องปิดแค่เมนู ห้ามให้ event ทะลุไปปิดลิ้นชัก/หน้าต่างยืนยัน (Rule #94 ข้อ 3 — Esc chain)
+     แก้ 2026-08-03 โดยทีม ERP-Design · ดู CLAUDE.md หัวข้อ "แก้ที่ตัว skill" */
+  else if(e.key === 'Escape'){ e.stopPropagation(); s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+}
+document.addEventListener('click', function(e){
+  Object.keys(window.__ss || {}).forEach(function(key){
+    var wrap = document.getElementById(ssId('ss-', key)); var s = ssGet(key);
+    if(wrap && s && s.open && !wrap.contains(e.target)){ s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+  });
+});
+
+// ============================================
+// FORMAT HELPERS (Iron Rule #43) — Thai locale, consistent ทุก feature
+// ใช้ตัวเหล่านี้เสมอ ห้าม format ตัวเลข/วันที่เองรายจุด
+// ============================================
+function fmtNumber(n, dp){ if(n==null||n==='')return '—'; var x=Number(n); if(isNaN(x))return String(n);
+  return x.toLocaleString('th-TH', {minimumFractionDigits: dp||0, maximumFractionDigits: dp!=null?dp:2}); }
+function fmtMoney(n, dp){ if(n==null||n==='')return '—'; var x=Number(n); if(isNaN(x))return String(n);
+  return '฿' + x.toLocaleString('th-TH', {minimumFractionDigits: dp!=null?dp:2, maximumFractionDigits: dp!=null?dp:2}); }
+function fmtDate(iso, buddhist){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso);
+  var s=d.toLocaleDateString('th-TH', {year:'numeric', month:'short', day:'numeric'});
+  return buddhist===false ? d.toLocaleDateString('en-GB',{year:'numeric',month:'short',day:'numeric'}) : s; }
+function fmtDateTime(iso){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso);
+  return d.toLocaleString('th-TH', {year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+
+// ============================================
+// INLINE VALIDATION (Iron Rule #43) — validate ตอน blur, ไม่ใช่รอ submit อย่างเดียว
+// markup: <div class="field"><input class="input" onblur="validateField(this, v => v.trim()? '' : 'จำเป็นต้องกรอก')">
+//          <div class="field-error"></div></div>
+// validator คืน '' = ผ่าน / ข้อความ = error
+// ============================================
+function validateField(el, validator){
+  var field = el.closest('.field'); if(!field) return true;
+  var msg = '';
+  try { msg = validator ? validator(el.value, el) : ''; } catch(e){ msg=''; }
+  var errEl = field.querySelector('.field-error');
+  if(msg){ field.classList.add('is-invalid'); if(errEl) errEl.textContent = msg; return false; }
+  field.classList.remove('is-invalid'); return true;
+}
+function clearFieldError(el){ var f=el.closest('.field'); if(f) f.classList.remove('is-invalid'); }
+
+// ============================================
+// EMPTY STATE (Iron Rule #39) — list/section ว่าง ต้องมี icon + title + desc + (action)
+// ============================================
+function emptyStateHTML(cfg){
+  cfg = cfg || {};
+  var act = cfg.actionLabel ? '<button class="btn btn-primary" onclick="' + (cfg.onAction||'') + '">' +
+    (cfg.actionIcon ? '<i data-lucide="' + cfg.actionIcon + '" class="w-4 h-4"></i>' : '') +
+    '<span>' + cfg.actionLabel + '</span></button>' : '';
+  return '<div class="empty">'
+    + '<div class="empty-icon"><i data-lucide="' + (cfg.icon||'inbox') + '" class="w-5 h-5"></i></div>'
+    + '<div class="empty-title">' + (cfg.title||'ยังไม่มีข้อมูล') + '</div>'
+    + '<div class="empty-desc">' + (cfg.desc||'') + '</div>'
+    + act + '</div>';
+}
+
+// ============================================
+// RENDER PRESERVATION (Iron Rule #29)
+// ------------------------------------------------
+// ทุกครั้งที่ render() ทำ innerHTML = ... full DOM rebuild
+// scroll position + focus + cursor selection จะหาย —
+// user รู้สึก "เด้งกลับบน" ทุกครั้งที่ toggle/click.
+//
+// withRenderPreservation(renderFn) wraps a render function
+// to save state before innerHTML rebuild, then restore after.
+//
+// Preserves:
+//   - scrollTop ของ .drawer-body
+//   - scrollTop ของ .modal-body
+//   - window.scrollY (page-level scroll)
+//   - document.activeElement focus + selection range (input/textarea ที่กำลังพิมพ์)
+//
+// Usage:
+//   const render = withRenderPreservation(function actualRender() {
+//     content.innerHTML = ...
+//   });
+//
+// หรือเรียกตรง ๆ ใน render() ที่มีอยู่แล้ว:
+//   function render() {
+//     const snapshot = preserveRenderState();
+//     // ... innerHTML rebuilds ...
+//     restoreRenderState(snapshot);
+//   }
+// ============================================
+function preserveRenderState() {
+  const drawerBody = document.querySelector('.drawer-body');
+  const modalBody = document.querySelector('.modal-body');
+  const activeEl = document.activeElement;
+  const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+  return {
+    drawerScroll: drawerBody ? drawerBody.scrollTop : 0,
+    modalScroll: modalBody ? modalBody.scrollTop : 0,
+    pageScroll: window.scrollY,
+    focusKey: isInput ? {
+      placeholder: activeEl.placeholder || '',
+      type: activeEl.type || '',
+      name: activeEl.name || '',
+      selStart: activeEl.selectionStart,
+      selEnd: activeEl.selectionEnd,
+    } : null,
+  };
+}
+function restoreRenderState(snap) {
+  if (!snap) return;
+  requestAnimationFrame(function() {
+    const dBody = document.querySelector('.drawer-body');
+    if (dBody && snap.drawerScroll > 0) dBody.scrollTop = snap.drawerScroll;
+    const mBody = document.querySelector('.modal-body');
+    if (mBody && snap.modalScroll > 0) mBody.scrollTop = snap.modalScroll;
+    if (snap.pageScroll > 0) window.scrollTo(0, snap.pageScroll);
+
+    if (snap.focusKey) {
+      const candidates = document.querySelectorAll('input, textarea');
+      for (let i = 0; i < candidates.length; i++) {
+        const c = candidates[i];
+        if ((c.placeholder || '') === snap.focusKey.placeholder
+            && (c.type || '') === snap.focusKey.type
+            && (c.name || '') === snap.focusKey.name) {
+          c.focus();
+          if (snap.focusKey.selStart != null && typeof c.setSelectionRange === 'function') {
+            try { c.setSelectionRange(snap.focusKey.selStart, snap.focusKey.selEnd); } catch(e) {}
+          }
+          break;
+        }
+      }
+    }
+  });
+}
+function withRenderPreservation(renderFn) {
+  return function preservedRender() {
+    const snap = preserveRenderState();
+    const result = renderFn.apply(this, arguments);
+    restoreRenderState(snap);
+    return result;
+  };
+}
+
+window.addEventListener('hashchange', function () { render(); });  // v6.1 late-binding — ให้ชี้ render() ตัวที่ feature override (ผูกตรง ๆ จะ capture placeholder เดิม)
+
+// รอ DOM + Lucide ทั้งคู่ก่อน first render
+// (Lucide loader จะ dispatch 'lucide:ready' เมื่อ load สำเร็จ
+//  หรือเมื่อทุก CDN fail แล้ว fallback เป็น no-op)
+var domReady = false;
+var lucideReady = false;
+function bootIfReady() {
+  if (domReady && lucideReady) {
+    render();
+    renderIcons();
+  }
+}
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', function() { domReady = true; bootIfReady(); });
+} else {
+  domReady = true;
+}
+// Listen for ready event AND check ว่า lucide load ไปแล้วหรือยัง
+// (script ตัวนี้รันหลัง loader — ถ้า loader sync เสร็จก่อน, event อาจหายไปแล้ว)
+window.addEventListener('lucide:ready', function() { lucideReady = true; bootIfReady(); });
+if (window.lucide && typeof window.lucide.createIcons === 'function') {
+  lucideReady = true;
+}
+bootIfReady();
+// Safety net: ถ้า lucide:ready ไม่มาภายใน 5s ให้ render ไปก่อน (UI ยังใช้งานได้)
+setTimeout(function() {
+  if (!lucideReady) {
+    console.warn('[Lucide] Timeout — rendering without icons');
+    lucideReady = true;
+    bootIfReady();
+  }
+}, 5000);
+</script>
+
+
+<script>
+/* ===== BASE-KIT UTILS (#66/#68/#95) — DO NOT EDIT ===== */
+/* #95: เมนูใน scroll container (.table-wrap / drawer body / B2 line grid)
+   ต้อง portal ด้วย util นี้ — z-index อย่างเดียวช่วยไม่ได้เพราะโดน ancestor overflow clip */
+function portalMenu(trigger, menu){
+  let host = document.getElementById('overlay-root');
+  if(!host){ host = document.createElement('div'); host.id='overlay-root'; document.body.appendChild(host); }
+  if(menu.parentElement !== host) host.appendChild(menu);
+  menu.classList.add('menu-fixed');
+  const r = trigger.getBoundingClientRect();
+  const below = window.innerHeight - r.bottom - 12, above = r.top - 12;
+  const h = Math.min(menu.scrollHeight || 320, 320);
+  menu.style.left = r.left + 'px';
+  menu.style.width = r.width + 'px';
+  if(below < h && above > below){ menu.style.top='auto'; menu.style.bottom=(window.innerHeight-r.top+4)+'px';
+    menu.style.maxHeight = Math.min(h, above)+'px'; }
+  else { menu.style.bottom='auto'; menu.style.top=(r.bottom+4)+'px';
+    menu.style.maxHeight = Math.min(h, Math.max(below,120))+'px'; }
+  menu._trigger = trigger;
+  const reposition = ()=>{ if(menu.classList.contains('open')) portalMenu(trigger, menu); };
+  if(!menu._portalBound){ menu._portalBound = true;
+    window.addEventListener('scroll', reposition, true);
+    window.addEventListener('resize', reposition); }
+}
+function positionMenu(trigger,menu){const r=trigger.getBoundingClientRect();
+  const below=window.innerHeight-r.bottom-12, above=r.top-12, h=Math.min(menu.scrollHeight,320);
+  if(below<h && above>below){menu.classList.add('drop-up');menu.style.maxHeight=Math.min(h,above)+'px';}
+  else{menu.classList.remove('drop-up');menu.style.maxHeight=Math.min(h,Math.max(below,120))+'px';}}
+function openOverlay(menu,trigger){document.querySelectorAll('[data-overlay].open').forEach(m=>{if(m!==menu)closeOverlay(m);});
+  menu.classList.add('open');menu._trigger=trigger;if(trigger)positionMenu(trigger,menu);}
+function closeOverlay(menu){menu.classList.remove('open');if(menu._trigger)menu._trigger.focus();}
+document.addEventListener('click',e=>{document.querySelectorAll('[data-overlay].open').forEach(m=>{
+  if(!m.contains(e.target)&&!(m._trigger&&m._trigger.contains(e.target)))closeOverlay(m);});});
+
+/* --- scroll lock + focus trap (#a11y · เพิ่ม 2026-08-04) ---
+   lockScroll: กันพื้นหลังเลื่อนตอน overlay เปิด · นับชั้นได้ (modal ซ้อน drawer)
+   trapFocus : กัน Tab หลุดออกไปพื้นหลัง + โฟกัสตัวแรกในกล่อง + คืนโฟกัสเดิมตอนปิด */
+function lockScroll(on){ document.body.classList.toggle('is-overlay-open', !!on); }
+var __focusStack = [];
+function trapFocus(box){
+  if(!box) return;
+  var prev = document.activeElement;
+  var sel = 'a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  function onKey(e){
+    if(e.key !== 'Tab') return;
+    var f = [].slice.call(box.querySelectorAll(sel)).filter(function(el){ var r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; });
+    if(!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+  box.__trap = onKey; box.__prevFocus = prev;
+  document.addEventListener('keydown', onKey);
+  requestAnimationFrame(function(){
+    var f = box.querySelector(sel);
+    if(f) f.focus();
+  });
+}
+function releaseFocus(box){
+  if(!box || !box.__trap) return;
+  document.removeEventListener('keydown', box.__trap);
+  var prev = box.__prevFocus;
+  box.__trap = null; box.__prevFocus = null;
+  if(prev && typeof prev.focus === 'function') prev.focus();
+}
+/* ===== END BASE-KIT UTILS ===== */
+</script>
+<script>
+/* ===== FEATURE SCRIPT ===== */
+/* ===== PERFORMANCE APP — master (แบบประเมิน/KPI) + cycle (รอบประเมิน) ===== */
+/* archetype = master + cycle · ไม่ใช่ Pattern Q (ไม่มีเลขรัน/PDF/เอกสารคนถือ) */
+Object.assign(state, {
+  tab: 'cycle',
+  role: 'hr',
+  f: { search: '', status: 'all', repCycle: 'CY1' },
+  view: { tab: 'detail' },
+  edit: null,        // working KPI rows when editing เป้า/KPI
+  doa: null,         // working DOA slot picker state
+  notifOpen: false,
+  _busy: false
+});
+
+const TODAY = '2026-09-09';
+const PERF = {
+  roles: [
+    { id: 'hr',    name: 'สุนิสา คำแก้ว', role: 'HR (HRBP)',   initials: 'สค', mask: false, manage: true  },
+    { id: 'mgr',   name: 'ประสงค์ ชัยมงคล', role: 'หัวหน้าสายงาน', initials: 'ปช', mask: false, manage: false, dept: 'ฝ่ายผลิต' },   // OQ-PERF-03 · หัวหน้าเห็นเฉพาะแผนกตัวเอง (= dept ของ P1 ประสงค์ ชัยมงคล)
+    { id: 'staff', name: 'สมชาย ใจดี',    role: 'พนักงาน',      initials: 'สช', mask: true,  manage: false }
+  ],
+  people: [
+    { id: 'P1', name: 'ประสงค์ ชัยมงคล', pos: 'ผู้จัดการฝ่ายผลิต', dept: 'ฝ่ายผลิต' },
+    { id: 'P2', name: 'สุนิสา คำแก้ว',   pos: 'HRBP',            dept: 'ทรัพยากรบุคคล' },
+    { id: 'P3', name: 'วิชัย เจริญสุข',   pos: 'ผู้อำนวยการสายงาน', dept: 'สำนักบริหาร' },
+    { id: 'P4', name: 'อรพิน สมบูรณ์',   pos: 'ผู้จัดการฝ่ายบัญชี', dept: 'ฝ่ายบัญชี' },
+    { id: 'P5', name: 'ธีรพงษ์ ทองดี',   pos: 'ผู้จัดการฝ่ายขาย',  dept: 'ฝ่ายขาย' }
+  ],
+  cycles: [
+    // cfg = ชื่อแบบฟอร์ม/รอบที่โชว์บนจอ (ภาษาผู้ใช้) · id ภายในจริง = appraisal_cycle #107 v3/v2 (HR Config) — ไม่โชว์ snake_case บนจอ (Rule #81)
+    { id: 'CY1', name: 'รอบครึ่งปีหลัง', year: 2569, period: '1 ก.ค. 2569 – 31 ธ.ค. 2569', status: 'open',   cfg: 'แบบฟอร์มประเมินมาตรฐาน', due: '2026-09-05' },
+    { id: 'CY2', name: 'รอบครึ่งปีแรก', year: 2569, period: '1 ม.ค. 2569 – 30 มิ.ย. 2569', status: 'closed', cfg: 'แบบฟอร์มประเมินมาตรฐาน', due: '2026-06-30' }
+  ],
+  // configCycles = รอบที่ประกาศไว้ที่ HR Configuration (feature นี้อ่านมาใช้ ไม่สร้างเอง) · sub = ภาษาผู้ใช้ (id จริง appraisal_cycle #107 ไม่โชว์บนจอ · Rule #81)
+  configCycles: [
+    { v: 'CFG-A', label: 'รอบครึ่งปีหลัง 2569 (ก.ค.–ธ.ค.)', sub: 'ประกาศไว้ในตั้งค่า HR' },
+    { v: 'CFG-B', label: 'รอบประเมินโบนัสปลายปี 2569',      sub: 'ประกาศไว้ในตั้งค่า HR' },
+    { v: 'CFG-C', label: 'รอบทดลองงาน (probation)',         sub: 'ประกาศไว้ในตั้งค่า HR' }
+  ],
+  apprs: [
+    { id:'A1', emp:'มะลิ ดอกไม้',  pos:'เจ้าหน้าที่คลัง', dept:'คลังสินค้า', cycle:'CY1', status:'goal', due:'2026-09-20', decision:'', gap:'', selfNote:'', mgrNote:'',
+      kpis:[ {n:'ความถูกต้องสต๊อก', w:60, t:'99%', self:null, mgr:null}, {n:'ความปลอดภัยในการทำงาน', w:40, t:'0 อุบัติเหตุ', self:null, mgr:null} ] },
+    { id:'A2', emp:'สมชาย ใจดี',   pos:'วิศวกร',        dept:'ฝ่ายผลิต',  cycle:'CY1', status:'self', due:'2026-09-05', decision:'', gap:'', selfNote:'', mgrNote:'',
+      kpis:[ {n:'ส่งงานตรงเวลา', w:40, t:'95%', self:null, mgr:null}, {n:'คุณภาพงาน', w:35, t:'ระดับ A', self:null, mgr:null}, {n:'ทำงานเป็นทีม', w:25, t:'ดี', self:null, mgr:null} ] },
+    { id:'A3', emp:'อรทัย แสนสุข', pos:'นักบัญชี',      dept:'ฝ่ายบัญชี', cycle:'CY1', status:'mgr', due:'2026-09-30', decision:'', gap:'', selfNote:'ปิดงบได้ครบทุกเดือน', mgrNote:'',
+      kpis:[ {n:'ปิดงบตรงเวลา', w:50, t:'ทุกเดือน', self:5, mgr:null}, {n:'ความแม่นยำ', w:50, t:'99%', self:4, mgr:null} ] },
+    { id:'A4', emp:'ธนากร พูนผล',  pos:'ผู้จัดการขาย',   dept:'ฝ่ายขาย',   cycle:'CY1', status:'calibration', due:'2026-09-28', decision:'', gap:'', selfNote:'ทำยอดเกินเป้า', mgrNote:'ผลงานดีเด่น',
+      kpis:[ {n:'ยอดขาย', w:60, t:'10 ลบ.', self:5, mgr:5}, {n:'ดูแลทีม', w:40, t:'ดี', self:4, mgr:4} ] },
+    { id:'A5', emp:'กนกพร วงศ์ไทย', pos:'นักการตลาด',   dept:'ฝ่ายการตลาด', cycle:'CY1', status:'published', due:'2026-08-30', decision:'ผ่าน', gap:'ทักษะการนำเสนอ', selfNote:'', mgrNote:'ผ่านเกณฑ์',
+      kpis:[ {n:'แคมเปญสำเร็จ', w:55, t:'8 แคมเปญ', self:4, mgr:4}, {n:'Lead ที่สร้าง', w:45, t:'500', self:5, mgr:4} ] },
+    { id:'A6', emp:'ปิยะ มั่นคง',   pos:'พนักงานคลัง',   dept:'คลังสินค้า', cycle:'CY1', status:'published', due:'2026-08-30', decision:'ทบทวน (PIP)', gap:'ความถูกต้องในงาน', selfNote:'', mgrNote:'ต่ำกว่าเกณฑ์',
+      kpis:[ {n:'ความถูกต้อง', w:70, t:'98%', self:3, mgr:2}, {n:'วินัยการทำงาน', w:30, t:'ดี', self:3, mgr:3} ] }
+  ],
+  audit: {
+    A4: [ {act:'หัวหน้าประเมิน + คะแนน', who:'ประสงค์ ชัยมงคล', at:'2026-09-06 10:12'}, {act:'พนักงานประเมินตนเอง', who:'ธนากร พูนผล', at:'2026-09-03 09:40'}, {act:'ตั้งเป้า/KPI', who:'สุนิสา คำแก้ว', at:'2026-08-15 14:00'} ],
+    A5: [ {act:'เผยแพร่ผล · decision: ผ่าน', who:'สุนิสา คำแก้ว', at:'2026-08-28 15:00'}, {act:'สอบทานผล (DOA)', who:'วิชัย เจริญสุข', at:'2026-08-28 14:30'}, {act:'หัวหน้าประเมิน + คะแนน', who:'ธีรพงษ์ ทองดี', at:'2026-08-26 11:00'} ],
+    A6: [ {act:'เปิดแผน PIP', who:'สุนิสา คำแก้ว', at:'2026-08-29 09:00'}, {act:'เผยแพร่ผล · decision: ทบทวน (PIP)', who:'สุนิสา คำแก้ว', at:'2026-08-28 16:20'}, {act:'สอบทานผล (DOA)', who:'วิชัย เจริญสุข', at:'2026-08-28 16:00'} ]
+  },
+  notifs: [
+    { ic:'calendar-check', b:'รอบประเมินเปิดกรอกแล้ว', m:'รอบครึ่งปีหลัง 2569 · เปิด 1 ก.ค. 2569' },
+    { ic:'alarm-clock',    b:'ใกล้ครบกำหนดประเมิน',   m:'สมชาย ใจดี · ครบกำหนด 5 ก.ย. (เกินกำหนด)' },
+    { ic:'megaphone',      b:'ผลประเมินเผยแพร่แล้ว',   m:'กนกพร วงศ์ไทย · decision: ผ่าน' }
+  ]
+};
+
+/* ---- helpers ---- */
+function curRole(){ return PERF.roles.find(r => r.id === state.role) || PERF.roles[0]; }
+function cyc(id){ return PERF.cycles.find(c => c.id === id) || {}; }
+function appr(id){ return PERF.apprs.find(a => a.id === id) || null; }
+function wsum(a){ return a.kpis.reduce((s,k) => s + (+k.w || 0), 0); }
+function rawScore(a){ let s=0,w=0; a.kpis.forEach(k => { if(k.mgr!=null){ s+=k.mgr*k.w; w+=k.w; } }); return w ? (s/w) : null; }
+function scoreText(a){ const s = rawScore(a); return s==null ? '—' : s.toFixed(2); }
+/* FIX-08 · เกรดเสนอจากคะแนนถ่วงน้ำหนัก (ใช้ในมุม Calibration ระดับทีม · mock) */
+function gradeOf(a){ const s=rawScore(a); if(s==null) return '—'; if(s>4.5) return 'A'; if(s>=4) return 'B'; if(s>=3) return 'C'; return 'D'; }
+function mask(v){ return curRole().mask ? '<span class="masked">•••</span>' : v; }
+function isOverdue(a){ return a.status!=='published' && a.due < TODAY; }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* FIX-03 · role guard (สิทธิ์) — ใช้ทั้งชั้น function guard และชั้น UI (ไม่ render ปุ่ม mutation ให้ role ที่ไม่ผ่านเงื่อนไขเดียวกัน) */
+const sec = {
+  can(action){
+    const r = curRole();
+    if(action==='saveMgr') return r.id==='mgr' || !!r.manage;   // บันทึกผลหัวหน้า = หัวหน้าสายงาน หรือ HR (manage)
+    return !!r.manage;   // doCalib · doPip · doCloseCycle · sendMovement · sendTraining · sendSuccession = ต้องมีสิทธิ์จัดการ (HR)
+  }
+};
+/* FIX-05 · lock รอบที่ปิด — mutation ทุกตัวของแบบประเมินเช็คก่อนเสมอ */
+function cycleClosed(a){ return !!(a && cyc(a.cycle).status==='closed'); }
+/* FIX-04 · scope SELF (staff) · OQ-PERF-03 · scope DEPT (mgr เห็นเฉพาะแผนกตัวเอง) · HR (manage) = ALL
+   staff(mask=true · staff.name===emp) เห็นเฉพาะของตน · mgr เห็นเฉพาะ dept ตัวเอง · คนนอก scope ไม่อยู่ใน DOM (ไม่ใช่แค่ mask) */
+function scopeSelf(list){ const r = curRole();
+  if(r.mask) return list.filter(a => a.emp===r.name);        // staff = SELF
+  if(r.id==='mgr') return list.filter(a => a.dept===r.dept);  // OQ-PERF-03 · mgr = เฉพาะแผนกตัวเอง (เฉพาะแผนกตัวเอง)
+  return list;                                                // HR (manage) = ALL
+}
+
+const CST = { open:['เปิดกรอก','pill-success'], calibration:['สอบทาน','pill-warning'], closed:['ปิดรอบ','pill-muted'] };
+const AST = { goal:['ตั้งเป้า','pill-muted'], self:['ประเมินตนเอง','pill-info'], mgr:['หัวหน้าประเมิน','pill-info'], calibration:['รอสอบทาน','pill-warning'], published:['เผยแพร่ผล','pill-success'] };
+function pill(map, s){ const m = map[s] || [s,'pill-muted']; return '<span class="pill '+m[1]+'">'+esc(m[0])+'</span>'; }
+function personCell(name, sub){ return '<span class="tbl-person"><span class="av">'+esc((name||'').slice(0,1))+'</span><span class="pp"><b>'+esc(name||'—')+'</b><span>'+esc(sub||'')+'</span></span></span>'; }
+
+/* ---- shell wiring ---- */
+function applyRole(){ const r = curRole();
+  const set=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
+  set('uName', r.name); set('uRole', r.role); set('uAv', r.initials);
+}
+function setRole(id){ state.role = id; render(); }
+function toggleUserMenu(){ document.getElementById('userMenu').classList.toggle('is-open'); }
+function toggleNotif(e){ if(e) e.stopPropagation(); const p=document.getElementById('notifPanel'); state.notifOpen=!p.classList.contains('is-open'); renderNotif(); p.classList.toggle('is-open', state.notifOpen); }
+function renderNotif(){ const p=document.getElementById('notifPanel'); if(!p) return;
+  p.innerHTML = '<div class="notif-head">การแจ้งเตือน (รอบเปิด · ครบกำหนด · ผล)</div>' +
+    PERF.notifs.map(n => '<div class="notif-item"><div class="ni-ic"><i data-lucide="'+n.ic+'" class="w-4 h-4"></i></div><div><div class="ni-b">'+esc(n.b)+'</div><div class="ni-m">'+esc(n.m)+'</div></div></div>').join('');
+  renderIcons();
+}
+document.addEventListener('click', e => {
+  if(!e.target.closest('.user-chip') && !e.target.closest('.user-menu')){ const u=document.getElementById('userMenu'); if(u) u.classList.remove('is-open'); }
+  if(!e.target.closest('#notifBtn') && !e.target.closest('#notifPanel')){ const p=document.getElementById('notifPanel'); if(p){ p.classList.remove('is-open'); state.notifOpen=false; } }
+});
+
+/* ============================================================ PAGE */
+function pageHTML(){
+  const tabs = [
+    ['cycle','รอบประเมิน','calendar-range', PERF.cycles.length],
+    ['appr','แบบประเมินรายคน','clipboard-list', PERF.apprs.length],
+    ['review','สอบทาน + ผล & Gap','git-branch', PERF.apprs.filter(a=>a.status==='calibration'||a.status==='published').length],
+    ['report','รายงาน','bar-chart-3', null]
+  ];
+  return ''
+  + '<div class="demo-strip"><span class="ds-label"><i data-lucide="user-cog" class="w-3.5 h-3.5"></i>มุมมองสาธิต (สิทธิ์)</span>'
+  +   '<span>ผลประเมิน/คะแนน = RESTRICTED — ปิดบังตามสิทธิ์</span>'
+  +   '<div class="seg-control">' + PERF.roles.map(r => '<button class="seg-item '+(state.role===r.id?'is-active':'')+'" onclick="setRole(\''+r.id+'\')">'+esc(r.role)+'</button>').join('') + '</div>'
+  + '</div>'
+  + '<div class="ph"><div><div class="ph-title-row"><h1 class="ph-title">ประเมินผลงาน</h1></div>'
+  +   '<p class="ph-sub">รอบประเมิน · KPI · ประเมินตนเอง + หัวหน้า · สอบทาน (DOA) · ผล/Gap — ผล→ปรับเงินเดือน/เลื่อนตำแหน่ง ส่งให้ระบบโยกย้าย (ไม่ปรับเอง)</p></div>'
+  +   '<div class="ph-actions">' + (state.tab==='cycle' && curRole().manage ? '<button class="btn btn-primary" onclick="openDrawer(\'newCycle\')"><i data-lucide="plus" class="w-4 h-4"></i><span>สร้างรอบประเมิน</span></button>' : '') + '</div>'
+  + '</div>'
+  + '<div class="tabs page-tabs">' + tabs.map(t => '<button class="tab '+(state.tab===t[0]?'is-active':'')+'" onclick="state.tab=\''+t[0]+'\';render()"><i data-lucide="'+t[2]+'" class="w-4 h-4"></i><span>'+esc(t[1])+'</span>'+(t[3]!=null?'<span class="tab-badge">'+t[3]+'</span>':'')+'</button>').join('') + '</div>'
+  + '<div id="view">' + viewHTML() + '</div>';
+}
+function viewHTML(){ return ({ cycle:cycleView, appr:apprView, review:reviewView, report:reportView }[state.tab] || cycleView)(); }
+function refreshView(){ const v=document.getElementById('view'); if(v){ const s=preserveRenderState(); v.innerHTML=viewHTML(); renderIcons(); restoreRenderState(s); } }
+
+/* ---- Tab 1 · รอบประเมิน (FN-01 create · FN-11 close) ---- */
+function cycleView(){
+  return '<div class="card page-fill-note"><div class="table-wrap"><table class="tbl"><thead><tr>'
+  + '<th>รหัส</th><th>รอบประเมิน</th><th>ช่วงเวลา</th><th class="center">แบบประเมิน</th><th>สถานะ</th></tr></thead><tbody>'
+  + PERF.cycles.map(c => { const n = PERF.apprs.filter(a=>a.cycle===c.id).length;
+      return '<tr class="is-clickable" onclick="openDrawer(\'viewCycle\',\''+c.id+'\')">'
+      + '<td class="mono">'+c.id+'</td>'
+      + '<td><b>'+esc(c.name)+' '+c.year+'</b><div class="sub-note">อ้าง '+esc(c.cfg)+' (อ่านจาก ตั้งค่า HR)</div></td>'
+      + '<td>'+esc(c.period)+'</td><td class="center">'+n+'</td><td>'+pill(CST,c.status)+'</td></tr>';
+    }).join('') + '</tbody></table></div></div>';
+}
+
+/* ---- Tab 2 · แบบประเมินรายคน + KPI editor (FN-02..04, 09, 90) ---- */
+function apprView(){
+  const q = state.f.search.trim().toLowerCase();
+  let rows = scopeSelf(PERF.apprs.filter(a => a.cycle==='CY1'));   // FIX-04 · role พนักงานเห็นเฉพาะแบบประเมินของตนเอง (คนอื่นไม่อยู่ใน DOM)
+  if(state.f.status!=='all') rows = rows.filter(a => a.status===state.f.status);
+  if(q) rows = rows.filter(a => a.emp.toLowerCase().includes(q) || a.pos.toLowerCase().includes(q) || a.dept.toLowerCase().includes(q));
+  const overdue = scopeSelf(PERF.apprs.filter(a => a.cycle==='CY1')).filter(isOverdue);
+  const statusOpts = [['all','ทุกสถานะ'],['goal','ตั้งเป้า'],['self','ประเมินตนเอง'],['mgr','หัวหน้าประเมิน'],['calibration','รอสอบทาน'],['published','เผยแพร่ผล']];
+  let h = '';
+  if(overdue.length) h += '<div class="note is-warn"><i data-lucide="alarm-clock" class="w-4 h-4"></i><span>มี '+overdue.length+' แบบประเมินเกินกำหนด — ต้องเตือนผู้ประเมิน</span><button class="btn btn-sm btn-secondary note-act" onclick="sendReminder()"><i data-lucide="bell-ring" class="w-3.5 h-3.5"></i><span>ส่งการเตือน</span></button></div>';
+  h += '<div class="card"><div class="filter-row">'
+    + '<div class="fr-grow"><div class="input-search"><i data-lucide="search" class="lead-icon w-4 h-4"></i><input class="input" placeholder="ค้นหาพนักงาน / ตำแหน่ง / แผนก…" value="'+esc(state.f.search)+'" oninput="state.f.search=this.value;refreshView()"></div></div>'
+    + '<select class="select w180" onchange="state.f.status=this.value;refreshView()">' + statusOpts.map(o=>'<option value="'+o[0]+'"'+(state.f.status===o[0]?' selected':'')+'>'+o[1]+'</option>').join('') + '</select>'
+    + (state.f.search||state.f.status!=='all' ? '<button class="btn btn-ghost btn-sm" onclick="state.f.search=\'\';state.f.status=\'all\';refreshView()"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i><span>ล้างตัวกรอง</span></button>' : '')
+    + '</div>';
+  if(!rows.length){
+    h += emptyStateHTML({ icon:'clipboard-x', title:'ไม่พบแบบประเมินที่ค้นหา', desc:'ลองปรับคำค้นหรือล้างตัวกรอง', actionLabel:'ล้างตัวกรอง', actionIcon:'rotate-ccw', onAction:"state.f.search='';state.f.status='all';refreshView()" });
+  } else {
+    h += '<div class="table-wrap"><table class="tbl"><thead><tr>'
+      + '<th>พนักงาน</th><th>รอบ</th><th class="center">น้ำหนัก KPI</th><th class="center">คะแนน (หัวหน้า)</th><th>สถานะ</th><th class="center">กำหนด</th><th>ผลการตัดสิน</th></tr></thead><tbody>'
+      + rows.map(a => { const bad = wsum(a)!==100;
+          return '<tr class="is-clickable" onclick="openAppr(\''+a.id+'\')">'
+          + '<td>'+personCell(a.emp, a.pos+' · '+a.dept)+'</td>'
+          + '<td>'+esc(cyc(a.cycle).name)+'</td>'
+          + '<td class="center"><span class="wtag '+(bad?'bad':'ok')+'">'+wsum(a)+'%</span></td>'
+          + '<td class="center">'+mask(scoreText(a))+'</td>'
+          + '<td>'+pill(AST,a.status)+'</td>'
+          + '<td class="center">'+(isOverdue(a)?'<span class="pill pill-danger">เกินกำหนด</span>':'<span class="due-ok">ตามกำหนด</span>')+'</td>'
+          + '<td>'+(a.decision?esc(a.decision):'—')+'</td></tr>';
+        }).join('') + '</tbody></table></div>';
+  }
+  h += '</div>';
+  return h;
+}
+function openAppr(id){ state.view.tab='detail'; openDrawer('viewAppr', id); }
+
+/* ---- Tab 3 · สอบทาน + ผล & Gap (FN-05..08, 10) ---- */
+/* FIX-08 · Calibration ระดับทีม (mock) — เทียบคะแนน/เกรดทั้งทีมก่อนสอบทานรายคน (มติ OQ-PERF-04 = เอาไว้รอบนี้ · KEPT) */
+function teamCalibHTML(){
+  const team = scopeSelf(PERF.apprs.filter(a => a.cycle==='CY1' && rawScore(a)!=null));   // OQ-PERF-03 · mgr = เฉพาะแผนกตัวเอง
+  const dist = { A:0, B:0, C:0, D:0 };
+  team.forEach(a => { const g=gradeOf(a); if(dist[g]!=null) dist[g]++; });
+  let h = '<div class="sec"><h4><i data-lucide="scale" class="w-4 h-4"></i>Calibration ระดับทีม (เทียบก่อนสอบทานรายคน)</h4>'
+    + '<p class="sub-note mb-3">มุมมองเทียบทั้งทีมในรอบ — ปรับเกรดให้สมดุลก่อนเคาะรายคน (mock · ยังไม่ผูกปลายทาง · คงไว้รอบนี้ · มติ OQ-PERF-04)</p>';
+  if(team.length){
+    h += '<div class="table-wrap"><table class="tbl"><thead><tr><th>พนักงาน</th><th class="center">คะแนนถ่วงน้ำหนัก</th><th class="center">เกรดเสนอ</th><th>ปรับเกรด (calibrate)</th></tr></thead><tbody>'
+      + team.map(a => '<tr><td>'+personCell(a.emp, a.pos+' · '+a.dept)+'</td>'
+          + '<td class="center">'+scoreText(a)+'</td>'
+          + '<td class="center"><span class="wtag ok">'+gradeOf(a)+'</span></td>'
+          + '<td><select class="select w180">'+['A','B','C','D'].map(g=>'<option'+(gradeOf(a)===g?' selected':'')+'>'+g+'</option>').join('')+'</select></td></tr>').join('')
+      + '</tbody></table></div>'
+      + '<div class="hookbox mt-3"><div class="hb-body">การกระจายเกรด (distribution) · ทั้งทีม '+team.length+' คน: A '+dist.A+' · B '+dist.B+' · C '+dist.C+' · D '+dist.D+'</div></div>';
+  } else h += '<div class="hookbox"><span class="hb-body">ยังไม่มีคะแนนในทีมสำหรับ calibrate</span></div>';
+  h += '</div>';
+  return h;
+}
+function reviewView(){
+  const isStaff = curRole().mask;                                         // FIX-04 · พนักงาน = scope SELF
+  const canReview = sec.can('doCalib');                                   // FIX-03 · เฉพาะ role ที่มีสิทธิ์จัดการเห็นปุ่ม mutation
+  const queue = isStaff ? [] : scopeSelf(PERF.apprs.filter(a => a.status==='calibration'));   // FIX-04 · ซ่อนคิวสอบทานจากพนักงาน · OQ-PERF-03 · mgr = dept-scoped
+  const done  = scopeSelf(PERF.apprs.filter(a => a.status==='published'));         // FIX-04 · พนักงานเห็นเฉพาะผลของตน
+  let h = '';
+  if(!isStaff) h += teamCalibHTML();                                      // FIX-08 · มุม calibrate ทั้งทีม (ผู้สอบทานเท่านั้น)
+  if(!isStaff){
+    h += '<div class="sec"><h4><i data-lucide="git-branch" class="w-4 h-4"></i>รอสอบทาน (calibration · DOA)</h4>';
+    if(queue.length){
+      h += '<div class="table-wrap"><table class="tbl"><thead><tr><th>พนักงาน</th><th class="center">คะแนน (หัวหน้า)</th><th></th></tr></thead><tbody>'
+        + queue.map(a => '<tr><td>'+personCell(a.emp,a.pos)+'</td><td class="center">'+mask(scoreText(a))+'</td>'
+          + '<td class="num">'+((canReview && !cycleClosed(a)) ? '<button class="btn btn-sm btn-primary" onclick="openModal(\'doaCalib\',{id:\''+a.id+'\'})"><i data-lucide="send" class="w-3.5 h-3.5"></i><span>สอบทาน (DOA)</span></button>' : '<span class="due-ok">'+(cycleClosed(a)?'รอบปิดแล้ว':'รอผู้มีสิทธิ์สอบทาน')+'</span>')+'</td></tr>').join('')
+        + '</tbody></table></div>';
+    } else h += '<div class="hookbox"><span class="hb-body">ไม่มีแบบประเมินที่รอสอบทาน</span></div>';
+    h += '</div>';
+  }
+
+  h += '<div class="sec"><h4><i data-lucide="trending-up" class="w-4 h-4"></i>ผล & Gap (เผยแพร่แล้ว)</h4>';
+  if(done.length){
+    h += '<div class="stack-8">' + done.map(a => {
+      const pip = (a.decision||'').includes('ทบทวน');
+      const closed = cycleClosed(a);   // FIX-A · รอบปิด → ซ่อนปุ่ม mutation ต่อแบบประเมิน
+      const topPerf = (a.decision==='ผ่าน') || (rawScore(a)!=null && rawScore(a)>=4);   // FIX-09 · ผ่าน/top performer → ส่ง Succession
+      let box = '<div class="rowbtw"><div><b>'+esc(a.emp)+'</b> · '+esc(cyc(a.cycle).name)+' · คะแนน '+mask(scoreText(a))+' · <span>'+esc(a.decision||'—')+'</span></div>'
+        + '<div class="rb-acts">'
+        + (pip && canReview && !closed ? '<button class="btn btn-sm btn-danger" onclick="openModal(\'pip\',{id:\''+a.id+'\'})"><i data-lucide="clipboard-plus" class="w-3.5 h-3.5"></i><span>เปิดแผน PIP</span></button>' : '')
+        + (canReview && !closed ? '<button class="btn btn-sm btn-secondary" onclick="openModal(\'reopen\',{id:\''+a.id+'\'})"><i data-lucide="undo-2" class="w-3.5 h-3.5"></i><span>เปิดแก้ไขผล</span></button>' : '')   // OQ-PERF-01 · เปิดแก้ไขผลหลังเผยแพร่ (authorized manage + audit ผู้แก้)
+        + '</div></div>';
+      /* ส่งต่อผล — ปรับตำแหน่ง/เงินเดือนส่งได้ทุกผลที่เผยแพร่ (FN-07 decouple จาก gap: top performer ไม่มี gap ก็ต้องส่งเรื่องเลื่อนขั้นได้) · อบรมเฉพาะเมื่อมี gap · Succession เมื่อผ่าน/top (FIX-09) · ปุ่ม mutation เฉพาะผู้มีสิทธิ์ (FIX-03) */
+      if(canReview && !closed){
+        box += '<div class="hookbox mt-3"><div class="hb-body">'
+          + (a.gap ? 'Gap ที่พบ: <b>'+esc(a.gap)+'</b> — ส่งต่อได้:' : 'ส่งต่อผลไปโมดูลอื่น:')
+          + '</div><div class="hb-acts">'
+          + (a.gap ? '<button class="btn btn-sm btn-secondary" onclick="sendTraining(\''+a.id+'\')"><i data-lucide="graduation-cap" class="w-3.5 h-3.5"></i><span>ส่งไปอบรม</span></button>' : '')
+          + '<button class="btn btn-sm btn-secondary" onclick="sendMovement(\''+a.id+'\')"><i data-lucide="arrow-left-right" class="w-3.5 h-3.5"></i><span>ส่งเรื่องปรับตำแหน่ง/เงินเดือน</span></button>'
+          + (topPerf ? '<button class="btn btn-sm btn-secondary" onclick="sendSuccession(\''+a.id+'\')"><i data-lucide="users-round" class="w-3.5 h-3.5"></i><span>ส่งเข้า Succession Planning</span></button>' : '')
+          + '</div></div>';
+      }
+      return '<div class="sec m0">'+box+'</div>';
+    }).join('') + '</div>';
+  } else h += '<div class="hookbox"><span class="hb-body">ยังไม่มีผลที่เผยแพร่</span></div>';
+  h += '</div>';
+  return h;
+}
+
+/* ---- Tab 4 · รายงาน (FN-13) ---- */
+function reportView(){
+  const inCycle = PERF.apprs.filter(a => state.f.repCycle==='all' || a.cycle===state.f.repCycle);
+  const buckets = { 'ต่ำ (<3.0)':0, 'ปานกลาง (3.0–3.9)':0, 'ดี (4.0–4.5)':0, 'ดีเยี่ยม (>4.5)':0 };
+  inCycle.forEach(a => { const s=rawScore(a); if(s!=null){ if(s<3)buckets['ต่ำ (<3.0)']++; else if(s<4)buckets['ปานกลาง (3.0–3.9)']++; else if(s<=4.5)buckets['ดี (4.0–4.5)']++; else buckets['ดีเยี่ยม (>4.5)']++; } });
+  const max = Math.max(1, ...Object.values(buckets));
+  const opts = [['all','ทุกรอบ']].concat(PERF.cycles.map(c=>[c.id, c.name+' '+c.year]));
+  return '<div class="stats">'
+    + '<div class="stat"><div class="stat-label"><i data-lucide="clipboard-list" class="w-3 h-3"></i>แบบประเมินในรอบ</div><div class="stat-value">'+inCycle.length+'</div></div>'
+    + '<div class="stat"><div class="stat-label"><i data-lucide="check-circle-2" class="w-3 h-3"></i>เผยแพร่ผลแล้ว</div><div class="stat-value">'+inCycle.filter(a=>a.status==='published').length+'</div></div>'
+    + '<div class="stat"><div class="stat-label"><i data-lucide="alert-triangle" class="w-3 h-3"></i>ทบทวน (PIP)</div><div class="stat-value">'+inCycle.filter(a=>(a.decision||'').includes('ทบทวน')).length+'</div></div>'
+    + '</div>'
+    + '<div class="card"><div class="filter-row"><b class="h3t">การกระจายคะแนน</b><div class="fr-spacer"></div>'
+    + '<select class="select w220" onchange="state.f.repCycle=this.value;refreshView()">' + opts.map(o=>'<option value="'+o[0]+'"'+(state.f.repCycle===o[0]?' selected':'')+'>'+esc(o[1])+'</option>').join('') + '</select></div>'
+    + '<div class="pad-lr">' + Object.entries(buckets).map(([k,v]) =>
+        '<div class="funnel-row"><span class="funnel-label">'+esc(k)+'</span><div class="funnel-track"><div class="funnel-bar" style="--fw:'+(v/max*100)+'%"></div></div><span class="funnel-val">'+v+'</span></div>'
+      ).join('') + '</div></div>';
+}
+
+/* ============================================================ DRAWERS */
+function drawerHTML(){ return ({ newCycle:dwNewCycle, viewCycle:dwViewCycle, viewAppr:dwViewAppr }[state.drawer.mode] || (()=>''))(); }
+function dwHead(eb, title, tabs){
+  return '<div class="drawer-header'+(tabs?' has-tabs':'')+'">'
+    + (tabs?'<div class="dw-head-row">':'')
+    + '<div class="fx1"><div class="dw-eyebrow">'+esc(eb)+'</div><div class="dw-title">'+title+'</div></div>'
+    + '<button class="icon-btn" onclick="closeDrawer()"><i data-lucide="x" class="w-4 h-4"></i></button>'
+    + (tabs?'</div>'+tabs:'') + '</div>';
+}
+
+/* FN-01 create cycle — อ่านรอบ/แบบจาก HR Config, ไม่สร้างฟอร์มกลางเอง */
+function dwNewCycle(){
+  return '<div class="drawer-panel">' + dwHead('รอบประเมิน', 'สร้างรอบประเมิน')
+  + '<div class="drawer-body">'
+  +   '<div class="note is-warn"><i data-lucide="info" class="w-4 h-4"></i><span>รอบ/แบบฟอร์ม/เกณฑ์คะแนน อ่านจาก ตั้งค่า HR — หน้านี้ไม่สร้าง/แก้ฟอร์มกลาง</span></div>'
+  +   '<div class="sec">'
+  +     '<div class="field"><label>เลือกรอบจาก ตั้งค่า HR <span class="req">*</span></label>' + searchSelectHTML('cfgCycle', { placeholder:'ค้นหารอบที่ประกาศไว้…' }) + '<div class="field-error" id="err-cfg">กรุณาเลือกรอบจากตั้งค่า HR</div></div>'
+  +     '<div class="field"><label>ผู้เข้าร่วม</label><select class="select" id="c_scope"><option>ทั้งองค์กร</option><option>เฉพาะแผนกที่เลือก</option></select></div>'
+  +     '<div class="field"><label>วันครบกำหนดประเมิน</label><input type="date" class="input" id="c_due" value="2026-12-31"></div>'
+  +   '</div>'
+  +   '<div class="hookbox"><i data-lucide="bell" class="w-4 h-4"></i><span class="hb-body">เมื่อสร้าง: เปิดกรอก + แจ้งเตือน "รอบเปิด" ให้ผู้เข้าร่วม</span></div>'
+  + '</div>'
+  + '<div class="drawer-footer"><button class="btn btn-ghost" onclick="closeDrawer()">ยกเลิก</button><div class="footer-spacer"></div>'
+  +   '<button class="btn btn-primary" id="btnNewCycle" onclick="submitNewCycle()"><i data-lucide="check" class="w-4 h-4"></i><span>สร้างและเปิดกรอก</span></button></div>'
+  + '</div>';
+}
+function submitNewCycle(){
+  if(state._busy) return;
+  const s = ssGet('cfgCycle');
+  if(!s || !s.value){ const f=document.getElementById('err-cfg'); if(f) f.closest('.field').classList.add('is-invalid'); showToast('กรุณาเลือกรอบจากตั้งค่า HR','warning'); return; }
+  const btn = document.getElementById('btnNewCycle'); state._busy=true;
+  if(btn){ btn.classList.add('is-disabled'); btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังบันทึก…</span>'; renderIcons(); }
+  setTimeout(() => {
+    const cfg = PERF.configCycles.find(c=>c.v===s.value) || {};
+    PERF.cycles.unshift({ id:'CY'+(PERF.cycles.length+1), name:'รอบใหม่', year:2569, period:esc(cfg.label||''), status:'open', cfg:esc(cfg.sub||'แบบฟอร์มประเมินมาตรฐาน'), due:(document.getElementById('c_due')||{}).value||'2026-12-31' });
+    PERF.notifs.unshift({ ic:'calendar-check', b:'รอบประเมินเปิดกรอกแล้ว', m:esc(cfg.label||'') });
+    state._busy=false; closeDrawer(); render();
+    showToast('สร้างรอบ · เปิดกรอก · แจ้งเตือนผู้เข้าร่วมแล้ว','success');
+  }, 500);
+}
+
+/* FN-11 view + close cycle */
+function dwViewCycle(){
+  const c = cyc(state.drawer.recordId); const as = PERF.apprs.filter(a=>a.cycle===c.id);
+  const prog = as.length ? Math.round(as.filter(a=>a.status==='published').length / as.length * 100) : 0;
+  return '<div class="drawer-panel">' + dwHead('รอบประเมิน', esc(c.name)+' '+c.year+' '+pill(CST,c.status))
+  + '<div class="drawer-body">'
+  +   '<div class="sec"><dl class="kv"><dt>ช่วงเวลา</dt><dd>'+esc(c.period)+'</dd><dt>อ้างอิงตั้งค่า HR</dt><dd>'+esc(c.cfg)+'</dd><dt>ครบกำหนด</dt><dd>'+fmtDate(c.due)+'</dd><dt>แบบประเมิน</dt><dd>'+as.length+' คน</dd><dt>ความคืบหน้า</dt><dd class="rowbtw"><div class="progress pw120"><i style="--w:'+prog+'%"></i></div><span>'+prog+'%</span></dd></dl></div>'
+  +   '<div class="sec"><h4><i data-lucide="clipboard-list" class="w-4 h-4"></i>สถานะรายคน</h4><table class="tbl"><tbody>'
+  +     as.map(a=>'<tr><td>'+esc(a.emp)+'</td><td>'+pill(AST,a.status)+'</td><td class="num">'+(isOverdue(a)?'<span class="pill pill-danger">เกินกำหนด</span>':'')+'</td></tr>').join('')
+  +   '</tbody></table></div>'
+  + '</div>'
+  + '<div class="drawer-footer"><div class="drawer-footer-meta">'+esc(c.cfg)+'</div><div class="footer-spacer"></div>'
+  +   '<button class="btn btn-secondary" onclick="closeDrawer()">ปิด</button>'
+  +   (c.status!=='closed' && curRole().manage ? '<button class="btn btn-danger" onclick="openModal(\'closeCycle\',{id:\''+c.id+'\'})"><i data-lucide="lock" class="w-4 h-4"></i><span>ปิดรอบ</span></button>' : '')
+  + '</div></div>';
+}
+
+/* view appraisal — tabs: รายละเอียด / KPI-คะแนน / สอบทาน / ประวัติ */
+function dwViewAppr(){
+  const a = appr(state.drawer.recordId); if(!a) return '';
+  const t = state.view.tab;
+  const tabDefs = [['detail','รายละเอียด'],['kpi','KPI / คะแนน'],['calib','สอบทาน'],['history','ประวัติ']];
+  const tabs = '<div class="tabs">' + tabDefs.map(x => '<button class="tab '+(t===x[0]?'is-active':'')+'" onclick="state.view.tab=\''+x[0]+'\';render()">'+esc(x[1])+'</button>').join('') + '</div>';
+  let body = '';
+  if(t==='detail') body = tabDetail(a);
+  else if(t==='kpi') body = tabKpi(a);
+  else if(t==='calib') body = tabCalib(a);
+  else body = tabHistory(a);
+  // footer actions by status
+  let foot = '<div class="drawer-footer"><div class="drawer-footer-meta">'+esc(cyc(a.cycle).name)+' · '+esc(a.dept)+'</div><div class="footer-spacer"></div><button class="btn btn-secondary" onclick="closeDrawer()">ปิด</button>';
+  if(!cycleClosed(a) && a.status==='calibration' && sec.can('doCalib')) foot += '<button class="btn btn-primary" onclick="openModal(\'doaCalib\',{id:\''+a.id+'\'})"><i data-lucide="send" class="w-4 h-4"></i><span>สอบทาน (DOA)</span></button>';   // FIX-03 UI + FIX-A รอบปิดซ่อน
+  else if(!cycleClosed(a) && a.status==='published' && (a.decision||'').includes('ทบทวน') && sec.can('doPip')) foot += '<button class="btn btn-danger" onclick="openModal(\'pip\',{id:\''+a.id+'\'})"><i data-lucide="clipboard-plus" class="w-4 h-4"></i><span>เปิดแผน PIP</span></button>';   // FIX-03 UI + FIX-A รอบปิดซ่อน
+  if(!cycleClosed(a) && a.status==='published' && sec.can('reopen')) foot += '<button class="btn btn-secondary" onclick="openModal(\'reopen\',{id:\''+a.id+'\'})"><i data-lucide="undo-2" class="w-4 h-4"></i><span>เปิดแก้ไขผล</span></button>';   // OQ-PERF-01 · re-open published (authorized manage + open cycle + audit ผู้แก้)
+  foot += '</div>';
+  return '<div class="drawer-panel">' + dwHead('แบบประเมินรายคน', esc(a.emp), tabs) + '<div class="drawer-body">'+body+'</div>' + foot + '</div>';
+}
+function tabDetail(a){
+  if(curRole().mask && a.emp!==curRole().name){   // FIX-04 · พนักงานเปิดแบบประเมินของผู้อื่นไม่ได้ (ชื่อ/decision/gap ของคนอื่นไม่อยู่ใน DOM)
+    return '<div class="sec"><div class="note is-warn"><i data-lucide="shield" class="w-4 h-4"></i><span>ข้อมูลนี้เป็นความลับ (RESTRICTED) — ดูได้เฉพาะแบบประเมินของตนเอง</span></div></div>';
+  }
+  if(curRole().id==='mgr' && a.dept!==curRole().dept){   // OQ-PERF-03 · หัวหน้าเปิดแบบประเมินนอกแผนกตัวเองไม่ได้ (detail-open guard respect dept scope)
+    return '<div class="sec"><div class="note is-warn"><i data-lucide="shield" class="w-4 h-4"></i><span>ข้อมูลนี้เป็นความลับ (RESTRICTED) — หัวหน้าดูได้เฉพาะแผนกของตน</span></div></div>';
+  }
+  let h = '';
+  if(isOverdue(a)) h += '<div class="note is-warn"><i data-lucide="alarm-clock" class="w-4 h-4"></i><span>เกินกำหนดประเมิน ('+fmtDate(a.due)+')</span><button class="btn btn-sm btn-secondary note-act" onclick="sendReminder(\''+a.id+'\')"><span>ส่งการเตือน</span></button></div>';
+  h += '<div class="sec"><dl class="kv">'
+    + '<dt>พนักงาน</dt><dd>'+esc(a.emp)+' · '+esc(a.pos)+'</dd>'
+    + '<dt>แผนก</dt><dd>'+esc(a.dept)+'</dd>'
+    + '<dt>รอบประเมิน</dt><dd>'+esc(cyc(a.cycle).name)+' '+cyc(a.cycle).year+'</dd>'
+    + '<dt>สถานะ</dt><dd>'+pill(AST,a.status)+'</dd>'
+    + '<dt>คะแนนรวม (หัวหน้า)</dt><dd><b>'+mask(scoreText(a))+' / 5</b></dd>'
+    + '<dt>ผลการตัดสิน</dt><dd>'+(a.decision?esc(a.decision):'—')+'</dd>'
+    + '<dt>จุดที่ต้องพัฒนา</dt><dd>'+(a.gap?esc(a.gap):'—')+'</dd>'
+    + '</dl></div>';
+  if(a.status==='published' && sec.can('sendMovement') && !cycleClosed(a)){   // FIX-03 role + FIX-A รอบปิดซ่อนปุ่ม mutation
+    /* ส่งต่อผล — ปรับตำแหน่ง/เงินเดือนส่งได้ทุกผลที่เผยแพร่ (FN-07 decouple จาก gap) · อบรมเฉพาะเมื่อมี gap · Succession เมื่อผ่าน/top (FIX-09) */
+    const topPerf = (a.decision==='ผ่าน') || (rawScore(a)!=null && rawScore(a)>=4);
+    h += '<div class="sec"><h4><i data-lucide="git-fork" class="w-4 h-4"></i>ส่งต่อผล</h4>'
+      + '<div class="hookbox"><div class="hb-body">'
+      + (a.gap ? 'จุดที่ต้องพัฒนา: <b>'+esc(a.gap)+'</b> — ส่งต่อได้:' : 'ส่งต่อผลไปโมดูลอื่น:')
+      + '</div><div class="hb-acts">'
+      + (a.gap ? '<button class="btn btn-sm btn-secondary" onclick="sendTraining(\''+a.id+'\')"><i data-lucide="graduation-cap" class="w-3.5 h-3.5"></i><span>ส่งไปอบรม</span></button>' : '')
+      + '<button class="btn btn-sm btn-secondary" onclick="sendMovement(\''+a.id+'\')"><i data-lucide="arrow-left-right" class="w-3.5 h-3.5"></i><span>ส่งเรื่องปรับตำแหน่ง/เงินเดือน</span></button>'
+      + (topPerf ? '<button class="btn btn-sm btn-secondary" onclick="sendSuccession(\''+a.id+'\')"><i data-lucide="users-round" class="w-3.5 h-3.5"></i><span>ส่งเข้า Succession Planning</span></button>' : '')
+      + '</div></div></div>';
+  }
+  return h;
+}
+function tabKpi(a){
+  const bad = wsum(a)!==100;
+  const closed = cycleClosed(a);   // FIX-A · รอบปิด → read-only ตั้งแต่ render (ไม่ใช่แค่บล็อกตอน save)
+  const editable = !closed && a.status==='goal' && curRole().manage;
+  const selfEdit = !closed && a.status==='self';
+  const mgrEdit  = !closed && a.status==='mgr' && (curRole().id==='mgr' || curRole().manage);
+  if(editable){
+    state.edit = state.edit || JSON.parse(JSON.stringify(a.kpis));
+    return renderKpiEditorShell(a);
+  }
+  // scoring / read-only view
+  let h = '';
+  if(closed) h += '<div class="note is-warn"><i data-lucide="lock" class="w-4 h-4"></i><span>รอบนี้ปิดแล้ว — ดูได้อย่างเดียว แก้ไขไม่ได้</span></div>';   // FIX-A · banner บอกเหตุ read-only
+  h += '<div class="sec"><h4><i data-lucide="target" class="w-4 h-4"></i>KPI / คะแนน '
+    + (bad ? '<span class="wtag bad mla">น้ำหนักรวม '+wsum(a)+'% ≠ 100</span>' : '<span class="wtag ok mla">น้ำหนักรวม 100%</span>') + '</h4>';
+  h += '<table class="kpitbl"><thead><tr><th>KPI</th><th class="center">น้ำหนัก</th><th>เป้าหมาย</th><th class="center">ตนเอง</th><th class="center">หัวหน้า</th></tr></thead><tbody id="kpiScoreBody">';
+  h += a.kpis.map((k,i) => '<tr><td>'+esc(k.n)+'</td><td class="center">'+k.w+'%</td><td>'+esc(k.t)+'</td>'
+    + '<td class="center">' + (selfEdit ? '<input class="in s" type="number" min="1" max="5" data-i="'+i+'" value="'+(k.self!=null?k.self:'')+'" oninput="onScoreInput()">' : (k.self!=null?k.self:'—')) + '</td>'
+    + '<td class="center">' + (mgrEdit ? '<input class="in s" type="number" min="1" max="5" data-i="'+i+'" value="'+(k.mgr!=null?k.mgr:'')+'" oninput="onScoreInput()">' : mask(k.mgr!=null?String(k.mgr):'—')) + '</td></tr>').join('');
+  h += '</tbody></table>';
+  if(selfEdit){
+    h += '<div class="field mt-3"><label>ความเห็นของพนักงาน (ประเมินตนเอง)</label><textarea class="notes-area" id="selfNote" placeholder="สรุปผลงานของตนเองในรอบนี้…">'+esc(a.selfNote)+'</textarea></div>';
+    h += '<div class="totbox"><button class="btn btn-primary" id="btnSelf" onclick="saveSelf(\''+a.id+'\')"><i data-lucide="check" class="w-4 h-4"></i><span>บันทึกประเมินตนเอง</span></button></div>';
+  } else if(mgrEdit){
+    h += '<div class="field mt-3"><label>ความเห็นหัวหน้า</label><textarea class="notes-area" id="mgrNote" placeholder="ความเห็น/ข้อเสนอแนะ…">'+esc(a.mgrNote)+'</textarea></div>';
+    h += '<div class="totbox">คะแนนรวมถ่วงน้ำหนัก (หัวหน้า): <b id="liveScore">'+scoreText(a)+' / 5</b></div>';
+    h += '<div class="totbox"><button class="btn btn-primary" id="btnMgr" onclick="saveMgr(\''+a.id+'\')"><i data-lucide="check" class="w-4 h-4"></i><span>บันทึกผลหัวหน้า</span></button></div>';
+  } else {
+    h += '<div class="totbox">คะแนนรวมถ่วงน้ำหนัก (หัวหน้า): <b>'+mask(scoreText(a))+' / 5</b></div>';
+  }
+  h += '</div>';
+  return h;
+}
+function renderKpiEditorShell(a){
+  const rows = state.edit;
+  const sum = rows.reduce((s,k)=>s+(+k.w||0),0);
+  let h = '<div class="sec" id="kpiEditor"><h4><i data-lucide="sliders-horizontal" class="w-4 h-4"></i>ตั้งเป้า / KPI '
+    + '<span class="wtag '+(sum===100?'ok':'bad')+' mla" id="wsumTag">น้ำหนักรวม '+sum+'%'+(sum===100?'':' ≠ 100')+'</span></h4>';
+  h += '<table class="kpitbl"><thead><tr><th>KPI</th><th class="center">น้ำหนัก %</th><th>เป้าหมาย</th><th></th></tr></thead><tbody>';
+  h += rows.map((k,i) => '<tr>'
+    + '<td><input class="in" data-f="n" data-i="'+i+'" value="'+esc(k.n)+'" oninput="onKpiEdit(this)" placeholder="ชื่อ KPI"></td>'
+    + '<td class="center"><input class="in w" type="number" min="0" max="100" data-f="w" data-i="'+i+'" value="'+k.w+'" oninput="onKpiEdit(this)"></td>'
+    + '<td><input class="in" data-f="t" data-i="'+i+'" value="'+esc(k.t)+'" oninput="onKpiEdit(this)" placeholder="เป้าหมาย"></td>'
+    + '<td class="center"><button class="kpi-del" onclick="delKpi('+i+')"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></td></tr>').join('');
+  h += '</tbody></table>';
+  h += '<div class="rowbtw mt-3"><button class="btn btn-sm btn-secondary" onclick="addKpi()"><i data-lucide="plus" class="w-3.5 h-3.5"></i><span>เพิ่ม KPI</span></button>'
+    + '<button class="btn btn-primary" id="btnKpi" onclick="saveKpi(\''+a.id+'\')"><i data-lucide="check" class="w-4 h-4"></i><span>บันทึกเป้า/KPI</span></button></div>';
+  h += '</div>';
+  return h;
+}
+function onKpiEdit(el){ const i=+el.dataset.i, f=el.dataset.f; state.edit[i][f] = (f==='w') ? (+el.value||0) : el.value; if(f==='w'){ const sum=state.edit.reduce((s,k)=>s+(+k.w||0),0); const tag=document.getElementById('wsumTag'); if(tag){ tag.className='wtag '+(sum===100?'ok':'bad')+' mla'; tag.textContent='น้ำหนักรวม '+sum+'%'+(sum===100?'':' ≠ 100'); } } }
+function addKpi(){ state.edit.push({ n:'', w:0, t:'', self:null, mgr:null }); const c=document.getElementById('kpiEditor'); const a=appr(state.drawer.recordId); if(c){ c.outerHTML=renderKpiEditorShell(a); renderIcons(); } }
+function delKpi(i){ state.edit.splice(i,1); const c=document.getElementById('kpiEditor'); const a=appr(state.drawer.recordId); if(c){ c.outerHTML=renderKpiEditorShell(a); renderIcons(); } }
+function saveKpi(id){
+  if(state._busy) return; const a=appr(id); if(!a) return;
+  if(cycleClosed(a)){ showToast('รอบนี้ปิดแล้ว — แก้ไขไม่ได้','warning'); return; }   // FIX-05
+  if(a.status!=='goal'){ showToast('บันทึกเป้า/KPI ได้เฉพาะขั้นตั้งเป้า','warning'); return; }   // FIX-02
+  const rows=state.edit || [];
+  if(rows.some(k=>!k.n.trim())){ showToast('กรุณากรอกชื่อ KPI ให้ครบ','warning'); return; }
+  const sum = rows.reduce((s,k)=>s+(+k.w||0),0);
+  if(sum!==100){ showToast('น้ำหนัก KPI รวมต้องเท่ากับ 100% (ตอนนี้ '+sum+'%)','warning'); return; }
+  const btn=document.getElementById('btnKpi'); state._busy=true; if(btn){ btn.classList.add('is-disabled'); btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังบันทึก…</span>'; renderIcons(); }
+  setTimeout(()=>{ a.kpis=JSON.parse(JSON.stringify(rows)); pushAudit(id,'ตั้งเป้า/KPI'); a.status='self'; state.edit=null; state._busy=false; render(); showToast('บันทึกเป้า/KPI แล้ว · เปิดให้พนักงานประเมินตนเอง','success'); }, 450);
+}
+function onScoreInput(){ /* live weighted score for mgr edit */
+  const a=appr(state.drawer.recordId); if(!a) return;
+  document.querySelectorAll('#kpiScoreBody input.in').forEach(inp=>{ const i=+inp.dataset.i; const v=inp.value===''?null:+inp.value; if(a.status==='self') a.kpis[i].self=v; else a.kpis[i].mgr=v; });
+  const ls=document.getElementById('liveScore'); if(ls) ls.textContent=scoreText(a)+' / 5';
+}
+function saveSelf(id){
+  if(state._busy) return; const a=appr(id); if(!a) return;
+  if(cycleClosed(a)){ showToast('รอบนี้ปิดแล้ว — แก้ไขไม่ได้','warning'); return; }   // FIX-05
+  if(a.status!=='self'){ showToast('ประเมินตนเองได้เฉพาะขั้นประเมินตนเอง','warning'); return; }   // FIX-02
+  if(a.kpis.some(k=>k.self==null||k.self<1||k.self>5)){ showToast('กรุณาให้คะแนนตนเองครบทุก KPI (1–5)','warning'); return; }
+  a.selfNote=(document.getElementById('selfNote')||{}).value||'';
+  const btn=document.getElementById('btnSelf'); state._busy=true; if(btn){ btn.classList.add('is-disabled'); btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังบันทึก…</span>'; renderIcons(); }
+  setTimeout(()=>{ pushAudit(id,'พนักงานประเมินตนเอง'); a.status='mgr'; state._busy=false; render(); showToast('บันทึกประเมินตนเองแล้ว · ส่งต่อหัวหน้าประเมิน','success'); }, 450);
+}
+function saveMgr(id){
+  if(state._busy) return; const a=appr(id); if(!a) return;
+  if(cycleClosed(a)){ showToast('รอบนี้ปิดแล้ว — แก้ไขไม่ได้','warning'); return; }   // FIX-05
+  if(!sec.can('saveMgr')){ showToast('สิทธิ์ไม่พอ','warning'); return; }   // FIX-03
+  if(a.status!=='mgr'){ showToast('บันทึกผลหัวหน้าได้เฉพาะขั้นหัวหน้าประเมิน','warning'); return; }   // FIX-02
+  if(a.kpis.some(k=>k.mgr==null||k.mgr<1||k.mgr>5)){ showToast('กรุณาให้คะแนน (หัวหน้า) ครบทุก KPI (1–5)','warning'); return; }
+  a.mgrNote=(document.getElementById('mgrNote')||{}).value||'';
+  const btn=document.getElementById('btnMgr'); state._busy=true; if(btn){ btn.classList.add('is-disabled'); btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังบันทึก…</span>'; renderIcons(); }
+  setTimeout(()=>{ pushAudit(id,'หัวหน้าประเมิน + คะแนน'); a.status='calibration'; state._busy=false; render(); showToast('บันทึกผลหัวหน้าแล้ว · ส่งเข้าสอบทาน (DOA)','success'); }, 450);
+}
+function tabCalib(a){
+  const reviewed = a.status==='published';
+  return '<div class="sec"><h4><i data-lucide="git-branch" class="w-4 h-4"></i>สอบทานผล (DOA · role-based)</h4>'
+    + '<p class="sub-note mb-3">ผู้สอบทาน resolve ตามตำแหน่ง (มติ 17 ส.ค.) — ไม่ hardcode สายอนุมัติในหน้านี้</p>'
+    + '<ul class="tl">'
+    + '<li class="'+(a.kpis.every(k=>k.mgr!=null)?'on':'wait')+'"><b>ขั้น 1 · หัวหน้าสายงาน</b><small>'+(a.kpis.every(k=>k.mgr!=null)?'ประเมินครบแล้ว':'รอหัวหน้าประเมิน')+'</small></li>'
+    + '<li class="'+(reviewed?'on':(a.status==='calibration'?'wait':''))+'"><b>ขั้น 2 · ผู้สอบทาน (HRBP/ผู้บริหารตามตำแหน่ง)</b><small>'+(reviewed?'สอบทานแล้ว · decision: '+esc(a.decision):'รอสอบทาน (DOA)')+'</small></li>'
+    + '</ul>'
+    + (!cycleClosed(a) && a.status==='calibration' && sec.can('doCalib')?'<button class="btn btn-primary mt-3" onclick="openModal(\'doaCalib\',{id:\''+a.id+'\'})"><i data-lucide="send" class="w-4 h-4"></i><span>เริ่มสอบทาน + เลือกผู้สอบทาน</span></button>':'')
+    + '</div>';
+}
+function tabHistory(a){
+  const log = PERF.audit[a.id] || [{ act:'ตั้งเป้า/KPI', who:'HR', at:cyc(a.cycle).period }];
+  return '<div class="sec"><h4><i data-lucide="history" class="w-4 h-4"></i>ประวัติ (audit · append-only)</h4><ul class="tl">'
+    + log.map(x => '<li class="on"><b>'+esc(x.act)+'</b><small>'+esc(x.who)+' · '+esc(x.at)+'</small></li>').join('') + '</ul></div>';
+}
+function pushAudit(id, act){ PERF.audit[id]=PERF.audit[id]||[]; PERF.audit[id].unshift({ act, who:curRole().name, at:TODAY+' '+new Date().toTimeString().slice(0,5) }); }
+
+/* ============================================================ MODALS */
+function modalHTML(){
+  const m = state.modal; if(!m.type) return '';
+  if(m.type==='doaCalib'){
+    const a = appr(m.data.id) || {};
+    const apv = a.approvals || [];
+    const started = apv.length > 0;                 // FIX-06 · แยกจังหวะ: ยังไม่ส่งสอบทาน = เลือกคน · ส่งแล้ว = บันทึกผลรายขั้น
+    let body = '', footBtn = '';
+    if(!started){
+      /* จังหวะ 1 · เลือกผู้สอบทาน 2 ขั้น (slot ว่าง · FIX-06a) แล้ว "ส่งสอบทาน" (freeze รายชื่อ · คง calibration) */
+      body = '<p class="sub-note mb-3">แต่ละขั้นเลือกคนตามตำแหน่งที่ DOA กำหนด (ไม่ fix รายชื่อในหน้านี้) — ส่งสอบทานก่อน ผู้สอบทานแต่ละขั้นจึงบันทึกผลของตน</p>'
+        + '<div class="slot-row"><span class="slot-no">1</span><span class="slot-role">หัวหน้าสายงาน</span><span class="slot-pick">'+searchSelectHTML('doa0',{placeholder:'เลือกผู้สอบทาน…'})+'</span></div>'
+        + '<div class="slot-row"><span class="slot-no">2</span><span class="slot-role">ผู้สอบทาน (HRBP/ผู้บริหาร)</span><span class="slot-pick">'+searchSelectHTML('doa1',{placeholder:'เลือกผู้สอบทาน…'})+'</span></div>'
+        + '<div class="note is-warn mt-3"><i data-lucide="shield" class="w-4 h-4"></i><span>ผล/คะแนน = RESTRICTED · เลือกครบทั้ง 2 ขั้นก่อนส่งสอบทาน</span></div>';
+      footBtn = '<button class="btn btn-primary" id="btnCalib" onclick="doCalibSend(\''+m.data.id+'\')"><i data-lucide="send" class="w-4 h-4"></i><span>ส่งสอบทาน</span></button>';
+    } else {
+      /* จังหวะ 2 · ผู้สอบทานขั้น current บันทึกผลของตน (ขั้นละ action · ทุกขั้นมี at/ผู้กระทำ) · เผยแพร่ผลหลังขั้นสุดท้ายเท่านั้น */
+      const cur = apv.find(x=>x.status==='current');
+      const isLast = cur ? (apv.indexOf(cur) === apv.length-1) : false;
+      body = '<p class="sub-note mb-3">บันทึกผลสอบทานทีละขั้น — เผยแพร่ผลหลังผู้สอบทานขั้นสุดท้ายบันทึกเท่านั้น</p>'
+        + '<ul class="tl">' + apv.map(x => '<li class="'+(x.status==='done'?'on':(x.status==='current'?'wait':''))+'"><b>ขั้น '+x.no+' · '+esc(x.role)+'</b><small>'+esc(x.personName)+(x.status==='done'?' · บันทึกแล้ว '+esc(x.at):(x.status==='current'?' · รอบันทึกผล (ขั้นนี้)':' · รอคิว'))+'</small></li>').join('') + '</ul>';
+      if(cur){
+        if(isLast) body += '<div class="field mt-3"><label>ผลการตัดสิน</label><select class="select" id="p_dec"><option value="ผ่าน">ผ่าน</option><option value="ทบทวน (PIP)">ทบทวน (เปิด PIP)</option><option value="ไม่ผ่าน">ไม่ผ่าน</option></select></div>';
+        body += '<div class="note is-warn mt-3"><i data-lucide="shield" class="w-4 h-4"></i><span>'+(isLast?'ขั้นสุดท้าย: บันทึกแล้วเผยแพร่ผล · ผล/คะแนน = RESTRICTED · แจ้งเตือนพนักงาน':'บันทึกผลขั้นนี้แล้วส่งต่อผู้สอบทานขั้นถัดไป (ยังไม่เผยแพร่)')+'</span></div>';
+        footBtn = '<button class="btn btn-primary" id="btnCalibStage" onclick="doCalibStage(\''+m.data.id+'\')"><i data-lucide="check" class="w-4 h-4"></i><span>'+(isLast?'บันทึกผล + เผยแพร่ผล':'บันทึกผลสอบทานขั้น '+cur.no)+'</span></button>';
+      }
+    }
+    return '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="git-branch" class="w-4 h-4"></i></div>'
+      + '<div><h3 class="modal-title">สอบทานผล (DOA) — '+(started?'บันทึกผลรายขั้น':'เลือกผู้สอบทาน')+'</h3><p class="modal-subtitle">'+esc(a.emp)+' · คะแนน '+scoreText(a)+' / 5</p></div></div>'
+      + '<div class="modal-body">' + body + '</div>'
+      + '<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>' + footBtn + '</div>';
+  }
+  if(m.type==='closeCycle'){
+    return '<div class="modal-header"><div class="modal-header-icon is-danger"><i data-lucide="lock" class="w-4 h-4"></i></div>'
+      + '<div><h3 class="modal-title">ปิดรอบประเมิน?</h3><p class="modal-subtitle">ปิดรอบจะล็อกการแก้ไขทั้งหมด (soft archive) — ย้อนกลับไม่ได้</p></div></div>'
+      + '<div class="modal-body">ต้องการปิดรอบ "'+esc(cyc(m.data.id).name)+' '+cyc(m.data.id).year+'" ใช่หรือไม่</div>'
+      + '<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-danger" id="btnClose" onclick="doCloseCycle(\''+m.data.id+'\')"><i data-lucide="lock" class="w-4 h-4"></i><span>ปิดรอบ</span></button></div>';
+  }
+  if(m.type==='pip'){
+    const a=appr(m.data.id)||{};
+    return '<div class="modal-header"><div class="modal-header-icon is-warning"><i data-lucide="clipboard-plus" class="w-4 h-4"></i></div>'
+      + '<div><h3 class="modal-title">เปิดแผนพัฒนา (PIP)</h3><p class="modal-subtitle">'+esc(a.emp)+' · คะแนน '+scoreText(a)+' / 5 · decision: '+esc(a.decision||'')+'</p></div></div>'
+      + '<div class="modal-body"><div class="field"><label>ประเด็นที่ต้องพัฒนา (Gap)</label><input class="input" id="pip_gap" value="'+esc(a.gap||'')+'"></div>'
+      + '<div class="field"><label>ระยะเวลา PIP</label><select class="select" id="pip_dur"><option>30 วัน</option><option>60 วัน</option><option>90 วัน</option></select></div>'
+      + '<div class="field"><label>แนวทาง/เป้าหมาย</label><textarea class="notes-area" id="pip_plan" placeholder="กิจกรรม/ตัวชี้วัดที่ต้องบรรลุ…"></textarea></div></div>'
+      + '<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" id="btnPip" onclick="doPip(\''+m.data.id+'\')"><i data-lucide="check" class="w-4 h-4"></i><span>เปิดแผน PIP</span></button></div>';
+  }
+  if(m.type==='reopen'){   /* OQ-PERF-01 · เปิดแก้ไขผลที่เผยแพร่แล้ว — เหตุผลบังคับ · append-only audit (ใครแก้) · mirror F-HR-WELFARE reversal */
+    const a=appr(m.data.id)||{};
+    return '<div class="modal-header"><div class="modal-header-icon is-warning"><i data-lucide="undo-2" class="w-4 h-4"></i></div>'
+      + '<div><h3 class="modal-title">เปิดแก้ไขผลที่เผยแพร่แล้ว?</h3><p class="modal-subtitle">'+esc(a.emp)+' · คะแนน '+scoreText(a)+' / 5 · decision: '+esc(a.decision||'—')+'</p></div></div>'
+      + '<div class="modal-body">'
+      +   '<ul class="modal-note-list">'
+      +     '<li>ส่งแบบประเมินกลับขั้น "หัวหน้าประเมิน" — แก้คะแนน → สอบทาน (DOA) → เผยแพร่ผลใหม่</li>'
+      +     '<li>บันทึกผู้เปิดแก้ไข + เวลา + เหตุผล ลงประวัติ (audit · append-only) — ผลเดิมไม่ถูกลบ</li></ul>'
+      +   '<div class="field"><label class="field-label">เหตุผลการเปิดแก้ไข <span class="req">*</span></label>'
+      +   '<textarea class="notes-area" id="reopenReason" placeholder="ระบุเหตุผล เช่น คะแนนผิด / decision ผิด / ข้อมูลไม่ครบ"></textarea>'
+      +   '<div class="field-error" id="reopenErr">กรุณาระบุเหตุผล</div></div></div>'
+      + '<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>'
+      + '<button class="btn btn-primary" id="btnReopen" onclick="doReopen(\''+m.data.id+'\')"><i data-lucide="undo-2" class="w-4 h-4"></i><span>เปิดแก้ไขผล</span></button></div>';
+  }
+  return '';
+}
+/* FIX-06 · จังหวะ 1 — ส่งสอบทาน: freeze รายชื่อผู้สอบทาน 2 ขั้น (approvals current/pending) · สถานะคำขอคง calibration
+   FIX-01 precondition (calibration + คะแนนหัวหน้าครบ) · FIX-03 role (manage) · FIX-05 closed lock */
+function doCalibSend(id){
+  if(state._busy) return;
+  const a=appr(id); if(!a) return;
+  if(cycleClosed(a)){ showToast('รอบนี้ปิดแล้ว — แก้ไขไม่ได้','warning'); return; }   // FIX-05
+  if(!sec.can('doCalib')){ showToast('สิทธิ์ไม่พอ','warning'); return; }   // FIX-03
+  if(a.status!=='calibration' || rawScore(a)==null){ showToast('สอบทานได้เฉพาะแบบประเมินที่ให้คะแนนหัวหน้าครบและรอสอบทาน','warning'); return; }   // FIX-01
+  const s0=ssGet('doa0'), s1=ssGet('doa1');
+  if(!s0||!s0.value||!s1||!s1.value){ showToast('กรุณาเลือกผู้สอบทานให้ครบทุกขั้น','warning'); return; }   // FIX-06 · validation บังคับเลือกครบ
+  const nm = pid => (PERF.people.find(p=>p.id===pid)||{}).name || pid;
+  const btn=document.getElementById('btnCalib'); state._busy=true; if(btn){ btn.classList.add('is-disabled'); btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังส่ง…</span>'; renderIcons(); }
+  setTimeout(()=>{
+    a.approvals = [
+      { no:1, role:'หัวหน้าสายงาน', personId:s0.value, personName:nm(s0.value), status:'current', at:null, actor:null },
+      { no:2, role:'ผู้สอบทาน (HRBP/ผู้บริหาร)', personId:s1.value, personName:nm(s1.value), status:'pending', at:null, actor:null }
+    ];
+    pushAudit(id,'ส่งสอบทาน · เลือกผู้สอบทาน 2 ขั้น (คง calibration)');
+    state._busy=false; render();
+    showToast('ส่งสอบทานแล้ว · รอผู้สอบทานขั้นที่ 1 บันทึกผล','info');
+  }, 400);
+}
+/* FIX-06 · จังหวะ 2 — ผู้สอบทานขั้น current บันทึกผลของตน (stamp at/ผู้กระทำ) · เฉพาะขั้นสุดท้ายจึง published + decision + notif + CSQ (FIX-07) */
+function doCalibStage(id){
+  if(state._busy) return;
+  const a=appr(id); if(!a || !a.approvals) return;
+  if(cycleClosed(a)){ showToast('รอบนี้ปิดแล้ว — แก้ไขไม่ได้','warning'); return; }   // FIX-05
+  if(!sec.can('doCalib')){ showToast('สิทธิ์ไม่พอ','warning'); return; }   // FIX-03
+  if(a.status!=='calibration'){ showToast('บันทึกผลสอบทานได้เฉพาะแบบประเมินที่รอสอบทาน','warning'); return; }
+  const cur=a.approvals.find(x=>x.status==='current'); if(!cur){ return; }
+  const idx=a.approvals.indexOf(cur); const isLast = idx===a.approvals.length-1;
+  const dec = isLast ? ((document.getElementById('p_dec')||{}).value||'ผ่าน') : null;
+  const btn=document.getElementById('btnCalibStage'); state._busy=true; if(btn){ btn.classList.add('is-disabled'); btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังบันทึก…</span>'; renderIcons(); }
+  setTimeout(()=>{
+    cur.status='done'; cur.at=TODAY+' '+new Date().toTimeString().slice(0,5); cur.actor=curRole().name;
+    pushAudit(id,'สอบทานขั้น '+cur.no+' ('+cur.role+') · '+cur.personName);
+    if(!isLast){
+      a.approvals[idx+1].status='current';
+      state._busy=false; render();
+      showToast('บันทึกผลสอบทานขั้น '+cur.no+' แล้ว · รอผู้สอบทานขั้นถัดไป','info');
+    } else {
+      a.status='published'; a.decision=dec;
+      if(dec.includes('ทบทวน')) a.gap = a.gap || 'ต้องพัฒนาเพิ่มเติม';
+      pushAudit(id,'เผยแพร่ผล · decision: '+dec);
+      pushAudit(id,'บันทึกผลประเมินเข้า 7C');   // FIX-07 · CSQ hook per-person publish (ref ภายในถอดออกจากจอ · มติ OQ-PERF-02 RESOLVED — ยิงท่อ 7C ตอนเผยแพร่ผลรายคน · ไม่ประกาศ OC/DC ซ้ำ)
+      PERF.notifs.unshift({ ic:'megaphone', b:'ผลประเมินเผยแพร่แล้ว', m:esc(a.emp)+' · decision: '+dec });
+      state._busy=false; closeModal(); render();
+      showToast('เผยแพร่ผล · บันทึกผลเข้า 7C · RESTRICTED · แจ้งเตือนพนักงานแล้ว','success');
+    }
+  }, 450);
+}
+function doCloseCycle(id){
+  if(state._busy) return;
+  if(!sec.can('doCloseCycle')){ showToast('สิทธิ์ไม่พอ','warning'); return; }   // FIX-03
+  const c=cyc(id); const btn=document.getElementById('btnClose'); state._busy=true;
+  if(btn){ btn.classList.add('is-disabled'); btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังปิด…</span>'; renderIcons(); }
+  setTimeout(()=>{ c.status='closed'; state._busy=false; closeModal(); closeDrawer(); render(); showToast('ปิดรอบแล้ว · ล็อกการแก้ไข (soft archive)','info'); }, 400);
+}
+function doPip(id){
+  if(state._busy) return; const a=appr(id); if(!a) return;
+  if(cycleClosed(a)){ showToast('รอบนี้ปิดแล้ว — แก้ไขไม่ได้','warning'); return; }   // FIX-05
+  if(!sec.can('doPip')){ showToast('สิทธิ์ไม่พอ','warning'); return; }   // FIX-03
+  const gap=(document.getElementById('pip_gap')||{}).value||a.gap;
+  if(!gap || !gap.trim()){ showToast('กรุณาระบุประเด็นที่ต้องพัฒนา','warning'); return; }
+  const btn=document.getElementById('btnPip'); state._busy=true; if(btn){ btn.classList.add('is-disabled'); btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังบันทึก…</span>'; renderIcons(); }
+  setTimeout(()=>{ a.gap=gap; pushAudit(id,'เปิดแผน PIP · '+(document.getElementById('pip_dur')||{}).value); state._busy=false; closeModal(); render(); showToast('เปิดแผน PIP แล้ว','success'); }, 450);
+}
+/* OQ-PERF-01 · เปิดแก้ไขผลหลังเผยแพร่ — authorized (manage) + open cycle + published เท่านั้น · append-only audit (ใครแก้)
+   ส่งกลับขั้นหัวหน้าประเมิน (mgr) → แก้คะแนน → สอบทาน (DOA) → เผยแพร่ใหม่ (staged DOA เดิม · CSQ 7C ยิงซ้ำ per-person · มติ OQ-PERF-02)
+   ไม่อ่อน guard เดิม: FIX-05 closed lock · FIX-03 role · saveMgr/doCalib ยัง stage/role/closed-guarded ครบ */
+function doReopen(id){
+  if(state._busy) return; const a=appr(id); if(!a) return;
+  if(cycleClosed(a)){ showToast('รอบนี้ปิดแล้ว — แก้ไขไม่ได้','warning'); return; }   // FIX-05 · open cycle only
+  if(!sec.can('reopen')){ showToast('สิทธิ์ไม่พอ','warning'); return; }   // OQ-PERF-01 · authorized (manage · HR) เท่านั้น
+  if(a.status!=='published'){ showToast('เปิดแก้ไขได้เฉพาะผลที่เผยแพร่แล้ว','warning'); return; }   // published only (explicit transition)
+  const ta=document.getElementById('reopenReason'); const reason=ta?ta.value.trim():'';
+  if(!reason){ const f=document.getElementById('reopenErr'); if(f) f.closest('.field').classList.add('is-invalid'); return; }   // เหตุผลบังคับ (non-empty)
+  const btn=document.getElementById('btnReopen'); state._busy=true; if(btn){ btn.classList.add('is-disabled'); btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังเปิดแก้ไข…</span>'; renderIcons(); }
+  setTimeout(()=>{
+    pushAudit(id,'เปิดแก้ไขผลหลังเผยแพร่ · เหตุผล: '+reason);   // OQ-PERF-01 · pushAudit stamp who(=curRole().name)+at → บันทึก "ใครแก้" + เมื่อไหร่ + เหตุผล
+    a.status='mgr'; a.decision=''; delete a.approvals;   // กลับขั้นหัวหน้าประเมิน · เคลียร์ผลตัดสิน+ผู้สอบทานเดิม (คงคะแนน/gap ไว้อ้างอิง) → re-publishable clean ผ่าน flow เดิม
+    state._busy=false; closeModal(); render();
+    showToast('เปิดแก้ไขผลแล้ว · ส่งกลับขั้นหัวหน้าประเมิน · บันทึกผู้แก้ไว้ในประวัติ','success');
+  }, 450);
+}
+
+/* ---- display-only hooks + reminder + notify ---- */
+function sendTraining(id){ if(!sec.can('sendTraining')){ showToast('สิทธิ์ไม่พอ','warning'); return; } const a=appr(id)||{}; showToast('ส่งจุดที่ต้องพัฒนา "'+(a.gap||'')+'" ไปหลักสูตรอบรม (ส่งต่อ ไม่แก้ที่นี่) — ไม่สร้างหลักสูตรในหน้านี้','info'); }
+function sendMovement(id){ if(!sec.can('sendMovement')){ showToast('สิทธิ์ไม่พอ','warning'); return; } const a=appr(id)||{}; showToast('ส่งเรื่องปรับเงินเดือน/เลื่อนตำแหน่งให้ระบบโยกย้าย (ไม่ปรับเอง)','info'); }
+/* FIX-09 · ส่งผลเข้า Succession Planning (display-only · ส่งต่อ ไม่แก้ที่นี่) — role guard เดียวกับ send* อื่น (manage) */
+function sendSuccession(id){ if(!sec.can('sendSuccession')){ showToast('สิทธิ์ไม่พอ','warning'); return; } showToast('ส่งผลเข้า Succession Planning (ส่งต่อ ไม่แก้ที่นี่)','info'); }
+function sendReminder(id){ showToast('ส่งการเตือนผู้ที่ประเมินไม่ครบ/เกินกำหนดแล้ว','info'); }
+
+/* ============================================================ RENDER (override) */
+function initFeatureSelects(){
+  // create cycle — HR config lookup (ใช้ ssId() helper ตาม BASE-KIT — ไม่อ้าง id ของ search-select ตรง ๆ)
+  if(state.drawer.open && state.drawer.mode==='newCycle' && document.getElementById(ssId('ss-','cfgCycle'))){
+    initSearchSelect('cfgCycle', { options: PERF.configCycles.map(c=>({ value:c.v, label:c.label, sub:c.sub, icon:'calendar-range' })), value:null, onSelect:()=>{ const f=document.getElementById('err-cfg'); if(f) f.closest('.field').classList.remove('is-invalid'); } });
+  }
+  // DOA slot pickers — role-based person resolve
+  if(state.modal.open && state.modal.type==='doaCalib'){
+    const opts = PERF.people.map(p=>({ value:p.id, label:p.name, sub:p.pos+' · '+p.dept, icon:'user' }));
+    // FIX-06a · slot ว่าง (value:null) — บังคับผู้ส่งค้นหา/เลือก "คน" จริงต่อตำแหน่ง (มติ 2026-08-17) · ไม่ preset P1/P2
+    if(document.getElementById(ssId('ss-','doa0'))) initSearchSelect('doa0', { options:opts, value:null, onSelect:()=>{} });
+    if(document.getElementById(ssId('ss-','doa1'))) initSearchSelect('doa1', { options:opts, value:null, onSelect:()=>{} });
+  }
+}
+function render(){
+  const snap = preserveRenderState();
+  applyRole();
+  const pc = document.getElementById('page-content'); if(pc) pc.innerHTML = pageHTML();
+  const dw = document.getElementById('drawer'); if(dw){ dw.innerHTML = state.drawer.open ? drawerHTML() : ''; renderIcons(); }   // FIX-10 · เรนเดอร์ไอคอนทันทีหลังเติม drawer (ปุ่มปิดต้องมี svg เสมอ)
+  const mb = document.querySelector('#modalBackdrop .modal'); if(mb) mb.innerHTML = state.modal.open ? modalHTML() : '';
+  renderIcons();
+  initFeatureSelects();
+  restoreRenderState(snap);
+}
+
+</script>
+<style id="page-late">/* late additions เท่านั้น (#69) — ห้าม inline */</style>
+<!-- PREFLIGHT v6.4
+  round1: spacing-off=0 font-sizes=0 flex-noalign=0 inline-layout=0 z-adhoc=0 hex-off=0 (feature CSS clean; BASE-KIT verbatim)
+  round2: 7/7 checked · audit.sh FAIL=0
+  residual self_audit (non-gate): custom_tabs (.tabs/.tab kit Rule 38.2), long_banners/missing_ids/fullwidth_select = JS-in-HTML heuristic false-positives
+  date: 2026-09-09
+  (Rule #60: numbers from self_audit.py) -->
+</body>
+</html>
