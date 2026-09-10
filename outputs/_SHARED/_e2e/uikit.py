@@ -1908,3 +1908,753 @@ def assert_text_absent(pg, needles, scope=None):
     found = dom_text_absent(pg, needles, scope=scope)
     assert not found, f"พบข้อความที่ role นี้ไม่ควรเห็นใน DOM (role-gated absence): {found}"
     return found
+
+
+# ⭐ เพิ่ม 2026-09-09 (F-HR-EXPENSE · §C3.8 · user-found bugs ที่ตัววัดเดิมมองไม่เห็น)
+# ─────────────────────────────────────────────────────────────────────────────
+# BUG-6 (backdrop/overlay ค้างหลังปิด): closeDrawer/closeModal ถอด .is-open + ตั้ง state
+#   หลัง timer แต่ไม่ render() → DOM overlay เก่าค้าง + ลิ้นชักที่ปิดแล้ว pointer-events:auto
+#   ระหว่าง slide-out → คลิกแรกโดน overlay (ต้องคลิกซ้ำ). ตัววัดเรขาคณิต/z-index เดิมจับไม่ได้
+#   เพราะมันดูตอน "เปิด" ไม่ได้ถามว่า "ปิดแล้ว overlay ยังกินคลิกมั้ย".
+JS_OVERLAY_CLOSED_NONBLOCK = r"""
+() => {
+  const bad = [];
+  // (1) overlay ที่ปิดแล้ว (ไม่มี .is-open) ต้อง pointer-events:none — deterministic (ไม่ขึ้นกับ transition)
+  document.querySelectorAll('.drawer, .drawer-backdrop, .modal-backdrop').forEach(el => {
+    if (el.classList.contains('is-open')) return;
+    const cs = getComputedStyle(el);
+    if (cs.pointerEvents !== 'none') bad.push({ el: el.id || el.className, why: 'pe=' + cs.pointerEvents });
+  });
+  // (2) คลิกกลางจอต้องไม่ตกบน overlay ที่ปิดแล้ว (ต้องทะลุไปถึงหน้าเพจ)
+  const cx = Math.floor(innerWidth / 2), cy = Math.floor(innerHeight / 2);
+  const hit = document.elementFromPoint(cx, cy);
+  const onClosed = hit && hit.closest &&
+    hit.closest('.drawer:not(.is-open), .drawer-backdrop:not(.is-open), .modal-backdrop:not(.is-open)');
+  if (onClosed) bad.push({ center: onClosed.id || onClosed.className });
+  return { ok: bad.length === 0, bad, centerHit: hit ? (hit.id || hit.className || hit.tagName) : null };
+}
+"""
+
+
+def assert_overlay_cleared_after_close(pg, note=''):
+    """assert ว่าหลังปิด drawer/modal ไม่มี overlay ที่ปิดแล้วดัก/บังคลิกกลางจอ (BUG-6 · F-HR-EXPENSE)
+
+    เรียก **หลังสั่งปิดแล้ว settle** (after(pg,'()=>closeDrawer()')) — เช็ก 2 อย่าง:
+      (1) ทุก .drawer/.drawer-backdrop/.modal-backdrop ที่ไม่มี .is-open ต้อง pointer-events:none
+          (deterministic — ตัวจับตัวจริงของ bug: ลิ้นชักปิดแต่ pe:auto ระหว่าง slide-out)
+      (2) document.elementFromPoint(กลางจอ) ไม่ตกบน overlay ที่ปิดแล้ว
+    คืน dict ถ้าผ่าน · โยน AssertionError ถ้าพัง
+    """
+    r = pg.evaluate(JS_OVERLAY_CLOSED_NONBLOCK)
+    assert r['ok'], (f"overlay ค้างหลังปิด (BUG-6) {note}: {r['bad']} · "
+                     f"คลิกกลางจอโดน {r['centerHit']}")
+    return r
+
+
+# BUG-5 (payment card เบียด footer action ปุ่มหลุดจอ): HTML ผิดรูป (SEC() เกิน </div>) ดัน
+#   .drawer-footer ออกนอก .drawer-panel → ปุ่ม อนุมัติ/ไม่อนุมัติ/ส่งจ่าย อยู่ต่ำกว่าจอ กดไม่ได้.
+#   audit.sh/self_audit นับ token/เรขาคณิตนิ่ง — ไม่ได้ hit-test ว่าปุ่ม footer คลิกได้จริงมั้ย.
+JS_FOOTER_ACTIONS_HITTABLE = r"""
+(sel) => {
+  const root = document.querySelector(sel || '#drawer');
+  if (!root) return { ok: false, bad: [{ why: 'no-drawer' }] };
+  const foot = root.querySelector('.drawer-footer');
+  if (!foot) return { ok: false, bad: [{ why: 'no-footer' }] };
+  const bad = [];
+  // footer ต้องยังเป็นลูกของ .drawer-panel (ไม่หลุดออกจาก panel เพราะ HTML ผิดรูป)
+  if (!foot.closest('.drawer-panel')) bad.push({ why: 'footer-outside-panel' });
+  const vh = innerHeight, vw = innerWidth;
+  const btns = [...foot.querySelectorAll('.btn')];
+  btns.forEach(b => {
+    const r = b.getBoundingClientRect();
+    const label = (b.textContent || '').replace(/\s+/g, ' ').trim();
+    if (r.width < 1 || r.height < 1) { bad.push({ label, why: 'zero-size' }); return; }
+    if (r.bottom > vh + 1 || r.top < -1 || r.right > vw + 1 || r.left < -1) {
+      bad.push({ label, why: 'offscreen', top: Math.round(r.top), bottom: Math.round(r.bottom) }); return;
+    }
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const el = document.elementFromPoint(cx, cy);
+    const hit = !!(el && (el === b || b.contains(el) || (el.closest && el.closest('.btn') === b)));
+    if (!hit) bad.push({ label, why: 'covered', hitBy: el ? (el.className || el.tagName) : null });
+  });
+  // payment/สถานะการจ่าย card ต้องไม่ position:fixed/sticky ทับ footer
+  const pay = [...root.querySelectorAll('.sec')].find(s => /สถานะการจ่าย/.test(s.textContent || ''));
+  let payPos = null;
+  if (pay) { payPos = getComputedStyle(pay).position;
+    if (payPos === 'fixed' || payPos === 'sticky') bad.push({ why: 'payment-card-' + payPos }); }
+  return { ok: bad.length === 0, bad, btnCount: btns.length, payPos };
+}
+"""
+
+
+def assert_footer_actions_hittable(pg, drawer_sel='#drawer', note=''):
+    """assert ว่าปุ่ม action ใน .drawer-footer กดได้จริง (hit-test) + payment card ไม่ fixed/sticky (BUG-5)
+
+    เรียกตอนเปิด view drawer ของใบที่มีปุ่ม footer (เช่น pending → อนุมัติ/ไม่อนุมัติ). เช็ก:
+      footer ยังอยู่ใน .drawer-panel · ปุ่มทุกตัวอยู่ในจอ + elementFromPoint กลางปุ่มโดนตัวปุ่มเอง ·
+      .sec 'สถานะการจ่าย' ไม่ position:fixed/sticky. คืน dict ถ้าผ่าน · โยน AssertionError ถ้าพัง
+    """
+    r = pg.evaluate(JS_FOOTER_ACTIONS_HITTABLE, drawer_sel)
+    assert r['ok'], f"footer action ปุ่มกดไม่ได้/payment card pinned (BUG-5) {note}: {r['bad']}"
+    return r
+
+
+# BUG-3 (wizard stepper เพี้ยน): base-kit .step-dot (variant .stepper-row 30px วงกลมเทา) รั่วทับ
+#   STEPH .step-dot (คอลัมน์) → item ได้ height:30/bg grey/border/radius:50% คลุม label. ตัววัด
+#   เดิมไม่ได้ตรวจว่า item ของ stepper "ไม่มีกล่องพื้นหลัง/ขอบแปลกปลอม + สูงพอครอบวงกลม+label".
+JS_STEPPER_WELL_FORMED = r"""
+(sel) => {
+  const items = [...document.querySelectorAll(sel + ' .step-dot')];
+  if (items.length < 2) return { ok: false, bad: [{ why: 'no-stepper', n: items.length }] };
+  const bad = [];
+  const widths = items.map(it => Math.round(it.getBoundingClientRect().width));
+  items.forEach((it, i) => {
+    const cs = getComputedStyle(it);
+    const bg = cs.backgroundColor;
+    if (!(bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent')) bad.push({ i, why: 'item-bg', bg });
+    if (parseFloat(cs.borderTopWidth) > 0.5) bad.push({ i, why: 'item-border', bw: cs.borderTopWidth });
+    const dot = it.querySelector('.d');
+    if (!dot) { bad.push({ i, why: 'no-circle' }); return; }
+    const dr = dot.getBoundingClientRect(), ir = it.getBoundingClientRect();
+    if (dr.width < 18 || dr.width > 34) bad.push({ i, why: 'circle-size', w: Math.round(dr.width) });
+    // item ต้องไม่ตัด (clip) วงกลม/label — ก้น item ต้องคลุมก้นวงกลม
+    if (ir.bottom < dr.bottom - 1) bad.push({ i, why: 'item-clips-circle', ib: Math.round(ir.bottom), db: Math.round(dr.bottom) });
+  });
+  const wmin = Math.min(...widths), wmax = Math.max(...widths);
+  if (wmax - wmin > 4) bad.push({ why: 'uneven-widths', widths });
+  return { ok: bad.length === 0, bad, widths };
+}
+"""
+
+
+def assert_stepper_well_formed(pg, stepper_sel='#drawer .stepper', note=''):
+    """assert ว่า stepper (STEPH .stepper > .step-dot) เรนเดอร์สะอาด — ไม่มี style รั่วจาก base-kit (BUG-3)
+
+    เช็กแต่ละ .step-dot: พื้นหลังโปร่ง · ไม่มีขอบแปลกปลอม · มีวงกลม .d (18–34px) · item ไม่ตัดวงกลม ·
+    ทุกขั้นกว้างเท่ากัน (±4px). คืน dict ถ้าผ่าน · โยน AssertionError ถ้าพัง
+    """
+    r = pg.evaluate(JS_STEPPER_WELL_FORMED, stepper_sel)
+    assert r['ok'], f"stepper เรนเดอร์เพี้ยน (BUG-3) {note}: {r['bad']}"
+    return r
+
+
+# BUG-2 (filter row ล้นการ์ด): .filter-row (padding 0) วางตรงใน .card → controls ชิดขอบการ์ด.
+#   วัด: control แรก/สุดท้ายในแถว filter ต้องมี gutter จากขอบการ์ด ≥ min (มี padding container).
+JS_FILTER_INSIDE_CARD = r"""
+(arg) => {
+  const card = document.querySelector(arg.card);
+  const bar = document.querySelector(arg.filter);
+  if (!card || !bar) return { ok: false, bad: [{ why: 'missing', card: !!card, filter: !!bar }] };
+  const ctrls = [...bar.querySelectorAll('input, select, button, .input, .fr-grow')];
+  if (!ctrls.length) return { ok: false, bad: [{ why: 'no-controls' }] };
+  const cr = card.getBoundingClientRect();
+  let minLeft = Infinity, minRight = Infinity;
+  ctrls.forEach(c => { const r = c.getBoundingClientRect(); if (r.width < 1) return;
+    minLeft = Math.min(minLeft, r.left - cr.left); minRight = Math.min(minRight, cr.right - r.right); });
+  const bad = [];
+  const MIN = arg.min || 8;
+  if (minLeft < MIN) bad.push({ why: 'left-gutter', px: Math.round(minLeft) });
+  if (minRight < MIN) bad.push({ why: 'right-gutter', px: Math.round(minRight) });
+  return { ok: bad.length === 0, bad, leftGutter: Math.round(minLeft), rightGutter: Math.round(minRight) };
+}
+"""
+
+
+def assert_filter_inside_card(pg, card_sel='#view .card', filter_sel='#view .filter-bar, #view .filter-row', min_gutter=8, note=''):
+    """assert ว่าแถว filter อยู่ในการ์ด มี gutter จากขอบ (ไม่ชิด/ล้นขอบการ์ด) (BUG-2)
+
+    วัด control ที่ซ้าย/ขวาสุดในแถว filter เทียบขอบ .card — ต้องเว้น ≥ min_gutter px ทั้งสองด้าน.
+    คืน dict ถ้าผ่าน · โยน AssertionError ถ้าพัง
+    """
+    r = pg.evaluate(JS_FILTER_INSIDE_CARD, {'card': card_sel, 'filter': filter_sel, 'min': min_gutter})
+    assert r['ok'], f"filter row ล้น/ชิดขอบการ์ด (BUG-2) {note}: {r['bad']}"
+    return r
+
+
+# ⭐ เพิ่ม 2026-09-09 (F-HR-EXPENSE) — ผู้ใช้เจอ modal ส่งอนุมัติ (DOA slot picker) auto-pick ผู้อนุมัติให้เอง
+#
+# ที่มา (Bug A): modal 'ส่งอนุมัติ' เรนเดอร์ combobox 1 ตัวต่อ slot อนุมัติ (slot-0, slot-1, …) เก็บที่
+#   state.doaDraft.picks[i]. เดิม initSelects PRE-FILL picks[i] ด้วยผู้อนุมัติที่ระบบแนะนำ → ปุ่มส่ง
+#   ENABLED ตั้งแต่เปิด modal ทั้งที่ช่อง slot ดูว่าง → กดส่งได้เลยโดยได้คนที่ "ระบบเลือกให้" ไม่ใช่ที่ผู้ใช้เลือก
+#   fix: ไม่ prefill — slot เปิดมาว่างจริง (picks={}), ปุ่ม disabled จนผู้ใช้เลือกครบทุก slot
+#
+# ทำไมตัววัด/gate เดิมมองไม่เห็น: qc-ux/qc-coverage grep โค้ด ไม่ได้เรนเดอร์แล้วกดจริง ·
+#   ตัววัด e2e เดิม (helper รุ่นแรก) กลับ "ยืนยันพฤติกรรม auto-pick" — assert ว่าเปิดมาปุ่ม enabled
+#   จึงผ่านตอนบั๊กยังอยู่ · e2e happy path (c_fn07/c_fn13) เรียก doSubmit() โดยไม่แตะ slot ได้เพราะ prefill
+#
+# ground-truth หลัง fix (ตัววัดนี้ต้อง assert):
+#   (1) modal เพิ่งเปิด · ยังไม่แตะ → ปุ่ม DISABLED · picks ไม่มี valid pick · ช่อง slot input ว่าง (ไม่ auto-pick)
+#   (2) กดส่งทั้งที่ยังไม่แตะ (ปุ่ม disabled → onclick ไม่ยิง · backstop doSubmit bail) → ไม่ commit
+#   (3) เลือกผู้อนุมัติจริงครบทุก slot → ปุ่ม enable → doSubmit commit ได้
+# ต้องเรียก "หลัง" เปิด submit modal + render (slot combos init) แล้ว · helper ขับ state เอง (กด+เลือก+doSubmit)
+JS_SUBMIT_APPROVER_GATE = r"""
+(arg) => {
+  const btnId = arg.btnId || 'submitConfirmBtn';
+  const btn = () => document.getElementById(btnId) ||
+                    document.querySelector('#modalBackdrop .modal-foot .btn-primary');
+  const out = { steps: 0, hadBtn: false, hadId: false,
+                disabledWhenFresh: null, noAutoPick: null, slotInputsEmpty: null,
+                submittedWhileUntouched: null, enabledWhenAllPicked: null,
+                submittedWhenAllPicked: null, busy: null, bad: [] };
+  if (!(state.modal.open && state.modal.type === 'submit' && state.doaDraft)) {
+    out.bad.push({ why: 'submit-modal-not-open' }); return out;
+  }
+  const doa = resolveDoa((state.doaDraft.grand) || 0);
+  out.steps = doa.steps.length;
+  const b0 = btn();
+  out.hadBtn = !!b0;
+  out.hadId = !!document.getElementById(btnId);
+  if (!b0) { out.bad.push({ why: 'no-confirm-btn:' + btnId }); return out; }
+
+  // (1) modal เพิ่งเปิด · ผู้ใช้ยังไม่แตะ slot → ปุ่มต้อง DISABLED · ไม่มี auto-pick · ช่องว่างจริง
+  out.disabledWhenFresh = b0.disabled === true;
+  if (!out.disabledWhenFresh)
+    out.bad.push({ why: 'enabled-when-fresh(auto-pick?)', picks: JSON.stringify(state.doaDraft.picks) });
+  const picks = state.doaDraft.picks || {};
+  const anyPrefilled = doa.steps.some((s, i) => APPROVERS.some(a => a.id === picks[i]));
+  out.noAutoPick = !anyPrefilled;
+  if (anyPrefilled)
+    out.bad.push({ why: 'slot-prefilled(auto-pick)', picks: JSON.stringify(picks) });
+  const slotVals = doa.steps.map((s, i) => {
+    const el = document.getElementById('ss-input-slot-' + i); return el ? (el.value || '').trim() : ''; });
+  out.slotInputsEmpty = slotVals.every(v => v === '');
+  if (!out.slotInputsEmpty) out.bad.push({ why: 'slot-input-not-empty', slotVals });
+
+  // (2) กดส่งทั้งที่ยังไม่แตะ (ปุ่ม disabled → onclick ไม่ยิง · backstop doSubmit ต้อง bail) → ไม่ commit
+  const beforeN = EXP.docs.length;
+  const docId = state.doaDraft.docId || null;
+  const beforeStatus = docId ? ((findDoc(docId) || {}).status) : null;
+  b0.click();
+  doSubmit();
+  const afterN = EXP.docs.length;
+  const afterStatus = docId ? ((findDoc(docId) || {}).status) : null;
+  out.submittedWhileUntouched = (afterN !== beforeN) || (docId ? (beforeStatus !== afterStatus) : false);
+  if (out.submittedWhileUntouched) out.bad.push({ why: 'committed-while-untouched',
+      beforeN, afterN, beforeStatus, afterStatus });
+
+  // (3) เลือกผู้อนุมัติจริงครบทุก slot → ปุ่มต้อง enable → doSubmit ต้อง commit
+  state._busy = false;
+  doa.steps.forEach((s, i) => {
+    if (typeof ssPick === 'function' && window.__ss && window.__ss['slot-' + i]) ssPick('slot-' + i, 0);
+    else { state.doaDraft.picks[i] = (APPROVERS[i] || APPROVERS[0]).id;
+           if (typeof onSlotPickChange === 'function') onSlotPickChange(); }
+  });
+  const b1 = btn();
+  out.enabledWhenAllPicked = b1 ? (b1.disabled === false) : null;
+  if (!out.enabledWhenAllPicked)
+    out.bad.push({ why: 'still-disabled-after-all-picked', picks: JSON.stringify(state.doaDraft.picks) });
+  const beforeN2 = EXP.docs.length;
+  const beforeStatus2 = docId ? ((findDoc(docId) || {}).status) : null;
+  doSubmit();
+  const afterN2 = EXP.docs.length;
+  const afterStatus2 = docId ? ((findDoc(docId) || {}).status) : null;
+  out.submittedWhenAllPicked = (afterN2 !== beforeN2) || (docId ? (beforeStatus2 !== afterStatus2) : false);
+  out.busy = state._busy;
+  if (!out.submittedWhenAllPicked) out.bad.push({ why: 'not-committed-after-all-picked',
+      beforeN2, afterN2, beforeStatus2, afterStatus2 });
+  return out;
+}
+"""
+
+
+def assert_submit_requires_all_approvers(pg, btn_id='submitConfirmBtn', note=''):
+    """assert ว่า modal 'ส่งอนุมัติ' (DOA slot picker) ไม่ auto-pick ผู้อนุมัติ + ต้องเลือกครบทุก slot ก่อนส่ง
+
+    เรียก **หลังเปิด submit modal + render** (slot combos init) แล้ว. เช็ก ground-truth หลัง fix (Bug A):
+      (1) modal เพิ่งเปิด · ยังไม่แตะ → ปุ่มยืนยัน DISABLED · picks ไม่มี valid pick · ช่อง slot input ว่าง
+          (ไม่มี auto-pick — พิสูจน์ว่าไม่ prefill คนให้เอง)
+      (2) กดส่งทั้งที่ยังไม่แตะ (ปุ่ม disabled + backstop doSubmit) → ไม่ commit (ไม่สร้างใบ · ไม่ flip)
+      (3) เลือกผู้อนุมัติจริงครบทุก slot (ssPick) → ปุ่ม enable → doSubmit commit ได้
+    helper ขับ state เอง (กดส่งเปล่า → เลือกครบ → doSubmit) — คืน dict ถ้าผ่าน · โยน AssertionError ถ้าพัง
+    """
+    r = pg.evaluate(JS_SUBMIT_APPROVER_GATE, {'btnId': btn_id})
+    assert r['bad'] == [], (f"submit modal auto-pick/ส่งได้ทั้งที่ slot ว่าง (F-HR-EXPENSE · Bug A) {note}: {r['bad']} · "
+                            f"steps={r['steps']} hadId={r['hadId']}")
+    return r
+
+
+# ⭐ เพิ่ม 2026-09-09 (F-HR-EXPENSE) — ผู้ใช้เจอ backdrop ค้างหลัง "confirm action" (อนุมัติ/ตีกลับ/ยกเลิก)
+#
+# ที่มา (Bug B): doApprove/doReject/doCancel เดิมเรียกแค่ closeModal() ปิด modal อย่างเดียว → view-drawer
+#   + drawerBackdrop (is-open · pointer-events:auto) ยังค้างบังทั้งจอ → ผู้ใช้ต้องคลิกอีกครั้งเพื่อเคลียร์
+#   fix: ทั้งสามเรียก closeModal(); closeDrawer(); render(); (mirror doSubmit) → overlay เคลียร์คลิกเดียวจบ
+#
+# ทำไม assert_overlay_cleared_after_close (BUG-6) เดิมมองไม่เห็น: มันตรวจ path "ปิดด้วย X / คลิก backdrop"
+#   เท่านั้น — ไม่ได้เดินผ่าน confirm action (doApprove/doReject/doCancel) ซึ่งเป็นคนละทางออก
+# ตัวนี้ตรวจ "หลังกดปุ่มยืนยันใน modal-foot": backdrop ทั้งคู่ต้องไม่ is-open + pointer-events:none ·
+#   และ elementFromPoint(กลางจอ) ต้องเป็น element ของหน้าเพจ ไม่ใช่ drawerBackdrop/modalBackdrop
+JS_OVERLAY_CLEARED_AFTER_CONFIRM = r"""
+() => {
+  const db = document.getElementById('drawerBackdrop');
+  const mb = document.getElementById('modalBackdrop');
+  const out = { ok: true, bad: [], centerHit: null };
+  const cx = Math.round(innerWidth / 2), cy = Math.round(innerHeight / 2);
+  const el = document.elementFromPoint(cx, cy);
+  out.centerHit = el ? (el.id || el.className || el.tagName).toString().slice(0, 34) : null;
+  const chk = (bd, name) => {
+    if (!bd) return;
+    if (bd.classList.contains('is-open')) out.bad.push({ why: name + '-still-is-open' });
+    const pe = getComputedStyle(bd).pointerEvents;
+    if (pe !== 'none') out.bad.push({ why: name + '-pointer-events', pe });
+  };
+  chk(db, 'drawerBackdrop');
+  chk(mb, 'modalBackdrop');
+  if (el) {
+    if (el === db || el === mb) out.bad.push({ why: 'center-on-backdrop', id: el.id });
+    else if (el.closest && el.closest('.drawer-backdrop, .modal-backdrop'))
+      out.bad.push({ why: 'center-under-backdrop' });
+  }
+  out.ok = out.bad.length === 0;
+  return out;
+}
+"""
+
+
+def assert_overlay_cleared_after_confirm_action(pg, note=''):
+    """assert ว่าหลัง confirm action (อนุมัติ/ตีกลับ/ยกเลิก) backdrop ไม่ค้างบังจอ — คลิกเดียวจบ (Bug B · F-HR-EXPENSE)
+
+    เรียก **หลังคลิกปุ่มยืนยันใน modal-foot แล้ว settle** (doApprove/doReject/doCancel รันแล้ว). เช็ก:
+      (1) drawerBackdrop + modalBackdrop ต้องไม่มี .is-open และ pointer-events:none (ไม่ดักคลิก)
+      (2) document.elementFromPoint(กลางจอ) เป็น element ของหน้าเพจ ไม่ใช่ backdrop ที่ปิดแล้ว
+    คืน dict ถ้าผ่าน · โยน AssertionError ถ้าพัง
+    """
+    r = pg.evaluate(JS_OVERLAY_CLEARED_AFTER_CONFIRM)
+    assert r['ok'], (f"backdrop ค้างหลัง confirm action (Bug B) {note}: {r['bad']} · "
+                     f"คลิกกลางจอโดน {r['centerHit']}")
+    return r
+
+
+# ⭐ เพิ่ม 2026-09-09 (F-HR-EXPENSE) — ผู้ใช้เจอ combobox ผู้อนุมัติในกล่อง "ส่งอนุมัติ" ดัน modal scroll (§C3.8)
+#
+# ที่มา (Bug C): modal 'ส่งอนุมัติ' มี .modal-body{overflow-y:auto} · ข้างในเป็น combobox slot picker
+#   ที่ dropdown (.ss-list) เป็น position:absolute. เปิด dropdown → เนื้อ list ดันพื้นที่ scroll ของ
+#   modal-body (วัดจริง: scrollHeight 187→440, scrollbar โผล่) → ทั้ง modal เลื่อน (ดูแปลก) แทนที่ list
+#   จะลอยทับขอบ modal. fix: render() toggle class 'has-combo' บน #modalBackdrop เมื่อ modal.type==='submit'
+#   + CSS '.modal-backdrop.has-combo .modal, .modal-backdrop.has-combo .modal-body{overflow:visible}'
+#   → dropdown ลอยพ้นกรอบ (ไม่ดัน scroll · ไม่ถูก clip) · เลือกยังทำงาน
+#
+# ทำไมตัววัด/gate เดิมมองไม่เห็น: qc-ux/qc-coverage grep โค้ด ไม่ได้เรนเดอร์แล้วเปิด dropdown จริง ·
+#   DSP-02b (modal_autoopens) ตรวจแค่ "combobox ไม่กางเอง" ไม่ได้เปิดเองแล้ววัด overflow/scroll ·
+#   ตัววัดเรขาคณิต (hscroll/clip) ดู scroll แนวนอน ไม่ได้ถามว่า "เปิด dropdown แล้ว modal-body เลื่อนมั้ย"
+#
+# ground-truth หลัง fix (ตัววัดนี้ต้อง assert):
+#   (1) เปิด submit modal → #modalBackdrop มี class has-combo · modal-body overflowY = 'visible' (ไม่ auto/scroll)
+#   (2) เปิด dropdown ของ slot → modal-body ยัง overflowY 'visible' + เลื่อนไม่ได้ (scrollTop set 50 อ่านกลับ 0)
+#   (3) dropdown เรนเดอร์เต็ม (option ครบ · list มีความสูงจริง) · ลอยพ้นกรอบ modal ได้ (ไม่ถูก clip)
+#   (4) เลือกผู้อนุมัติ (ssPick) → list ปิด · picks บันทึก · ปุ่มส่ง reflect validation (submitReady)
+# helper self-contained: เปิด modal ของ draft แรก → รอ rAF (guard ทำงานจบ) → เปิด/วัด/เลือกเอง
+JS_COMBOBOX_FLOATS_IN_MODAL = r"""
+async (arg) => {
+  const raf = () => new Promise(res => { let n = 0;
+    const t = () => { n++; if (n >= 6) res(); else requestAnimationFrame(t); }; requestAnimationFrame(t); });
+  const out = { steps: 0, optCount: 0, bad: [],
+                hasCombo: null, bodyOverflowFresh: null, listVisibleAfterOpen: null,
+                bodyOverflowOpen: null, scrollTrapped: null, listRendered: null, listFloatsBelow: null,
+                pickClosedList: null, pickRecorded: null, btnReflects: null };
+  // (0) เปิด submit modal ของ draft แรก
+  const draft = (typeof EXP !== 'undefined') && EXP.docs.find(x => x.status === 'draft');
+  if (!draft) { out.bad.push({ why: 'no-draft-doc' }); return out; }
+  openSubmitDraft(draft.id);
+  await raf();   // ให้ trapFocus + guardOverlayAutoCombo (DSP-02b) ทำงานจนจบก่อน (กันเปิดเองมาชน)
+  if (!(state.modal.open && state.modal.type === 'submit' && state.doaDraft)) {
+    out.bad.push({ why: 'submit-modal-not-open' }); return out; }
+  const doa = resolveDoa((state.doaDraft.grand) || 0);
+  out.steps = doa.steps.length;
+  const backdrop = document.getElementById('modalBackdrop');
+  const modal = document.querySelector('#modalBackdrop .modal');
+  const body  = document.querySelector('#modalBackdrop .modal-body');
+  if (!backdrop || !modal || !body) { out.bad.push({ why: 'no-modal-parts' }); return out; }
+
+  // (1) has-combo ติด · modal-body ปล่อยลอย (overflowY visible ไม่ใช่ auto/scroll)
+  out.hasCombo = backdrop.classList.contains('has-combo');
+  if (!out.hasCombo) out.bad.push({ why: 'modalBackdrop-ไม่มี-has-combo' });
+  out.bodyOverflowFresh = getComputedStyle(body).overflowY;
+  if (out.bodyOverflowFresh !== 'visible')
+    out.bad.push({ why: 'modal-body-overflowY-fresh', v: out.bodyOverflowFresh });
+
+  // (2) เปิด dropdown ของ slot แรก → รอ settle
+  ssOpen('slot-0');
+  await raf();
+  const list = document.getElementById(ssId('ss-list-', 'slot-0'));
+  if (!list) { out.bad.push({ why: 'no-ss-list-slot-0' }); return out; }
+  out.listVisibleAfterOpen = !list.classList.contains('hidden');
+  if (!out.listVisibleAfterOpen) out.bad.push({ why: 'ss-list-ยังซ่อนหลัง-ssOpen' });
+
+  // (3) modal-body ไม่ถูกดันให้ scroll (dropdown ลอยทับ) — เช็ก 2 ชั้น: overflowY + เลื่อนไม่ได้จริง
+  out.bodyOverflowOpen = getComputedStyle(body).overflowY;
+  if (out.bodyOverflowOpen !== 'visible')
+    out.bad.push({ why: 'modal-body-overflowY-open(dropdown-ดัน-scroll)', v: out.bodyOverflowOpen });
+  body.scrollTop = 50;                       // overflow:visible → ไม่ใช่ scroll container → อ่านกลับ 0
+  out.scrollTrapped = body.scrollTop !== 0;  // true = พังจริง (modal-body เลื่อนได้ = dropdown ดันสูง)
+  if (out.scrollTrapped) out.bad.push({ why: 'modal-body-เลื่อนได้', scrollTop: body.scrollTop });
+
+  // (4) dropdown เรนเดอร์เต็ม · ลอยพ้นกรอบ modal ได้ (ไม่ถูก clip)
+  const lr = list.getBoundingClientRect(), mr = modal.getBoundingClientRect();
+  out.optCount = list.querySelectorAll('.ss-opt').length;
+  out.listRendered = out.optCount === APPROVERS.length && lr.height > 10;
+  if (!out.listRendered)
+    out.bad.push({ why: 'dropdown-ไม่เรนเดอร์เต็ม', opt: out.optCount, want: APPROVERS.length, h: Math.round(lr.height) });
+  out.listFloatsBelow = lr.bottom > mr.bottom;   // informational — ลอยพ้นกรอบ = คาดหวัง (ไม่ถูก clip)
+
+  // (5) เลือกผู้อนุมัติจริง → list ปิด · picks บันทึก · ปุ่มส่ง reflect validation
+  ssPick('slot-0', 0);
+  await raf();
+  out.pickClosedList = list.classList.contains('hidden');
+  if (!out.pickClosedList) out.bad.push({ why: 'list-ไม่ปิดหลัง-ssPick' });
+  const picks = state.doaDraft.picks || {};
+  out.pickRecorded = APPROVERS.some(a => a.id === picks[0]);
+  if (!out.pickRecorded) out.bad.push({ why: 'picks[0]-ไม่ถูกบันทึก', picks: JSON.stringify(picks) });
+  const btn = document.getElementById(arg.btnId || 'submitConfirmBtn');
+  out.btnReflects = btn ? (btn.disabled === !submitReady()) : null;
+  if (out.btnReflects === false)
+    out.bad.push({ why: 'ปุ่มส่งไม่-reflect-validation', disabled: btn.disabled, ready: submitReady() });
+  return out;
+}
+"""
+
+
+def assert_combobox_floats_in_modal(pg, btn_id='submitConfirmBtn', note=''):
+    """assert ว่า combobox ในกล่อง 'ส่งอนุมัติ' เปิด dropdown แล้วลอยทับ — ไม่ดัน modal scroll (Bug C · F-HR-EXPENSE)
+
+    self-contained: เปิด submit modal ของ draft แรก (openSubmitDraft) → รอ rAF → เปิด/วัด/เลือกเอง. เช็ก:
+      (1) #modalBackdrop มี class has-combo · modal-body overflowY = 'visible' (ไม่ auto/scroll)
+      (2) เปิด dropdown slot → modal-body ยัง overflowY 'visible' + เลื่อนไม่ได้ (scrollTop set 50 → อ่านกลับ 0)
+      (3) dropdown เรนเดอร์เต็ม (option ครบ APPROVERS) · ลอยพ้นกรอบ modal ได้ (ไม่ถูก clip)
+      (4) เลือกผู้อนุมัติ (ssPick) → list ปิด · picks[0] บันทึก · ปุ่มส่ง reflect submitReady()
+    คืน dict ถ้าผ่าน · โยน AssertionError ถ้าพัง
+    """
+    r = pg.evaluate(JS_COMBOBOX_FLOATS_IN_MODAL, {'btnId': btn_id})
+    assert r['bad'] == [], (f"combobox ในกล่องส่งอนุมัติดัน modal scroll / ถูก clip (Bug C · F-HR-EXPENSE) {note}: "
+                            f"{r['bad']} · steps={r['steps']} hasCombo={r['hasCombo']} "
+                            f"overflowY(fresh/open)={r['bodyOverflowFresh']}/{r['bodyOverflowOpen']}")
+    return r
+
+
+# ⭐ เพิ่ม 2026-09-10 (F-HR-EXPENSE) — ผู้ใช้เจอ slot combobox dropdown ในกล่อง "ส่งอนุมัติ" ทะลุก้นจอ (§C3.8)
+#
+# ที่มา (Bug D): modal 'ส่งอนุมัติ' ของยอด >50,000 มี 3 slot · เปิด dropdown ของ slot ล่างสุดที่จอเตี้ย
+#   (~<900px) → .ss-list (absolute, top:100%) กางลงล่าง แล้วก้น list ทะลุขอบล่างของ window
+#   (วัดจริงก่อนแก้: viewport 800/768/720/650 → ล้น 22/38/62/97px · ที่ 900 ยังพอดี)
+#   fix: CSS '.ss-list.ss-up{top:auto;bottom:calc(100% + 4px);margin-top:0}' + JS ssPlaceList(key,list)
+#   เรียกท้าย ssRenderList ตอน s.open — วัด wrap rect แล้วเติม class 'ss-up' เมื่อพื้นที่ด้านล่างไม่พอ
+#   และด้านบนมากกว่า → dropdown flip ขึ้น กันทะลุก้นจอ
+#
+# ทำไมตัววัด/gate เดิมมองไม่เห็น: qc-ux/qc-coverage grep โค้ด ไม่ได้เปิด dropdown จริง · JS_LAYOUT ข้อ
+#   'clipped' ตรวจแค่ 'ถูกกล่องแม่ (overflow) ตัด' — ที่นี่ list ลอยพ้นทุกกล่อง (modal overflow:visible จาก
+#   has-combo, Bug C) จึงไม่มีบรรพบุรุษตัด แต่ก้นมันเลย innerHeight ไป · ไม่มีข้อไหนถามว่า 'list ทะลุ
+#   "ก้นจอ" มั้ย' · ต้องเรนเดอร์ที่จอเตี้ย + เปิด slot ล่างสุดถึงจะเห็น
+#
+# ⚠️ ต้องเรียกที่ viewport เตี้ย (เช่น pg.set_viewport_size({'width':1440,'height':768})) + reload หน้าแล้ว
+#   helper บังคับ submit modal 3 slot เอง (state.doaDraft grand 60000 → openModal('submit')) → เปิด slot
+#   ล่างสุด → วัด · ground-truth หลัง fix: (1) list.bottom <= innerHeight (ไม่ทะลุ) · (2) list มี class 'ss-up'
+JS_SLOT_DROPDOWN_NO_SPILL = r"""
+async () => {
+  const raf = () => new Promise(res => { let n = 0;
+    const t = () => { n++; if (n >= 6) res(); else requestAnimationFrame(t); }; requestAnimationFrame(t); });
+  const out = { ok: false, bad: [], nslots: 0, vh: window.innerHeight, lastKey: null,
+                listTop: null, listBottom: null, spillPx: null, hasUp: null };
+  if (typeof openModal !== 'function' || typeof resolveDoa !== 'function' ||
+      typeof ssOpen !== 'function' || typeof ssId !== 'function') {
+    out.bad.push({ why: 'missing-fns' }); return out; }
+  // บังคับ submit modal 3 slot (ยอด >50,000 → DOA 3 ขั้น)
+  state.doaDraft = { picks: {}, grand: 60000 };
+  openModal('submit', {});
+  await raf();
+  if (!(state.modal.open && state.modal.type === 'submit' && state.doaDraft)) {
+    out.bad.push({ why: 'submit-modal-not-open' }); return out; }
+  const doa = resolveDoa((state.doaDraft.grand) || 0);
+  out.nslots = doa.steps.length;
+  if (out.nslots < 3) { out.bad.push({ why: 'not-3-slots', n: out.nslots }); return out; }
+  const last = out.nslots - 1;
+  out.lastKey = 'slot-' + last;
+  ssOpen('slot-' + last);
+  await raf();
+  const list = document.getElementById(ssId('ss-list-', 'slot-' + last));
+  if (!list) { out.bad.push({ why: 'no-ss-list-last' }); return out; }
+  if (list.classList.contains('hidden')) { out.bad.push({ why: 'list-hidden-after-open' }); return out; }
+  const r = list.getBoundingClientRect();
+  out.listTop = Math.round(r.top);
+  out.listBottom = Math.round(r.bottom);
+  out.spillPx = Math.round(r.bottom - window.innerHeight);
+  out.hasUp = list.classList.contains('ss-up');
+  // (1) ก้น list ต้องไม่ทะลุก้นจอ (innerHeight)
+  if (r.bottom > window.innerHeight + 1)
+    out.bad.push({ why: 'spills-below-window', listBottom: out.listBottom, vh: window.innerHeight, over: out.spillPx });
+  // (2) ที่จอเตี้ย + slot ล่างสุด ต้อง flip ขึ้น (ss-up) — ตัวจับตัวจริงของ fix
+  if (!out.hasUp)
+    out.bad.push({ why: 'ss-up-not-applied(flip-หาย)', listBottom: out.listBottom, vh: window.innerHeight });
+  out.ok = out.bad.length === 0;
+  return out;
+}
+"""
+
+
+def assert_slot_dropdown_no_spill(pg, note=''):
+    """assert ว่า slot combobox dropdown (กล่องส่งอนุมัติ 3 slot) ไม่ทะลุก้นจอ + flip ขึ้น (ss-up) ที่จอเตี้ย (Bug D · F-HR-EXPENSE)
+
+    ⚠️ ต้องเรียก **หลังตั้ง viewport เตี้ย** (เช่น pg.set_viewport_size({'width':1440,'height':768})) + reload หน้า.
+    helper บังคับ submit modal 3 slot เอง (state.doaDraft grand 60000 → openModal('submit')) → เปิด dropdown
+    ของ slot ล่างสุด → วัด:
+      (1) list.getBoundingClientRect().bottom <= innerHeight (ไม่ทะลุก้นจอ)
+      (2) list มี class 'ss-up' (flip ขึ้นเมื่อพื้นที่ด้านล่างไม่พอ)
+    คืน dict ถ้าผ่าน · โยน AssertionError ถ้าพัง
+    """
+    r = pg.evaluate(JS_SLOT_DROPDOWN_NO_SPILL)
+    assert r['bad'] == [], (f"slot dropdown ทะลุก้นจอ/ไม่ flip ขึ้น (Bug D · F-HR-EXPENSE) {note}: {r['bad']} · "
+                            f"nslots={r['nslots']} vh={r['vh']} listBottom={r['listBottom']} hasUp={r['hasUp']}")
+    return r
+
+
+# ⭐ เพิ่ม 2026-09-10 (F-HR-EXPENSE) — regression guard: ไม่มี backdrop ค้างหลังปิดกล่อง "ส่งอนุมัติ" ทุกทาง (§C3.8)
+# ⭐ แก้ให้ FAITHFUL 2026-09-10 (F-HR-EXPENSE · backdrop bug) — เปิด modal "ผ่านลิ้นชักดูใบร่างจริง" ไม่ใช่เปิดตรง
+#
+# ที่มา: ปิด submit modal ได้หลายทาง (ปุ่มยกเลิก · คลิกฉากหลัง #modalBackdrop · Escape) — ทุกทางต้องเคลียร์
+#   overlay คลิกเดียวจบ (mirror BUG-6/Bug B) · + Esc chain (Rule #94 ข้อ 3): ถ้า dropdown ของ slot เปิดค้าง
+#   → Esc ครั้งแรกต้องปิด "แค่ dropdown" คงกล่องส่งอนุมัติไว้ (ห้าม Esc ทะลุไปปิด modal ทิ้งงานที่กรอกไว้)
+#
+# ⚠️ FALSE PASS ที่แก้: เวอร์ชันเดิมเปิด modal ด้วย openSubmitDraft() ตรง ๆ ใน eval → **ไม่มีลิ้นชักดูใบร่างอยู่ใต้ modal**
+#   จึงไม่เคยเดินเคสจริงที่ผู้ใช้เจอ: กล่อง "ส่งอนุมัติ" เปิดจากปุ่มใน footer ของลิ้นชักดูใบร่าง (openSubmitDraft(id))
+#   → ลิ้นชัก + drawerBackdrop (is-open · pe:auto) ค้างอยู่ใต้ modal · ปิด modal ทางเดียว เดิมเคลียร์แค่ modal
+#   เหลือ drawerBackdrop หรี่จอค้าง ต้องคลิกซ้ำ. fix (expense.html · closeModal): submit-modal ที่มี doaDraft.docId
+#   → เรียก closeDrawer() ด้วย ทุกทาง dismiss. ตัววัดต้องเปิด modal "ผ่านลิ้นชัก" ถึงจะจับ regression นี้ได้
+#
+# faithful path: openView(draftId) → คลิกปุ่ม 'ส่งอนุมัติ' ใน footer ลิ้นชัก → submit modal ทับลิ้นชัก (ทั้งคู่เปิด)
+#   → ทุกทาง dismiss ต้องปิด **ทั้ง modal และลิ้นชัก** (state.drawer.open===false · ไม่มี backdrop ตัวไหนค้าง)
+#
+# หมายเหตุพฤติกรรมจริงที่ยืนยันแล้ว (2026-09-10 · ทั้ง fix เข้าแล้ว): ตราบใดที่โฟกัสยังค้างใน ss-input ของ slot
+#   ssOnKey เรียก e.stopPropagation() ทุก Escape (BASE-KIT footgun — uikit combobox_sweep ก็เตือนไว้เรื่องเดียวกัน)
+#   → Esc ครั้งถัดไปถูกกลืน · modal จึงยังไม่ปิดจนกว่าโฟกัสจะออกจาก combobox. การปิด modal ขั้นสุดท้ายจึงเดินผ่าน
+#   window Esc handler เมื่อโฟกัสออกจาก ss-input แล้ว (blur → Escape) — ไม่แตะ expense.html
+#
+# ทำไม assert_overlay_cleared_after_* เดิมไม่ครอบ: BUG-6 ตรวจปิดด้วย X/คลิก backdrop · Bug B ตรวจหลัง confirm
+#   action (อนุมัติ/ตีกลับ/ยกเลิก) — ทั้งคู่ไม่ได้เดิน Esc chain (dropdown ของ slot เปิดค้าง) ของ 'กล่องส่งอนุมัติ'
+def assert_submit_modal_all_dismiss_clean(pg, note=''):
+    """assert ว่ากล่อง 'ส่งอนุมัติ' (เปิดจากลิ้นชักดูใบร่าง) ปิดสะอาดทุกทาง — ทั้ง modal และลิ้นชักเคลียร์ (F-HR-EXPENSE)
+
+    FAITHFUL: เปิด modal ผ่านทางจริง — openView(draftId) เปิดลิ้นชักดูใบร่าง แล้ว **คลิกปุ่ม 'ส่งอนุมัติ' ใน footer
+    ของลิ้นชัก** (openSubmitDraft(id)) → submit modal เปิดทับลิ้นชัก (drawerBackdrop is-open ค้างอยู่ใต้ modal).
+    ต่อทาง dismiss แล้ว assert:
+      · modal ปิด (state.modal.open===false)
+      · ลิ้นชักปิดด้วย (state.drawer.open===false) — fix closeModal ต้องเรียก closeDrawer เมื่อ submit จากใบร่าง
+      · ไม่มี backdrop ตัวไหนค้าง (drawerBackdrop/modalBackdrop ไม่ is-open · pointer-events:none ·
+        elementFromPoint กลางจอเป็น element ของหน้าเพจ ไม่ใช่ backdrop)
+    ทาง dismiss: cancel-button · click-backdrop · escape · escape-chain (Esc#1 ปิดแค่ dropdown คง modal)
+    คืน dict {'paths':[...]} ถ้าผ่าน · โยน AssertionError ถ้าพัง
+    """
+    def _raf():
+        pg.evaluate("() => new Promise(res=>{let n=0;const t=()=>{n++;if(n>=6)res();else requestAnimationFrame(t);};requestAnimationFrame(t);})")
+
+    def _open_fresh():
+        draft = pg.evaluate("() => { const d=(typeof EXP!=='undefined')&&EXP.docs.find(x=>x.status==='draft'); return d?d.id:null; }")
+        assert draft, f"ไม่มีใบร่างให้เปิดลิ้นชัก {note}"
+        # (1) เปิดลิ้นชักดูใบร่าง เหมือนผู้ใช้คลิกแถวในลิสต์
+        pg.evaluate("(id) => openView(id)", draft)
+        settle(pg); _raf()
+        assert pg.evaluate("() => state.drawer.open===true"), f"openView ไม่เปิดลิ้นชักดูใบร่าง {note}"
+        # (2) คลิกปุ่ม 'ส่งอนุมัติ' ที่ footer ของลิ้นชัก (primary · onclick=openSubmitDraft(id)) — ไม่ใช่ 'ยกเลิก'
+        clicked = pg.evaluate("""() => { const btns=[...document.querySelectorAll('#drawer .drawer-footer .btn, #drawer .drawer-footer button, #drawer button')];
+            const s=btns.find(b=>/ส่งอนุมัติ/.test(b.textContent||'') && !/ยกเลิก/.test(b.textContent||'')); if(s){ s.click(); return true; } return false; }""")
+        assert clicked, f"ไม่พบปุ่ม 'ส่งอนุมัติ' ใน footer ลิ้นชักดูใบร่าง {note}"
+        settle(pg); _raf()
+        st = pg.evaluate("""() => ({ modal: state.modal.open===true && state.modal.type==='submit',
+            drawer: state.drawer.open===true, docId: !!(state.doaDraft&&state.doaDraft.docId) })""")
+        assert st['modal'], f"คลิก 'ส่งอนุมัติ' ในลิ้นชักไม่เปิดกล่องส่งอนุมัติ {note}: {st}"
+        assert st['drawer'], f"submit modal เปิดแล้วลิ้นชักดูใบร่างต้องยังเปิดอยู่ใต้ modal (over-drawer case) {note}: {st}"
+        assert st['docId'], f"submit modal จากใบร่างต้องมี doaDraft.docId (จุดที่ closeModal ใช้ตัดสินปิดลิ้นชักด้วย) {note}: {st}"
+
+    def _clean(path):
+        r = pg.evaluate(JS_OVERLAY_CLEARED_AFTER_CONFIRM)
+        drawer_closed = pg.evaluate("() => state.drawer.open===false")
+        assert r['ok'] and drawer_closed, (
+            f"overlay ค้างหลังปิดกล่องส่งอนุมัติจากลิ้นชัก [{path}] {note}: bad={r['bad']} · "
+            f"state.drawer.open={pg.evaluate('() => state.drawer.open')} (ต้อง false) · คลิกกลางจอโดน {r['centerHit']}")
+
+    paths = []
+
+    # (a) ปุ่มยกเลิก (ghost) ใน modal-foot
+    _open_fresh()
+    clicked = pg.evaluate("""() => { const b=[...document.querySelectorAll('#modalBackdrop .modal-foot .btn-ghost, #modalBackdrop .modal-footer .btn-ghost')].find(x=>/ยกเลิก/.test(x.textContent||'')); if(b){ b.click(); return true; } return false; }""")
+    assert clicked, f"ไม่พบปุ่มยกเลิกใน modal-foot ของกล่องส่งอนุมัติ {note}"
+    settle(pg)
+    assert pg.evaluate("() => state.modal.open") is False, f"กดยกเลิกแล้วกล่องส่งอนุมัติไม่ปิด {note}"
+    _clean('cancel-button'); paths.append('cancel-button')
+
+    # (b) คลิกที่ฉากหลัง #modalBackdrop
+    _open_fresh()
+    pg.evaluate("() => document.getElementById('modalBackdrop').click()")
+    settle(pg)
+    assert pg.evaluate("() => state.modal.open") is False, f"คลิก backdrop แล้วกล่องส่งอนุมัติไม่ปิด {note}"
+    _clean('click-backdrop'); paths.append('click-backdrop')
+
+    # (c) Escape (ไม่มี dropdown เปิด) → window Esc handler ปิด modal
+    _open_fresh()
+    pg.keyboard.press('Escape')
+    settle(pg)
+    assert pg.evaluate("() => state.modal.open") is False, f"กด Escape แล้วกล่องส่งอนุมัติไม่ปิด {note}"
+    _clean('escape'); paths.append('escape')
+
+    # (d) Esc chain: dropdown ของ slot เปิดค้าง → Esc#1 ปิดแค่ dropdown คง modal → (blur) Esc → ปิดสะอาด
+    _open_fresh()
+    pg.evaluate("() => { const i=document.getElementById(ssId('ss-input-','slot-0')); if(i) i.focus(); ssOpen('slot-0'); }")
+    settle(pg); _raf()
+    pg.keyboard.press('Escape')
+    settle(pg)
+    mid = pg.evaluate("""() => ({ modal: state.modal.open===true,
+        listHidden: (()=>{const l=document.getElementById(ssId('ss-list-','slot-0'));return l?l.classList.contains('hidden'):null;})() })""")
+    assert mid['modal'] is True, \
+        f"Esc#1 (dropdown ของ slot เปิดค้าง) ปิด modal ทิ้ง — ควรปิดแค่ dropdown คง modal (Esc chain · Rule #94) {note}: {mid}"
+    assert mid['listHidden'] is True, f"Esc#1 ไม่ปิด dropdown ของ slot {note}: {mid}"
+    pg.evaluate("() => (typeof ssBlurActive==='function') && ssBlurActive()")   # โฟกัสออกจาก combobox → Esc ถึง window handler
+    pg.keyboard.press('Escape')
+    settle(pg)
+    assert pg.evaluate("() => state.modal.open") is False, \
+        f"ปิดกล่องส่งอนุมัติหลัง Esc chain ไม่สำเร็จ (โฟกัสออกจาก combobox แล้ว Esc ต้องปิด modal) {note}"
+    _clean('escape-chain'); paths.append('escape-chain')
+
+    return {'paths': paths, 'viaDrawer': True}
+
+
+# ⭐ เพิ่ม 2026-09-10 (F-HR-EXPENSE · backdrop bug) — regression guard คู่กับ faithful dismiss ข้างบน (§C3.8)
+#
+# fix backdrop bug (closeModal) ผูกเงื่อนไข "ปิดลิ้นชักด้วย" ไว้กับ submit modal ที่ **มี doaDraft.docId**
+#   (= เปิดจากใบร่าง openSubmitDraft) เท่านั้น. ต้องกันไม่ให้ fix นี้ไป regress กล่องส่งอนุมัติของ CREATE WIZARD
+#   (เปิดด้วย openSubmit() — ไม่มี docId): กดยกเลิกกล่องส่งอนุมัติจาก wizard แล้ว **ลิ้นชัก wizard ต้องยังเปิด**
+#   (ผู้ใช้แค่ยกเลิกการเลือกผู้อนุมัติ ไม่ได้ทิ้งใบที่กรอกไว้). ถ้า fix ไปปิด wizard drawer ตามด้วย = regression.
+#
+# ขับ create flow จริง (ไม่เรียก openDrawer('wizard') ตรง ๆ ที่ทิ้ง state.wizard.doc ไว้ว่างแล้ว throw):
+#   คลิกปุ่ม '+ สร้างใบเบิก' (onclick=openCreate) → เดินไปขั้นตรวจสอบ + ใส่รายการ (ให้ปุ่มส่ง enable) →
+#   คลิก 'บันทึกและส่งอนุมัติ' (openSubmit · ไม่มี docId) → เลือกผู้อนุมัติครบ → คลิก 'ยกเลิก' บน modal →
+#   assert state.drawer.open===true && state.drawer.mode==='wizard' (wizard ยังเปิด · draft-view fix ไม่ regress)
+# ⭐ FALSE-PASS fix 2026-09-10 (F-HR-EXPENSE · lingering-backdrop bug) — §C3.8
+#
+# เวอร์ชันเดิมของ helper นี้ assert แค่ `state.drawer.open===true && mode==='wizard'` (STATE flag)
+# → FALSE PASS: บั๊กจริงคือ full render() เขียนทับ className ของ #drawer แล้ว "ทิ้ง class is-open"
+#   (มีแต่ renderDrawerOnly ที่คงไว้) → พอ closeModal เรียก render() ตอน submit modal ของ wizard ปิด
+#   ลิ้นชัก wizard สไลด์ออก (เสีย is-open) แต่ drawerBackdrop ยัง is-open → wizard หายจากตา
+#   เหลือฉากหลังหรี่ค้าง (ต้องคลิกซ้ำ 1 ที) ทั้งที่ state.drawer.open ยัง true อยู่
+# fix (expense.html render): คง is-open ปัจจุบันของ #drawer ข้ามการเขียน className:
+#   const dwOpen=dw.classList.contains('is-open'); dw.className='drawer'+(dwOpen?' is-open':'')+(wizard?' wide':'')
+#
+# ตัววัดใหม่จึงต้องพิสูจน์ว่าลิ้นชัก "เปิดจริงบนจอ" ไม่ใช่แค่ธง — ครบทั้ง:
+#   · #drawer มี class is-open (panel สไลด์เข้า)
+#   · elementFromPoint(กลางจอ) ไม่ใช่ drawerBackdrop และอยู่ "ใน" #drawer (panel คลุมกลางจอ)
+#   · stepper/wizard body มองเห็น (rect กว้าง×สูง>0)
+#   · state.drawer.open===true · mode==='wizard' · modal ปิด
+# drawerBackdrop จะยัง is-open (หรี่จอ) ได้ — ถูกต้องแล้ว เพราะลิ้นชักเปิดอยู่จริง
+# ย้อนโค้ด fix กลับ (ตัด is-open preservation) → center = drawerBackdrop / #drawer เสีย is-open → เคสนี้ FAIL
+JS_WIZARD_DRAWER_VISUALLY_OPEN = """
+() => {
+  const dw=document.getElementById('drawer'), db=document.getElementById('drawerBackdrop');
+  const cx=Math.round(innerWidth/2), cy=Math.round(innerHeight/2);
+  const el=document.elementFromPoint(cx, cy);
+  const stepper=document.querySelector('#drawer .stepper');
+  const sr=stepper?stepper.getBoundingClientRect():null;
+  return {
+    drawerIsOpen: dw ? dw.classList.contains('is-open') : false,
+    drawerCls: dw ? dw.className : '(no #drawer)',
+    backdropIsOpen: db ? db.classList.contains('is-open') : false,
+    stateDrawerOpen: state.drawer.open, stateMode: state.drawer.mode, stateModalOpen: state.modal.open,
+    centerCls: el ? (el.id||el.className||el.tagName).toString().slice(0,40) : null,
+    centerInDrawer: !!(el && dw && dw.contains(el)),
+    centerIsBackdrop: !!(el && (el.id==='drawerBackdrop' || /backdrop/.test((el.className||'').toString()))),
+    stepperVisible: !!(sr && sr.width>0 && sr.height>0),
+  };
+}
+"""
+
+
+def assert_wizard_submit_cancel_keeps_drawer(pg, note=''):
+    """assert ว่ากล่อง 'ส่งอนุมัติ' ที่เปิดจาก CREATE WIZARD (openSubmit · ไม่มี docId) แล้ว dismiss ทุกทาง
+    (ยกเลิก / คลิก backdrop / Escape) → ลิ้นชัก wizard ยัง **เปิดจริงบนจอ** (ไม่ใช่แค่ธง state):
+    #drawer มี is-open · กลางจอเป็นเนื้อ wizard (ไม่ใช่ drawerBackdrop) · stepper มองเห็น · mode==='wizard' · modal ปิด.
+
+    กันทั้ง 2 ทิศ: (ก) draft-view fix ต้องไม่ปิด wizard drawer ตาม (regression) และ
+    (ข) lingering-backdrop bug — full render() ทิ้ง is-open ของ #drawer → wizard สไลด์ออก เหลือฉากหลังหรี่ค้าง
+    (เดิม assert แค่ state.drawer.open → FALSE PASS เพราะธงยัง true แต่จอไม่เห็นลิ้นชัก).
+    page ต้องโหลดหน้าไว้แล้ว · viewport ปกติ. คืน dict {'paths','drawerOpen','drawerMode','center'} ถ้าผ่าน.
+    """
+    def _raf():
+        pg.evaluate("() => new Promise(res=>{let n=0;const t=()=>{n++;if(n>=6)res();else requestAnimationFrame(t);};requestAnimationFrame(t);})")
+
+    def _reload():
+        # เปิดหน้าใหม่ (reset mock + ปิด overlay ทั้งหมด) เพื่อให้แต่ละทาง dismiss เดินจาก slate สะอาด
+        pg.evaluate("() => location.reload()")
+        pg.wait_for_load_state('load')
+        pg.wait_for_function(
+            "() => { const p=document.getElementById('page-content'); return p && p.innerHTML.trim().length>0; }",
+            timeout=12000)
+        settle(pg)
+
+    def _open_wizard_submit():
+        # (1) คลิกปุ่ม '+ สร้างใบเบิก' จริง → openCreate → wizard drawer เปิด (init state.wizard.doc ให้ครบ)
+        made = pg.evaluate("""() => { const b=[...document.querySelectorAll('#page-content button, .btn')].find(x=>/สร้างใบเบิก/.test(x.textContent||'')); if(b){ b.click(); return true; } return false; }""")
+        assert made, f"ไม่พบปุ่ม '+ สร้างใบเบิก' ในลิสต์ {note}"
+        settle(pg); _raf()
+        assert pg.evaluate("() => state.drawer.open===true && state.drawer.mode==='wizard'"), \
+            f"คลิกสร้างใบเบิกไม่เปิด wizard drawer {note}"
+        # (2) ไปขั้นตรวจสอบ (step 5) + ผู้เบิก + รายการ (ยอด>0 → ปุ่มส่ง enable)
+        pg.evaluate("""() => { state.wizard.doc.emp='E01';
+          state.wizard.doc.lines=[{date:'2569-08-28',cat:'other',desc:'x',qty:1,unit_price:500,vat_mode:'none'}];
+          state.wizard.step=5; renderDrawerOnly(); }""")
+        settle(pg)
+        # (3) คลิก 'บันทึกและส่งอนุมัติ' ที่ footer wizard (เรียก openSubmit — ไม่มี docId)
+        sent = pg.evaluate("""() => { const b=[...document.querySelectorAll('#drawer .drawer-footer .btn')].find(x=>/บันทึกและส่งอนุมัติ/.test(x.textContent||'')); if(b && !b.disabled){ b.click(); return true; } return false; }""")
+        assert sent, f"ปุ่ม 'บันทึกและส่งอนุมัติ' ในขั้นตรวจสอบกดไม่ได้/ไม่พบ (ปุ่มควร enable เมื่อมีรายการ) {note}"
+        settle(pg); _raf()
+        st = pg.evaluate("""() => ({ modal: state.modal.open===true && state.modal.type==='submit',
+            hasDocId: !!(state.doaDraft&&state.doaDraft.docId), drawer: state.drawer.open===true }) """)
+        assert st['modal'], f"กล่องส่งอนุมัติจาก wizard ไม่เปิด {note}: {st}"
+        assert st['hasDocId'] is False, \
+            f"submit จาก wizard ต้องไม่มี docId (ไม่งั้นจะเข้าเงื่อนไข closeDrawerToo ผิด) {note}: {st}"
+        assert st['drawer'], f"เปิด submit modal จาก wizard แล้ว wizard drawer ต้องยังเปิดอยู่ใต้ modal {note}: {st}"
+        # (4) เลือกผู้อนุมัติครบทุก slot (เหมือนผู้ใช้กรอกจริง) แล้วค่อย dismiss
+        pg.evaluate("""() => { const doa=resolveDoa((state.doaDraft&&state.doaDraft.grand)||0);
+          doa.steps.forEach((s,i)=>{ if(window.__ss && window.__ss['slot-'+i]) ssPick('slot-'+i,0); }); }""")
+        settle(pg); _raf()
+
+    def _assert_visually_open(path):
+        v = pg.evaluate(JS_WIZARD_DRAWER_VISUALLY_OPEN)
+        base = f"[{path}] {note}: {v}"
+        assert v['stateModalOpen'] is False, f"dismiss กล่องส่งอนุมัติ (wizard) แล้ว modal ไม่ปิด {base}"
+        # ★ หัวใจของ fix false-pass: ลิ้นชักต้อง "เปิดจริงบนจอ" ไม่ใช่แค่ธง state
+        assert v['drawerIsOpen'] is True, \
+            f"#drawer เสีย class is-open หลัง dismiss (lingering-backdrop bug — render() ทิ้ง is-open) {base}"
+        assert v['stateDrawerOpen'] is True and v['stateMode'] == 'wizard', \
+            f"state.drawer ต้อง open + mode='wizard' (draft-view fix ต้องไม่ regress wizard) {base}"
+        assert v['centerIsBackdrop'] is False, \
+            f"กลางจอเป็น drawerBackdrop = ลิ้นชักสไลด์ออกเหลือฉากหลังหรี่ค้าง (ต้องคลิกซ้ำ) {base}"
+        assert v['centerInDrawer'] is True, \
+            f"กลางจอไม่ได้อยู่ใน panel #drawer (ลิ้นชักไม่คลุมกลางจอ = ไม่ได้เปิดจริง) {base}"
+        assert v['stepperVisible'] is True, \
+            f"stepper/เนื้อ wizard มองไม่เห็นหลัง dismiss (ลิ้นชักไม่ได้เรนเดอร์เนื้อ) {base}"
+        return v
+
+    dismissers = [
+        ('cancel-button', lambda: pg.evaluate("""() => { const b=[...document.querySelectorAll('#modalBackdrop .modal-foot .btn-ghost, #modalBackdrop .modal-footer .btn-ghost')].find(x=>/ยกเลิก/.test(x.textContent||'')); if(b){ b.click(); return true; } return false; }""")),
+        ('click-backdrop', lambda: pg.evaluate("() => { document.getElementById('modalBackdrop').click(); return true; }")),
+        ('escape', None),   # จัดการแยกด้านล่าง (blur combobox ก่อนกัน Esc chain กลืน)
+    ]
+
+    paths, last = [], None
+    for i, (path, act) in enumerate(dismissers):
+        if i > 0:
+            _reload()
+        _open_wizard_submit()
+        if act is None:
+            # Esc: โฟกัสออกจาก combobox ก่อน (กัน Esc#1 ปิดแค่ dropdown คง modal ไว้) → Esc ถึง window handler ปิด modal
+            pg.evaluate("() => (typeof ssBlurActive==='function') && ssBlurActive()")
+            pg.keyboard.press('Escape')
+            settle(pg); _raf()
+            if pg.evaluate("() => state.modal.open"):     # เผื่อ Esc#1 ไปโดน dropdown ที่เปิดค้าง
+                pg.evaluate("() => (typeof ssBlurActive==='function') && ssBlurActive()")
+                pg.keyboard.press('Escape')
+                settle(pg); _raf()
+        else:
+            ok = act()
+            assert ok, f"dismiss [{path}] หา affordance ไม่เจอ {note}"
+            settle(pg); _raf()
+        last = _assert_visually_open(path)
+        paths.append(path)
+
+    return {'paths': paths, 'drawerOpen': last['stateDrawerOpen'],
+            'drawerMode': last['stateMode'], 'center': last['centerCls']}
