@@ -2658,3 +2658,55 @@ def assert_wizard_submit_cancel_keeps_drawer(pg, note=''):
 
     return {'paths': paths, 'drawerOpen': last['stateDrawerOpen'],
             'drawerMode': last['stateMode'], 'center': last['centerCls']}
+
+
+# ⭐ เพิ่ม 2026-09-10 (F-HR-ESS · §C3.8 · user-found bug ที่ qc-ux มองไม่เห็น)
+# ─────────────────────────────────────────────────────────────────────────────
+# บั๊กจริง: มี click listener ระดับ document/body ที่ผูกแบบ capture-phase (addEventListener
+#   'click', ..., true) แล้วเรียก stopPropagation() → event ถูกหยุดตั้งแต่ขาลง (capture)
+#   ยังไม่ทันถึง target เลย → onclick ของ 'ทุกปุ่มหลัก' (การ์ด dashboard .qcard ·
+#   แถว action-picker .ap-row) ตายเงียบ: real click ไม่เกิดอะไร ทั้งที่ markup/attribute ถูกหมด.
+#
+# ทำไมตัววัดเดิมมองไม่เห็น: JS_AFFORDANCE ถามว่า "มี cursor:pointer มั้ย" (มี · ผ่าน) ·
+#   JS_A11Y_REACH ถามว่า "คีย์บอร์ดไปถึงมั้ย" (native button ผ่าน) · JS_GHOST_CLASS/self_audit
+#   ตรวจ markup/CSS แบบ static — ไม่มีข้อไหน "คลิกจริงแล้วดูว่า event ถึง target มั้ย".
+#   qc-ux อ่านโค้ด+เรขาคณิต จึงเห็นปุ่มครบสวยแต่ทั้งหน้ากดไม่ติด.
+# ข้อนี้ถามตรง ๆ: dispatch คลิกจริงที่ target แล้ว target ได้รับ event มั้ย — capture-phase
+#   ancestor ที่ stopPropagation จะกันไม่ให้ event ลงมาถึง → probe ไม่ยิง = ตาย (จับได้).
+def assert_affordances_fire(pg, selectors, note=''):
+    """assert ว่า element ที่กดได้ (ตาม selector) 'ยิง handler จริง' เมื่อคลิก — จับ listener
+    capture-phase ที่ stopPropagation กลืนคลิกทั้งหน้า (บั๊กที่ qc-ux มองไม่เห็น · F-HR-ESS)
+
+    กลไก: ต่อ selector — หา match ที่ 'มองเห็น' ตัวแรก (re-query สด เพื่อให้ element ยังติดใน
+    document ตอนคลิก · detached จะไม่วิ่งผ่าน capture ancestor จริง) → ติด probe listener บน
+    target เอง (bubble) → el.click() (คลิกจริงผ่าน capture→target→bubble) → อ่านว่า probe ยิงมั้ย.
+    ถ้า capture-phase ancestor เรียก stopPropagation event จะไม่ถึง target → probe เงียบ = 'ตาย'.
+    selector ที่ไม่มี match มองเห็น = ข้าม (absent · ไม่นับตาย). คืน dict ถ้าผ่าน · โยน
+    AssertionError พร้อมรายชื่อ selector ที่คลิกไม่ถึง target ถ้าพัง.
+    """
+    r = pg.evaluate(
+        r"""(arg) => {
+          const selectors = arg.selectors || [];
+          const vis = el => { const rc = el.getBoundingClientRect(), cs = getComputedStyle(el);
+            return rc.width > 0 && rc.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none'; };
+          const dead = [], tested = [], absent = [];
+          selectors.forEach(s => {
+            // re-query สด: element ต้องยังติดใน document ตอนคลิก (การคลิก selector ก่อนหน้าอาจ
+            //   navigate/render ใหม่) — detached node จะไม่วิ่งผ่าน capture ancestor จริง
+            const el = [...document.querySelectorAll(s)].find(vis);
+            if (!el) { absent.push(s); return; }
+            let fired = false;
+            const probe = () => { fired = true; };
+            el.addEventListener('click', probe, false);
+            try { el.click(); } catch (e) {}
+            el.removeEventListener('click', probe, false);
+            tested.push(s);
+            if (!fired) dead.push(s);
+          });
+          return { dead, tested, absent };
+        }""",
+        {"selectors": list(selectors)})
+    dead = r["dead"]
+    assert not dead, (f"[{note}] คลิกไม่ถึง target (capture-phase กลืนคลิก?): {dead} · "
+                      f"tested={r['tested']} · absent={r['absent']}")
+    return r

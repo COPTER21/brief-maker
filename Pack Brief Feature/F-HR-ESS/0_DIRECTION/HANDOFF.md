@@ -1,0 +1,7 @@
+# HANDOFF — F-HR-ESS · ESS Portal (พนักงานทำเอง) · Phase A จบ 2026-08-31 · runner v2.4
+## 1. ทำอะไร: portal รวมมุมมองพนักงาน self-service (สลิป/ลา/OT/เวลา/เบิก/หนังสือรับรอง/สวัสดิการ/อบรม/แจ้งเตือน) ไว้ที่เดียว · display-only · deep-link ไปหน้า feature เจ้าของ · ไม่ CRUD ซ้ำ (OQ-HR-04) · เห็นเฉพาะข้อมูลของตัวเอง.
+## 2. ส่งมอบ: 0_DIRECTION · 1_HTML(ess.html portal aggregate · home dashboard+4 tabs) audit FAIL=0·qc-ux BLOCK=0·coverage FN 15/15 · 2_BRD(md/docx APPROVED) · 5_DECLARATIONS(NTF read-feed · CSQ SecC self-access + NOT_NEEDED doa/doccfg/pdfdoc) · 3_FRD/4_TC ⏳Phase B
+## 3. LOCK: display-only ทุก surface · ห้าม CRUD feature อื่น(OQ-HR-04) · ยื่นคำขอ=deep-link หน้าเจ้าของ(ไม่ทำ form เอง) · สลิปอ่าน Payroll PS-1 self all-or-nothing · self-access เท่านั้น·คนอื่น=403(SecC) · surface ba-done=[ASSUMED contract] soft ref · personal/salary RESTRICTED masking ตาม self · CSQ SecC + NTF อ่าน feed(ไม่นับ doa_*) · ไม่มี doa/doccfg/pdfdoc · ไม่ออกเอกสาร/เลขรันเอง · audit อ่าน
+## 4. [ASSUMED]/OQ: A-ESS-01 อ่านทุก surface display-only(OQ-HR-04) · A-ESS-02 ยื่น=deep-link หน้าเจ้าของ · A-ESS-03 surface ba-done=[ASSUMED contract] soft ref · DIVERGENCE: —
+## 5. vibe อิสระ: layout/microcopy/mock/มือถือ · คงไว้: FN ทุกข้อ · portal aggregate display-only · deep-link semantics · self-access masking(SecC) · #104/#105/#106 · พ.ศ. · :root --z-* tokens
+## 6. Phase B: run_state.py phase briefs/W6/F-HR-ESS docs · lane docs "ESS Portal"
