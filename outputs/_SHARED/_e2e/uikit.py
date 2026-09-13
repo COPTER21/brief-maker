@@ -2710,3 +2710,177 @@ def assert_affordances_fire(pg, selectors, note=''):
     assert not dead, (f"[{note}] คลิกไม่ถึง target (capture-phase กลืนคลิก?): {dead} · "
                       f"tested={r['tested']} · absent={r['absent']}")
     return r
+
+
+# ⭐ เพิ่ม 2026-09-11 (F-MKT-CONSENT · §C3.8 · user-found cosmetic bugs ที่ตัววัดเดิมมองไม่เห็น)
+# ─────────────────────────────────────────────────────────────────────────────
+# 3 จุดที่ผู้ใช้เห็นเองแต่ qc-ux/e2e เดิมมองไม่เห็น — ล้วนเป็น "ระยะหายใจ" (spacing) ที่บวกอยู่
+# แต่แคบเกินไป จึงไม่ทับ ไม่ล้น ไม่ตัด → ทุกตัวนับเดิมเงียบหมด:
+#   (1) filter-bar แปะชิดการ์ดตาราง (แท็บทะเบียน) — margin-bottom หาย → แถวกรองติดหัวตาราง
+#   (2) ปุ่มในลิ้นชัก/หน้าต่างชิดกัน — gap ของ container แคบ → ปุ่มติดกันอ่านเป็นก้อนเดียว
+#   (3) กล่องเตือนใน modal ออกเวอร์ชันใหม่ อึดอัด — modal-body padding-top + warn-banner padding น้อย
+#
+# ทำไมตัววัดเดิมมองไม่เห็น: JS_LAYOUT วัด "ทับ/ล้น/สูงไม่เท่า/ถูกตัด" — ไม่มีข้อไหนถามว่า
+#   "สององค์ประกอบที่ควรมีช่องไฟ กลับชิดกันเกินไป" (gap เป็นบวกแต่เล็ก = ผ่านทุกข้อ). ข้อ stackFlush
+#   ตรวจเฉพาะลูก static+rounded ระดับ .content/.drawer-body/.modal-body — filter-bar→card ผ่านเมื่อ
+#   margin แค่บางลง(ไม่ถึง 0) · ปุ่มใน footer เป็น inline-flex แถวเดียว (stackFlush ดูเฉพาะแถวซ้อน) ·
+#   ไม่มีใครวัด clearance ของ warn-banner ใต้หัว modal เลย.
+# ทั้ง 3 ตัวเป็น opt-in (feature เรียกเองใน e2e) · threshold อนุรักษ์นิยม (≥8 / ≥12) กัน false-positive
+# ระยะปกติของ kit. พิสูจน์ว่าจับได้จริงด้วยการย้อน style ให้พัง (ดู e2e-consent.py E33/E34/E35 · C3.8).
+
+# (1) filter-bar ต้องไม่แปะชิดการ์ด/ตารางที่ตามหลัง — ขอบล่างเว้น ≥ MIN px
+JS_FILTER_FLUSH = r"""
+(arg) => {
+  const MIN = arg.min || 8;
+  const vis = el => { const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+    return r.width > 4 && r.height > 4 && cs.display !== 'none' && cs.visibility !== 'hidden'
+           && parseFloat(cs.opacity || '1') >= 0.05; };
+  const bars = [...document.querySelectorAll('.filter-bar')].filter(vis);
+  if (!bars.length) return { ok: false, why: 'no-filter-bar' };
+  const cards = [...document.querySelectorAll('.card, table.table, .table-wrap, .table')].filter(vis);
+  const pairs = [], bad = [];
+  bars.forEach(bar => {
+    const br = bar.getBoundingClientRect();
+    // การ์ด/ตารางที่ "ตามหลัง" filter-bar: อยู่ต่ำลงมา (top >= bar.top) และไม่ใช่กล่องที่ห่อ/ถูกห่อโดย bar
+    const below = cards.filter(c => !c.contains(bar) && !bar.contains(c)
+                    && c.getBoundingClientRect().top >= br.top)
+                    .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
+    if (!below.length) return;                 // ไม่มีตารางตามหลัง — ไม่นับเป็นความผิด
+    const card = below[0], cr = card.getBoundingClientRect();
+    const gap = Math.round(cr.top - br.bottom);
+    const rec = { bar: (bar.className || '').toString().slice(0, 24),
+                  card: (card.className || card.tagName).toString().slice(0, 24), gap };
+    pairs.push(rec);
+    if (gap < MIN) bad.push(rec);
+  });
+  const minGap = pairs.length ? Math.min(...pairs.map(p => p.gap)) : null;
+  return { ok: bad.length === 0, bad, pairs, minGap, min: MIN, checked: pairs.length };
+}
+"""
+
+
+def assert_filter_not_flush(pg, note=''):
+    """assert ว่าแถบกรอง .filter-bar ไม่แปะชิดการ์ด/ตารางที่ตามหลัง (F-MKT-CONSENT · C3.8 · bug#1)
+
+    ขอบล่าง .filter-bar ที่มองเห็น ต้องเว้น ≥ 8px เหนือขอบบนของตาราง/การ์ดที่ตามมา —
+    flush/ทับ = fail. เรียกตอนอยู่แท็บที่มี filter-bar + ตาราง (เช่น registry). คืน dict ถ้าผ่าน
+    """
+    r = pg.evaluate(JS_FILTER_FLUSH, {'min': 8})
+    if isinstance(r, dict) and r.get('why') == 'no-filter-bar':
+        raise AssertionError(f"assert_filter_not_flush {note}: ไม่พบ .filter-bar ที่มองเห็นบนจอ")
+    assert r['ok'], (f"[{note}] filter-bar แปะชิดตาราง/การ์ดที่ตามหลัง (ระยะหายใจหาย): "
+                     + ' · '.join(f"{b['bar']}→{b['card']} เว้นแค่ {b['gap']}px (ต้อง ≥ {r['min']}px)"
+                                  for b in r['bad']))
+    return r
+
+
+# (2) ปุ่มที่อยู่ติดกันในแต่ละ container ต้องมีช่องไฟ ≥ min_gap px (แนวนอนสำหรับแถว · แนวตั้งสำหรับกอง)
+JS_ACTION_BTN_GAP = r"""
+(arg) => {
+  const sels = arg.selectors || [];
+  const MIN = arg.min || 8;
+  const vis = el => { const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+    return r.width > 1 && r.height > 1 && cs.display !== 'none' && cs.visibility !== 'hidden'
+           && parseFloat(cs.opacity || '1') >= 0.05; };
+  const tested = [], absent = [], bad = [], pairs = [];
+  sels.forEach(sel => {
+    const conts = [...document.querySelectorAll(sel)].filter(vis);
+    if (!conts.length) { absent.push(sel); return; }
+    let sawPair = false;
+    conts.forEach(cont => {
+      let btns = [...cont.querySelectorAll('button, .btn, a.btn')].filter(vis);
+      btns = btns.filter(b => !btns.some(o => o !== b && o.contains(b)));   // ปุ่มซ้อนปุ่ม → เก็บตัวนอก
+      if (btns.length < 2) return;
+      const R = btns.map(b => { const r = b.getBoundingClientRect();
+        return { l: r.left, r: r.right, t: r.top, b: r.bottom,
+                 tx: (b.innerText || '').trim().replace(/\s+/g, ' ').slice(0, 12) }; });
+      R.sort((a, b) => (a.t - b.t) || (a.l - b.l));
+      for (let i = 1; i < R.length; i++) {
+        const a = R[i - 1], c = R[i];
+        const yOverlap = Math.min(a.b, c.b) - Math.max(a.t, c.t);
+        const xOverlap = Math.min(a.r, c.r) - Math.max(a.l, c.l);
+        let axis, gap;
+        if (yOverlap > 2) { axis = 'h'; gap = Math.round(c.l - a.r); }        // แถวเดียวกัน → ช่องไฟแนวนอน
+        else if (xOverlap > 2) { axis = 'v'; gap = Math.round(c.t - a.b); }   // กองซ้อน → ช่องไฟแนวตั้ง
+        else continue;                                                         // ทแยงกัน → ไม่ถือว่าติดกัน
+        sawPair = true;
+        const rec = { sel, axis, gap, a: a.tx, b: c.tx };
+        pairs.push(rec);
+        if (gap < MIN) bad.push(rec);
+      }
+    });
+    if (sawPair) tested.push(sel);
+  });
+  return { ok: bad.length === 0, bad, pairs, tested, absent, min: MIN };
+}
+"""
+
+
+def assert_action_button_gap(pg, container_sels, min_gap=8, note=''):
+    """assert ว่าปุ่มที่ "อยู่ติดกัน" ในแต่ละ container มีช่องไฟ ≥ min_gap px (F-MKT-CONSENT · C3.8 · bug#2)
+
+    container_sels : selector เดียว หรือ list ของ selector (เช่น ['.dw-footer-right','.modal-footer']).
+    แต่ละคู่ปุ่มที่มองเห็นและอยู่ติดกัน — แถวเดียวกันวัดช่องไฟแนวนอน · ซ้อนกันวัดแนวตั้ง · คู่ที่ทแยงข้าม
+    (space-between ซ้าย↔ขวา) ไม่ถือว่าติดกันจึงข้าม. container ที่มีปุ่ม < 2 ตัว = ข้าม (ไม่นับ).
+    คืน dict {ok,bad,pairs,tested,absent} ถ้าผ่าน · โยน AssertionError พร้อม px ที่วัดได้ถ้าพัง.
+    """
+    if isinstance(container_sels, str):
+        container_sels = [container_sels]
+    r = pg.evaluate(JS_ACTION_BTN_GAP, {'selectors': list(container_sels), 'min': min_gap})
+    assert r['ok'], (f"[{note}] ปุ่มที่อยู่ติดกันชิดเกินไป (ช่องไฟ < {r['min']}px): "
+                     + ' · '.join(
+                         f"“{b['a']}”↔“{b['b']}” ({'แนวนอน' if b['axis'] == 'h' else 'แนวตั้ง'}) "
+                         f"เว้นแค่ {b['gap']}px @{b['sel']}" for b in r['bad']))
+    return r
+
+
+# (3) กล่องเตือน .warn-banner ใน modal ที่เปิดอยู่ ต้องไม่อึดอัด: เว้นใต้หัว modal + padding เพียงพอ
+JS_MODAL_WARN_CRAMPED = r"""
+(arg) => {
+  const MINCLR = arg.clear || 8, MINPAD = arg.pad || 12;
+  const vis = el => { const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+    return r.width > 4 && r.height > 4 && cs.display !== 'none' && cs.visibility !== 'hidden'
+           && parseFloat(cs.opacity || '1') >= 0.05; };
+  // modal ที่เปิดอยู่ (z สูงสุดถ้ามีหลายชั้น)
+  const modal = [...document.querySelectorAll('.modal, [role=dialog]')].filter(vis)
+    .sort((a, b) => (parseInt(getComputedStyle(b).zIndex) || 0) - (parseInt(getComputedStyle(a).zIndex) || 0))[0];
+  if (!modal) return { ok: false, why: 'no-open-modal' };
+  const head = [...modal.querySelectorAll('.modal-header')].filter(vis)[0];
+  const warn = [...modal.querySelectorAll('.warn-banner')].filter(vis)[0];
+  if (!warn) return { ok: false, why: 'no-warn-banner' };
+  const cs = getComputedStyle(warn);
+  const pad = { t: parseFloat(cs.paddingTop) || 0, r: parseFloat(cs.paddingRight) || 0,
+                b: parseFloat(cs.paddingBottom) || 0, l: parseFloat(cs.paddingLeft) || 0 };
+  const bad = [];
+  let clearance = null;
+  if (head) {
+    clearance = Math.round(warn.getBoundingClientRect().top - head.getBoundingClientRect().bottom);
+    if (clearance < MINCLR) bad.push({ why: 'clearance', px: clearance, min: MINCLR });
+  }
+  ['t', 'r', 'b', 'l'].forEach(k => {
+    if (pad[k] < MINPAD) bad.push({ why: 'padding-' + k, px: Math.round(pad[k]), min: MINPAD }); });
+  return { ok: bad.length === 0, bad, clearance,
+           padding: [Math.round(pad.t), Math.round(pad.r), Math.round(pad.b), Math.round(pad.l)],
+           minClear: MINCLR, minPad: MINPAD };
+}
+"""
+
+
+def assert_modal_warn_not_cramped(pg, note=''):
+    """assert ว่ากล่องเตือน .warn-banner ใน modal ที่เปิดอยู่ ไม่อึดอัด (F-MKT-CONSENT · C3.8 · bug#3)
+
+    (a) ขอบบน .warn-banner ต้องเว้นใต้ขอบล่าง .modal-header ≥ 8px · (b) computed padding ทั้ง 4 ด้าน
+    ต้อง ≥ 12px. เรียก "หลัง" เปิด modal ที่มี .warn-banner แล้ว (เช่น new-version). คืน dict ถ้าผ่าน ·
+    โยน AssertionError ถ้าไม่มี modal/ไม่มี warn-banner หรืออึดอัด (พร้อม px ที่วัดได้)
+    """
+    r = pg.evaluate(JS_MODAL_WARN_CRAMPED, {'clear': 8, 'pad': 12})
+    if isinstance(r, dict) and r.get('why'):
+        raise AssertionError(f"assert_modal_warn_not_cramped {note}: {r['why']} "
+                             f"(ต้องเปิด modal ที่มี .warn-banner ก่อนเรียก)")
+    assert r['ok'], (f"[{note}] กล่องเตือนใน modal อึดอัด: "
+                     + ' · '.join(
+                         (f"ชิดใต้หัว modal แค่ {b['px']}px (ต้อง ≥ {b['min']}px)" if b['why'] == 'clearance'
+                          else f"padding {b['why'].split('-')[1]} แค่ {b['px']}px (ต้อง ≥ {b['min']}px)")
+                         for b in r['bad'])
+                     + f" · [clearance={r['clearance']} · padding(t/r/b/l)={r['padding']}]")
+    return r
