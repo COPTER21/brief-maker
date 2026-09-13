@@ -1,0 +1,207 @@
+<!-- ==========================================================================
+     Pattern B2 — DOCUMENT LINE EDITOR : required CSS
+     Verbatim from the approved PR reference (F-PR-001), CI = CUBE Warm Light.
+     Paste inside <style>. Assumes the :root token block from
+     references/drawer-standard/drawer.css.html is already present.
+     ========================================================================== -->
+
+    /* --- tabular numerals: MANDATORY on every money / qty cell --- */
+    .num { font-variant-numeric: tabular-nums; }
+
+    /* --- drawer width contract (B2 documents need the wide variant) --- */
+    .drawer-panel {
+      position: absolute; right: 0; top: 0;
+      height: 100%; width: 100%;
+      max-width: 920px;
+      background: white;
+      box-shadow: var(--sh-xl);
+      display: flex; flex-direction: column;
+    }
+    .drawer-panel.standard { max-width: 680px; }
+    .drawer-panel.wide     { max-width: 1290px; }  /* B2 line-editor documents only */
+
+    /* ============================================================
+       BUTTON SYSTEM
+       ============================================================ */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 6px;
+      padding: 0 14px;
+      height: 34px;
+      border-radius: var(--r);
+      font-size: 12.5px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      background: transparent;
+      color: var(--c-text);
+      line-height: 1;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .btn:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 2px; }
+    .btn:disabled { cursor: not-allowed; opacity: 0.6; }
+    .btn.lg { height: 38px; padding: 0 18px; font-size: 13px; }
+    .btn.sm { height: 28px; padding: 0 10px; font-size: 12px; }
+    .btn-primary    { background: var(--c-primary); color: white; border-color: var(--c-primary); }
+    .btn-primary:hover:not(:disabled) { background: var(--c-primary-h); border-color: var(--c-primary-h); }
+    .btn-secondary  { background: var(--c-white); color: var(--c-navy); border-color: var(--c-border); }
+    .btn-secondary:hover:not(:disabled) { border-color: var(--c-text-soft); }
+    .btn-ghost      { background: transparent; color: var(--c-text-mute); }
+    .btn-ghost:hover:not(:disabled) { background: var(--c-off-white); color: var(--c-text); }
+    .btn-success    { background: var(--c-teal); color: white; border-color: var(--c-teal); }
+    .btn-success:hover:not(:disabled) { background: #E08800; border-color: #E08800; }
+    .btn-danger     { background: var(--c-danger); color: white; border-color: var(--c-danger); }
+    .btn-danger:hover:not(:disabled) { background: #dc2626; }
+    .btn-link       { background: transparent; color: var(--c-primary); padding: 0; height: auto; font-weight: 600; }
+    .btn-link:hover { text-decoration: underline; }
+
+
+    /* ============================================================
+       CARD
+       ============================================================ */
+    .card {
+      background: var(--c-white);
+      border: 1px solid var(--c-border);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+    }
+    .card-head {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--c-border-soft);
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    }
+    .card-title { font-size: 14px; font-weight: 700; color: var(--c-navy); }
+    .card-body { padding: 16px 18px; }
+    .card-body.flush { padding: 0; }
+
+    /* ============================================================
+       INPUT / SELECT
+       ============================================================ */
+    .input, .select {
+      height: 34px;
+      background: var(--c-white);
+      border: 1px solid var(--c-border);
+      border-radius: var(--r);
+      padding: 0 12px;
+      font-size: 13px;
+      color: var(--c-text);
+      transition: all 0.15s;
+      width: 100%;
+    }
+    .input::placeholder { color: var(--c-text-soft); }
+    .input:focus, .select:focus {
+      outline: none;
+      border-color: var(--c-primary);
+      box-shadow: 0 0 0 3px var(--c-primary-12);
+    }
+    label.required::after { content: ' *'; color: var(--c-danger); }
+
+    /* ============================================================
+       TABLE
+       ============================================================ */
+    .tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .tbl th {
+      text-align: left; padding: 10px 14px;
+      font-size: 10.5px; font-weight: 700;
+      color: var(--c-text-mute);
+      background: var(--c-off-white);
+      border-bottom: 1px solid var(--c-border);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+    .tbl td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--c-border-soft);
+      color: var(--c-text);
+      vertical-align: middle;
+    }
+    .tbl tbody tr { transition: background 0.1s; cursor: pointer; }
+    .tbl tbody tr:hover { background: var(--c-off-white); }
+    .tbl tbody tr:last-child td { border-bottom: none; }
+    .tbl-name { font-weight: 600; color: var(--c-navy); }
+    .tbl-meta { font-size: 11px; color: var(--c-text-mute); margin-top: 1px; }
+    .tbl-mono { font-family: ui-monospace, monospace; font-size: 12px; }
+    .tbl-num { font-variant-numeric: tabular-nums; text-align: right; }
+    .tbl-th-sortable { cursor: pointer; user-select: none; }
+    .tbl-th-sortable:hover { color: var(--c-text); }
+
+    /* --- expandable line row animation (Pattern E borrow) --- */
+    /* Slide-down animation for expandable line panel (Pattern E) */
+    @keyframes line-expand-slide {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+        max-height: 0;
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 600px;
+      }
+    }
+    @keyframes line-collapse-slide {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 600px;
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-8px);
+        max-height: 0;
+      }
+    }
+    .line-expand-panel {
+      animation: line-expand-slide 220ms cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: top;
+      overflow: hidden;
+    }
+    .line-collapse-panel {
+      animation: line-collapse-slide 200ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      transform-origin: top;
+      overflow: hidden;
+    }
+
+    /* --- toggle (WHT / end-bill discount switches) --- */
+    /* Toggle */
+    .toggle {
+      position: relative; display: inline-block;
+      width: 36px; height: 20px;
+      flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: var(--c-border);
+      border-radius: 20px;
+      transition: 200ms;
+    }
+    .toggle-slider::before {
+      position: absolute; content: '';
+      height: 14px; width: 14px;
+      left: 3px; bottom: 3px;
+      background-color: white;
+      border-radius: 50%;
+      transition: 200ms;
+    }
+    .toggle input:checked + .toggle-slider { background-color: var(--c-primary); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+    /* Section divider for wizard step 2 */
+    .section-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--c-off-white);
+      border: 1px solid var(--c-border);
+      border-radius: var(--r);
+      margin-bottom: 10px;
+    }
+    .section-label { font-size: 13px; font-weight: 500; color: var(--c-navy); display: flex; align-items: center; gap: 8px; }
+
+    /* --- markup-only hooks (no CSS rules; used by JS selectors) ---
+       .item-combo               wrapper around the item search input + suggest list
+       .line-expand-panel-anchor <tr> that carries the expanded detail for a line
+       .line-expand-panel-inner  the animated inner card of that <tr>
+       Do not rename these — toggleLineExpand() queries them by selector.        */

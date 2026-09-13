@@ -1,0 +1,216 @@
+<!-- ============================================ -->
+<!-- ERP SHELL (Sidebar + Shell-Bar + Content)    -->
+<!-- ============================================ -->
+<!-- Drop this into <body> of file-skeleton.template.html
+     Replace {{...}} placeholders with feature-specific values. -->
+
+<!-- ===== SIDEBAR ===== -->
+<aside class="sidebar">
+  <!-- Brand -->
+  <div class="sb-brand">
+    <div class="sb-logo">
+      <i data-lucide="box" class="w-4 h-4"></i>
+    </div>
+    <div>
+      <div class="sb-name">CUBE NATIVE</div>
+      <div class="sb-sub">{{MODULE_NAME}}</div>
+    </div>
+  </div>
+
+  <!-- Nav — Module (collapsible) → Feature pattern (Iron Rule #27)
+       Replace modules/features per feature. data-module/data-feature
+       are required (used for future Menu Management + permission gating). -->
+  <nav class="sb-nav" id="sb-nav">
+
+    <!-- MODULE 1 -->
+    <div class="sb-module" data-module="{{MODULE_1_ID}}" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="{{MODULE_1_ICON}}" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">{{SECTION_1_TITLE}}</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item is-active" data-feature="{{FEATURE_1_ID}}">
+          <i data-lucide="{{ICON}}" class="w-4 h-4"></i>
+          <span>{{ITEM_LABEL}}</span>
+          <!-- Optional badge: -->
+          <!-- <span class="sb-badge">12</span> -->
+        </a>
+        <a class="sb-item" data-feature="campaigns">
+          <i data-lucide="briefcase" class="w-4 h-4"></i>
+          <span>Campaigns</span>
+        </a>
+        <a class="sb-item" data-feature="outreach">
+          <i data-lucide="mail" class="w-4 h-4"></i>
+          <span>Outreach</span>
+        </a>
+        <a class="sb-item is-disabled" data-feature="analytics">
+          <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+          <span>Analytics</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- MODULE 2 -->
+    <div class="sb-module" data-module="{{MODULE_2_ID}}" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="{{MODULE_2_ICON}}" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">{{SECTION_2_TITLE}}</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item" data-feature="customers">
+          <i data-lucide="users" class="w-4 h-4"></i>
+          <span>Customers</span>
+        </a>
+        <a class="sb-item" data-feature="quotations">
+          <i data-lucide="receipt" class="w-4 h-4"></i>
+          <span>Quotations</span>
+        </a>
+        <a class="sb-item" data-feature="orders">
+          <i data-lucide="file-text" class="w-4 h-4"></i>
+          <span>Orders</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- MODULE: System (always last) -->
+    <div class="sb-module" data-module="system" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sliders-horizontal" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">System</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item" data-feature="settings">
+          <i data-lucide="settings" class="w-4 h-4"></i>
+          <span>Settings</span>
+        </a>
+      </div>
+    </div>
+
+  </nav>
+
+  <!-- Footer -->
+  <div class="sb-footer">
+    <div class="pulse-dot"></div>
+    <span>{{ENV_LABEL}} · v1.0.0</span>
+  </div>
+</aside>
+
+<!-- ===== MAIN (right of sidebar) ===== -->
+<main class="main">
+
+  <!-- ===== SHELL BAR ===== -->
+  <header class="shell-bar">
+    <!-- Left: Breadcrumb -->
+    <nav class="breadcrumb">
+      <a>{{BC_ROOT}}</a>
+      <i data-lucide="chevron-right" class="w-3 h-3 sep"></i>
+      <a>{{BC_MIDDLE}}</a>
+      <i data-lucide="chevron-right" class="w-3 h-3 sep"></i>
+      <span class="breadcrumb-current">{{BC_CURRENT}}</span>
+    </nav>
+
+    <!-- Right: Notifications + User -->
+    <div style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
+      <div class="notif-wrap" style="position: relative;">
+        <button class="icon-btn" onclick="toggleNotif()" id="notifBtn">
+          <i data-lucide="bell" class="w-4 h-4"></i>
+          <span class="notif-dot"></span>
+        </button>
+        <!-- Notif panel (hidden by default — show via JS) -->
+      </div>
+
+      <div style="position: relative;">
+        <div class="user-chip" onclick="toggleUserMenu()">
+          <div class="user-text">
+            <div class="user-name">{{USER_NAME}}</div>
+            <div class="user-role">{{USER_ROLE}}</div>
+          </div>
+          <div class="avatar">{{USER_INITIALS}}</div>
+        </div>
+
+        <!-- User dropdown menu -->
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-item">
+            <i data-lucide="user" class="w-3.5 h-3.5"></i>
+            <span>My Profile</span>
+          </div>
+          <div class="user-menu-item">
+            <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+            <span>Preferences</span>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-item is-danger">
+            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+            <span>Sign out</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== CONTENT (per page — replace) ===== -->
+  <div class="content" id="page-content">
+    <!-- Page Header -->
+    <div class="ph">
+      <div>
+        <div class="ph-title-row">
+          <h1 class="ph-title">{{PAGE_TITLE}}</h1>
+          <!-- Optional count badge (for list pages): -->
+          <!-- <span class="ph-count">29 รายการ</span> -->
+        </div>
+        <p class="ph-sub">{{PAGE_SUBTITLE}}</p>
+      </div>
+      <div class="ph-actions">
+        <button class="btn btn-secondary">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>Export</span>
+        </button>
+        <button class="btn btn-primary" onclick="openDrawer('create')">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span>{{PRIMARY_ACTION_LABEL}}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Optional KPI stats -->
+    <!--
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label"><i data-lucide="users" class="w-3 h-3"></i>Total</div>
+        <div class="stat-value">29</div>
+        <div class="stat-meta is-up"><i data-lucide="trending-up" class="w-3 h-3"></i>+12% MoM</div>
+      </div>
+    </div>
+    -->
+
+    <!-- Per pattern (A/B/C/D/E/F/G/H/I) — see patterns/ folder -->
+    <div class="card">
+      <!-- Content placeholder — replace with pattern HTML -->
+    </div>
+  </div>
+</main>
+
+<!--
+  ============== JAVASCRIPT for shell ==============
+  Add these to your <script> block (after the base state):
+-->
+<script>
+// User menu toggle
+function toggleUserMenu() {
+  document.getElementById('userMenu').classList.toggle('is-open');
+}
+// Close user menu when clicking outside
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.user-chip') && !e.target.closest('.user-menu')) {
+    document.getElementById('userMenu')?.classList.remove('is-open');
+  }
+});
+
+// Notification panel (basic — extend as needed)
+function toggleNotif() {
+  // Implement notif panel toggle here if needed
+}
+</script>
