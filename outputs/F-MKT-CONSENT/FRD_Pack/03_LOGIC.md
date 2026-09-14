@@ -10,6 +10,9 @@
 
 ## §3.1 Functions (Scope-Local · camelCase)
 
+> **⭐ Permission model (FIX-02 · BR-25):** ทุก mutation function เช็ค role **ภายในตัวเอง** (ไม่พึ่ง render-time gate) เป็นบรรทัดแรก: `submitReqCreate→PERM().reqCreate` · `sendVia→PERM().send` · `applyAnswers→PERM().sign` · `doWithdraw→PERM().withdraw` · `doPublishVersion`/`doClosePurpose→PERM().purpose (dpo only)`. ไม่ผ่าน → toast "สิทธิ์ไม่พอสำหรับบทบาทนี้" + return. Prototype `PERM()` = mirror `sec.can()`; ระบบจริง = role จากล็อกอิน (**OQ-05**). auditor = read-only.
+> **⭐ Double-submit guard (FIX-04 · BR-26):** ทุก mutation ที่เปลี่ยน state ผ่าน `guardBusy(ev)` — `if(state._busy)return; state._busy=true; …; setTimeout(()=>_busy=false,500)` + ปุ่ม loading state (Rule #44). ใช้ที่: `submitReqCreate` · `submitRecipient` · `doWithdraw` · `doPublishVersion` · `doClosePurpose`.
+
 ### F058-FN-01: `createPurpose`
 - **Purpose:** สร้างวัตถุประสงค์ใหม่พร้อมเอกสารนโยบาย v1 (DECLARED-01 upload)
 - **Input:** `{ name, channels[], lifespan_months, document{name,type,ref,size} }`
@@ -53,10 +56,18 @@
 - **Iron rule:** ✅ · **HTML ref:** `createRequestRecord()` / `submitReqCreate()` — **LOCK-07 single-screen**
 
 ### F058-FN-06: `recordSend`
-- **Purpose:** บันทึกการส่ง/ส่งซ้ำ (mock) — ครั้งที่ N ในคำขอเดิม
-- **Input:** `{ request_id, channel }` · **Output:** `{ send_seq, status }`
-- **Invoked by:** F058-API-09 · **Side effects:** INSERT T_consent_request_send · UPDATE status=pending (ครั้งแรก) · **ไม่ส่งจริง (BR: mock)**
-- **Iron rule:** ✅ · **HTML ref:** `sendVia()` (toast จำลอง) · BR-18 (ไม่สร้างคำขอใหม่)
+- **Purpose:** บันทึกการส่ง/ส่งซ้ำ (mock) — ครั้งที่ N ในคำขอเดิม พร้อม snapshot เวอร์ชันนโยบาย
+- **Input:** `{ request_id, channel }` · **Output:** `{ send_seq, status, vers }`
+- **Guard (FIX-02/05):** role check `PERM().send` ใน function · request.status ∈ {draft,pending} เท่านั้น (answered/expired → toast "คำขอนี้ปิดแล้ว" + return · BR-26)
+- **Invoked by:** F058-API-09 · **Calls:** F058-FN-21 snapshotVers (FIX-03)
+- **Side effects:** INSERT T_consent_request_send (`{ch, at, vers}`) · UPDATE status=pending (ครั้งแรก) · **ไม่ส่งจริง (BR: mock)**
+- **Iron rule:** ✅ · **HTML ref:** `sendVia()` (guard draft/pending · `r.sends.push({ch,at,vers:snapshotVers(r)})` · toast จำลอง) · BR-18/24
+
+### F058-FN-21: `snapshotVers` (FIX-03 · NEW)
+- **Purpose:** จับ snapshot เวอร์ชันนโยบายปัจจุบันต่อ purpose ของคำขอ ณ เวลาส่ง — หลักฐาน "ส่งเอกสารเวอร์ชันไหน" (BR-24)
+- **Input:** `{ request }` · **Output:** `{ "<purpose_code>": <version>, ... }`
+- **Invoked by:** F058-FN-06 recordSend · **Calls:** — (อ่าน purpose.current_ver) · **Side effects:** — (pure map)
+- **Iron rule:** ✅ pure · **HTML ref:** `snapshotVers(r)` → `{code: currentVer(code)}` · `policyRows` ใช้ `sends[last].vers[code]` + `viewPolicy(code, sentVer)` + ป้ายเตือน newer
 
 ### F058-FN-07: `recordLinkExport`
 - **Purpose:** log การนำลิงก์/QR ออก + ดาวน์โหลดเอกสารของคำขอ
@@ -70,15 +81,20 @@
 - **Invoked by:** F058-API-12 · **Side effects:** — (read) · lapsed → expired:true (ไม่ 404)
 - **Iron rule:** ✅ · **HTML ref:** `openRecipientView()`/`recipientViewHTML()`/`renderRecipient()`
 
-### F058-FN-09: `applyAnswers` ⭐
-- **Purpose:** แปลงคำตอบผู้รับ → registry rows (granted/declined ต่อ purpose) + evidence 5 + history + supersede + CSQ
+### F058-FN-09: `applyAnswers` ⭐ (FIX-01 answered=terminal · FIX-02 role guard)
+- **Purpose:** แปลงคำตอบผู้รับ → registry rows (granted/declined ต่อ purpose) + evidence 5 + history + supersede + CSQ — **จุดเดียวที่คุมทั้ง officer-answer และ recipient-submit**
 - **Input:** `{ request, answers:[{purpose_code, grant}], verified }`
 - **Output:** `{ granted, declined }`
-- **Invoked by:** F058-API-13
+- **Invoked by:** F058-API-13 (recipient submit) + officer answer path
+- **⭐ Guard order (เช็คก่อน mutate ใด ๆ):**
+  1. **role check** `PERM().sign` — ไม่ผ่าน → toast "สิทธิ์ไม่พอสำหรับบทบาทนี้" + return (FIX-02 · auditor เรียกตรงไม่ผ่าน · bypass B4)
+  2. **BR-23 answered=terminal** — `request.status ∈ {draft,pending}` เท่านั้น · answered/closed/expired → **BR_REQUEST_CLOSED** toast "คำขอนี้ปิดแล้ว — ตอบซ้ำไม่ได้" + return (FIX-01 · กัน evidence chain ถูกเขียนทับ · bypass B1/B2)
+  3. verified + answers ครบ
 - **Calls:** F058-FN-10 supersede, F058-FN-11 buildEvidence, F058-FN-19 emitConsequence
-- **Side effects (per purpose):** supersede คู่ triple เดิม · INSERT T_consent(granted/declined) + T_consent_evidence(5) + T_consent_history · UPDATE request.status=answered · emit `consent.granted`/`consent.declined`
-- **Error:** BR_IDENTITY_NOT_VERIFIED (verified=false), BR_ANSWERS_INCOMPLETE
-- **Iron rule:** ✅ (render() ถูกถอดออก — เป็น HTTP/UI) · **HTML ref:** `applyAnswers()` (policy_version = snapshot p.currentVer, BR-06)
+- **Side effects (per purpose · หลังผ่าน guard):** supersede คู่ triple เดิม · INSERT T_consent(granted/declined) + T_consent_evidence(5) + T_consent_history · **UPDATE request.status=answered + set `answered_at` (terminal · ไม่มี re-answer path)** · emit `consent.granted`/`consent.declined`
+- **⚠️ Evidence immutability (FIX-01):** ไม่มี supersede-on-re-answer — เมื่อ answered แล้ว evidence/consent เดิมถูกแช่แข็ง · เปลี่ยนใจ = คำขอใหม่/withdraw (OQ-CNS-01)
+- **Error:** **BR_REQUEST_CLOSED** (answered=terminal), ERR_INSUFFICIENT_ROLE, BR_IDENTITY_NOT_VERIFIED (verified=false), BR_ANSWERS_INCOMPLETE
+- **Iron rule:** ✅ (render() ถูกถอดออก — เป็น HTTP/UI) · **HTML ref:** `applyAnswers()` (guard `!['draft','pending'].includes(r.status)` → return · `r.status='answered'; r.answeredAt=…` · policy_version = snapshot p.currentVer, BR-06)
 
 ### F058-FN-10: `supersede`
 - **Purpose:** ปิดสถานะ record คู่ triple เดิม (subject×purpose×channel) เมื่อมี record ใหม่ — คงไว้เป็นหลักฐาน (ไม่ลบ, BR-17)
@@ -100,14 +116,15 @@
 - **Invoked by:** F058-API-15 · **Calls:** F058-ENG-02 · **Side effects:** — (read)
 - **Iron rule:** ✅ · **HTML ref:** `openConsentView()`/`consentViewDrawer()`/`evItem()`
 
-### F058-FN-13: `withdrawConsent`
+### F058-FN-13: `withdrawConsent` (FIX-02 role · FIX-05 granted-only guard)
 - **Purpose:** ถอนความยินยอม (เหตุผล+ช่องทาง) มีผลทันที ไม่ต้องอนุมัติ
 - **Input:** `{ consent_id, reason, via }` · **Output:** `Consent`
+- **Guard order:** (1) role `PERM().withdraw` (FIX-02) · (2) **eff_status = granted เท่านั้น** (FIX-05 · BR-26) → withdrawn/declined/expired/pending → toast "รายการนี้ไม่อยู่ในสถานะยินยอม" + return (กัน history + CSQ reversal ยิงซ้ำ · bypass B3) · (3) reason + via required
 - **Invoked by:** F058-API-17
 - **Calls:** F058-FN-19 emitConsequence
 - **Side effects:** UPDATE status=withdrawn, updated_at · INSERT T_consent_history(reason,via) · emit `consent.withdrawn` **reversal_of=grant_event_id**
-- **Error:** BR_WITHDRAW_REASON_REQUIRED, BR_WITHDRAW_CHANNEL_REQUIRED (BR-10)
-- **Iron rule:** ✅ · **HTML ref:** `doWithdraw()` (BR-09/10 · toast "ถอนความยินยอมแล้ว — มีผลทันที...")
+- **Error:** BR_NOT_GRANTED (FIX-05), BR_WITHDRAW_REASON_REQUIRED, BR_WITHDRAW_CHANNEL_REQUIRED (BR-10)
+- **Iron rule:** ✅ · **HTML ref:** `doWithdraw()` (guard `effStatus(c)!=='granted'` · BR-09/10 · toast "ถอนความยินยอมแล้ว — มีผลทันที...")
 
 ### F058-FN-14: `renewConsent`
 - **Purpose:** ต่ออายุ = สร้างคำขอใหม่อ้างเดิม (ไม่แก้ expires_at เดิม, BR-13)
@@ -208,7 +225,7 @@
 | API-06 | GET | /consent/requests | FN-11 | — |
 | API-07 | POST | /consent/requests | FN-05 | — |
 | API-08 | GET | /consent/requests/:id | — (single read) | — |
-| API-09 | POST | /consent/requests/:id/send | FN-06 | — |
+| API-09 | POST | /consent/requests/:id/send | FN-06, FN-21 | — |
 | API-10 | POST | /consent/requests/:id/link-export | FN-07 | — |
 | API-11 | GET | /consent/requests/:id/document | FN-07 | — |
 | API-12 | GET | /consent/recipient/:token | FN-08 | — |
@@ -223,7 +240,7 @@
 
 ### Trace Verification (Self-Check)
 - [x] ทุก mutation API (POST) มี ≥1 Function/Engine
-- [x] ไม่มี orphan Function — FN-01..20 ปรากฏใน trace (FN-15 reConsent = registry action/API-04 flow; FN-16 delegate ใช้ทุก read; FN-19 ใน withdraw/renew/version/close)
+- [x] ไม่มี orphan Function — FN-01..21 ปรากฏใน trace (FN-15 reConsent = registry action/API-04 flow; FN-16 delegate ใช้ทุก read; FN-19 ใน withdraw/renew/version/close; **FN-21 snapshotVers = API-09 send**)
 - [x] ไม่มี orphan Engine — ENG-01 (API-20), ENG-02 (API-01/14/15/16/18/20 + ENG-01)
 - [x] ไม่มี hidden logic ใน 02_API
 
@@ -243,12 +260,25 @@
 
 ---
 
-## §3.5 Open Questions / Locked Decisions Referenced
+## §3.5 State Machine — Request lifecycle (FIX-01 · terminal answered)
+
+```
+[draft] ──send (FN-06 · guard draft/pending)──> [pending] ──answer (FN-09 · guard draft/pending)──> [answered]★ terminal
+[pending] ──เกิน 30 วัน──> [expired]  (lapsed ≠ declined · BR-08)
+[answered] ──(ตอบซ้ำ)──> ✗ BR_REQUEST_CLOSED (re-answer blocked · evidence immutable)
+```
+★ **answered = terminal:** ตั้ง `answered_at` · ไม่มี transition ออก · เปลี่ยนใจ = **คำขอใหม่ / withdraw** (OQ-CNS-01) · publish เวอร์ชันใหม่ระหว่าง pending = ไม่ auto-expire (แสดง sent-version + เตือน · OQ-CNS-02)
+
+## §3.6 Open Questions / Locked Decisions Referenced
 - **LD-01** (07): content model = **upload** (DECLARED-01) — old ≥40-char free-text rule REPLACED by "ต้องแนบเอกสาร"
 - **LD-02** (07): resolve contract locked (BR-20) — ENG-01 output schema immutable
 - **LD-03** (07): no approval chain (LOCK-04) — withdraw immediate
 - **LD-04** (07): ENG-01/02 register CUBIC ตอน hand-off (DRAFT now)
+- **LD-07** (07): **answered = terminal · re-answer blocked · evidence immutable** (FIX-01 · BR-23)
 - **OQ-03**: id_method จริง (checkbox mock) — FN-09 evidence.id_method ปัจจุบัน = "ลิงก์ที่ส่งถึงเจ้าตัว" (mock)
+- **OQ-CNS-01**: post-answer change path (คำขอใหม่/withdraw) + ใครเปิดคำขอใหม่ได้ → กระทบ §3.5 state machine
+- **OQ-CNS-02**: publish v ใหม่ระหว่าง pending — auto-expire vs answer-current (build = ไม่ auto-expire · FN-06 snapshot + FN-08 sent-version) → §3.5 + BR
+- **OQ-CNS-03**: renewal trigger manual vs batch (NTF ฝั่ง F136) — near-expiry (FN-18) มีแล้ว
 - **[AI-DEFAULT]**: optimistic lock (FN-02/13), idempotency-key header (all mutation) — ดู 05_RULES §5.5
 
 ---

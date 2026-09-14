@@ -33,6 +33,8 @@
 | F058-API-20 | POST | /api/v1/consent/resolve | ตรวจสิทธิ์ (locked contract, 200 เสมอ) | required (read) | FN-19/20 |
 
 > **Common:** ทุก endpoint ต้อง `X-Tenant-Id` · ทุก mutation รับ `Idempotency-Key` header `[AI-DEFAULT]` (PR-7) · PUT/PATCH ไม่มี (ใช้ POST action ตาม state machine)
+> **Role enforcement (FIX-02 · BR-25):** คอลัมน์ Auth = สิทธิ์ที่ต้อง enforce **ภายในทุก mutation function** (ไม่ใช่แค่ render ปุ่ม) — prototype ใช้ persona mirror `sec.can()`; ระบบจริง = role จากล็อกอิน (**OQ-05**). auditor = read-only ทุก endpoint (403 ทุก mutation) · จัดการ purpose (API-02/04/05) = dpo เท่านั้น
+> **Sub-status / re-answer guards (FIX-01/05 · BR-23/26):** mutation ที่ผูก lifecycle เช็คสถานะก่อนทำ — answer (API-13) เฉพาะ draft/pending · send (API-09) เฉพาะ draft/pending · withdraw (API-17) เฉพาะ granted → มิฉะนั้น 422 (ดูราย endpoint)
 
 ---
 
@@ -83,24 +85,29 @@ document: file (required — .pdf/.doc/.docx/.txt)  ← ต้องแนบ (B
 
 ### F058-API-09: POST /api/v1/consent/requests/:id/send  (FN-06/07)
 **Request:** `{ channel }`
-**Response 200:** `{ request_id, status:"pending", send_seq:<N> }`
+**Guard (FIX-05):** ส่ง/ส่งซ้ำได้เฉพาะ request.status ∈ {draft, pending} — answered/expired → 422 BR_REQUEST_CLOSED ("คำขอนี้ปิดแล้ว") · role check ใน function (FIX-02)
+**Response 200:** `{ request_id, status:"pending", send_seq:<N>, vers:{ "<purpose_code>": <version>, ... } }`
 **BR-18:** ส่งซ้ำ = INSERT send record (ครั้งที่ N) — **ไม่สร้างคำขอใหม่** · **mock** (ไม่ส่งอีเมล/LINE จริง — toast "บันทึกการส่งทาง<channel> (จำลอง...)")
-**Side effects:** INSERT T_consent_request_send · UPDATE request.status=pending (ครั้งแรก)
-**Calls (Logic):** F058-FN-06 recordSend
+**BR-24 (FIX-03 · version snapshot):** แต่ละ send record บันทึก **`vers` = snapshot เวอร์ชันนโยบายปัจจุบันต่อ purpose ณ เวลาส่ง** (`snapshotVers()`) → panel "เนื้อหาที่ให้เซ็น" render เวอร์ชันที่ส่งจริง (ไม่ใช่ current) + เตือนเมื่อ current ใหม่กว่า · `viewPolicy(code, ver)` โหลดเวอร์ชันประวัติจาก T_consent_policy_version
+**Side effects:** INSERT T_consent_request_send (พร้อม `vers` jsonb) · UPDATE request.status=pending (ครั้งแรก)
+**Calls (Logic):** F058-FN-06 recordSend → F058-FN-21 snapshotVers
 
 ### F058-API-12: GET /api/v1/consent/recipient/:token  (FN-10 load)
-**Auth:** token (public link · ไม่ต้อง JWT) — **read-only** โหลดคำขอ + เอกสารเวอร์ชันปัจจุบันของแต่ละ purpose
-**Response 200:** `{ request:{...}, purposes:[{code, name, doc_name, doc_body, policy_version}] }`
+**Auth:** token (public link · ไม่ต้อง JWT) — **read-only** โหลดคำขอ + เอกสารเวอร์ชันที่ส่งของแต่ละ purpose (จาก send snapshot `vers`, FIX-03)
+**Response 200 (form):** `{ request:{...}, purposes:[{code, name, doc_name, doc_body, policy_version}] }`
+**Response 200 (closed-state · FIX-01):** ถ้า request.status ∉ {draft, pending} → `{ closed:true, status, answered_at }` — client แสดงหน้าสถานะปิด "คำขอนี้ตอบแล้ว เมื่อ..." **ไม่แสดงฟอร์ม** (ลูกค้าเปิดลิงก์ซ้ำ)
 **Errors:** 200 พร้อม `{ expired:true }` ถ้า request เกินกำหนด (lapsed) — ไม่ 404
 **Calls (Logic):** F058-FN-08 buildRecipientView
 
 ### F058-API-13: POST /api/v1/consent/recipient/:token/answer  (FN-10/11)
 **Request:** `{ verified:true, answers:[{purpose_code, grant:boolean}] }`
+**Guard (FIX-01 · BR-23 · re-answer block — CRITICAL):** applyAnswers เช็คแรกสุด — request.status ต้อง ∈ {draft, pending} เท่านั้น · answered/closed/expired → **422 BR_REQUEST_CLOSED** ("คำขอนี้ปิดแล้ว — ตอบซ้ำไม่ได้") **ก่อน** supersede/INSERT ใด ๆ → กัน evidence chain ถูกเขียนทับ (bypass B1/B2) · guard นี้คุมทั้ง officer-answer และ recipient-submit (จุดเดียวที่ applyAnswers)
+**Guard (FIX-02):** role check ใน function (sign) — auditor เรียกตรง → 403/ปฏิเสธ (ไม่ใช่แค่ render)
 **Validation:** `verified` ต้อง true (BR-15 ยืนยันตัวตนก่อน — mock, OQ-03) · answers ครบทุก purpose ในคำขอ
 **Response 200:** `{ granted:N, declined:M, evidence_complete:true }`
-**Errors:** 422 BR_IDENTITY_NOT_VERIFIED ("กรุณายืนยันตัวตนก่อนส่งคำตอบ") · 422 BR_ANSWERS_INCOMPLETE
-**Side effects (per purpose):** supersede คู่ triple เดิม · INSERT T_consent (granted/declined) + T_consent_evidence(5) + T_consent_history · UPDATE request.status=answered · emit CSQ `consent.granted` / `consent.declined`
-**Calls (Logic):** F058-FN-09 applyAnswers → F058-FN-10 supersede, F058-FN-11 buildEvidence
+**Errors:** **422 BR_REQUEST_CLOSED** (answered=terminal, FIX-01) · 422 BR_IDENTITY_NOT_VERIFIED ("กรุณายืนยันตัวตนก่อนส่งคำตอบ") · 422 BR_ANSWERS_INCOMPLETE · 403 ERR_INSUFFICIENT_ROLE
+**Side effects (per purpose · เฉพาะเมื่อผ่าน guard):** supersede คู่ triple เดิม · INSERT T_consent (granted/declined) + T_consent_evidence(5) + T_consent_history · **UPDATE request.status=answered + set `answered_at`** (terminal, BR-23) · emit CSQ `consent.granted` / `consent.declined`
+**Calls (Logic):** F058-FN-09 applyAnswers (guard answered=terminal) → F058-FN-10 supersede, F058-FN-11 buildEvidence
 
 ### F058-API-14: GET /api/v1/consent/registry  (FN-13)
 **Query:** `search, status, channel, purpose, near_expiry, limit, offset`
@@ -109,6 +116,7 @@ document: file (required — .pdf/.doc/.docx/.txt)  ← ต้องแนบ (B
 
 ### F058-API-17: POST /api/v1/consent/registry/:id/withdraw  (FN-15)
 **Request:** `{ reason (required), via (required) }` (BR-10)
+**Guard (FIX-05 · BR-26):** ถอนได้เฉพาะ eff_status = granted — withdrawn/declined/expired/pending → 422 BR_NOT_GRANTED ("รายการนี้ไม่อยู่ในสถานะยินยอม") → กัน history/CSQ reversal ยิงซ้ำ (bypass B3) · role check ใน function (FIX-02)
 **Response 200:** `{ id, status:"withdrawn", updated_at }`
 **BR-09:** มีผลทันที · **ไม่ต้องอนุมัติ** (LOCK-04) · caller cache ต้องล้างทันที (BR-21 — ดู §2.X)
 **Side effects:** UPDATE status=withdrawn · INSERT T_consent_history(reason,via) · emit CSQ `consent.withdrawn` **reversal_of=grant_event_id** (BR-CSQ-04)
@@ -159,6 +167,7 @@ document: file (required — .pdf/.doc/.docx/.txt)  ← ต้องแนบ (B
 ---
 
 ## §2.3 Common Concerns
+- **Double-submit backstop (FIX-04 · BR-26):** ทุก mutation function มี `_busy` re-entrancy guard (UI) + ปุ่ม loading state (Rule #44) — ป้องกันคำขอ/รายการซ้ำจาก double-click (bypass B8) · เป็น backstop คู่กับ server-side `Idempotency-Key` (ไม่แทนกัน)
 - **Idempotency (PR-7 `[AI-DEFAULT]`):** mutation รับ `Idempotency-Key` → cache 24 ชม. · same key+body → cached · CSQ envelope มี idempotency_key ของตัวเอง (BR-CSQ-02)
 - **Optimistic Locking (PR-2 `[AI-DEFAULT]`):** purpose version publish + consent withdraw ใช้ `version` column → mismatch = 409 ERR_STALE_DATA
 - **Multi-Tenant:** ทุก endpoint `X-Tenant-Id` → RLS
@@ -180,7 +189,7 @@ document: file (required — .pdf/.doc/.docx/.txt)  ← ต้องแนบ (B
 | API-06 GET requests | FN-11 | — |
 | API-07 POST requests | FN-05 | — |
 | API-08 GET request/:id | — (read) | — |
-| API-09 POST send | FN-06 | — |
+| API-09 POST send | FN-06, FN-21 (snapshotVers) | — |
 | API-10 POST link-export | FN-07 | — |
 | API-11 GET document | FN-07 | — |
 | API-12 GET recipient | FN-08 | — |
@@ -199,13 +208,16 @@ document: file (required — .pdf/.doc/.docx/.txt)  ← ต้องแนบ (B
 
 ## §2.X Cross-Module Contract (BRD §12.1 Downstream Impact)
 
+> **FIX-06 contract anchors** — 3 consumer ประกาศชัด (Feature List F058) · anchor เป็น comment ในหน้าจอ (head + tab resolve + registry) · **display-only — ไม่ mock หน้าจอ feature อื่น**
+
 | Downstream | รูปแบบ | Contract | Trigger | Payload หลัก |
 |---|---|---|---|---|
-| แคมเปญ/ส่งข้อความ | Endpoint (ปลายทางเรียก) | `POST /api/v1/consent/resolve` (200 เสมอ, locked) | ก่อนส่งทุกครั้ง | { subject, purpose, channel } → { allowed, status, reason } |
+| **F136 Broadcast** (control) | Endpoint (ปลายทางเรียก) | `POST /api/v1/consent/resolve` (200 เสมอ, locked) → ตรวจ opt-in **ก่อนส่ง Email/SMS block อัตโนมัติ** | ก่อนส่งทุกครั้ง | { subject, purpose, channel } → { allowed, status, reason } |
+| **F031 Customer 360** (data) | Endpoint / read | `POST /consent/resolve` + ทะเบียน consent (สถานะผูกลูกค้า) | เปิดหน้าลูกค้า | subject → consent status per purpose |
+| **F157 DSAR** (data) | Data source (read) | ทะเบียน consent + **evidence 5 + history append-only** = ฐานข้อมูลประกอบคำขอ DSAR | DSAR request | subject → consent + evidence + timeline (เดิม E3 consent-receipt deferred) |
 | **Backend Enforcement Gate (F143)** | Registration | `/consent/*` ต้องขึ้นทะเบียน + review 4 ขั้น | deploy | endpoint manifest — **hard dependency go-live (BR-22 → OQ-04)** |
 | 7C Consequence Engine (F-CSQ-01) | Event (declare-only) | `POST /csq/events` envelope | ทุก state change | 7 events (ดู 03_LOGIC §3.4) · reversal_of ตอนถอน |
 | Caller cache contract (BR-21) | Contract (no UI) | ผู้เรียกแคชผล resolve **≤5 นาที** + **ล้างทันทีเมื่อถอน** | — | documented only → **OQ-02** |
-| DSAR / consent receipt (E3) | (deferred) | evidence + history | — | — |
 
 - **Compensating:** ถอน → resolve ตอบ `allowed:false` ทันที + caller ล้างแคช (BR-21) · CSQ ส่ง `consent.withdrawn` reversal_of (ไม่ลบผลเดิม)
-- ทุกแถว trace → 06_TESTS §6.9 (XT-01..04)
+- ทุกแถว trace → 06_TESTS §6.9 (XT-01..05)

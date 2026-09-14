@@ -37,6 +37,10 @@
 | BR-CSQ-03 | payload ห้ามพก restricted ดิบ — mask ที่ผู้ส่ง | FIXED | FN-19 mask |
 | BR-CSQ-04 | reversal ส่ง event มี reversal_of ชี้ event เดิม — ห้ามลบ/แก้ผลเดิม | FIXED | FN-13 withdraw reversal_of=grant_event_id |
 | BR-CSQ-05 | ไม่ประกาศ/ไม่คำนวณท่อ OC + DC ระดับเอกสาร (มาจาก Operation Process / DOA engine) | FIXED (LOCK-CSQ) | FN-19 (declare-only) |
+| **BR-23** | **[FIX-01]** คำขอ **answered = terminal** — ตอบได้ครั้งเดียว (guard applyAnswers: draft/pending เท่านั้น) · re-answer ถูกบล็อก · evidence chain immutable · เปลี่ยนใจ = คำขอใหม่/withdraw | FIXED | FN-09 guard · 02_API-13 (BR_REQUEST_CLOSED) · 04_DB answered_at · OQ-CNS-01 |
+| **BR-24** | **[FIX-03]** การส่ง **snapshot เวอร์ชันนโยบายต่อ purpose** (`vers`) ณ เวลาส่ง · panel "เนื้อหาที่ให้เซ็น" แสดงเวอร์ชันที่ส่งจริง + เตือนเมื่อ current ใหม่กว่า · `viewPolicy(code, ver)` เปิดเวอร์ชันประวัติ | FIXED | FN-06/FN-21 · 04_DB T_consent_request_send.vers · OQ-CNS-02 |
+| **BR-25** | **[FIX-02]** role check บังคับ **ภายใน mutation function** (ไม่ใช่แค่ render) — auditor read-only · purpose = dpo เท่านั้น | FIXED (enforce จริง = OQ-05) | 05_RULES §5.3 · 03_LOGIC §3.1 guard |
+| **BR-26** | **[FIX-04/05]** double-submit guard (`_busy` + loading) + sub-status guard (withdraw=granted only · resend=draft/pending only) — UI idempotency backstop ของ BR-CSQ-02 | FIXED | 03_LOGIC guardBusy · §5.5 EC-12/13 · 02_API §2.3 |
 
 ---
 
@@ -62,8 +66,9 @@
 | granted | withdrawn | ถอน | officer/dpo | reason + via required · ทันที |
 | granted | (expired) | เวลา | system | expires_at < now (computed) |
 
-### Request status
-`draft → pending (ส่งครั้งแรก) → answered` · หรือ `pending → expired (เกิน 30 วัน)`
+### Request status (FIX-01 · answered = terminal)
+`draft → pending (ส่งครั้งแรก) → answered`★ · หรือ `pending → expired (เกิน 30 วัน)`
+★ **answered = terminal** — set `answered_at` · re-answer ถูกบล็อก (BR-23 · BR_REQUEST_CLOSED) · send/resend เฉพาะ draft/pending (BR-26/FIX-05) · เปลี่ยนใจ = คำขอใหม่/withdraw (OQ-CNS-01) · ลูกค้าเปิดลิงก์ซ้ำ = หน้าสถานะปิด
 
 ### Purpose status
 `active → closed` (ปิดแล้วขอใหม่ไม่ได้ · consent เดิมคงอยู่)
@@ -79,6 +84,7 @@
 | auditor (ผู้ตรวจสอบ) | ✅ (read) | ❌ | ❌ | ❌ | ❌ | ✅ (read) |
 
 > HTML: `PERM()` → `reqCreate/send/sign/withdraw = persona!=='auditor'` · `purpose = persona==='dpo'` · ⚠️ **persona switcher เดโม** — FRD ต้อง enforce จริงต่อ role (OQ-05)
+> **FIX-02 (BR-25) enforcement point:** role check อยู่ **ต้นทุก mutation function** (applyAnswers/sendVia/doWithdraw/doPublishVersion/doClosePurpose/submitReqCreate) ไม่ใช่แค่ render ปุ่ม → auditor เรียก mutation ตรง (bypass B4) ถูกปฏิเสธ (state ไม่เปลี่ยน) · comment `<!-- SEC: บทบาทจริงจากล็อกอิน · prototype mirror sec.can() -->` · ระบบจริง = login-based (OQ-05)
 
 ---
 
@@ -90,6 +96,11 @@
 | อัปโหลดเวอร์ชันใหม่ | ต้องแนบเอกสาร | Prevent | "ต้องแนบเอกสาร PDPA" |
 | ส่ง recipient answer | verified=true ก่อน | Prevent | "กรุณายืนยันตัวตนก่อนส่งคำตอบ" |
 | recipient answer | ตอบครบทุก purpose | Prevent | "กรุณาเลือกยินยอม/ไม่ยินยอมให้ครบ..." |
+| **ตอบคำขอ (FIX-01)** | status ∈ draft/pending | Prevent | "คำขอนี้ปิดแล้ว — ตอบซ้ำไม่ได้" (BR-23 · BR_REQUEST_CLOSED) |
+| **ส่ง/ส่งซ้ำ (FIX-05)** | status ∈ draft/pending | Prevent | "คำขอนี้ปิดแล้ว" (BR-26) |
+| **ถอน — สถานะ (FIX-05)** | eff_status = granted | Prevent | "รายการนี้ไม่อยู่ในสถานะยินยอม" (BR-26 · BR_NOT_GRANTED) |
+| **ทุก mutation (FIX-04)** | ไม่ double-submit | Prevent | `_busy` guard + ปุ่ม loading "กำลังบันทึก…" (Rule #44 · BR-26) |
+| **ทุก mutation (FIX-02)** | role พอ | Prevent | "สิทธิ์ไม่พอสำหรับบทบาทนี้" (BR-25) |
 | ถอน | เหตุผล + ช่องทาง | Prevent | "กรอกเหตุผล" / "เลือกช่องทางที่ลูกค้าแจ้งมา" |
 | สร้างคำขอ | subject + channel + purpose ที่รองรับ channel + active | Prevent | "เลือกเจ้าของข้อมูลก่อน" / "เลือกช่องทางก่อน" / "เลือกวัตถุประสงค์ที่รองรับช่องทาง..." |
 | resolve | เลือกครบ 3 ช่อง | Prevent | "เลือกให้ครบทั้ง 3 ช่องก่อนตรวจสอบ" |
@@ -136,6 +147,15 @@
 ### EC-11 `[AI-DEFAULT]`: optimistic lock (PR-2)
 - **Scenario:** 2 dpo ออกเวอร์ชัน/แก้ purpose พร้อมกัน · **Resolution (default):** `version` column → 409 ERR_STALE_DATA · **Test:** AT-VER-lock
 
+### EC-12: re-answer / answered-terminal (FIX-01 · BR-23 · bypass B1/B2)
+- **Scenario:** คำขอ answered ถูก answerRequest/submitRecipient ซ้ำ (ลูกค้าเปิดลิงก์เดิม หรือ officer เรียกซ้ำ) · **Resolution:** applyAnswers guard `status ∈ {draft,pending}` → บล็อก BR_REQUEST_CLOSED · consent/evidence เดิมไม่ถูกเขียนทับ · recipient เห็นหน้าสถานะปิด · **Test:** AT-21
+
+### EC-13: double-submit + sub-status (FIX-04/05 · BR-26 · bypass B3/B7/B8)
+- **Scenario:** (a) double-click submit ทุก mutation (b) withdraw ซ้ำบน consent ที่ withdrawn แล้ว (c) sendVia บนคำขอ answered · **Resolution:** (a) `_busy` guard → ผลครั้งเดียว (b) withdraw เฉพาะ granted → กัน history/CSQ reversal ซ้ำ (c) send เฉพาะ draft/pending · เป็น UI backstop ของ BR-CSQ-02 idempotency · **Test:** AT-24/25
+
+### EC-14: role bypass — auditor เรียก mutation ตรง (FIX-02 · BR-25 · bypass B4)
+- **Scenario:** persona/role auditor เรียก mutation function ตรง (ข้าม render gate) · **Resolution:** role check ใน function → ปฏิเสธ "สิทธิ์ไม่พอ" · state ไม่เปลี่ยน · **Test:** AT-23
+
 ---
 
 ## §5.6 Error Catalog
@@ -154,6 +174,8 @@
 | BR_ANSWERS_INCOMPLETE | 422 | br.consent.answers.incomplete | ตอบไม่ครบทุก purpose |
 | BR_WITHDRAW_REASON_REQUIRED | 422 | br.consent.withdraw.reason | ถอนไม่มีเหตุผล (BR-10) |
 | BR_WITHDRAW_CHANNEL_REQUIRED | 422 | br.consent.withdraw.channel | ถอนไม่มีช่องทาง (BR-10) |
+| BR_REQUEST_CLOSED | 422 | br.consent.request.closed | ตอบ/ส่งคำขอที่ปิดแล้ว (answered/expired · FIX-01/05 · BR-23/26) |
+| BR_NOT_GRANTED | 422 | br.consent.not.granted | ถอน consent ที่ไม่ได้อยู่สถานะ granted (FIX-05 · BR-26) |
 | CSQ_ERR_DUPLICATE_ENVELOPE | 422 | (7C) | idempotency_key ซ้ำ (BR-CSQ-02) — กันซ้ำ |
 
 > **หมายเหตุ:** resolve (API-20) **ไม่มี error business** — ตอบ 200 เสมอ (BR-19) · ผลลบสื่อผ่าน `allowed:false + status + reason`

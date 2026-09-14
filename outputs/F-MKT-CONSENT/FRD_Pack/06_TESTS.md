@@ -2,7 +2,7 @@
 
 > **Audience:** QA engineer
 > **Purpose:** Acceptance Criteria + FN-40 Negative Locks + Cross-Module + DoD
-> **Coverage source:** 02_API + 03_LOGIC + 05_RULES + `consent-pdpa.html` (e2e ผ่าน 32/32 · FN 20/20)
+> **Coverage source:** 02_API + 03_LOGIC + 05_RULES + `consent-pdpa.html` (e2e re-gate หลัง BA fixes · FN 20/20 · เพิ่มเคส E41–E45 ครอบ FIX-01..05 + revert-proof · bypass B1..B8 ถูก block)
 > **🚨 Expected text:** ยึด **ข้อความจริงบนจอ (verbatim)** จาก HTML ก่อน แล้ว fallback microcopy กลาง — ห้ามแต่งคำเอง (§6.10)
 
 ---
@@ -81,6 +81,27 @@
 ### AT-ID (EC-04): idempotency — double-submit → 1 record (Idempotency-Key)
 ### AT-VER-lock (EC-11): 2 dpo ออกเวอร์ชันพร้อมกัน → 409 ERR_STALE_DATA
 
+### AT-21 (FIX-01 · BR-23 · EC-12 · e2e E41): answered = terminal — re-answer blocked
+**Given** คำขอ REQ-2603 status=answered **When** answerRequest/submitRecipient ซ้ำ **Then** consent count คงที่ (ไม่เพิ่ม · evidence chain ไม่ถูกเขียนทับ) + toast "คำขอนี้ปิดแล้ว — ตอบซ้ำไม่ได้" (BR_REQUEST_CLOSED)
+- **AT-21b:** ลูกค้าเปิดลิงก์ recipient ของคำขอที่ตอบแล้ว → หน้าสถานะปิด "คำขอนี้ตอบแล้ว เมื่อ..." (ไม่มีฟอร์ม)
+- **AT-21c:** applyAnswers เรียกตรงบนคำขอ answered → consent ไม่เพิ่ม (guard ที่ engine ไม่ใช่แค่ UI)
+
+### AT-22 (FIX-03 · BR-24 · e2e E45): send version snapshot
+**Given** ส่งคำขอ REQ-2602 (PUR-01 v`n`) **When** publish v`n+1` แล้วเปิด drawer คำขอเดิม **Then** panel "เนื้อหาที่ให้เซ็น" แสดง "ส่ง v`n` · ปัจจุบัน v`n+1` — พิจารณาส่งคำขอใหม่" + `.doc-link` → `viewPolicy(code, n)` เปิดเอกสารเวอร์ชันที่ส่งจริง (ไม่ใช่ current) · `sends[].vers[PUR-01] == n`
+
+### AT-23 (FIX-02 · BR-25 · EC-14 · e2e E42): role enforced in function
+**Given** role=auditor **When** เรียก 6 mutation ตรง (applyAnswers/doWithdraw/doPublishVersion/doClosePurpose/submitReqCreate/sendVia) **Then** state ไม่เปลี่ยนทุกตัว + toast "สิทธิ์ไม่พอสำหรับบทบาทนี้"
+- **AT-23b (C3.8 revert-proof):** defeat PERM (all-true = จำลอง guard UI-only) → auditor เขียนได้จริง → ตัววัด (assert_role_write_blocked) ต้อง RAISE (พิสูจน์จับ regression ได้)
+- **AT-23c:** จัดการ purpose (publish/close) = dpo เท่านั้น (officer ปฏิเสธ)
+
+### AT-24 (FIX-04 · BR-26 · e2e E43): double-submit → 1 result
+**Given** ปุ่ม submit ทุก mutation **When** double-click **Then** เกิดผลครั้งเดียว (`_busy` guard) + ปุ่ม loading state (loader-2 "กำลังบันทึก…") · audit WARN #44 หาย
+- **AT-24b (revert-proof):** defeat guardBusy (คืน true เสมอ) → ยิง 2 ครั้ง = +2 → helper RAISE
+
+### AT-25 (FIX-05 · BR-26 · EC-13 · e2e E44): sub-status guards
+**Given** CNS-5004 status=withdrawn **When** withdraw ซ้ำ **Then** history/CSQ reversal ไม่เพิ่ม + toast "รายการนี้ไม่อยู่ในสถานะยินยอม" (BR_NOT_GRANTED)
+- **AT-25b:** sendVia บนคำขอ answered (REQ-2603) → sends ไม่เพิ่ม (BR_REQUEST_CLOSED)
+
 ---
 
 ## §6.2 FN-40 Negative Lock Tests (ต้องไม่มี — render จริงแล้ว assert absent · e2e ผ่าน 10/10)
@@ -140,13 +161,20 @@ N/A — feature นี้ไม่มี realtime/WS event (ntf ไม่เล�
 | AT-17 | API-19 | FN-14, FN-05 | — |
 | AT-19/20 | API-20 | FN-20 | ENG-01, ENG-02 |
 | AT-13/14/16 | API-14/16/18 | FN-11, FN-18 | ENG-02 |
-> ทุก FN-01..20 + ENG-01/02 ถูก trace ≥1 AC ✅
+| AT-21 (re-answer block) | API-13 | FN-09 (guard) | — |
+| AT-22 (send snapshot) | API-09 | FN-06, FN-21 | — |
+| AT-23 (role in function) | all mutation | FN guard (§3.1 note) | — |
+| AT-24 (double-submit) | all mutation | guardBusy | — |
+| AT-25 (sub-status guard) | API-17/09 | FN-13, FN-06 | — |
+> ทุก FN-01..21 + ENG-01/02 ถูก trace ≥1 AC ✅ · BA-gate fixes FIX-01..05 → AT-21..25 (e2e E41..E45)
 
 ## §6.9 Cross-Module Test Cases (BRD §12.1 Downstream)
 | ID | Scenario | Downstream | Expected |
 |---|---|---|---|
-| XT-01 | campaign เรียก resolve ก่อนส่ง (granted) | แคมเปญ | allowed:true → ส่งได้ |
-| XT-02 | campaign เรียก resolve (never_asked/withdrawn/expired) | แคมเปญ | allowed:false + reason → ไม่ส่ง (default-deny) |
+| XT-01 | campaign เรียก resolve ก่อนส่ง (granted) | **F136 Broadcast (ctl)** | allowed:true → ส่งได้ |
+| XT-02 | campaign เรียก resolve (never_asked/withdrawn/expired) | **F136 Broadcast (ctl)** | allowed:false + reason → ไม่ส่ง (default-deny) |
+| XT-06 | Customer 360 อ่านสถานะ consent ของลูกค้า | **F031 Customer 360 (data)** | subject → consent per purpose (resolve/registry) |
+| XT-07 | DSAR ดึงประวัติ consent + evidence ของลูกค้า | **F157 DSAR (data)** | consent + evidence 5 + history append-only |
 | XT-03 | ถอน → caller cache invalidation ≤5 นาที | caller | resolve ตอบ false ทันที (BR-21, OQ-02) |
 | XT-04 | ทุก state change → CSQ envelope ถูกต้อง (idempotency_key/reversal_of) | 7C Engine | envelope shape ตรง · **ไม่มี OC/DC/SC** |
 | XT-05 | register `/consent/*` Backend Enforcement Gate | F143 | 4-step review pass ก่อน go-live (OQ-04) |

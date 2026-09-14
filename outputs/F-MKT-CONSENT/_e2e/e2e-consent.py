@@ -35,6 +35,7 @@ from uikit import (  # noqa: E402
     assert_text_absent, assert_no_garbage_text,
     modal_autoopens_comboboxes, assert_affordances_fire,
     assert_filter_not_flush, assert_action_button_gap, assert_modal_warn_not_cramped,
+    assert_double_submit_single, assert_role_write_blocked,
     JS_FILTER_FLUSH, JS_ACTION_BTN_GAP, JS_MODAL_WARN_CRAMPED,
     JS_MODAL_UNDER_DRAWER,
 )
@@ -1119,6 +1120,191 @@ def c_e40_search_focus(page):
             f"('แสดง X จาก Y' ตรง) · ล้าง=ครบ {total} · ไม่ตรง='ไม่พบวัตถุประสงค์' (โฟกัสยังอยู่)")
 
 
+# ═══════════════════════════════ BA-GATE FIXES (2026-09-14 · FIX-01..08) ═══════════════════════════════
+# รอบแก้จาก BA gate: bypass ที่ e2e เดิม (41/41) มองไม่เห็น — ตอบซ้ำ/persona bypass/double-submit/
+# ส่งซ้ำ-ถอนซ้ำ/snapshot เวอร์ชัน/contract anchors/demo-only/pill. อ้าง bypass id B1..B8 ในใบสั่งแก้.
+
+def c_fix01_answer_once(page):
+    """[E41 · FIX-01 · B1/B2 CRITICAL] คำขอ answered ตอบซ้ำไม่ได้ (evidence chain ไม่ถูกเขียนทับ) + หน้าผู้รับปิด"""
+    open_(page)                                   # persona = officer (sign ได้) → ทดสอบ 'status guard' ล้วน
+    n0 = ev(page, "() => state.consents.length")
+    h0 = ev(page, "() => request('REQ-2603').status")
+    assert h0 == "answered", "seed REQ-2603 ต้องเป็น answered"
+    after(page, "() => answerRequest('REQ-2603','all')")     # B1: เดิม consents 9→11
+    assert ev(page, "() => state.consents.length") == n0, "[FIX-01] คำขอ answered ถูกตอบซ้ำ → consent เพิ่ม (evidence ถูกเขียนทับ)"
+    assert "ปิดแล้ว" in toast_text(page), f"[FIX-01] ตอบซ้ำต้องขึ้น toast 'คำขอนี้ปิดแล้ว' (toast='{toast_text(page)}')"
+    # submitRecipient path ก็ต้องกันเช่นกัน (จุดเดียวคุมที่ applyAnswers)
+    after(page, "() => applyAnswers(request('REQ-2603'), function(){return true;})")
+    assert ev(page, "() => state.consents.length") == n0, "[FIX-01] applyAnswers ตรงบนคำขอ answered ยังสร้าง consent"
+    # ── ลูกค้าเปิดลิงก์ซ้ำ (recipient view ของคำขอที่ปิดแล้ว) → หน้าสถานะปิด ไม่มีฟอร์ม/ปุ่มส่ง ──
+    after(page, "() => openRecipientView('REQ-2603')")
+    page.wait_for_function("() => state.recipient && state.recipient.open===true", timeout=4000)
+    rt = ev(page, "() => (document.getElementById('recipientRoot')||{}).textContent || ''")
+    assert "คำขอนี้ปิดแล้ว" in rt, "[FIX-01] เปิดลิงก์ซ้ำต้องเห็นหน้าสถานะปิด 'คำขอนี้ปิดแล้ว'"
+    assert ev(page, "() => document.querySelectorAll('#recipientRoot .rcp-submit').length") == 0, "[FIX-01] หน้าปิดต้องไม่มีปุ่มส่งคำตอบ"
+    assert ev(page, "() => document.querySelectorAll('#recipientRoot .rcp-choice').length") == 0, "[FIX-01] หน้าปิดต้องไม่มีตัวเลือกยินยอม/ไม่ยินยอม"
+    return f"answered ตอบซ้ำไม่ได้ (consents คงที่ {n0} · toast ปิดแล้ว · applyAnswers ตรงก็กัน) · เปิดลิงก์ซ้ำ = หน้าสถานะปิด (ไม่มีฟอร์ม)"
+
+
+def c_fix02_persona_guard(page):
+    """[E42 · FIX-02 · B4] persona อ่านอย่างเดียว (auditor) เรียก mutation ตรงไม่ผ่าน (guard อยู่ในฟังก์ชัน)"""
+    open_(page)
+    set_persona(page, "auditor")
+    # ทุก mutation: เรียกตรง → state ต้องไม่ขยับ (assert_role_write_blocked · uikit C3.8)
+    assert_role_write_blocked(page, "answerRequest('REQ-2601','all')", "state.consents.length", note="sign")
+    assert_role_write_blocked(page, "doWithdraw('CNS-5001')",
+                              "state.consents.find(function(x){return x.id==='CNS-5001';}).history.length", note="withdraw")
+    assert_role_write_blocked(page, "doPublishVersion('PUR-01')", "purpose('PUR-01').versions.length", note="purpose/publish")
+    assert_role_write_blocked(page, "doClosePurpose('PUR-02')",
+                              "(purpose('PUR-02').status==='closed')?1:0", note="purpose/close")
+    assert_role_write_blocked(page, "sendVia('REQ-2602','line')", "request('REQ-2602').sends.length", note="send")
+    n_req = ev(page, "() => state.requests.length")
+    ev(page, "() => { state.reqForm={subject:'CUS-1001',channel:'email',purposes:['PUR-01'],refOld:null}; }")
+    ev(page, "() => { try{ submitReqCreate(); }catch(e){} }")
+    assert ev(page, "() => state.requests.length") == n_req, "[FIX-02] auditor สร้างคำขอตรงได้ (reqCreate guard ไม่อยู่ในฟังก์ชัน)"
+    # ── revert-proof: defeat PERM (คืนค่า all-true = จำลองสภาพ guard UI-only) → auditor เขียนได้จริง = ตัววัดจับได้ ──
+    open_(page); set_persona(page, "auditor")
+    ev(page, "() => { window.__PERM=window.PERM; window.PERM=function(){return {reqCreate:true,send:true,sign:true,withdraw:true,purpose:true};}; }")
+    raised = False
+    try:
+        assert_role_write_blocked(page, "answerRequest('REQ-2601','all')", "state.consents.length", note="revert")
+    except AssertionError:
+        raised = True
+    assert raised, "[C3.8] defeat PERM แล้ว auditor ยังเขียนไม่ได้ = ตัววัด role-guard จับ regression ไม่ได้"
+    ev(page, "() => { window.PERM=window.__PERM; }")
+    return "auditor เรียก 6 mutation ตรง → state ไม่ขยับทุกตัว (guard ในฟังก์ชัน) · revert(defeat PERM) จับได้ (raise)"
+
+
+def c_fix04_double_submit(page):
+    """[E43 · FIX-04 · B8] double submit สร้างคำขอครั้งเดียว (_busy guard + loader-2) + revert-proof"""
+    open_(page)
+    set_persona(page, "dpo")
+    ev(page, "() => { state.reqForm={subject:'CUS-1001',channel:'email',purposes:['PUR-01'],refOld:null}; }")
+    r0 = assert_double_submit_single(page, "submitReqCreate()", "state.requests.length", note="req-create")
+    # loader-2 มีในไฟล์ (Rule #44) — spinner CSS + icon ในปุ่มตอน busy
+    assert ev(page, "() => /loader-2/.test(document.documentElement.innerHTML)"), "[FIX-04] ไม่พบ loader-2 (loading affordance · Rule #44)"
+    # ── revert-proof: defeat guardBusy (คืน true เสมอ = ไม่มี _busy) → ยิง 2 ครั้ง = +2 → helper ต้อง RAISE ──
+    open_(page); set_persona(page, "dpo")
+    ev(page, "() => { window.__gb=window.guardBusy; window.guardBusy=function(){return true;}; }")
+    ev(page, "() => { state.reqForm={subject:'CUS-1001',channel:'email',purposes:['PUR-01'],refOld:null}; }")
+    raised = False
+    try:
+        assert_double_submit_single(page, "submitReqCreate()", "state.requests.length", note="revert")
+    except AssertionError:
+        raised = True
+    assert raised, "[C3.8] defeat guardBusy แล้วยิง 2 ครั้งยังไม่ +2 = ตัววัด double-submit จับ regression ไม่ได้"
+    ev(page, "() => { window.guardBusy=window.__gb; }")
+    return f"double submit สร้างคำขอครั้งเดียว (delta={r0['delta']}) · loader-2 มีจริง · revert(defeat guardBusy) จับได้ (raise)"
+
+
+def c_fix05_substatus_guard(page):
+    """[E44 · FIX-05 · B3/B7] withdraw เฉพาะ granted · sendVia เฉพาะ draft/pending"""
+    open_(page)
+    set_persona(page, "dpo")
+    # (a) B3: withdraw ซ้ำบน consent ที่ withdrawn แล้ว (CNS-5004) → history/CSQ ไม่เพิ่ม
+    h0 = ev(page, "() => state.consents.find(function(x){return x.id==='CNS-5004';}).history.length")
+    csq0 = ev(page, "() => (state._csq||[]).length")
+    after(page, "() => doWithdraw('CNS-5004')")
+    assert ev(page, "() => state.consents.find(function(x){return x.id==='CNS-5004';}).history.length") == h0, \
+        "[FIX-05] withdraw ซ้ำบน withdrawn → history เพิ่ม"
+    assert ev(page, "() => (state._csq||[]).length") == csq0, "[FIX-05] withdraw ซ้ำ → CSQ reversal ยิงซ้ำ (idempotency ฝั่ง UI พัง)"
+    assert "ไม่อยู่ในสถานะยินยอม" in toast_text(page), f"[FIX-05] withdraw ซ้ำต้องเตือน (toast='{toast_text(page)}')"
+    # (b) B7: sendVia บนคำขอ answered (REQ-2603) → sends ไม่เพิ่ม
+    s0 = ev(page, "() => request('REQ-2603').sends.length")
+    after(page, "() => sendVia('REQ-2603','line')")
+    assert ev(page, "() => request('REQ-2603').sends.length") == s0, "[FIX-05] sendVia บนคำขอ answered → บันทึกการส่งเพิ่ม"
+    assert "ปิดแล้ว" in toast_text(page), f"[FIX-05] sendVia บนคำขอปิดต้องเตือน (toast='{toast_text(page)}')"
+    return f"withdraw เฉพาะ granted (CNS-5004 withdrawn: history {h0} คงที่ · CSQ {csq0} คงที่) · sendVia เฉพาะ draft/pending (REQ-2603 answered: sends {s0} คงที่)"
+
+
+def c_fix03_send_snapshot(page):
+    """[E45 · FIX-03] การส่ง snapshot เวอร์ชันนโยบาย → drawer แสดงเวอร์ชัน ณ ตอนส่ง + ป้ายเตือนเมื่อมีเวอร์ชันใหม่กว่า"""
+    open_(page)
+    set_persona(page, "dpo")
+    v_send = ev(page, "() => purpose('PUR-01').currentVer")     # = 2 (เวอร์ชันตอนส่ง)
+    after(page, "() => sendVia('REQ-2602','email')")            # REQ-2602 = [PUR-01] · snapshot vers
+    snap = ev(page, "() => { var s=request('REQ-2602').sends; return s[s.length-1].vers; }")
+    assert snap and snap.get("PUR-01") == v_send, f"[FIX-03] การส่งไม่ snapshot เวอร์ชัน ({snap})"
+    # ออกเวอร์ชันใหม่ของ PUR-01 (v2→v3) ระหว่างคำขอค้าง
+    after(page, "() => openNewVersion('PUR-01')")
+    wait_modal(page, "new-version")
+    upload_doc(page, "nvDocInput", "() => state.nvDoc && (state.nvDoc.body||'').length>0")
+    after(page, "() => doPublishVersion('PUR-01')")
+    v_now = ev(page, "() => purpose('PUR-01').currentVer")
+    assert v_now == v_send + 1, f"[FIX-03] publish เวอร์ชันใหม่ไม่สำเร็จ ({v_send}→{v_now})"
+    # เปิด drawer คำขอเดิม → panel 'เนื้อหาที่ให้เซ็น' ต้องแสดงเวอร์ชัน ณ ตอนส่ง (v2) + ป้ายเตือน ปัจจุบัน v3
+    after(page, "() => openReqView('REQ-2602')")
+    wait_drawer(page, "req-view")
+    dt = drawer_text(page)
+    assert ("ส่ง v%d" % v_send) in dt and ("ปัจจุบัน v%d" % v_now) in dt, \
+        f"[FIX-03] drawer ไม่เตือนเวอร์ชัน (คาด 'ส่ง v{v_send} · ปัจจุบัน v{v_now}')"
+    # .doc-link ต้องเปิดเวอร์ชันที่ส่ง (viewPolicy('PUR-01',2)) ไม่ใช่เวอร์ชันปัจจุบัน
+    has_sent_link = ev(page, "() => [].slice.call(document.querySelectorAll('#drawer .doc-link'))"
+                       ".some(function(b){return (b.getAttribute('onclick')||'').indexOf(\"viewPolicy('PUR-01',%d)\")>=0;})" % v_send)
+    assert has_sent_link, f"[FIX-03] .doc-link ไม่ชี้เวอร์ชันที่ส่ง (viewPolicy('PUR-01',{v_send}))"
+    return f"ส่ง snapshot v{v_send} → publish v{v_now} → drawer แสดง 'ส่ง v{v_send} · ปัจจุบัน v{v_now}' + .doc-link เปิดเวอร์ชันที่ส่ง"
+
+
+def c_fix06_contract_anchors(page):
+    """[E46 · FIX-06] contract anchors F136/F031/F157/DSAR อยู่ในไฟล์ (comment · display-only ไม่ mock จอ)"""
+    open_(page)
+    src = HTML.read_text(encoding="utf-8")
+    for code in ("F136", "F031", "F157", "DSAR"):
+        assert code in src, f"[FIX-06] ไม่พบ contract anchor '{code}' ในไฟล์"
+    assert src.count("CONTRACT") >= 2, "[FIX-06] ไม่พบ comment 'CONTRACT:' (anchor สัญญาข้ามฟีเจอร์)"
+    # display-only: ต้องไม่มีเมนู/หน้าจอของฟีเจอร์อื่นเกิดใหม่ (sidebar ยังเมนูเดียว #navConsent)
+    nmenu = ev(page, "() => document.querySelectorAll('#navConsent').length")
+    assert nmenu == 1, f"[FIX-06] sidebar ควรเมนูเดียว (#navConsent) — พบ {nmenu}"
+    # F136/F031/F157 ต้องไม่โผล่เป็นข้อความบนจอผู้ใช้ (เป็น comment เท่านั้น)
+    for t in ("registry", "requests", "purposes", "resolve"):
+        go_tab(page, t)
+        pt = page_text(page)
+        for code in ("F136", "F031", "F157"):
+            assert code not in pt, f"[FIX-06] รหัส {code} โผล่บนจอแท็บ {t} (ต้องเป็น comment/anchor ไม่ใช่ UI)"
+    return "contract anchors F136/F031/F157/DSAR อยู่ในไฟล์ (comment) · เมนูเดียว #navConsent · ไม่โผล่บนจอผู้ใช้"
+
+
+def c_fix07_demo_only(page):
+    """[E47 · FIX-07] demo elements ติด class demo-only · ซ่อนแล้วหน้าจอสะอาด (ไม่พัง layout)"""
+    open_(page)
+    assert ev(page, "() => document.querySelectorAll('.demo-strip.demo-only').length") == 1, \
+        "[FIX-07] demo-strip ไม่ติด class demo-only"
+    # เปิดหน้าผู้รับ → simbar ต้องติด demo-only
+    after(page, "() => openReqView('REQ-2601')")
+    wait_drawer(page, "req-view")
+    # sim section ในลิ้นชัก (พรีวิวหน้าผู้รับ) ติด demo-only
+    assert ev(page, "() => document.querySelectorAll('#drawer .demo-only').length") >= 1, \
+        "[FIX-07] ส่วนพรีวิวหน้าผู้รับในลิ้นชักไม่ติด demo-only"
+    open_recipient(page)
+    assert ev(page, "() => document.querySelectorAll('#recipientRoot .rcp-simbar.demo-only').length") == 1, \
+        "[FIX-07] simbar หน้าผู้รับไม่ติด demo-only"
+    # ── inject .demo-only{display:none} → ทุก demo element ซ่อน · ไม่มี h-scroll · ไม่เหลือ 'จำลอง' บนแถบ demo ──
+    page.add_style_tag(content=".demo-only{display:none !important}")
+    settle(page)
+    vis = ev(page, "() => [].slice.call(document.querySelectorAll('.demo-only'))"
+             ".filter(function(e){var r=e.getBoundingClientRect();return r.width>2&&r.height>2;}).length")
+    assert vis == 0, f"[FIX-07] ซ่อน demo-only แล้วยังมี demo element โผล่ {vis} ตัว"
+    hscroll = ev(page, "() => document.documentElement.scrollWidth - document.documentElement.clientWidth")
+    assert hscroll <= 2, f"[FIX-07] ซ่อน demo-only แล้ว layout พัง (h-scroll {hscroll}px)"
+    assert ev(page, "() => (document.getElementById('recipientRoot').innerText||'').indexOf('จำลอง')") == -1, \
+        "[FIX-07] ซ่อน demo-only แล้วยังเหลือคำ 'จำลอง' ที่มองเห็นบนหน้าผู้รับ (innerText = เฉพาะข้อความที่เรนเดอร์)"
+    return f"demo-strip + ส่วนพรีวิว + rcp-simbar ติด demo-only · ซ่อนแล้ว 0 element โผล่ · ไม่มี h-scroll · ไม่เหลือ 'จำลอง'"
+
+
+def c_fix08_pill_single(page):
+    """[E48 · FIX-08] ตาราง purposes: เซลล์เดียวไม่มี pill ≥2 (Rule #103/#40 · แยกคอลัมน์สถานะ)"""
+    open_(page)
+    go_tab(page, "purposes")
+    maxpill = ev(page, "() => Math.max.apply(null,[0].concat([].slice.call("
+                "document.querySelectorAll('.table tbody td')).map(function(td){return td.querySelectorAll('.pill').length;})))")
+    assert maxpill <= 1, f"[FIX-08] ตาราง purposes มีเซลล์ที่ใส่ pill {maxpill} ตัว (ต้องแยกคอลัมน์ · ≤1)"
+    # แต่ละแถวยังมี pill สถานะ 1 ตัว (ไม่ได้หายไป)
+    nrow = ev(page, "() => document.querySelectorAll('.table tbody tr').length")
+    npill = ev(page, "() => document.querySelectorAll('.table tbody .pill').length")
+    assert npill >= nrow, f"[FIX-08] แถว purposes บางแถวไม่มี pill สถานะ (rows={nrow} pills={npill})"
+    return f"ตาราง purposes: เซลล์สูงสุด {maxpill} pill (≤1) · {nrow} แถวมี pill สถานะครบ ({npill})"
+
+
 # ═══════════════════════════════ RUN ═══════════════════════════════
 
 # (case-id, fn, FN codes ที่เคสนี้ครอบ)
@@ -1164,6 +1350,14 @@ CASES = [
     ("E38", c_e38_feature_name, []),
     ("E39", c_e39_view_policy, []),
     ("E40", c_e40_search_focus, []),
+    ("E41", c_fix01_answer_once, []),
+    ("E42", c_fix02_persona_guard, []),
+    ("E43", c_fix04_double_submit, []),
+    ("E44", c_fix05_substatus_guard, []),
+    ("E45", c_fix03_send_snapshot, []),
+    ("E46", c_fix06_contract_anchors, []),
+    ("E47", c_fix07_demo_only, []),
+    ("E48", c_fix08_pill_single, []),
 ]
 
 ALL_FN = ["FN-%02d" % i for i in range(1, 21)]

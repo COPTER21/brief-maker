@@ -2884,3 +2884,45 @@ def assert_modal_warn_not_cramped(pg, note=''):
                          for b in r['bad'])
                      + f" · [clearance={r['clearance']} · padding(t/r/b/l)={r['padding']}]")
     return r
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# C3.8 · interaction-guard helpers (append-only · 2026-09-14 · from F-MKT-CONSENT BA-gate)
+# มาจาก bypass ที่ e2e/qc เดิมมองไม่เห็น: (a) mutation ตอบซ้ำ/ยิงซ้ำเพราะไม่มี _busy
+# (double submit) · (b) read-only persona เรียก mutation ตรงผ่าน (persona guard เป็น UI-only).
+# คลาสเดียวกับที่เคย block F101/F102/F131 มาแล้ว → generalize เป็นตัวตรวจกลาง.
+# ทั้งคู่ generic: รับ JS snippet (fire/mutate + counter) — ไม่ผูกกับฟีเจอร์ใดฟีเจอร์หนึ่ง.
+# ─────────────────────────────────────────────────────────────────────────────
+
+def assert_double_submit_single(pg, fire_js, count_js, note=''):
+    """ยิง mutation 2 ครั้งติดกันแบบ synchronous (ก่อน re-render/timeout จะรีเซ็ต busy flag)
+    แล้ว counter ต้องเพิ่มไม่เกิน 1 = มี guard กัน double-submit จริง (Rule #44 / pattern F101).
+
+    fire_js  : นิพจน์/คำสั่งเรียก mutation เช่น "submitReqCreate()" (ไม่ต้องมี arrow)
+    count_js : นิพจน์นับผลลัพธ์ เช่น "state.requests.length"
+    เรียกหลังจัดสถานะให้พร้อม submit แล้ว. คืน dict {before,after,delta} ถ้าผ่าน ·
+    โยน AssertionError ถ้า delta > 1 (double submit หลุด).
+    """
+    before = pg.evaluate("() => (%s)" % count_js)
+    pg.evaluate("() => { (%s); (%s); }" % (fire_js, fire_js))   # สองครั้งใน tick เดียว
+    after_ = pg.evaluate("() => (%s)" % count_js)
+    delta = after_ - before
+    assert delta <= 1, (f"[{note}] double-submit หลุด: ยิง 2 ครั้งติดกัน → counter +{delta} "
+                        f"(ต้อง ≤1 · {before}→{after_}) — ขาด _busy/loading guard")
+    return {'before': before, 'after': after_, 'delta': delta}
+
+
+def assert_role_write_blocked(pg, mutate_js, count_js, note=''):
+    """ตั้ง read-only persona/บทบาทไว้ก่อน (โดยผู้เรียก) แล้วเรียก mutation ตรง → counter ต้องไม่ขยับ
+    = guard อยู่ "ในฟังก์ชัน" ไม่ใช่แค่ตอน render ปุ่ม (persona/role bypass — B4 class).
+
+    mutate_js : คำสั่งเรียก mutation ตรง เช่น "answerRequest('REQ-2601','all')"
+    count_js  : นิพจน์นับ state ที่ mutation จะแก้ เช่น "state.consents.length"
+    คืน dict {before,after} ถ้าผ่าน · โยน AssertionError ถ้า state เปลี่ยน (บทบาทอ่านอย่างเดียวเขียนได้).
+    """
+    before = pg.evaluate("() => (%s)" % count_js)
+    pg.evaluate("() => { try { (%s); } catch(e){} }" % mutate_js)
+    after_ = pg.evaluate("() => (%s)" % count_js)
+    assert after_ == before, (f"[{note}] persona/role guard เป็น UI-only: บทบาทอ่านอย่างเดียวเรียก "
+                              f"mutation ตรงแล้ว state เปลี่ยน ({before}→{after_}) — ต้อง guard ในฟังก์ชัน")
+    return {'before': before, 'after': after_}

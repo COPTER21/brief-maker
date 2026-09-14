@@ -71,6 +71,19 @@
 - **Decision:** ENG-01 consent-resolution-engine + ENG-02 consent-status-evaluator = DRAFT ใน FRD → register ตอน dev hand-off (ENG-01 คู่กับ F143 review)
 - **Reversibility:** EASY
 
+### LD-07: Request answered = terminal · re-answer blocked · evidence immutable (FIX-01 · BR-23)
+- **Date:** 2026-09-14 (BA-gate round)
+- **Context:** เดิม applyAnswers ไม่เช็คสถานะ → คำขอ answered ถูกตอบซ้ำได้ไม่จำกัด แต่ละครั้งสร้าง consent ใหม่ + supersede หลักฐานเดิม (bypass B1/B2: consents 9→11 จากคำขอเดียว) = evidence chain (หัวใจ PDPA + ฐาน DSAR) ถูกเขียนทับ
+- **Decision:** applyAnswers guard `status ∈ {draft,pending}` เท่านั้น (คุมทั้ง officer-answer + recipient-submit ที่จุดเดียว) · ตอบแล้ว set `answered_at` = terminal · ลูกค้าเปิดลิงก์ซ้ำ = หน้าสถานะปิด · **ไม่มี supersede-on-re-answer** (evidence เดิม immutable)
+- **Change path (เปลี่ยนใจหลังตอบ):** คำขอใหม่ / withdraw ตาม flow ปกติ — **ไม่ทำ flow แก้คำตอบผ่านลิงก์เดิม** → **OQ-CNS-01** (ใครเปิดคำขอใหม่ได้ · Strike เคาะ)
+- **Related:** publish เวอร์ชันใหม่ระหว่าง pending ค้าง = **ไม่ auto-expire** (แสดง sent-version snapshot + เตือน · FIX-03) → **OQ-CNS-02**
+- **Reversibility:** LOW (PDPA evidence integrity)
+
+### LD-08: Contract anchors (display-only) — F136 / F031 / F157 (FIX-06)
+- **Decision:** ประกาศ consumer 3 ตัวเป็น anchor (comment) — resolveConsent = API ให้ **F136 Broadcast (ctl · ตรวจ opt-in ก่อนส่ง)** + **F031 Customer 360 (data)** consume · ทะเบียน consent + evidence + history = ฐานข้อมูลให้ **F157 DSAR (data)** · **display-only — ไม่ mock หน้าจอ feature อื่น** (นอกขอบเขต)
+- **Rationale:** Phase B เขียน §Integration ได้ · d "เป็นฐานข้อมูลให้ DSAR" มีร่องรอย
+- **Reversibility:** LOCKED (Feature List contract)
+
 ---
 
 ## §7.2 Convention Deviations
@@ -87,7 +100,7 @@
 ---
 
 ## §7.3 Open Questions (pointer → 00_OVERVIEW §0.8)
-OQ-01 (governance sync PREBRIEF) · OQ-02 (caller cache) · OQ-03 (id_method จริง — BLOCKING ก่อน impl) · OQ-04 (F143 register — BLOCKING go-live) · OQ-05 (permission enforce + E3 PDF) · OQ-06 (baseline) · OQ-07/08 ([AI-DEFAULT] upload validation / timezone)
+OQ-01 (governance sync PREBRIEF) · OQ-02 (caller cache) · OQ-03 (id_method จริง — BLOCKING ก่อน impl) · OQ-04 (F143 register — BLOCKING go-live) · OQ-05 (permission enforce จริงต่อ role — FIX-02 mirror sec.can() · + E3 PDF) · OQ-06 (baseline) · OQ-07/08 ([AI-DEFAULT] upload validation / timezone) · **OQ-CNS-01** (post-answer change path + ใครเปิดคำขอใหม่ · Strike) · **OQ-CNS-02** (publish v ใหม่ระหว่าง pending: auto-expire vs answer-current · Strike) · **OQ-CNS-03** (renewal trigger manual vs batch · Strike)
 
 ## §7.4 Architecture Tradeoffs
 - **AT-01:** PostgreSQL RLS over app-level filtering — accepted (CUBE standard)

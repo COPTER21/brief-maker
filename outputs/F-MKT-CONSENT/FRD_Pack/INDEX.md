@@ -1,6 +1,7 @@
 # INDEX — FRD F-MKT-CONSENT ความยินยอม PDPA (FULL)
 
 > **Variant:** FULL (9 files + INDEX) · **Audience:** All roles (entry point)
+> **FRD v1.1 (2026-09-14)** — sync BA-gate round: FIX-01 (answered=terminal · re-answer block · evidence immutable) · FIX-02 (role check ใน mutation) · FIX-03 (send version snapshot) · FIX-04 (double-submit `_busy`) · FIX-05 (sub-status guards) · FIX-06 (contract anchors F136/F031/F157) · FIX-07/08 (demo-only + pill). + OQ-CNS-01/02/03.
 
 ---
 
@@ -10,11 +11,11 @@
 | 00 | OVERVIEW.md | All | Meta + Scope + Roles + Coverage Manifest + OQ |
 | 01 | UI.md | FE | Layout Decision Log + 5 pages + drawers/modals + Journey |
 | 02 | API.md | BE (HTTP) | 20 API contracts + Cross-Module + resolve locked contract |
-| 03 | LOGIC.md | BE (logic) | 20 Functions + 2 Engines + Trace |
-| 04 | DB.md | DBA / BE | 9 tables + Classification |
-| 05 | RULES.md | BE + QA | 22 BR + CSQ + State + Permission + Edge + Errors + Security |
-| 06 | TESTS.md | QA | 20 AT + 10 FN-40 negatives + Cross-Module + DoD |
-| 07 | LOCKED_DECISIONS.md | All | Scope Lock (13) + 6 LD |
+| 03 | LOGIC.md | BE (logic) | 21 Functions + 2 Engines + Trace + Request state machine |
+| 04 | DB.md | DBA / BE | 9 tables (+answered_at, +vers snapshot) + Classification |
+| 05 | RULES.md | BE + QA | 26 BR + CSQ + State + Permission + 14 Edge + Errors + Security |
+| 06 | TESTS.md | QA | 25 AT + 10 FN-40 negatives + Cross-Module + DoD |
+| 07 | LOCKED_DECISIONS.md | All | Scope Lock (13) + 8 LD |
 
 ---
 
@@ -94,16 +95,17 @@
 | Pages / surfaces | 5 (4 tab + recipient) |
 | Drawers/Modals | 11 |
 | APIs | 20 |
-| Functions | 20 |
+| Functions | 21 (+FN-21 snapshotVers) |
 | Engines | 2 |
 | DB Tables | 9 (+audit shared) |
-| Business Rules | 22 + 5 CSQ |
+| Business Rules | 26 + 5 CSQ (BR-23..26 = BA-gate fixes) |
 | FN positive | 20 · FN-40 negatives | 10 |
-| Edge Cases | 11 |
-| Error codes | 12 |
-| Locked Decisions | 6 · Scope Locks | 13 |
+| Edge Cases | 14 (+EC-12/13/14) |
+| Error codes | 14 (+BR_REQUEST_CLOSED, BR_NOT_GRANTED) |
+| Locked Decisions | 8 · Scope Locks | 13 |
 | CSQ events | 7 (declare-only) |
-| Open Questions | 8 |
+| Open Questions | 11 (+OQ-CNS-01/02/03) |
+| Acceptance Tests | 25 (AT-21..25 = FIX-01..05) |
 
 ---
 

@@ -16,12 +16,12 @@
 | **Module** | Marketing |
 | **Wave** | W1 |
 | **Variant** | **FULL** (9 files + INDEX) |
-| **Status** | DRAFT (awaiting BA/PM review — gate 2) |
-| **FRD Version** | 1.0 (2026-09-13) |
+| **Status** | DRAFT (awaiting BA/PM review — gate 2 · re-issued หลัง BA-gate fixes) |
+| **FRD Version** | 1.1 (2026-09-14) — sync BA-gate round (FIX-01..08) + BRD v1.1 |
 | **Generator** | frd-generator-v6 |
 | **Source Brief** | — (no Brief; WF-01 lane — variant fallback จาก BRD) |
-| **Source BRD** | `BRD_F-MKT-CONSENT.md` (status: **APPROVED** 2026-09-13) |
-| **Source HTML** | `consent-pdpa.html` (3086 บรรทัด · ผ่าน ux+coverage+e2e gate 32/32 · FN 20/20) — HTML-first source of truth ฝั่งหน้าจอ |
+| **Source BRD** | `BRD_F-MKT-CONSENT.md` (status: **APPROVED** · v1.1 2026-09-14 — refreshed หลัง BA fixes) |
+| **Source HTML** | `consent-pdpa.html` (updated · surgical BA fixes) — ผ่าน ux+coverage+e2e re-gate (2026-09-14 · เพิ่มเคส E41–E45 ครอบ FIX-01..05 · bypass B1..B8 ถูก block · FN 20/20) — **HTML-first source of truth ฝั่งหน้าจอ** |
 | **Author** | tadswan@2bsimple.com (BA) |
 | **Reviewers** | Tech Lead · PM · QA Lead · ทีม Security (F143 owner) |
 
@@ -41,6 +41,7 @@
 | Version | Date | Author | Changes |
 |---|---|---|---|
 | 1.0 | 2026-09-13 | BA | Initial FRD generation (HTML-first · Recognize & Validate จาก consent-pdpa.html) |
+| 1.1 | 2026-09-14 | BA | Re-sync หลัง BA-gate round (surgical HTML fixes + BRD v1.1). Encode: **FIX-01** answered = terminal state (re-answer blocked ที่ applyAnswers · evidence chain immutable · ลิงก์เปิดซ้ำ = หน้าสถานะปิด) · **FIX-02** role check ใน mutation function ทุกตัว (ไม่ใช่แค่ render · OQ-05) · **FIX-03** sends[] snapshot `vers:{purpose:version}` ณ เวลาส่ง + BR-06 panel เตือน stale · **FIX-04** `_busy` double-submit guard + loading state ทุก mutation · **FIX-05** sub-status guard (withdraw=granted only · resend=draft/pending only) · **FIX-06** contract anchors F136/F031/F157 · FIX-07/08 demo-only + pill column (01_UI). เพิ่ม OQ-CNS-01/02/03. |
 
 ---
 
@@ -91,13 +92,16 @@
 
 > **Standalone** — plan `dep=""` · ไม่มี upstream trigger เอกสารต้นทาง
 
-### Downstream (features that depend on this)
-| Consumer | What it uses |
-|---|---|
-| แคมเปญส่งข้อความ / จดหมายข่าว | ผล `POST /consent/resolve` (allowed + status) ก่อนส่งทุกครั้ง |
-| **Backend Enforcement Gate (F143)** | ทะเบียน endpoint `/consent/*` + review 4 ขั้น — **hard dependency ก่อน go-live** (BR-22) |
-| 7C Consequence Engine (F-CSQ-01) | event envelope (declare-only) ทุก state change (ดู 03_LOGIC §3.4) |
-| DSAR / consent receipt (อนาคต) | evidence + history — deferred (E3) |
+### Downstream (features that depend on this) — contract anchors (FIX-06 · Feature List F058)
+| Consumer | Type | What it uses |
+|---|---|---|
+| **F136 Broadcast** (แคมเปญส่งข้อความ/จดหมายข่าว) | **control (ctl)** | เรียก `POST /consent/resolve` ตรวจ opt-in **ก่อนส่ง Email/SMS ทุกครั้ง** (block อัตโนมัติเมื่อ allowed:false) |
+| **F031 Customer 360** | **data** | สถานะ consent ผูกลูกค้า (subject) — ผล resolve + ทะเบียน |
+| **F157 DSAR** | **data** | ทะเบียน consent + **evidence 5 + history append-only** = ฐานข้อมูลประกอบคำขอ DSAR (เดิม E3 receipt deferred · anchor ประกาศแล้ว) |
+| **Backend Enforcement Gate (F143)** | registration | ทะเบียน endpoint `/consent/*` + review 4 ขั้น — **hard dependency ก่อน go-live** (BR-22) |
+| 7C Consequence Engine (F-CSQ-01) | event (declare-only) | event envelope ทุก state change (ดู 03_LOGIC §3.4) |
+
+> **FIX-06 (display-only):** anchor 3 contract ประกาศเป็น comment ในหน้าจอ (`consent-pdpa.html` head + tab resolve + registry) — **ห้าม mock หน้าจอ F136/F031/F157** ในรอบนี้ (นอกขอบเขต) · รายละเอียดสัญญา → 02_API §2.X
 
 ### External
 | Service | Purpose |
@@ -156,8 +160,12 @@ Highest classification level ที่ feature นี้แตะ:
 | **OQ-06** | เก็บ baseline ตัวชี้วัด (BRD §2.3) ก่อน launch | NO (action) | PM |
 | **OQ-07** `[AI-DEFAULT]` | อัปโหลดเอกสาร: validation ชนิด/ขนาดจริง (ปัจจุบัน accept `.pdf .doc .docx .txt`, mock ไม่ validate size) → default: allow 4 types + max size TBD | NO | BA/dev |
 | **OQ-08** `[AI-DEFAULT]` | timezone rule ของ `expires_at` (lifespan เดือน) — default: คำนวณ UTC + display tenant TZ | NO | dev |
+| **OQ-CNS-01** | เปลี่ยนใจ **หลังตอบคำขอแล้ว** — ปัจจุบันแก้ผ่านลิงก์เดิมไม่ได้ (FIX-01 answered=terminal) เส้นทางถูกคือ **คำขอใหม่ / withdraw** · **ใครมีสิทธิ์เปิดคำขอใหม่** → 03_LOGIC state machine | NO | Strike |
+| **OQ-CNS-02** | ออกนโยบายเวอร์ชันใหม่ระหว่างคำขอ **pending ค้าง** — auto-expire คำขอเก่า (บังคับสร้างใหม่) vs ให้ตอบกับเวอร์ชันปัจจุบัน · **build ปัจจุบัน = ไม่ auto-expire** (แสดงเวอร์ชัน ณ ตอนส่ง + ป้ายเตือน FIX-03) → 03_LOGIC + BR | NO | Strike |
+| **OQ-CNS-03** | รอบ **ต่ออายุ** — near-expiry 30 วันมีแล้ว ใคร/อะไร trigger คำขอต่ออายุ (manual จาก registry vs batch อัตโนมัติ · NTF ฝั่ง F136) | NO | Strike |
 
 > Resolved → move to 07_LOCKED as LD-NN
+> **OQ-CNS-01/02/03** = ประเด็นใหม่จาก BA-gate (Strike เคาะ) — build ปัจจุบันเลือก conservative (answered=terminal · no auto-expire) แขวนรอมติ ห้าม dev เดา
 
 ---
 
@@ -236,6 +244,10 @@ Highest classification level ที่ feature นี้แตะ:
 | BR-19/20 (resolve 200 always / contract lock) | 05_RULES §5.1 · 02_API-20 · 03_ENG-01 · 06 AT-19/20 |
 | BR-21 (caller cache ≤5min + clear-on-withdraw) | 02_API §2.X Cross-Module · 05_RULES §5.5 EC-02 · OQ-02 |
 | BR-22 (register Backend Enforcement Gate) | 02_API §2.X · 00 §0.5 · OQ-04 |
+| BR-23 **[FIX-01]** answered = terminal · re-answer blocked · evidence immutable | 05_RULES §5.2 State + §5.4 · 03_LOGIC §3.1 FN-09 guard · 02_API-13 · 04_DB `answered_at` · 06 AT-21 |
+| BR-24 **[FIX-03]** send snapshot เวอร์ชันนโยบาย (`vers` ต่อ purpose) + BR-06 panel เตือน stale | 02_API-09 · 04_DB T_consent_request_send.vers · 03_FN-06 · 06 AT-22 |
+| BR-25 **[FIX-02]** role check ใน mutation function (ไม่ใช่แค่ render) | 05_RULES §5.3 · 03_LOGIC §3.1 (guard ทุก mutation) · 06 AT-23 · OQ-05 |
+| BR-26 **[FIX-04/05]** double-submit guard (`_busy`) + sub-status guard (withdraw=granted · resend=draft/pending) — UI idempotency backstop | 05_RULES §5.4 §5.5 EC-12/13 · 02_API §2.3 · 06 AT-24/25 |
 | BR-CSQ-01…05 (7C declare-only) | 03_LOGIC §3.4 + §3.1 FN-19 · 05_RULES §5.1 · CSQ_BRIEF (step 7) |
 
 ### Edges (BRD §10 confirmed ☑)
@@ -247,4 +259,4 @@ Highest classification level ที่ feature นี้แตะ:
 | version stale | 05_RULES §5.5 EC-03 · 06 AT-19c |
 | ปิด purpose → consent เดิมคงอยู่ | 05_RULES §5.5 EC-07 · 06 AT-04 |
 
-**สรุป:** Stories 20/20 ✅ · Rules 22+CSQ ✅ · Edges 5/5 confirmed ✅ · ไม่มีแถวที่ "อยู่ที่" ว่าง · requirement ที่ยังต้อง BA เคาะ → OQ-01…08 (ไม่หายเงียบ)
+**สรุป:** Stories 20/20 ✅ · Rules 22+CSQ + BR-23..26 (BA-gate fixes) ✅ · Edges 5/5 confirmed + EC-12/13 (FIX-04/05) ✅ · ไม่มีแถวที่ "อยู่ที่" ว่าง · requirement ที่ยังต้อง BA เคาะ → OQ-01…08 + OQ-CNS-01/02/03 (ไม่หายเงียบ)

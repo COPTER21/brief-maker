@@ -1,7 +1,9 @@
 # PROPOSALS / OQ ส่งออก — ความยินยอม PDPA (F-MKT-CONSENT · F058)
 
-> ปิดงาน WF-01 ครบ 12 step วันที่ 2026-09-13 · feature **ความยินยอม PDPA** · standalone (dep="") · module การตลาด · wave W1 · declaration = **csq เท่านั้น** (declare-only)
+> ปิดงาน WF-01 ครบ 12 step · feature **ความยินยอม PDPA** · standalone (dep="") · module การตลาด · wave W1/S1 · declaration = **csq เท่านั้น** (declare-only)
 > ไฟล์นี้รวม **ข้อเสนอถึงเจ้าของฟีเจอร์อื่น / design system** + **OQ ที่ BA ต้องเคาะ** — ยังไม่ commit (รอผู้ใช้สั่ง)
+>
+> 🔁 **รอบแก้ BA gate (2026-09-14):** BA ตีกลับ BLOCK (CRITICAL 1 · HIGH 5 · MINOR 2) จาก `Pack Brief Feature/PDPA/pdpa feedback/` → แก้ HTML 8 จุด (FIX-01..08 · surgical) แล้ว re-gate 3·4·5 เขียว (**e2e 49/49 · FN 20/20** · audit FAIL=0 WARN=3 · qc-ux PASS · coverage R1+R2 PASS) → regen เอกสาร step 6→12 ทับของเดิม (BRD/FRD/CSQ/UI Brief/testcases 83 เคส/UAT 71 เคส/TL;DR/CTX เป็น v1.1). แพ็กที่ commit ก่อนหน้า (`3de7e43`) เป็น pre-fix — รอบนี้ commit ทับ
 
 ---
 
@@ -25,6 +27,9 @@
 | OQ-CSQ-01 | **เลขโปรไฟล์ 7C จริง `CSQ-NN`** | ตอนนี้ใช้ placeholder `CSQ-F058` — เลขจริงออกโดย 7C Profile Registry | CSQ_BRIEF |
 | OQ-CSQ-02 | **ยืนยันท่อ `SecC`** ถูกต้องไหม | ประกาศ SecC แบบ `[DEFAULT — รอยืนยัน]` เพราะ master contract `references/csq-contract.md` **ไม่มีในเครื่องนี้** (skill ติดตั้งแบบ flat) → ตรวจ enum กับ catalog จริงไม่ได้ | CSQ_BRIEF · skill flat |
 | OQ-CSQ-03 | consent ควรนับเป็น **DC** (data-subject terminal decision) เพิ่มไหม | ที่นี่ไม่ประกาศตาม lock (declare-only, no OC/DC/SC) — BA เคาะว่าต้องเพิ่มปลายทางไหม | CSQ_BRIEF · LOCK-CSQ-02 |
+| **OQ-CNS-01** | **เปลี่ยนใจหลังตอบแล้ว — เส้นทางที่ถูกคืออะไร** (ผู้เคาะ: Strike) | หลัง FIX-01 คำขอที่ตอบแล้ว = ปิด (แก้ผ่านลิงก์เดิมไม่ได้) → เส้นทางถูกคือส่งคำขอใหม่/withdraw ใช่ไหม + ใครมีสิทธิ์เปิดคำขอใหม่ · build เลือก conservative (answered = terminal) | REVIEW_FIX_ORDER · FRD 03_LOGIC state machine |
+| **OQ-CNS-02** | **publish เวอร์ชันใหม่ระหว่างคำขอ pending ค้าง** (Strike) | auto-expire คำขอเก่า (บังคับสร้างใหม่) หรือให้ตอบกับเวอร์ชันปัจจุบัน · **build ปัจจุบันไม่ auto-expire** — แสดงเวอร์ชัน ณ ตอนส่ง + ป้ายเตือน (FIX-03) | REVIEW_FIX_ORDER · FRD 03_LOGIC · BR-24 |
+| **OQ-CNS-03** | **รอบต่ออายุ ใคร/อะไร trigger** (Strike) | nearExpiry ≤30 วันมีแล้ว — คำขอต่ออายุ trigger แบบ manual จากทะเบียน หรือ batch อัตโนมัติ (ผูก NTF ฝั่ง F136) | REVIEW_FIX_ORDER · FRD 03_LOGIC · NTF |
 
 ## C. 📤 ข้อเสนอถึงเจ้าของฟีเจอร์อื่น / design system
 

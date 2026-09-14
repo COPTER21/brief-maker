@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ความยินยอม PDPA · F-MKT-CONSENT · CUBE NATIVE</title>
+<!-- CONTRACT (Feature List F058): resolveConsent = API ให้ F136 Broadcast (ctl ตรวจ opt-in ก่อนส่ง) + F031 Customer 360 (data) consume · ทะเบียน consent + evidence = ฐานข้อมูลให้ F157 DSAR (data) · display-only ไม่ mock หน้าจอ feature อื่น -->
+<!-- SEC: ฟีเจอร์นี้อยู่ wave S1 (security ก่อน production) · persona = prototype mirror ของ sec.can() — บทบาทจริงมาจากล็อกอิน -->
+<!-- OQ-CNS-01: เปลี่ยนใจหลังตอบแล้ว = คำขอใหม่/withdraw (ไม่แก้ผ่านลิงก์เดิม) · OQ-CNS-02: publish v ใหม่ระหว่างคำขอค้าง = ไม่ auto-expire (แสดงเวอร์ชัน ณ ตอนส่ง + เตือน) -->
+<!-- (Feature-List codes F136/F031/F157 อ้างเป็น contract anchor — ไม่ใช่การอ้างจอ) -->
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1510,6 +1514,10 @@ svg.lucide.w-5    { width: 20px; }   svg.lucide.h-5    { height: 20px; }
   font-family:inherit; font-size:11.5px; font-weight:600; border-radius:6px; cursor:pointer; }
 .ds-seg button.is-on{ background:#fff; color:#111; }
 
+/* FIX-04 · loading spinner (Rule #44) */
+.spin{ animation:spin360 .8s linear infinite; }
+@keyframes spin360{ to{ transform:rotate(360deg); } }
+
 /* ---------- chips ---------- */
 .chips{ display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
 .rz-layout{ display:grid; grid-template-columns:minmax(340px,420px) 1fr; gap:18px; align-items:start; }
@@ -1671,7 +1679,8 @@ svg.lucide.w-5    { width: 20px; }   svg.lucide.h-5    { height: 20px; }
 <div id="overlay-root"></div>
 
 <!-- demo-strip (#105) — สลับบทบาท เฉพาะ prototype (ไม่อยู่ใน page header) · จำลองการตอบย้ายไปในลิ้นชักคำขอ (in-context) -->
-<div class="demo-strip" id="demoStrip">
+<!-- DEMO-ONLY: ห้าม render ใน production build (บทบาทจริงมาจากล็อกอิน) -->
+<div class="demo-strip demo-only" id="demoStrip">
   <span class="ds-brand"><i data-lucide="flask-conical"></i>Prototype · v1.0.0</span>
   <div class="ds-grp">
     <span class="ds-cap">บทบาท</span>
@@ -1759,6 +1768,7 @@ const state = {
   modal: { open: false, type: null, data: null },
   recipient: { open: false, reqId: null, choices: {}, verified: false, expanded: {} },
   toast: { visible: false, message: '', variant: 'info' },
+  _busy: false,                       // FIX-04 · double-submit guard (pattern F101)
   filters: { search: '', status: 'all' },
   pagination: { page: 1, pageSize: 20 },
   sort: { col: null, dir: 'asc' },
@@ -2136,6 +2146,13 @@ function initials(name){ var t=String(name||'').replace(/^(นาย|นาง|�
   return ((t[0]||'').slice(0,1)+((t[1]||'').slice(0,1))||'?'); }
 function PERM(){ var p=state.persona; return {
   reqCreate:p!=='auditor', send:p!=='auditor', sign:p!=='auditor', withdraw:p!=='auditor', purpose:p==='dpo' }; }
+/* FIX-04 · double-submit guard + loading affordance (Rule #44) — pattern F101
+   วางท้ายสุดในแต่ละ mutation (หลัง perm/status/validation) เพื่อไม่ล็อกปุ่มตอน validate ตก */
+function guardBusy(ev){ if(state._busy) return false; state._busy=true;
+  var b=ev&&ev.currentTarget; if(b&&b.tagName==='BUTTON'){ b.disabled=true; b.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i> กำลังบันทึก…'; renderIcons(); }
+  setTimeout(function(){ state._busy=false; },500); return true; }
+/* DEMO-ONLY: ต่อท้าย toast จำลอง — production build ตัดค่านี้เป็น '' (ข้อความจริงไม่มีวงเล็บจำลอง) */
+var SIM_NOTE=' (จำลอง — ไม่ส่งจริง)';
 
 /* ---------- channels (BR-02) ---------- */
 var CHANNELS = [
@@ -2399,6 +2416,8 @@ function pageHTML(tab){
 
 /* =====================================================================
    TAB 1 · REGISTRY (FN-13/14/16)
+   CONTRACT: ทะเบียน consent + evidence + history = ฐานข้อมูลให้ F157 DSAR
+   (data — ประวัติ consent ประกอบคำขอ DSAR) · display-only ไม่ mock หน้าจอ F157
    ===================================================================== */
 function filteredConsents(){
   var f=state.filters, q=f.search.toLowerCase().trim();
@@ -2517,6 +2536,9 @@ function purposeStats(code){
   return {total:list.length, granted:granted, withdrawn:withdrawn, expired:expired, coverage: list.length?Math.round(granted/list.length*100):0}; }
 function staleCount(code){ return state.consents.filter(function(c){return c.purpose===code && policyStale(c);}).length; }
 
+/* FIX-08 · แยกสถานะออกเป็น pill เดียวต่อบรรทัด (Rule #103/#40 — เลี่ยง cell มี pill ≥2) */
+function purStatusPill(s){ if(s==='active') return '<span class="pill pill-success">ใช้งาน</span>';
+  return '<span class="pill pill-muted">ปิดแล้ว</span>'; }
 function purposesBody(){
   var head='<thead><tr><th>รหัส</th><th>วัตถุประสงค์</th><th>ช่องทาง</th><th>อายุ (เดือน)</th><th>เวอร์ชัน</th><th>สถานะ</th><th>ความครอบคลุม</th></tr></thead>';
   var rows=state.purposes.map(function(p){ var st=purposeStats(p.code), stale=staleCount(p.code);
@@ -2527,7 +2549,7 @@ function purposesBody(){
       + '<td><div class="chips">'+chChips+'</div></td>'
       + '<td class="num">'+p.lifespan+'</td>'
       + '<td><span class="ver-tag">v'+p.currentVer+'</span></td>'
-      + '<td>'+(p.status==='active'?'<span class="pill pill-success">ใช้งาน</span>':'<span class="pill pill-muted">ปิดแล้ว</span>')+'</td>'
+      + '<td>'+purStatusPill(p.status)+'</td>'
       + '<td><b class="num">'+st.coverage+'%</b> <span class="text-mute-2">('+st.granted+'/'+st.total+')</span></td></tr>';
   }).join('');
   return '<div class="card page-fill"><div class="table-wrap"><table class="table">'+head+'<tbody>'+rows+'</tbody></table></div>'
@@ -2536,6 +2558,9 @@ function purposesBody(){
 
 /* =====================================================================
    TAB 4 · RESOLVE (FN-19 simulator · FN-20 never_asked)  — BR-19/20
+   CONTRACT: resolveConsent = API ให้ F136 Broadcast (ctl — ตรวจ opt-in ก่อนส่ง Email/SMS
+   block อัตโนมัติ) และ F031 Customer 360 (data — สถานะ consent ผูกลูกค้า) consume
+   · display-only ไม่ mock หน้าจอ F136/F031
    ===================================================================== */
 function resolveBody(){
   var r=state.rz.result;
@@ -2634,7 +2659,7 @@ function reqCreateDrawer(){ var fm=state.reqForm;
     + sec('วัตถุประสงค์ (เลือกได้หลายข้อ)', purBlock)
     + '</div>';
   var foot=dwFoot('<button class="btn btn-ghost" onclick="closeDrawer()">ยกเลิก</button>',
-    '<button class="btn btn-primary" onclick="submitReqCreate()"><i data-lucide="link" class="w-4 h-4"></i>สร้างคำขอ + ลิงก์/QR</button>');
+    '<button class="btn btn-primary" onclick="submitReqCreate(event)"><i data-lucide="link" class="w-4 h-4"></i>สร้างคำขอ + ลิงก์/QR</button>');
   return dwHead('<i data-lucide="file-plus" class="w-3.5 h-3.5"></i>สร้างคำขอความยินยอม', 'คำขอความยินยอมใหม่','เลือกเจ้าของข้อมูล ช่องทาง และวัตถุประสงค์')+body+foot;
 }
 function reqPurRowsHTML(){ var fm=state.reqForm;
@@ -2655,11 +2680,13 @@ function reqPurRowsHTML(){ var fm=state.reqForm;
 }
 function renderReqPurRows(){ var el=document.getElementById('reqPurRows'); if(el){ el.innerHTML=reqPurRowsHTML(); renderIcons(); } }
 function toggleReqPurpose(code){ var a=state.reqForm.purposes, i=a.indexOf(code); if(i>=0)a.splice(i,1); else a.push(code); render(); }
-function submitReqCreate(){ var fm=state.reqForm;
+function submitReqCreate(ev){ var fm=state.reqForm;
+  if(!PERM().reqCreate){ showToast('สิทธิ์ไม่พอสำหรับบทบาทนี้','warning'); return; }   /* FIX-02 · SEC: บทบาทจริงจากล็อกอิน · prototype mirror sec.can() */
   if(!fm.subject){ showToast('เลือกเจ้าของข้อมูลก่อน','warning'); return; }
   if(!fm.channel){ showToast('เลือกช่องทางก่อน','warning'); return; }
   var pur=fm.purposes.filter(function(code){ return purpose(code).channels.indexOf(fm.channel)>=0; });
   if(!pur.length){ showToast('เลือกวัตถุประสงค์ที่รองรับช่องทางนี้อย่างน้อย 1 ข้อ','warning'); return; }
+  if(!guardBusy(ev)) return;   /* FIX-04 · กัน double submit */
   var r=createRequestRecord(fm.subject, pur, fm.channel, fm.refOld);
   if(fm.refOld) emitConsequence('consent.renew_requested', r.id, {subject:fm.subject, refOld:fm.refOld});
   closeDrawer(); showToast('สร้างคำขอ '+r.id+' พร้อมลิงก์และ QR แล้ว','success');
@@ -2681,9 +2708,14 @@ function reqViewDrawer(){ var r=request(state.drawer.recordId); if(!r) return dw
     + '<div class="k">วัตถุประสงค์</div><div class="v"><div class="chips">'+purChips+'</div></div>'
     + '<div class="k">สร้างเมื่อ</div><div class="v">'+fmtDT(r.createdAt)+'</div>'
     + (r.refOld?'<div class="k">อ้างรายการเดิม</div><div class="v">'+r.refOld+' (ต่ออายุ)</div>':'')+'</div>');
-  var policyRows=r.purposes.map(function(code){ var pp=purpose(code); if(!pp) return ''; var cd=curDoc(pp);
-    return '<div class="opt-row" style="cursor:default"><div class="opt-main"><div class="opt-t">'+esc(pp.name)+' <span class="ver-tag">v'+pp.currentVer+'</span></div>'
-      + '<div class="opt-d">'+(cd?'<button class="doc-link" onclick="viewPolicy(\''+code+'\')"><i data-lucide="'+docIcon(cd.docType)+'"></i>'+esc(cd.docName)+'</button>':'<span class="text-mute-2">—</span>')+' — เอกสารที่เจ้าของข้อมูลเห็นตอนเซ็น</div></div></div>';
+  var lastSent=r.sends.filter(function(x){return x.vers;}).slice(-1)[0];   /* FIX-03 · การส่งล่าสุดที่ snapshot เวอร์ชันไว้ */
+  var policyRows=r.purposes.map(function(code){ var pp=purpose(code); if(!pp) return '';
+    var sentVer=(lastSent && lastSent.vers[code]!=null) ? lastSent.vers[code] : pp.currentVer;   /* เวอร์ชัน ณ ตอนส่ง — คำขอที่ยังไม่ส่งใช้ current ตามเดิม */
+    var docAt=pp.versions.filter(function(v){return v.v===sentVer;})[0] || curDoc(pp);
+    var newer = sentVer < pp.currentVer;
+    var warn = newer ? '<div class="near-tag" style="margin-top:3px"><i data-lucide="alert-triangle"></i>ส่ง v'+sentVer+' · ปัจจุบัน v'+pp.currentVer+' — พิจารณาส่งคำขอใหม่</div>' : '';
+    return '<div class="opt-row" style="cursor:default"><div class="opt-main"><div class="opt-t">'+esc(pp.name)+' <span class="ver-tag">v'+sentVer+'</span>'+(lastSent?' <span class="text-mute-2" style="font-size:11px">เวอร์ชันที่ส่ง</span>':'')+'</div>'
+      + '<div class="opt-d">'+(docAt?'<button class="doc-link" onclick="viewPolicy(\''+code+'\','+sentVer+')"><i data-lucide="'+docIcon(docAt.docType)+'"></i>'+esc(docAt.docName)+'</button>':'<span class="text-mute-2">—</span>')+' — เอกสารที่เจ้าของข้อมูลเห็นตอนเซ็น</div>'+warn+'</div></div>';
   }).join('');
   var policy=sec('เนื้อหาที่ให้เซ็น (BR-06)', policyRows || '<p class="field-help">ไม่มีวัตถุประสงค์</p>');
   var qr=sec('ลิงก์และคิวอาร์โค้ด', '<div class="qr-box"><div class="qr-img">'+qrSVG(r.id)+'</div><div style="flex:1;min-width:0">'
@@ -2699,20 +2731,26 @@ function reqViewDrawer(){ var r=request(state.drawer.recordId); if(!r) return dw
     sendBtns='<div class="field" style="margin-top:10px"><label class="field-label">ส่งซ้ำช่องทางอื่น (คำขอเดิม — BR-18)</label><div style="display:flex;gap:8px;align-items:flex-start">'
       + '<div style="flex:1">'+comboHTML('resendCh','เลือกช่องทาง')+'</div>'
       + '<button class="btn btn-secondary" onclick="resendOther(\''+r.id+'\')"><i data-lucide="send" class="w-4 h-4"></i>ส่งซ้ำ</button></div></div>'
-      + '<button class="btn btn-primary mt-2" onclick="sendVia(\''+r.id+'\',\''+r.channel+'\')"><i data-lucide="mail" class="w-4 h-4"></i>ส่งทาง'+chLabel(r.channel)+' (จำลอง)</button>';
+      + '<button class="btn btn-primary mt-2" onclick="sendVia(\''+r.id+'\',\''+r.channel+'\')"><i data-lucide="mail" class="w-4 h-4"></i>ส่งทาง'+chLabel(r.channel)+'</button>';
   }
   var send=sec('การส่ง (FN-06/07)', sendLog+sendBtns);
   var sim='';
   if(p.sign && (r.status==='pending'||r.status==='draft')){
-    sim=sec('มุมมองผู้รับ (จำลองลิงก์)', '<div class="warn-banner" style="background:#EAF2FF;border-color:#BBD3FF;color:#1A4F9E"><i data-lucide="info"></i>เปิดหน้าที่เจ้าของข้อมูลเห็นเมื่อกดลิงก์ — อ่านเอกสารแต่ละวัตถุประสงค์แล้วเลือกยินยอม/ไม่ยินยอม เมื่อยืนยันจะสร้างรายการในทะเบียน + เก็บหลักฐาน 5 อย่าง (S-10/S-11)</div>'
-      + '<button class="btn btn-primary" onclick="openRecipientView(\''+r.id+'\')"><i data-lucide="external-link" class="w-4 h-4"></i>เปิดมุมมองผู้รับ (จำลองลิงก์)</button>');
+    sim='<div class="demo-only"><!-- DEMO-ONLY: พรีวิวหน้าผู้รับ เฉพาะ prototype · production ส่งลิงก์ให้เจ้าของข้อมูลเปิดเอง -->'
+      + sec('มุมมองผู้รับ (จำลองลิงก์)', '<div class="warn-banner" style="background:#EAF2FF;border-color:#BBD3FF;color:#1A4F9E"><i data-lucide="info"></i>เปิดหน้าที่เจ้าของข้อมูลเห็นเมื่อกดลิงก์ — อ่านเอกสารแต่ละวัตถุประสงค์แล้วเลือกยินยอม/ไม่ยินยอม เมื่อยืนยันจะสร้างรายการในทะเบียน + เก็บหลักฐาน 5 อย่าง (S-10/S-11)</div>'
+      + '<button class="btn btn-primary" onclick="openRecipientView(\''+r.id+'\')"><i data-lucide="external-link" class="w-4 h-4"></i>เปิดมุมมองผู้รับ (จำลองลิงก์)</button>')
+      + '</div>';
   }
   var body='<div class="drawer-body">'+info+policy+qr+send+sim+'</div>';
   return dwHead('<i data-lucide="send" class="w-3.5 h-3.5"></i>คำขอ '+r.id+' <span class="pill pill-'+sp[1]+'" style="margin-left:6px">'+sp[0]+'</span>', 'คำขอความยินยอม', esc(s.name))
     + body + dwFoot('', '<button class="btn btn-secondary" onclick="closeDrawer()">ปิด</button>');
 }
-function sendVia(id, ch){ var r=request(id); if(!r) return; r.sends.push({ch:ch, at:new Date().toISOString()}); if(r.status==='draft') r.status='pending';
-  render(); showToast('บันทึกการส่งทาง'+chLabel(ch)+' (จำลอง — ไม่ส่งจริง)','success'); }
+function snapshotVers(r){ var o={}; r.purposes.forEach(function(c){ o[c]=currentVer(c); }); return o; }   /* FIX-03 · เวอร์ชันนโยบายต่อ purpose ณ เวลาส่ง (ES5) */
+function sendVia(id, ch){ var r=request(id); if(!r) return;
+  if(!PERM().send){ showToast('สิทธิ์ไม่พอสำหรับบทบาทนี้','warning'); return; }   /* FIX-02 · SEC: บทบาทจริงจากล็อกอิน · prototype mirror sec.can() */
+  if(!['draft','pending'].includes(r.status)){ showToast('คำขอนี้ปิดแล้ว','warning'); return; }   /* FIX-05 · ส่ง/ส่งซ้ำได้เฉพาะ draft/pending */
+  r.sends.push({ch:ch, at:new Date().toISOString(), vers:snapshotVers(r)}); if(r.status==='draft') r.status='pending';   /* FIX-03 · snapshot ver */
+  render(); showToast('บันทึกการส่งทาง'+chLabel(ch)+SIM_NOTE,'success'); }
 function resendOther(id){ var v=CB['resendCh']?CB['resendCh'].value:null; if(!v){ showToast('เลือกช่องทางก่อน','warning'); return; } sendVia(id, v); }
 
 /* answer / sign (FN-10 grant · FN-11 partial · S-11)
@@ -2722,6 +2760,8 @@ function answerRequest(id, mode){ var r=request(id); if(!r) return;
   applyAnswers(r, function(code, idx){ return mode==='all' || (mode==='partial' && idx%2===0); });   // partial = สลับข้อ
 }
 function applyAnswers(r, decide){
+  if(!PERM().sign){ showToast('สิทธิ์ไม่พอสำหรับบทบาทนี้','warning'); return; }   /* FIX-02 · SEC: บทบาทจริงจากล็อกอิน · prototype mirror sec.can() */
+  if(!['draft','pending'].includes(r.status)){ showToast('คำขอนี้ปิดแล้ว — ตอบซ้ำไม่ได้','warning'); return; }   /* FIX-01 · ตอบได้ครั้งเดียว — กัน evidence chain ถูกเขียนทับ */
   var codes=r.purposes; var granted=0, declined=0;
   codes.forEach(function(code, idx){
     var p=purpose(code); if(!p) return;
@@ -2742,7 +2782,7 @@ function applyAnswers(r, decide){
       state.consents.push(c2); emitConsequence('consent.declined', id2, {subject:r.subject,purpose:code,channel:r.channel}); declined++;
     }
   });
-  r.status='answered';
+  r.status='answered'; r.answeredAt=new Date().toISOString();   /* FIX-01 · ปิดคำขอเมื่อตอบแล้ว */
   render();
   showToast('บันทึกคำตอบแล้ว · ยินยอม '+granted+' · ปฏิเสธ '+declined+' (เก็บหลักฐานครบ 5 อย่าง)','success');
 }
@@ -2769,19 +2809,27 @@ function renderRecipient(){ var el=document.getElementById('recipientRoot');
 function setRecipientChoice(code, val){ state.recipient.choices[code]=val; renderRecipient(); }
 function toggleRecipientVerify(){ state.recipient.verified=!state.recipient.verified; renderRecipient(); }
 function toggleRecipientDoc(code){ state.recipient.expanded[code]=!state.recipient.expanded[code]; renderRecipient(); }
-function submitRecipient(){ var st=state.recipient; var r=request(st.reqId); if(!r) return;
+function submitRecipient(ev){ var st=state.recipient; var r=request(st.reqId); if(!r) return;
   if(!st.verified){ showToast('กรุณายืนยันตัวตนก่อนส่งคำตอบ','warning'); return; }
   var missing=r.purposes.filter(function(code){ return st.choices[code]!=='grant' && st.choices[code]!=='decline'; });
   if(missing.length){ showToast('กรุณาเลือกยินยอม/ไม่ยินยอมให้ครบทุกวัตถุประสงค์','warning'); return; }
+  if(!guardBusy(ev)) return;   /* FIX-04 · กัน double submit */
   var choices={}; r.purposes.forEach(function(code){ choices[code]=st.choices[code]; });   // snapshot ก่อนปิด
   closeRecipientView();
   setTimeout(function(){ applyAnswers(r, function(code){ return choices[code]==='grant'; }); }, 60);   // engine เดิม → ทะเบียน+หลักฐาน 5+ประวัติ
 }
 function recipientViewHTML(){ var st=state.recipient; var r=request(st.reqId); if(!r) return '';
   var s=subj(r.subject);
-  var simbar='<div class="rcp-simbar"><i data-lucide="flask-conical" class="w-4 h-4"></i>'
+  var simbar='<div class="rcp-simbar demo-only"><!-- DEMO-ONLY: ห้าม render ใน production build (หน้าจริงเปิดจากลิงก์ที่ส่งให้เจ้าของข้อมูล) --><i data-lucide="flask-conical" class="w-4 h-4"></i>'
     + '<span class="rcp-sim-t"><b>จำลอง</b> — นี่คือหน้าที่เจ้าของข้อมูลเห็นเมื่อเปิดลิงก์ (ไม่ใช่การส่งจริง)</span>'
     + '<button class="rcp-close" onclick="closeRecipientView()"><i data-lucide="x" class="w-4 h-4"></i>ปิด</button></div>';
+  if(!['draft','pending'].includes(r.status)){   /* FIX-01 · ลูกค้าเปิดลิงก์ซ้ำหลังตอบแล้ว → หน้าสถานะปิด (ไม่แสดงฟอร์ม) */
+    var whenTxt=r.answeredAt?(' เมื่อ '+fmtDT(r.answeredAt)):'แล้ว';
+    return simbar+'<div class="rcp-page"><div class="rcp-brandcard"><div class="rcp-brand"><i data-lucide="shield-check" class="w-5 h-5"></i>CUBE Consent</div>'
+      + '<h1 class="rcp-h1">คำขอนี้ปิดแล้ว</h1>'
+      + '<p class="rcp-sub">คำขอความยินยอมนี้ได้รับคำตอบ'+whenTxt+' — หากต้องการเปลี่ยนแปลง โปรดติดต่อบริษัท</p>'
+      + '<div class="rcp-subject"><i data-lucide="user" class="w-4 h-4"></i>'+esc(s.name)+' · '+esc(s.id)+'</div></div></div>';
+  }
   var head='<div class="rcp-brandcard"><div class="rcp-brand"><i data-lucide="shield-check" class="w-5 h-5"></i>CUBE Consent</div>'
     + '<h1 class="rcp-h1">คำขอความยินยอม PDPA</h1>'
     + '<p class="rcp-sub">โปรดอ่านเอกสารแต่ละวัตถุประสงค์ แล้วเลือกว่าจะยินยอมหรือไม่ยินยอม</p>'
@@ -2803,7 +2851,7 @@ function recipientViewHTML(){ var st=state.recipient; var r=request(st.reqId); i
   var verify='<div class="rcp-verify'+(st.verified?' is-on':'')+'"><div class="rcp-verify-row" onclick="toggleRecipientVerify()">'
     + '<span class="rv-cb"></span><div><div class="rcp-verify-t">ฉันคือเจ้าของข้อมูลและได้อ่านเอกสารแล้ว</div>'
     + '<div class="rcp-verify-s">ยืนยันตัวตน (ต้นแบบ) — จำเป็นก่อนส่งคำตอบ</div></div></div></div>';
-  var submit='<button class="rcp-submit" onclick="submitRecipient()"><i data-lucide="send" class="w-5 h-5"></i>ยืนยันการตอบ</button>';
+  var submit='<button class="rcp-submit" onclick="submitRecipient(event)"><i data-lucide="send" class="w-5 h-5"></i>ยืนยันการตอบ</button>';
   return simbar+'<div class="rcp-page">'+head+cards+verify+submit+'</div>';
 }
 
@@ -2979,12 +3027,15 @@ function withdrawModal(d){ var c=state.consents.find(function(x){return x.id===d
   return '<div class="modal-header"><div class="modal-header-icon is-danger"><i data-lucide="undo-2"></i></div><div><h3 class="modal-title">ถอนความยินยอมแทนลูกค้า</h3><p class="modal-subtitle">มีผลทันที ไม่ต้องผ่านการอนุมัติ (BR-09) · '+esc(subj(c.subject).name)+'</p></div></div>'
     + '<div class="modal-body"><div class="field"><label class="field-label">เหตุผล <span class="req">*</span></label><textarea class="notes-area" id="wdReason" style="min-height:80px" placeholder="เช่น ลูกค้าไม่ประสงค์รับข้อความส่งเสริมการขาย"></textarea></div>'
     + '<div class="field"><label class="field-label">ลูกค้าแจ้งมาทางช่องทางใด <span class="req">*</span></label>'+comboHTML('wdVia','เลือกช่องทาง')+'</div></div>'
-    + '<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-danger" onclick="doWithdraw(\''+c.id+'\')"><i data-lucide="undo-2" class="w-4 h-4"></i>ยืนยันถอน</button></div>';
+    + '<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-danger" onclick="doWithdraw(\''+c.id+'\',event)"><i data-lucide="undo-2" class="w-4 h-4"></i>ยืนยันถอน</button></div>';
 }
-function doWithdraw(id){ var c=state.consents.find(function(x){return x.id===id;}); if(!c) return;
+function doWithdraw(id, ev){ var c=state.consents.find(function(x){return x.id===id;}); if(!c) return;
+  if(!PERM().withdraw){ showToast('สิทธิ์ไม่พอสำหรับบทบาทนี้','warning'); return; }   /* FIX-02 · SEC: บทบาทจริงจากล็อกอิน · prototype mirror sec.can() */
+  if(effStatus(c)!=='granted'){ showToast('รายการนี้ไม่อยู่ในสถานะยินยอม','warning'); return; }   /* FIX-05 · ถอนได้เฉพาะ granted — กัน history/CSQ ซ้ำ */
   var reason=(document.getElementById('wdReason').value||'').trim(); var via=CB['wdVia']?CB['wdVia'].value:null;
   if(!reason){ showToast('กรอกเหตุผล','warning'); return; }
   if(!via){ showToast('เลือกช่องทางที่ลูกค้าแจ้งมา','warning'); return; }
+  if(!guardBusy(ev)) return;   /* FIX-04 · กัน double submit */
   c.status='withdrawn'; c.updated=new Date().toISOString();
   c.history.push({at:c.updated,action:'withdrawn',label:'ถอนความยินยอม',reason:reason,via:via});
   emitConsequence('consent.withdrawn', c.id, {subject:c.subject,purpose:c.purpose,channel:c.channel, reversal_of:c.grantEvent});  // BR-CSQ-04
@@ -2998,10 +3049,13 @@ function newVersionModal(d){ var p=purpose(d.code); if(!p) return ''; var affect
   return '<div class="modal-header"><div class="modal-header-icon is-warning"><i data-lucide="file-plus"></i></div><div><h3 class="modal-title">ออกเอกสารเวอร์ชันใหม่ (v'+(p.currentVer+1)+')</h3><p class="modal-subtitle">'+esc(p.name)+' · เวอร์ชันเดิมแก้ไม่ได้ (BR-05)</p></div></div>'
     + '<div class="modal-body"><div class="warn-banner"><i data-lucide="alert-triangle"></i><div><b>ความยินยอม '+affected+' รายการจะไม่ครอบคลุมเวอร์ชันใหม่</b><div style="margin-top:3px">ที่ยินยอมไว้กับนโยบาย v'+p.currentVer+' — ต้องขอความยินยอมใหม่ (S-02 · BR-06)</div></div></div>'
     + '<div class="field"><label class="field-label">แนบเอกสารเวอร์ชันใหม่ <span class="req">*</span></label><div id="nvDocBlock">'+uploadBlockHTML('nvDocInput', state.nvDoc, "handleDocUpload(this,'nv')", "removeNvDoc()")+'</div></div></div>'
-    + '<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" onclick="doPublishVersion(\''+p.code+'\')"><i data-lucide="check" class="w-4 h-4"></i>ออกเวอร์ชัน v'+(p.currentVer+1)+'</button></div>';
+    + '<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" onclick="doPublishVersion(\''+p.code+'\',event)"><i data-lucide="check" class="w-4 h-4"></i>ออกเวอร์ชัน v'+(p.currentVer+1)+'</button></div>';
 }
-function doPublishVersion(code){ var p=purpose(code); if(!p) return; var doc=state.nvDoc;
+function doPublishVersion(code, ev){ var p=purpose(code); if(!p) return;
+  if(!PERM().purpose){ showToast('สิทธิ์ไม่พอสำหรับบทบาทนี้','warning'); return; }   /* FIX-02 · SEC: จัดการวัตถุประสงค์ = DPO เท่านั้น · mirror sec.can() */
+  var doc=state.nvDoc;
   if(!doc){ showToast('ต้องแนบเอกสาร PDPA','warning'); return; }
+  if(!guardBusy(ev)) return;   /* FIX-04 · กัน double submit */
   var nv=p.currentVer+1; p.versions.push({v:nv,date:new Date().toISOString(),docName:doc.name,docType:doc.type,body:doc.body}); p.currentVer=nv;
   state.nvDoc=null;
   var stale=staleCount(code);
@@ -3011,9 +3065,12 @@ function doPublishVersion(code){ var p=purpose(code); if(!p) return; var doc=sta
 function closePurposeModal(d){ var p=purpose(d.code); if(!p) return '';
   return '<div class="modal-header"><div class="modal-header-icon is-danger"><i data-lucide="archive"></i></div><div><h3 class="modal-title">ปิดวัตถุประสงค์</h3><p class="modal-subtitle">'+esc(p.name)+'</p></div></div>'
     + '<div class="modal-body">ปิดแล้วจะ<b>สร้างคำขอใหม่ไม่ได้</b> แต่ความยินยอมเดิมยังอยู่ในทะเบียนเป็นหลักฐาน (BR-14) · ไม่มีการลบถาวร (BR-17)</div>'
-    + '<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-danger" onclick="doClosePurpose(\''+p.code+'\')"><i data-lucide="archive" class="w-4 h-4"></i>ยืนยันปิด</button></div>';
+    + '<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-danger" onclick="doClosePurpose(\''+p.code+'\',event)"><i data-lucide="archive" class="w-4 h-4"></i>ยืนยันปิด</button></div>';
 }
-function doClosePurpose(code){ var p=purpose(code); if(!p) return; p.status='closed';
+function doClosePurpose(code, ev){ var p=purpose(code); if(!p) return;
+  if(!PERM().purpose){ showToast('สิทธิ์ไม่พอสำหรับบทบาทนี้','warning'); return; }   /* FIX-02 · SEC: จัดการวัตถุประสงค์ = DPO เท่านั้น · mirror sec.can() */
+  if(!guardBusy(ev)) return;   /* FIX-04 · กัน double submit */
+  p.status='closed';
   emitConsequence('purpose.closed', code, {purpose:code});
   closeModal(); render(); showToast('ปิดวัตถุประสงค์ '+code+' แล้ว','success');
 }

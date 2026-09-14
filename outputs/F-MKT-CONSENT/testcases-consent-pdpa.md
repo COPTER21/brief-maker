@@ -4,6 +4,8 @@
 
 > **Consumer = AI** (กลับขั้วจาก qa-friendly) — คงรายละเอียด route/label/toast ที่ agent ใช้นำทาง.
 > **Anchor source order:** HTML ต้นทาง (verbatim) > 01_UI > microcopy กลาง html-generator-v9.
+>
+> 🔄 **Re-run step 9 (2026-09-14):** regen ต่อจาก BA-gate HTML fixes (FIX-01..08 · consent-pdpa.html) + FRD v1.1 (06_TESTS AT-21..25 + XT-06/07 · 05_RULES BR-23..26 + EC-12/13/14 · 03_LOGIC FN-21 snapshotVers). คง TC-id เดิม 72 เคส (R16) + เพิ่มกลุ่มใหม่ **G10 (TC-FIX-01..11)** ครอบ BA fixes. **สรุปรวมใหม่ = 83 เคส** (ไฟล์เดิมเขียน 68 = stale — reconcile แล้ว: จริง 72→ตอนนี้ 83).
 
 ## ⚠️ Drift note (HTML ชนะ — FRD กับจอหลุดกันเล็กน้อย ให้คนไป sync)
 1. **resolve เลือกไม่ครบ:** จอจริงแสดง toast **"เลือกให้ครบทั้ง 3 ช่องก่อนตรวจสิทธิ์"** (05_RULES/06_TESTS เขียน "…ก่อนตรวจสอบ") → ยึดจอ
@@ -19,12 +21,13 @@
 |---|---|
 | Feature ID | F-MKT-CONSENT (plan F058) |
 | ชื่อ | ความยินยอม PDPA (Consent Management) |
-| เวอร์ชัน pack | FRD v1.0 (2026-09-13) FULL · BRD APPROVED |
+| เวอร์ชัน pack | FRD v1.1 (2026-09-14) FULL · BRD APPROVED · หลัง BA-gate fixes FIX-01..08 |
 | App entry | เปิด `consent-pdpa.html` → default route `#/consent/registry` |
 | Routes | `#/consent/registry` (default) · `#/consent/requests` · `#/consent/purposes` · `#/consent/resolve` · recipient view (full-screen overlay z=--z-recipient เปิดจากปุ่มในคำขอ) |
-| ที่มา | FRD Pack (00/01/05/06/07) + BRD_F-MKT-CONSENT.md + consent-pdpa.html (source of truth หน้าจอ · e2e 32/32 · FN 20/20) |
-| role switch | persona strip: `Officer` / `DPO` / `Auditor` (มุมบน demo-strip) |
-| จำนวนเคส | **68** เคส · 10 group |
+| ที่มา | FRD Pack v1.1 (00/01/03/05/06/07) + BRD_F-MKT-CONSENT.md + consent-pdpa.html (source of truth หน้าจอ · e2e re-gate หลัง fixes · FN 20/20 · bypass B1..B8 blocked) + BA fix orders (FIX_PROMPT_F058.md · REVIEW_FIX_ORDER_F058) |
+| role switch | persona strip: `Officer` / `DPO` / `Auditor` (มุมบน demo-strip · `class="demo-strip demo-only"` — prod ใช้ role จากล็อกอิน) |
+| จำนวนเคส | **83** เคส · 11 group (G1–G10) |
+| regen note | คง TC-id เดิม (R16) · เพิ่ม G10 TC-FIX-01..11 (BA fixes) ต่อท้าย · ไม่มีเคสถูกลบ |
 
 ## Coverage
 
@@ -39,6 +42,7 @@
 | G7 Edge cases + Cross-Module (XT) | 9 | กลาง |
 | G8 Permission matrix | 5 | สูง |
 | G9 UX / interaction | 4 | กลาง |
+| G10 BA-gate fixes (FIX-01..08 · re-run 2026-09-14) | 11 | สูง |
 
 ---
 
@@ -68,7 +72,23 @@
 | FN-19 resolve simulator | S-19·BR-19/20 | TC-RES-01, TC-RES-03, TC-RES-04, TC-RES-05, TC-RES-06, TC-RES-07 |
 | FN-20 never_asked (ไม่ 404/declined) | S-20·BR-04/08/19 | TC-RES-02, TC-RES-08 |
 
-**FN cross-check: ✅ 20/20**
+**FN cross-check: ✅ 20/20** (FN-01..20 ครบ · FN-21 `snapshotVers` [NEW/helper · ไม่อยู่ใน FUNCTION_CHECKLIST] = TC-FIX-03)
+
+### BA-gate fixes (FRD v1.1 · 06_TESTS AT-21..25 · 05_RULES BR-23..26 · EC-12..14)
+| item | ที่มา | cases |
+|---|---|---|
+| AT-21 answered = terminal · re-answer blocked (BR-23 · EC-12 · bypass B1/B2) | FIX-01 | TC-FIX-01 |
+| AT-21b ลูกค้าเปิดลิงก์ซ้ำ → หน้าสถานะปิด (no form) | FIX-01 | TC-FIX-02 |
+| AT-21c applyAnswers guard ที่ engine (ไม่ใช่แค่ UI) | FIX-01 | TC-FIX-01 (via officer เรียกซ้ำ) |
+| AT-22 send version snapshot (`vers` ต่อ purpose · viewPolicy ver ที่ส่ง · BR-24 · FN-21) | FIX-03 | TC-FIX-03 |
+| AT-23 role enforced in 6 mutation functions (auditor read-only · BR-25 · EC-14 · bypass B4) | FIX-02 | TC-FIX-04 |
+| AT-23c purpose mgmt = dpo เท่านั้น (officer ปฏิเสธ) | FIX-02 | TC-FIX-05 |
+| AT-24 double-submit → 1 result + loading "กำลังบันทึก…" (BR-26 · Rule #44 · bypass B8) | FIX-04 | TC-FIX-06 |
+| AT-25 withdraw = granted only (BR-26 · BR_NOT_GRANTED · bypass B3) | FIX-05 | TC-FIX-07 |
+| AT-25b sendVia = draft/pending only (BR-26 · BR_REQUEST_CLOSED · bypass B7) | FIX-05 | TC-FIX-08 |
+| contract anchors F136/F031/F157/DSAR (display-only · comment) | FIX-06 | TC-FIX-09 |
+| demo-only strip test (`.demo-only{display:none}` → clean) | FIX-07 | TC-FIX-10 |
+| purposes status column = one pill/cell (Rule #103/#40) | FIX-08 | TC-FIX-11 |
 
 ### FN-40 Negative Locks (10 ข้อ — ต้องไม่มี)
 | NEG | ต้องไม่มี | LOCK | case |
@@ -114,6 +134,10 @@
 | BR-CSQ-03 payload mask restricted | TC-XT-04 (ต้อง simulate) |
 | BR-CSQ-04 reversal_of ตอนถอน (ไม่ลบผลเดิม) | TC-XT-04, TC-REG-08 |
 | BR-CSQ-05 ไม่ประกาศ/คำนวณ OC/DC/SC | TC-NEG-06, TC-XT-04 |
+| BR-23 [FIX-01] คำขอ answered = terminal (re-answer blocked · evidence immutable) | TC-FIX-01, TC-FIX-02 |
+| BR-24 [FIX-03] send snapshot เวอร์ชันนโยบายต่อ purpose (`vers`) | TC-FIX-03 |
+| BR-25 [FIX-02] role check ภายใน mutation function (auditor read-only) | TC-FIX-04, TC-FIX-05 |
+| BR-26 [FIX-04/05] `_busy` double-submit guard + sub-status guard | TC-FIX-06, TC-FIX-07, TC-FIX-08 |
 
 ### Edge Cases (05_RULES §5.5)
 | EC | case / สถานะ |
@@ -129,6 +153,9 @@
 | EC-09 upload ชนิด/ขนาด `[AI-DEFAULT]` | TC-EC-09 (partial — mock ไม่ validate size · OQ-07) |
 | EC-10 timezone expires_at `[AI-DEFAULT]` | TC-EC-10 (ต้อง simulate · OQ-08) |
 | EC-11 optimistic lock (2 dpo) | TC-EC-11 (ต้อง simulate — API 409) |
+| EC-12 re-answer / answered-terminal (FIX-01 · B1/B2) | TC-FIX-01, TC-FIX-02 |
+| EC-13 double-submit + sub-status (FIX-04/05 · B3/B7/B8) | TC-FIX-06, TC-FIX-07, TC-FIX-08 |
+| EC-14 role bypass — auditor เรียก mutation ตรง (FIX-02 · B4) | TC-FIX-04 |
 
 ### Error Catalog (05_RULES §5.6)
 | error | case |
@@ -144,6 +171,9 @@
 | ERR_DUPLICATE_IDEMPOTENCY_KEY / CSQ_ERR_DUPLICATE_ENVELOPE | TC-EC-04 (ต้อง simulate) |
 | ERR_STALE_DATA (409) | TC-EC-11 (ต้อง simulate) |
 | ERR_INSUFFICIENT_ROLE (403) | TC-PERM-01, TC-PERM-04 (UI: ปุ่มหาย/chip — enforce จริง OQ-05) |
+| BR_REQUEST_CLOSED (422) [FIX-01/05] ตอบ/ส่งคำขอที่ปิดแล้ว | TC-FIX-01, TC-FIX-02, TC-FIX-08 |
+| BR_NOT_GRANTED (422) [FIX-05] ถอน consent ที่ไม่ใช่ granted | TC-FIX-07 |
+| "สิทธิ์ไม่พอสำหรับบทบาทนี้" (BR-25 · role guard in function) | TC-FIX-04, TC-FIX-05 |
 | resolve = ไม่มี error business (200 เสมอ) | TC-RES-02, TC-RES-07, TC-NEG-09 |
 
 ### Field Validation (05_RULES §5.4)
@@ -177,6 +207,8 @@
 | XT-03 ถอน → caller cache invalidation ≤5 นาที | caller | TC-XT-03 (ต้อง simulate) |
 | XT-04 state change → CSQ envelope ถูก (idempotency/reversal · ไม่มี OC/DC/SC) | 7C | TC-XT-04 (ต้อง simulate) |
 | XT-05 register `/consent/*` Enforcement Gate | F143 | TC-XT-05 (ต้อง simulate) |
+| XT-06 Customer 360 อ่านสถานะ consent | F031 (data) | TC-REG-07, TC-FIX-09 (anchor) |
+| XT-07 DSAR ดึงประวัติ consent + evidence 5 + history | F157 (data) | TC-REG-05, TC-REG-06, TC-FIX-09 (anchor) |
 
 ### Scope Lock (07_LOCKED §7.0 — ทุกข้อต้องมีเคส verify)
 | LOCK | ข้อยืนยัน (ย่อ) | case verify |
@@ -1139,6 +1171,143 @@
 | 1 | OPEN `#/consent/registry` → CLICK "ส่งออก CSV" | — | toast ปรากฏ | ☐ |
 | 2 | WAIT ~3 วินาที | — | toast หายเอง (auto-dismiss) | ☐ |
 
+## G10 — BA-gate fixes (FIX-01..08 · re-run 2026-09-14)
+
+> เคสกลุ่มนี้พิสูจน์ผลของใบสั่งแก้ BA (`FIX_PROMPT_F058.md` · `REVIEW_FIX_ORDER_F058`). anchor = ข้อความจริงบนจอ verbatim จาก `consent-pdpa.html` (หลังแก้). เคส `(ต้อง simulate)` = ต้องเรียก function ตรง/inspect เพราะกดมือปกติไม่ถึง path.
+
+### TC-FIX-01 — คำขอ answered ตอบซ้ำไม่ได้ (FIX-01 · AT-21 · BR-23 · EC-12 · bypass B1/B2)
+- group: BA-fix · ความสำคัญ: สูง · trace: FIX-01 / AT-21,21c / BR-23 / EC-12 / BR_REQUEST_CLOSED / event guard (evidence immutable)
+- actor: officer · Setup: role=officer · seed=คำขอที่ตอบแล้ว (answered) — ตอบ REQ-2601 ให้ครบก่อน (ทำ TC-RCP-01) หรือใช้ seed answered ที่มี (REQ-2603) · files=—
+- Start: OPEN `#/consent/requests`
+- ผ่านเมื่อ: ตอบซ้ำ → toast **"คำขอนี้ปิดแล้ว — ตอบซ้ำไม่ได้"** + จำนวน consent **ไม่เพิ่ม** (evidence chain ไม่ถูกเขียนทับ)
+
+| # | Action | Input | Expected | Result |
+|---|---|---|---|---|
+| 1 | OPEN `#/consent/registry` → VERIFY+บันทึก จำนวนแถวความยินยอมทั้งหมด | — | จดจำนวนฐาน (อ้าง step 4) | ☐ |
+| 2 | OPEN `#/consent/requests` → CLICK แถวคำขอสถานะ **ตอบแล้ว (answered)** | — | drawer คำขอ · สถานะ = ตอบแล้ว | ☐ |
+| 3 | CLICK **"เปิดมุมมองผู้รับ (จำลองลิงก์)"** แล้วพยายามตอบซ้ำ (หรือ CLICK ปุ่มตอบ/ส่งคำตอบซ้ำ) | — | toast warning **"คำขอนี้ปิดแล้ว — ตอบซ้ำไม่ได้"** · ไม่บันทึกคำตอบใหม่ | ☐ |
+| 4 | OPEN `#/consent/registry` → VERIFY จำนวนแถวอีกครั้ง | — | จำนวน consent **เท่าเดิม** (เท่าค่าที่จด step 1 — ไม่เพิ่ม · หลักฐานเดิมไม่ถูก supersede) | ☐ |
+
+### TC-FIX-02 — ลูกค้าเปิดลิงก์ recipient ของคำขอที่ตอบแล้ว → หน้าสถานะปิด (FIX-01 · AT-21b)
+- group: BA-fix · ความสำคัญ: สูง · trace: FIX-01 / AT-21b / BR-23
+- actor: เจ้าของข้อมูล (ผ่าน mock link) · Setup: role=officer · seed=คำขอ answered (เช่น REQ-2603 หรือคำขอที่เพิ่งตอบใน TC-FIX-01) · files=—
+- Start: OPEN `#/consent/requests` → CLICK คำขอ answered → CLICK "เปิดมุมมองผู้รับ (จำลองลิงก์)"
+- ผ่านเมื่อ: recipient view แสดง **หน้าสถานะปิด** หัวข้อ **"คำขอนี้ปิดแล้ว"** — **ไม่มีฟอร์มให้เซ็น**
+
+| # | Action | Input | Expected | Result |
+|---|---|---|---|---|
+| 1 | OPEN `#/consent/requests` → CLICK แถวคำขอ **ตอบแล้ว** → CLICK **"เปิดมุมมองผู้รับ (จำลองลิงก์)"** | — | recipient view เปิด | ☐ |
+| 2 | VERIFY เนื้อหา recipient view | — | หัวข้อ **"คำขอนี้ปิดแล้ว"** + ข้อความ **"คำขอความยินยอมนี้ได้รับคำตอบ เมื่อ … — หากต้องการเปลี่ยนแปลง โปรดติดต่อบริษัท"** · **ไม่มี** รายการวัตถุประสงค์ให้เลือก/checkbox ยืนยันตัวตน/ปุ่มส่งคำตอบ | ☐ |
+
+### TC-FIX-03 — send snapshot เวอร์ชันนโยบาย: ส่งแล้ว publish ใหม่ → drawer แสดงเวอร์ชันที่ส่ง (FIX-03 · AT-22 · BR-24 · FN-21)
+- group: BA-fix · ความสำคัญ: สูง · trace: FIX-03 / AT-22 / BR-24,06 / FN-21 snapshotVers · **(ต้องส่งคำขอก่อน แล้วสลับเป็น DPO publish)**
+- actor: officer + dpo · Setup: role=officer (ส่งคำขอ) → dpo (ออกเวอร์ชัน) · seed=คำขอ pending ที่ **ส่งแล้ว** มี PUR-01 (currentVer=n) · files=`policy-test-v2.pdf`
+- Start: OPEN `#/consent/requests`
+- ผ่านเมื่อ: หลัง publish เวอร์ชันใหม่ → drawer คำขอเดิมแสดงป้าย **"ส่ง vN · ปัจจุบัน vM — พิจารณาส่งคำขอใหม่"** + ลิงก์เอกสารเปิด **เวอร์ชันที่ส่ง** (ไม่ใช่ current)
+
+| # | Action | Input | Expected | Result |
+|---|---|---|---|---|
+| 1 | OPEN `#/consent/requests` → CLICK คำขอที่มี PUR-01 → ส่งทางช่องทาง (ถ้ายัง draft) → VERIFY+บันทึกเวอร์ชันที่ส่ง | — | drawer panel **"เนื้อหาที่ให้เซ็น (BR-06)"** แสดง ver-tag **vN** + ป้าย "เวอร์ชันที่ส่ง" · จดค่า N | ☐ |
+| 2 | CLICK persona **DPO** → OPEN `#/consent/purposes` → CLICK PUR-01 → CLICK **"ออกเวอร์ชันใหม่"** → UPLOAD `policy-test-v2.pdf` → ยืนยัน | `policy-test-v2.pdf` | toast **"ออกเอกสาร vM แล้ว · …"** · currentVer เพิ่มเป็น M (=N+1) | ☐ |
+| 3 | OPEN `#/consent/requests` → CLICK คำขอเดิม → VERIFY panel "เนื้อหาที่ให้เซ็น" | — | แถว PUR-01 ยังแสดง **vN (เวอร์ชันที่ส่ง)** + ป้ายเตือน **"ส่ง vN · ปัจจุบัน vM — พิจารณาส่งคำขอใหม่"** (ไอคอน alert-triangle) | ☐ |
+| 4 | CLICK ลิงก์เอกสารของ PUR-01 (`.doc-link` ในแถวนั้น) | — | เปิด document viewer เอกสาร **เวอร์ชัน N ที่ส่งจริง** (`viewPolicy(code, N)`) — ไม่ใช่เวอร์ชัน M ปัจจุบัน | ☐ |
+
+### TC-FIX-04 — Auditor เรียก mutation ตรงไม่ได้ทุกตัว (FIX-02 · AT-23 · BR-25 · EC-14 · bypass B4)
+- group: BA-fix · ความสำคัญ: สูง · trace: FIX-02 / AT-23 / BR-25 / EC-14 / "สิทธิ์ไม่พอสำหรับบทบาทนี้" · **(ต้อง simulate — เรียก 6 mutation function ตรงผ่าน console เพราะ UI ซ่อนปุ่มไว้แล้ว: applyAnswers/doWithdraw/doPublishVersion/doClosePurpose/submitReqCreate/sendVia)**
+- actor: auditor · Setup: role=auditor (persona "Auditor") · seed=default (REQ-2601 pending · CNS-5001 granted · PUR-01/02) · files=—
+- Start: OPEN `#/consent/registry`
+- ผ่านเมื่อ: ทุก mutation ที่เรียกตรง → state **ไม่เปลี่ยน** + (ถ้าเรียกผ่าน UI shortcut ที่เหลือ) toast **"สิทธิ์ไม่พอสำหรับบทบาทนี้"**
+
+| # | Action | Input | Expected | Result |
+|---|---|---|---|---|
+| 1 | CLICK persona **Auditor** → OPEN `#/consent/registry` → VERIFY+บันทึก จำนวน consent + requests ฐาน | — | จดค่าฐาน (อ้าง step 3) | ☐ |
+| 2 | (simulate) เรียกตรงทีละตัว: `applyAnswers` · `doWithdraw` · `doPublishVersion` · `doClosePurpose` · `submitReqCreate` · `sendVia` | — | แต่ละครั้ง → toast **"สิทธิ์ไม่พอสำหรับบทบาทนี้"** + return (guard เป็นบรรทัดแรกใน function · ไม่ใช่แค่ render) | ☐ |
+| 3 | OPEN `#/consent/registry` + `#/consent/requests` → VERIFY จำนวนอีกครั้ง | — | consent + requests **เท่าเดิม** (เท่าค่าที่จด step 1 — Auditor เขียนอะไรไม่ได้เลย · read-only) | ☐ |
+
+### TC-FIX-05 — Officer ทำ mutation ได้ ยกเว้นจัดการวัตถุประสงค์ = DPO เท่านั้น (FIX-02 · AT-23c · BR-25)
+- group: BA-fix · ความสำคัญ: สูง · trace: FIX-02 / AT-23c / BR-25 (purpose = dpo only)
+- actor: officer · Setup: role=officer (persona "Officer") · seed=default (CNS-5001 granted · PUR-01) · files=—
+- Start: OPEN `#/consent/requests`
+- ผ่านเมื่อ: officer สร้างคำขอ/ส่ง/ถอน/resolve ได้ · แต่ publish/close purpose → toast **"สิทธิ์ไม่พอสำหรับบทบาทนี้"** (purpose = DPO)
+
+| # | Action | Input | Expected | Result |
+|---|---|---|---|---|
+| 1 | CLICK persona **Officer** → OPEN `#/consent/requests` | — | เห็นปุ่ม **"สร้างคำขอ"** (สร้าง/ส่งได้) | ☐ |
+| 2 | OPEN `#/consent/registry` → CLICK consent granted | — | เห็นปุ่ม **"ถอนความยินยอม"** (ถอนได้) | ☐ |
+| 3 | OPEN `#/consent/purposes` | — | **ไม่มี**ปุ่ม "สร้างวัตถุประสงค์" · chip **"เฉพาะ DPO แก้ไขได้"** | ☐ |
+| 4 | (simulate) เรียก `doPublishVersion`/`doClosePurpose` ตรงในบทบาท officer | — | toast **"สิทธิ์ไม่พอสำหรับบทบาทนี้"** + purpose ไม่เปลี่ยน (จัดการวัตถุประสงค์ = DPO เท่านั้น) | ☐ |
+
+### TC-FIX-06 — double-click submit → ผลครั้งเดียว + spinner "กำลังบันทึก…" (FIX-04 · AT-24 · BR-26 · bypass B8)
+- group: BA-fix · ความสำคัญ: สูง · trace: FIX-04 / AT-24 / BR-26 / Rule #44 (`_busy` guard) · **(ต้อง simulate — double-click เร็วภายใน ~500ms)**
+- actor: officer · Setup: role=officer · seed=default (subject CUS-1003 + PUR-02 email สำหรับสร้างคำขอ) · files=—
+- Start: OPEN `#/consent/requests` → CLICK "สร้างคำขอ"
+- ผ่านเมื่อ: กดยืนยัน 2 ครั้งเร็ว ๆ → เกิดคำขอ **1 ใบ** + ปุ่มขึ้น loading **"กำลังบันทึก…"** ระหว่างรอ
+
+| # | Action | Input | Expected | Result |
+|---|---|---|---|---|
+| 1 | OPEN `#/consent/requests` → VERIFY+บันทึก footer "N คำขอ" | — | จดจำนวนคำขอฐาน (อ้าง step 4) | ☐ |
+| 2 | CLICK "สร้างคำขอ" → SELECT CUS-1003 · email · TOGGLE PUR-02 | B | ฟอร์มครบ | ☐ |
+| 3 | (simulate) CLICK **"สร้างคำขอ + ลิงก์/QR"** 2 ครั้งเร็ว ๆ (double-click) | — | ปุ่มแสดง loading state **"กำลังบันทึก…"** (icon loader-2) ระหว่างรอ · ประมวลผลครั้งเดียว | ☐ |
+| 4 | VERIFY footer "N คำขอ" | — | จำนวนคำขอเพิ่ม **+1 เท่านั้น** (ไม่ใช่ +2 · `_busy` กันซ้ำ · เทียบค่าที่จด step 1) | ☐ |
+
+### TC-FIX-07 — withdraw ได้เฉพาะ granted (บล็อกบน withdrawn) (FIX-05 · AT-25 · BR-26 · BR_NOT_GRANTED · bypass B3)
+- group: BA-fix · ความสำคัญ: สูง · trace: FIX-05 / AT-25 / EC-13 / BR-26 / BR_NOT_GRANTED · **(ต้อง simulate — consent withdrawn ไม่มีปุ่มถอน · เรียก `doWithdraw` ตรง)**
+- actor: officer · Setup: role=officer · seed=CNS-5004 (withdrawn) + CNS-5001 (granted) · files=—
+- Start: OPEN `#/consent/registry`
+- ผ่านเมื่อ: ถอนบน granted สำเร็จ · ถอนซ้ำบน withdrawn → toast **"รายการนี้ไม่อยู่ในสถานะยินยอม"** + history/CSQ ไม่เพิ่ม
+
+| # | Action | Input | Expected | Result |
+|---|---|---|---|---|
+| 1 | OPEN `#/consent/registry` · SELECT กรอง **ถอนแล้ว** → CLICK แถว **CNS-5004** (withdrawn) → VERIFY+บันทึกจำนวน timeline | — | drawer · **ไม่มี**ปุ่ม "ถอนความยินยอม" (ถอนไปแล้ว) · จดจำนวน history | ☐ |
+| 2 | (simulate) เรียก `doWithdraw` ตรงบน CNS-5004 | — | toast warning **"รายการนี้ไม่อยู่ในสถานะยินยอม"** + return · timeline **ไม่เพิ่ม** · ไม่มี CSQ reversal ซ้ำ | ☐ |
+| 3 | OPEN `#/consent/registry` → CLICK แถว CNS-5001 (granted) → CLICK "ถอนความยินยอม" → กรอกเหตุผล+ช่องทาง → ยืนยัน | — | ถอนสำเร็จ (granted → ถอนได้ตามปกติ) — ยืนยันว่า guard บล็อกเฉพาะ non-granted | ☐ |
+
+### TC-FIX-08 — resend ได้เฉพาะ draft/pending (บล็อกบน answered) (FIX-05 · AT-25b · BR-26 · BR_REQUEST_CLOSED · bypass B7)
+- group: BA-fix · ความสำคัญ: สูง · trace: FIX-05 / AT-25b / EC-13 / BR-26 / BR_REQUEST_CLOSED · **(ต้อง simulate — คำขอ answered ไม่มีปุ่มส่ง · เรียก `sendVia` ตรง)**
+- actor: officer · Setup: role=officer · seed=คำขอ answered (REQ-2603) + คำขอ pending (REQ-2601) · files=—
+- Start: OPEN `#/consent/requests`
+- ผ่านเมื่อ: ส่งบน pending สำเร็จ · ส่ง/ส่งซ้ำบน answered → toast **"คำขอนี้ปิดแล้ว"** + sends ไม่เพิ่ม
+
+| # | Action | Input | Expected | Result |
+|---|---|---|---|---|
+| 1 | OPEN `#/consent/requests` → CLICK คำขอ **ตอบแล้ว (answered)** → VERIFY+บันทึกจำนวนรายการส่ง (sends) | — | drawer · **ไม่มี**ปุ่มส่ง (คำขอปิด) · จดจำนวน sends | ☐ |
+| 2 | (simulate) เรียก `sendVia` ตรงบนคำขอ answered | — | toast warning **"คำขอนี้ปิดแล้ว"** + return · sends **ไม่เพิ่ม** | ☐ |
+| 3 | OPEN `#/consent/requests` → CLICK REQ-2601 (pending) → ส่งทางช่องทาง | — | ส่งสำเร็จ toast "บันทึกการส่ง…(จำลอง — ไม่ส่งจริง)" — ยืนยัน guard บล็อกเฉพาะ non-draft/pending | ☐ |
+
+### TC-FIX-09 — contract anchors F136/F031/F157 (comment · display-only · ไม่โผล่บนจอ) (FIX-06)
+- group: BA-fix · ความสำคัญ: กลาง · trace: FIX-06 / XT-06,07 / d "ฐานข้อมูลให้ DSAR" · **(ต้อง inspect source — anchor เป็น HTML comment)**
+- actor: dev · Setup: role=officer · seed=default · files=—
+- Start: OPEN `#/consent/resolve` (และ inspect source)
+- ผ่านเมื่อ: มี contract comment F136 (ctl) / F031 (data) / F157 DSAR (data) ใน source · แต่รหัสเหล่านี้ **ไม่แสดงบนหน้าจอ**ผู้ใช้ใด ๆ (display-only)
+
+| # | Action | Input | Expected | Result |
+|---|---|---|---|---|
+| 1 | (inspect) ค้น source ของ consent-pdpa.html หา contract anchors | — | พบ comment: `CONTRACT: resolveConsent = API ให้ F136 Broadcast (ctl …) + F031 …` และ `CONTRACT: ทะเบียน consent + evidence + history = ฐานข้อมูลให้ F157 DSAR` — ครบ 3 contract | ☐ |
+| 2 | OPEN ทุกแท็บ (registry/requests/purposes/resolve) → VERIFY บนจอ | — | ข้อความ **"F136" / "F031" / "F157" / "DSAR" ไม่ปรากฏบนหน้าจอ**ที่ผู้ใช้เห็น (anchor เป็น comment display-only · ไม่มีหน้าจอ feature อื่นเกิดใหม่) | ☐ |
+
+### TC-FIX-10 — demo elements ซ่อนเมื่อ strip demo-only → จอสะอาด (FIX-07)
+- group: BA-fix · ความสำคัญ: กลาง · trace: FIX-07 / 01_UI §1.10 demo-only · **(ต้อง simulate — inject `.demo-only{display:none}`)**
+- actor: dev · Setup: role=officer · seed=default · files=—
+- Start: OPEN `#/consent/registry`
+- ผ่านเมื่อ: inject CSS ซ่อน `.demo-only` → persona strip + simbar + วลี "(จำลอง)" หาย · layout ไม่พัง · ไม่เหลือศัพท์ dev บนจอ
+
+| # | Action | Input | Expected | Result |
+|---|---|---|---|---|
+| 1 | OPEN `#/consent/registry` → VERIFY มี demo-strip (persona Officer/DPO/Auditor) ปกติ | — | เห็น persona switcher (demo-strip) มุมบน | ☐ |
+| 2 | (simulate) inject `.demo-only{display:none}` | — | persona strip หาย · recipient simbar "จำลอง…" หาย · **layout ไม่พัง** (ไม่มีช่องว่าง/element เหลื่อม) | ☐ |
+| 3 | VERIFY ทุกแท็บหลัง strip | — | หน้าจอสะอาด · ไม่เหลือศัพท์ dev/ปุ่ม sim · (prod: บทบาทจริงมาจากล็อกอิน) | ☐ |
+
+### TC-FIX-11 — ตาราง purposes: คอลัมน์สถานะ 1 pill ต่อเซลล์ (FIX-08 · Rule #103/#40)
+- group: BA-fix · ความสำคัญ: กลาง · trace: FIX-08 / 01_UI §1.10 / Rule #103,#40 (pill-cramped)
+- actor: dpo · Setup: role=dpo · seed=default (PUR-01 v2 · PUR-04 closed) · files=—
+- Start: OPEN `#/consent/purposes`
+- ผ่านเมื่อ: เซลล์คอลัมน์สถานะแต่ละแถวมี **pill เดียว** — เวอร์ชัน/ตัวเลขแยกคอลัมน์ ไม่อัด pill ≥2 ในเซลล์เดียว
+
+| # | Action | Input | Expected | Result |
+|---|---|---|---|---|
+| 1 | CLICK persona **DPO** → OPEN `#/consent/purposes` | — | ตารางวัตถุประสงค์แสดง PUR-01..04 | ☐ |
+| 2 | VERIFY คอลัมน์สถานะ ของแต่ละแถว | — | แต่ละเซลล์สถานะมี **pill เดียว** (เช่น "ใช้งาน"/"ปิด") · เวอร์ชัน (v2) และตัวเลขสถิติอยู่**คนละคอลัมน์** — ไม่มีเซลล์ที่อัด pill ≥2 ติดกัน (Rule #103/#40) | ☐ |
+
 ---
 
 ## วิธีที่ agent รัน (Run protocol)
@@ -1156,19 +1325,20 @@
 
 | หมวด | covered / total |
 |---|---|
-| FN บวก (FUNCTION_CHECKLIST) | **20 / 20** |
+| FN บวก (FUNCTION_CHECKLIST) | **20 / 20** (+ FN-21 helper = TC-FIX-03) |
 | FN-40 Negative Locks | **10 / 10** |
-| FR / AT (06_TESTS AT-01..20 + AT-ID/VER) | 22 / 22 |
-| Business rules (05_RULES §5.1) | 27 / 27 (BR-21/22 = ต้อง simulate) |
-| Edge cases (EC-01..11) | 11 / 11 (EC-04/10/11 simulate · EC-09 partial) |
-| Error codes (catalog) | 12 / 12 (idempotency/stale = simulate) |
+| FR / AT (06_TESTS AT-01..20 + AT-ID/VER + **AT-21..25 BA fixes**) | 27 / 27 |
+| Business rules (05_RULES §5.1 + **BR-23..26**) | 31 / 31 (BR-21/22 = ต้อง simulate) |
+| Edge cases (EC-01..11 + **EC-12/13/14**) | 14 / 14 (EC-04/10/11/13/14 simulate · EC-09 partial) |
+| Error codes (catalog + **BR_REQUEST_CLOSED · BR_NOT_GRANTED**) | 14 / 14 (idempotency/stale = simulate) |
 | Field validation | 10 / 10 |
-| Permission cells (สำคัญ) | 5 / 5 (enforce จริง = OQ-05) |
+| Permission cells (สำคัญ) | 5 / 5 (+ role-in-function BR-25 = TC-FIX-04/05 · enforce จริง = OQ-05) |
 | Cross-cutting / events / states / UI states | ครบ |
 
-- Cross-Module (XT): **5 / 5** (XT-03/04/05 = ต้อง simulate)
+- Cross-Module (XT): **7 / 7** (XT-03/04/05 = ต้อง simulate · XT-06→TC-REG-07 · XT-07→TC-REG-05/06)
 - Scope Lock (LOCK): **13 / 13** (ทุกข้อมีเคส verify — ส่วนใหญ่เป็น NEG verify "ไม่มี")
-- **Manifest cross-check (FRD §0.12): ✅ 20/20 stories + 22 rules + 5 edges** — ทุกแถว manifest มีคู่ใน Ledger
+- BA-gate fixes (FIX-01..08): **8 / 8** (G10 · TC-FIX-01..11 · bypass B1..B8 มีเคส verify block)
+- **Manifest cross-check (FRD v1.1 §0.12): ✅ 20/20 stories + 27 AT + 31 rules + 14 edges** — ทุกแถว manifest มีคู่ใน Ledger
 
 ### ข้าม (พร้อมเหตุผล)
 - **Out-of-Scope 10 Locks** — ห้ามสร้างเคส "ทำได้"; แทนด้วยเคส verify **ไม่มี** (TC-NEG-01..10) — ตามใบเซ็น/LOCK
@@ -1190,9 +1360,7 @@
   "results": [
     { "id": "TC-PUR-01", "status": "pass|fail|blocked", "failed_step": null, "evidence": "", "note": "" }
   ],
-  "summary": { "total": 68, "pass": 0, "fail": 0, "blocked": 0 }
+  "summary": { "total": 83, "pass": 0, "fail": 0, "blocked": 0 }
 }
 ```
 > `evidence` = สิ่งที่ agent **เห็นจริง** ตอน fail/blocked (ข้อความ toast จริง, route ที่ค้าง, verdict/JSON ที่ได้แทน Expected). `note` = สำหรับ `(ต้อง simulate)` ระบุว่า inject ได้/ไม่ได้ · สำหรับ `[AI-DEFAULT]` ระบุว่าพฤติกรรมตรง default หรือไม่.
-</content>
-</invoke>

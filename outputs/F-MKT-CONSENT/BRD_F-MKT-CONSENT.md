@@ -1,7 +1,8 @@
 # BRD — ความยินยอม PDPA (Consent PDPA)
 
-> **โหมด:** brd-generator-full v2.2 · **Fresh Mode (HTML-first)** — HTML ผ่าน ux+coverage gate แล้ว = source of truth ฝั่งหน้าจอ
+> **โหมด:** brd-generator-full v2.2 · **Revision Mode (sync HTML v2 → BRD)** — BRD ถูก re-generate หลัง BA-gate round ของ surgical HTML fixes 8 จุด · HTML ผ่าน ux+coverage+e2e gate แล้ว = source of truth ฝั่งหน้าจอ
 > **Conflict priority ที่ใช้จริง:** LOCK-XX > PREBRIEF (business intent) > HTML (พฤติกรรมจอ) · ทุก drift ประกาศ ไม่แก้เงียบ
+> **⚠️ Revision note:** fix รอบนี้ทั้ง 8 = **guards/anchors ของ scope เดิม ไม่ใช่ scope ใหม่** — FIX-01..05 เป็น hardening (state machine + persona + snapshot + idempotency) · FIX-06 = contract anchors (display-only) · FIX-07/08 = demo-marking + cosmetic
 
 ---
 
@@ -16,16 +17,22 @@
 | Wave | W1 |
 | Dependency | **standalone — ไม่มี upstream dependency** (plan `dep=""`) |
 | ประเภท BRD | New Feature |
-| Version | 1.0 |
-| Status | **APPROVED** (ผ่าน Quality Gate — ดู §14.7) |
+| Version | 1.1 |
+| Status | **APPROVED** (ผ่าน Quality Gate — ดู §14.8) |
 | Owner (BA) | tadswan@2bsimple.com |
-| Stakeholders | เจ้าหน้าที่การตลาด · ผู้ดูแลข้อมูลส่วนบุคคล (DPO) · ผู้ตรวจสอบ (Auditor) · ทีมพัฒนา · ทีม Security (เจ้าของ Backend Enforcement Gate F143) |
+| Stakeholders | เจ้าหน้าที่การตลาด · ผู้ดูแลข้อมูลส่วนบุคคล (DPO) · ผู้ตรวจสอบ (Auditor) · ทีมพัฒนา · ทีม Security (เจ้าของ Backend Enforcement Gate F143) · Strike (BA gate — เจ้าของ OQ-CNS-01/02/03) |
 | Declaration รอบนี้ | **csq เท่านั้น** (`CSQ_BRIEF` ออกที่ step 7) · doa / doccfg / ntf = ไม่เลือก |
-| วันที่ | 2026-09-13 |
-| Input | `consent-pdpa.html` (3086 บรรทัด, ผ่าน gate) · `PREBRIEF_F-MKT-CONSENT.md` · `FUNCTION_CHECKLIST_F-MKT-CONSENT.md` (20 FN + 10 FN-40) · `_UX_CHECK_REPORT.md` (PASS/4WARN cosmetic) · `_COVERAGE_REPORT.md` (PASS FN 20/20) |
+| วันที่ | 2026-09-14 (revision) · 2026-09-13 (v1.0) |
+| Input | `consent-pdpa.html` (updated · ผ่าน ux+coverage+e2e gate) · `PREBRIEF_F-MKT-CONSENT.md` · `FUNCTION_CHECKLIST_F-MKT-CONSENT.md` (20 FN + 10 FN-40) · **`FIX_PROMPT_F058.md` + `REVIEW_FIX_ORDER_F058_ConsentPDPA.md`** (BA fix orders — Verdict เดิม BLOCK: CRITICAL 1 · HIGH 5 · MINOR 2) |
 
 ### 1.1 Changelog
 - **v1.0 (2026-09-13):** Initial BRD via brd-generator-full (Fresh Mode HTML-first). สกัด Screen Inventory จาก HTML จริง · encode content-model divergence (เอกสารอัปโหลด) เป็น DECLARED DIVERGENCE
+- **v1.1 (2026-09-14):** Revision จาก BA-gate surgical fixes ⭐ (overwrite in place)
+  - **Source:** `consent-pdpa.html` (updated) + `FIX_PROMPT_F058.md` + `REVIEW_FIX_ORDER_F058_ConsentPDPA.md`
+  - **Drift class:** ทั้ง 8 fix = 🟡 Hidden-Logic/guard hardening + 🟢 anchors/cosmetic — **ไม่มี Business drift (scope เดิม), ไม่มี Critical drift** (ไม่มี Tag เปลี่ยน · ไม่ลบ Locked Section · Security Preset คงเดิม)
+  - **Sections updated:** §4 (persona enforcement) · §5.1/5.2 (answered-once + recipient closed page) · §8.2 (request `answered` = terminal + `answeredAt`) · §9/§9.2 (guard backstops FIX-01..05) · §12.1 (contract anchors F136/F031/F157) · §12.3/§16 (integration register) · §15 (OQ-CNS-01/02/03) · §14.8 (AI review)
+  - **Sections preserved:** §1.2 · §2 · §3 · §6 · §7 · §10 · §11 · §13 · §17 · §18
+  - **Fix ledger:** FIX-01 request answered-once (evidence chain immutable) · FIX-02 persona guard in mutation · FIX-03 policy-version snapshot ตอนส่ง · FIX-04 double-submit `_busy`+loading · FIX-05 sub-status guards (withdraw/resend) · FIX-06 contract anchors · FIX-07 demo-only marking · FIX-08 cosmetic (Rule #103/#40 pill split)
 
 ### 1.2 ⚠️ Declared Divergence (สำคัญ — อ่านก่อน)
 BRD ฉบับนี้สะท้อน **โมเดลที่ระบบสร้างจริง (HTML)** ซึ่งต่างจาก PREBRIEF ที่ยังไม่ sync:
@@ -116,7 +123,8 @@ PDPA compliance requirement (Marketing) · plan row `F058 · Marketing · W1 · 
 | ผู้ดูแลข้อมูล / DPO (dpo) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | ผู้ตรวจสอบ (auditor) | ✅ (อ่านอย่างเดียว) | ❌ | ❌ | ❌ | ❌ | ✅ (อ่าน) |
 
-> รายละเอียด permission ระดับ field/route ที่แท้จริง → กำหนดใน FRD + Security Preset (§16) · ⚠️ HTML ปัจจุบันเป็น role switcher เดโม (ไม่บังคับสิทธิ์จริง) → matrix ข้างบนเป็น business intent ที่ FRD ต้อง enforce → §15 OQ-05
+> **FIX-02 (v1.1):** persona/role enforcement ถูกย้ายเข้า**ทุก mutation** แล้ว (`applyAnswers`/sign · `doWithdraw` · `doPublishVersion`+`doClosePurpose`/purpose=DPO เท่านั้น · `submitReqCreate` · `sendVia`) — Auditor เรียก mutation ตรงจะถูก block (`showToast('สิทธิ์ไม่พอสำหรับบทบาทนี้')` + return) ไม่ใช่แค่ซ่อนปุ่มเหมือน v1.0
+> ⚠️ **ยังเป็น prototype mirror ของ `sec.can()`** — บทบาทจริงต้องมาจากล็อกอิน (comment `<!-- SEC: บทบาทจริงจากล็อกอิน · prototype mirror sec.can() -->`) · การ enforce สิทธิ์จริงระดับ field/route ยังเป็นหน้าที่ FRD + Security Preset (§16) → **§15 OQ-05 ยังเปิดอยู่**
 
 ---
 
@@ -130,19 +138,21 @@ PDPA compliance requirement (Marketing) · plan row `F058 · Marketing · W1 · 
 |--:|---|---|---|---|---|---|
 | 1 | ตั้งวัตถุประสงค์ + อัปโหลดเอกสาร v1 | `#/consent/purposes` → drawer สร้าง | เจ้าหน้าที่/DPO | — | — | บังคับ name+≥1 channel+life 1–120+เอกสาร → push `versions:[{v:1}]` |
 | 2 | สร้างคำขอ (subject + purposes หลายข้อ + channel) | `#/consent/requests` → drawer single-screen | เจ้าหน้าที่ | — | — | gen link + QR · status = draft |
-| 3 | ส่งคำขอ (email/…) | drawer รายละเอียดคำขอ | เจ้าหน้าที่ | — | — | บันทึกการส่ง (mock toast) · status → pending |
-| 4 | เจ้าของข้อมูลอ่าน+ยืนยันตัวตน+เลือกยินยอมรายข้อ+เซ็น | recipient view (mock ลิงก์ภายนอก) | เจ้าของข้อมูล | — | — | `applyAnswers` → registry row granted/declined ต่อ purpose + evidence 5 + history + supersede คู่เดิม |
+| 3 | ส่งคำขอ (email/…) | drawer รายละเอียดคำขอ | เจ้าหน้าที่ | — | — | บันทึกการส่ง (mock toast) · **snapshot เวอร์ชันนโยบายต่อ purpose ณ ตอนส่ง (FIX-03)** · status → pending · ส่งได้เฉพาะ draft/pending (FIX-05) |
+| 4 | เจ้าของข้อมูลอ่าน+ยืนยันตัวตน+เลือกยินยอมรายข้อ+เซ็น | recipient view (mock ลิงก์ภายนอก) | เจ้าของข้อมูล | — | — | `applyAnswers` → registry row granted/declined ต่อ purpose + evidence 5 + history + supersede คู่เดิม · **ตอบได้ครั้งเดียว: status → answered (terminal) + answeredAt · re-answer ถูก block (FIX-01)** |
 | 5 | ดูทะเบียน/หลักฐาน/ประวัติ | `#/consent/registry` → consent drawer | ทุก role (auditor อ่าน) | — | — | render evidence 5 + timeline append-only |
 | 6 | ระบบปลายทางตรวจสิทธิ์ก่อนส่ง | `#/consent/resolve` (จำลอง) / API จริง | ระบบปลายทาง | — | — | ตอบ 200 + allowed + reason + JSON ล็อกฟิลด์ |
 
 ### 5.2 Alternative / Exception Paths
 - **A1 ยินยอมบางวัตถุประสงค์:** เลือกยินยอม 2 ปฏิเสธ 1 → บันทึกแยกรายข้อ (ไม่ใช่ทั้งก้อน)
-- **A2 ออกเวอร์ชันนโยบายใหม่:** อัปโหลดเอกสารใหม่ → v+1 + เตือน consent v เดิม N รายการไม่ครอบคลุม (BR-06)
-- **A3 ถอนความยินยอม:** ลูกค้าโทรมา → เจ้าหน้าที่ถอน (เหตุผล+ช่องทาง) มีผลทันที ไม่ต้องอนุมัติ
-- **A4 ต่ออายุ:** จากรายการ ≤30 วัน → สร้างคำขอใหม่อ้างรายการเดิม (ไม่แก้วันหมดอายุเดิม)
+- **A2 ออกเวอร์ชันนโยบายใหม่:** อัปโหลดเอกสารใหม่ → v+1 + เตือน consent v เดิม N รายการไม่ครอบคลุม (BR-06) · **คำขอ pending ที่ค้างไม่ auto-expire** — drawer แสดงเวอร์ชัน ณ ตอนส่ง + ป้ายเตือน "ส่ง vX · ปัจจุบัน vY — พิจารณาส่งคำขอใหม่" (FIX-03) → นโยบาย auto-expire = **OQ-CNS-02**
+- **A3 ถอนความยินยอม:** ลูกค้าโทรมา → เจ้าหน้าที่ถอน (เหตุผล+ช่องทาง) มีผลทันที ไม่ต้องอนุมัติ · **ถอนได้เฉพาะรายการ `granted` — ถอนซ้ำบน withdrawn ถูก block (FIX-05)** กัน history/CSQ reversal ยิงซ้ำ
+- **A4 ต่ออายุ:** จากรายการ ≤30 วัน → สร้างคำขอใหม่อ้างรายการเดิม (ไม่แก้วันหมดอายุเดิม) · trigger ต่ออายุ (manual/batch) = **OQ-CNS-03**
 - **A5 ปิดวัตถุประสงค์:** ห้ามสร้างคำขอใหม่ · consent เดิมยังอยู่เป็นหลักฐาน
+- **A6 เปลี่ยนใจหลังตอบแล้ว (FIX-01):** ลูกค้าเปิดลิงก์เดิมซ้ำ → เห็น**หน้าสถานะปิด** "คำขอนี้ตอบแล้วเมื่อ [เวลา]" แทนฟอร์ม · การเปลี่ยนใจ = withdraw หรือคำขอใหม่ (ไม่ใช่แก้ผ่านลิงก์เดิม) → ใครเปิดคำขอใหม่ได้ = **OQ-CNS-01**
 - **E1 ตรวจคนไม่เคยถูกขอ:** resolve → `allowed:false · status:"never_asked"` (ไม่ใช่ 404 · ไม่ใช่ declined)
 - **E2 คำขอเกินกำหนดตอบ:** → status `expired` (คำขอหมดอายุ) ≠ declined
+- **E3 double-submit (FIX-04):** กดยืนยันรัวทุก mutation (สร้างคำขอ/ส่ง/ตอบ/ถอน/publish/ปิด) → `_busy` guard ให้เกิดผลครั้งเดียว + ปุ่มขึ้น loading state (Rule #44)
 
 > ทุก step map กับ route/ปุ่มจริงบนจอ — ไม่มี step ลอย (ตรวจกับ Screen Inventory §14.6)
 
@@ -260,8 +270,17 @@ Subject(Customer, external ref CUS-xxxx) ──(1:N)──▶ Consent
 | near-expiry (คำนวณ) | 0 ≤ daysLeft ≤ 30 | เตือน ไม่บล็อก | |
 | never_asked | ไม่มี record (resolve) | — | allowed:false |
 
-### 8.2 Request status
-`draft → pending → answered` · หรือ `pending → expired` (เกิน 30 วัน)
+### 8.2 Request status (FIX-01 · `answered` = terminal)
+`draft → pending → answered` (**terminal — ตอบซ้ำไม่ได้**, บันทึก `answeredAt`) · หรือ `pending → expired` (เกิน 30 วัน)
+
+| State | Trigger | Next | หมายเหตุ |
+|---|---|---|---|
+| draft | สร้างคำขอ | pending / (ตอบ) answered | ส่ง/ตอบได้ |
+| pending | ส่งคำขอแล้ว | answered / expired | ส่งซ้ำได้ (นับเป็นการส่ง) · ตอบได้ครั้งเดียว |
+| **answered** | เจ้าของตอบครบ | **(terminal)** | re-answer/sendVia ถูก block (FIX-01/05) · recipient view = หน้าสถานะปิด |
+| expired | เกิน 30 วัน ไม่ตอบ | (terminal) | lapsed ≠ declined (BR-08) |
+
+> ตอบได้เฉพาะคำขอ `draft`/`pending` เท่านั้น · การส่ง/ส่งซ้ำ (`sendVia`) ก็เฉพาะ `draft`/`pending` (FIX-05) — evidence chain จึงถูกเขียนทับจากลิงก์เดิมไม่ได้
 
 ### 8.3 Purpose status
 `active → closed` (ปิดแล้วขอใหม่ไม่ได้ · consent เดิมคงอยู่)
@@ -277,7 +296,7 @@ Subject(Customer, external ref CUS-xxxx) ──(1:N)──▶ Consent
 | BR-03 | วัตถุประสงค์กำหนดช่องทางที่ใช้ได้เอง — ขอช่องทางนอกรายการไม่ได้ | **FIXED** | — | ✅ |
 | BR-04 | default = ไม่อนุญาต (ไม่มี record = ส่งไม่ได้) | **FIXED** | — | ✅ |
 | BR-05 | เอกสารนโยบายเป็นเวอร์ชัน · อัปโหลดใหม่ = ออกเวอร์ชันใหม่ · เวอร์ชันเดิมแก้ไม่ได้ | **FIXED** | — | ✅ (DECLARED-01: "อัปโหลด" ไม่ใช่ "แก้ข้อความ") |
-| BR-06 | consent ผูกกับเวอร์ชันที่เจ้าของเห็นตอนเซ็น — เวอร์ชันใหม่ไม่ครอบคลุมอัตโนมัติ | **FIXED** | — | ✅ |
+| BR-06 | consent ผูกกับเวอร์ชันที่เจ้าของเห็นตอนเซ็น — เวอร์ชันใหม่ไม่ครอบคลุมอัตโนมัติ · **การส่งคำขอ snapshot เวอร์ชันต่อ purpose ณ ตอนส่ง (FIX-03)** — panel "เนื้อหาที่ให้เซ็น" แสดงเวอร์ชันที่ส่งจริง + เตือนเมื่อเวอร์ชันปัจจุบันใหม่กว่า | **FIXED** | — | ✅ |
 | BR-07 | สถานะ 5 ค่า + คำนวณ expired | **FIXED** | — | ✅ |
 | BR-08 | ไม่ตอบ ≠ ปฏิเสธ (เกินกำหนด = คำขอหมดอายุ) | **FIXED** | — | ✅ |
 | BR-09 | ถอนได้ทุกเมื่อ ไม่ต้องอนุมัติ มีผลทันที | **FIXED** | — | ✅ |
@@ -305,6 +324,23 @@ Subject(Customer, external ref CUS-xxxx) ──(1:N)──▶ Consent
 | ถอน | ต้องมีเหตุผล + ช่องทาง | Prevent | — |
 | สร้างคำขอ | เลือกได้เฉพาะวัตถุประสงค์ status=active | Prevent | ปิดแล้วเลือกไม่ได้ |
 | resolve never_asked | ไม่มี record | Trigger | `status:"never_asked"` reason อธิบาย |
+| ตอบคำขอ (recipient/answerRequest) | คำขอต้อง `draft`/`pending` | Prevent | "คำขอนี้ปิดแล้ว — ตอบซ้ำไม่ได้" (FIX-01) |
+| ส่ง/ส่งซ้ำ (sendVia) | คำขอต้อง `draft`/`pending` | Prevent | "คำขอนี้ปิดแล้ว" (FIX-05) |
+| ถอน (doWithdraw) | consent ต้อง `granted` | Prevent | "รายการนี้ไม่อยู่ในสถานะยินยอม" (FIX-05) |
+| mutation ทุกตัว (persona) | PERM() ของ action ต้องผ่าน | Prevent | "สิทธิ์ไม่พอสำหรับบทบาทนี้" (FIX-02, prototype mirror) |
+| double-submit ทุก mutation | `state._busy=false` | Prevent | guard + ปุ่ม loading state (FIX-04, Rule #44) |
+
+### 9.2 UI Idempotency & Guard Backstops (post-BA-gate, FIX-01..05)
+
+> ทั้งหมดเป็น **guard/backstop ของ rule เดิม** — ไม่ใช่ business rule ใหม่ · ปิดช่อง bypass ที่ BA gate พบ (B1–B8) · หลักฐาน PDPA (evidence chain) จึงเขียนทับจากลิงก์เดิม/บทบาทที่ไม่มีสิทธิ์/การกดซ้ำไม่ได้
+
+| Fix | ปิดช่องอะไร (bypass เดิม) | Backstop ของ rule | หมายเหตุ |
+|---|---|---|---|
+| FIX-01 | คำขอ answered ถูกตอบซ้ำ → consent ทับซ้อน (B1/B2) | BR-15/16 (evidence/history immutable) | request `answered` = terminal + recipient closed-page |
+| FIX-02 | Auditor เรียก mutation ตรงสำเร็จ (B4) | §4 role matrix | prototype mirror `sec.can()` — real enforce = OQ-05 |
+| FIX-03 | sends ไม่ snapshot ver → หลักฐาน "ส่งอะไรไป" ไม่ตรง | BR-06 | snapshot ต่อ purpose ณ ตอนส่ง + stale warning |
+| FIX-04 | double-submit สร้างคำขอ/รายการซ้ำ (B8) | BR-18 (การส่ง = รายการ) | `_busy` guard + loading |
+| FIX-05 | withdraw ซ้ำ / ส่งหลังตอบแล้ว (B3/B7) | BR-09/CSQ-02 (idempotency) | sub-status guard = UI backstop ของ idempotency_key |
 
 ### 9.5 สรุประดับความยืดหยุ่น
 | Rule | ระดับ | เหตุผล | ที่มา |
@@ -349,15 +385,17 @@ New Feature standalone — ไม่มี regression กับ feature เด�
 
 **Upstream:** รับ subject reference (ลูกค้า CUS-xxxx) จากทะเบียนลูกค้า (external ref) · ไม่มี trigger เอกสารต้นทาง
 
-**Downstream Impact Map:**
-| ปลายทาง | ข้อมูลที่ไหลไป | Trigger | ถ้าเปลี่ยน/ถอน |
-|---|---|---|---|
-| แคมเปญส่งข้อความ / จดหมายข่าว | ผล `/consent/resolve` (allowed + status) | ก่อนส่งทุกครั้ง | ถอน → resolve ตอบ false ทันที · caller ต้องล้างแคช ≤5 นาที (BR-21) |
-| Backend Enforcement Gate (F143) | ทะเบียน endpoint `/consent/*` + review 4 ขั้น | deploy | ต้องขึ้นทะเบียนก่อน go-live (BR-22) — **hard dependency** |
-| 7C Consequence Engine (F-CSQ-01) | event envelope (granted/declined/withdrawn/version_published/purpose_closed/renew/reconsent) | ทุก state change | reversal ส่ง event `reversal_of` (ถอน) — ไม่ลบผลเดิม |
-| DSAR / consent receipt (อนาคต) | evidence + history | (deferred E3) | — |
+**Downstream Impact Map:** (⭐ FIX-06 — contract anchors ประกาศไว้ใน HTML แบบ display-only ครบ 3 contract)
+| ปลายทาง | ประเภท | ข้อมูลที่ไหลไป | Trigger | ถ้าเปลี่ยน/ถอน |
+|---|---|---|---|---|
+| **F136 Broadcast** | **control (ctl)** | ผล `resolveConsent` / `/consent/resolve` (allowed + status) — ตรวจ opt-in ก่อนส่ง Email/SMS (block อัตโนมัติฝั่ง F136) | ก่อนส่งทุกครั้ง | ถอน → resolve ตอบ false ทันที · caller ต้องล้างแคช ≤5 นาที (BR-21) |
+| **F031 Customer 360** | **data** | สถานะ consent ผูกลูกค้า (registry) | เปิดหน้า/ดึงข้อมูลลูกค้า | สถานะเปลี่ยน → สะท้อนใน 360 |
+| **F157 DSAR** | **data** | ทะเบียน consent + **evidence 5** + **history append-only** = ฐานข้อมูลประกอบคำขอ DSAR | คำขอ DSAR | เป็นแหล่งหลักฐาน — BR-16/17 กันแก้/ลบ |
+| Backend Enforcement Gate (F143) | dependency | ทะเบียน endpoint `/consent/*` + review 4 ขั้น | deploy | ต้องขึ้นทะเบียนก่อน go-live (BR-22) — **hard dependency** |
+| 7C Consequence Engine (F-CSQ-01) | event | event envelope (granted/declined/withdrawn/version_published/purpose_closed/renew/reconsent) | ทุก state change | reversal ส่ง event `reversal_of` (ถอน) — ไม่ลบผลเดิม |
+| consent receipt PDF (อนาคต) | data | evidence + history | (deferred E3) | — |
 
-> ⚠️ Downstream ทุกแถวตอบ "แล้วไงต่อ" ได้ · BR-22 = external dependency ที่ต้อง confirm timeline กับทีม Security → §15 OQ-04
+> ⚠️ Downstream ทุกแถวตอบ "แล้วไงต่อ" ได้ · **F136/F031/F157 = contract anchor (display-only) ไม่ใช่การ mock หน้าจอ feature อื่น** — Phase B เขียน §Integration ได้จาก anchor นี้ · BR-22 = external dependency ที่ต้อง confirm timeline กับทีม Security → §15 OQ-04
 
 ---
 
@@ -367,6 +405,9 @@ New Feature standalone — ไม่มี regression กับ feature เด�
 | Backend Enforcement Gate (BR-22) | ✅ (plan F143 done ตาม prompt) | ต้องลงทะเบียน `/consent/*` + review 4 ขั้น |
 | 7C Consequence Engine (CSQ) | ✅ | POST /csq/events (declare-only, CSQ_BRIEF step 7) |
 | ทะเบียนลูกค้า (subject ref) | ⚠️ external | ใช้ CUS-xxxx เป็น ref เท่านั้น |
+| **F136 Broadcast** (consumer — ctl) | consumer | เรียก `resolveConsent` ตรวจ opt-in ก่อนส่ง (FIX-06 anchor) |
+| **F031 Customer 360** (consumer — data) | consumer | อ่านสถานะ consent ผูกลูกค้า (FIX-06 anchor) |
+| **F157 DSAR** (consumer — data) | consumer | อ่านทะเบียน+evidence+history เป็นฐาน DSAR (FIX-06 anchor) |
 | Document store / running number | ❌ ไม่ใช้ | ไม่ใช่เอกสารธุรกรรม (ไม่มี doccfg) |
 
 ---
@@ -438,6 +479,9 @@ N/A (standalone)
 | **OQ-04** | BR-22 `/consent/*` ขึ้นทะเบียน Backend Enforcement Gate (F143 done) + ตรวจ 4 ขั้น — confirm timeline/ขั้นตอนกับทีม Security | ⚠️ รอ Security | hard dependency ก่อน go-live |
 | **OQ-05** | Permission enforcement จริงต่อ role (switcher เดโม) + consent receipt PDF (E3) deferred | ⚠️ รอ BA/PM | E3 → wave DSAR |
 | **OQ-06** | เก็บ baseline ตัวชี้วัด §2.3 ก่อน launch | ⚠️ action ก่อน go-live | |
+| **OQ-CNS-01** | หลังลูกค้าตอบแล้ว การเปลี่ยนใจ **ไม่ผ่านลิงก์เดิม** (FIX-01) — เส้นทางถูกต้อง = คำขอใหม่/withdraw ใช่ไหม + **ใครมีสิทธิ์เปิดคำขอใหม่** | ⚠️ รอ Strike | กระทบ 03_LOGIC state machine · build ปัจจุบัน block re-answer + แสดงหน้าสถานะปิด |
+| **OQ-CNS-02** | publish นโยบายเวอร์ชันใหม่ระหว่างคำขอ pending ค้าง — **auto-expire คำขอเก่า (บังคับสร้างใหม่)** หรือให้ตอบกับเวอร์ชันปัจจุบัน | ⚠️ รอ Strike | build ปัจจุบัน **ไม่ auto-expire** — แสดงเวอร์ชัน ณ ตอนส่ง + ป้ายเตือน (FIX-03) · กระทบ 03_LOGIC · BR |
+| **OQ-CNS-03** | รอบต่ออายุ (nearExpiry 30 วันมีแล้ว) — ใคร/อะไร trigger คำขอต่ออายุ (**manual จาก registry** หรือ **batch อัตโนมัติ**) | ⚠️ รอ Strike | กระทบ 03_LOGIC · NTF ฝั่ง F136 |
 
 ---
 
@@ -456,8 +500,8 @@ PDPA (หลัก) · ISO 27001 (access/audit log) · หลักฐาน/ร
 | Audit trail append-only | ✓Must | BR-16/17 (มีในโมเดลแล้ว) |
 | Data masking ก่อนส่ง CSQ | ✓Must | BR-CSQ-03 (mask restricted ที่ผู้ส่ง) |
 | Immutable policy version | ✓Must | BR-05/06 |
-| API contract lock + gate register | ✓Must | BR-19/20/22 |
-| Role-based permission | ✓Must | §4 (ปัจจุบัน switcher เดโม → OQ-05) |
+| API contract lock + gate register | ✓Must | BR-19/20/22 · consumer contract F136/F031/F157 ประกาศแล้ว (FIX-06) |
+| Role-based permission | ✓Must | §4 · **mutation guard ครบทุกจุดแล้ว (FIX-02)** แต่ยัง prototype mirror `sec.can()` → real enforce = OQ-05 |
 | Cache invalidation on withdraw | ✓Must | BR-21 |
 
 ### 16.4 Risk Statement
@@ -520,7 +564,7 @@ resolve = call ก่อนส่งทุก message → capacity ต้อง�
 ═══════════════════════════════════════
 AI REVIEW REPORT — BRD Generator Full
 BRD: BRD-F-MKT-CONSENT — ความยินยอม PDPA
-ประเภท: New Feature · วันที่: 2026-09-13
+ประเภท: New Feature · v1.1 (Revision) · วันที่: 2026-09-14
 ═══════════════════════════════════════
 ✅ C01 Business Objective วัดผลได้ (§2.3 มี baseline/target/แหล่งวัด)
 ✅ C02 User Roles ครบ (§4)
@@ -539,11 +583,26 @@ BRD: BRD-F-MKT-CONSENT — ความยินยอม PDPA
 ✅ PE04 SLA+KPI+Threshold ครบ (§17)
 ✅ PE05 Cross-section coverage ผ่าน (§18.7)
 
-DIVERGENCES (ประกาศ ไม่นับตก): DECLARED-01 (content model), DECLARED-02 (DOA false positive)
-OPEN QUESTIONS: 6 (OQ-01…06) — ยกเข้า PROPOSALS step 12
+✅ CR01 Changelog v1.1 entry ครบทุก field (source/drift/updated/preserved/fix ledger)
+✅ CR02 ไม่มี Critical drift — ทั้ง 8 fix = guard/anchor ของ scope เดิม (ไม่ต้อง user decision gate)
+✅ CR03 Sections preserved (§1.2/2/3/6/7/10/11/13/17/18) ไม่ถูกแตะโดยไม่จำเป็น
+✅ CR04 ไม่มี Tag change — ไม่ต้อง migration plan เพิ่ม
+✅ CR05 Philosophy embed ครบเดิม (COSO/Security P6/SLA/Monitor)
 
-SUMMARY: ผ่าน 16/16 core + 5/5 PE
-สถานะ: ✅ APPROVED — พร้อมเข้า frd-generator-v6
+REVISION (v1.1) — BA-gate surgical fixes เข้ารหัสครบ:
+  FIX-01 request answered-once (§5.1/5.2 A6 · §8.2 · §9.1/9.2) — evidence chain immutable
+  FIX-02 persona guard in mutation (§4 · §9.2) — prototype mirror sec.can() → OQ-05
+  FIX-03 policy-version snapshot ตอนส่ง + stale warning (§5.1 · §6.2 BR-06 · §9.2)
+  FIX-04 double-submit _busy + loading (§5.2 E3 · §9.1/9.2)
+  FIX-05 sub-status guards withdraw/resend (§5.2 A3 · §8.2 · §9.1/9.2)
+  FIX-06 contract anchors F136(ctl)/F031(data)/F157(DSAR data) (§12.1 · §12.3 · §16.3)
+  FIX-07 demo-only marking · FIX-08 cosmetic (Rule #103/#40) — noted
+
+DIVERGENCES (ประกาศ ไม่นับตก): DECLARED-01 (content model), DECLARED-02 (DOA false positive)
+OPEN QUESTIONS: 9 (OQ-01…06 + OQ-CNS-01/02/03) — ยกเข้า PROPOSALS step 12
+
+SUMMARY: ผ่าน 16/16 core + 5/5 PE + 5/5 CR (revision)
+สถานะ: ✅ APPROVED — พร้อมเข้า frd-generator-v6 (re-gen)
 ```
 
-**Next step:** BRD APPROVED → step 7 `frd-generator-v6` (+ `csq-declaration` ออก `CSQ_BRIEF` หลัง step 7)
+**Next step:** BRD v1.1 APPROVED → step 7 `frd-generator-v6` re-gen (+ `csq-declaration` ออก `CSQ_BRIEF` หลัง step 7) · OQ-CNS-01/02/03 = BLOCKING สำหรับ 03_LOGIC state machine (เคาะโดย Strike ก่อนเขียน FRD)

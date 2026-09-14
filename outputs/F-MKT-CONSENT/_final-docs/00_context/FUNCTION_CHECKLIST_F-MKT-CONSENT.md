@@ -51,7 +51,7 @@
 - step7 FRD ✅ (2026-09-13) `FRD_Pack\` FULL 10 ไฟล์ — gate PASS; OQ-03/OQ-04 BLOCKING (id-verify จริง, ขึ้นทะเบียน F143)
 - csq-declaration ✅ (2026-09-13) `CSQ_BRIEF_F-MKT-CONSENT.md` — 7 events, declare-only (no OC/DC/SC), gates pass; OQ-CSQ-01 profile#, OQ-CSQ-02 SecC pipe [DEFAULT รอ BA]
 - step8 UI Brief ✅ `UI_BRIEF_ความยินยอม-PDPA.md`
-- step9 AI Test case ✅ (2026-09-13) `testcases-consent-pdpa.md` — 72 เคสจริง (สรุปในไฟล์เขียน 68 = stale, reconcile ที่ step12) · QA 20/20 · FN-40 negatives 10/10 · XT 5/5 · LOCK 13/13
+- step9 AI Test case ✅ **RE-RUN (2026-09-14)** `testcases-consent-pdpa.md` — **83 เคสจริง** (summary total = 83 ตรงกับจำนวน `### TC-` แล้ว · เดิม stale 68/72 reconcile แล้ว) · regen ต่อ BA-gate fixes FIX-01..08 + FRD v1.1 · คง TC-id เดิม 72 + เพิ่ม G10 `TC-FIX-01..11` (11 เคส) · QA **20/20** · FN-40 negatives 10/10 · XT 7/7 (เพิ่ม XT-06/07) · LOCK 13/13 · BA fixes 8/8 (AT-21..25 · BR-23..26 · EC-12/13/14)
 - step10 Coverage R2 ✅ (2026-09-13) `_COVERAGE_R2_REPORT.md` — PASS · FRD 20/20 · TC 20/20 · BR 27/27 · FN-40 10/10 · no creep · WARN: DECLARED-01 + microcopy drift + TC-count stale
 - step11 UAT ✅ (2026-09-13) `ความยินยอม PDPA HTML Testcase.html` — 62 เคสคนเล่นได้ · 8 กลุ่ม · 0 JS err · capture 20/0 · drop-ledger 10 backend-only
 - step11.5 TL;DR ✅ (2026-09-13) `FEATURE_TLDR_F-MKT-CONSENT.html` — gate PASS · แสดง gate results + DECLARED-01 + BLOCKING OQ-03/04
