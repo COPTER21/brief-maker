@@ -35,7 +35,7 @@ workspace file still exists. Do not create or hardcode a Claude Code memory path
 
 ## Twelve steps
 
-1. Build or revise HTML with `html-generator-v8`; treat seed HTML as input, run
+1. Build or revise HTML with `html-generator-v9`; treat seed HTML as input, run
    its prescribed self-audit/static checks, and do not trust embedded pass claims.
 2. Use `thai-doc-pdf-generator` for printable A4 output. This is the only
    skippable step and only when the feature has no printable document.
@@ -79,7 +79,7 @@ workspace file still exists. Do not create or hardcode a Claude Code memory path
 ## Integrity and precedence
 
 - If HTML changes after step 5, rerun steps 3, 4, and 5 before continuing.
-- Precedence: `html-generator-v8` for UI/BASE-KIT/CI; locked artifacts for
+- Precedence: `html-generator-v9` for UI/BASE-KIT/CI; locked artifacts for
   cross-feature contracts; `CENTRAL_PLAN` for global contracts/waves/edges;
   PREBRIEF for this feature's business intent; checklist and seed HTML for FN
   inventory, not final appearance.

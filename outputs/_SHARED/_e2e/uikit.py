@@ -1230,6 +1230,23 @@ _JS_PATCH_TIMERS = """
 })();
 """ % SHORT_TIMER_MS
 
+# C3.8 (F-WH-STKADJ 2026-09-14): ดัก native confirm/alert/prompt — ห้ามใช้ ต้องเป็น modal ของแอป (Pattern D)
+# บันทึกการเรียกไว้ (ไม่ throw กันไม่ให้ flow ของ feature พังกลางคัน) แล้วให้ assert_no_native_dialog ตัดสิน
+_JS_TRAP_NATIVE_DIALOGS = """
+(() => {
+  if (window.__uikitDialogTrap) return;
+  window.__uikitDialogTrap = true;
+  window.__NATIVE_DIALOGS = [];
+  ['confirm','alert','prompt'].forEach(k => {
+    const ret = k === 'confirm' ? true : (k === 'prompt' ? '' : undefined);
+    window[k] = function (msg) {
+      window.__NATIVE_DIALOGS.push({ kind: k, msg: String(msg == null ? '' : msg).slice(0, 120) });
+      return ret;
+    };
+  });
+})();
+"""
+
 _JS_ANIM_DONE = """() => {
     if (window.__uikitPending) return false;
     if (!document.getAnimations) return true;
@@ -1280,12 +1297,14 @@ def ready(pg, url=None, timeout=15000):
     """
     try:
         pg.add_init_script(_JS_PATCH_TIMERS)   # มี guard ในตัว เรียกซ้ำไม่เป็นไร
+        pg.add_init_script(_JS_TRAP_NATIVE_DIALOGS)   # C3.8 ดัก native confirm/alert/prompt
     except Exception:
         pass
     if url:
         pg.goto(url)
     pg.wait_for_load_state('load')
     pg.evaluate(_JS_PATCH_TIMERS)              # เผื่อหน้าถูกเปิดไปก่อนหน้านี้แล้ว
+    pg.evaluate(_JS_TRAP_NATIVE_DIALOGS)       # เผื่อหน้าถูกเปิดไปก่อนหน้านี้แล้ว
     try:
         pg.evaluate("() => document.fonts ? document.fonts.ready : null")
     except Exception:
@@ -1908,6 +1927,99 @@ def assert_text_absent(pg, needles, scope=None):
     found = dom_text_absent(pg, needles, scope=scope)
     assert not found, f"พบข้อความที่ role นี้ไม่ควรเห็นใน DOM (role-gated absence): {found}"
     return found
+
+
+def assert_no_native_dialog(pg, note=''):
+    """C3.8 (F-WH-STKADJ 2026-09-14): assert ว่า flow ไม่เคยเรียก native confirm/alert/prompt
+
+    ต้องใช้ modal ของแอป (Pattern D) เสมอ — native dialog หลุดธีม + ตัววัดเรขาคณิต/e2e ทั่วไปมองไม่เห็น
+    (bug จริง: onChangeAdjType / เปลี่ยนคลัง ใช้ confirm() ดิบ — user จับได้ตอน UAT ตัววัดเดิมไม่จับ)
+    ต้องเรียกหลังเดินทุก flow ที่มีจุดยืนยัน (เปลี่ยนคลัง/ประเภท · ลบ · ยกเลิก · กลับรายการ) แล้ว
+    ทำงานได้ต่อเมื่อเปิดหน้าผ่าน ready() (ซึ่งติดตั้ง trap ให้) — คืน [] ถ้าผ่าน · โยนถ้าพบ
+    """
+    calls = pg.evaluate("()=>window.__NATIVE_DIALOGS||null")
+    assert calls is not None, ("[native-dialog] trap ไม่ถูกติดตั้ง — ต้องเปิดหน้าผ่าน ready() ก่อน"
+                               f"{(' · '+note) if note else ''}")
+    kinds = [c.get('kind') for c in calls]
+    assert not calls, (f"[native-dialog] พบการใช้ native {kinds} — ต้องเป็น modal ของแอป (Pattern D) "
+                       f"ไม่ใช่ confirm/alert/prompt{(' · '+note) if note else ''}: {calls[:3]}")
+    return f"ไม่มี native confirm/alert/prompt (ใช้ modal ของแอปทั้งหมด){(' · '+note) if note else ''}"
+
+
+def assert_icon_inside_input(pg, wrap_sel, note=''):
+    """C3.8 (F-WH-STKADJ 2026-09-14): assert ไอคอน overlay ในกล่อง search/input ไม่ 'ลอย' ออกนอกช่อง
+
+    bug จริง: ไอคอนวางด้วย CSS selector `.wrap>i{position:absolute}` แต่ Lucide แปลง <i data-lucide>
+    เป็น <svg> ตอน render → selector `>i` ไม่แมตช์ svg → ไอคอนหลุด position ลอยออกนอก input.
+    ตัววัดเรขาคณิต/overflow เดิมมองไม่เห็น (ไอคอนยังอยู่ในหน้า แค่ผิดตำแหน่ง). fix = selector `>i,>svg`
+    หรือ inline style. ตรวจ: center ของไอคอนต้องอยู่ในกรอบ bounding ของ input เดียวกัน.
+    คืนข้อความถ้าผ่าน · โยน AssertionError ถ้าไอคอนลอยออกนอก.
+    """
+    r = pg.evaluate("""sel=>{
+      const w=document.querySelector(sel); if(!w) return {err:'no-wrap'};
+      const ic=w.querySelector('svg,i[data-lucide]'); const inp=w.querySelector('input,textarea');
+      if(!ic||!inp) return {err:'no-icon-or-input'};
+      const R=e=>e.getBoundingClientRect();
+      const a=R(ic), b=R(inp);
+      const cx=a.left+a.width/2, cy=a.top+a.height/2;
+      return {inside: cx>=b.left-1&&cx<=b.right+1&&cy>=b.top-1&&cy<=b.bottom+1,
+              icx:Math.round(cx),icy:Math.round(cy),
+              box:[Math.round(b.left),Math.round(b.top),Math.round(b.right),Math.round(b.bottom)],tag:ic.tagName};
+    }""", wrap_sel)
+    assert not r.get('err'), f"[icon-inside-input] {r.get('err')} ที่ {wrap_sel}{(' · '+note) if note else ''}"
+    assert r['inside'], (f"[icon-inside-input] ไอคอน ({r['tag']} center {r['icx']},{r['icy']}) ลอยออกนอกกล่อง input "
+                         f"{r['box']} — น่าจะ CSS `>i` หลุดหลัง Lucide swap เป็น svg{(' · '+note) if note else ''}")
+    return f"ไอคอน overlay อยู่ในกล่อง input ({wrap_sel}){(' · '+note) if note else ''}"
+
+
+def assert_pop_above_modal(pg, pop_sel, note=''):
+    """C3.8 (F-WH-STKADJ 2026-09-16): assert dropdown/popover ที่เปิดใน modal ลอย 'อยู่หน้า' modal คลิกได้จริง
+
+    bug จริง: search dropdown (combobox) ในกล่อง 'ส่งอนุมัติ' z=--z-portal(60) < modal z=--z-modal(70)
+    → dropdown เรนเดอร์ 'จมอยู่หลัง' modal → user เห็นว่า 'ไม่มี option ชื่อคน' ทั้งที่ข้อมูลมี (DSP-02).
+    ต้องเปิด dropdown ให้มี option แล้วเรียก. เช็คด้วย elementFromPoint ที่ตำแหน่งกลาง option แรก —
+    ต้องได้ element ที่เป็นลูกของ pop (ไม่ถูก modal บัง). ตัววัด z-index/overflow เดิมมองไม่เห็น
+    (option อยู่ใน DOM + มีขนาด แค่ถูกทับ). คืน dict ถ้าผ่าน · โยนถ้า option ถูกบัง.
+    """
+    r = pg.evaluate("""sel=>{
+      const p=document.querySelector(sel); if(!p) return {err:'no-pop'};
+      const opt=p.querySelector('button,[role=option],.opt,a'); if(!opt) return {err:'no-option'};
+      const b=opt.getBoundingClientRect();
+      if(b.width<1||b.height<1) return {err:'option-zero-size'};
+      const cx=b.left+b.width/2, cy=b.top+b.height/2;
+      const top=document.elementFromPoint(cx,cy);
+      return {covered: !p.contains(top),
+              topTag: top?(top.className||top.tagName):'none',
+              popZ: getComputedStyle(p).zIndex};
+    }""", pop_sel)
+    assert not r.get('err'), f"[pop-above-modal] {r.get('err')} ที่ {pop_sel} (ต้องเปิด dropdown ให้มี option ก่อน){(' · '+note) if note else ''}"
+    assert not r['covered'], (f"[pop-above-modal] dropdown ({pop_sel} z={r['popZ']}) ถูก modal บัง — "
+                              f"element บนสุดที่ option = '{r['topTag']}' ไม่ใช่ลูกของ pop · "
+                              f"z ของ pop ต่ำกว่า modal (DSP-02){(' · '+note) if note else ''}")
+    return f"dropdown ลอยหน้า modal คลิกได้ ({pop_sel} z={r['popZ']}){(' · '+note) if note else ''}"
+
+
+def assert_no_scroll_lock_leak(pg, lock_class='is-overlay-open', note=''):
+    """C3.8 (F-WH-STKADJ 2026-09-16): assert หลังปิด overlay ทั้งหมด body ไม่ค้าง scroll-lock
+
+    bug จริง: กลับรายการ (doReverse) navigate ไป view drawer ใหม่ 'ก่อน' closeModal + openViewDrawer
+    ไม่ release trap ของ drawer เดิม → _trapStack ไม่ balance → body.is-overlay-open ค้าง → scroll ล็อก
+    ปิด drawer เท่าไรก็ไม่หลุด. ต้องเรียก 'หลังปิด overlay หมดแล้ว'. เช็ค: body ไม่มี lock class +
+    (ถ้ามี window._trapStack) length 0 + overflow ไม่ถูก freeze. ตัววัด z-index/overflow เดิมมองไม่เห็น
+    (มันดูตอน 'เปิด' ไม่ถามว่า 'ปิดหมดแล้ว lock หลุดมั้ย'). คืนข้อความถ้าผ่าน · โยนถ้ายังค้าง.
+    """
+    r = pg.evaluate("""lc=>{
+      const hasLock=document.body.classList.contains(lc);
+      const ts=(typeof _trapStack!=='undefined'&&_trapStack)?_trapStack.length:null;
+      const ov=getComputedStyle(document.body).overflowY;
+      return {hasLock, ts, ov};
+    }""", lock_class)
+    assert not r['hasLock'], (f"[scroll-lock-leak] body ยังมี .{lock_class} หลังปิด overlay — trap stack ค้าง "
+                              f"(_trapStack={r['ts']}) → scroll ล็อก (DSP-01){(' · '+note) if note else ''}")
+    if r['ts'] is not None:
+        assert r['ts'] == 0, (f"[scroll-lock-leak] _trapStack ยังเหลือ {r['ts']} รายการหลังปิด overlay "
+                              f"(ต้อง 0){(' · '+note) if note else ''}")
+    return f"ไม่มี scroll-lock ค้างหลังปิด overlay (trapStack={r['ts']}){(' · '+note) if note else ''}"
 
 
 # ⭐ เพิ่ม 2026-09-09 (F-HR-EXPENSE · §C3.8 · user-found bugs ที่ตัววัดเดิมมองไม่เห็น)

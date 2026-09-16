@@ -3,7 +3,8 @@
 ```markdown
 # UX Check Report — [feature/ไฟล์]
 - วันที่: YYYY-MM-DD · Iteration: N
-- Generator spec: html-generator-v6 (iron-rules v3.13, 48 ข้อ)  ← จดจากไฟล์ที่ Sync Read จริง
+- Generator spec: html-generator-v9 (iron-rules #1–#49, #94–#103 · Pattern Q/B2 v2/P)  ← จดจากไฟล์ที่ Sync Read จริง
+- Passes run: audit.sh · static_scan · G · D (ถ้าเอกสาร) · R (shots ใน _shots/) · golden compare
 - ไฟล์ที่ตรวจ: xxx.html (NNN บรรทัด)
 
 ## Verdict: 🔴 BLOCK | 🟡 WARN | 🟢 PASS (with N warnings)

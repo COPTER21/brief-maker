@@ -45,3 +45,19 @@
 กฎที่ต้องเห็น rendering จริง (เช่น ความรู้สึก spacing บางกรณี, contrast บนจอจริง)
 → ใส่หมวด NOT-CHECKED พร้อมเหตุผล + วิธีให้ user เช็คเองใน 1 บรรทัด
 ห้ามเดาผลแล้วนับเป็นผ่าน
+
+## v9 facts (2026-08-25) — map fact → rule
+
+| Fact (static_scan) | ตีความ | verdict |
+|---|---|---|
+| `px_watchlist.1290px` > 0 แต่ไม่มี `.drawer-panel.wide` | 1290 ใช้ได้เฉพาะ B2/Q wide drawer | BLOCK #11 |
+| `select_big` > 0 หรือ `select_big_template` > 0 (select ที่ map จาก master) | ต้องเป็น search combobox | WARN #102 (BLOCK ถ้าเป็น master คน/สินค้า/คู่ค้า) |
+| `combobox_count` > 0 แต่ `combo_person_option` = 0 ทั้งที่มี field คน | option คนไม่มี avatar/ตำแหน่ง | BLOCK #102 |
+| `overlay_root` = false หรือ `portal_menu` = false ทั้งที่มี dropdown ในตาราง/drawer | เมนูจะจมใต้ overflow | BLOCK #95 |
+| `page_fill` = false ในไฟล์ที่มีหน้า list | ตารางไม่ชิดขอบล่าง | WARN #96 |
+| `render_table_only` = false ทั้งที่มี filter/sort | re-render ทั้งหน้า → กระโดด | WARN #103 |
+| `body_minwidth_768` = false / `scrollbar_gutter_stable` = false | responsive/stability | WARN #97 / #35 |
+| `td_multi_pill` > 0 | ซ้อนข้อมูลคนละตัวใน cell | BLOCK #103/#40 (ยกเว้น pill ของแถม+ชื่อสินค้า = WARN) |
+| `doc_archetype.is_document` = true → ทุกช่องใน `doc_archetype` ต้อง true · `wizard_steps` = 5 ชื่อล็อก (ตัด "รายการสินค้า" ได้ถ้าไม่มี line items) · `view_tabs` เริ่ม detail ลง pdf/sign/history ท้าย ไม่มี attach · `line_tbl_widths` = [26,64,92,92,78,72,104,54] | Pass D | BLOCK #98–#101 |
+| `preflight_stamp` = null | ไม่มี pre-flight | BLOCK #60 |
+| `planner_archetype` = true | ตรวจตาม patterns/P (cal-grid · pool-card · plan-row · cap-track · seg-control · mbar ถ้าเป็นทีม) | ตามหัวข้อ |
