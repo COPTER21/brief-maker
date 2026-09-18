@@ -1,0 +1,3 @@
+# FRD F-WH-ROP Pack Index
+
+FULL lane pack, nine section files plus this index. Start with `00_OVERVIEW`, then `01_UI` for three actual routes, `02_API` for proposed transport, `03_LOGIC` FN-01–09 and §3.3 trace, `04_DB` field classification, `05_RULES` BR/errors/D-CLASS/CSQ, `06_TESTS` AT/XT and evidence limits, `07_LOCKED` immutable decisions, and `08_COVERAGE_MANIFEST` source→spec/test mapping. Mutation trace: API-02→FN-01/02→policy/event; API-04→FN-06→mock request/event; API-05→FN-07→candidate/event. Stock and movement tables are read-only upstream. Declarations in `5_DECLARATIONS` are drafts, not registered.

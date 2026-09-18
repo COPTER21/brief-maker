@@ -1,0 +1,3 @@
+# S6a TC / ledger gate
+
+PASS for authored case set: 60/60 unique IDs, all cases have Setup, route, action steps and observable expected result; 82/82 ledger items map to a case; cases.json mirror has exactly the same 60 IDs and 20 explicitly marked system/mock-only. `TC_LEDGER_PRE.md` was established before drafting. Manual cases are instructions, not executed results. System/mock cases require backend harness and are `sys:true` in QA; no actual W2 PR, NC delivery, CSQ registration, stock/movement posting or authorization is claimed. Sources: FRD 06_TESTS AT01–18, 05_RULES R01–08/error catalog, PREBRIEF S01–13, BRD US/BR, LOCK01–06 and XT contract paths. No silently dropped case.

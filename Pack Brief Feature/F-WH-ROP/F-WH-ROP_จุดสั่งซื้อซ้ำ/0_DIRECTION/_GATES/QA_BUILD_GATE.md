@@ -1,0 +1,3 @@
+# S6b QA-friendly HTML gate
+
+WARN: exact requested file `จุดสั่งซื้อซ้ำ HTML Testcase.html` built self-contained from the same 60-case source as `testcases-F-WH-ROP.md`; 60 IDs, six groups, 20 `sys:true` backend/mock-only cases are visible but excluded from manual progress. Builder reports 0 image regions and no missing region references. Official capture tool was attempted with system Python (PIL absent) and bundled Python (Playwright absent), so no actual screenshot, manual click check, PDF render or visual layout claim exists. Empty `shots_b64.json` deliberately prevents wrong screenshots. Before user UAT, rerun capture and visually inspect QA nav/step/PDF, or retain this as WARN.

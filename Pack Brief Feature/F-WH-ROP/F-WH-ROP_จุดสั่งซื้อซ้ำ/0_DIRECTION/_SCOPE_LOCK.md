@@ -1,0 +1,2 @@
+# LOCK-W4-ROP
+W4A console/master: Item×Warehouse Min/Max/Safety/Lead Time/ADU-window policy; read ATP and movement history from F009 without recalculating hold; calculate `max(0,(Max−ATP−On-Order)+(ADU×Lead Time))` and round up to purchase Pack Size. Evaluate daily and on low-ATP movement events. Emit Notification and create one editable F072 PR Draft per warehouse per evaluation round; never auto-submit to DOA, create PO, post inventory, query Quality Hold separately, or split PR by vendor. Confirmed by PM/BA on 2026-09-17; this supersedes the former PR mock boundary.
