@@ -1,0 +1,136 @@
+# PREBRIEF · Credit Note — ใบลดหนี้ลูกค้า (F-ACC-CN · F096)
+> Accounting/AR · W5P#2 · จาก CONTEXT_PACK §2.2+§3 · BRD_F-ACC-ARINV §12.1 (ar_open_item) · 2026-09-20 · [AI-DRAFT] รอเคาะผ่าน vibe
+
+## 0. Obligations
+| # | พันธะ | จาก | ตอบที่ |
+|---|---|---|---|
+| OB-1 | เส้นเข้า AR Invoice → CN (ในเลน) | workflow_graph | S-01..S-04 · §3.1 |
+| OB-2 | ลดไม่เกินคงเหลือใบอ้างอิง · ลดลอยปิด | OQ-CN-01 | BR-02 · S-05 · S-12 |
+| OB-3 | เหตุผล master config (รับคืน/ส่วนลด/ผิดราคา) | §2.2 | BR-05 · §3.4 |
+| OB-4 | รับคืนอ้าง Sales Return W4-LITE (mock) | §2.2 · GR-5 | S-02 · BR-06 |
+| OB-5 | DOA slot picker ตามมูลค่า | §2.2 · GR-3 | §5 · S-06..S-08 |
+| OB-6 | doccfg CN-YYYY-NNNN · pdfdoc อ้างเลขใบเดิม+เหตุผล | §2.2 | BR-08 · §6 |
+| OB-7 | กระทบ VAT ขาย ระบุใน BRD | §2.2 | S-01 ผล · §9 |
+| OB-8 | ลดหนี้หลายรอบ | user rule / §4 CONTEXT | S-04 |
+| OB-9 | declarations doa/ntf/csq/doccfg/pdfdoc | F096 chip | S1.8 |
+| OB-10 | UI #67.1/#104/#105/#106 · ค.ศ. · append-only | GR | §6 · §7 |
+
+## 1. สรุป + สิทธิ์
+ออกใบลดหนี้ลูกค้าอ้างใบแจ้งหนี้ที่ยังมียอดคงค้าง ด้วยเหตุผลตาม master (รับคืน/ส่วนลดภายหลัง/คิดราคาผิด/คิดจำนวนเกิน) · ลดได้ไม่เกินยอดคงเหลือ · อนุมัติตาม DOA ตามมูลค่า · อนุมัติครบแล้วออกเลข CN ลดยอดลูกหนี้และภาษีขาย
+| Role | ทำได้ |
+|---|---|
+| เจ้าหน้าที่ลูกหนี้ | สร้าง/แก้ร่าง/ส่งอนุมัติ/ส่งลูกค้า/ยกเลิก |
+| ผู้จัดการฝ่ายขาย · ผู้จัดการบัญชี · CFO | อนุมัติ/ไม่อนุมัติ ตามขั้นที่ถูกเลือก (ไม่ใช่ใบที่ตัวเองส่ง) |
+
+## 2. Scenarios
+> derive: D1 ปริมาณ→S-01,S-03,S-04,S-05 · D2 state→S-06..S-10 · D3 จุดตรวจ(DOA)→S-06..S-08 · D4 ต้นทาง→S-11,S-12,S-13 · D5 ปลายทาง→S-01 ผล, S-14 · D6 [STD]→S-15,S-16
+| S | ประเภท | ชื่อ | ข้อมูลที่ต้องมี | ผล |
+|---|---|---|---|---|
+| S-01 | Happy | ลดหนี้รับคืนสินค้าอ้างใบรับคืน | ใบแจ้งหนี้ · ใบรับคืน · จำนวนคืน | CN ≤ คงเหลือ · ออกเลขเมื่ออนุมัติ · AR outstanding ลด · VAT ขายลด |
+| S-02 | Alt | ส่วนลดภายหลัง (ราคา) | ราคาลดต่อหน่วย ≤ ราคาเดิม | ลดมูลค่าไม่ลดจำนวน |
+| S-03 | Alt | คิดราคาผิด/คิดจำนวนเกิน | บรรทัด + ผลต่าง | — |
+| S-04 | Alt | ลดหนี้หลายรอบบนใบเดียว | ลดแล้วสะสมต่อบรรทัด | คงเหลือถูก |
+| S-05 | Exception | ยอดลดเกินคงเหลือ/เกินจำนวนเดิม | — | บล็อก + บอกยอด |
+| S-06 | Happy | อนุมัติครบสาย (tier ตามมูลค่า) | คนต่อขั้น | approved + เลข CN |
+| S-07 | Exception | ไม่อนุมัติ → กลับร่าง | เหตุผล | ประวัติรอบก่อน append-only |
+| S-08 | Exception | ผู้ส่งพยายามอนุมัติใบตัวเอง | — | ไม่มีปุ่ม (SoD) |
+| S-09 | Exception | ยกเลิกร่าง/รออนุมัติ | เหตุผล | cancelled · คืนยอด |
+| S-10 | Alt | ส่งให้ลูกค้า | — | sent + snapshot |
+| S-11 | Exception | ใบแจ้งหนี้ถูกชำระเพิ่มระหว่างรออนุมัติ | — | re-check ตอนอนุมัติ ถ้าเกิน = บล็อกอนุมัติ ให้ไม่อนุมัติกลับไปแก้ |
+| S-12 | ไม่รองรับ | ลดหนี้ไม่อ้างใบ | — | ปิด (OQ-CN-01) — tile แสดง "ปิดไว้" |
+| S-13 | Exception | ใบแจ้งหนี้ void/ชำระครบ | — | ไม่โผล่ให้เลือก |
+| S-14 | Alt | ผลต่อ AR | cn_applied | ใบแจ้งหนี้คงค้างลด/ปิดเมื่อ = 0 |
+| S-15 | ไม่รองรับ | คืนเงินเมื่อชำระครบ (refund) | — | OQ-CN-03 |
+| S-16 | ไม่รองรับ | ยกเลิก CN หลังอนุมัติ | — | OQ-CN-02 — แก้ด้วยใบแจ้งหนี้/ใบเพิ่มหนี้ใหม่ |
+
+## 3. Data
+### 3.1 Header
+| Field | ชนิด | บังคับ | ที่มา | Validation |
+|---|---|---|---|---|
+| เลขที่ | readonly | ออกตอนอนุมัติ | ENG-DOC-NUM CN | CN-YYYY-NNNN |
+| ใบแจ้งหนี้อ้างอิง | lookup ar_open_item | ✓ | F-ACC-ARINV | outstanding > 0 |
+| ลูกค้า · ที่อยู่/เลขภาษี | readonly | ✓ | จากใบเดิม | — |
+| วันที่ใบลดหนี้ | date | ✓ | วันนี้ | ≥ วันที่ใบเดิม |
+| เหตุผล | select master | ✓ | CN reason config | — |
+| ใบรับคืน | lookup SR | เมื่อ RET | Sales Return W4-LITE mock | ของใบเดียวกัน |
+| คำอธิบายเหตุผล (พิมพ์บนใบ) | textarea | ✓ | input | ≥10 ตัว |
+| พนักงานขาย | combobox | ✓ | จากใบเดิม | — |
+| หมายเหตุ · เอกสารแนบ | — | — | — | — |
+### 3.2 Lines (B2 v2)
+สินค้า (ล็อกจากใบเดิม) · meta: จำนวนเดิม · ลดแล้ว · ลดได้อีก · จำนวนลด (≤ ลดได้อีก) · ราคา/หน่วยที่ลด (≤ ราคาเดิม · โหมดราคา = ลดต่อหน่วย) · VAT ตามบรรทัดเดิม
+### 3.3 Computed
+ยอด CN = totals() · มูลค่าเดิม/มูลค่าที่ถูกต้อง/ผลต่าง (ม.86/10) · คงเหลือใบเดิมหลังลด
+### 3.4 Config: CN reason master [ASSUMED] · DOA entry DOA-ACC-CN (tier) · doccfg CN
+
+## 4. Business Rules
+| BR | กติกา | S | ที่มา |
+|---|---|---|---|
+| BR-01 | เลือกใบแจ้งหนี้ได้เฉพาะ issued/sent outstanding>0 | S-01,S-13 | [แผน] |
+| BR-02 | ยอด CN ≤ outstanding ใบอ้างอิง (ตอนส่งและตอนอนุมัติ) | S-05,S-11 | [มติ OQ-CN-01] |
+| BR-03 | จำนวนลดต่อบรรทัด ≤ จำนวนใบเดิม − ลดแล้ว | S-04,S-05 | [STD] |
+| BR-04 | ราคาลดต่อหน่วย ≤ ราคาเดิม | S-02 | [STD] |
+| BR-05 | เหตุผลจาก master + คำอธิบาย ≥10 ตัว | S-01..03 | [แผน] |
+| BR-06 | เหตุผลรับคืน ต้องอ้างใบรับคืนของใบเดียวกัน · จำนวนไม่เกินที่รับคืน | S-01 | [แผน][ASSUMED contract] |
+| BR-07 | DOA resolve ตามมูลค่า ณ กดส่ง แล้ว freeze · ผู้ขอไม่อนุมัติเอง | S-06,S-08 | [แผน][BR-DOA] |
+| BR-08 | เลข CN ออกเมื่ออนุมัติครบ | S-06 | [doccfg] |
+| BR-09 | อนุมัติครบ → cn_applied ใบเดิม + JE mock + ลดภาษีขายเดือนที่ออก | S-14 | [แผน] |
+| BR-10 | ร่าง/รออนุมัติกันยอดลดชั่วคราว | S-04 | [AI-DRAFT] |
+
+## 5. State Machine
+draft → pending_approval → approved → sent · pending→draft (ไม่อนุมัติ) · draft/pending→cancelled
+| จาก | ไป | ใคร | เงื่อนไข | S |
+|---|---|---|---|---|
+| — | draft | officer | — | S-01 |
+| draft | pending_approval | officer | BR-02 · slot ครบ | S-06 |
+| pending | approved | ผู้อนุมัติขั้นสุดท้าย | BR-02 re-check | S-06,S-11 |
+| pending | draft | ผู้อนุมัติ | เหตุผล | S-07 |
+| draft/pending | cancelled | officer | เหตุผล | S-09 |
+| approved | sent | officer | — | S-10 |
+
+## 6. Actions + จุดแจ้งเตือนที่อนุญาต (#67.1 explicit)
+list: สร้าง · CSV · stat · ⋮ · wizard: ถัดไป/ย้อนกลับ/บันทึกแบบร่าง/บันทึกและส่งอนุมัติ · view: draft=[ยกเลิก][แก้ไข][ส่งอนุมัติ] · pending=[ไม่อนุมัติ][อนุมัติ] (เฉพาะผู้มีสิทธิ์ขั้นปัจจุบัน) · approved=[ส่งให้ลูกค้า]
+**อนุญาตเฉพาะ:** ① hard-warn "ยอดลดเกินยอดคงเหลือใบอ้างอิง" ② field-error/บรรทัดเกิน ③ แถบสถานะยกเลิก (note.danger) — ห้าม hint/info อื่น
+
+## 7. Data behaviour
+เลข CN จาก ENG-DOC-NUM ตอนอนุมัติ · soft-ref ใบเดิม/SR · audit append-only · approval_chain snapshot + approval_history · ไม่มี hard delete
+
+## 8. Mock Data Spec
+| ชุด | prove |
+|---|---|
+| INV-2026-0140 (10 กล่อง · CN-0021 ลดแล้ว 1) + SR-2026-0016 (2 กล่อง) | S-01, S-04 |
+| INV-2026-0137 (บริการ) | S-02 |
+| INV-2026-0135 | S-03 |
+| INV-2026-0141 (770,400) + SR-2026-0014 | tier 2/3 DOA, S-06 |
+| INV-2026-0136 ชำระครบ · INV-2026-0143 void | S-13 ไม่โผล่ |
+| CN 8 ใบ: approved/sent · pending ขั้น 1 · pending ขั้น 2 · draft ลดรอบ 2 · draft มีประวัติตีกลับ · cancelled | list/stat/sign |
+
+## 9. Edges
+| ทิศ | คู่ | UI | ผล |
+|---|---|---|---|
+| in | AR Invoice (ar_open_item) | step 1 ตารางใบแจ้งหนี้คงค้าง · tab "ใบแจ้งหนี้อ้างอิง · ภาษีขาย" | cn_applied เพิ่ม |
+| in | Sales Return W4-LITE (mock) | step 2 เลือกใบรับคืน | — |
+| out | VAT Report | tab ภาษีขาย (ลดเดือนที่ออก) | contract output_vat_line (negative) |
+| out | JE F093 | รายการบัญชี (จำลอง) | forward-wire |
+
+## 10. OQ register
+OQ-CN-01 (ลดไม่เกินคงเหลือ · ลดลอยปิด) · OQ-CN-02 (ยกเลิกหลังอนุมัติ) · OQ-CN-03 (refund) · OQ-CN-04 (tier DOA) · OQ-AR-06 (role id) — owner Strike / Policy Center
+
+## 11. Coverage Matrix
+| S | BR | transition | UI | FN |
+|---|---|---|---|---|
+| S-01 | BR-01,05,06 | —→draft→pending→approved | step1-3 · submit · approve | FN-01,03,05,10 |
+| S-02 | BR-04 | — | step3 ราคา | FN-06 |
+| S-03 | BR-03 | — | step3 | FN-07 |
+| S-04 | BR-03,10 | — | meta ลดแล้ว | FN-08 |
+| S-05 | BR-02,03 | — | hard-warn/field | FN-09 |
+| S-06 | BR-07,08 | pending→approved | slot picker · sign | FN-11,12 |
+| S-07 | BR-07 | pending→draft | reject modal | FN-13 |
+| S-08 | BR-07 | — | ไม่มีปุ่ม | FN-14 |
+| S-09 | — | →cancelled | modal | FN-15 |
+| S-10 | — | approved→sent | ส่งลูกค้า | FN-16 |
+| S-11 | BR-02 | — | approve re-check | FN-17 |
+| S-12 | — | — | tile ปิดไว้ | FN-02 |
+| S-13 | BR-01 | — | picker | FN-04 |
+| S-14 | BR-09 | — | ref tab | FN-18 |
+| S-15,S-16 | — | — | ไม่รองรับ | §ไม่รองรับ |
+ผ่าน: ทุก BR ≥1 · ทุก transition ≥1 · ทุก S มี UI+FN · OB ครบ
