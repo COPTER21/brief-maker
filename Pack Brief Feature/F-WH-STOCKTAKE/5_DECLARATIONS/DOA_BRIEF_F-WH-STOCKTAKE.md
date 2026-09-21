@@ -1,0 +1,3 @@
+# DOA declaration — Stocktake
+
+Identity F-WH-STOCKTAKE / Warehouse / policy_approve, wire_status pending. Action `approve_variance` after finalized count/recount, before Stock Adjustment handoff. No monetary-band assumption; threshold determines recount in Inventory config, not approver chain. DOA central resolves chain and actual person candidates; slot picker shows avatar, name, position, selection and immutable snapshot. Maker/counter cannot approve own round. Approve/reject reason and actor/time append-only; rejected round returns to review via new event, never edits count history. UI has pending/approved/rejected timeline and My Approval hook. Owner Warehouse BA + DOA admin; confirm matrix and effective date centrally.

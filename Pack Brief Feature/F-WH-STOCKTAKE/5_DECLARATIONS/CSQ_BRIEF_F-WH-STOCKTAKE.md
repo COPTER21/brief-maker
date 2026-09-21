@@ -1,0 +1,3 @@
+# CSQ declaration — Stocktake
+
+`stocktake.frozen` when scope freeze+snapshot completes (BR01–02); `stocktake.variance_confirmed` after independent recount or below-threshold review (BR04); `stocktake.adjustment_handoff` after DOA approval and mock W3 acknowledgment (BR05–06). Payload: round ref, scope label, timestamp/version, item/location refs, variance aggregates, idempotency key, masked counter identifiers. No OC/DC document event duplicate. ENG-CSQ evaluates consequences, feature never calculates valuation/cost or stores 7C results. Correction emits new event with reversal_of. Wire_status pending; owner Warehouse integration/CSQ admin.
