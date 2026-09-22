@@ -1,0 +1,117 @@
+# PREBRIEF · Debit Note — ใบลดหนี้ผู้ขาย (F-ACC-DN)
+> Accounting/AP · W5Q#2 · จาก CONTEXT_PACK §2 ข้อ 4 · BRD_F-ACC-APINV §12.1 · 2026-09-20 · [AI-DRAFT] รอเคาะผ่าน vibe
+
+## 0. Obligations
+| # | พันธะ | จาก | ตอบที่ |
+|---|---|---|---|
+| OB-1 | อ้าง AP Invoice (ในเลน) | CONTEXT §2.4 | S-01..04 · §3.1 |
+| OB-2 | ลดไม่เกินยอดคงเหลือ | CONTEXT §2.4 | BR-02 · S-05 · S-11 |
+| OB-3 | เหตุผล: RTV/ราคาเกิน/ของขาด | CONTEXT §2.4 | BR-05 |
+| OB-4 | RTV W3-LITE mock | GR-5 | BR-06 |
+| OB-5 | DOA ตามมูลค่า | CONTEXT §2.4 | §5 · S-06..08 |
+| OB-6 | doccfg DN · pdfdoc อ้างเลขใบเดิม + เหตุผล | CONTEXT · user | BR-08 · FN-92 |
+| OB-7 | กระทบ VAT ซื้อใน BRD | CONTEXT | BR-09 · §9 |
+| OB-8 | declarations | chip | S1.8 |
+| OB-9 | UI #67.1/#104/#105/#106 · ค.ศ. · append-only | GR | §6/§7 |
+
+## 1. สรุป + สิทธิ์
+ออกใบลดหนี้ฝั่งซื้อถึงผู้ขาย อ้างใบตั้งหนี้ (AP Invoice) ที่ยังค้างจ่าย ด้วยเหตุผลคืนของ (อ้างใบคืนสินค้า) / ราคาเกิน / ของขาด · ลดได้ไม่เกินยอดคงเหลือ · อนุมัติตาม DOA ตามมูลค่า · อนุมัติครบออกเลข DN ลดยอดเจ้าหนี้และภาษีซื้อ
+| Role | ทำได้ |
+|---|---|
+| เจ้าหน้าที่เจ้าหนี้ | สร้าง/แก้ร่าง/ส่งอนุมัติ/ส่งผู้ขาย/ยกเลิก |
+| ผู้จัดการจัดซื้อ · ผู้จัดการบัญชี · CFO | อนุมัติ/ไม่อนุมัติ ขั้นที่ถูกเลือก |
+
+## 2. Scenarios
+> derive: D1→S-01,S-03,S-04,S-05 · D2→S-06..S-10 · D3 (DOA)→S-06..S-08 · D4→S-11..S-13 · D5→S-14 · D6→S-15,S-16
+| S | ประเภท | ชื่อ | ผล |
+|---|---|---|---|
+| S-01 | Happy | คืนของอ้าง RTV | DN ≤ คงเหลือ · เลข DN เมื่ออนุมัติ · เจ้าหนี้ลด · ภาษีซื้อลด |
+| S-02 | Alt | ราคาเกิน (ลดราคาต่อหน่วย) | ≤ ราคาเดิม |
+| S-03 | Alt | ของขาด (ลดจำนวน) | ≤ จำนวนเดิม − ลดแล้ว |
+| S-04 | Alt | ลดหลายรอบ | คงเหลือถูก |
+| S-05 | Exception | เกินคงเหลือ/เกินจำนวน | บล็อก |
+| S-06 | Happy | อนุมัติครบสาย | approved + เลข DN |
+| S-07 | Exception | ไม่อนุมัติ | draft + ประวัติ |
+| S-08 | Exception | ผู้ส่งอนุมัติเอง | ไม่มีปุ่ม |
+| S-09 | Exception | ยกเลิกร่าง/รออนุมัติ | cancelled |
+| S-10 | Alt | ส่งผู้ขาย | sent |
+| S-11 | Exception | ใบตั้งหนี้ถูกจ่ายเพิ่มระหว่างรออนุมัติ | re-check บล็อก |
+| S-12 | ไม่รองรับ | ลดลอยไม่อ้างใบ | tile ปิดไว้ (OQ-DN-01) |
+| S-13 | Exception | ใบตั้งหนี้จ่ายครบ | ไม่โผล่ |
+| S-14 | Alt | ผลต่อ AP/PV/VAT ซื้อ | dn_applied · outstanding · input_vat_line ติดลบ |
+| S-15 | ไม่รองรับ | เรียกเงินคืน | OQ-DN-03 |
+| S-16 | ไม่รองรับ | ยกเลิกหลังอนุมัติ | OQ-DN-04 |
+
+## 3. Data
+### 3.1 Header: เลขที่ (DN-YYYY-NNNN ตอนอนุมัติ) · ใบตั้งหนี้อ้างอิง (lookup · outstanding>0) · ผู้ขาย (readonly) · วันที่ใบลดหนี้ (≥ วันที่ใบกำกับเดิม) · เหตุผล (select master ≤7) · RTV (lookup เมื่อคืนของ) · คำอธิบาย (≥10 · พิมพ์บนใบ) · เลขที่ใบลดหนี้จากผู้ขาย (ถ้ามี) · หมายเหตุ · แนบ
+### 3.2 Lines (B2 v2): สินค้า (ล็อก) · meta จำนวนเดิม/ลดแล้ว/ลดได้อีก · จำนวนลด · ราคาลด · VAT ตามเดิม
+### 3.3 Computed: มูลค่าเดิม/ถูกต้อง/ผลต่าง · คงค้างหลังลด · ภาษีซื้อที่ลด
+### 3.4 Config: DN reason master [ASSUMED] · DOA-ACC-DN · doccfg DN
+
+## 4. Business Rules
+| BR | กติกา | S | ที่มา |
+|---|---|---|---|
+| BR-01 | อ้างได้เฉพาะใบตั้งหนี้ approved outstanding>0 | S-01,S-13 | [แผน] |
+| BR-02 | ยอด DN ≤ outstanding (ส่ง + อนุมัติ) | S-05,S-11 | [CONTEXT] |
+| BR-03 | จำนวนลด ≤ เดิม − ลดแล้ว | S-03,S-04 | [STD] |
+| BR-04 | ราคาลด ≤ ราคาเดิม | S-02 | [STD] |
+| BR-05 | เหตุผล master + คำอธิบาย ≥10 | S-01..03 | [CONTEXT] |
+| BR-06 | คืนของต้องอ้าง RTV ของใบเดียวกัน · ≤ จำนวนคืน | S-01 | [ASSUMED contract] |
+| BR-07 | DOA ตามมูลค่า · freeze · ผู้ขอไม่อนุมัติเอง | S-06,S-08 | [BR-DOA] |
+| BR-08 | เลข DN ตอนอนุมัติครบ | S-06 | [doccfg] |
+| BR-09 | อนุมัติ → dn_applied + input_vat_line ติดลบ (เดือนวันที่ใบลดหนี้) + JE mock | S-14 | [CONTEXT] |
+| BR-10 | ร่าง/รออนุมัติกันยอด | S-04 | [AI-DRAFT] |
+
+## 5. State Machine
+| จาก | ไป | ใคร | เงื่อนไข | S |
+|---|---|---|---|---|
+| — | draft | officer | — | S-01 |
+| draft | pending_approval | officer | BR-02 · slot ครบ | S-06 |
+| pending | approved | ขั้นสุดท้าย | BR-02 re-check | S-06,S-11 |
+| pending | draft | ผู้อนุมัติ | เหตุผล | S-07 |
+| draft/pending | cancelled | officer | เหตุผล | S-09 |
+| approved | sent | officer | — | S-10 |
+
+## 6. Actions + จุดแจ้งเตือนที่อนุญาต (#67.1)
+**อนุญาตเฉพาะ:** ① hard-warn "ยอดลดหนี้เกินยอดคงเหลือใบตั้งหนี้" ② field-error/บรรทัดเกิน ③ note.danger ยกเลิก — ห้าม hint/info อื่น
+
+## 7. Data behaviour: เลข DN ตอนอนุมัติ · soft-ref ใบตั้งหนี้/RTV · approval_chain snapshot + history append-only · ไม่มี hard delete
+
+## 8. Mock Data Spec
+| ชุด | prove |
+|---|---|
+| API-2026-0041 (จ่ายบางส่วน · DN-0011 คืน 1 เครื่อง · ร่างคืน 2 กล่อง) + RTV-0007/0010 | S-01, S-04 |
+| API-2026-0043 (ราคา 4,100) | S-02, S-07 |
+| API-2026-0046 (60 ใบ · 526,440) · DN รอ ขั้น 1 (tier 2) + รอ ขั้น 2 (tier 3) + RTV-0009 | S-03, S-06, S-11 |
+| API-2026-0038 จ่ายครบ | S-13 |
+| DN 8 ใบ: sent ×2 · approved · pending ×2 · draft ×2 (1 ตีกลับ) · cancelled | list/stat/sign |
+
+## 9. Edges
+| ทิศ | คู่ | UI | ผล |
+|---|---|---|---|
+| in | AP Invoice (ap_open_item) | step 1 · tab ใบตั้งหนี้อ้างอิง | dn_applied_amount |
+| in | RTV W3-LITE (mock) | step 2 | — |
+| out | VAT ซื้อ | tab ภาษีซื้อ | input_vat_line ติดลบ |
+| out | PV | outstanding ใหม่ | — |
+| out | JE F093 | จำลอง | forward-wire |
+
+## 10. OQ register: OQ-DN-01..05 · OQ-AP-06 (role id)
+
+## 11. Coverage Matrix
+| S | BR | UI | FN |
+|---|---|---|---|
+| S-01 | BR-01,05,06 | step1-3 · submit | FN-01,03,05,10 |
+| S-02 | BR-04 | step3 ราคา | FN-06 |
+| S-03 | BR-03 | step3 | FN-07 |
+| S-04 | BR-03,10 | meta | FN-08 |
+| S-05 | BR-02,03 | hard-warn/field | FN-09 |
+| S-06 | BR-07,08 | slot · sign | FN-11,12 |
+| S-07 | BR-07 | reject | FN-13 |
+| S-08 | BR-07 | ไม่มีปุ่ม | FN-14 |
+| S-09 | — | modal | FN-15 |
+| S-10 | — | ส่งผู้ขาย | FN-16 |
+| S-11 | BR-02 | approve re-check | FN-17 |
+| S-12 | — | tile ปิด | FN-02 |
+| S-13 | BR-01 | picker | FN-04 |
+| S-14 | BR-09 | ref tab | FN-18 |
+ผ่าน: ทุก BR ≥1 · ทุก transition ≥1 · OB ครบ

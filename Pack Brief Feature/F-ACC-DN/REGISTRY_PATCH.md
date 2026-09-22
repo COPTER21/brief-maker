@@ -1,0 +1,1 @@
+- F-ACC-DN Debit Note → ba-done (2026-09-20 · CUBE-LANE-W5-LITE) · HANDOFF: output/2026-09-20/F-ACC-DN_ลดหนี้ผู้ขาย/HANDOFF.md
