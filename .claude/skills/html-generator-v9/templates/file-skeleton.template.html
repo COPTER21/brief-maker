@@ -32,6 +32,9 @@
   --c-mute: #54565C;
   --c-mute-2: #73757B;
   --c-mute-3: #9A9CA2;
+  --c-placeholder: #B4B6BC;   /* v9.1 #104 — placeholder จางกว่า mute-3 */
+  /* v9.1 — Z-Index Registry (Rule #62) — เดิม kit อ้าง var(--z-*) โดยไม่ประกาศ = z-index auto */
+  --z-content:1; --z-sticky:10; --z-shell:10; --z-dropdown:30; --z-backdrop:50; --z-drawer:51; --z-modal:60; --z-toast:80;
   --c-line: #DEDAD4;
   --c-line-2: #E9E5E0;
   --c-line-3: #F1EEEA;
@@ -384,7 +387,7 @@ input[type="number"] { -moz-appearance: textfield; }
   align-items: flex-start;
   gap:16px;
 }
-.ph > div:first-child { flex: 1 1 auto; min-width: 280px; }
+.ph > div:first-child { flex: 1 1 0; min-width: 280px; }   /* v9.1 — 1 1 0 กัน ph-sub ยาวดัน ph-actions ตกบรรทัด */
 .ph-title-row {
   display: flex;
   align-items: baseline;
@@ -675,6 +678,11 @@ td.col-num .num, td.col-num { font-variant-numeric: tabular-nums; }
   background: #fff;
 }
 .cb:hover { border-color: var(--c-primary); }
+/* v9.1 #104 — checkbox + ข้อความ ใช้ label.chk (ห้ามใช้ .cb กับ label — .cb คือกล่อง 18px ของตาราง ข้อความจะแตกเป็นคำละบรรทัด) */
+label.chk { display:inline-flex; align-items:center; gap:8px; font-size: var(--fs-sub); color: var(--c-ink); cursor:pointer; line-height:1.4; }
+.chk input[type=checkbox] { width:16px; height:16px; margin:0; accent-color: var(--c-navy); flex:0 0 auto; cursor:pointer; }
+/* v9.1 #103 — เซลล์ตารางไม่ตัดบรรทัด: ใส่ .nw ที่ td ชื่อ/รหัส/วันที่/แพ็กเกจ */
+.table td.nw, .table td.uc-name { white-space:nowrap; }
 
 /* ============== USER CELL ============== */
 .user-cell { display: flex; align-items: center; gap:10px; }
@@ -722,7 +730,7 @@ td.col-num .num, td.col-num { font-variant-numeric: tabular-nums; }
 .spin { animation: spin 0.8s linear infinite; }
 
 /* v3.13 — Form Section Grouping (Iron Rule #45) */
-.form-section { margin-top:var(--sp-xl); }
+.form-section { margin-top:16px; }   /* v9.1 #104 (เดิม --sp-xl 28) */
 .form-section:first-child { margin-top:0; }
 .form-section-title {
   font-size: var(--fs-cap); font-weight: 700; text-transform: uppercase;
@@ -1163,17 +1171,20 @@ td.col-num .num, td.col-num { font-variant-numeric: tabular-nums; }
 }
 
 /* ============== FIELDS ============== */
-.field { margin-bottom:16px; }
-.field-label { display: block; font-size:12.5px; font-weight: 500; color: var(--c-mute); margin-bottom:6px; }
+.field { margin-bottom:12px; }   /* v9.1 #104 (เดิม 16) */
+.field-label { display: block; font-size:12.5px; font-weight: 500; color: var(--c-mute); margin-bottom:4px; }   /* v9.1 #104 (เดิม 6) */
 .field-label .req { color: var(--c-danger); margin-left:2px; }
 .field-input { width: 100%; }
 .field-help { font-size:12px; color: var(--c-mute-2); margin-top:4px; }
-/* Rule #43 — จองพื้นที่ error ไว้ (visibility แทน display) → error โผล่แล้วฟอร์มไม่กระตุก.
-   ถ้า field ไหนไม่ใส่ <div class="field-error"> ก็ไม่จองพื้นที่ (author เลือกเองรายตัว) */
-.field-error { font-size:12px; color: var(--c-danger); margin-top:4px; min-height: 15px; visibility: hidden; }
+/* v9.1 #104 — placeholder จาง (ห้ามกลืนกับค่าที่กรอก) */
+.input::placeholder, textarea.input::placeholder, .input-search input::placeholder { color: var(--c-placeholder); opacity:1; }
+/* v9.1 #104 (แทน #43 เดิม) — ไม่จองพื้นที่ error ล่วงหน้า (จองแล้วทุกช่องห่างกัน ~19px ฟอร์มยืดยาว)
+   error โผล่เฉพาะ .field.is-invalid — layout ขยับเฉพาะตอนกรอกผิด ยอมรับได้ · toast รวม "กรุณากรอกข้อมูลให้ครบถ้วน" ยังอยู่ */
+.field-error { font-size:12px; color: var(--c-danger); margin-top:4px; display:none; }
+.field-error.is-show { display:block; }
 .field.is-invalid .input,
 .field.is-invalid .select { border-color: var(--c-danger); }
-.field.is-invalid .field-error { visibility: visible; }
+.field.is-invalid .field-error { display:block; }
 
 /* Responsive form grid (Iron Rule #17) */
 .field-row {
@@ -1343,10 +1354,17 @@ svg.lucide.w-5    { width: 20px; }   svg.lucide.h-5    { height: 20px; }
   background:var(--c-navy);color:#fff;font-size:12px;line-height:1.5;padding:8px 12px;border-radius:8px;
   max-width:340px;width:max-content;white-space:normal;opacity:0;pointer-events:none;transition:opacity .12s;z-index:var(--z-dropdown)}
 .info-tip:hover::after{opacity:1}
+/* v9.1 #67.2 — ⓘ ใน drawer/card ชิดซ้าย (กัน overflow ตัด) · .is-below เปิดลงสำหรับหัวข้อบนสุด */
+.drawer .info-tip::after, .card .info-tip::after { left:0; transform:none; }
+.info-tip.is-below::after { bottom:auto; top:calc(100% + 8px); }
+.form-section-title .info-tip, .drawer-section-title .info-tip { margin-left:6px; font-weight:400; text-transform:none; letter-spacing:0; }
 /* ===== Drop-up (#66) ===== */
 .drop-up{bottom:100%!important;top:auto!important;margin-bottom:4px}
 
 /* ===== END BASE-KIT — เขียน page-specific CSS ใต้บรรทัดนี้เท่านั้น ===== */
+/* v9.1 Rule #62 — modal เหนือ drawer */
+.modal-backdrop { z-index: var(--z-modal); }
+#drawer { z-index: var(--z-drawer); } #drawerBackdrop { z-index: var(--z-backdrop); } #toast { z-index: var(--z-toast); }
 </style>
 </head>
 <body>
@@ -1632,7 +1650,7 @@ function ssRenderList(key){
 }
 function ssOpen(key){ var s = ssGet(key); if(!s) return; s.open = true; s.query = ''; s.hi = 0; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
 function ssOnInput(key, val){ var s = ssGet(key); if(!s) return; s.query = val; s.open = true; s.hi = 0; s.value = null; ssSyncChrome(key); ssRenderList(key); }
-function ssPick(key, i){ var s = ssGet(key); if(!s) return; var o = ssFiltered(key)[i]; if(!o) return; s.value = o.value; s.query = ''; s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); s.onSelect(o.value, o); }
+function ssPick(key, i){ var s = ssGet(key); if(!s) return; var o = ssFiltered(key)[i]; if(!o) return; s.value = o.value; s.query = ''; s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); var ai = document.activeElement; if (ai && ai.id === 'ss-input-' + key) ai.blur(); /* v9.1 — กัน list เด้งเปิดซ้ำเมื่อ consumer render() แล้ว restore focus */ s.onSelect(o.value, o); }
 function ssClear(key){ var s = ssGet(key); if(!s) return; s.value = null; s.query = ''; s.open = true; ssSetText(key); ssSyncChrome(key); ssRenderList(key); var inp = document.getElementById('ss-input-' + key); if(inp) inp.focus(); s.onSelect(null, null); }
 function ssOnKey(key, e){
   var s = ssGet(key); if(!s) return; var items = ssFiltered(key);

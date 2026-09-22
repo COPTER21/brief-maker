@@ -6,26 +6,7 @@ description: >
   ★ v9 แทน v8/v7/v6: Pattern Q Transaction Document Archetype ล็อกทุกเอกสาร PR/PO/QT/SO/GRN/INV/CN
   (list + wizard 5 steps + view tabs รายละเอียด›PDF›ลายเซ็น›ประวัติ + เอกสารแนบใน landing) · B2 v2 Line Editor
   re-locked กับ SO (grid compact, VAT segmented, ส่วนลด, totals) · Pattern P Planner/Scheduler ·
-  Iron Rules #98–#103 (doc archetype, combobox anatomy คน/สินค้า, lean list ไม่ซ้อนคอลัมน์, layout นิ่ง).
-
-## ⛔ Iron Rules #104–#106 (เพิ่ม 2026-09-10 — บทเรียนจาก W1-FULL batch)
-
-**#104 Tab Placement Lock** — console/master ที่มีหลาย sub-view ต้องใช้ **tab row มาตรฐานใต้ page header · เหนือ stat/filter** (`<div class="tabs"><button class="tab is-active">…`) เท่านั้น
-- **ห้าม**ใช้ปุ่ม/segmented ที่มุมขวาบนของ page header เป็นตัวสลับ view — มุมขวาบน = action buttons (สร้าง/ส่งออก) เท่านั้น
-- ห้ามซ่อน view หลักไว้ใน dropdown/user menu · Pattern Q view tabs (รายละเอียด›PDF›ลายเซ็น›ประวัติ) คงตาม #98 เดิม
-
-**#105 Persona/Role Switcher = DEMO Harness** — ตัวสลับบทบาทใน prototype (เพื่อรีวิว permission ต่างบทบาท) อนุญาต แต่บังคับ 3 อย่าง:
-1. ติด attribute `data-demo="persona-switch"` ที่ container + badge ตัวหนังสือ **"DEMO"** สีส้ม (#FF9A1F) มองเห็นชัดข้างตัวสลับ
-2. แยกจาก user-chip จริง — ห้ามทำให้ดูเหมือน feature production
-3. **FRD §UI + UI Brief ต้องมี section "Demo-only elements"** ระบุว่า persona switcher ไม่ขึ้นหน้าจริง มีไว้ให้ผู้รีวิวเห็นต่างบทบาทเท่านั้น — ไม่มี section นี้ = FRD ไม่ผ่าน
-- Playwright/TC ใช้สลับบทบาทได้ แต่ TC ต้อง mark ว่า action นี้คือ demo harness ไม่ใช่ user flow
-
-**#106 Toolbar-Filter Block Lock** — แถบค้นหา+ตัวกรองของ list ทุกหน้า **ต้องลอกจาก `templates/blocks/toolbar-filter.html` verbatim แล้ว bind** (#78 ยกระดับเป็น iron rule ตรวจอัตโนมัติ):
-- container = `class="toolbar"` · ช่องค้นหา = `class="search-box"` (flex:1 · min 220 · max 420) · select กว้างตามเนื้อหา 160–240px · ปุ่มล้างตัวกรอง btn-ghost ปิดแถว — **ทุก control อยู่แถวเดียว flex-wrap**
-- **ห้าม**ตั้งชื่อ class เอง (`filter-row` / `filter-bar` / `input-search` = FAIL) · ห้าม search เต็มความกว้างเป็นแถวเดี่ยวแยกจาก select
-- audit เพิ่ม: พบ input[placeholder^="ค้นหา"] ที่ไม่อยู่ใน `.toolbar > .search-box` = FAIL
-
-**Hint (#67.1) ย้ำระดับ lane:** ใน lane/automate = **BLOCK ไม่ใช่ WARN** — ห้ามมี info-banner/hint/ⓘ ทุกชนิดเว้น FRD/PREBRIEF ระบุ explicit เป็นรายจุด
+  Iron Rules #98–#105 (doc archetype, combobox anatomy คน/สินค้า, lean list ไม่ซ้อนคอลัมน์, layout นิ่ง, ★ v9.1 compact form/placeholder/lean cell + z-index registry).
   ใช้เมื่อ user พูดถึง "สร้าง HTML", "HTML prototype/mockup", "html-generator", "html-generator-v9/v8/v7",
   "line editor", "รายการสินค้า", "เอกสารธุรกรรม PR PO SO", "search dropdown", "sidebar shell", "planner".
 ---
@@ -71,6 +52,7 @@ description: >
 ### Version History (สรุป — รายละเอียดเต็มอยู่ใน git/README)
 | Ver | สาระสำคัญ |
 |---|---|
+| **v9.1** | ⭐ **Compact Form + Lean Cell + Kit fixes** (จาก Tenant Master / Plan & Package vibe 2026-09-16) — **#104** compact form spacing · ไม่จอง error · placeholder `--c-placeholder` · `label.chk` · ⓘ ชิดซ้าย/is-below · combobox blur ก่อน render · **#105** 1 เซลล์ = 1 บรรทัด (`.nw`) · **kit: Z-Index Registry #62 ประกาศจริงใน `:root` (เดิมหาย)** · `.ph` wrap fix — ดู `CHANGELOG-v9.1.md` |
 | **v9.0** | ⭐⭐ **Document Archetype release — แทน html-generator-v8** (จาก f-sales-order.html + op-action-plan.html + team-plan.html ที่ user craft แล้ว, 2026-08-25) — **Pattern Q** โครงเอกสารธุรกรรมล็อก 4 surface (list / wizard 5 steps / view tabs / PDF+sign+modals) · **B2 v2** line editor re-locked กับ SO (grid compact + lean advanced row + discount engine + totals order) · **Pattern P** planner/scheduler · **#98 Document Archetype Lock · #99 Line Editor v2 Lock · #100 Wizard Step Contract · #101 View Tab Contract** · audit `doc_archetype` checks — ดู `CHANGELOG-v9.0.md` |
 | **v8.0** | ⭐⭐ **Consolidated release — แทน html-generator-v7** (รวม field feedback 2026-08-09 เป็น major) — **#95 Overlay Portal (BREAKING)** root cause "dropdown จม" = ancestor overflow clip ไม่ใช่ z-index → เมนูใน scroll container (.table-wrap/drawer body/B2 grid) ต้อง `portalMenu()` ไป `#overlay-root` position:fixed (util + `.menu-fixed` ใน skeleton BASE-KIT) · **#94.1 Cascade Clear** clear combobox → field autofill ตามต้องเคลียร์ครบ + confirm ก่อนล้าง line items · **#96 List Full-Height** `.page-fill` + `.table-wrap` flex:1 scroll ภายใน + thead sticky + `.table-foot` ติดล่าง — ตารางชิดขอบล่าง viewport เสมอ · **#97 Responsive Desktop-Base (BREAKING — แทน doctrine desktop-only)** ≥1180 เต็ม · 768–1180 adaptive (sidebar off-canvas/rail + `.nav-toggle`, drawer `min(กว้างเดิม,100vw)`, content padding 16) · <768 ไม่ guarantee · `body min-width:768` · Render Gate เพิ่ม viewport 1024 · **#67.1 Hint Opt-in** default ไม่ gen hint/ⓘ เลย — มีได้เฉพาะ FRD ระบุ explicit · **#47.1 Stepper Geometry Lock** `flex:1 1 0` เท่ากันเป๊ะ + connector กึ่งกลาง dot + dot ขนาดเดียว + CSS จาก kit verbatim + Render Gate วัดจริง · self-check #20–24 · doctrine sync (erp-design-guide, Rule #30, Checklist F) — ดู `CHANGELOG-v8.0.md` |
 | **v7.0** | ⭐⭐ **Consolidated release — แทน html-generator-v6.** Pattern B2 — Document Line Editor (สกัด verbatim จาก F-PR-001, CI Warm Light): grid 8 คอลัมน์ locked · VAT engine 3 โหมด (`calcLineVat`+`migrateLine`) · multi-UoM cascade (`units[]`+`setLineUnit`) · totals 6 บรรทัด (ฐาน WHT = ก่อน VAT) · hard control hook (disable ปุ่มจริง) · `.drawer-panel.wide` 1290px = ข้อยกเว้นเดียวของ Rule #11 · เพิ่ม keyboard nav + drop-up ให้ item combobox (ปิด gap OQ-B2-01) + **Iron Rule #94 Master-Backed Field = Search Combobox เสมอ** (canonical: `master-combobox.js.txt`) + QC Rules #83–#92 ใน component-contracts |
@@ -179,7 +161,8 @@ User สั่ง "สร้าง HTML..."
 | **Option anatomy เหมือนกันทุก dropdown** | **คน** = avatar/`user` icon → ชื่อ (บรรทัด 1) → ตำแหน่ง · แผนก (บรรทัด 2) · **สินค้า** = `package` icon → code · หมวด (บรรทัด 1 mono) → ชื่อ (บรรทัด 2) → ราคา/หน่วย + สต๊อก (ขวา) · **องค์กร/อื่น** = icon ประเภท → ชื่อ → code · meta · ลำดับห้ามสลับ | #102 |
 | **หน้าจอนิ่ง ไม่เบี้ยว** | dropdown/popover ลอยทับ (portal) ไม่ดันเนื้อหา · `scrollbar-gutter:stable` · ตารางกว้าง scroll ใน wrap · render แล้วคืน scroll/focus · ความสูงแถว/ปุ่มคงที่ | #29, #35, #36, #95 |
 | **ข้อมูล lean** | แสดงเฉพาะที่ตัดสินใจได้ · ข้อมูลรองไป `title`/บรรทัดรอง/drawer · ไม่มี hint เปลือย · ไม่มีศัพท์ภายใน | #67.1, #81, #103 |
-| **List view ห้ามซ้อนข้อมูล** | **1 ข้อมูล = 1 คอลัมน์** — คนละตัว (สถานะเอกสาร / จัดส่ง / การจ่าย / ลายเซ็น / ยอด) แยกคอลัมน์ ห้ามยัดรวมใน cell เดียว · บรรทัดรองในเซลล์ใช้ได้เฉพาะ meta ของ**ข้อมูลเดียวกัน** (code ใต้ชื่อ) | #40, #103 |
+| **List view ห้ามซ้อนข้อมูล** | **1 ข้อมูล = 1 คอลัมน์** — คนละตัว (สถานะเอกสาร / จัดส่ง / การจ่าย / ลายเซ็น / ยอด) แยกคอลัมน์ ห้ามยัดรวมใน cell เดียว · ★ v9.1: **1 เซลล์ = 1 บรรทัด** — ไม่มี user-cell avatar+ชื่อ+code ใน list (แยกคอลัมน์ รหัส · ชื่อ) · td ชื่อ/รหัส/วันที่ ใส่ `.nw` | #40, #103, #105 |
+| **ฟอร์ม compact** | section ห่าง 16 · field ห่าง 12 · ไม่จองพื้นที่ error (โผล่เฉพาะ invalid) · placeholder `#B4B6BC` · ตัวเลือกที่ต้องอธิบาย = การ์ดเลือก (`.track-card`) · เลือกแล้วมีการ์ดสรุป · รายการย่อยเป็นตารางมีหัว · checkbox+ข้อความ = `label.chk` | #104 |
 
 ## 📥 Input Modes
 

@@ -1050,3 +1050,31 @@ tabs ของ view drawer เอกสาร: **รายละเอียด 
 - `scrollbar-gutter: stable` บน container ที่ scroll · ตารางกว้างอยู่ใน `.table-wrap overflow-x:auto` · body ไม่มี h-scroll (#97)
 - render ซ้ำต้องคืน scroll + focus + caret (#29 · `updateLine` เป็นตัวอย่าง) · ความสูง row/ปุ่ม/input คงที่ (#36, #63) · toggle เปิด/ปิด section ห้ามทำให้ปุ่มด้านล่างกระโดด (reserve space หรือ animate)
 - เปลี่ยน filter/sort/page → render เฉพาะ `#table-body` (`renderTableOnly`) ไม่ re-render ทั้งหน้า
+
+
+---
+
+## Group 22: Compact Form · Lean Cell · Kit Fixes (Rules #104–#105) — v9.1 ⭐ (จาก Tenant Master / Plan & Package vibe 2026-09-16)
+
+### Rule #104 — Compact Form Spacing + Placeholder + Checkbox Label (BREAKING · แทน #43)
+**A. ระยะฟอร์ม (ค่าใหม่ใน kit — ห้ามยืดกลับ)**
+- `.form-section` เว้นบน **16px** (เดิม 28) · `.form-section-title` ใต้ **10px** · `.field` ห่างกัน **12px** (เดิม 16) · label → ช่อง **4px**
+- **ไม่จองพื้นที่ error ล่วงหน้า** — `.field-error` = `display:none` โผล่เฉพาะ `.field.is-invalid` (เดิม #43 จอง 15px ทุกช่อง = ฟอร์มยืด ~19px/ช่อง "ดูโล่ง ๆ ห่าง ๆ") · layout ขยับเฉพาะตอนกรอกผิด ยอมรับได้ · toast รวมยังต้องมี
+- ฟอร์มที่มีหลายส่วน → หัวข้อเป็นลำดับ **"1 · ลูกค้าคือใคร / 2 · ซื้ออะไร / 3 · …"** อ่านเป็นเรื่องเดียว · ช่องรหัสสั้น (≤180px) จับคู่ช่องชื่อยาวในแถวเดียว (`fgrid-13`) · แถว 3 ช่องเท่ากันใช้ `fgrid-3`
+- ตัวเลือกกลุ่มที่ต้องอธิบาย (track / ประเภทลูกค้า / โหมด) ≤3 ค่า → **การ์ดเลือกมีคำอธิบายในตัว** (`.track-card`) ไม่ใช่ seg-control จิ๋ว · เลือกแล้วโชว์ **การ์ดสรุป** สิ่งที่ได้ (`.pkg-card` — ชื่อ · จำนวน · ราคา · pills) ใต้ combobox
+- รายการย่อยที่กรอกหลายแถว (instance / ที่อยู่ / ผู้ติดต่อ) = **ตารางมีหัวคอลัมน์** (`.inst-table` + `.inst-head`) ปุ่มเพิ่มเป็น ghost `btn-sm` ใต้ตาราง · placeholder แถวแรกเป็นตัวอย่างจริง (WKN-HQ / สำนักงานใหญ่)
+**B. Placeholder** — สี `--c-placeholder #B4B6BC` (จางกว่า mute-3) ทุก input/search/textarea · ห้ามใช้ placeholder เป็น label · ค่าที่ระบบแนะนำ (เช่น "รวม module ฿1,500" · "ว่าง = 10 × รายเดือน") ใส่ใน placeholder ได้แทน hint ใต้ช่อง
+**C. Checkbox + ข้อความ** — ใช้ `label.chk > input[type=checkbox]` เท่านั้น · **ห้าม** `class="cb"` บน label (`.cb` = กล่อง 18px ของ header ตาราง → ข้อความแตกเป็นคำละบรรทัด)
+**D. ⓘ ทุกที่ (ย้ำ #67)** — ไม่มี `.field-help`/`.sec-desc` ยาวใต้ช่อง/ใต้หัวข้อ → `tip(text, below)` ข้าง label/หัวข้อ · ใน drawer/card tooltip ชิดซ้าย (`left:0`) · หัวข้อบนสุดของ drawer ใช้ `.is-below`
+**E. Combobox re-render** — `onSelect` ที่ตามด้วย `render()` ต้อง `blur()` input ก่อน (kit `ssPick` ทำให้แล้วใน v9.1) — ไม่งั้น restoreRenderState คืน focus → list เด้งเปิดค้าง
+
+### Rule #105 — Lean Cell: 1 เซลล์ = 1 บรรทัด (ขยาย #103A)
+- **ห้าม** user-cell แบบ avatar + ชื่อ + code 2 บรรทัดใน list ทั่วไป — แยกเป็นคอลัมน์ **รหัส · ชื่อ** (avatar/ID ไปอยู่ใน drawer header) · ยกเว้น combobox option (#102) ที่ยังเป็น 2 บรรทัด
+- td ที่เป็นชื่อ/รหัส/วันที่/แพ็กเกจ/ตัวเลข ใส่ `.nw` (nowrap) · ถ้ายังล้น → ลดจำนวนคอลัมน์ (#16) ไม่ใช่ปล่อยตัดบรรทัด
+- ตัวเลข+ป้าย ในเซลล์เดียว (เช่น `2/4 ล้ม 1`) = inline nowrap ไม่ซ้อนบรรทัด
+- ตรวจ: viewport 1440 ทุกแถวสูงเท่ากัน (ไม่มีแถว 2 บรรทัด) · 1024 ไม่มี h-scroll ของ body (#97)
+
+### Kit fixes v9.1 (ไม่ใช่ rule ใหม่ แต่ author ต้องรู้)
+- **Z-Index Registry (#62) ประกาศแล้วใน `:root`** (`--z-content 1 · sticky/shell 10 · dropdown 30 · backdrop 50 · drawer 51 · modal 60 · toast 80`) — v9.0 และก่อนหน้า kit อ้าง `var(--z-*)` โดยไม่ประกาศ = z-index auto (รอดเพราะ DOM order) · ไฟล์เก่าที่ gen จาก v9.0 ให้เพิ่ม registry ใน feature-css
+- `.ph > div:first-child { flex:1 1 0 }` — ph-sub ยาวไม่ดัน ph-actions ตกบรรทัดแล้ว
+- `drawerShell(o)` ควรรับ `o.cls` ต่อท้าย `.drawer-body` (เช่น `form-compact`) และ `o.fill` (list เต็มความสูง `is-fill`)
