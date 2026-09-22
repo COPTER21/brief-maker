@@ -3038,3 +3038,204 @@ def assert_role_write_blocked(pg, mutate_js, count_js, note=''):
     assert after_ == before, (f"[{note}] persona/role guard เป็น UI-only: บทบาทอ่านอย่างเดียวเรียก "
                               f"mutation ตรงแล้ว state เปลี่ยน ({before}→{after_}) — ต้อง guard ในฟังก์ชัน")
     return {'before': before, 'after': after_}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# C3.8 · DSP-08 (F-ACC-CN 2026-09-21) — modal card จมใต้ .backdrop ของตัวเอง
+# ─────────────────────────────────────────────────────────────────────────────
+# ที่มา (BLOCK จริง): overlay ใช้ .backdrop (position:absolute · z=var(--z-backdrop) 50) คู่กับการ์ด
+#   modal ที่ตั้ง position:relative แต่ z-index:auto → การ์ดจมใต้ backdrop เพราะ backdrop มี z ชัดเจน
+#   ส่วนการ์ด z:auto วาดที่ระดับ 0 · elementFromPoint จุดกึ่งกลางการ์ดจึงโดน .backdrop (onclick=ปิด)
+#   = คลิกในการ์ดทะลุไปปิด modal · แก้ด้วย `.modal-overlay > *:not(.backdrop){z-index:var(--z-modal)}`
+#
+# ทำไมตัววัด static/เรขาคณิตเดิมมองไม่เห็น: JS_MODAL_UNDER_DRAWER ตรวจ modal-vs-drawer (คนละคู่) ·
+#   JS_OVERLAY_STACK ใส่ .modal-backdrop ไว้ใน SEL_OK จึงไม่จับ backdrop-ทับ-card ในกล่องเดียวกัน ·
+#   self_audit/audit.sh เทียบข้อความ/นับ token ไม่ได้ประกอบ DOM แล้ว hit-test — ต้องเรนเดอร์จริงเท่านั้น
+# invariant: ขณะ modal เปิด elementFromPoint(กึ่งกลางการ์ด) ต้อง resolve เป็นการ์ด (หรือลูกของการ์ด)
+#   ไม่ใช่ .backdrop — เป็นตัวตรวจกลาง generic (รับ overlay_sel/card_sel/backdrop_sel ปรับได้)
+JS_MODAL_CARD_TOPMOST = r"""
+(a) => {
+  const vis = el => { const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+    return r.width > 4 && r.height > 4 && cs.display !== 'none' && cs.visibility !== 'hidden'
+           && parseFloat(cs.opacity || '1') >= 0.05; };
+  const overlays = [...document.querySelectorAll(a.overlay)].filter(vis);
+  if (!overlays.length) return { ok: false, why: 'no-open-overlay' };
+  const ov = overlays[overlays.length - 1];                  // ตัวบนสุดถ้าซ้อนหลายชั้น
+  const backdrop = ov.querySelector(a.backdrop);
+  // การ์ด = ลูกที่เห็นได้ของ overlay ที่ไม่ใช่ backdrop (รองรับทั้ง .card และ id เฉพาะ)
+  const card = [...ov.children].filter(c => vis(c) && !c.matches(a.backdrop))
+    .sort((x, y) => (y.getBoundingClientRect().width * y.getBoundingClientRect().height)
+                  - (x.getBoundingClientRect().width * x.getBoundingClientRect().height))[0];
+  if (!card) return { ok: false, why: 'no-card' };
+  const r = card.getBoundingClientRect();
+  const cx = Math.round(r.left + r.width / 2), cy = Math.round(r.top + r.height / 2);
+  const hit = document.elementFromPoint(cx, cy);
+  const onCard = !!hit && (hit === card || card.contains(hit));
+  const onBackdrop = !!hit && !!backdrop && (hit === backdrop || backdrop.contains(hit));
+  return { ok: onCard && !onBackdrop, cx, cy,
+    cardCls: (card.className || card.id || card.tagName).toString().slice(0, 30),
+    cardZ: getComputedStyle(card).zIndex, cardPos: getComputedStyle(card).position,
+    backdropZ: backdrop ? getComputedStyle(backdrop).zIndex : 'none',
+    hit: hit ? (hit.className || hit.id || hit.tagName).toString().slice(0, 40) : 'none' };
+}
+"""
+
+
+def assert_modal_card_topmost(pg, note='', overlay_sel='.modal-overlay',
+                              card_sel='.card', backdrop_sel='.backdrop'):
+    """assert ว่าการ์ด modal ที่เปิดอยู่เป็น hit-test บนสุด ณ จุดกึ่งกลาง — ไม่ใช่ .backdrop (DSP-08)
+
+    เรียก 'หลัง' เปิด modal ที่มี backdrop คลุมทั้ง overlay. คืน dict ถ้าผ่าน · โยน AssertionError
+    ถ้าไม่มี overlay/การ์ด หรือจุดกึ่งกลางการ์ดโดน backdrop (การ์ดจมใต้ backdrop = คลิกทะลุไปปิด modal).
+    card_sel ใช้แค่แยก backdrop ออก — การ์ดจริงเลือกจากลูก overlay ที่ใหญ่สุดที่ไม่ใช่ backdrop.
+    """
+    r = pg.evaluate(JS_MODAL_CARD_TOPMOST,
+                    {'overlay': overlay_sel, 'card': card_sel, 'backdrop': backdrop_sel})
+    if r.get('why'):
+        raise AssertionError(f"assert_modal_card_topmost {note}: {r['why']} "
+                             f"(ต้องเปิด modal ที่มี {backdrop_sel} ก่อนเรียก)")
+    assert r['ok'], (f"[{note}] DSP-08 — การ์ด modal จมใต้ .backdrop: จุดกึ่งกลาง ({r['cx']},{r['cy']}) "
+                     f"โดน '{r['hit']}' (การ์ด {r['cardCls']} · position:{r['cardPos']} · z:{r['cardZ']} · "
+                     f"backdrop z:{r['backdropZ']}) — คลิกในการ์ดทะลุไปโดน backdrop ปิด modal")
+    return r
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# C3.8 · CAP-DISPLAY (F-ACC-CN 2026-09-21) — เลขเพดานที่โชว์ ≠ เพดานที่ระบบบังคับจริง
+# ─────────────────────────────────────────────────────────────────────────────
+# ที่มา (user เจอตอน manual test): line editor โชว์ "ลดจำนวนได้อีก N" จาก room.qtyLeft (เพดาน
+#   ตามใบแจ้งหนี้ เช่น 9) แต่ระบบบล็อกจริงที่ l.max (เพดานตามใบรับคืน SR เช่น 2 · pickSR ตัดให้แคบลง)
+#   → เลขที่ตาเห็น (9) ขัดกับจุดที่เริ่มแดง/บล็อก (3+) = misleading. การบล็อกถูก แต่เลขที่โชว์ผิด.
+#
+# ทำไมตัววัด static/e2e เดิมมองไม่เห็น: grep/self_audit เห็นแค่ว่า "มีเลขโชว์" ไม่รู้ว่าเลขนั้นตรงกับ
+#   enforcement มั้ย · e2e เดิม assert ค่า l.max ใน "โมเดล" (ไม่ได้อ่านเลขที่ 'เรนเดอร์บนจอ')
+#   → ต้องเรนเดอร์จริง อ่านเลขจาก DOM แล้วพิสูจน์ว่า qty=N ยังผ่าน · qty=N+1 แดง (จุดบล็อกจริง = N).
+# invariant: เลขที่โชว์หลัง label = เพดานสูงสุดที่ยังกรอกได้ (qty=N ไม่แดง · N+1 แดง).
+JS_LINE_CAP_READ = r"""
+(a) => {
+  const scope = a.scope ? document.querySelector(a.scope) : document.body;
+  if (!scope) return { why: 'no-scope' };
+  const metas = [...scope.querySelectorAll(a.metaSel)].filter(m => {
+    const r = m.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && (m.textContent || '').indexOf(a.label) >= 0; });
+  if (!metas.length) return { why: 'no-meta-with-label' };
+  const meta = metas[a.index] || metas[0];
+  const txt = meta.textContent || '';
+  const i = txt.indexOf(a.label);
+  const rest = txt.slice(i + a.label.length);
+  const m = rest.match(/[\d,]+(?:\.\d+)?/);
+  if (!m) return { why: 'no-number', txt: txt.slice(0, 120) };
+  const cap = parseFloat(m[0].replace(/,/g, ''));
+  const suffix = /\(ตามใบรับคืน\)/.test(rest.slice(0, (m.index || 0) + m[0].length + 24));
+  return { cap, suffix, metaText: txt.trim().slice(0, 180) };
+}
+"""
+
+JS_LINE_RED = r"""
+(a) => {
+  const scope = a.scope ? document.querySelector(a.scope) : document.body;
+  if (!scope) return { found: false };
+  const metas = [...scope.querySelectorAll(a.metaSel)].filter(m => {
+    const r = m.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && (m.textContent || '').indexOf(a.label) >= 0; });
+  const meta = metas[a.index] || metas[0];
+  if (!meta) return { found: false };
+  const row = meta.closest('tr') || meta.parentElement;
+  const qty = row ? row.querySelector('input[type=number]') : null;
+  const badMeta = meta.classList.contains('bad');
+  const qtyOver = qty ? qty.classList.contains('qty-over') : false;
+  return { found: true, red: badMeta || qtyOver, badMeta, qtyOver,
+           qtyVal: qty ? qty.value : null, metaText: (meta.textContent || '').trim().slice(0, 180) };
+}
+"""
+
+
+def assert_line_cap_display_matches_enforced(pg, set_qty_js, note='', scope='#create-drawer-content',
+                                             meta_sel='.line-meta', label='ลดจำนวนได้อีก', index=0):
+    """C3.8 (F-ACC-CN 2026-09-21): assert เลขที่โชว์ "<label> N" ในกล่องแก้บรรทัด = เพดานที่ระบบบังคับจริง.
+
+    อ่านเลข N ที่ 'เรนเดอร์บนจอ' → ตั้ง qty = N ต้องไม่แดง · ตั้ง qty = N+1 ต้องแดง
+    (แดง = .line-meta.bad หรือ input.qty-over). ถ้าเลขที่โชว์ไม่ใช่จุดที่เริ่มบล็อก = display ขัด enforcement.
+
+    set_qty_js : template สั่งตั้ง qty ของบรรทัด มี '{v}' แทนค่า — เช่น
+                 "updateLine(createWizard.data.lines[0].id,'qty',{v})"
+                 (ต้องเป็นคำสั่งที่ทำให้ re-render/อัปเดต red-state; helper จะ settle ให้เอง)
+    คืน dict {cap, suffix, ...} ถ้าผ่าน · โยน AssertionError ถ้าเลขที่โชว์ ≠ เพดานที่บังคับจริง.
+    """
+    args = {'scope': scope, 'metaSel': meta_sel, 'label': label, 'index': index}
+    read = pg.evaluate(JS_LINE_CAP_READ, args)
+    if read.get('why'):
+        raise AssertionError(f"assert_line_cap_display_matches_enforced {note}: อ่านเลขที่โชว์ไม่ได้ "
+                             f"({read['why']}{' · ' + read.get('txt', '') if read.get('txt') else ''})")
+    cap = read['cap']
+    cap_n = int(cap) if float(cap).is_integer() else cap
+
+    def _set(v):
+        pg.evaluate("() => { %s }" % set_qty_js.format(v=v))
+        settle(pg)
+        return pg.evaluate(JS_LINE_RED, args)
+
+    at_cap = _set(cap_n)
+    assert at_cap.get('found'), (f"[{note}] ตั้ง qty=N ({cap_n}) แล้วหาบรรทัด/meta ไม่เจอ (re-render เพี้ยน?)")
+    assert not at_cap['red'], (
+        f"[{note}] CAP-DISPLAY — เลขที่โชว์ '{label} {cap_n}' แต่ qty={cap_n} 'แดงแล้ว' "
+        f"(badMeta={at_cap['badMeta']} · qtyOver={at_cap['qtyOver']}) → เลขที่โชว์ 'เกิน' เพดานจริง "
+        f"(display ตามใบแจ้งหนี้ ไม่ใช่ตามใบรับคืน/l.max) · meta: {at_cap['metaText']}")
+
+    over = _set((cap_n + 1) if isinstance(cap_n, int) else cap + 1)
+    assert over.get('found'), f"[{note}] ตั้ง qty=N+1 แล้วหาบรรทัด/meta ไม่เจอ"
+    assert over['red'], (
+        f"[{note}] CAP-DISPLAY — เลขที่โชว์ '{label} {cap_n}' แต่ qty={cap_n + 1} 'ยังไม่แดง' "
+        f"→ จุดบล็อกจริงสูงกว่าเลขที่โชว์ (display แคบกว่าที่บังคับ) · meta: {over['metaText']}")
+
+    return {'cap': cap, 'suffix': read['suffix'], 'metaText': read['metaText']}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# C3.8 · STATUS-GUARD (F-ACC-CN 2026-09-22) — ปุ่มถูกซ่อน แต่ controller ยังเรียกได้
+# ─────────────────────────────────────────────────────────────────────────────
+# ที่มา (BA gate BLOCK · bypass catalog): เอกสารภาษี (Credit Note) — ปุ่ม gate ถูกต้อง (approved/sent
+#   ไม่โชว์ปุ่มยกเลิก · draft ไม่โชว์ปุ่มส่ง) แต่ controller (openCancelCN/openSendCN/confirmSubmit/
+#   openSubmitModal) ไม่ได้เช็คสถานะ 'ในฟังก์ชัน' → เรียกตรงบนใบสถานะผิดยังทำ transition ผิดได้:
+#   C1 ยกเลิกใบ sent (ยอด AR/VAT เด้งกลับ) · C2 ส่งใบ draft (ข้ามอนุมัติ ไม่มีเลข) · C4 ส่งอนุมัติซ้ำ
+#   ใบ approved (chain ถูกเขียนทับ). = bypass class B4 (guard เป็น UI-only ไม่ใช่ in-function).
+#
+# ทำไมตัววัดเดิมมองไม่เห็น: assert_role_write_blocked จับ 'role/persona' bypass (คนละแกน) ·
+#   qc-coverage/self_audit grep เห็นแค่ว่า "ปุ่มถูกซ่อนตามสถานะ" (render-time) — ไม่ได้เรียก controller
+#   บนสถานะผิดแล้วดูว่า data เปลี่ยนมั้ย. ต้องเรนเดอร์จริง → ตั้งสถานะผิด → เรียก controller → assert.
+# invariant: controller ที่ guard แล้ว เรียกบน record สถานะผิด → snapshot (status/code/chain) 'ไม่เปลี่ยน'
+#   + ขึ้น warning toast (block อย่างซื่อสัตย์ ไม่ใช่เงียบ).
+def assert_status_guard(pg, fn_call_js, rec_id, illegal_status, expect_unchanged_js, note=''):
+    """เรียก controller ที่ถูก guard บน record ที่ตั้งให้อยู่ 'สถานะผิด' แล้วต้องไม่เกิด transition ผิด
+    (status/code/chain คงเดิม) + ขึ้น warning toast = guard อยู่ 'ในฟังก์ชัน' ไม่ใช่แค่ตอน render ปุ่ม.
+
+    fn_call_js         : คำสั่งเรียก controller ที่ guard — เช่น "openCancelCN('R1')" หรือ
+                         "modalState.id='R2'; confirmSubmit();" (helper ห่อด้วย ()=>{ ... } ให้เอง)
+    rec_id             : id ของ record ที่ทดสอบ (ใช้ตั้งสถานะผิดก่อนเรียก)
+    illegal_status     : สถานะผิดที่ตั้งก่อนเรียก controller (เช่น 'sent' / 'draft' / 'approved')
+    expect_unchanged_js: expression คืน snapshot ที่ 'ต้องไม่เปลี่ยน' — เช่น
+                         "({s:findRec('R1').status,c:findRec('R1').code,n:(findRec('R1').approval_chain||[]).length})"
+    คืน dict {before, after, toast} ถ้าผ่าน · โยน AssertionError ถ้ามี transition ผิด หรือไม่มี warning toast.
+    """
+    pg.evaluate("(a) => { const r = findRec(a.id); if (r) r.status = a.st; }",
+                {'id': rec_id, 'st': illegal_status})
+    before = pg.evaluate("() => (%s)" % expect_unchanged_js)
+    # เคลียร์ toast เดิม เพื่ออ่าน toast ของ action นี้เท่านั้น
+    pg.evaluate("() => { const r = document.getElementById('toast-root'); if (r) r.innerHTML = ''; }")
+    pg.evaluate("() => { %s }" % fn_call_js)
+    settle(pg)
+    after_ = pg.evaluate("() => (%s)" % expect_unchanged_js)
+    toast = pg.evaluate(
+        "() => { const r = document.getElementById('toast-root'); if (!r) return {t: '', warn: false};"
+        " const ts = r.querySelectorAll('.toast'); if (!ts.length) return {t: '', warn: false};"
+        " const el = ts[ts.length - 1]; const ic = el.querySelector('[data-lucide]');"
+        " return {t: el.textContent || '', warn: !!ic && ic.getAttribute('data-lucide') === 'alert-triangle'}; }")
+    assert after_ == before, (
+        f"[{note}] STATUS-GUARD หลุด: เรียก `{fn_call_js}` บนใบสถานะ '{illegal_status}' แล้ว snapshot "
+        f"เปลี่ยน ({before} → {after_}) — ปุ่มถูกซ่อนแต่ controller ยัง mutate ได้ (guard เป็น UI-only)")
+    assert toast['t'], (
+        f"[{note}] STATUS-GUARD: เรียก `{fn_call_js}` บนสถานะผิดแล้วไม่มี toast เตือนใด ๆ "
+        f"(guard ต้อง block พร้อมแจ้งผู้ใช้ ไม่ใช่เงียบ/เปิด modal ต่อ)")
+    assert toast['warn'], (
+        f"[{note}] STATUS-GUARD: block แล้วแต่ไม่ใช่ warning toast (ข้อความล่าสุด: {toast['t'][:90]})")
+    return {'before': before, 'after': after_, 'toast': toast['t']}
