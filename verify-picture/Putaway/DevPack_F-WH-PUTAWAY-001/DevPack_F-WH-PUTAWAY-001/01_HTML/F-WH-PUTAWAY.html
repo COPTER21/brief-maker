@@ -1,0 +1,2995 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Putaway — จัดเก็บเข้าที่ · CUBE NATIVE</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+
+<!-- Lucide Icons: loader ที่ท้าย body (ดู section "Lucide loader" ก่อน main <script>) -->
+<!-- เหตุผล:
+     1) ย้ายมาท้าย body หลีกเลี่ยง race กับ DOMContentLoaded
+     2) Multi-CDN fallback (unpkg → jsdelivr → cdnjs)
+     3) Pin version (เลิกใช้ @latest ที่ flaky — GitHub issue #2962)
+-->
+
+<style>
+/* ===== BASE-KIT v6.4 — DO NOT EDIT (Rule #69) — page CSS ต่อท้ายหลัง END marker ===== */
+/* ============== CSS VARIABLES (CUBE CI — v2.0 Warm Light rebrand) ============== */
+:root {
+  --c-navy: #111111;
+  --c-navy-2: #111111;
+  --c-primary: #FF3B30;
+  --c-primary-hover: #E62E24;
+  --c-teal: #FF9A1F;
+  --c-teal-light: #FFB763;
+  --c-ink: #111111;
+  --c-mute: #54565C;
+  --c-mute-2: #73757B;
+  --c-mute-3: #9A9CA2;
+  --c-line: #DEDAD4;
+  --c-line-2: #E9E5E0;
+  --c-line-3: #F1EEEA;
+  --c-bg-off: #FAF8F5;
+  --c-success: #1F9D55;
+  --c-warning: #E8870F;
+  --c-danger: #E62E24;
+  --sidebar-w: 232px;
+  --shell-h: 52px;
+  /* v3.13 — Fixed type scale (Iron Rule locked values) */
+  --fs-h1: 22px;        /* page title */
+  --fs-h2: 17px;        /* section title */
+  --fs-h3: 15px;        /* card / drawer title */
+  --fs-body: 14px;      /* body default */
+  --fs-sub: 13px;       /* secondary body / table cell */
+  --fs-meta: 12px;      /* meta / label */
+  --fs-cap: 11px;       /* uppercase section caption */
+  --fs-kpi: 28px;       /* stat value */
+  /* v3.13 — Fixed spacing scale */
+  --sp-xs: 4px; --sp-sm: 8px; --sp-md: 12px; --sp-lg: 20px; --sp-xl: 28px;
+  /* v3.13 — Fixed radius scale */
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-full: 999px;
+}
+
+/* ============== RESET ============== */
+* { box-sizing: border-box; }
+html, body { margin:0; padding:0; }
+/* Rule #35 — Layout Stability: จองพื้นที่ scrollbar ไว้เสมอ → เปิด modal/drawer หรือ
+   content โตขึ้นแล้ว scrollbar โผล่/หาย จะไม่ทำให้หน้าจอขยับซ้าย-ขวา (jank) */
+html { scrollbar-gutter: stable; }
+
+/* ============== SCROLLBAR (Iron Rule #49 — minimal, ห้าม default) ============== */
+/* เส้นบางมาก 5px · track โปร่งใส · พื้นเข้ม (sidebar/panel) = ขาวโปร่ง · พื้นสว่าง = charcoal จาง */
+* { scrollbar-width: thin; scrollbar-color: rgba(17,17,17,.16) transparent; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(17,17,17,.14); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(17,17,17,.26); }
+.sidebar, .slide { scrollbar-color: rgba(255,255,255,.28) transparent; }
+.sidebar ::-webkit-scrollbar-thumb, .slide ::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb, .slide::-webkit-scrollbar-thumb { background: rgba(255,255,255,.28); }
+.sidebar ::-webkit-scrollbar-thumb:hover, .slide ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.42); }
+body {
+  font-family: 'Satoshi', 'Noto Sans Thai', system-ui, sans-serif;
+  background: var(--c-bg-off);
+  color: var(--c-ink);
+  font-size:14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  /* v7.1 Rule #97: desktop-base + adaptive — 768-1180 ปรับ layout ผ่าน media query,
+     <768 = horizontal scroll (ไม่ guarantee) */
+  min-width: 768px;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+[data-lucide] { flex-shrink: 0; }
+
+/* Hide number input spinner globally (Iron Rule #19) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin:0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ============== SIDEBAR ============== */
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sidebar-w);
+  background: #111111;
+  color: #E9E5E0;
+  z-index:var(--z-shell);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.sb-brand {
+  padding:18px;
+  display: flex;
+  align-items: center;
+  gap:12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+.sb-logo {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, #FF3B30, #FF9A1F);
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(255,59,48,0.3);
+}
+.sb-name { font-weight: 700; font-size:14px; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+.sb-sub { font-size:11px; color: #9A9CA2; letter-spacing: 0.06em; font-weight: 600; text-transform: uppercase; margin-top:2px; }
+.sb-nav { flex: 1; padding:12px 8px; overflow-y: auto; }
+
+/* Module = collapsible group (Iron Rule #27).
+   Header toggles expand/collapse only — NOT navigable.
+   Children = .sb-features (clickable feature items). */
+.sb-module { margin-bottom:4px; }
+.sb-module-header {
+  display: flex; align-items: center; gap:8px;
+  width: 100%;
+  padding:8px 10px;
+  border-radius: 6px;
+  background: transparent; border: 0;
+  color: #9A9CA2;
+  font-family: inherit;
+  font-size:11px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  cursor: pointer; transition: all 120ms;
+  text-align: left;
+}
+.sb-module-header:hover { background: rgba(255,255,255,0.04); color: #DEDAD4; }
+.sb-module-header .mod-icon { flex-shrink: 0; opacity: 0.7; }
+.sb-module-header .mod-label { flex: 1; }
+.sb-module-header .mod-chevron {
+  flex-shrink: 0;
+  transition: transform 200ms;
+  opacity: 0.7;
+}
+.sb-module[data-expanded="false"] .mod-chevron { transform: rotate(-90deg); }
+.sb-module[data-expanded="false"] .sb-features { display: none; }
+
+.sb-features { padding:2px 0 6px 0; }
+
+.sb-item {
+  display: flex; align-items: center; gap:10px;
+  padding:8px 12px 8px 16px;
+  border-radius: 6px;
+  color: #DEDAD4;
+  font-size:13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms;
+  margin-bottom:1px;
+  position: relative;
+  user-select: none;
+}
+.sb-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sb-item.is-active {
+  background: #FF3B30;
+  color: #fff;
+  font-weight: 600;
+}
+.sb-item.is-active::before {
+  content: '';
+  position: absolute;
+  left: -10px; top: 7px; bottom: 7px;
+  width: 3px;
+  background: #fff;
+  border-radius: 0 2px 2px 0;
+}
+.sb-item [data-lucide] { width: 16px; height: 16px; opacity: 0.85; }
+.sb-item.is-active [data-lucide] { opacity: 1; }
+.sb-badge {
+  margin-left:auto;
+  font-size:11px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.10);
+  color: #9A9CA2;
+  padding:2px 8px;
+  border-radius: 999px;
+}
+.sb-item.is-active .sb-badge { background: rgba(255,255,255,0.18); color: #fff; }
+.sb-item.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.sb-item.is-disabled:hover { background: transparent; color: #DEDAD4; }
+.sb-footer {
+  padding:12px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  gap:8px;
+  font-size:12px;
+  color: #9A9CA2;
+}
+.pulse-dot {
+  width: 7px; height: 7px;
+  background: var(--c-teal);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(255,154,31,0.20);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ============== MAIN ============== */
+.main {
+  margin-left:var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--c-bg-off);
+}
+
+/* ============== SHELL BAR ============== */
+.shell-bar {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  border-bottom: 1px solid var(--c-line-2);
+  height: var(--shell-h);
+  display: flex;
+  align-items: center;
+  padding:0 24px;
+  z-index:var(--z-sticky);
+  gap:12px;
+}
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap:8px;
+  font-size:13px;
+  color: var(--c-mute);
+}
+.breadcrumb a { cursor: pointer; transition: color 120ms; }
+.breadcrumb a:hover { color: var(--c-primary); }
+.breadcrumb .sep { color: var(--c-mute-3); font-size:11px; }
+.breadcrumb-current { color: var(--c-ink); font-weight: 500; }
+.icon-btn {
+  width: 34px; height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--c-mute);
+  border-radius: 7px;
+  position: relative;
+  transition: all 120ms;
+}
+.icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.icon-btn [data-lucide] { width: 17px; height: 17px; }
+.notif-dot {
+  position: absolute;
+  top: 7px; right: 8px;
+  width: 7px; height: 7px;
+  background: var(--c-danger);
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap:10px;
+  padding:6px 10px 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 120ms;
+}
+.user-chip:hover { background: var(--c-line-3); }
+.user-text { line-height: 1.2; text-align: right; }
+.user-name { font-size:12.5px; font-weight: 500; color: var(--c-ink); white-space: nowrap; }
+.user-role { font-size:11px; color: var(--c-mute-2); white-space: nowrap; margin-top:1px; }
+.avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* User dropdown menu */
+.user-menu {
+  position: absolute;
+  top: calc(var(--shell-h) - 4px);
+  right: 22px;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(17,17,17,0.12);
+  width: 240px;
+  z-index:var(--z-dropdown);
+  padding:6px;
+  display: none;
+}
+.user-menu.is-open { display: block; }
+.user-menu-item {
+  display: flex;
+  align-items: center;
+  gap:10px;
+  padding:8px 12px;
+  border-radius: 6px;
+  font-size:13px;
+  color: var(--c-ink);
+  cursor: pointer;
+  transition: background 120ms;
+}
+.user-menu-item:hover { background: var(--c-bg-off); }
+.user-menu-item [data-lucide] { width: 15px; height: 15px; color: var(--c-mute-2); }
+.user-menu-item.is-danger { color: var(--c-danger); }
+.user-menu-item.is-danger [data-lucide] { color: var(--c-danger); }
+.user-menu-divider { height: 1px; background: var(--c-line-2); margin:6px 0; }
+
+/* ============== CONTENT ============== */
+/* Fluid full-width — content stretches to fill viewport (Iron Rule #30).
+   Do NOT add max-width here; component-level constraints (modal/toast/wizard
+   internal cards) are responsible for their own readability bounds. */
+.content {
+  padding:24px;
+}
+
+/* ============== v7.1 RESPONSIVE — Rule #97 (desktop-base adaptive) ============== */
+.nav-toggle { display:none; }
+@media (max-width: 1180px){
+  .content { padding:16px; }
+  .drawer { width: min(920px, 100vw); }
+  .drawer.standard { width: min(680px, 100vw); }
+  .drawer.wide, .drawer-panel.wide { width: min(1290px, 100vw); }
+  /* generic shell: sidebar เป็น off-canvas — Pattern N shell ใช้ icon rail ของตัวเองแทน */
+  .main { margin-left: 0; }
+  .sidebar { transform: translateX(-100%); transition: transform .18s ease; }
+  .sidebar.open { transform: translateX(0); box-shadow: 0 8px 32px rgba(0,0,0,.24); }
+  .nav-toggle { display:inline-flex; align-items:center; justify-content:center;
+    width:32px; height:32px; border:none; background:transparent; border-radius:8px;
+    color:var(--c-ink); }
+  .nav-toggle:hover { background: rgba(17,17,17,.06); }
+}
+
+/* ============== v7.1 LIST FULL-HEIGHT — Rule #96 ============== */
+/* หน้า list หลัก: ตารางยืดเต็มพื้นที่เหลือ ติดขอบล่างเสมอ ทุกขนาดจอ */
+.page-fill { display:flex; flex-direction:column;
+  min-height: calc(100dvh - var(--shellbar-h, 52px) - 48px); } /* 48 = content padding บน+ล่าง */
+@media (max-width:1180px){ .page-fill { min-height: calc(100dvh - var(--shellbar-h, 52px) - 32px); } }
+.page-fill > .card-list, .page-fill > .list-card { flex:1 1 auto; min-height:0;
+  display:flex; flex-direction:column; }
+.table-wrap { flex:1 1 auto; min-height:0; overflow:auto; }
+.table-wrap thead th { position:sticky; top:0; background:#fff; z-index:var(--z-sticky); }
+.table-foot { flex:0 0 auto; } /* pagination/count ติดล่างของ card เสมอ */
+
+/* ============== v7.1 OVERLAY PORTAL — Rule #95 ============== */
+/* เมนูที่ portal ออกจาก scroll container (ใช้คู่ portalMenu util) */
+.menu-fixed { position:fixed !important; z-index:var(--z-dropdown);
+  background:#fff; border:1px solid var(--c-line, #E7E2DB); border-radius:10px;
+  box-shadow:0 12px 32px rgba(17,17,17,.14); overflow-y:auto; }
+
+/* ============== PAGE HEADER ============== */
+.ph {
+  margin-bottom:18px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap:16px;
+}
+.ph > div:first-child { flex: 1 1 auto; min-width: 280px; }
+.ph-title-row {
+  display: flex;
+  align-items: baseline;
+  gap:10px;
+  margin-bottom:6px;
+}
+.ph-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:20px;
+  font-weight: 700;
+  color: var(--c-navy);
+  margin:0;
+  letter-spacing: -0.01em;
+}
+.ph-count {
+  font-size:12.5px;
+  font-weight: 600;
+  color: var(--c-mute-2);
+  background: var(--c-line-3);
+  padding:3px 10px;
+  border-radius: 999px;
+}
+.ph-sub { font-size:13px; color: var(--c-mute); margin:0; }
+.ph-actions { display: flex;align-items:center; gap:8px; flex-shrink: 0; }
+
+/* ============== BUTTONS ============== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;   /* Rule #36 — content กึ่งกลางแนวนอน */
+  gap:6px;
+  height: 36px;
+  /* Rule #36 — padding-top 2px = optical centering สำหรับฟอนต์ไทย (Noto Sans Thai):
+     baseline ของไทยลอยสูงเมื่อ flex-center เพราะ font เผื่อที่สระล่าง → นัดจ์ลง 2px ให้เข้ากลางจริง.
+     ✅ verified ด้วยการ render จริง — ทนทุกเบราว์เซอร์ (ต่างจาก text-box-trim ที่รองรับเฉพาะ Chrome 133+). */
+  padding:2px 16px 0;
+  border-radius: 8px;
+  font-size:13px;
+  font-weight: 500;
+  /* ⚠️ Rule #36 — ห้ามใส่ line-height:1 / overflow:hidden กับตัวปุ่มที่มีข้อความไทย
+     เพราะจะ "ตัดสระบน-วรรณยุกต์-สระล่าง" ทำให้ตัวอักษรเบี้ยว. ปล่อย line-height ตาม body (1.5). */
+  border: 1px solid transparent;
+  background: transparent;
+  white-space: nowrap;       /* label ไม่ตัดบรรทัด → ปุ่มในแถวเดียวสูงเท่ากัน */
+  transition: all 120ms;
+  user-select: none;
+  cursor: pointer;
+}
+.btn [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; }  /* Rule #36 — icon ไม่ถูกบีบ */
+.btn:disabled, .btn.is-disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+.btn-eq { min-width: 104px; }  /* Rule #36 — ปุ่มคู่ที่ควรสมมาตร → กว้างเท่ากัน */
+/* Rule #36 — label ยาวที่ "ต้อง" จำกัดความกว้าง: truncate ที่ span (.lbl) ไม่ใช่ที่ตัวปุ่ม.
+   line-height (1.5) สูงพอ → overflow:hidden ตัดเฉพาะแนวนอน (ไม่ตัดสระไทย). ปกติปล่อยปุ่มโตตาม label ดีกว่า. */
+.btn-truncate { max-width: 220px; }
+.btn-truncate .lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn-primary { background: var(--c-primary); color: #fff; }
+.btn-primary:hover { background: var(--c-primary-hover); box-shadow: 0 2px 8px rgba(255,59,48,0.30); }
+.btn-secondary { background: #fff; border-color: var(--c-line); color: var(--c-ink); }
+.btn-secondary:hover { background: var(--c-line-3); border-color: var(--c-mute-2); }
+.btn-ghost { color: var(--c-mute); }
+.btn-ghost:hover { background: var(--c-line-3); color: var(--c-ink); }
+.btn-danger { background: #fff; border-color: var(--c-line); color: var(--c-danger); }
+.btn-danger:hover { background: #FFE9E7; border-color: var(--c-danger); }
+.btn-link { background: transparent; border: 0; padding:0 4px; height: auto; color: var(--c-primary); font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn-sm { height: 30px; padding:2px 12px 0; font-size:12px; }
+
+/* ============== STATS (KPI Cards) ============== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap:12px;
+  margin-bottom:18px;
+}
+.stat {
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  padding:16px 16px;
+  transition: all 150ms;
+}
+.stat:hover { border-color: var(--c-line); box-shadow: 0 2px 8px rgba(17,17,17,0.05); }
+.stat-label {
+  display: flex;
+  align-items: center;
+  gap:6px;
+  font-size:12px;
+  font-weight: 500;
+  color: var(--c-mute);
+}
+.stat-label [data-lucide] { width: 13px; height: 13px; color: var(--c-primary); }
+.stat-value {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:26px;
+  font-weight: 700;
+  color: var(--c-navy);
+  margin-top:6px;
+  letter-spacing: -0.01em;
+}
+.stat-meta {
+  font-size:12px;
+  color: var(--c-mute-2);
+  margin-top:6px;
+  display: flex;
+  align-items: center;
+  gap:4px;
+}
+.stat-meta.is-up { color: var(--c-success); }
+.stat-meta.is-down { color: var(--c-danger); }
+.stat-meta [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== CARD ============== */
+.card {
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* ============== FILTER BAR ============== */
+.filter-bar {
+  padding:16px 18px;
+  display: flex;
+  gap:10px;
+  align-items: center;
+  border-bottom: 1px solid var(--c-line-2);
+  background: #fff;
+  flex-wrap: wrap;
+}
+
+/* ============== INPUTS ============== */
+.input, .select {
+  height: 36px;
+  padding:0 12px;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  font-size:13px;
+  background: #fff;
+  color: var(--c-ink);
+  font-family: inherit;
+  transition: all 120ms;
+  width: 100%;
+}
+.input:focus, .select:focus {
+  outline: none;
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px rgba(255,59,48,0.10);
+}
+.select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right:32px;
+  appearance: none;
+}
+.input-search { position: relative; flex: 1; max-width: 320px; }
+.input-search input { padding-left:36px; }
+.input-search .lead-icon {
+  position: absolute;
+  left: 11px; top: 50%;
+  transform: translateY(-50%);
+  width: 15px; height: 15px;
+  color: var(--c-mute-2);
+  pointer-events: none;
+}
+
+/* ===== SEARCH-SELECT (Iron Rule #34) — searchable dropdown แทน <select> เมื่อ options เยอะ/lookup master =====
+   list = position:absolute overlay → ไม่ดันเนื้อหา (สอดคล้อง Rule #35) */
+.search-select { position: relative; width: 100%; }
+.search-select .ss-input { padding-left:32px; padding-right:32px; }
+.search-select .ss-lead {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px;   /* ⬅ ขนาดตายตัว — ไม่พึ่ง .w-4 (กัน Lucide เรนเดอร์ 24px default → placeholder ดูห่าง) */
+  color: var(--c-mute-3); pointer-events: none;
+}
+.search-select .ss-caret {
+  position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+  width: 15px; height: 15px; color: var(--c-mute-3); pointer-events: none;
+}
+.search-select .ss-clear {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  display: inline-flex; padding:3px; border: 0; background: transparent;
+  color: var(--c-mute-2); cursor: pointer; border-radius: 6px;
+}
+.search-select .ss-clear:hover { background: var(--c-line-3); color: var(--c-ink); }
+.ss-list {
+  position: absolute; z-index:var(--z-backdrop); left: 0; right: 0; margin-top:4px;
+  max-height: 280px; overflow-y: auto; background: #fff;
+  border: 1px solid var(--c-line); border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(17,17,17,0.10), 0 4px 10px rgba(17,17,17,0.05);
+}
+.ss-opt {
+  width: 100%; display: flex; align-items: center; gap:10px; padding:10px 12px;
+  border: 0; border-bottom: 1px solid var(--c-line-3); background: transparent;
+  cursor: pointer; text-align: left; font-family: inherit;
+}
+.ss-opt:last-child { border-bottom: 0; }
+.ss-opt:hover, .ss-opt.is-active { background: rgba(255,59,48,0.06); }
+.ss-opt-ic { width: 16px; height: 16px; color: var(--c-primary); flex-shrink: 0; }  /* ขนาดตายตัวเช่นกัน */
+.ss-opt-main { flex: 1; min-width: 0; }
+.ss-opt-label { display: block; font-size:13px; color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-sub { display: block; font-size:12px; color: var(--c-mute-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-right { flex-shrink: 0; font-size:12px; color: var(--c-mute); }
+.ss-opt mark { background: rgba(255,59,48,0.16); color: inherit; padding:0 1px; border-radius: 2px; }
+.ss-empty { padding:20px 16px; text-align: center; font-size:13px; color: var(--c-mute-2); }
+
+/* ============== TABLE ============== */
+.table-scroll { overflow-x: auto; }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size:13px;
+}
+.table thead { background: var(--c-bg-off); }
+.table th {
+  padding:12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--c-mute);
+  font-size:12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--c-line-2);
+  white-space: nowrap;
+}
+.table th.col-check { width: 40px; padding-right:0; }
+.table th.is-sortable { cursor: pointer; user-select: none; }
+.table th.is-sortable:hover { color: var(--c-ink); background: var(--c-line-3); }
+.table th .sort-arrow { display: inline-block; margin-left:4px; opacity: 0.4; }
+.table th.is-sorted .sort-arrow { opacity: 1; color: var(--c-primary); }
+.table td {
+  padding:12px 16px 12px;  /* Rule #38 — optical centering ไทย: pad-top มากกว่า bottom 2px */
+  border-bottom: 1px solid var(--c-line-2);
+  color: var(--c-ink);
+  vertical-align: middle;
+}
+.table tbody tr { transition: background 120ms; }
+.table tbody tr:hover { background: var(--c-bg-off); }
+.table tbody tr.is-selected { background: rgba(255,59,48,0.04); }
+.table tbody tr.is-selected:hover { background: rgba(255,59,48,0.07); }
+.table tbody tr:last-child td { border-bottom: 0; }
+/* Rule #41 — แถวกดได้ = เปิด view (ไม่มีไอคอนดวงตา). row ที่ clickable ต้องสื่อด้วย cursor */
+.table tbody tr.is-clickable { cursor: pointer; }
+/* Rule #42 — Long-list UX: sticky header (opt-in .is-sticky) — ตารางยาว scroll หัวค้าง */
+.table-scroll.is-sticky { max-height: 560px; overflow-y: auto; scrollbar-gutter: stable; }
+.table-scroll.is-sticky thead th {
+  position: sticky; top: 0; z-index: 3;
+  background: var(--c-bg-off);            /* ⚠️ ต้องทึบที่ตัว th (ไม่ใช่แค่ thead) — ไม่งั้น row เลื่อนทะลุซ้อนหัว */
+  box-shadow: inset 0 -1px 0 var(--c-line-2);  /* border-bottom สำหรับ sticky (border ปกติหายตอน sticky) */
+}
+/* Rule #42 — Thai-safe cell truncation: ตัดเฉพาะแนวนอน (… ) line-height พอ ไม่ตัดสระ. ใส่ title=ค่าเต็มเพื่อ hover ดู */
+.cell-truncate { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+/* Rule #43 — ตัวเลข tabular + คอลัมน์ตัวเลขชิดขวา */
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+th.col-num, td.col-num { text-align: right; }
+td.col-num .num, td.col-num { font-variant-numeric: tabular-nums; }
+
+/* ============== CHECKBOX ============== */
+.cb {
+  width: 16px; height: 16px;
+  border: 1.5px solid var(--c-line);
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: all 120ms;
+  flex-shrink: 0;
+}
+.cb.is-checked, .cb.is-partial {
+  background: var(--c-primary);
+  border-color: var(--c-primary);
+}
+.cb.is-checked::after {
+  content: '';
+  position: absolute;
+  left: 4px; top: 1px;
+  width: 5px; height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.cb.is-partial::after {
+  content: '';
+  position: absolute;
+  left: 3px; top: 6px;
+  width: 8px; height: 2px;
+  background: #fff;
+}
+.cb:hover { border-color: var(--c-primary); }
+
+/* ============== USER CELL ============== */
+.user-cell { display: flex; align-items: center; gap:10px; }
+.uc-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.uc-name { font-weight: 600; color: var(--c-ink); font-size:13px; line-height: 1.3; }
+.uc-email { font-size:12px; color: var(--c-mute-2); margin-top:1px; line-height: 1.3; }
+
+/* ============== PILLS ============== */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap:4px;
+  padding:4px 10px 3px;  /* Rule #38 — optical centering ไทย: pad-top มากกว่า bottom 1px กัน text ลอยสูง (verified) */
+  border-radius: 999px;
+  font-size:12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pill [data-lucide] { width: 11px; height: 11px; }
+.pill-registered { background: #E6F0FF; color: #1A5FCC; }
+.pill-active { background: #E6F0FF; color: #1A5FCC; }
+.pill-converted { background: #E4F4EB; color: #157A41; }
+.pill-suspended { background: #FFF1DD; color: #B8690B; }
+.pill-archived { background: var(--c-line-3); color: var(--c-mute-2); }
+/* v3.13 — Semantic pill aliases (ใช้ชุดนี้เป็นหลัก — mapping ดู knowledge/microcopy.md) */
+.pill-info    { background: #E6F0FF; color: #1A5FCC; }   /* กำลังดำเนินการ/ใช้งาน */
+.pill-success { background: #E4F4EB; color: #157A41; }   /* อนุมัติแล้ว/เสร็จสิ้น */
+.pill-warning { background: #FFF1DD; color: #B8690B; }   /* รอดำเนินการ/รออนุมัติ */
+.pill-danger  { background: #FFE9E7; color: #E62E24; }   /* ปฏิเสธ/ยกเลิก */
+.pill-muted   { background: var(--c-line-3); color: var(--c-mute-2); } /* ร่าง/ปิดใช้งาน/เก็บถาวร */
+
+/* v3.13 — Loading spinner (Iron Rule #44) */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.8s linear infinite; }
+
+/* v3.13 — Form Section Grouping (Iron Rule #45) */
+.form-section { margin-top:var(--sp-xl); }
+.form-section:first-child { margin-top:0; }
+.form-section-title {
+  font-size: var(--fs-cap); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--c-mute);
+  padding-bottom:var(--sp-sm); border-bottom: 1px solid var(--c-line-2);
+  margin-bottom:var(--sp-md);
+}
+
+/* v3.13 — Segmented control (ช่วงเวลา dashboard ฯลฯ — Pattern J) */
+.seg-control { display:inline-flex; background: var(--c-line-3); border-radius: var(--r-md); padding:2px; gap:2px; }
+.seg-item {
+  padding:6px 12px 3px; border-radius: var(--r-sm); border: none; background: transparent;
+  font-size: var(--fs-meta); font-weight: 500; color: var(--c-mute-2); cursor: pointer;
+  font-family: inherit; white-space: nowrap;
+}
+.seg-item.is-active { background: #fff; color: var(--c-ink); font-weight: 600; box-shadow: 0 1px 3px rgba(17,17,17,0.08); }
+.pill-danger { background: #FFE9E7; color: var(--c-danger); }
+
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot.is-active { background: #1A5FCC; box-shadow: 0 0 0 2.5px rgba(37,99,235,0.18); }
+.dot.is-converted { background: #157A41; box-shadow: 0 0 0 2.5px rgba(6,95,70,0.20); }
+.dot.is-suspended { background: var(--c-warning); }
+.dot.is-archived { background: var(--c-mute-3); }
+
+/* Mini-link cell (e.g. tenant link) */
+.tenant-link {
+  display: inline-flex;
+  align-items: center;
+  gap:4px;
+  color: var(--c-primary);
+  font-size:12.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.tenant-link:hover { text-decoration: underline; }
+.tenant-link [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== ROW ACTIONS ============== */
+.row-actions { display: inline-flex; gap:2px; }
+.ra-btn {
+  width: 28px; height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--c-mute-2);
+  border-radius: 6px;
+  transition: all 120ms;
+}
+.ra-btn:hover { background: var(--c-line-3); color: var(--c-primary); }
+.ra-btn.is-danger:hover { background: #FFE9E7; color: var(--c-danger); }
+.ra-btn.is-success:hover { background: rgba(255,154,31,0.12); color: var(--c-teal); }
+.ra-btn [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== TABLE FOOTER ============== */
+.table-footer {
+  padding:12px 18px;
+  background: var(--c-bg-off);
+  border-top: 1px solid var(--c-line-2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size:12.5px;
+  color: var(--c-mute);
+  flex-wrap: wrap;
+  gap:10px;
+}
+.pagination { display: inline-flex; gap:4px; align-items: center; }
+.pg-btn {
+  min-width: 30px; height: 30px;
+  padding:0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 6px;
+  color: var(--c-mute);
+  font-size:12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms;
+}
+.pg-btn:hover { border-color: var(--c-line); background: var(--c-bg-off); }
+.pg-btn.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.pg-btn.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn [data-lucide] { width: 13px; height: 13px; }
+
+/* ============== BULK BAR ============== */
+.bulk-bar {
+  background: var(--c-navy);
+  color: #fff;
+  padding:12px 18px;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  gap:12px;
+  border-bottom: 1px solid var(--c-line-2);
+  margin:-1px -1px 0;
+  font-size:13px;
+}
+.bulk-bar .btn { height: 30px; padding:2px 12px 0; font-size:12px; }
+.bulk-bar .btn-secondary {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.18);
+  color: #fff;
+}
+.bulk-bar .btn-secondary:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.30); }
+
+/* ============== DRAWER ============== */
+/* ---- v6.1 Pattern B drawer chrome (locked to references/drawer-standard/pr.html) ----
+   create/edit drawer ให้ใช้ชุดนี้: .dw-head (eyebrow + h2 20px + .top-icon-btn ปิด)
+   + .d-stepper (.stepper-item/.stepper-circle 32px — ไม่ใช่ .stepper กลางของ page wizard)
+   + .dw-footer (ย้อนกลับ secondary ซ้าย · ยกเลิก ghost + primary ชิดขวา) */
+.top-icon-btn { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border:0; background:transparent; border-radius: var(--r-sm); color: var(--c-mute-2); cursor:pointer; transition: all 120ms; flex-shrink:0; }
+.top-icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.dw-head { padding:18px 24px 16px; border-bottom: 1px solid var(--c-line-2); flex-shrink: 0; }
+.dw-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap:16px; }
+.dw-eyebrow { display: flex; align-items: center; gap:6px; font-size:11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-mute-2); margin-bottom:4px; font-weight: 600; }
+.dw-title { font-size:20px; font-weight: 700; color: var(--c-navy); margin:0; letter-spacing: -0.01em; }
+.dw-sub { font-size: var(--fs-meta); color: var(--c-mute-2); margin-top:4px; }
+.d-stepper { display: flex; align-items: flex-start; gap:0; width: 100%; margin-top:18px; }
+.stepper-item { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; min-width: 0; }
+.stepper-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size:13px; font-weight: 600; background: #fff; color: var(--c-mute-3); border: 2px solid var(--c-line); transition: all 200ms; z-index: 2; }
+.stepper-item.active .stepper-circle { background: var(--c-primary); color: #fff; border-color: var(--c-primary); box-shadow: 0 0 0 4px rgba(255,59,48,0.12); }
+.stepper-item.done .stepper-circle { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
+.stepper-label { margin-top:8px; font-size:12px; font-weight: 500; color: var(--c-mute-3); text-align: center; line-height: 1.3; transition: color 200ms; }
+.stepper-item.active .stepper-label { color: var(--c-navy); font-weight: 600; }
+.stepper-item.done .stepper-label { color: var(--c-mute); }
+.stepper-item:not(:last-child)::after { content: ''; position: absolute; top: 15px; left: 50%; right: -50%; height: 2px; background: var(--c-line-2); z-index: 1; }
+.stepper-item.done:not(:last-child)::after { background: var(--c-primary); }
+.dw-footer { padding:16px 24px; border-top: 1px solid var(--c-line-2); background: var(--c-bg-off); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap:8px; }
+.dw-footer-right { display: flex; align-items: center; gap:8px; }
+
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17,17,17,0.40);
+  z-index:var(--z-backdrop);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms;
+}
+.drawer-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 920px;           /* v2 standard (Iron Rule #11) — wide drawer */
+  max-width: 96vw;
+  background: #fff;
+  z-index:var(--z-drawer);
+  transform: translateX(100%);
+  transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -16px 0 40px rgba(17,17,17,0.18);
+}
+.drawer.is-open { transform: translateX(0); }
+.drawer.standard { width: 680px; }   /* simple forms / short view (Iron Rule #11) */
+
+/* ========== STEPPER STANDARD (Iron Rule #47) — ใช้ตัวเดียวทุก wizard ========== */
+.stepper { display:flex; align-items:center; gap:var(--sp-sm); }
+.step { display:flex; align-items:center; gap:var(--sp-sm); }
+.step-dot {
+  width:26px; height:26px; border-radius: var(--r-full);
+  display:flex; align-items:center; justify-content:center;
+  font-size: var(--fs-meta); font-weight:600; padding-top:1px; /* Thai rhythm */
+  border:1.5px solid var(--c-line); background:#fff; color: var(--c-mute-2);
+}
+.step-label { font-size: var(--fs-sub); color: var(--c-mute-2); font-weight:500; white-space:nowrap; }
+.step-connector { width:28px; height:1.5px; background: var(--c-line-2); flex:0 0 auto; }
+.step.is-current .step-dot { border-color: var(--c-primary); background: var(--c-primary); color:#fff; }
+.step.is-current .step-label { color: var(--c-ink); font-weight:600; }
+.step.is-done .step-dot { border-color: var(--c-teal); background:#fff; color: var(--c-teal); }
+.step.is-done .step-connector, .step.is-current ~ * {}
+.step.is-done + .step-connector { background: var(--c-teal); }
+/* placement: drawer wizard → .drawer-stepper-band (ใต้ header) / page wizard → .wizard-stepper-band */
+.drawer-stepper-band { padding:10px 24px; border-bottom: 1px solid var(--c-line-2); background: var(--c-bg-off); }
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  gap:16px;
+  padding:18px 24px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.drawer-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.drawer-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:20px;
+  font-weight: 600;
+  color: var(--c-navy);
+  margin:0;
+  letter-spacing: -0.01em;
+}
+.drawer-subtitle {
+  font-size:12px;
+  color: var(--c-mute);
+  margin-top:4px;
+  display: flex;
+  align-items: center;
+  gap:8px;
+  flex-wrap: wrap;
+}
+.drawer-tabs {
+  display: flex;align-items:center;
+  padding:0 24px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.drawer-tab {
+  padding:10px 16px;
+  font-size:13px;
+  font-weight: 500;
+  color: var(--c-mute);
+  border-bottom: 2px solid transparent;
+  transition: all 120ms;
+  margin-bottom:-1px;
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+}
+.drawer-tab:hover { color: var(--c-ink); }
+.drawer-tab.is-active { color: var(--c-primary); border-bottom-color: var(--c-primary); }
+.drawer-body { flex: 1; overflow-y: auto; padding:24px; scrollbar-gutter: stable; }
+.drawer-section { margin-bottom:24px; }
+.drawer-section-title {
+  font-size:11px;
+  font-weight: 700;
+  color: var(--c-mute);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin:0 0 10px;
+}
+.drawer-fields {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap:10px 16px;
+  font-size:13px;
+}
+.drawer-fields .lbl { color: var(--c-mute); }
+.drawer-fields .val { color: var(--c-ink); font-weight: 500; }
+.drawer-footer {
+  padding:12px 24px;
+  border-top: 1px solid var(--c-line-2);
+  display: flex;
+  gap:8px;
+  align-items: center;
+  background: var(--c-bg-off);
+}
+/* Drawer Button Contract (Iron Rule #31) helpers */
+.footer-spacer { flex: 1; }
+.drawer-footer-meta { font-size:12px; color: var(--c-mute-2); }
+.drawer-header-actions { display: flex; gap:6px; align-items: center; }
+.drawer-header-divider { width: 1px; height: 22px; background: var(--c-line-2); margin:0 4px; flex-shrink: 0; }
+
+/* ============== TIMELINE ============== */
+.timeline { position: relative; padding-left:24px; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--c-line-2);
+}
+.tl-item { position: relative; margin-bottom:16px; }
+.tl-item:last-child { margin-bottom:0; }
+.tl-dot {
+  position: absolute;
+  left: -20px;
+  top: 3px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--c-primary);
+}
+.tl-dot.is-success { border-color: var(--c-success); }
+.tl-dot.is-warning { border-color: var(--c-warning); }
+.tl-title { font-size:13px; font-weight: 600; color: var(--c-ink); }
+.tl-meta { font-size:12px; color: var(--c-mute-2); margin-top:2px; }
+
+/* ============== BOOKMARK / RELATED CARDS ============== */
+.bm-card {
+  display: flex;
+  gap:12px;
+  padding:12px 12px;
+  border: 1px solid var(--c-line-2);
+  border-radius: 8px;
+  margin-bottom:8px;
+  cursor: pointer;
+  transition: all 120ms;
+  align-items: center;
+}
+.bm-card:hover { border-color: var(--c-line); }
+.bm-icon {
+  width: 28px; height: 28px;
+  background: rgba(255,59,48,0.10);
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-primary);
+  flex-shrink: 0;
+}
+.bm-card [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== NOTES ============== */
+.notes-area {
+  width: 100%;
+  min-height: 130px;
+  padding:12px 16px;
+  background: #fff;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  resize: vertical;
+  font-family: inherit;
+  font-size:13px;
+  line-height: 1.55;
+}
+.notes-area:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(255,59,48,0.10); }
+
+/* ============== EMPTY STATE ============== */
+.empty {
+  padding:56px 24px;
+  text-align: center;
+  color: var(--c-mute);
+}
+.empty-icon {
+  width: 52px; height: 52px;
+  margin:0 auto 16px;
+  border-radius: 50%;
+  background: var(--c-line-3);
+  color: var(--c-mute-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.empty-icon [data-lucide] { width: 22px; height: 22px; }
+.empty-title {
+  font-size:16px;
+  font-weight: 600;
+  color: var(--c-ink);
+  margin-bottom:6px;
+  font-family: 'Noto Sans Thai', sans-serif;
+}
+.empty-desc { font-size:13px; color: var(--c-mute); max-width: 320px; margin:0 auto; }
+.empty .btn { margin-top:16px; }  /* Rule #39 — empty state ควรมีปุ่ม action หลัก */
+
+/* ============== MODAL ============== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17,17,17,0.50);
+  z-index:var(--z-backdrop);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 440px;
+  max-width: 92vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.96);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 24px 64px rgba(17,17,17,0.28);
+  overflow: hidden;
+}
+.modal-backdrop.is-open .modal { transform: scale(1); }
+.modal-header {
+  padding:18px 24px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap:12px;
+}
+.modal-header-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: rgba(255,59,48,0.10);
+  color: var(--c-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.modal-header-icon.is-danger { background: #FFE9E7; color: var(--c-danger); }
+.modal-header-icon.is-warning { background: #FFF1DD; color: var(--c-warning); }
+.modal-header-icon [data-lucide] { width: 18px; height: 18px; }
+.modal-title {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size:16px;
+  font-weight: 600;
+  color: var(--c-navy);
+  margin:0 0 4px;
+}
+.modal-subtitle { font-size:13px; color: var(--c-mute); margin:0; line-height: 1.5; }
+.modal-body {
+  padding:6px 24px 18px;
+  font-size:13px;
+  color: var(--c-ink);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+.modal-footer {
+  padding:12px 24px;
+  background: var(--c-bg-off);
+  border-top: 1px solid var(--c-line-2);
+  display: flex;align-items:center;
+  justify-content: flex-end;
+  gap:8px;
+}
+
+/* ============== FIELDS ============== */
+.field { margin-bottom:16px; }
+.field-label { display: block; font-size:12.5px; font-weight: 500; color: var(--c-mute); margin-bottom:6px; }
+.field-label .req { color: var(--c-danger); margin-left:2px; }
+.field-input { width: 100%; }
+.field-help { font-size:12px; color: var(--c-mute-2); margin-top:4px; }
+/* Rule #43 — จองพื้นที่ error ไว้ (visibility แทน display) → error โผล่แล้วฟอร์มไม่กระตุก.
+   ถ้า field ไหนไม่ใส่ <div class="field-error"> ก็ไม่จองพื้นที่ (author เลือกเองรายตัว) */
+.field-error { font-size:12px; color: var(--c-danger); margin-top:4px; min-height: 15px; visibility: hidden; }
+.field.is-invalid .input,
+.field.is-invalid .select { border-color: var(--c-danger); }
+.field.is-invalid .field-error { visibility: visible; }
+
+/* Responsive form grid (Iron Rule #17) */
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap:12px;
+}
+
+/* ============== TOAST ============== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--c-navy);
+  color: #fff;
+  padding:12px 18px;
+  border-radius: 10px;
+  font-size:13px;
+  font-weight: 500;
+  z-index:var(--z-toast);
+  display: flex;
+  align-items: center;
+  gap:10px;
+  box-shadow: 0 12px 32px rgba(17,17,17,0.30);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 380px;
+}
+.toast.is-visible { transform: translateY(0); opacity: 1; }
+.toast.is-success { background: var(--c-success); }
+.toast.is-info { background: var(--c-primary); }
+.toast.is-warning { background: var(--c-warning); }
+.toast.is-error { background: var(--c-danger); }
+.toast [data-lucide] { width: 17px; height: 17px; }
+
+/* ============== LINE EXPAND ANIMATION (Pattern E) ============== */
+.line-expanded {
+  animation: lineExpand 220ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+@keyframes lineExpand {
+  from { max-height: 0; opacity: 0; transform: translateY(-8px); }
+  to { max-height: 600px; opacity: 1; transform: translateY(0); }
+}
+
+/* ============== WIZARD LAYOUT (Iron Rule #22) ============== */
+.page-content-host.has-wizard { display: flex; flex-direction: column; height: 100%; }
+.wizard-shell { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 100%; }
+.wizard-stepper-band {
+  flex: 0 0 auto; background: white;
+  padding:18px 32px;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.wizard-body { flex: 1 1 auto; padding:24px 32px 28px; min-height: 0; background: var(--c-bg-off); }
+.wizard-card {
+  padding:28px 32px;
+  width: 100%;
+  max-width: 960px;
+  margin:0 auto;
+  background: #fff;
+  border: 1px solid var(--c-line-2);
+  border-radius: 10px;
+}
+.wizard-footer {
+  flex: 0 0 auto;
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding:12px 32px;
+  display: flex;align-items:center;
+  justify-content: space-between;
+  border-top: 1px solid var(--c-line-2);
+  box-shadow: 0 -2px 8px rgba(17,17,17,0.04);
+  z-index:var(--z-sticky);
+}
+.stepper-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+  max-width: 640px;
+  margin:0 auto;
+  gap:0;
+}
+.stepper-row .step-line {
+  flex: 1 1 auto;
+  min-width: 28px;
+  max-width: 80px;
+  height: 2px;
+  background: var(--c-line-2);
+}
+.stepper-row .step-line.is-done { background: var(--c-primary); }
+.step-dot {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--c-line-2);
+  color: var(--c-mute-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size:12.5px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.step-dot.is-active { background: var(--c-primary); color: #fff; }
+.step-dot.is-done { background: var(--c-primary); color: #fff; }
+
+/* ============== UTILITIES ============== */
+.hidden { display: none !important; }  /* v6.1 — search-select/overlay พึ่ง class นี้ (เดิมหายไป ทำให้ ss-list เปิดค้าง + ปุ่ม X โผล่) */
+.text-mute { color: var(--c-mute); }
+.text-mute-2 { color: var(--c-mute-2); }
+.text-primary { color: var(--c-primary); }
+.text-success { color: var(--c-success); }
+.text-danger { color: var(--c-danger); }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap:8px; }
+.gap-3 { gap:12px; }
+.gap-4 { gap:16px; }
+.mb-2 { margin-bottom:8px; }
+.mb-3 { margin-bottom:12px; }
+.mb-4 { margin-bottom:16px; }
+.mt-2 { margin-top:8px; }
+.mt-3 { margin-top:12px; }
+.mt-4 { margin-top:16px; }
+
+/* Icon utility classes (CSS-defined so no Tailwind dependency for these) */
+.w-2\.5 { width: 10px; }   .h-2\.5 { height: 10px; }
+.w-3   { width: 12px; }    .h-3   { height: 12px; }
+.w-3\.5 { width: 14px; }   .h-3\.5 { height: 14px; }
+.w-4   { width: 16px; }    .h-4   { height: 16px; }
+.w-5   { width: 20px; }    .h-5   { height: 20px; }
+
+/* ============================================================
+   Lucide SVG sizing fix
+   ------------------------------------------------------------
+   Lucide replaces <i data-lucide="..."> with <svg class="lucide ...">
+   ที่มี width="24" height="24" attributes ติดมาด้วย — attributes
+   เหล่านี้ override CSS class .w-N ทำให้ icons เด้งเป็น 24×24
+   ดัน pill/button สูงเกินขนาด design.
+
+   วิธีแก้: บังคับ svg.lucide ทุกตัวให้ width/height = 1em แล้ว
+   ปรับขนาดผ่าน font-size บน parent. Plus override สำหรับเคสที่
+   ใช้ .w-N/.h-N โดยตรงบน <i> (Lucide จะ copy class ไปยัง svg)
+   ============================================================ */
+svg.lucide {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: -0.125em;
+  flex-shrink: 0;
+}
+/* เมื่อ .w-N / .h-N ถูก copy ไปบน svg.lucide ให้บังคับ override
+   width/height attributes ที่ Lucide ใส่มา (specificity ชนะ attribute) */
+svg.lucide.w-2\.5 { width: 10px; }   svg.lucide.h-2\.5 { height: 10px; }
+svg.lucide.w-3    { width: 12px; }   svg.lucide.h-3    { height: 12px; }
+svg.lucide.w-3\.5 { width: 14px; }   svg.lucide.h-3\.5 { height: 14px; }
+svg.lucide.w-4    { width: 16px; }   svg.lucide.h-4    { height: 16px; }
+svg.lucide.w-5    { width: 20px; }   svg.lucide.h-5    { height: 20px; }
+
+/* ===== Tooltip (#33/#67 — hint เข้า ⓘ hover) ===== */
+.info-tip{display:inline-flex;align-items:center;margin-left:6px;color:var(--c-mute-2);cursor:help;position:relative}
+.info-tip svg,.info-tip i{width:14px;height:14px}
+.info-tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:var(--c-navy);color:#fff;font-size:12px;line-height:1.5;padding:8px 12px;border-radius:8px;
+  max-width:340px;width:max-content;white-space:normal;opacity:0;pointer-events:none;transition:opacity .12s;z-index:var(--z-dropdown)}
+.info-tip:hover::after{opacity:1}
+/* ===== Drop-up (#66) ===== */
+.drop-up{bottom:100%!important;top:auto!important;margin-bottom:4px}
+
+/* ===== END BASE-KIT — เขียน page-specific CSS ใต้บรรทัดนี้เท่านั้น ===== */
+
+/* ===== PAGE CSS — F-WH-PUTAWAY (console/master · Pattern M+A+E+O+N · ห้าม Pattern Q) ===== */
+/* Z-Index Registry (#62) — BASE-KIT อ้าง var(--z-*) แต่ไม่ประกาศค่า จึงประกาศที่นี่ (ใต้ END marker) */
+:root { --z-content:1; --z-sticky:10; --z-shell:20; --z-dropdown:30; --z-backdrop:50; --z-drawer:51; --z-modal:60; --z-toast:80; }
+
+/* --- view switcher (segmented) --- */
+.vseg { display:inline-flex; align-items:center; background:var(--c-line-3); border-radius:8px; padding:2px; gap:2px; }
+.vseg button { display:inline-flex; align-items:center; gap:6px; border:0; background:transparent; padding:2px 12px 0; height:32px; border-radius:6px; font-family:inherit; font-size:12.5px; font-weight:600; color:var(--c-mute-2); white-space:nowrap; }
+.vseg button:hover { color:var(--c-ink); }
+.vseg button.is-on { background:#fff; color:var(--c-primary); box-shadow:0 1px 3px rgba(17,17,17,.12); }
+.vseg button [data-lucide] { width:13px; height:13px; }
+
+/* --- split-pane runner (Pattern O) --- */
+.run-shell { display:flex; align-items:flex-start; gap:18px; }
+.run-aside { width:340px; flex:0 0 auto; position:sticky; top:56px; }
+.run-main { flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:16px; }
+.aside-head { padding:12px 16px; border-bottom:1px solid var(--c-line-2); background:var(--c-bg-off); }
+.aside-head-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.aside-t { font-size:12.5px; font-weight:700; color:var(--c-navy); display:inline-flex; align-items:center; gap:4px; }
+.aside-n { font-size:11px; font-weight:600; color:var(--c-mute-2); font-variant-numeric:tabular-nums; }
+.bar { height:6px; background:var(--c-line-2); border-radius:999px; overflow:hidden; margin-top:8px; }
+.bar > span { display:block; height:6px; width:var(--pct,0%); background:var(--c-teal); border-radius:999px; }
+.bar.is-full > span { background:var(--c-success); }
+.aside-tools { padding:10px 12px; display:flex; align-items:center; flex-wrap:wrap; gap:8px; border-bottom:1px solid var(--c-line-2); }
+.aside-list { max-height:520px; overflow-y:auto; scrollbar-gutter:stable; }
+.aside-grp { display:flex; align-items:center; gap:6px; padding:6px 16px 4px; background:var(--c-bg-off); border-bottom:1px solid var(--c-line-2); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--c-mute-2); }
+.aside-grp-n { margin-left:auto; font-weight:600; font-variant-numeric:tabular-nums; }
+.qcase { display:flex; align-items:flex-start; gap:10px; width:100%; text-align:left; padding:10px 16px; border:0; border-bottom:1px solid var(--c-line-3); background:transparent; font-family:inherit; position:relative; }
+.qcase:hover { background:var(--c-bg-off); }
+.qcase.is-on { background:rgba(255,59,48,.06); }
+.qcase.is-on::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--c-primary); }
+.rdot { width:10px; height:10px; border-radius:50%; flex-shrink:0; margin-top:4px; border:2px solid var(--c-line); background:#fff; }
+.rdot.is-wait { border-color:var(--c-mute-3); }
+.rdot.is-doing { border-color:var(--c-primary); background:var(--c-primary); }
+.rdot.is-done { border-color:var(--c-success); background:var(--c-success); }
+.rdot.is-hot { border-color:var(--c-warning); background:var(--c-warning); }
+.rdot.is-off { border-color:var(--c-line); background:var(--c-line-2); }
+.qc-main { flex:1 1 auto; min-width:0; }
+.qc-t { display:block; font-size:13px; font-weight:600; color:var(--c-ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.qc-m { display:block; font-size:11px; color:var(--c-mute-2); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.qc-r { display:block; flex:0 0 auto; line-height:1.5; text-align:right; font-size:11px; color:var(--c-mute-2); font-variant-numeric:tabular-nums; }
+
+/* --- runner head --- */
+.rh { padding:16px 20px; border-bottom:1px solid var(--c-line-2); }
+.rh-top { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+.rh-name { font-size:16px; font-weight:700; color:var(--c-navy); display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.rh-sub { font-size:12px; color:var(--c-mute-2); margin-top:4px; }
+.rh-acts { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.kv { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-top:16px; }
+.kv-i { min-width:0; }
+.kv-l { font-size:11px; color:var(--c-mute-2); font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+.kv-v { font-size:14px; font-weight:600; color:var(--c-ink); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.kv-v.is-num { font-variant-numeric:tabular-nums; }
+.kv-v.is-hot { color:var(--c-warning); }
+
+/* --- section inside runner --- */
+.rsec { padding:16px 20px; border-bottom:1px solid var(--c-line-2); }
+.rsec:last-child { border-bottom:0; }
+.rsec-h { display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--c-mute-2); margin-bottom:12px; }
+.rsec-h [data-lucide] { width:12px; height:12px; }
+
+/* --- suggestion cards --- */
+.sug-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+.sug { display:flex; flex-direction:column; gap:6px; text-align:left; padding:12px; border:1px solid var(--c-line-2); border-radius:10px; background:#fff; font-family:inherit; position:relative; }
+.sug:hover { border-color:var(--c-primary); }
+.sug.is-on { border-color:var(--c-primary); box-shadow:0 0 0 2px rgba(255,59,48,.14); }
+.sug-top { display:flex; align-items:center; gap:6px; }
+.sug-code { font-size:14px; font-weight:700; color:var(--c-navy); font-variant-numeric:tabular-nums; }
+.sug-rank { margin-left:auto; font-size:11px; font-weight:700; color:var(--c-primary); background:rgba(255,59,48,.08); border-radius:999px; padding:2px 8px 1px; }
+.sug-why { font-size:12px; color:var(--c-mute); line-height:1.5; }
+.sug-cap { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--c-mute-2); font-variant-numeric:tabular-nums; }
+
+/* --- destination grid (head/row grid เดียวกันเป๊ะ — Pattern O) --- */
+.dst-head, .dst-row { display:grid; grid-template-columns:1.2fr 96px 96px 100px 1.4fr 32px; gap:12px; align-items:center; }
+.dst-head { padding:8px 12px 6px; background:var(--c-bg-off); border:1px solid var(--c-line-2); border-radius:8px 8px 0 0; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--c-mute-2); }
+.dst-row { padding:10px 12px; border:1px solid var(--c-line-2); border-top:0; }
+.dst-row:last-of-type { border-radius:0 0 8px 8px; }
+.dst-row.is-over { background:rgba(232,135,15,.06); }
+.dst-code { font-size:13px; font-weight:600; color:var(--c-ink); font-variant-numeric:tabular-nums; }
+.dst-zone { font-size:11px; color:var(--c-mute-2); }
+.qty-in { height:32px; padding:0 10px; border:1px solid var(--c-line); border-radius:8px; font-family:inherit; font-size:13px; width:100%; color:var(--c-ink); text-align:right; font-variant-numeric:tabular-nums; background:#fff; }
+.qty-in:focus { outline:none; border-color:var(--c-primary); box-shadow:0 0 0 3px rgba(255,59,48,.10); }
+.qty-in.is-bad { border-color:var(--c-danger); }
+.mini-sel { height:32px; padding:0 10px; border:1px solid var(--c-line); border-radius:8px; font-family:inherit; font-size:12px; width:100%; color:var(--c-ink); background:#fff; }
+.mini-sel:focus { outline:none; border-color:var(--c-primary); }
+.mini-sel.is-need { border-color:var(--c-warning); background:rgba(232,135,15,.06); }
+.xbtn { width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; border:0; background:transparent; color:var(--c-mute-3); border-radius:6px; }
+.xbtn:hover { background:#FFE9E7; color:var(--c-danger); }
+.xbtn [data-lucide] { width:14px; height:14px; }
+
+/* --- confirm bar --- */
+.cbar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:12px 20px; background:var(--c-bg-off); border-top:1px solid var(--c-line-2); }
+.cbar-sum { font-size:13px; color:var(--c-ink); font-weight:600; font-variant-numeric:tabular-nums; }
+.cmini { font-size:11px; color:var(--c-mute-2); display:inline-flex; align-items:center; gap:4px; }
+.cmini [data-lucide] { width:12px; height:12px; }
+
+/* --- alerts (action-scoped เท่านั้น — #33) --- */
+.warnbox { display:flex; align-items:flex-start; gap:8px; padding:10px 12px; border-radius:8px; background:#FFF1DD; color:#B8690B; font-size:12px; line-height:1.5; }
+.warnbox [data-lucide] { width:14px; height:14px; margin-top:2px; }
+.warnbox.is-stop { background:#FFE9E7; color:#E62E24; }
+
+/* --- bins map (Pattern E) --- */
+.zrow-x { padding:0; background:var(--c-bg-off); }
+.zpanel { padding:16px 20px; border-top:1px solid var(--c-line-2); }
+.bin-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; }
+.bin-c { display:flex; flex-direction:column; gap:8px; padding:12px; border:1px solid var(--c-line-2); border-radius:10px; background:#fff; }
+.bin-c.is-lock { background:var(--c-line-3); }
+.bin-top { display:flex; align-items:center; gap:6px; }
+.bin-code { font-size:13px; font-weight:700; color:var(--c-navy); font-variant-numeric:tabular-nums; }
+.bin-meta { font-size:11px; color:var(--c-mute-2); font-variant-numeric:tabular-nums; }
+.bin-items { display:flex; flex-direction:column; gap:4px; }
+.bin-item { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12px; color:var(--c-ink); }
+.bin-item span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.bin-item b { font-variant-numeric:tabular-nums; font-weight:600; flex-shrink:0; }
+.bin-acts { display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:4px; }
+
+/* --- misc --- */
+.tag { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; padding:2px 8px 1px; border-radius:6px; background:var(--c-line-3); color:var(--c-mute-2); white-space:nowrap; }
+.tag.is-q { background:#FFF1DD; color:#B8690B; }
+.tag.is-tr { background:#E6F0FF; color:#1A5FCC; }
+.tag.is-dm { background:#FFE9E7; color:#E62E24; }
+.tag.is-st { background:#E4F4EB; color:#157A41; }
+.tag.is-force { background:#FFE9E7; color:#E62E24; }
+.mono { font-variant-numeric:tabular-nums; }
+.filt { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:12px 18px; border-bottom:1px solid var(--c-line-2); background:#fff; }
+.ss-w { width:260px; }
+.ss-w-lg { width:320px; }
+.lnk { display:inline-flex; align-items:center; gap:4px; color:var(--c-primary); font-size:12px; font-weight:600; background:transparent; border:0; font-family:inherit; padding:0; }
+.lnk:hover { text-decoration:underline; }
+.lnk [data-lucide] { width:12px; height:12px; }
+.rsn-t { width:100%; min-height:56px; padding:8px 10px; border:1px solid var(--c-line); border-radius:8px; font-family:inherit; font-size:13px; color:var(--c-ink); resize:vertical; background:#fff; }
+.rsn-t:focus { outline:none; border-color:var(--c-primary); box-shadow:0 0 0 3px rgba(255,59,48,.10); }
+.mstack { display:flex; flex-direction:column; gap:12px; }
+.hx { padding:0; background:var(--c-bg-off); }
+.hx-in { padding:12px 20px; border-top:1px solid var(--c-line-2); display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; }
+@media (max-width:1180px){ .run-shell { flex-direction:column; } .run-aside { width:100%; position:static; } }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand">
+    <span class="sb-logo"><i data-lucide="box" class="w-4 h-4"></i></span>
+    <div>
+      <div class="sb-name">CUBE NATIVE</div>
+      <div class="sb-sub">Warehouse</div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-module" data-module="wh" data-expanded="true">
+      <button class="sb-module-header" type="button" aria-expanded="true" onclick="toggleModule(this)">
+        <i data-lucide="warehouse" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">คลังสินค้า</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item" data-feature="f008" onclick="navStub('คลัง / ตำแหน่ง')"><i data-lucide="map-pin" class="w-4 h-4"></i><span>คลัง / ตำแหน่ง</span></a>
+        <a class="sb-item" data-feature="f009" onclick="navStub('ยอดคงคลัง')"><i data-lucide="layers" class="w-4 h-4"></i><span>ยอดคงคลัง</span></a>
+        <a class="sb-item" data-feature="f079" onclick="navStub('ใบรับของ (GRN)')"><i data-lucide="package-check" class="w-4 h-4"></i><span>ใบรับของ (GRN)</span></a>
+        <a class="sb-item is-active" data-feature="f081"><i data-lucide="package-plus" class="w-4 h-4"></i><span>จัดเก็บเข้าที่</span><span class="sb-badge" id="sbBadge">0</span></a>
+        <a class="sb-item" data-feature="f082" onclick="navStub('ปรับยอดสต๊อก')"><i data-lucide="scale" class="w-4 h-4"></i><span>ปรับยอดสต๊อก</span></a>
+        <a class="sb-item" data-feature="f083" onclick="navStub('ย้ายคลัง / สาขา')"><i data-lucide="truck" class="w-4 h-4"></i><span>ย้ายคลัง / สาขา</span></a>
+        <a class="sb-item" data-feature="f040" onclick="navStub('จัดหยิบ')"><i data-lucide="hand" class="w-4 h-4"></i><span>จัดหยิบ</span></a>
+        <a class="sb-item" data-feature="f042" onclick="navStub('ใบส่งของ')"><i data-lucide="send" class="w-4 h-4"></i><span>ใบส่งของ</span></a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="pur" data-expanded="false">
+      <button class="sb-module-header" type="button" aria-expanded="false" onclick="toggleModule(this)">
+        <i data-lucide="shopping-cart" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">จัดซื้อ</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item" data-feature="f007" onclick="navStub('ผู้ขาย')"><i data-lucide="building-2" class="w-4 h-4"></i><span>ผู้ขาย</span></a>
+        <a class="sb-item" data-feature="f078" onclick="navStub('ใบสั่งซื้อ (PO)')"><i data-lucide="file-text" class="w-4 h-4"></i><span>ใบสั่งซื้อ (PO)</span></a>
+        <a class="sb-item" data-feature="f080" onclick="navStub('คืนผู้ขาย (RTV)')"><i data-lucide="undo-2" class="w-4 h-4"></i><span>คืนผู้ขาย (RTV)</span></a>
+      </div>
+    </div>
+  </nav>
+  <div class="sb-footer">
+    <span class="pulse-dot"></span>
+    <span>ต้นแบบ Phase A · 2026</span>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="shell-bar">
+    <nav class="breadcrumb">
+      <a data-breadcrumb-module="wh">คลังสินค้า</a>
+      <i data-lucide="chevron-right" class="sep w-3 h-3"></i>
+      <span class="breadcrumb-current">จัดเก็บเข้าที่</span>
+    </nav>
+    <div class="footer-spacer"></div>
+    <button class="icon-btn" onclick="notifyStub()"><i data-lucide="bell" class="w-4 h-4"></i><span class="notif-dot"></span></button>
+    <div class="user-chip" onclick="toggleUserMenu()">
+      <div class="user-text">
+        <div class="user-name">อนุชา พูลสวัสดิ์</div>
+        <div class="user-role">เจ้าหน้าที่คลังกลาง · CUBE NATIVE</div>
+      </div>
+      <span class="avatar">อพ</span>
+    </div>
+  </div>
+  <div class="user-menu" id="userMenu">
+    <div class="user-menu-item" onclick="toggleUserMenu()"><i data-lucide="user" class="w-4 h-4"></i><span>โปรไฟล์ของฉัน</span></div>
+    <div class="user-menu-item" onclick="toggleUserMenu()"><i data-lucide="settings" class="w-4 h-4"></i><span>ตั้งค่าการใช้งาน</span></div>
+    <div class="user-menu-divider"></div>
+    <div class="user-menu-item is-danger" onclick="toggleUserMenu()"><i data-lucide="log-out" class="w-4 h-4"></i><span>ออกจากระบบ</span></div>
+  </div>
+
+  <main class="content" id="page-content"></main>
+</div>
+
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+<div class="drawer standard" id="drawer"></div>
+
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()">
+  <div class="modal" id="modalBox" onclick="stopEv(event)"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="overlay-root"></div>
+<!-- ============================================================
+     Lucide Icons Loader (multi-CDN fallback, pinned version)
+     ------------------------------------------------------------
+     ทำไมไม่ใช้ <script src="..."> ตรง ๆ:
+       - Single CDN = single point of failure (corp proxy/firewall block)
+       - @latest = breaking changes โดยไม่บอก (GitHub issue #2962)
+       - <script> ใน <head> โดยไม่มี defer ชน DOMContentLoaded
+     กลยุทธ์:
+       1) Pin version 0.469.0 (stable, ทดสอบแล้ว)
+       2) ลอง CDN 3 ตัวเรียงตามความน่าเชื่อถือ: unpkg → jsdelivr → cdnjs
+       3) ถ้าทุก CDN fail → log warning + ไม่ block render
+            (UI ยังใช้งานได้ แค่ไม่มี icons)
+     ============================================================ -->
+<script>
+(function loadLucide() {
+  var version = '0.469.0';
+  var cdns = [
+    'https://unpkg.com/lucide@' + version + '/dist/umd/lucide.min.js',
+    'https://cdn.jsdelivr.net/npm/lucide@' + version + '/dist/umd/lucide.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/lucide/' + version + '/lucide.min.js'
+  ];
+  var i = 0;
+  function tryNext() {
+    if (i >= cdns.length) {
+      console.warn('[Lucide] All CDNs failed. Icons จะไม่แสดง but UI ยังใช้งานได้');
+      window.lucide = window.lucide || { createIcons: function() {} }; // no-op fallback
+      window.dispatchEvent(new Event('lucide:ready'));
+      return;
+    }
+    var s = document.createElement('script');
+    s.src = cdns[i++];
+    s.onload = function() {
+      window.dispatchEvent(new Event('lucide:ready'));
+    };
+    s.onerror = tryNext;
+    document.head.appendChild(s);
+  }
+  tryNext();
+})();
+</script>
+
+<script>
+// ============================================
+// STATE
+// ============================================
+const state = {
+  currentRoute: 'home',
+  drawer: { open: false, mode: null, recordId: null, step: 1 },
+  modal: { open: false, type: null, data: null },
+  toast: { visible: false, message: '', variant: 'info' },
+  filters: { search: '', status: 'all' },
+  pagination: { page: 1, pageSize: 20 },
+  sort: { col: null, dir: 'asc' },
+  selectedIds: new Set(),
+  records: [],
+};
+
+// ============================================
+// SIDEBAR — Module collapse/expand (Iron Rule #27)
+// Module header is non-navigable; click toggles children visibility.
+// State persists in DOM (data-expanded) — future: persist per user.
+// ============================================
+function toggleModule(headerEl) {
+  const mod = headerEl.closest('.sb-module');
+  if (!mod) return;
+  const isExpanded = mod.getAttribute('data-expanded') !== 'false';
+  mod.setAttribute('data-expanded', isExpanded ? 'false' : 'true');
+}
+
+// ============================================
+// ROUTER (Hash-based, refresh-safe)
+// ============================================
+function getRoute() {
+  const hash = location.hash;
+  if (!hash || hash === '#' || hash === '#/') return 'home';
+  return hash.replace(/^#\//, '');
+}
+function navigate(route) {
+  location.hash = '#/' + route;
+}
+
+// ============================================
+// DRAWER / MODAL TOGGLES
+// ============================================
+function openDrawer(mode, recordId) {
+  state.drawer = { open: true, mode, recordId, step: 1 };
+  render();
+  // Trigger CSS animation
+  requestAnimationFrame(() => {
+    document.getElementById('drawerBackdrop').classList.add('is-open');
+    document.getElementById('drawer').classList.add('is-open');
+  });
+}
+function closeDrawer() {
+  document.getElementById('drawerBackdrop').classList.remove('is-open');
+  document.getElementById('drawer').classList.remove('is-open');
+  setTimeout(() => {
+    state.drawer = { open: false, mode: null, recordId: null, step: 1 };
+  }, 280);
+}
+function openModal(type, data) {
+  state.modal = { open: true, type, data };
+  render();
+  requestAnimationFrame(() => {
+    document.getElementById('modalBackdrop').classList.add('is-open');
+  });
+}
+function closeModal() {
+  document.getElementById('modalBackdrop').classList.remove('is-open');
+  setTimeout(() => {
+    state.modal = { open: false, type: null, data: null };
+  }, 200);
+}
+
+// ============================================
+// TOAST
+// ============================================
+function showToast(message, variant = 'info', durationMs = 2800) {
+  const el = document.getElementById('toast');
+  const iconMap = { success: 'check-circle-2', info: 'info', warning: 'alert-triangle', error: 'x-circle' };
+  el.className = 'toast is-' + variant;
+  el.innerHTML = `<i data-lucide="${iconMap[variant] || 'info'}" class="w-4 h-4"></i><span>${message}</span>`;
+  renderIcons();
+  requestAnimationFrame(() => el.classList.add('is-visible'));
+  setTimeout(() => el.classList.remove('is-visible'), durationMs);
+}
+
+// ============================================
+// ESC key handler (close drawer/modal)
+// ============================================
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (state.modal.open) closeModal();
+    else if (state.drawer.open) closeDrawer();
+  }
+});
+
+// ============================================
+// RENDER (placeholder — replace per feature)
+// ============================================
+function render() {
+  // Specific feature should override this function.
+  //
+  // ⚠️ Iron Rule #29 — Render Preservation:
+  // If your render() does innerHTML rebuild (typical pattern), wrap with
+  // withRenderPreservation() OR use preserveRenderState()/restoreRenderState()
+  // to keep scroll position + focus across re-renders.
+  //
+  // Example:
+  //   function render() {
+  //     const snap = preserveRenderState();
+  //     document.getElementById('page-content').innerHTML = renderPage();
+  //     drawer.innerHTML = state.drawer.open ? renderDrawer() : '';
+  //     renderIcons();
+  //     restoreRenderState(snap);
+  //   }
+  //
+  // After every DOM update, call renderIcons() — safe wrapper ที่ทน race เมื่อ Lucide ยังไม่ load.
+  renderIcons();
+}
+
+// ============================================
+// INIT
+// ============================================
+// Helper: safe icon render — กัน race ก่อน lucide load เสร็จ
+function renderIcons() {
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// ============================================
+// SEARCH-SELECT (Iron Rule #34) — generic searchable dropdown
+// ------------------------------------------------
+// ใช้แทน <select> เมื่อ options เยอะ (>8) หรือเป็น lookup จาก master อื่น.
+// list = position:absolute overlay → ไม่ดันเนื้อหา. แก้เฉพาะ list ตอนพิมพ์ →
+// ไม่ rebuild ทั้งหน้า (ไม่ชน Rule #29). decoupled — เรียก onSelect callback ไม่ผูก render().
+//
+// วิธีใช้ 2 ขั้น:
+//   1) ใส่ markup:  ${searchSelectHTML('country', { placeholder: 'เลือกประเทศ' })}
+//   2) หลัง markup อยู่ใน DOM แล้ว (เช่นท้าย render()):
+//        initSearchSelect('country', {
+//          options: countries.map(c => ({ value:c.code, label:c.name, sub:c.code, icon:'flag', right:'' })),
+//          value: state.form.country,
+//          onSelect: (val, opt) => { state.form.country = val; }
+//        });
+// option fields: { value, label, sub?, icon?, right? }
+// ============================================
+window.__ss = window.__ss || {};
+function ssGet(key){ return window.__ss[key]; }
+function ssEscapeReg(s){ return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+function searchSelectHTML(key, opt){
+  opt = opt || {};
+  var ph = opt.placeholder || 'ค้นหา...';
+  return ''
+    + '<div class="search-select" id="ss-' + key + '">'
+    +   '<i data-lucide="search" class="ss-lead w-4 h-4"></i>'
+    +   '<input type="text" class="input ss-input" id="ss-input-' + key + '" autocomplete="off" placeholder="' + ph + '"'
+    +     ' oninput="ssOnInput(\'' + key + '\', this.value)" onfocus="ssOpen(\'' + key + '\')" onkeydown="ssOnKey(\'' + key + '\', event)">'
+    +   '<button type="button" class="ss-clear hidden" id="ss-clear-' + key + '" tabindex="-1" onclick="ssClear(\'' + key + '\')"><i data-lucide="x" class="w-4 h-4"></i></button>'
+    +   '<i data-lucide="chevron-down" class="ss-caret" id="ss-caret-' + key + '"></i>'
+    +   '<div class="ss-list hidden" id="ss-list-' + key + '"></div>'
+    + '</div>';
+}
+function initSearchSelect(key, cfg){
+  cfg = cfg || {};
+  window.__ss[key] = {
+    options: cfg.options || [], value: (cfg.value != null ? cfg.value : null),
+    onSelect: cfg.onSelect || function(){}, emptyText: cfg.emptyText || 'ไม่พบรายการ',
+    query: '', open: false, hi: 0
+  };
+  ssSetText(key); ssSyncChrome(key); renderIcons();
+}
+function ssFiltered(key){
+  var s = ssGet(key); if(!s) return [];
+  var q = (s.query || '').toLowerCase().trim();
+  if(!q) return s.options;
+  return s.options.filter(function(o){
+    return String(o.label).toLowerCase().includes(q)
+      || String(o.value).toLowerCase().includes(q)
+      || String(o.sub || '').toLowerCase().includes(q);
+  });
+}
+function ssSyncChrome(key){
+  var s = ssGet(key); if(!s) return;
+  var sel = s.options.find(function(o){ return o.value === s.value; });
+  var c = document.getElementById('ss-clear-' + key); if(c) c.classList.toggle('hidden', !sel);
+  var k = document.getElementById('ss-caret-' + key); if(k) k.classList.toggle('hidden', !!sel);
+}
+function ssSetText(key){
+  var s = ssGet(key); if(!s) return;
+  var input = document.getElementById('ss-input-' + key); if(!input) return;
+  var sel = s.options.find(function(o){ return o.value === s.value; });
+  input.value = s.open ? s.query : (sel ? sel.label : '');
+}
+function ssRenderList(key){
+  var s = ssGet(key); if(!s) return;
+  var list = document.getElementById('ss-list-' + key); if(!list) return;
+  var items = ssFiltered(key);
+  if(items.length === 0){
+    list.innerHTML = '<div class="ss-empty">' + s.emptyText + '</div>';
+  } else {
+    var q = (s.query || '').toLowerCase().trim();
+    var hl = function(t){ return q ? String(t).replace(new RegExp('(' + ssEscapeReg(q) + ')', 'gi'), '<mark>$1</mark>') : String(t); };
+    list.innerHTML = items.map(function(o, i){
+      return '<button type="button" class="ss-opt ' + (i === s.hi ? 'is-active' : '') + '" onmousedown="event.preventDefault()" onclick="ssPick(\'' + key + '\', ' + i + ')">'
+        + (o.icon ? '<i data-lucide="' + o.icon + '" class="ss-opt-ic w-4 h-4"></i>' : '')
+        + '<span class="ss-opt-main"><span class="ss-opt-label">' + hl(o.label) + '</span>'
+        + (o.sub ? '<span class="ss-opt-sub">' + hl(o.sub) + '</span>' : '') + '</span>'
+        + (o.right ? '<span class="ss-opt-right">' + o.right + '</span>' : '')
+        + '</button>';
+    }).join('');
+  }
+  list.classList.toggle('hidden', !s.open);
+  renderIcons();
+}
+function ssOpen(key){ var s = ssGet(key); if(!s) return; s.open = true; s.query = ''; s.hi = 0; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+function ssOnInput(key, val){ var s = ssGet(key); if(!s) return; s.query = val; s.open = true; s.hi = 0; s.value = null; ssSyncChrome(key); ssRenderList(key); }
+function ssPick(key, i){ var s = ssGet(key); if(!s) return; var o = ssFiltered(key)[i]; if(!o) return; s.value = o.value; s.query = ''; s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); s.onSelect(o.value, o); }
+function ssClear(key){ var s = ssGet(key); if(!s) return; s.value = null; s.query = ''; s.open = true; ssSetText(key); ssSyncChrome(key); ssRenderList(key); var inp = document.getElementById('ss-input-' + key); if(inp) inp.focus(); s.onSelect(null, null); }
+function ssOnKey(key, e){
+  var s = ssGet(key); if(!s) return; var items = ssFiltered(key);
+  if(e.key === 'ArrowDown'){ e.preventDefault(); s.open = true; s.hi = Math.min(items.length - 1, s.hi + 1); ssRenderList(key); }
+  else if(e.key === 'ArrowUp'){ e.preventDefault(); s.hi = Math.max(0, s.hi - 1); ssRenderList(key); }
+  else if(e.key === 'Enter'){ e.preventDefault(); if(items[s.hi]) ssPick(key, s.hi); }
+  else if(e.key === 'Escape'){ s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+}
+document.addEventListener('click', function(e){
+  Object.keys(window.__ss || {}).forEach(function(key){
+    var wrap = document.getElementById('ss-' + key); var s = ssGet(key);
+    if(wrap && s && s.open && !wrap.contains(e.target)){ s.open = false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+  });
+});
+
+// ============================================
+// FORMAT HELPERS (Iron Rule #43) — Thai locale, consistent ทุก feature
+// ใช้ตัวเหล่านี้เสมอ ห้าม format ตัวเลข/วันที่เองรายจุด
+// ============================================
+function fmtNumber(n, dp){ if(n==null||n==='')return '—'; var x=Number(n); if(isNaN(x))return String(n);
+  return x.toLocaleString('th-TH', {minimumFractionDigits: dp||0, maximumFractionDigits: dp!=null?dp:2}); }
+function fmtMoney(n, dp){ if(n==null||n==='')return '—'; var x=Number(n); if(isNaN(x))return String(n);
+  return '฿' + x.toLocaleString('th-TH', {minimumFractionDigits: dp!=null?dp:2, maximumFractionDigits: dp!=null?dp:2}); }
+function fmtDate(iso, buddhist){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso);
+  var s=d.toLocaleDateString('th-TH', {year:'numeric', month:'short', day:'numeric'});
+  return buddhist===false ? d.toLocaleDateString('en-GB',{year:'numeric',month:'short',day:'numeric'}) : s; }
+function fmtDateTime(iso){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso);
+  return d.toLocaleString('th-TH', {year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+
+// ============================================
+// INLINE VALIDATION (Iron Rule #43) — validate ตอน blur, ไม่ใช่รอ submit อย่างเดียว
+// markup: <div class="field"><input class="input" onblur="validateField(this, v => v.trim()? '' : 'จำเป็นต้องกรอก')">
+//          <div class="field-error"></div></div>
+// validator คืน '' = ผ่าน / ข้อความ = error
+// ============================================
+function validateField(el, validator){
+  var field = el.closest('.field'); if(!field) return true;
+  var msg = '';
+  try { msg = validator ? validator(el.value, el) : ''; } catch(e){ msg=''; }
+  var errEl = field.querySelector('.field-error');
+  if(msg){ field.classList.add('is-invalid'); if(errEl) errEl.textContent = msg; return false; }
+  field.classList.remove('is-invalid'); return true;
+}
+function clearFieldError(el){ var f=el.closest('.field'); if(f) f.classList.remove('is-invalid'); }
+
+// ============================================
+// EMPTY STATE (Iron Rule #39) — list/section ว่าง ต้องมี icon + title + desc + (action)
+// ============================================
+function emptyStateHTML(cfg){
+  cfg = cfg || {};
+  var act = cfg.actionLabel ? '<button class="btn btn-primary" onclick="' + (cfg.onAction||'') + '">' +
+    (cfg.actionIcon ? '<i data-lucide="' + cfg.actionIcon + '" class="w-4 h-4"></i>' : '') +
+    '<span>' + cfg.actionLabel + '</span></button>' : '';
+  return '<div class="empty">'
+    + '<div class="empty-icon"><i data-lucide="' + (cfg.icon||'inbox') + '"></i></div>'
+    + '<div class="empty-title">' + (cfg.title||'ยังไม่มีข้อมูล') + '</div>'
+    + '<div class="empty-desc">' + (cfg.desc||'') + '</div>'
+    + act + '</div>';
+}
+
+// ============================================
+// RENDER PRESERVATION (Iron Rule #29)
+// ------------------------------------------------
+// ทุกครั้งที่ render() ทำ innerHTML = ... full DOM rebuild
+// scroll position + focus + cursor selection จะหาย —
+// user รู้สึก "เด้งกลับบน" ทุกครั้งที่ toggle/click.
+//
+// withRenderPreservation(renderFn) wraps a render function
+// to save state before innerHTML rebuild, then restore after.
+//
+// Preserves:
+//   - scrollTop ของ .drawer-body
+//   - scrollTop ของ .modal-body
+//   - window.scrollY (page-level scroll)
+//   - document.activeElement focus + selection range (input/textarea ที่กำลังพิมพ์)
+//
+// Usage:
+//   const render = withRenderPreservation(function actualRender() {
+//     content.innerHTML = ...
+//   });
+//
+// หรือเรียกตรง ๆ ใน render() ที่มีอยู่แล้ว:
+//   function render() {
+//     const snapshot = preserveRenderState();
+//     // ... innerHTML rebuilds ...
+//     restoreRenderState(snapshot);
+//   }
+// ============================================
+function preserveRenderState() {
+  const drawerBody = document.querySelector('.drawer-body');
+  const modalBody = document.querySelector('.modal-body');
+  const activeEl = document.activeElement;
+  const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+  return {
+    drawerScroll: drawerBody ? drawerBody.scrollTop : 0,
+    modalScroll: modalBody ? modalBody.scrollTop : 0,
+    pageScroll: window.scrollY,
+    focusKey: isInput ? {
+      placeholder: activeEl.placeholder || '',
+      type: activeEl.type || '',
+      name: activeEl.name || '',
+      selStart: activeEl.selectionStart,
+      selEnd: activeEl.selectionEnd,
+    } : null,
+  };
+}
+function restoreRenderState(snap) {
+  if (!snap) return;
+  requestAnimationFrame(function() {
+    const dBody = document.querySelector('.drawer-body');
+    if (dBody && snap.drawerScroll > 0) dBody.scrollTop = snap.drawerScroll;
+    const mBody = document.querySelector('.modal-body');
+    if (mBody && snap.modalScroll > 0) mBody.scrollTop = snap.modalScroll;
+    if (snap.pageScroll > 0) window.scrollTo(0, snap.pageScroll);
+
+    if (snap.focusKey) {
+      const candidates = document.querySelectorAll('input, textarea');
+      for (let i = 0; i < candidates.length; i++) {
+        const c = candidates[i];
+        if ((c.placeholder || '') === snap.focusKey.placeholder
+            && (c.type || '') === snap.focusKey.type
+            && (c.name || '') === snap.focusKey.name) {
+          c.focus();
+          if (snap.focusKey.selStart != null && typeof c.setSelectionRange === 'function') {
+            try { c.setSelectionRange(snap.focusKey.selStart, snap.focusKey.selEnd); } catch(e) {}
+          }
+          break;
+        }
+      }
+    }
+  });
+}
+function withRenderPreservation(renderFn) {
+  return function preservedRender() {
+    const snap = preserveRenderState();
+    const result = renderFn.apply(this, arguments);
+    restoreRenderState(snap);
+    return result;
+  };
+}
+
+window.addEventListener('hashchange', function () { render(); });  // v6.1 late-binding — ให้ชี้ render() ตัวที่ feature override (ผูกตรง ๆ จะ capture placeholder เดิม)
+
+// รอ DOM + Lucide ทั้งคู่ก่อน first render
+// (Lucide loader จะ dispatch 'lucide:ready' เมื่อ load สำเร็จ
+//  หรือเมื่อทุก CDN fail แล้ว fallback เป็น no-op)
+var domReady = false;
+var lucideReady = false;
+function bootIfReady() {
+  if (domReady && lucideReady) {
+    render();
+    renderIcons();
+  }
+}
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', function() { domReady = true; bootIfReady(); });
+} else {
+  domReady = true;
+}
+// Listen for ready event AND check ว่า lucide load ไปแล้วหรือยัง
+// (script ตัวนี้รันหลัง loader — ถ้า loader sync เสร็จก่อน, event อาจหายไปแล้ว)
+window.addEventListener('lucide:ready', function() { lucideReady = true; bootIfReady(); });
+if (window.lucide && typeof window.lucide.createIcons === 'function') {
+  lucideReady = true;
+}
+bootIfReady();
+// Safety net: ถ้า lucide:ready ไม่มาภายใน 5s ให้ render ไปก่อน (UI ยังใช้งานได้)
+setTimeout(function() {
+  if (!lucideReady) {
+    console.warn('[Lucide] Timeout — rendering without icons');
+    lucideReady = true;
+    bootIfReady();
+  }
+}, 5000);
+</script>
+
+
+<script>
+/* ===== BASE-KIT UTILS (#66/#68/#95) — DO NOT EDIT ===== */
+/* #95: เมนูใน scroll container (.table-wrap / drawer body / B2 line grid)
+   ต้อง portal ด้วย util นี้ — z-index อย่างเดียวช่วยไม่ได้เพราะโดน ancestor overflow clip */
+function portalMenu(trigger, menu){
+  let host = document.getElementById('overlay-root');
+  if(!host){ host = document.createElement('div'); host.id='overlay-root'; document.body.appendChild(host); }
+  if(menu.parentElement !== host) host.appendChild(menu);
+  menu.classList.add('menu-fixed');
+  const r = trigger.getBoundingClientRect();
+  const below = window.innerHeight - r.bottom - 12, above = r.top - 12;
+  const h = Math.min(menu.scrollHeight || 320, 320);
+  menu.style.left = r.left + 'px';
+  menu.style.width = r.width + 'px';
+  if(below < h && above > below){ menu.style.top='auto'; menu.style.bottom=(window.innerHeight-r.top+4)+'px';
+    menu.style.maxHeight = Math.min(h, above)+'px'; }
+  else { menu.style.bottom='auto'; menu.style.top=(r.bottom+4)+'px';
+    menu.style.maxHeight = Math.min(h, Math.max(below,120))+'px'; }
+  menu._trigger = trigger;
+  const reposition = ()=>{ if(menu.classList.contains('open')) portalMenu(trigger, menu); };
+  if(!menu._portalBound){ menu._portalBound = true;
+    window.addEventListener('scroll', reposition, true);
+    window.addEventListener('resize', reposition); }
+}
+function positionMenu(trigger,menu){const r=trigger.getBoundingClientRect();
+  const below=window.innerHeight-r.bottom-12, above=r.top-12, h=Math.min(menu.scrollHeight,320);
+  if(below<h && above>below){menu.classList.add('drop-up');menu.style.maxHeight=Math.min(h,above)+'px';}
+  else{menu.classList.remove('drop-up');menu.style.maxHeight=Math.min(h,Math.max(below,120))+'px';}}
+function openOverlay(menu,trigger){document.querySelectorAll('[data-overlay].open').forEach(m=>{if(m!==menu)closeOverlay(m);});
+  menu.classList.add('open');menu._trigger=trigger;if(trigger)positionMenu(trigger,menu);}
+function closeOverlay(menu){menu.classList.remove('open');if(menu._trigger)menu._trigger.focus();}
+document.addEventListener('click',e=>{document.querySelectorAll('[data-overlay].open').forEach(m=>{
+  if(!m.contains(e.target)&&!(m._trigger&&m._trigger.contains(e.target)))closeOverlay(m);});});
+/* ===== END BASE-KIT UTILS ===== */
+</script>
+
+<script>
+/* ===================================================================
+   F-WH-PUTAWAY · Putaway — จัดเก็บเข้าที่  (fid F081 · Warehouse · W3Q)
+   arch = master/console — ห้าม Pattern Q (ไม่มี wizard · ไม่มีเลขเอกสาร · ไม่มี PDF/ลายเซ็น/สายอนุมัติ)
+   Pattern: N sidebar shell · M console home (KPI) · O split-pane runner · A list · E expandable row
+   forward-wire markers ในไฟล์นี้ใช้ FWD-WIRE: เท่านั้น (convention ล็อกจาก F-PUR-PO · audit.sh Rule #24)
+   =================================================================== */
+
+/* ---------- เวลาอ้างอิงของต้นแบบ (ค.ศ. ล้วน — BR-22) ---------- */
+var NOW = new Date('2026-09-10T10:30:00');
+var THMON = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function pad2(n){ return (n < 10 ? '0' : '') + n; }
+function fmtD(iso){ if(!iso) return '—'; var d = new Date(iso); if(isNaN(d)) return String(iso);
+  return d.getDate() + ' ' + THMON[d.getMonth()] + ' ' + d.getFullYear(); }
+function fmtDT(iso){ if(!iso) return '—'; var d = new Date(iso); if(isNaN(d)) return String(iso);
+  return fmtD(iso) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()); }
+function nfm(n){ if(n === null || n === undefined || n === '') return '—'; return Number(n).toLocaleString('en-US'); }
+function ageHours(iso){ return Math.max(0, Math.round((NOW - new Date(iso)) / 36e5)); }
+function ageText(iso){ var h = ageHours(iso); if(h < 1) return 'เพิ่งเข้าคิว';
+  if(h < 24) return 'ค้าง ' + h + ' ชม.'; return 'ค้าง ' + Math.floor(h / 24) + ' วัน ' + (h % 24) + ' ชม.'; }
+function esc(s){ return String(s === null || s === undefined ? '' : s)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function stopEv(e){ if(e) e.stopPropagation(); }
+
+/* ---------- NC rules / config (ห้าม hardcode ใน feature — BR-20 · อ่านจาก config กลาง) ---------- */
+var NC = { agingWarnHours: 24, softLockMinutes: 30 };   // FWD-WIRE: NC-rules config feed
+
+/* ---------- LOCATION MODEL (PREBRIEF §3.0 — StockAdj + StockTransfer ใช้ชุดนี้ ห้ามนิยามใหม่) ---------- */
+var WHS = [
+  { code:'WH-BKK-01', name:'คลังกลางบางนา' },
+  { code:'WH-CNX-01', name:'คลังเชียงใหม่' },
+  { code:'WH-TRN',    name:'ระหว่างทาง (เสมือน)' }
+];
+var LTYPE = {
+  staging:    { th:'พักรับเข้า',  cls:'is-st' },
+  storage:    { th:'เก็บปกติ',    cls:'' },
+  quarantine: { th:'กักกัน',      cls:'is-q'  },
+  'in-transit':{ th:'ระหว่างทาง', cls:'is-tr' },
+  damage:     { th:'ของเสีย',     cls:'is-dm' }
+};
+var ZONES = [
+  { wh:'WH-BKK-01', code:'ST', name:'โซนพักรับเข้า',        type:'staging',     cats:[], near:0, open:true },
+  { wh:'WH-BKK-01', code:'A',  name:'สินค้าหมุนเร็ว',       type:'storage',     cats:['เครื่องเขียน','วัสดุสิ้นเปลือง'], near:1, open:true },
+  { wh:'WH-BKK-01', code:'B',  name:'วัสดุก่อสร้าง',        type:'storage',     cats:['ท่อ/ข้อต่อ','เคมีภัณฑ์','วัสดุก่อสร้าง'], near:2, open:true },
+  { wh:'WH-BKK-01', code:'C',  name:'ของหนัก / นอกอาคาร',  type:'storage',     cats:['ของหนัก','วัสดุก่อสร้าง'], near:3, open:true },
+  { wh:'WH-BKK-01', code:'QA', name:'กักกัน (QC ไม่ผ่าน)',  type:'quarantine',  cats:[], near:1, open:true },
+  { wh:'WH-BKK-01', code:'DM', name:'ของเสีย / รอทำลาย',    type:'damage',      cats:[], near:4, open:true },
+  { wh:'WH-CNX-01', code:'CNX-ST', name:'โซนพักรับเข้า',     type:'staging',    cats:[], near:0, open:true },
+  { wh:'WH-CNX-01', code:'CNX-A',  name:'สินค้าหมุนเร็ว',    type:'storage',    cats:['เครื่องเขียน'], near:1, open:true },
+  { wh:'WH-CNX-01', code:'CNX-QA', name:'กักกัน',            type:'quarantine', cats:[], near:2, open:true },
+  { wh:'WH-TRN',    code:'TR', name:'ระหว่างทาง — สงวนให้ใบย้ายสินค้า', type:'in-transit', cats:[], near:9, open:true }
+];
+function B(code, wh, zone, type, cap, mixed, row, lock){
+  return { code:code, wh:wh, zone:zone, type:type, cap:cap, mixed:mixed, row:row, locked:!!lock, lockReason: lock || '' };
+}
+var BINS = [
+  B('ST-DOCK-01','WH-BKK-01','ST','staging',null,true,1),
+  B('ST-DOCK-02','WH-BKK-01','ST','staging',null,true,2),
+  B('A-01-01-A','WH-BKK-01','A','storage',200,true,1),
+  B('A-01-01-B','WH-BKK-01','A','storage',200,true,2),
+  B('A-01-02-A','WH-BKK-01','A','storage',200,true,3),
+  B('A-02-01-A','WH-BKK-01','A','storage',200,true,4),
+  B('B-01-01-A','WH-BKK-01','B','storage',500,false,1),
+  B('B-01-01-B','WH-BKK-01','B','storage',150,false,2),
+  B('B-01-02-A','WH-BKK-01','B','storage',180,true,3),
+  B('B-02-01-A','WH-BKK-01','B','storage',100,true,4),
+  B('B-03-02-B','WH-BKK-01','B','storage',300,true,5),
+  B('C-01','WH-BKK-01','C','storage',null,true,1,'ปิดซ่อมพื้น — เปิดใช้อีกครั้ง 2026-09-14'),
+  B('C-02','WH-BKK-01','C','storage',null,true,2),
+  B('C-03','WH-BKK-01','C','storage',null,true,3),
+  B('QA-01','WH-BKK-01','QA','quarantine',null,true,1),
+  B('QA-02','WH-BKK-01','QA','quarantine',null,true,2),
+  B('DM-01','WH-BKK-01','DM','damage',null,true,1),
+  B('CNX-ST-01','WH-CNX-01','CNX-ST','staging',null,true,1),
+  B('CNX-A-01-01-A','WH-CNX-01','CNX-A','storage',100,true,1),
+  B('CNX-A-01-01-B','WH-CNX-01','CNX-A','storage',100,true,2),
+  B('CNX-QA-01','WH-CNX-01','CNX-QA','quarantine',null,true,1),
+  B('TR-BKK-CNX','WH-TRN','TR','in-transit',null,true,1),
+  B('TR-CNX-BKK','WH-TRN','TR','in-transit',null,true,2)
+];
+
+/* ---------- ยอดคงเหลือราย bin (derive จาก movement — ไม่มีตารางยอดที่แก้มือได้ · §7) ---------- */
+var STOCK = [
+  { bin:'B-01-01-A', code:'PVC-P4', name:'ท่อ PVC 4" ชั้น 8.5', qty:60 },
+  { bin:'B-02-01-A', code:'PVC-J4', name:'ข้อต่อ PVC 4" (สามทาง)', qty:40 },
+  { bin:'B-03-02-B', code:'HP-26A', name:'ตลับหมึก HP 26A', qty:20 },
+  { bin:'A-01-02-A', code:'PPR-A4', name:'กระดาษ A4 80 แกรม', qty:120 },
+  { bin:'QA-01',     code:'HP-26A', name:'ตลับหมึก HP 26A', qty:12 },
+  { bin:'QA-01',     code:'PPR-A4', name:'กระดาษ A4 80 แกรม', qty:50 },
+  { bin:'CNX-A-01-01-A', code:'PEN-BL', name:'ปากกาลูกลื่นน้ำเงิน', qty:100 },
+  { bin:'CNX-A-01-01-B', code:'PPR-A4', name:'กระดาษ A4 80 แกรม', qty:100 },
+  { bin:'ST-DOCK-01', code:'PVC-P4', name:'ท่อ PVC 4" ชั้น 8.5', qty:100 },
+  { bin:'ST-DOCK-01', code:'PVC-J4', name:'ข้อต่อ PVC 4" (สามทาง)', qty:40 },
+  { bin:'ST-DOCK-01', code:'ROOF-T', name:'กระเบื้องหลังคาลอนคู่', qty:300 },
+  { bin:'ST-DOCK-01', code:'CMT-50', name:'ปูนซีเมนต์ถุง 50 กก.', qty:100 },
+  { bin:'ST-DOCK-02', code:'HP-26A', name:'ตลับหมึก HP 26A', qty:88 },
+  { bin:'ST-DOCK-02', code:'PVC-P2', name:'ท่อ PVC 2" ชั้น 8.5', qty:208 },
+  { bin:'ST-DOCK-02', code:'WIR-25', name:'สายไฟ THW 2.5 sq.mm.', qty:20 },
+  { bin:'ST-DOCK-02', code:'CAB-4D', name:'ตู้เหล็ก 4 ลิ้นชัก', qty:6 },
+  { bin:'ST-DOCK-02', code:'GLU-PV', name:'กาวทาท่อ PVC 500 กรัม', qty:50 },
+  { bin:'CNX-ST-01',  code:'GYP-12', name:'แผ่นยิปซัมบอร์ด 12 มม.', qty:40 }
+];
+
+/* ---------- คน (คนจริง — ห้าม role ID · BR-24) ---------- */
+var PEOPLE = [
+  { id:'u-anucha', name:'อนุชา พูลสวัสดิ์', pos:'เจ้าหน้าที่คลัง', dept:'คลังกลางบางนา', ini:'อพ' },
+  { id:'u-somchai', name:'สมชาย ทองใบ', pos:'หัวหน้าคลัง', dept:'คลังกลางบางนา', ini:'สท' },
+  { id:'u-pimchanok', name:'พิมพ์ชนก วัฒนกิจ', pos:'เจ้าหน้าที่ควบคุมคุณภาพ', dept:'ควบคุมคุณภาพ', ini:'พว' },
+  { id:'u-wanna', name:'วรรณา ศรีสุข', pos:'ผู้ดูแลผังคลัง', dept:'คลังกลางบางนา', ini:'วศ' }
+];
+var ME = 'u-anucha';
+function person(id){ for(var i=0;i<PEOPLE.length;i++){ if(PEOPLE[i].id === id) return PEOPLE[i]; } return null; }
+function personName(id){ var p = person(id); return p ? p.name : '—'; }
+
+/* ---------- เหตุผล override (master config · §3.6) ---------- */
+var OVR_REASONS = ['ช่องเก็บที่แนะนำเต็ม','ช่องเก็บที่แนะนำเข้าไม่ถึง','ของหนักต้องอยู่ชั้นล่าง','จัดกลุ่มตามงานลูกค้า','อื่น ๆ'];
+
+/* ---------- งาน putaway (มาจาก GRN ที่ posted เฉพาะบรรทัดที่ผ่าน QC — BR-02/OB-3) ---------- */
+function T(id, grn, line, code, name, cat, qty, uom, src, wh, status, queuedAt, holder, done){
+  return { id:id, grn:grn, line:line, code:code, name:name, cat:cat, qty:qty, uom:uom, src:src, wh:wh,
+           status:status, queuedAt:queuedAt, holder:holder||null, done:done||0, note:'' };
+}
+var TASKS = [
+  T('PT-0001','GRN-2026-0001',1,'PVC-P4','ท่อ PVC 4" ชั้น 8.5','ท่อ/ข้อต่อ',100,'ท่อน','ST-DOCK-01','WH-BKK-01','wait','2026-09-10T08:10:00'),
+  T('PT-0002','GRN-2026-0002',2,'PVC-J4','ข้อต่อ PVC 4" (สามทาง)','ท่อ/ข้อต่อ',40,'ตัว','ST-DOCK-01','WH-BKK-01','wait','2026-09-10T08:12:00'),
+  T('PT-0003','GRN-2026-0003',1,'ROOF-T','กระเบื้องหลังคาลอนคู่','วัสดุก่อสร้าง',300,'แผ่น','ST-DOCK-01','WH-BKK-01','wait','2026-09-10T08:20:00'),
+  T('PT-0004','GRN-2026-0003',2,'CMT-50','ปูนซีเมนต์ถุง 50 กก.','ของหนัก',100,'ถุง','ST-DOCK-01','WH-BKK-01','wait','2026-09-10T08:24:00'),
+  T('PT-0005','GRN-2026-0007',1,'HP-26A','ตลับหมึก HP 26A','เครื่องเขียน',88,'กล่อง','ST-DOCK-02','WH-BKK-01','wait','2026-09-10T09:02:00'),
+  T('PT-0006','GRN-2026-0007',1,'HP-26A','ตลับหมึก HP 26A (QC ไม่ผ่าน)','เครื่องเขียน',12,'กล่อง','QA-01','WH-BKK-01','wait','2026-09-10T09:03:00'),
+  T('PT-0007','GRN-2026-0008',1,'PPR-A4','กระดาษ A4 80 แกรม (QC ไม่ผ่าน)','วัสดุสิ้นเปลือง',50,'รีม','QA-01','WH-BKK-01','wait','2026-09-10T09:05:00'),
+  T('PT-0008','GRN-2026-0005',1,'PVC-P2','ท่อ PVC 2" ชั้น 8.5','ท่อ/ข้อต่อ',208,'ท่อน','ST-DOCK-02','WH-BKK-01','wait','2026-09-10T09:20:00'),
+  T('PT-0009','GRN-2026-0012',1,'WIR-25','สายไฟ THW 2.5 sq.mm.','อุปกรณ์ไฟฟ้า',20,'ม้วน','ST-DOCK-02','WH-BKK-01','wait','2026-09-10T09:40:00'),
+  T('PT-0010','GRN-2026-0013',1,'CAB-4D','ตู้เหล็ก 4 ลิ้นชัก','ของหนัก',6,'ตู้','ST-DOCK-02','WH-BKK-01','wait','2026-09-08T09:15:00'),
+  T('PT-0011','GRN-2026-0002',3,'GLU-PV','กาวทาท่อ PVC 500 กรัม','เคมีภัณฑ์',50,'กระป๋อง','ST-DOCK-02','WH-BKK-01','doing','2026-09-10T10:05:00','u-anucha'),
+  T('PT-0014','GRN-2026-0009',1,'PVC-P4','ท่อ PVC 4" ชั้น 8.5','ท่อ/ข้อต่อ',30,'ท่อน','ST-DOCK-01','WH-BKK-01','void','2026-09-09T16:40:00'),
+  T('PT-0015','GRN-2026-0006',1,'GYP-12','แผ่นยิปซัมบอร์ด 12 มม.','วัสดุแผ่น',40,'แผ่น','CNX-ST-01','WH-CNX-01','wait','2026-09-10T07:50:00')
+];
+
+/* ---------- movement (append-only — ห้ามลบ ห้ามแก้ · OB-8/BR-16) ---------- */
+var MV_SEQ = 100;
+var MOVES = [
+  { id:'MV-0091', kind:'put', at:'2026-09-09T14:22:00', code:'PVC-P4', name:'ท่อ PVC 4" ชั้น 8.5', qty:60,
+    from:'ST-DOCK-01', to:'B-01-01-A', by:'u-anucha', task:'PT-0000', grn:'GRN-2026-0001', line:1,
+    src:'rank1', reason:'', note:'', revOf:null, revBy:null },
+  { id:'MV-0092', kind:'put', at:'2026-09-09T15:40:00', code:'HP-26A', name:'ตลับหมึก HP 26A', qty:20,
+    from:'ST-DOCK-02', to:'B-03-02-B', by:'u-anucha', task:'PT-0000', grn:'GRN-2026-0004', line:1,
+    src:'override', reason:'จัดกลุ่มตามงานลูกค้า', note:'ล็อตนี้ส่งพร้อมงานติดตั้งของลูกค้ารายเดิม', revOf:null, revBy:null },
+  { id:'MV-0093', kind:'put', at:'2026-09-09T16:02:00', code:'ROOF-T', name:'กระเบื้องหลังคาลอนคู่', qty:80,
+    from:'ST-DOCK-01', to:'B-01-02-A', by:'u-anucha', task:'PT-0003', grn:'GRN-2026-0003', line:1,
+    src:'rank1', reason:'', note:'', revOf:null, revBy:null },
+  { id:'MV-0094', kind:'rev', at:'2026-09-10T08:05:00', code:'ROOF-T', name:'กระเบื้องหลังคาลอนคู่', qty:80,
+    from:'B-01-02-A', to:'ST-DOCK-01', by:'u-somchai', task:'PT-0003', grn:'GRN-2026-0003', line:1,
+    src:'', reason:'เก็บผิดช่อง — สลับกับล็อตของอีกใบ', note:'', revOf:'MV-0093', revBy:null }
+];
+MOVES[2].revBy = 'MV-0094';
+
+/* ---------- derived ---------- */
+function binOf(code){ for(var i=0;i<BINS.length;i++){ if(BINS[i].code === code) return BINS[i]; } return null; }
+function zoneOf(wh, zcode){ for(var i=0;i<ZONES.length;i++){ if(ZONES[i].wh === wh && ZONES[i].code === zcode) return ZONES[i]; } return null; }
+function whName(code){ for(var i=0;i<WHS.length;i++){ if(WHS[i].code === code) return WHS[i].name; } return code; }
+function stockAt(bin){ return STOCK.filter(function(s){ return s.bin === bin && s.qty > 0; }); }
+function usedOf(bin){ return stockAt(bin).reduce(function(a,s){ return a + s.qty; }, 0); }
+function freeOf(bin){ var b = binOf(bin); if(!b || b.cap === null) return null; return b.cap - usedOf(bin); }
+function binStatus(bin){ var b = binOf(bin); if(!b) return 'ว่าง';
+  if(b.locked) return 'ล็อก'; var f = freeOf(bin);
+  if(f !== null && f <= 0) return 'เต็ม'; return usedOf(bin) > 0 ? 'มีของ' : 'ว่าง'; }
+function addStock(bin, code, name, qty){
+  for(var i=0;i<STOCK.length;i++){ if(STOCK[i].bin === bin && STOCK[i].code === code){ STOCK[i].qty += qty; return; } }
+  STOCK.push({ bin:bin, code:code, name:name, qty:qty });
+}
+function taskOf(id){ for(var i=0;i<TASKS.length;i++){ if(TASKS[i].id === id) return TASKS[i]; } return null; }
+function remainOf(t){ return Math.max(0, t.qty - t.done); }
+function taskKind(t){ var b = binOf(t.src); return (b && b.type === 'quarantine') ? 'quarantine' : 'normal'; }
+
+/* ---------- เกณฑ์แนะนำช่องเก็บ (PREBRIEF §3.5 · BR-06..BR-09) ---------- */
+/* ขั้นที่ 1 hard filter F-1..F-5 → ขั้นที่ 2 จัดอันดับ R1..R4 → ขั้นที่ 3 tie-break */
+function suggestBins(t){
+  var srcBin = binOf(t.src);
+  var srcType = srcBin ? srcBin.type : 'staging';
+  var out = [];
+  for(var i=0;i<BINS.length;i++){
+    var b = BINS[i];
+    var z = zoneOf(b.wh, b.zone);
+    /* F-5 ไม่ข้ามคลัง (BR-25) */
+    if(b.wh !== t.wh) continue;
+    /* F-1 ประเภทเข้ากันไม่ได้ (BR-04/BR-05) */
+    if(srcType === 'quarantine'){ if(b.type !== 'quarantine') continue; }
+    else if(b.type !== 'storage') continue;
+    if(b.code === t.src) continue;
+    /* F-2 ล็อก / โซนปิด (BR-08) */
+    if(b.locked || (z && !z.open)) continue;
+    /* F-3 เต็ม (BR-09) */
+    var free = freeOf(b.code);
+    if(free !== null && free <= 0) continue;
+    /* F-4 ห้ามปนสินค้า */
+    var items = stockAt(b.code);
+    if(!b.mixed && items.length > 0 && !(items.length === 1 && items[0].code === t.code)) continue;
+    /* ขั้นที่ 2 — จัดอันดับ */
+    var rank = 4, why = 'ว่าง · ใกล้จุดรับเข้าที่สุด';
+    var same = null;
+    for(var k=0;k<items.length;k++){ if(items[k].code === t.code) same = items[k]; }
+    if(same){ rank = 1; why = 'มีสินค้าตัวเดียวกันอยู่แล้ว ' + nfm(same.qty) + ' ' + t.uom; }
+    else if(z && z.cats.length && z.cats.indexOf(t.cat) >= 0){ rank = 2; why = 'โซน ' + z.code + ' รับหมวด ' + t.cat; }
+    else if(z && z.cats.length === 0 && b.type === 'storage'){ rank = 3; why = 'โซน ' + z.code + ' รับได้ทุกหมวด'; }
+    else if(srcType === 'quarantine'){ rank = 2; why = 'ช่องกักกันที่ยังรับได้ (ของ QC ไม่ผ่านออกได้ทางใบคืนผู้ขายเท่านั้น)'; }
+    out.push({ bin:b.code, zone:b.zone, rank:rank, why:why, free:free, near:(z ? z.near : 9), row:b.row });
+  }
+  /* ขั้นที่ 3 — tie-break: อันดับ → ใกล้ staging → ความจุคงเหลือมาก → รหัส */
+  out.sort(function(a,c){
+    if(a.rank !== c.rank) return a.rank - c.rank;
+    if(a.near !== c.near) return a.near - c.near;
+    var af = a.free === null ? 1e9 : a.free, cf = c.free === null ? 1e9 : c.free;
+    if(af !== cf) return cf - af;
+    return a.bin < c.bin ? -1 : 1;
+  });
+  return out.slice(0, 3);
+}
+/* ตรวจว่า "ฝืนเกณฑ์" หรือไม่ (BR-11/BR-15) → บังคับเหตุผล */
+function violationOf(t, binCode, qty){
+  var b = binOf(binCode); if(!b) return '';
+  var z = zoneOf(b.wh, b.zone);
+  var free = freeOf(binCode);
+  if(free !== null && qty > free) return 'เกินความจุ';
+  var top = suggestBins(t).map(function(s){ return s.bin; });
+  if(top.indexOf(binCode) >= 0) return '';
+  if(z && z.cats.length && z.cats.indexOf(t.cat) < 0) return 'ข้ามหมวดโซน';
+  return 'นอกรายการแนะนำ';
+}
+</script>
+
+<script>
+/* ======================= STATE (console) ======================= */
+state.view = 'queue';
+state.wh = 'all';
+state.qf = { q:'', kind:'all', mine:false, sort:'age', showVoid:false };
+state.hf = { q:'', only:'all' };
+state.zoneOpen = null;
+state.histOpen = null;
+state.taskId = null;
+state.dests = [];
+state.busy = false;
+state.mReason = '';
+state.mNote = '';
+
+/* ======================= SHARED BITS ======================= */
+function pillOf(kind, label){ return '<span class="pill pill-' + kind + '">' + esc(label) + '</span>'; }
+function typeTag(type){ var t = LTYPE[type] || { th:type, cls:'' };
+  return '<span class="tag ' + t.cls + '">' + esc(t.th) + '</span>'; }
+function whOptions(){
+  var o = [{ value:'all', label:'ทุกคลัง', sub:'รวมงานค้างของทุกสาขา', icon:'layers' }];
+  WHS.forEach(function(w){ if(w.code === 'WH-TRN') return;
+    o.push({ value:w.code, label:w.name, sub:w.code + ' · คลังจริง', icon:'warehouse' }); });
+  return o;
+}
+function inWh(wh){ return state.wh === 'all' || state.wh === wh; }
+
+/* ======================= QUEUE DATA ======================= */
+function queueTasks(){
+  var q = state.qf.q.trim().toLowerCase();
+  var rows = TASKS.filter(function(t){
+    if(!inWh(t.wh)) return false;
+    if(t.status === 'void' && !state.qf.showVoid) return false;
+    if(t.status === 'done') return false;
+    if(state.qf.kind !== 'all' && taskKind(t) !== state.qf.kind) return false;
+    if(state.qf.mine && t.holder !== ME) return false;
+    if(q && (t.name + ' ' + t.code + ' ' + t.grn + ' ' + t.src + ' ' + t.id).toLowerCase().indexOf(q) < 0) return false;
+    return true;
+  });
+  rows.sort(function(a,b){
+    if(state.qf.sort === 'new') return new Date(b.queuedAt) - new Date(a.queuedAt);
+    if(state.qf.sort === 'zone') return a.src < b.src ? -1 : (a.src > b.src ? 1 : 0);
+    return new Date(a.queuedAt) - new Date(b.queuedAt);
+  });
+  return rows;
+}
+function kpi(){
+  var open = TASKS.filter(function(t){ return inWh(t.wh) && (t.status === 'wait' || t.status === 'doing'); });
+  var units = open.reduce(function(a,t){ return a + remainOf(t); }, 0);
+  var aged = open.filter(function(t){ return ageHours(t.queuedAt) >= NC.agingWarnHours; }).length;
+  var mine = open.filter(function(t){ return t.holder === ME; }).length;
+  var puts = MOVES.filter(function(m){ return m.kind === 'put'; });
+  var forced = puts.filter(function(m){ return m.src === 'override'; }).length;
+  var pct = puts.length ? Math.round(forced * 100 / puts.length) : 0;
+  return { open:open.length, units:units, aged:aged, mine:mine, ovr:pct, ovrN:forced, ovrAll:puts.length };
+}
+
+/* ======================= RENDER ROOT ======================= */
+var render = withRenderPreservation(function realRender(){
+  var k = kpi();
+  var host = document.getElementById('page-content');
+  host.innerHTML = pageHTML(k);
+  var badge = document.getElementById('sbBadge');
+  if(badge) badge.textContent = String(k.open);
+  var box = document.getElementById('modalBox');
+  box.innerHTML = state.modal.open ? modalHTML() : '';
+  renderIcons();
+  initSearchSelect('wh', {
+    options: whOptions(), value: state.wh,
+    onSelect: function(v){ state.wh = v || 'all'; state.taskId = null; state.dests = []; render(); }
+  });
+  if(state.view === 'queue' && state.taskId){
+    var t = taskOf(state.taskId);
+    initSearchSelect('actor', {
+      options: PEOPLE.map(function(p){ return { value:p.id, label:p.name, sub:p.pos + ' · ' + p.dept, icon:'user' }; }),
+      value: state.actorId || t.holder || ME, emptyText:'ไม่พบพนักงาน',
+      onSelect: function(v){ state.actorId = v; }
+    });
+    initSearchSelect('binpick', {
+      options: pickerOptions(t), value: null, emptyText:'ไม่พบช่องเก็บที่ค้นหา',
+      onSelect: function(v){ if(v) chooseBin(v); }
+    });
+  }
+});
+
+function pageHTML(k){
+  return ''
+  + '<div class="ph">'
+  +   '<div>'
+  +     '<div class="ph-title-row">'
+  +       '<h1 class="ph-title">จัดเก็บเข้าที่</h1>'
+  +       '<span class="ph-count">' + nfm(k.open) + ' งานค้าง</span>'
+  +     '</div>'
+  +     '<p class="ph-sub">ของที่รับเข้าแล้วแต่ยังไม่ได้วางลงช่องเก็บ — เลือกงาน รับข้อเสนอช่องเก็บ แล้วยืนยันทีละงาน'
+  +       '<span class="info-tip" data-tip="คิวรับเฉพาะบรรทัดที่ผ่านการตรวจคุณภาพจากใบรับของที่บันทึกแล้วเท่านั้น · บรรทัดประเภทบริการและใบรับของที่ยังเป็นร่างไม่เข้าคิว · ของที่โผล่มาโดยไม่มีใบรับของให้ใช้ใบปรับยอดสต๊อก"><i data-lucide="info" class="w-3.5 h-3.5"></i></span>'
+  +     '</p>'
+  +   '</div>'
+  +   '<div class="ph-actions">'
+  +     '<div class="ss-w">' + searchSelectHTML('wh', { placeholder:'เลือกคลัง' }) + '</div>'
+  +     '<button class="btn btn-primary" onclick="resumeNext()"><i data-lucide="play" class="w-4 h-4"></i><span>เริ่มงานถัดไป</span></button>'
+  +   '</div>'
+  + '</div>'
+  + statsHTML(k)
+  + '<div class="mstack">'
+  +   '<div class="flex items-center gap-2"><div class="vseg">'
+  +     vsegBtn('queue','คิวจัดเก็บ','list-checks')
+  +     vsegBtn('bins','ผังช่องเก็บ','grid-3x3')
+  +     vsegBtn('history','ประวัติการจัดเก็บ','history')
+  +   '</div></div>'
+  +   (state.view === 'queue' ? queueViewHTML() : (state.view === 'bins' ? binsViewHTML() : histViewHTML()))
+  + '</div>';
+}
+function vsegBtn(v, label, icon){
+  return '<button type="button" class="' + (state.view === v ? 'is-on' : '') + '" onclick="setView(\'' + v + '\')">'
+    + '<i data-lucide="' + icon + '" class="w-3.5 h-3.5"></i><span>' + label + '</span></button>';
+}
+function statsHTML(k){
+  function s(icon, label, val, meta){
+    return '<div class="stat"><div class="stat-label"><i data-lucide="' + icon + '" class="w-3.5 h-3.5"></i><span>' + label + '</span></div>'
+      + '<div class="stat-value mono">' + val + '</div><div class="stat-meta">' + meta + '</div></div>';
+  }
+  return '<div class="stats">'
+    + s('list-checks','งานค้างจัดเก็บ', nfm(k.open), 'รายการที่ยังไม่วางลงช่อง')
+    + s('boxes','หน่วยที่รอเก็บ', nfm(k.units), 'รวมทุกหน่วยนับ')
+    + s('alarm-clock','ค้างเกินเกณฑ์', nfm(k.aged), 'เกิน ' + NC.agingWarnHours + ' ชม. (เกณฑ์จาก NC rules)')
+    + s('user-check','งานในมือฉัน', nfm(k.mine), personName(ME))
+    + s('shuffle','ฝืนเกณฑ์ (7 วัน)', k.ovr + '%', nfm(k.ovrN) + ' จาก ' + nfm(k.ovrAll) + ' รายการที่จัดเก็บ')
+    + '</div>';
+}
+
+/* ======================= VIEW 1 — คิวจัดเก็บ (Pattern O) ======================= */
+function queueViewHTML(){
+  var rows = queueTasks();
+  return '<div class="run-shell">'
+    + '<aside class="run-aside"><div class="card">' + asideHTML(rows) + '</div></aside>'
+    + '<div class="run-main">' + runnerHTML() + '</div>'
+    + '</div>';
+}
+function asideHTML(rows){
+  var all = TASKS.filter(function(t){ return inWh(t.wh) && t.status !== 'void'; });
+  var doneN = all.filter(function(t){ return t.status === 'done'; }).length;
+  var pct = all.length ? Math.round(doneN * 100 / all.length) : 0;
+  var head = '<div class="aside-head">'
+    + '<div class="aside-head-row"><span class="aside-t"><i data-lucide="list-checks" class="w-3.5 h-3.5"></i>รายการรอจัดเก็บ</span>'
+    + '<span class="aside-n">' + nfm(doneN) + ' / ' + nfm(all.length) + '</span></div>'
+    + '<div class="bar' + (pct >= 100 ? ' is-full' : '') + '"><span style="--pct:' + pct + '%"></span></div>'
+    + '</div>';
+  var tools = '<div class="aside-tools">'
+    + '<div class="input-search"><i data-lucide="search" class="lead-icon w-4 h-4"></i>'
+    + '<input class="input" type="text" name="qsearch" placeholder="ค้นหางาน สินค้า หรือเลขใบรับของ" value="' + esc(state.qf.q) + '" oninput="qfSearch(this.value)"></div>'
+    + '<div class="vseg">'
+    +   '<button type="button" class="' + (state.qf.kind === 'all' ? 'is-on' : '') + '" onclick="qfSet(\'kind\',\'all\')">ทั้งหมด</button>'
+    +   '<button type="button" class="' + (state.qf.kind === 'normal' ? 'is-on' : '') + '" onclick="qfSet(\'kind\',\'normal\')">ปกติ</button>'
+    +   '<button type="button" class="' + (state.qf.kind === 'quarantine' ? 'is-on' : '') + '" onclick="qfSet(\'kind\',\'quarantine\')">กักกัน</button>'
+    + '</div>'
+    + '<button class="btn btn-sm ' + (state.qf.mine ? 'btn-primary' : 'btn-secondary') + '" onclick="qfSet(\'mine\',' + (!state.qf.mine) + ')"><i data-lucide="user-check" class="w-3.5 h-3.5"></i><span>งานในมือฉัน</span></button>'
+    + '<button class="btn btn-sm ' + (state.qf.showVoid ? 'btn-primary' : 'btn-secondary') + '" onclick="qfSet(\'showVoid\',' + (!state.qf.showVoid) + ')"><i data-lucide="archive" class="w-3.5 h-3.5"></i><span>รวมที่ถอนออก</span></button>'
+    + '<div class="vseg">'
+    +   '<button type="button" class="' + (state.qf.sort === 'age' ? 'is-on' : '') + '" onclick="qfSet(\'sort\',\'age\')">ค้างนานสุด</button>'
+    +   '<button type="button" class="' + (state.qf.sort === 'new' ? 'is-on' : '') + '" onclick="qfSet(\'sort\',\'new\')">เข้าคิวล่าสุด</button>'
+    +   '<button type="button" class="' + (state.qf.sort === 'zone' ? 'is-on' : '') + '" onclick="qfSet(\'sort\',\'zone\')">โซนต้นทาง</button>'
+    + '</div>'
+    + '<button class="btn btn-sm btn-ghost" onclick="qfReset()"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i><span>ล้างตัวกรอง</span></button>'
+    + '</div>';
+  var body;
+  if(rows.length === 0){
+    var dirty = state.qf.q || state.qf.kind !== 'all' || state.qf.mine;
+    body = dirty
+      ? emptyStateHTML({ icon:'search-x', title:'ไม่พบรายการที่ค้นหา', desc:'ลองปรับคำค้นหรือล้างตัวกรอง', actionLabel:'ล้างตัวกรอง', actionIcon:'rotate-ccw', onAction:'qfReset()' })
+      : emptyStateHTML({ icon:'party-popper', title:'ไม่มีงานค้างจัดเก็บ', desc:'ของที่รับเข้าถูกวางลงช่องเก็บครบแล้วทั้งหมด', actionLabel:'ดูผังช่องเก็บ', actionIcon:'grid-3x3', onAction:'setView(\'bins\')' });
+  } else {
+    var groups = {};
+    rows.forEach(function(t){ var g = taskKind(t) === 'quarantine' ? 'ของกักกัน (รอคืนผู้ขาย)' : 'คิวปกติ';
+      (groups[g] = groups[g] || []).push(t); });
+    body = '<div class="aside-list">' + Object.keys(groups).map(function(g){
+      return '<div class="aside-grp"><i data-lucide="' + (g.indexOf('กักกัน') >= 0 ? 'shield-alert' : 'inbox') + '" class="w-3 h-3"></i><span>' + g + '</span>'
+        + '<span class="aside-grp-n">' + nfm(groups[g].length) + '</span></div>'
+        + groups[g].map(qcaseHTML).join('');
+    }).join('') + '</div>';
+  }
+  return head + tools + body;
+}
+function qcaseHTML(t){
+  var dot = t.status === 'doing' ? 'is-doing' : (t.status === 'void' ? 'is-off'
+    : (ageHours(t.queuedAt) >= NC.agingWarnHours ? 'is-hot' : 'is-wait'));
+  var right = t.status === 'void' ? 'ถอนออก' : ageText(t.queuedAt);
+  var meta = t.grn + ' บรรทัด ' + t.line + ' · ' + t.src
+    + (t.holder ? ' · ถือโดย ' + personName(t.holder) : '')
+    + (t.done > 0 ? ' · เก็บแล้ว ' + nfm(t.done) : '');
+  return '<button type="button" class="qcase' + (state.taskId === t.id ? ' is-on' : '') + '" onclick="pickTask(\'' + t.id + '\')">'
+    + '<span class="rdot ' + dot + '"></span>'
+    + '<span class="qc-main"><span class="qc-t">' + esc(t.name) + '</span><span class="qc-m">' + esc(meta) + '</span></span>'
+    + '<span class="qc-r">' + nfm(remainOf(t)) + ' ' + esc(t.uom) + '<br>' + esc(right) + '</span>'
+    + '</button>';
+}
+</script>
+
+<script>
+/* ======================= RUNNER PANE (ขวา) ======================= */
+function pickerOptions(t){
+  if(!t) return [];
+  var srcBin = binOf(t.src); var srcType = srcBin ? srcBin.type : 'staging';
+  return BINS.filter(function(b){
+    if(b.wh !== t.wh) return false;
+    if(b.code === t.src) return false;
+    return srcType === 'quarantine' ? b.type === 'quarantine' : b.type === 'storage';
+  }).map(function(b){
+    var z = zoneOf(b.wh, b.zone); var free = freeOf(b.code);
+    var sub = 'โซน ' + b.zone + ' · ' + (LTYPE[b.type] ? LTYPE[b.type].th : b.type)
+      + (b.locked ? ' · ล็อก: ' + b.lockReason : (z && z.cats.length ? ' · รับหมวด ' + z.cats.join(', ') : ' · รับได้ทุกหมวด'));
+    return { value:b.code, label:b.code + ' — ' + (z ? z.name : b.zone), sub:sub, icon:'warehouse',
+      right: b.locked ? 'ล็อก' : (free === null ? 'ไม่จำกัด' : 'เหลือ ' + nfm(free)) };
+  });
+}
+function destSum(){ return state.dests.reduce(function(a,d){ return a + (Number(d.qty) || 0); }, 0); }
+function destIssues(t){
+  var out = [];
+  if(!t) return ['ยังไม่ได้เลือกงาน'];
+  if(t.status === 'void') out.push('งานนี้ถูกถอนออกจากคิวแล้ว (ใบรับของต้นทางถูกกลับรายการ)');
+  if(t.holder !== ME) out.push('ต้องกดรับงานก่อนจึงจะยืนยันได้');
+  var pos = state.dests.filter(function(d){ return d.bin && (Number(d.qty) || 0) > 0; });
+  if(pos.length === 0) out.push('ต้องมีปลายทางอย่างน้อย 1 รายการที่จำนวนมากกว่า 0');
+  if(destSum() > remainOf(t)) out.push('จำนวนรวมเกินยอดคงค้างเก็บ ' + nfm(remainOf(t)) + ' ' + t.uom);
+  state.dests.forEach(function(d, i){
+    if(!d.bin) return;
+    if((Number(d.qty) || 0) < 0) out.push('ปลายทางที่ ' + (i + 1) + ': จำนวนติดลบไม่ได้');
+    var v = violationOf(t, d.bin, Number(d.qty) || 0);
+    if(v && !d.reason) out.push('ปลายทางที่ ' + (i + 1) + ' (' + v + '): ต้องเลือกเหตุผลก่อนยืนยัน');
+    if(v && d.reason === 'อื่น ๆ' && !String(d.note).trim()) out.push('ปลายทางที่ ' + (i + 1) + ': เลือก "อื่น ๆ" ต้องพิมพ์เหตุผลเพิ่ม');
+  });
+  return out;
+}
+function runnerHTML(){
+  var t = taskOf(state.taskId);
+  if(!t){
+    return '<div class="card">' + emptyStateHTML({ icon:'mouse-pointer-click', title:'เลือกงานจากคิวด้านซ้าย',
+      desc:'ระบบจะเสนอช่องเก็บให้ทันทีเมื่อเลือกงาน — เลือกตามที่แนะนำ หรือค้นหาช่องเก็บเองก็ได้',
+      actionLabel:'เริ่มงานถัดไป', actionIcon:'play', onAction:'resumeNext()' }) + '</div>';
+  }
+  var kind = taskKind(t);
+  var sug = suggestBins(t);
+  var issues = destIssues(t);
+  var sum = destSum();
+  var left = remainOf(t) - sum;
+  var head = ''
+  + '<div class="rh">'
+  +   '<div class="rh-top">'
+  +     '<div>'
+  +       '<div class="rh-name"><span>' + esc(t.name) + '</span>'
+  +         (kind === 'quarantine' ? '<span class="tag is-q"><i data-lucide="shield-alert" class="w-3 h-3"></i>ของกักกัน</span>' : '')
+  +         (ageHours(t.queuedAt) >= NC.agingWarnHours ? '<span class="tag is-force"><i data-lucide="alarm-clock" class="w-3 h-3"></i>' + ageText(t.queuedAt) + '</span>' : '')
+  +       '</div>'
+  +       '<div class="rh-sub">' + esc(t.id) + ' · รหัสสินค้า ' + esc(t.code) + ' · หมวด ' + esc(t.cat)
+  +         ' · <button class="lnk" onclick="openGrn(\'' + t.grn + '\')"><i data-lucide="external-link" class="w-3 h-3"></i>' + esc(t.grn) + ' บรรทัด ' + t.line + '</button></div>'
+  +     '</div>'
+  +     '<div class="rh-acts">' + holderBtnHTML(t) + '</div>'
+  +   '</div>'
+  +   '<div class="kv">'
+  +     kvI('ช่องต้นทาง', esc(t.src))
+  +     kvI('ประเภทต้นทาง', esc((LTYPE[binOf(t.src) ? binOf(t.src).type : 'staging'] || {}).th))
+  +     kvI('คลัง', esc(whName(t.wh)))
+  +     kvI('ต้องเก็บทั้งหมด', nfm(t.qty) + ' ' + esc(t.uom), true)
+  +     kvI('เก็บแล้ว', nfm(t.done) + ' ' + esc(t.uom), true)
+  +     kvI('คงค้างเก็บ', nfm(remainOf(t)) + ' ' + esc(t.uom), true)
+  +     kvI('เข้าคิวเมื่อ', fmtDT(t.queuedAt))
+  +     kvI('อายุงานค้าง', ageText(t.queuedAt), false, ageHours(t.queuedAt) >= NC.agingWarnHours)
+  +   '</div>'
+  + '</div>';
+
+  var sugSec = '<div class="rsec"><div class="rsec-h"><i data-lucide="sparkles" class="w-3 h-3"></i><span>ช่องเก็บที่แนะนำ</span>'
+    + '<span class="info-tip" data-tip="เกณฑ์เรียงตามลำดับ: (1) มีสินค้าตัวเดียวกันอยู่แล้ว (2) โซนที่รับหมวดสินค้านี้ (3) โซนที่รับได้ทุกหมวด (4) ช่องว่างที่ใกล้จุดรับเข้าที่สุด — ช่องที่ล็อก เต็ม ห้ามปน หรือผิดประเภท จะไม่ถูกเสนอ"><i data-lucide="info" class="w-3.5 h-3.5"></i></span></div>';
+  if(sug.length === 0){
+    sugSec += '<div class="warnbox is-stop"><i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i><span>ไม่มีช่องเก็บที่ตรงเกณฑ์ในคลังนี้ — ช่องที่เหลือถูกกรองออกเพราะ เต็ม / ล็อก / ห้ามปนสินค้า / ผิดประเภท · ทางออก: ปล่อยงานค้างคิวไว้ก่อน หรือค้นหาช่องเก็บเองแล้วระบุเหตุผล</span></div>';
+  } else {
+    if(!zoneCatMatch(t)) sugSec += '<div class="warnbox"><i data-lucide="map-pin-off" class="w-3.5 h-3.5"></i><span>หมวด "' + esc(t.cat) + '" ยังไม่ได้กำหนดโซนในผังคลัง — ระบบเสนอช่องว่างที่ใกล้จุดรับเข้าที่สุดแทน · แจ้งผู้ดูแลผังคลังให้ตั้งค่าเพิ่ม</span></div>';
+    sugSec += '<div class="sug-grid">' + sug.map(function(s, i){
+      var on = state.dests[0] && state.dests[0].bin === s.bin;
+      return '<button type="button" class="sug' + (on ? ' is-on' : '') + '" onclick="chooseSug(' + i + ')">'
+        + '<span class="sug-top"><span class="sug-code">' + esc(s.bin) + '</span>'
+        + (i === 0 ? '<span class="sug-rank">แนะนำ</span>' : '<span class="sug-rank">อันดับ ' + (i + 1) + '</span>') + '</span>'
+        + '<span class="sug-why">' + esc(s.why) + '</span>'
+        + '<span class="sug-cap"><i data-lucide="gauge" class="w-3 h-3"></i>' + (s.free === null ? 'ความจุไม่จำกัด' : 'เหลือที่ ' + nfm(s.free) + ' ' + esc(t.uom)) + '</span>'
+        + '</button>';
+    }).join('') + '</div>';
+  }
+  sugSec += '</div>';
+
+  var pickSec = '<div class="rsec"><div class="rsec-h"><i data-lucide="search" class="w-3 h-3"></i><span>เลือกช่องเก็บอื่น (ปลายทางที่ ' + (state.destIdx + 1) + ')</span></div>'
+    + (kind === 'quarantine' ? '<div class="warnbox"><i data-lucide="shield-alert" class="w-3.5 h-3.5"></i><span>ของกักกันเลือกได้เฉพาะช่องประเภทกักกันเท่านั้น — ออกจากการกักกันได้ทางเดียวคือใบคืนผู้ขาย</span></div>' : '')  /* FWD-WIRE: RTV handoff */
+    + '<div class="ss-w-lg">' + searchSelectHTML('binpick', { placeholder:'ค้นหารหัสช่องเก็บหรือชื่อโซน' }) + '</div></div>';
+
+  var dstSec = '<div class="rsec"><div class="rsec-h"><i data-lucide="package-plus" class="w-3 h-3"></i><span>ปลายทางที่จะจัดเก็บ</span></div>'
+    + '<div class="dst-head"><span>ช่องเก็บ</span><span>ที่มา</span><span>จำนวนที่เก็บ</span><span>ความจุคงเหลือ</span><span>เหตุผลเมื่อฝืนเกณฑ์</span><span></span></div>'
+    + state.dests.map(function(d, i){ return dstRowHTML(t, d, i); }).join('')
+    + '<div class="bin-acts">'
+    +   '<button class="btn btn-sm btn-secondary" onclick="addDest()"><i data-lucide="plus" class="w-3.5 h-3.5"></i><span>เพิ่มปลายทาง</span></button>'
+    +   '<button class="btn btn-sm btn-secondary" onclick="fillAll()"><i data-lucide="wand-2" class="w-3.5 h-3.5"></i><span>เก็บทั้งหมดที่ช่องแนะนำ</span></button>'
+    +   '<span class="cmini"><i data-lucide="corner-down-right" class="w-3 h-3"></i>คงค้างหลังครั้งนี้ ' + nfm(Math.max(0, left)) + ' ' + esc(t.uom) + '</span>'
+    + '</div></div>';
+
+  var whoSec = '<div class="rsec"><div class="rsec-h"><i data-lucide="user-check" class="w-3 h-3"></i><span>ผู้จัดเก็บ และ หมายเหตุ</span></div>'
+    + '<div class="kv">' + kvI('ผู้ถือครองงาน', t.holder ? esc(personName(t.holder)) + ' · ' + esc(person(t.holder).pos) : 'ยังไม่มีผู้ถือครองงาน')
+    + kvI('ใบรับของต้นทาง', esc(t.grn) + ' บรรทัด ' + t.line) + '</div>'
+    + '<div class="mt-3"><div class="kv-l">ผู้จัดเก็บที่จะบันทึกลงรายการเคลื่อนไหว</div>'
+    + '<div class="ss-w-lg mt-2">' + searchSelectHTML('actor', { placeholder:'เลือกผู้จัดเก็บ (คนจริง)' }) + '</div></div>'
+    + '<div class="mt-3"><textarea class="rsn-t" name="tasknote" placeholder="หมายเหตุของงานนี้ (ไม่บังคับ)" oninput="setTaskNote(this.value)">' + esc(t.note) + '</textarea></div></div>';
+
+  var issueBox = issues.length ? '<div class="rsec"><div class="warnbox is-stop"><i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i><span>' + issues.map(esc).join(' · ') + '</span></div></div>' : '';
+
+  var cbar = '<div class="cbar">'
+    + '<span class="cbar-sum">เก็บครั้งนี้ ' + nfm(sum) + ' ' + esc(t.uom) + ' · คงค้าง ' + nfm(Math.max(0, left)) + ' ' + esc(t.uom) + '</span>'
+    + '<span class="cmini"><i data-lucide="landmark" class="w-3 h-3"></i>ไม่กระทบบัญชี — ย้ายภายในคลังเดียวกัน</span>'  /* FWD-WIRE: JE posting */
+    + '<div class="footer-spacer"></div>'
+    + '<button class="btn btn-secondary" onclick="skipTask()"><i data-lucide="skip-forward" class="w-4 h-4"></i><span>ข้ามงานนี้</span></button>'
+    + '<button class="btn btn-primary' + (issues.length || state.busy ? ' is-disabled' : '') + '" id="btnConfirm" onclick="confirmPutaway()">'
+    +   '<i data-lucide="check" class="w-4 h-4"></i><span>ยืนยันจัดเก็บ</span></button>'
+    + '</div>';
+
+  return '<div class="card">' + head + sugSec + pickSec + dstSec + whoSec + issueBox + cbar + '</div>';
+}
+function kvI(l, v, num, hot){
+  return '<div class="kv-i"><div class="kv-l">' + l + '</div><div class="kv-v' + (num ? ' is-num' : '') + (hot ? ' is-hot' : '') + '">' + v + '</div></div>';
+}
+function zoneCatMatch(t){
+  for(var i=0;i<ZONES.length;i++){ var z = ZONES[i];
+    if(z.wh === t.wh && z.type === 'storage' && z.cats.indexOf(t.cat) >= 0) return true; }
+  return false;
+}
+function holderBtnHTML(t){
+  if(t.status === 'void') return '<span class="tag">ถอนออกจากคิวแล้ว</span>';
+  if(!t.holder) return '<button class="btn btn-primary" onclick="claimTask()"><i data-lucide="hand" class="w-4 h-4"></i><span>รับงาน</span></button>';
+  if(t.holder === ME) return '<span class="tag is-st">ในมือคุณ</span>'
+    + '<button class="btn btn-secondary" onclick="releaseTask()"><i data-lucide="undo-2" class="w-4 h-4"></i><span>คืนงาน</span></button>';
+  return '<span class="tag is-q">ถือโดย ' + esc(personName(t.holder)) + '</span>'
+    + '<button class="btn btn-secondary" onclick="forceRelease()"><i data-lucide="unlock" class="w-4 h-4"></i><span>ปลดล็อกงาน (หัวหน้าคลัง)</span></button>';
+}
+function dstRowHTML(t, d, i){
+  var b = d.bin ? binOf(d.bin) : null;
+  var z = b ? zoneOf(b.wh, b.zone) : null;
+  var free = d.bin ? freeOf(d.bin) : null;
+  var qty = Number(d.qty) || 0;
+  var v = d.bin ? violationOf(t, d.bin, qty) : '';
+  var srcTh = d.src === 'rank1' ? 'แนะนำอันดับ 1' : (d.src === 'rankN' ? 'แนะนำอันดับรอง' : 'เลือกเอง');
+  var bad = qty < 0 || destSum() > remainOf(t);
+  return '<div class="dst-row' + (v === 'เกินความจุ' ? ' is-over' : '') + '">'
+    + '<div><div class="dst-code">' + (d.bin ? esc(d.bin) : '— ยังไม่เลือก —') + '</div>'
+    +   '<div class="dst-zone">' + (z ? esc(z.name) : 'กดการ์ดที่แนะนำ หรือค้นหาเอง') + '</div>'
+    +   '<button class="lnk" onclick="setDestIdx(' + i + ')"><i data-lucide="pencil" class="w-3 h-3"></i>เลือกช่องนี้ใหม่</button></div>'
+    + '<div>' + (d.bin ? '<span class="tag' + (d.src === 'override' ? ' is-force' : '') + '">' + srcTh + '</span>' : '—') + '</div>'
+    + '<div><input class="qty-in' + (bad ? ' is-bad' : '') + '" type="number" name="dq' + i + '" value="' + qty + '" min="0" oninput="setDestQty(' + i + ', this.value)"></div>'
+    + '<div class="dst-zone mono">' + (d.bin ? (free === null ? 'ไม่จำกัด' : nfm(free) + ' ' + esc(t.uom)) : '—') + '</div>'
+    + '<div>' + (v
+        ? '<select class="mini-sel' + (d.reason ? '' : ' is-need') + '" onchange="setDestReason(' + i + ', this.value)">'
+          + '<option value="">— ' + v + ': เลือกเหตุผล —</option>'
+          + OVR_REASONS.map(function(r){ return '<option value="' + esc(r) + '"' + (d.reason === r ? ' selected' : '') + '>' + esc(r) + '</option>'; }).join('')
+          + '</select>'
+          + (d.reason === 'อื่น ๆ' ? '<input class="qty-in mt-2" type="text" name="dn' + i + '" value="' + esc(d.note) + '" placeholder="ระบุเหตุผล" oninput="setDestNote(' + i + ', this.value)">' : '')
+        : '<span class="dst-zone">อยู่ในกรอบเกณฑ์</span>') + '</div>'
+    + '<div>' + (state.dests.length > 1 ? '<button class="xbtn" onclick="removeDest(' + i + ')"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>' : '') + '</div>'
+    + '</div>';
+}
+</script>
+
+<script>
+/* ======================= VIEW 2 — ผังช่องเก็บ (Pattern E) ======================= */
+function binsViewHTML(){
+  var zs = ZONES.filter(function(z){ return inWh(z.wh) || (state.wh === 'all'); });
+  if(state.wh !== 'all') zs = ZONES.filter(function(z){ return z.wh === state.wh; });
+  var rows = zs.map(function(z){
+    var bins = BINS.filter(function(b){ return b.wh === z.wh && b.zone === z.code; });
+    var cap = bins.reduce(function(a,b){ return a + (b.cap || 0); }, 0);
+    var used = bins.reduce(function(a,b){ return a + usedOf(b.code); }, 0);
+    var pct = cap ? Math.min(100, Math.round(used * 100 / cap)) : 0;
+    var stat = { 'ว่าง':0, 'มีของ':0, 'เต็ม':0, 'ล็อก':0 };
+    bins.forEach(function(b){ stat[binStatus(b.code)]++; });
+    var open = state.zoneOpen === z.wh + '/' + z.code;
+    var main = '<tr class="is-clickable" onclick="toggleZoneRow(\'' + z.wh + '/' + z.code + '\')">'
+      + '<td><i data-lucide="' + (open ? 'chevron-down' : 'chevron-right') + '" class="w-3.5 h-3.5"></i></td>'
+      + '<td><span class="dst-code">' + esc(z.code) + '</span> <span class="dst-zone">' + esc(z.name) + '</span></td>'
+      + '<td>' + typeTag(z.type) + '</td>'
+      + '<td>' + (z.cats.length ? esc(z.cats.join(' · ')) : 'ทุกหมวด') + '</td>'
+      + '<td class="col-num num">' + nfm(bins.length) + '</td>'
+      + '<td><div class="bar"><span style="--pct:' + pct + '%"></span></div></td>'
+      + '<td class="mono">ว่าง ' + stat['ว่าง'] + ' · มีของ ' + stat['มีของ'] + ' · เต็ม ' + stat['เต็ม'] + ' · ล็อก ' + stat['ล็อก'] + '</td>'
+      + '</tr>';
+    var exp = open ? '<tr class="line-expanded"><td colspan="7" class="zrow-x"><div class="zpanel">'
+      + (bins.length ? '<div class="bin-grid">' + bins.map(binCardHTML).join('') + '</div>'
+         : '<div class="dst-zone">โซนนี้ยังไม่มีช่องเก็บ — ผู้ดูแลผังคลังเป็นผู้เพิ่ม</div>')
+      + '</div></td></tr>' : '';
+    return main + exp;
+  }).join('');
+  return '<div class="card">'
+    + '<div class="filt"><span class="rsec-h">ผัง คลัง › โซน › ช่องเก็บ'
+    +   '<span class="info-tip" data-tip="ผังนี้คือสัญญากลางของคลัง — ใบปรับยอดสต๊อกและใบย้ายสินค้าใช้โครงเดียวกันนี้ ห้ามนิยามใหม่ · ประเภทระหว่างทางสงวนไว้ให้ใบย้ายสินค้าข้ามสาขาเท่านั้น"><i data-lucide="info" class="w-3.5 h-3.5"></i></span></span></div>'
+    + '<div class="table-scroll"><table class="table"><thead><tr>'
+    + '<th class="col-check"></th><th>โซน</th><th>ประเภท</th><th>หมวดที่รับ</th><th class="col-num">ช่องเก็บ</th><th>การใช้งาน</th><th>สถานะช่องเก็บ</th>'
+    + '</tr></thead><tbody>' + (rows || '') + '</tbody></table></div>'
+    + (rows ? '' : emptyStateHTML({ icon:'grid-3x3', title:'ยังไม่มีโซนในคลังนี้', desc:'เลือกคลังอื่น หรือให้ผู้ดูแลผังคลังตั้งค่าโซนก่อน' }))
+    + '<div class="table-footer"><span>คลิกแถวเพื่อกางดูช่องเก็บและยอดคงเหลือ</span><span class="mono">' + nfm(zs.length) + ' โซน</span></div>'
+    + '</div>';
+}
+function binCardHTML(b){
+  var st = binStatus(b.code);
+  var free = freeOf(b.code);
+  var items = stockAt(b.code);
+  var pillKind = st === 'ล็อก' ? 'muted' : (st === 'เต็ม' ? 'danger' : (st === 'มีของ' ? 'info' : 'success'));
+  return '<div class="bin-c' + (b.locked ? ' is-lock' : '') + '">'
+    + '<div class="bin-top"><span class="bin-code">' + esc(b.code) + '</span>' + typeTag(b.type)
+    +   '<div class="footer-spacer"></div>' + pillOf(pillKind, st) + '</div>'
+    + '<div class="bin-meta">ความจุ ' + (b.cap === null ? 'ไม่จำกัด' : nfm(b.cap)) + ' · ใช้ไป ' + nfm(usedOf(b.code))
+    +   ' · คงเหลือ ' + (free === null ? '—' : nfm(free)) + (b.mixed ? '' : ' · ห้ามปนสินค้า') + '</div>'
+    + (b.locked ? '<div class="warnbox"><i data-lucide="lock" class="w-3.5 h-3.5"></i><span>' + esc(b.lockReason) + '</span></div>' : '')
+    + '<div class="bin-items">' + (items.length
+        ? items.map(function(s){ return '<div class="bin-item"><span>' + esc(s.name) + '</span><b>' + nfm(s.qty) + '</b></div>'; }).join('')
+        : '<div class="bin-item"><span class="dst-zone">ไม่มีสินค้าในช่องนี้</span></div>') + '</div>'
+    + '<div class="bin-acts">'
+    +   (b.locked
+        ? '<button class="btn btn-sm btn-secondary" onclick="askUnlockBin(\'' + b.code + '\')"><i data-lucide="unlock" class="w-3.5 h-3.5"></i><span>ปลดล็อก</span></button>'
+        : '<button class="btn btn-sm btn-secondary" onclick="askLockBin(\'' + b.code + '\')"><i data-lucide="lock" class="w-3.5 h-3.5"></i><span>ล็อกช่อง</span></button>')
+    +   '<button class="btn btn-sm btn-secondary" onclick="fwdAdjust(\'' + b.code + '\')"><i data-lucide="scale" class="w-3.5 h-3.5"></i><span>ปรับยอด</span></button>'
+    +   '<button class="btn btn-sm btn-secondary" onclick="fwdTransfer(\'' + b.code + '\')"><i data-lucide="truck" class="w-3.5 h-3.5"></i><span>ย้ายสินค้า</span></button>'
+    +   (b.type === 'quarantine' ? '<button class="btn btn-sm btn-secondary" onclick="fwdRtv()"><i data-lucide="undo-2" class="w-3.5 h-3.5"></i><span>คืนผู้ขาย</span></button>' : '')
+    + '</div></div>';
+}
+
+/* ======================= VIEW 3 — ประวัติการจัดเก็บ (append-only) ======================= */
+function histRows(){
+  var q = state.hf.q.trim().toLowerCase();
+  return MOVES.filter(function(m){
+    var b = binOf(m.kind === 'rev' ? m.from : m.to);
+    if(state.wh !== 'all' && b && b.wh !== state.wh) return false;
+    if(state.hf.only === 'force' && m.src !== 'override') return false;
+    if(state.hf.only === 'rev' && m.kind !== 'rev') return false;
+    if(q && (m.name + ' ' + m.code + ' ' + m.from + ' ' + m.to + ' ' + m.grn + ' ' + personName(m.by)).toLowerCase().indexOf(q) < 0) return false;
+    return true;
+  }).slice().sort(function(a,b){ return new Date(b.at) - new Date(a.at); });
+}
+function histViewHTML(){
+  var rows = histRows();
+  var body = rows.map(function(m){
+    var open = state.histOpen === m.id;
+    var canRev = m.kind === 'put' && !m.revBy;
+    var main = '<tr class="is-clickable" onclick="toggleHistRow(\'' + m.id + '\')">'
+      + '<td class="mono">' + fmtDT(m.at) + '</td>'
+      + '<td>' + (m.kind === 'rev' ? pillOf('danger','กลับรายการ') : pillOf('success','จัดเก็บ')) + '</td>'
+      + '<td><span class="cell-truncate" title="' + esc(m.name) + '">' + esc(m.name) + '</span></td>'
+      + '<td class="col-num num">' + nfm(m.qty) + '</td>'
+      + '<td class="mono">' + esc(m.from) + '</td>'
+      + '<td class="mono">' + esc(m.to) + '</td>'
+      + '<td>' + esc(personName(m.by)) + '</td>'
+      + '<td><div class="row-actions">'
+      +   (canRev ? '<button class="ra-btn is-danger" title="กลับรายการจัดเก็บ" onclick="stopEv(event);askReverse(\'' + m.id + '\')"><i data-lucide="undo-2" class="w-3.5 h-3.5"></i></button>'
+                  : '<span class="dst-zone">—</span>')
+      + '</div></td></tr>';
+    var exp = open ? '<tr class="line-expanded"><td colspan="8" class="hx"><div class="hx-in">'
+      + kvI('ที่มาการเลือก', m.src === 'override' ? '<span class="tag is-force">เลือกเอง · ฝืนเกณฑ์</span>' : (m.src === 'rank1' ? 'แนะนำอันดับ 1' : (m.src === 'rankN' ? 'แนะนำอันดับรอง' : '—')))
+      + kvI('เหตุผล', esc(m.reason || '—'))
+      + kvI('หมายเหตุเพิ่มเติม', esc(m.note || '—'))
+      + kvI('ใบรับของต้นทาง', esc(m.grn) + ' บรรทัด ' + m.line)
+      + kvI('งานที่ผูก', esc(m.task))
+      + kvI('รายการที่ผูกกัน', esc(m.revOf ? 'กลับรายการของ ' + m.revOf : (m.revBy ? 'ถูกกลับรายการโดย ' + m.revBy : '—')))
+      + '</div></td></tr>' : '';
+    return main + exp;
+  }).join('');
+  return '<div class="card">'
+    + '<div class="filt">'
+    +   '<div class="input-search"><i data-lucide="search" class="lead-icon w-4 h-4"></i>'
+    +   '<input class="input" type="text" name="hsearch" placeholder="ค้นหาสินค้า ช่องเก็บ หรือผู้ทำรายการ" value="' + esc(state.hf.q) + '" oninput="hfSearch(this.value)"></div>'
+    +   '<div class="vseg">'
+    +     '<button type="button" class="' + (state.hf.only === 'all' ? 'is-on' : '') + '" onclick="hfSet(\'all\')">ทั้งหมด</button>'
+    +     '<button type="button" class="' + (state.hf.only === 'force' ? 'is-on' : '') + '" onclick="hfSet(\'force\')">เฉพาะที่ฝืนเกณฑ์</button>'
+    +     '<button type="button" class="' + (state.hf.only === 'rev' ? 'is-on' : '') + '" onclick="hfSet(\'rev\')">เฉพาะกลับรายการ</button>'
+    +   '</div>'
+    +   '<div class="footer-spacer"></div>'
+    +   '<span class="cmini"><i data-lucide="lock" class="w-3 h-3"></i>บันทึกต่อท้ายอย่างเดียว — แก้และลบไม่ได้</span>'
+    +   '<button class="btn btn-sm btn-ghost" onclick="hfReset()"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i><span>ล้างตัวกรอง</span></button>'
+    + '</div>'
+    + (rows.length ? '<div class="table-scroll is-sticky"><table class="table"><thead><tr>'
+        + '<th>เวลา</th><th>ประเภท</th><th>สินค้า</th><th class="col-num">จำนวน</th><th>จาก</th><th>ไป</th><th>ผู้ทำรายการ</th><th>การทำงาน</th>'
+        + '</tr></thead><tbody>' + body + '</tbody></table></div>'
+      : emptyStateHTML({ icon:'history', title:'ไม่พบรายการที่ค้นหา', desc:'ลองปรับคำค้นหรือล้างตัวกรอง', actionLabel:'ล้างตัวกรอง', actionIcon:'rotate-ccw', onAction:'hfReset()' }))
+    + '<div class="table-footer"><span>คลิกแถวเพื่อดูเหตุผลและรายการที่ผูกกัน</span><span class="mono">' + nfm(rows.length) + ' รายการ</span></div>'
+    + '</div>';
+}
+
+/* ======================= MODAL ======================= */
+function modalHTML(){
+  var m = state.modal;
+  if(m.type === 'reverse'){
+    var mv = null; MOVES.forEach(function(x){ if(x.id === m.data) mv = x; });
+    if(!mv) return '';
+    return '<div class="modal-header"><span class="modal-header-icon is-danger"><i data-lucide="undo-2" class="w-4 h-4"></i></span>'
+      + '<div><h3 class="modal-title">กลับรายการจัดเก็บ?</h3>'
+      + '<p class="modal-subtitle">' + esc(mv.name) + ' ' + nfm(mv.qty) + ' จาก ' + esc(mv.to) + ' กลับไป ' + esc(mv.from)
+      + ' — ระบบจะสร้างรายการเคลื่อนไหวตรงข้าม รายการเดิมยังอยู่ในประวัติ ลบไม่ได้ และงานจะกลับเข้าคิว</p></div></div>'
+      + '<div class="modal-body"><div class="field"><label class="field-label">เหตุผลการกลับรายการ <span class="req">*</span></label>'
+      + '<textarea class="rsn-t" name="mreason" placeholder="เช่น เก็บผิดช่อง — สลับกับล็อตของอีกใบ" oninput="setModalReason(this.value)">' + esc(state.mReason) + '</textarea>'
+      + '<div class="field-help">ผู้ทำรายการ: หัวหน้าคลัง</div></div></div>'
+      + '<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>'
+      + '<button class="btn btn-danger' + (String(state.mReason).trim() ? '' : ' is-disabled') + '" id="btnRev" onclick="doReverse()">'
+      + '<i data-lucide="undo-2" class="w-4 h-4"></i><span>กลับรายการ</span></button></div>';
+  }
+  if(m.type === 'lock'){
+    return '<div class="modal-header"><span class="modal-header-icon is-warning"><i data-lucide="lock" class="w-4 h-4"></i></span>'
+      + '<div><h3 class="modal-title">ล็อกช่องเก็บ ' + esc(m.data) + '?</h3>'
+      + '<p class="modal-subtitle">ช่องที่ล็อกจะไม่ถูกเสนอให้จัดเก็บ และเลือกด้วยมือไม่ได้จนกว่าจะปลดล็อก</p></div></div>'
+      + '<div class="modal-body"><div class="field"><label class="field-label">เหตุผลที่ล็อก <span class="req">*</span></label>'
+      + '<textarea class="rsn-t" name="mreason" placeholder="เช่น ปิดซ่อมพื้น — เปิดใช้อีกครั้ง 2026-09-14" oninput="setModalReason(this.value)">' + esc(state.mReason) + '</textarea></div></div>'
+      + '<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>'
+      + '<button class="btn btn-primary' + (String(state.mReason).trim() ? '' : ' is-disabled') + '" id="btnLock" onclick="doLockBin()">'
+      + '<i data-lucide="check" class="w-4 h-4"></i><span>ล็อกช่องเก็บ</span></button></div>';
+  }
+  if(m.type === 'unlock'){
+    return '<div class="modal-header"><span class="modal-header-icon"><i data-lucide="unlock" class="w-4 h-4"></i></span>'
+      + '<div><h3 class="modal-title">ปลดล็อกช่องเก็บ ' + esc(m.data) + '?</h3>'
+      + '<p class="modal-subtitle">ช่องนี้จะกลับมาอยู่ในรายการที่ระบบเสนอให้จัดเก็บอีกครั้ง</p></div></div>'
+      + '<div class="modal-body"><div class="field-help">บันทึกลงประวัติแบบต่อท้าย</div></div>'
+      + '<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>'
+      + '<button class="btn btn-primary" id="btnUnlock" onclick="doUnlockBin()"><i data-lucide="check" class="w-4 h-4"></i><span>ปลดล็อก</span></button></div>';
+  }
+  return '';
+}
+</script>
+
+<script>
+/* ======================= ACTIONS ======================= */
+state.destIdx = 0;
+state.actorId = null;
+
+function navStub(name){ showToast('หน้า "' + name + '" อยู่นอกขอบเขตของต้นแบบนี้', 'info'); }
+function notifyStub(){ showToast('ศูนย์แจ้งเตือนกลางอยู่นอกขอบเขตของหน้านี้', 'info'); }
+function toggleUserMenu(){ document.getElementById('userMenu').classList.toggle('is-open'); }
+function setView(v){ state.view = v; render(); }
+
+function qfSearch(v){ state.qf.q = v; render(); }
+function qfSet(k, v){ state.qf[k] = v; render(); }
+function qfReset(){ state.qf = { q:'', kind:'all', mine:false, sort:'age', showVoid:false }; render(); }
+function hfSearch(v){ state.hf.q = v; render(); }
+function hfSet(v){ state.hf.only = v; render(); }
+function hfReset(){ state.hf = { q:'', only:'all' }; render(); }
+
+/* ---------- เลือก/ถือครองงาน (S-11/S-12/S-15 · BR-18/BR-24) ---------- */
+function seedDests(t){
+  var s = suggestBins(t);
+  state.destIdx = 0;
+  state.dests = [{ bin: s.length ? s[0].bin : '', qty: s.length ? remainOf(t) : 0, src:'rank1', reason:'', note:'' }];
+  if(s.length && s[0].free !== null && s[0].free < remainOf(t)) state.dests[0].qty = s[0].free;
+}
+function pickTask(id){
+  var t = taskOf(id); if(!t) return;
+  state.taskId = id; state.actorId = t.holder || ME; seedDests(t); render();
+}
+function resumeNext(){
+  var rows = queueTasks().filter(function(t){ return t.status !== 'void' && (!t.holder || t.holder === ME); });
+  if(rows.length === 0){ showToast('ไม่มีงานค้างที่รับต่อได้', 'info'); return; }
+  var mine = rows.filter(function(t){ return t.holder === ME; });
+  var t = mine.length ? mine[0] : rows[0];
+  state.taskId = t.id; seedDests(t);
+  if(!t.holder){ t.holder = ME; t.status = 'doing'; }
+  render(); showToast('เปิดงาน ' + t.id + ' — ' + t.name, 'info');
+}
+function claimTask(){
+  var t = taskOf(state.taskId); if(!t) return;
+  if(t.holder && t.holder !== ME){ showToast('งานนี้ถูก ' + personName(t.holder) + ' ถือครองอยู่', 'warning'); return; }
+  t.holder = ME; t.status = 'doing'; render(); showToast('รับงานแล้ว', 'success');
+}
+function releaseTask(){
+  var t = taskOf(state.taskId); if(!t) return;
+  t.holder = null; if(t.status === 'doing') t.status = 'wait';
+  render(); showToast('คืนงานเข้าคิวแล้ว — ไม่มีรายการเคลื่อนไหวเกิดขึ้น', 'info');
+}
+function forceRelease(){
+  var t = taskOf(state.taskId); if(!t) return;
+  var who = personName(t.holder);
+  t.holder = null; t.status = 'wait';
+  render(); showToast('ปลดล็อกงานจาก ' + who + ' แล้ว (บันทึกในประวัติ)', 'success');
+}
+function skipTask(){
+  var rows = queueTasks();
+  var i = rows.findIndex(function(t){ return t.id === state.taskId; });
+  var nx = rows[i + 1] || rows[0];
+  if(nx && nx.id !== state.taskId){ pickTask(nx.id); } else { showToast('ไม่มีงานถัดไปในคิวนี้', 'info'); }
+}
+
+/* ---------- ปลายทาง (S-01..S-08 · BR-10..BR-15) ---------- */
+function chooseSug(i){
+  var t = taskOf(state.taskId); if(!t) return;
+  var s = suggestBins(t)[i]; if(!s) return;
+  var d = state.dests[state.destIdx] || state.dests[0];
+  d.bin = s.bin; d.src = (i === 0 ? 'rank1' : 'rankN'); d.reason = ''; d.note = '';
+  if(!(Number(d.qty) > 0)) d.qty = Math.min(remainOf(t), s.free === null ? remainOf(t) : s.free);
+  render();
+}
+function chooseBin(code){
+  var t = taskOf(state.taskId); if(!t) return;
+  var b = binOf(code);
+  if(b && b.locked){ showToast('ช่อง ' + code + ' ถูกล็อก — ' + b.lockReason, 'warning'); render(); return; }
+  var d = state.dests[state.destIdx] || state.dests[0];
+  var top = suggestBins(t).map(function(s){ return s.bin; });
+  d.bin = code; d.reason = ''; d.note = '';
+  d.src = top.indexOf(code) === 0 ? 'rank1' : (top.indexOf(code) > 0 ? 'rankN' : 'override');
+  render();
+}
+function setDestIdx(i){ state.destIdx = i; render(); showToast('การค้นหาช่องเก็บจะใช้กับปลายทางที่ ' + (i + 1), 'info'); }
+function addDest(){
+  var t = taskOf(state.taskId); if(!t) return;
+  state.dests.push({ bin:'', qty:0, src:'override', reason:'', note:'' });
+  state.destIdx = state.dests.length - 1; render();
+}
+function removeDest(i){
+  state.dests.splice(i, 1);
+  if(state.dests.length === 0) state.dests.push({ bin:'', qty:0, src:'override', reason:'', note:'' });
+  state.destIdx = Math.min(state.destIdx, state.dests.length - 1); render();
+}
+function setDestQty(i, v){ if(state.dests[i]){ state.dests[i].qty = v === '' ? 0 : Number(v); render(); } }
+function setDestReason(i, v){ if(state.dests[i]){ state.dests[i].reason = v; render(); } }
+function setDestNote(i, v){ if(state.dests[i]){ state.dests[i].note = v; render(); } }
+function setTaskNote(v){ var t = taskOf(state.taskId); if(t){ t.note = v; } }
+function fillAll(){
+  var t = taskOf(state.taskId); if(!t) return;
+  var s = suggestBins(t);
+  if(s.length === 0){ showToast('ไม่มีช่องเก็บที่ตรงเกณฑ์ให้เติมอัตโนมัติ', 'warning'); return; }
+  state.dests = [{ bin:s[0].bin, qty:remainOf(t), src:'rank1', reason:'', note:'' }];
+  state.destIdx = 0; render();
+}
+
+/* ---------- ยืนยันจัดเก็บ → movement append-only (S-01..S-03 · BR-16) ---------- */
+function nextMv(){ MV_SEQ++; return 'MV-0' + MV_SEQ; }
+function emitCsq(evt, payload){
+  /* FWD-WIRE: ENG-CSQ emit — ดู 5_DECLARATIONS/CSQ_BRIEF_F-WH-PUTAWAY.md
+     feature ประกาศ event เท่านั้น — ห้ามประเมินผลรายท่อเอง ห้ามเก็บผลลง state ของ feature */
+  void evt; void payload;
+}
+function confirmPutaway(){
+  var t = taskOf(state.taskId); if(!t || state.busy) return;
+  if(destIssues(t).length){ showToast('กรุณากรอกข้อมูลให้ครบถ้วน', 'warning'); return; }
+  var btn = document.getElementById('btnConfirm');
+  state.busy = true;
+  if(btn){ btn.classList.add('is-disabled');
+    btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังบันทึก…</span>'; renderIcons(); }
+  setTimeout(function(){
+    var moved = 0, bins = [];
+    state.dests.forEach(function(d){
+      var q = Number(d.qty) || 0; if(!d.bin || q <= 0) return;
+      var v = violationOf(t, d.bin, q);
+      MOVES.push({ id:nextMv(), kind:'put', at:new Date(NOW.getTime() + 60000).toISOString(),
+        code:t.code, name:t.name, qty:q, from:t.src, to:d.bin, by:(state.actorId || t.holder || ME), task:t.id, grn:t.grn, line:t.line,
+        src:d.src, reason:d.reason, note:d.note, revOf:null, revBy:null });
+      addStock(d.bin, t.code, t.name, q);
+      var from = STOCK.filter(function(s){ return s.bin === t.src && s.code === t.code; })[0];
+      if(from) from.qty = Math.max(0, from.qty - q);
+      t.done += q; moved += q; bins.push(d.bin);
+      if(v) emitCsq('putaway_forced_override', { task:t.id, bin:d.bin, qty:q, violation:v, reason:d.reason });
+    });
+    if(remainOf(t) <= 0){ t.status = 'done'; t.holder = null; }
+    state.busy = false;
+    showToast('จัดเก็บแล้ว ' + nfm(moved) + ' ' + t.uom + ' ที่ ' + bins.join(', '), 'success');
+    var rest = queueTasks().filter(function(x){ return x.status !== 'void' && x.id !== t.id; });
+    if(remainOf(t) > 0){ seedDests(t); } else if(rest.length){ pickTask(rest[0].id); return; }
+    else { state.taskId = null; state.dests = []; }
+    render();
+  }, 600);
+}
+
+/* ---------- ผังช่องเก็บ (S-10/S-19 · BR-08) ---------- */
+function toggleZoneRow(key){ state.zoneOpen = state.zoneOpen === key ? null : key; render(); }
+function toggleHistRow(id){ state.histOpen = state.histOpen === id ? null : id; render(); }
+function askLockBin(code){ state.mReason = ''; openModal('lock', code); }
+function askUnlockBin(code){ state.mReason = ''; openModal('unlock', code); }
+function doLockBin(){
+  var b = binOf(state.modal.data); if(!b) return;
+  if(!String(state.mReason).trim()){ showToast('กรุณากรอกข้อมูลให้ครบถ้วน', 'warning'); return; }
+  b.locked = true; b.lockReason = String(state.mReason).trim();
+  closeModal(); setTimeout(function(){ render(); showToast('ล็อกช่อง ' + b.code + ' แล้ว', 'success'); }, 210);
+}
+function doUnlockBin(){
+  var b = binOf(state.modal.data); if(!b) return;
+  b.locked = false; b.lockReason = '';
+  closeModal(); setTimeout(function(){ render(); showToast('ปลดล็อกช่อง ' + b.code + ' แล้ว', 'success'); }, 210);
+}
+function fwdAdjust(code){ showToast('ส่งต่อไปใบปรับยอดสต๊อกของช่อง ' + code + ' (จำลอง)', 'info'); }
+function fwdTransfer(code){ showToast('ส่งต่อไปใบย้ายสินค้าจากช่อง ' + code + ' (จำลอง)', 'info'); }
+function fwdRtv(){ showToast('ส่งของกักกันต่อไปใบคืนผู้ขาย (จำลอง)', 'info'); }
+function openGrn(g){ showToast('เปิดใบรับของ ' + g + ' (จำลอง — อยู่คนละหน้าจอ)', 'info'); }
+
+/* ---------- กลับรายการ (S-13 · BR-17) ---------- */
+function askReverse(id){ state.mReason = ''; openModal('reverse', id); }
+function setModalReason(v){
+  state.mReason = v;
+  var b = document.getElementById('btnRev') || document.getElementById('btnLock');
+  if(b) b.classList.toggle('is-disabled', !String(v).trim());
+}
+function doReverse(){
+  var mv = null; MOVES.forEach(function(x){ if(x.id === state.modal.data) mv = x; });
+  if(!mv) return;
+  if(!String(state.mReason).trim()){ showToast('กรุณากรอกข้อมูลให้ครบถ้วน', 'warning'); return; }
+  var rid = nextMv();
+  MOVES.push({ id:rid, kind:'rev', at:new Date(NOW.getTime() + 120000).toISOString(),
+    code:mv.code, name:mv.name, qty:mv.qty, from:mv.to, to:mv.from, by:'u-somchai',
+    task:mv.task, grn:mv.grn, line:mv.line, src:'', reason:String(state.mReason).trim(), note:'',
+    revOf:mv.id, revBy:null });
+  mv.revBy = rid;
+  var s = STOCK.filter(function(x){ return x.bin === mv.to && x.code === mv.code; })[0];
+  if(s) s.qty = Math.max(0, s.qty - mv.qty);
+  addStock(mv.from, mv.code, mv.name, mv.qty);
+  var t = taskOf(mv.task);
+  if(t){ t.done = Math.max(0, t.done - mv.qty); if(t.status === 'done') t.status = 'wait'; }
+  emitCsq('putaway_reversed', { task:mv.task, reversal_of:mv.id, qty:mv.qty, reason:state.mReason });
+  closeModal();
+  setTimeout(function(){ render(); showToast('กลับรายการแล้ว — รายการเดิมยังอยู่ในประวัติ และงานกลับเข้าคิว', 'success'); }, 210);
+}
+
+/* ======================= BOOT ======================= */
+function boot(){ render(); renderIcons(); }
+if(document.readyState === 'loading'){ window.addEventListener('DOMContentLoaded', boot); } else { boot(); }
+</script>
+<style id="page-late">/* late additions เท่านั้น (#69) — ห้าม inline */</style>
+<!-- PREFLIGHT v6.4
+  round1: spacing-off=0 font-sizes=8 flex-noalign=0 inline-layout=0 z-adhoc=0 hex-off=0
+  round2: 7/7 checked
+  date: 2026-09-10 -->
+</body>
+</html>
