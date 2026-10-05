@@ -1,0 +1,5 @@
+# S3b Workflow gate · Cycle
+PASS for authored local workflow and isolated domain logic, with browser/production excluded. `_lane_tools/test_cycle.js` ran 12/12 assertions against the injected JS VM: default value AABC, optional weighted rank, tie/zero/changed policy, Jan31 month-end, blind counter projection, blank vs zero, reviewer-only comparison, zero/no StockAdj, +4 after review mock, recount latest −1, box snapshot conversion+12, idempotency/unassigned guard. FN01–09 and S01–10 map to actual functions `cySavePolicy`, `cyClassify`, `cyCreatePlan`, `cyCounterProjection`, `cySubmit`, `cyReview`, `cyDispatchAdjustment`, `cyEvents`, `cyRows`. No claim of UI clicks, server redaction, Inventory/StockAdj posting or CSQ execution. Counter API projection is a production contract (local fixture still stores expected in JS memory).
+
+## Re-gate round 2
+13/13 isolated assertions. Added Oct01 future policy fixture: Sep20 plan keeps ABC-01/class A; Oct02 uses new ABC-02/class B; current Sep14 list remains old; old session policy snapshot unchanged.

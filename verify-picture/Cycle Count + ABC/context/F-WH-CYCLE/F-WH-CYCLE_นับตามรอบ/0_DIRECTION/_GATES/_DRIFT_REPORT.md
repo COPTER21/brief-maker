@@ -1,0 +1,2 @@
+# HTML-to-FRD sync · Cycle round2
+Input: frozen round1→round2 authored HTML and FRD 00–08/BRD/RIF. D-001 corrected existing effective-date business requirement; it is no new business scope. Surgical updates to FRD 01_UI,02_API,03_LOGIC,07_LOCKED, UI Brief, CTX and TC. No other layout/field/state/permission drift introduced. The old local behavior was a defect; production contract still requires server effective-policy lookup. 13/13 isolated tests, browser WARN. No human clarification under W4 default rule.

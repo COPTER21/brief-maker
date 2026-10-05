@@ -1,0 +1,1316 @@
+{
+  "meta": {
+    "feature_id": "F-WH-QHOLD",
+    "title": "แบบทดสอบกักคุณภาพ",
+    "crumb": "Warehouse · Quality Hold",
+    "code": "F-WH-QHOLD · เวอร์ชัน 1.0",
+    "footer": "F-WH-QHOLD · AI 100% · ผลบันทึกในเครื่องนี้",
+    "report_sub": "กักคุณภาพ · รหัสฟีเจอร์ F-WH-QHOLD"
+  },
+  "groups": [
+    {
+      "id": "hold",
+      "name": "ขอกัก"
+    },
+    {
+      "id": "decision",
+      "name": "ผล DOA จำลอง"
+    },
+    {
+      "id": "release",
+      "name": "ปล่อยกัก"
+    },
+    {
+      "id": "validation",
+      "name": "ตรวจจำนวน"
+    },
+    {
+      "id": "doa",
+      "name": "เลือกผู้อนุมัติ"
+    },
+    {
+      "id": "source",
+      "name": "แหล่งอ้างอิง"
+    },
+    {
+      "id": "availability",
+      "name": "ATP"
+    },
+    {
+      "id": "history",
+      "name": "ประวัติ"
+    },
+    {
+      "id": "list",
+      "name": "รายการ"
+    },
+    {
+      "id": "system",
+      "name": "ระบบ/สัญญา"
+    }
+  ],
+  "data": {
+    "A": {
+      "rows": [
+        [
+          "Slice",
+          "SL-001"
+        ],
+        [
+          "On-hand",
+          "100"
+        ],
+        [
+          "Reserved",
+          "10"
+        ],
+        [
+          "ATP baseline",
+          "90"
+        ]
+      ]
+    },
+    "B": {
+      "rows": [
+        [
+          "Hold",
+          "30"
+        ],
+        [
+          "Pending ATP",
+          "60"
+        ],
+        [
+          "Approved ATP",
+          "60"
+        ]
+      ]
+    },
+    "C": {
+      "rows": [
+        [
+          "Release",
+          "12"
+        ],
+        [
+          "Approved ATP",
+          "72"
+        ]
+      ]
+    }
+  },
+  "cases": [
+    {
+      "id": "TC-001",
+      "grp": "hold",
+      "pri": "high",
+      "title": "กักบางส่วนทำให้ pending block ATP",
+      "why": "ตรวจผล: กักบางส่วนทำให้ pending block ATP",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต fixture SL-001: onHand100, จองขาย10, กักมีผล0, รอกัก0, ATP90; maker Warehouse WH-01",
+      "data": null,
+      "pass": "toast ส่งคำขอรออนุมัติแล้ว; สถานะรออนุมัติ, รอกัก30, กักมีผล0, ATP60, On-hand100",
+      "steps": [
+        [
+          "เปิดแท็บ รายการกัก",
+          "`#/records`",
+          "เห็นแถว SL-001 และ ATP90",
+          ""
+        ],
+        [
+          "คลิก เพิ่มการกัก แล้วเลือก SL-001",
+          "สินค้า ITEM-101 / LOT-001",
+          "drawer แสดง On-hand100 / จองขาย10 / ATP90 / กักได้90",
+          ""
+        ],
+        [
+          "กรอก จำนวน / ที่มา / เหตุผล",
+          "30 / พบปัญหาภายหลัง / QC pending",
+          "แสดงจำนวน30และเหตุผล",
+          ""
+        ],
+        [
+          "เลือกผู้อนุมัติสองช่อง",
+          "PERSON-01 ผู้ตรวจคุณภาพ และ PERSON-03 หัวหน้าคลัง",
+          "เห็นชื่อ ตำแหน่ง แผนก และ DEMO",
+          ""
+        ],
+        [
+          "คลิก ส่งคำขอ",
+          "—",
+          "toast ส่งคำขอรออนุมัติแล้ว; สถานะรออนุมัติ, รอกัก30, กักมีผล0, ATP60, On-hand100",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-002",
+      "grp": "decision",
+      "pri": "high",
+      "title": "อนุมัติกักโดยจำลอง DOA",
+      "why": "ตรวจผล: อนุมัติกักโดยจำลอง DOA",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "ต่อจาก TC-001; QH-001 requested, pendingHeld30, ATP60",
+      "data": null,
+      "pass": "toast ผลอนุมัติจำลอง; กลับรายการกัก activeHeld30,pendingHeld0,ATP60,onHand100",
+      "steps": [
+        [
+          "เปิดแท็บ รออนุมัติ",
+          "`#/history`",
+          "เห็น QH-001 จำนวน30",
+          ""
+        ],
+        [
+          "คลิกคำขอ QH-001",
+          "—",
+          "drawer แสดงผู้อนุมัติสองคนและ DEMO",
+          ""
+        ],
+        [
+          "คลิก จำลองอนุมัติ",
+          "—",
+          "toast ผลอนุมัติจำลอง; กลับรายการกัก activeHeld30,pendingHeld0,ATP60,onHand100",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-003",
+      "grp": "decision",
+      "pri": "high",
+      "title": "ไม่อนุมัติกักคืน ATP",
+      "why": "ตรวจผล: ไม่อนุมัติกักคืน ATP",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต baseline แล้วทำ TC-001 เท่านั้น",
+      "data": null,
+      "pass": "คำขอ rejected, pendingHeld0,activeHeld0,ATP90,onHand100; event เพิ่มหนึ่ง",
+      "steps": [
+        [
+          "เปิด รออนุมัติ และคลิก QH-001",
+          "—",
+          "เห็น requested และ ATP60",
+          ""
+        ],
+        [
+          "คลิก จำลองไม่อนุมัติ",
+          "—",
+          "คำขอ rejected, pendingHeld0,activeHeld0,ATP90,onHand100; event เพิ่มหนึ่ง",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-004",
+      "grp": "release",
+      "pri": "high",
+      "title": "ขอปล่อย12 ไม่เพิ่ม ATP ก่อนอนุมัติ",
+      "why": "ตรวจผล: ขอปล่อย12 ไม่เพิ่ม ATP ก่อนอนุมัติ",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต baseline; ทำ TC-001→TC-002; activeHeld30,ATP60",
+      "data": null,
+      "pass": "requested release12; pendingRelease12, releasable18,activeHeld30,ATP60",
+      "steps": [
+        [
+          "เปิด รายการกัก แล้วคลิก SL-001",
+          "—",
+          "เห็น กักมีผล30, ปล่อยได้30, ATP60",
+          ""
+        ],
+        [
+          "คลิก ขอปล่อยกัก",
+          "—",
+          "drawer แสดง จำนวน และผู้อนุมัติ",
+          ""
+        ],
+        [
+          "กรอกจำนวน/เหตุผล/ที่มา",
+          "12 / ตรวจผ่าน / พบปัญหาภายหลัง",
+          "จำนวน12",
+          ""
+        ],
+        [
+          "เลือก PERSON-01 และ PERSON-03 แล้วคลิก ส่งคำขอ",
+          "—",
+          "requested release12; pendingRelease12, releasable18,activeHeld30,ATP60",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-005",
+      "grp": "release",
+      "pri": "high",
+      "title": "อนุมัติปล่อย12 เพิ่ม ATP ครั้งเดียว",
+      "why": "ตรวจผล: อนุมัติปล่อย12 เพิ่ม ATP ครั้งเดียว",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "ต่อจาก TC-004; activeHeld30,pendingRelease12,ATP60",
+      "data": null,
+      "pass": "activeHeld18,pendingRelease0,ATP72,onHand100; event release.approved เพิ่มหนึ่ง",
+      "steps": [
+        [
+          "เปิด รออนุมัติ แล้วคลิกคำขอปล่อย",
+          "—",
+          "เห็นจำนวน12และ DEMO",
+          ""
+        ],
+        [
+          "คลิก จำลองอนุมัติ",
+          "—",
+          "activeHeld18,pendingRelease0,ATP72,onHand100; event release.approved เพิ่มหนึ่ง",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-006",
+      "grp": "release",
+      "pri": "high",
+      "title": "ปฏิเสธปล่อยคง held เดิม",
+      "why": "ตรวจผล: ปฏิเสธปล่อยคง held เดิม",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต; ทำ TC-001→TC-002→TC-004",
+      "data": null,
+      "pass": "activeHeld30,pendingRelease0,releasable30,ATP60",
+      "steps": [
+        [
+          "เปิดคำขอปล่อย12ใน รออนุมัติ",
+          "—",
+          "requested",
+          ""
+        ],
+        [
+          "คลิก จำลองไม่อนุมัติ",
+          "—",
+          "activeHeld30,pendingRelease0,releasable30,ATP60",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-007",
+      "grp": "validation",
+      "pri": "high",
+      "title": "ปฏิเสธกักจำนวน 91",
+      "why": "ตรวจผล: ปฏิเสธกักจำนวน 91",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต fixture SL-001: onHand100, จองขาย10, กักมีผล0, รอกัก0, ATP90; maker Warehouse WH-01",
+      "data": null,
+      "pass": "จำนวนกักเกินยอดที่กักได้; ไม่มีคำขอใหม่,ATP90,onHand100",
+      "steps": [
+        [
+          "เปิด เพิ่มการกัก เลือก SL-001/คนครบ",
+          "—",
+          "drawer เปิดและมี ATP90",
+          ""
+        ],
+        [
+          "กรอก จำนวนแล้วส่งคำขอ",
+          "91",
+          "จำนวนกักเกินยอดที่กักได้; ไม่มีคำขอใหม่,ATP90,onHand100",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-008",
+      "grp": "validation",
+      "pri": "high",
+      "title": "ปฏิเสธกักจำนวน 0",
+      "why": "ตรวจผล: ปฏิเสธกักจำนวน 0",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต fixture SL-001: onHand100, จองขาย10, กักมีผล0, รอกัก0, ATP90; maker Warehouse WH-01",
+      "data": null,
+      "pass": "จำนวนต้องมากกว่า 0; ไม่มีคำขอใหม่,ATP90,onHand100",
+      "steps": [
+        [
+          "เปิด เพิ่มการกัก เลือก SL-001/คนครบ",
+          "—",
+          "drawer เปิดและมี ATP90",
+          ""
+        ],
+        [
+          "กรอก จำนวนแล้วส่งคำขอ",
+          "0",
+          "จำนวนต้องมากกว่า 0; ไม่มีคำขอใหม่,ATP90,onHand100",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-009",
+      "grp": "validation",
+      "pri": "high",
+      "title": "ปฏิเสธกักจำนวน -1",
+      "why": "ตรวจผล: ปฏิเสธกักจำนวน -1",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต fixture SL-001: onHand100, จองขาย10, กักมีผล0, รอกัก0, ATP90; maker Warehouse WH-01",
+      "data": null,
+      "pass": "จำนวนต้องมากกว่า 0; ไม่มีคำขอใหม่,ATP90,onHand100",
+      "steps": [
+        [
+          "เปิด เพิ่มการกัก เลือก SL-001/คนครบ",
+          "—",
+          "drawer เปิดและมี ATP90",
+          ""
+        ],
+        [
+          "กรอก จำนวนแล้วส่งคำขอ",
+          "-1",
+          "จำนวนต้องมากกว่า 0; ไม่มีคำขอใหม่,ATP90,onHand100",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-010",
+      "grp": "validation",
+      "pri": "high",
+      "title": "ปฏิเสธกักจำนวน 1.5",
+      "why": "ตรวจผล: ปฏิเสธกักจำนวน 1.5",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต fixture SL-001: onHand100, จองขาย10, กักมีผล0, รอกัก0, ATP90; maker Warehouse WH-01",
+      "data": null,
+      "pass": "จำนวนต้องมากกว่า 0 และตรงหน่วยนับ; ไม่มีคำขอใหม่,ATP90,onHand100",
+      "steps": [
+        [
+          "เปิด เพิ่มการกัก เลือก SL-001/คนครบ",
+          "—",
+          "drawer เปิดและมี ATP90",
+          ""
+        ],
+        [
+          "กรอก จำนวนแล้วส่งคำขอ",
+          "1.5",
+          "จำนวนต้องมากกว่า 0 และตรงหน่วยนับ; ไม่มีคำขอใหม่,ATP90,onHand100",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-011",
+      "grp": "validation",
+      "pri": "high",
+      "title": "จำนวนว่างต้องไม่แปลงเป็น0",
+      "why": "ตรวจผล: จำนวนว่างต้องไม่แปลงเป็น0",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต fixture SL-001: onHand100, จองขาย10, กักมีผล0, รอกัก0, ATP90; maker Warehouse WH-01",
+      "data": null,
+      "pass": "เห็น error จำนวน; ไม่มี request/event เพิ่ม",
+      "steps": [
+        [
+          "เปิด เพิ่มการกัก เลือก SL-001/คนครบ",
+          "—",
+          "drawer เปิด",
+          ""
+        ],
+        [
+          "ปล่อยช่องจำนวนว่างแล้วคลิก ส่งคำขอ",
+          "ว่าง",
+          "เห็น error จำนวน; ไม่มี request/event เพิ่ม",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-012",
+      "grp": "validation",
+      "pri": "high",
+      "title": "กักได้90 และกักเพิ่ม1ถูกปฏิเสธ",
+      "why": "ตรวจผล: กักได้90 และกักเพิ่ม1ถูกปฏิเสธ",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต fixture SL-001: onHand100, จองขาย10, กักมีผล0, รอกัก0, ATP90; maker Warehouse WH-01",
+      "data": null,
+      "pass": "จำนวนกักเกินยอดที่กักได้; ไม่มีคำขอที่สอง",
+      "steps": [
+        [
+          "ส่งคำขอกัก90พร้อมคนครบ",
+          "90",
+          "pendingHeld90,ATP0",
+          ""
+        ],
+        [
+          "เปิดคำขอกักใหม่และกรอก1",
+          "1",
+          "จำนวนกักเกินยอดที่กักได้; ไม่มีคำขอที่สอง",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-013",
+      "grp": "validation",
+      "pri": "high",
+      "title": "ขอบเขตปล่อย 31",
+      "why": "ตรวจผล: ขอบเขตปล่อย 31",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต; ทำ TC-001→TC-002 activeHeld30 ATP60",
+      "data": null,
+      "pass": "จำนวนปล่อยเกินยอดที่ปล่อยได้",
+      "steps": [
+        [
+          "คลิก SL-001 แล้ว ขอปล่อยกัก",
+          "—",
+          "ปล่อยได้30",
+          ""
+        ],
+        [
+          "กรอกจำนวน/เหตุผล/เลือกคนครบแล้วส่ง",
+          "31",
+          "จำนวนปล่อยเกินยอดที่ปล่อยได้",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-014",
+      "grp": "validation",
+      "pri": "high",
+      "title": "ขอบเขตปล่อย 0",
+      "why": "ตรวจผล: ขอบเขตปล่อย 0",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต; ทำ TC-001→TC-002 activeHeld30 ATP60",
+      "data": null,
+      "pass": "จำนวนต้องมากกว่า 0",
+      "steps": [
+        [
+          "คลิก SL-001 แล้ว ขอปล่อยกัก",
+          "—",
+          "ปล่อยได้30",
+          ""
+        ],
+        [
+          "กรอกจำนวน/เหตุผล/เลือกคนครบแล้วส่ง",
+          "0",
+          "จำนวนต้องมากกว่า 0",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-015",
+      "grp": "validation",
+      "pri": "high",
+      "title": "ขอบเขตปล่อย 30",
+      "why": "ตรวจผล: ขอบเขตปล่อย 30",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต; ทำ TC-001→TC-002 activeHeld30 ATP60",
+      "data": null,
+      "pass": "requested release30 ยัง ATP60; อนุมัติแล้ว activeHeld0,ATP90",
+      "steps": [
+        [
+          "คลิก SL-001 แล้ว ขอปล่อยกัก",
+          "—",
+          "ปล่อยได้30",
+          ""
+        ],
+        [
+          "กรอกจำนวน/เหตุผล/เลือกคนครบแล้วส่ง",
+          "30",
+          "requested release30 ยัง ATP60; อนุมัติแล้ว activeHeld0,ATP90",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-016",
+      "grp": "doa",
+      "pri": "high",
+      "title": "ขาดผู้อนุมัติช่องที่สอง",
+      "why": "ตรวจผล: ขาดผู้อนุมัติช่องที่สอง",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต fixture SL-001: onHand100, จองขาย10, กักมีผล0, รอกัก0, ATP90; maker Warehouse WH-01",
+      "data": null,
+      "pass": "เห็น เลือกคนให้ครบทุกช่องอนุมัติ; ATP90 ไม่มีคำขอ",
+      "steps": [
+        [
+          "เปิด เพิ่มการกัก เลือก SL-001 จำนวน30 เหตุผลครบ",
+          "—",
+          "มีช่องผู้ตรวจคุณภาพ/ผู้รับรองคลัง",
+          ""
+        ],
+        [
+          "เลือก PERSON-01 ช่องแรก แล้วคลิกส่ง",
+          "ช่องสองว่าง",
+          "เห็น เลือกคนให้ครบทุกช่องอนุมัติ; ATP90 ไม่มีคำขอ",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-017",
+      "grp": "doa",
+      "pri": "high",
+      "title": "ผู้ไม่อยู่ในรายชื่อเลือกไม่ได้",
+      "why": "ตรวจผล: ผู้ไม่อยู่ในรายชื่อเลือกไม่ได้",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต fixture SL-001: onHand100, จองขาย10, กักมีผล0, รอกัก0, ATP90; maker Warehouse WH-01",
+      "data": null,
+      "pass": "ไม่พบตัวเลือก PERSON-04 ในช่องนั้น; ไม่สามารถส่งด้วยผู้ไม่เข้าเกณฑ์",
+      "steps": [
+        [
+          "เปิดเพิ่มการกัก เลือก SL-001 จำนวน30",
+          "—",
+          "เห็น picker",
+          ""
+        ],
+        [
+          "ค้น PERSON-04 ในช่องผู้ตรวจคุณภาพ",
+          "PERSON-04",
+          "ไม่พบตัวเลือก PERSON-04 ในช่องนั้น; ไม่สามารถส่งด้วยผู้ไม่เข้าเกณฑ์",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-018",
+      "grp": "doa",
+      "pri": "high",
+      "title": "ชื่อจริง/ตำแหน่ง/แผนกและ DEMO",
+      "why": "ตรวจผล: ชื่อจริง/ตำแหน่ง/แผนกและ DEMO",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต fixture SL-001: onHand100, จองขาย10, กักมีผล0, รอกัก0, ATP90; maker Warehouse WH-01",
+      "data": null,
+      "pass": "ช่องแสดงชื่อและตำแหน่ง; ไม่มี role-ID เป็นตัวเลือก",
+      "steps": [
+        [
+          "เปิด เพิ่มการกัก เลือก SL-001 จำนวน30",
+          "—",
+          "ช่องผู้อนุมัติปรากฏ",
+          ""
+        ],
+        [
+          "เปิด picker ทั้งสอง",
+          "—",
+          "แต่ละตัวเลือกแสดง initials avatar, ชื่อ, ตำแหน่ง, แผนก; badge DEMO",
+          ""
+        ],
+        [
+          "เลือก PERSON-01 และ PERSON-03",
+          "—",
+          "ช่องแสดงชื่อและตำแหน่ง; ไม่มี role-ID เป็นตัวเลือก",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-019",
+      "grp": "source",
+      "pri": "med",
+      "title": "GRN QC ต้องมีอ้างอิง",
+      "why": "ตรวจผล: GRN QC ต้องมีอ้างอิง",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต fixture SL-001: onHand100, จองขาย10, กักมีผล0, รอกัก0, ATP90; maker Warehouse WH-01",
+      "data": null,
+      "pass": "ระบุอ้างอิง GRN QC; ไม่มีคำขอ",
+      "steps": [
+        [
+          "เปิด เพิ่มการกัก เลือก SL-001 จำนวน10 และคนครบ",
+          "—",
+          "drawer เปิด",
+          ""
+        ],
+        [
+          "เลือกที่มา ตรวจรับ GRN QC เว้นอ้างอิง",
+          "—",
+          "ระบุอ้างอิง GRN QC; ไม่มีคำขอ",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-020",
+      "grp": "source",
+      "pri": "med",
+      "title": "GRN QC mock ref ถูก snapshot",
+      "why": "ตรวจผล: GRN QC mock ref ถูก snapshot",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต fixture SL-001: onHand100, จองขาย10, กักมีผล0, รอกัก0, ATP90; maker Warehouse WH-01",
+      "data": null,
+      "pass": "เห็นอ้างอิง GRN-2609-014; onHand ไม่เปลี่ยน",
+      "steps": [
+        [
+          "ส่งกัก10 ที่มา ตรวจรับ GRN QC",
+          "GRN-2609-014 + เหตุผล + คนครบ",
+          "requested; ไม่มีการรับสินค้าใหม่",
+          ""
+        ],
+        [
+          "เปิด รออนุมัติ คลิกคำขอ",
+          "—",
+          "เห็นอ้างอิง GRN-2609-014; onHand ไม่เปลี่ยน",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-021",
+      "grp": "source",
+      "pri": "med",
+      "title": "พบปัญหาภายหลังไม่ต้อง GRN ref",
+      "why": "ตรวจผล: พบปัญหาภายหลังไม่ต้อง GRN ref",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต fixture SL-001: onHand100, จองขาย10, กักมีผล0, รอกัก0, ATP90; maker Warehouse WH-01",
+      "data": null,
+      "pass": "requested; sourceRef null,ATP80",
+      "steps": [
+        [
+          "เปิด เพิ่มการกัก SL-001 จำนวน10",
+          "ที่มา พบปัญหาภายหลัง; อ้างอิงว่าง",
+          "drawer ยอมให้ว่าง",
+          ""
+        ],
+        [
+          "กรอกเหตุผล/คนครบ แล้วส่ง",
+          "—",
+          "requested; sourceRef null,ATP80",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-022",
+      "grp": "source",
+      "pri": "med",
+      "title": "เหตุผลว่างถูกปฏิเสธ",
+      "why": "ตรวจผล: เหตุผลว่างถูกปฏิเสธ",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต fixture SL-001: onHand100, จองขาย10, กักมีผล0, รอกัก0, ATP90; maker Warehouse WH-01",
+      "data": null,
+      "pass": "ระบุเหตุผล; ไม่มีคำขอหรือ ATP change",
+      "steps": [
+        [
+          "เปิดเพิ่มการกัก SL-001 จำนวน10 คนครบ",
+          "เหตุผลว่าง",
+          "drawer เปิด",
+          ""
+        ],
+        [
+          "คลิก ส่งคำขอ",
+          "—",
+          "ระบุเหตุผล; ไม่มีคำขอหรือ ATP change",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-023",
+      "grp": "availability",
+      "pri": "med",
+      "title": "held30 ATP60 ปฏิเสธ outbound61",
+      "why": "ตรวจผล: held30 ATP60 ปฏิเสธ outbound61",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต; ทำ TC-001→TC-002; activeHeld30 ATP60",
+      "data": null,
+      "pass": "จำนวนนี้ใช้ไม่ได้ · พร้อมใช้ 60 · ยังไม่มีการขายหรือย้ายจริง",
+      "steps": [
+        [
+          "เปิด SL-001 drawer",
+          "—",
+          "เห็น ATP พร้อมใช้60",
+          ""
+        ],
+        [
+          "กรอก ตรวจจำนวนขาย/ย้ายที่ใช้ได้ แล้วคลิก ตรวจจำนวน",
+          "61",
+          "จำนวนนี้ใช้ไม่ได้ · พร้อมใช้ 60 · ยังไม่มีการขายหรือย้ายจริง",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-024",
+      "grp": "availability",
+      "pri": "med",
+      "title": "outbound60 ผ่านการตรวจแต่ไม่ขายจริง",
+      "why": "ตรวจผล: outbound60 ผ่านการตรวจแต่ไม่ขายจริง",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต; ทำ TC-001→TC-002",
+      "data": null,
+      "pass": "100/30/60 เท่าเดิม",
+      "steps": [
+        [
+          "เปิด SL-001 drawer แล้วกรอกตรวจจำนวน",
+          "60",
+          "จำนวนนี้พร้อมใช้ · พร้อมใช้ 60 · ยังไม่มีการขายหรือย้ายจริง",
+          ""
+        ],
+        [
+          "ดู On-hand/กัก/ATP อีกครั้ง",
+          "—",
+          "100/30/60 เท่าเดิม",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-025",
+      "grp": "availability",
+      "pri": "med",
+      "title": "อีกล็อตไม่ถูกกักตาม SL-001",
+      "why": "ตรวจผล: อีกล็อตไม่ถูกกักตาม SL-001",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต; ทำ TC-001→TC-002",
+      "data": null,
+      "pass": "activeHeld0,pendingHeld0; ATP คำนวณจาก SL-002 เอง ไม่รับ30จาก SL-001",
+      "steps": [
+        [
+          "ค้น SL-002 ในรายการกัก",
+          "SL-002",
+          "เห็นแถวอีก slice",
+          ""
+        ],
+        [
+          "คลิก SL-002",
+          "—",
+          "activeHeld0,pendingHeld0; ATP คำนวณจาก SL-002 เอง ไม่รับ30จาก SL-001",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-026",
+      "grp": "history",
+      "pri": "med",
+      "title": "ประวัติ append-only หลังคำขอและผล",
+      "why": "ตรวจผล: ประวัติ append-only หลังคำขอและผล",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต; ทำ TC-001→TC-002",
+      "data": null,
+      "pass": "เห็น actor/time/source/qty; ไม่มีปุ่มแก้ไขหรือลบ",
+      "steps": [
+        [
+          "เปิดแท็บ ประวัติ",
+          "`#/settings`",
+          "เห็น hold.requested และ hold.approved ผูก QH-001",
+          ""
+        ],
+        [
+          "คลิกแต่ละเหตุการณ์",
+          "—",
+          "เห็น actor/time/source/qty; ไม่มีปุ่มแก้ไขหรือลบ",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-027",
+      "grp": "history",
+      "pri": "med",
+      "title": "ค้นหาเหตุการณ์ตามคำขอ",
+      "why": "ตรวจผล: ค้นหาเหตุการณ์ตามคำขอ",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต; ทำ TC-001→TC-002",
+      "data": null,
+      "pass": "empty state; footer จำนวนตรงแถวที่เห็น",
+      "steps": [
+        [
+          "เปิด ประวัติ แล้วกรอกค้นหา",
+          "QH-001",
+          "เห็นเฉพาะเหตุการณ์ QH-001",
+          ""
+        ],
+        [
+          "กรอกค้นหา",
+          "ZZ-NO-REQUEST",
+          "empty state; footer จำนวนตรงแถวที่เห็น",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-028",
+      "grp": "list",
+      "pri": "med",
+      "title": "กรองสถานะรออนุมัติ",
+      "why": "ตรวจผล: กรองสถานะรออนุมัติ",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต; ทำ TC-001",
+      "data": null,
+      "pass": "ทุกแถวที่เห็นเป็นรออนุมัติ; footer ตรงจำนวน",
+      "steps": [
+        [
+          "เปิด รออนุมัติ",
+          "—",
+          "เห็น QH-001",
+          ""
+        ],
+        [
+          "กรองสถานะ รออนุมัติ",
+          "—",
+          "ทุกแถวที่เห็นเป็นรออนุมัติ; footer ตรงจำนวน",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-029",
+      "grp": "list",
+      "pri": "med",
+      "title": "ยกเลิก drawer ไม่เปลี่ยน ATP",
+      "why": "ตรวจผล: ยกเลิก drawer ไม่เปลี่ยน ATP",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต fixture SL-001: onHand100, จองขาย10, กักมีผล0, รอกัก0, ATP90; maker Warehouse WH-01",
+      "data": null,
+      "pass": "drawer ปิด; ATP90, ไม่มี request/event ใหม่",
+      "steps": [
+        [
+          "เปิด เพิ่มการกัก เลือก SL-001 กรอก30",
+          "—",
+          "drawer แสดงค่า",
+          ""
+        ],
+        [
+          "คลิก ยกเลิก",
+          "—",
+          "drawer ปิด; ATP90, ไม่มี request/event ใหม่",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-030",
+      "grp": "list",
+      "pri": "med",
+      "title": "สถิติตารางคำนวณจาก slice",
+      "why": "ตรวจผล: สถิติตารางคำนวณจาก slice",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต; ทำ TC-001→TC-002",
+      "data": null,
+      "pass": "เท่าผลรวม ATP ของทุก slice จากข้อมูล ไม่ใช่ค่าประมาณ",
+      "steps": [
+        [
+          "เปิด รายการกัก",
+          "—",
+          "stat ตำแหน่งสินค้า=จำนวน slice, กักมีผลรวม30, รอกักรวม0",
+          ""
+        ],
+        [
+          "ตรวจ ATP พร้อมใช้",
+          "—",
+          "เท่าผลรวม ATP ของทุก slice จากข้อมูล ไม่ใช่ค่าประมาณ",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-031",
+      "grp": "list",
+      "pri": "med",
+      "title": "แท็บอยู่ใต้หัวและ action ขวาบน",
+      "why": "ตรวจผล: แท็บอยู่ใต้หัวและ action ขวาบน",
+      "who": "Warehouse maker/reviewer · DEMO decision",
+      "pre": "รีเซ็ต fixture SL-001: onHand100, จองขาย10, กักมีผล0, รอกัก0, ATP90; maker Warehouse WH-01",
+      "data": null,
+      "pass": "tab row คงตำแหน่ง ไม่มี hint/banner",
+      "steps": [
+        [
+          "เปิด รายการกัก",
+          "—",
+          "tab row ใต้ page-head; เพิ่มการกักที่ action ขวาบน",
+          ""
+        ],
+        [
+          "เปิด รออนุมัติ/ประวัติ",
+          "—",
+          "tab row คงตำแหน่ง ไม่มี hint/banner",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-032",
+      "grp": "system",
+      "pri": "med",
+      "title": "same request key same body replay",
+      "why": "ตรวจผล: same request key same body replay",
+      "who": "integration tester",
+      "pre": "role=integration/backend tester; ต้อง simulate API/DOA/Inventory fixture; ห้ามนับว่า HTML ผ่าน",
+      "data": null,
+      "pass": "คืน requestId เดิม, projection/event ครั้งเดียว",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "key K1 body hold30",
+          "มี baseline ที่ระบุ",
+          ""
+        ],
+        [
+          "ส่ง API-03 ซ้ำ",
+          "key K1 body hold30",
+          "คืน requestId เดิม, projection/event ครั้งเดียว",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-033",
+      "grp": "system",
+      "pri": "med",
+      "title": "same key different body conflict",
+      "why": "ตรวจผล: same key different body conflict",
+      "who": "integration tester",
+      "pre": "role=integration/backend tester; ต้อง simulate API/DOA/Inventory fixture; ห้ามนับว่า HTML ผ่าน",
+      "data": null,
+      "pass": "IDEMPOTENCY_CONFLICT; no second reservation",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "key K1 body hold31",
+          "มี baseline ที่ระบุ",
+          ""
+        ],
+        [
+          "ส่ง API-03 ซ้ำต่าง qty",
+          "key K1 body hold31",
+          "IDEMPOTENCY_CONFLICT; no second reservation",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-034",
+      "grp": "system",
+      "pri": "med",
+      "title": "same DOA event replay",
+      "why": "ตรวจผล: same DOA event replay",
+      "who": "integration tester",
+      "pre": "role=integration/backend tester; ต้อง simulate API/DOA/Inventory fixture; ห้ามนับว่า HTML ผ่าน",
+      "data": null,
+      "pass": "held30/ATP60 เท่าเดิม; applied event เดียว",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "approve QH-001",
+          "มี baseline ที่ระบุ",
+          ""
+        ],
+        [
+          "ส่ง API-04 sourceEventId E1 ซ้ำ",
+          "approve QH-001",
+          "held30/ATP60 เท่าเดิม; applied event เดียว",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-035",
+      "grp": "system",
+      "pri": "med",
+      "title": "decision after rejected blocked",
+      "why": "ตรวจผล: decision after rejected blocked",
+      "who": "integration tester",
+      "pre": "role=integration/backend tester; ต้อง simulate API/DOA/Inventory fixture; ห้ามนับว่า HTML ผ่าน",
+      "data": null,
+      "pass": "INVALID_TRANSITION; ATP90 ไม่เปลี่ยน",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "QH-001 rejected",
+          "มี baseline ที่ระบุ",
+          ""
+        ],
+        [
+          "ส่ง API-04 approve หลัง reject",
+          "QH-001 rejected",
+          "INVALID_TRANSITION; ATP90 ไม่เปลี่ยน",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-036",
+      "grp": "system",
+      "pri": "med",
+      "title": "concurrent release stale version",
+      "why": "ตรวจผล: concurrent release stale version",
+      "who": "integration tester",
+      "pre": "role=integration/backend tester; ต้อง simulate API/DOA/Inventory fixture; ห้ามนับว่า HTML ผ่าน",
+      "data": null,
+      "pass": "รายแรก pending20; รายสอง VERSION_CONFLICT หรือ OVER_RELEASE; releasable10",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "release20 vs release15 held30 same version",
+          "มี baseline ที่ระบุ",
+          ""
+        ],
+        [
+          "ส่ง API-03 สอง writer",
+          "release20 vs release15 held30 same version",
+          "รายแรก pending20; รายสอง VERSION_CONFLICT หรือ OVER_RELEASE; releasable10",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-037",
+      "grp": "system",
+      "pri": "med",
+      "title": "cross-tenant slice denied",
+      "why": "ตรวจผล: cross-tenant slice denied",
+      "who": "integration tester",
+      "pre": "role=integration/backend tester; ต้อง simulate API/DOA/Inventory fixture; ห้ามนับว่า HTML ผ่าน",
+      "data": null,
+      "pass": "403 ACCESS_DENIED, no disclosure/mutation",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "slice SL-X",
+          "มี baseline ที่ระบุ",
+          ""
+        ],
+        [
+          "อ่าน/เขียน API-01/03 tenant อื่น",
+          "slice SL-X",
+          "403 ACCESS_DENIED, no disclosure/mutation",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-038",
+      "grp": "system",
+      "pri": "med",
+      "title": "maker cannot decide via UI/API",
+      "why": "ตรวจผล: maker cannot decide via UI/API",
+      "who": "integration tester",
+      "pre": "role=integration/backend tester; ต้อง simulate API/DOA/Inventory fixture; ห้ามนับว่า HTML ผ่าน",
+      "data": null,
+      "pass": "403; adapter-only external signed event",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "approve own request",
+          "มี baseline ที่ระบุ",
+          ""
+        ],
+        [
+          "เรียก API-04 จาก maker client",
+          "approve own request",
+          "403; adapter-only external signed event",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-039",
+      "grp": "system",
+      "pri": "med",
+      "title": "DOA policy unavailable no request",
+      "why": "ตรวจผล: DOA policy unavailable no request",
+      "who": "integration tester",
+      "pre": "role=integration/backend tester; ต้อง simulate API/DOA/Inventory fixture; ห้ามนับว่า HTML ผ่าน",
+      "data": null,
+      "pass": "503/retryable; no request/projection/false approval",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "hold30",
+          "มี baseline ที่ระบุ",
+          ""
+        ],
+        [
+          "จำลอง API-02 unavailable",
+          "hold30",
+          "503/retryable; no request/projection/false approval",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-040",
+      "grp": "system",
+      "pri": "med",
+      "title": "GRN mock only",
+      "why": "ตรวจผล: GRN mock only",
+      "who": "integration tester",
+      "pre": "role=integration/backend tester; ต้อง simulate API/DOA/Inventory fixture; ห้ามนับว่า HTML ผ่าน",
+      "data": null,
+      "pass": "request source snapshot only; W3 GRN count/onHand unchanged",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "hold30",
+          "มี baseline ที่ระบุ",
+          ""
+        ],
+        [
+          "ส่ง hold with GRN-2609-014 ref",
+          "hold30",
+          "request source snapshot only; W3 GRN count/onHand unchanged",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-041",
+      "grp": "system",
+      "pri": "med",
+      "title": "NC/NTF candidate only",
+      "why": "ตรวจผล: NC/NTF candidate only",
+      "who": "integration tester",
+      "pre": "role=integration/backend tester; ต้อง simulate API/DOA/Inventory fixture; ห้ามนับว่า HTML ผ่าน",
+      "data": null,
+      "pass": "envelope once; no delivery/recipient/channel claim",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "inventory.quarantine_changed",
+          "มี baseline ที่ระบุ",
+          ""
+        ],
+        [
+          "capture outbox after approved hold",
+          "inventory.quarantine_changed",
+          "envelope once; no delivery/recipient/channel claim",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-042",
+      "grp": "system",
+      "pri": "med",
+      "title": "CSQ draft only",
+      "why": "ตรวจผล: CSQ draft only",
+      "who": "integration tester",
+      "pre": "role=integration/backend tester; ต้อง simulate API/DOA/Inventory fixture; ห้ามนับว่า HTML ผ่าน",
+      "data": null,
+      "pass": "facts once; no 7C stamp or registry",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "inventory.quarantine_changed",
+          "มี baseline ที่ระบุ",
+          ""
+        ],
+        [
+          "capture candidate after approved hold",
+          "inventory.quarantine_changed",
+          "facts once; no 7C stamp or registry",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-043",
+      "grp": "system",
+      "pri": "med",
+      "title": "availability consumer no transaction",
+      "why": "ตรวจผล: availability consumer no transaction",
+      "who": "integration tester",
+      "pre": "role=integration/backend tester; ต้อง simulate API/DOA/Inventory fixture; ห้ามนับว่า HTML ผ่าน",
+      "data": null,
+      "pass": "denied; sale/transfer records and movement unchanged",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "sell61 held30 ATP60",
+          "มี baseline ที่ระบุ",
+          ""
+        ],
+        [
+          "เรียก API-07 แล้วตรวจ downstream",
+          "sell61 held30 ATP60",
+          "denied; sale/transfer records and movement unchanged",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-044",
+      "grp": "system",
+      "pri": "med",
+      "title": "held request immutable and ledger unchanged",
+      "why": "ตรวจผล: held request immutable and ledger unchanged",
+      "who": "integration tester",
+      "pre": "role=integration/backend tester; ต้อง simulate API/DOA/Inventory fixture; ห้ามนับว่า HTML ผ่าน",
+      "data": null,
+      "pass": "movement rows byte-for-byte unchanged; qh_event append only",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "movement baseline snapshot",
+          "มี baseline ที่ระบุ",
+          ""
+        ],
+        [
+          "compare DB before/after hold+decision",
+          "movement baseline snapshot",
+          "movement rows byte-for-byte unchanged; qh_event append only",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-045",
+      "grp": "system",
+      "pri": "med",
+      "title": "release replay no ATP inflation",
+      "why": "ตรวจผล: release replay no ATP inflation",
+      "who": "integration tester",
+      "pre": "role=integration/backend tester; ต้อง simulate API/DOA/Inventory fixture; ห้ามนับว่า HTML ผ่าน",
+      "data": null,
+      "pass": "ATP90 ทั้งสองครั้ง, ไม่ใช่120; event ครั้งเดียว",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "held30→0",
+          "มี baseline ที่ระบุ",
+          ""
+        ],
+        [
+          "ส่ง approve release30 E2 ซ้ำ",
+          "held30→0",
+          "ATP90 ทั้งสองครั้ง, ไม่ใช่120; event ครั้งเดียว",
+          ""
+        ]
+      ],
+      "sys": true
+    }
+  ]
+}

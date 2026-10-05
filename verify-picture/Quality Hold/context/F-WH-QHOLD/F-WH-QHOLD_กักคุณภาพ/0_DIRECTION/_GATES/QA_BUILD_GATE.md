@@ -1,0 +1,2 @@
+# S6b QA-friendly HTML gate
+WARN: exact requested `กักคุณภาพ HTML Testcase.html` built self-contained from the same 45-case source as Markdown; 45 unique IDs, 10 groups, 14 sys/mock-only cases excluded from manual progress. Builder reports zero image regions and no missing references. Capture tool was attempted with system Python (PIL absent) and bundled Python (Playwright absent), so browser clicks, screenshot, print and visual layout are NOT-CHECKED. Empty shots_b64.json prevents incorrect images. Demo decisions are tagged and cannot certify actual DOA integration.

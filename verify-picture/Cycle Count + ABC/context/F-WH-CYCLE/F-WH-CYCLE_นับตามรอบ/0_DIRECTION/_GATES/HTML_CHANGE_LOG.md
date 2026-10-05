@@ -1,0 +1,2 @@
+# Cycle HTML post-freeze repair
+Round1 e68e250a5b7658d11e8378bdb34edfe816f0c4239842c26dd9b48238906519a5; round2 81cf096f802e8bf5e4593987c859069403613f85b922b8d987a77a04e616c6d2. Corrected effective-date resolver for current class and plan creation, aligned with BRD §8/§14 and FRD effective policy. Re-gates S3a FAIL0/WARN2, S3b13/13, S3c Playwright unavailable. html-to-frd-sync report and surgical FRD/TC/UI/CTX updates follow.

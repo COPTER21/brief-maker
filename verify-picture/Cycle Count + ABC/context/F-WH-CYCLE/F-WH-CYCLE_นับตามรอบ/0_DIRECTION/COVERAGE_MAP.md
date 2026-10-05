@@ -1,0 +1,2 @@
+# Coverage map · pre-HTML
+S-01–04 → FN-01/02 default/value-weighted config and deterministic boundaries. S-05 → FN-03 calendar due/snapshot. S-06 → FN-04/05 blind and zero. S-07–08 → FN-05/06/07 review gate and mock adjustment. S-09 → FN-04/05/06/08 recount latest attempt. S-10 → FN-03/07/08 conversion/idempotency/assignment. LOCK-01/09 shared UI/freezing, LOCK-06 mock boundary, LOCK-08 csq draft. S3 evidence must verify actual domain functions and visual WARN honestly. No source rule is accepted merely because text appears in settings.

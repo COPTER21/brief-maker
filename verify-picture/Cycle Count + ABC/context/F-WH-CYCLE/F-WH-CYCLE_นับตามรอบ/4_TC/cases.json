@@ -1,0 +1,1366 @@
+{
+  "meta": {
+    "feature_id": "F-WH-CYCLE",
+    "title": "แบบทดสอบนับตามรอบ",
+    "crumb": "Warehouse · Cycle Count + ABC",
+    "code": "F-WH-CYCLE · เวอร์ชัน 1.0",
+    "footer": "F-WH-CYCLE · AI 100% · ผลบันทึกในเครื่องนี้",
+    "report_sub": "นับตามรอบ · รหัสฟีเจอร์ F-WH-CYCLE"
+  },
+  "groups": [
+    {
+      "id": "abc",
+      "name": "จัดชั้น ABC"
+    },
+    {
+      "id": "plan",
+      "name": "แผนนับ"
+    },
+    {
+      "id": "blind",
+      "name": "นับแบบปิดยอด"
+    },
+    {
+      "id": "review",
+      "name": "ตรวจทาน"
+    },
+    {
+      "id": "recount",
+      "name": "นับใหม่"
+    },
+    {
+      "id": "uom",
+      "name": "หน่วยนับ"
+    },
+    {
+      "id": "list",
+      "name": "รายการและประวัติ"
+    },
+    {
+      "id": "system",
+      "name": "ระบบ/สัญญา"
+    }
+  ],
+  "data": {
+    "A": {
+      "rows": [
+        [
+          "ค่ามูลค่า",
+          "40/30/20/10"
+        ],
+        [
+          "เกณฑ์",
+          "A70 B20 C10"
+        ]
+      ]
+    },
+    "B": {
+      "rows": [
+        [
+          "CC-001",
+          "expected100, count104"
+        ],
+        [
+          "delta",
+          "+4 reviewer only"
+        ]
+      ]
+    },
+    "C": {
+      "rows": [
+        [
+          "CC-002",
+          "1box=12pcs"
+        ],
+        [
+          "count",
+          "3box=36pcs"
+        ]
+      ]
+    }
+  },
+  "cases": [
+    {
+      "id": "TC-001",
+      "grp": "abc",
+      "pri": "high",
+      "title": "ค่าเริ่มต้น ABC มูลค่า AABC",
+      "why": "ตรวจว่าค่าเริ่มต้น ABC มูลค่า AABC",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต fixture ABC: ITEM-101/102/103/104 มูลค่า40/30/20/10 ความถี่4/3/2/1; policy basis=value,A70/B20/C10; ผู้ตรวจนับ PERSON-COUNT-01; W3 mock only",
+      "data": null,
+      "pass": "40%,30%,20%,10%; ไม่มีคะแนนความถี่ปนค่าเริ่มต้น",
+      "steps": [
+        [
+          "เปิด จัดชั้น ABC",
+          "`#/records`",
+          "แถวเรียง ITEM-101/102/103/104, คะแนน40/30/20/10, คลาส A/A/B/C",
+          ""
+        ],
+        [
+          "ตรวจสัดส่วนจริง",
+          "—",
+          "40%,30%,20%,10%; ไม่มีคะแนนความถี่ปนค่าเริ่มต้น",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-002",
+      "grp": "abc",
+      "pri": "high",
+      "title": "ปรับสัดส่วน 40/40/20 ทำให้ class เปลี่ยน",
+      "why": "ตรวจว่าปรับสัดส่วน 40/40/20 ทำให้ class เปลี่ยน",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต fixture ABC: ITEM-101/102/103/104 มูลค่า40/30/20/10 ความถี่4/3/2/1; policy basis=value,A70/B20/C10; ผู้ตรวจนับ PERSON-COUNT-01; W3 mock only",
+      "data": null,
+      "pass": "toast บันทึกเกณฑ์ ABC แล้ว; คลาส A/B/B/C และ policy version ใหม่",
+      "steps": [
+        [
+          "คลิก แก้เกณฑ์ ABC",
+          "—",
+          "drawer แสดง basis, effective date, A/B/C, cadence",
+          ""
+        ],
+        [
+          "กรอก A/B/C และบันทึก",
+          "40/40/20",
+          "toast บันทึกเกณฑ์ ABC แล้ว; คลาส A/B/B/C และ policy version ใหม่",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-003",
+      "grp": "abc",
+      "pri": "high",
+      "title": "สัดส่วนรวม105 ถูกปฏิเสธ",
+      "why": "ตรวจว่าสัดส่วนรวม105 ถูกปฏิเสธ",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต fixture ABC: ITEM-101/102/103/104 มูลค่า40/30/20/10 ความถี่4/3/2/1; policy basis=value,A70/B20/C10; ผู้ตรวจนับ PERSON-COUNT-01; W3 mock only",
+      "data": null,
+      "pass": "เห็น สัดส่วน A/B/C ต้องรวม 100; version และคลาสเดิมไม่เปลี่ยน",
+      "steps": [
+        [
+          "เปิด แก้เกณฑ์ ABC",
+          "—",
+          "drawer เปิด",
+          ""
+        ],
+        [
+          "กรอก A/B/C แล้วบันทึก",
+          "70/25/10",
+          "เห็น สัดส่วน A/B/C ต้องรวม 100; version และคลาสเดิมไม่เปลี่ยน",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-004",
+      "grp": "abc",
+      "pri": "high",
+      "title": "โหมดคะแนนมูลค่า×ความถี่",
+      "why": "ตรวจว่าโหมดคะแนนมูลค่า×ความถี่",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต fixture ABC: ITEM-101/102/103/104 มูลค่า40/30/20/10 ความถี่4/3/2/1; policy basis=value,A70/B20/C10; ผู้ตรวจนับ PERSON-COUNT-01; W3 mock only",
+      "data": null,
+      "pass": "คะแนน ITEM-101/102/103/104 เป็น160/90/40/10, ไม่เรียกคะแนนว่าเงิน; policy version ใหม่",
+      "steps": [
+        [
+          "เปิด แก้เกณฑ์ ABC",
+          "—",
+          "basis มูลค่าเริ่มต้น",
+          ""
+        ],
+        [
+          "เลือก มูลค่า × ความถี่ แล้วบันทึก",
+          "A70/B20/C10",
+          "คะแนน ITEM-101/102/103/104 เป็น160/90/40/10, ไม่เรียกคะแนนว่าเงิน; policy version ใหม่",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-005",
+      "grp": "abc",
+      "pri": "high",
+      "title": "เปลี่ยนกลับ basis มูลค่า",
+      "why": "ตรวจว่าเปลี่ยนกลับ basis มูลค่า",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "ต่อจาก TC-004",
+      "data": null,
+      "pass": "คะแนนกลับ40/30/20/10, คลาส A/A/B/C; version ก่อนยังอยู่ audit",
+      "steps": [
+        [
+          "เปิด แก้เกณฑ์ ABC แล้วเลือก มูลค่า",
+          "—",
+          "basis มูลค่า",
+          ""
+        ],
+        [
+          "บันทึก",
+          "—",
+          "คะแนนกลับ40/30/20/10, คลาส A/A/B/C; version ก่อนยังอยู่ audit",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-006",
+      "grp": "abc",
+      "pri": "high",
+      "title": "วันที่เริ่มใช้ไม่ถูกต้อง",
+      "why": "ตรวจว่าวันที่เริ่มใช้ไม่ถูกต้อง",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต fixture ABC: ITEM-101/102/103/104 มูลค่า40/30/20/10 ความถี่4/3/2/1; policy basis=value,A70/B20/C10; ผู้ตรวจนับ PERSON-COUNT-01; W3 mock only",
+      "data": null,
+      "pass": "เห็น วันที่เริ่มใช้ไม่ถูกต้อง; ไม่เพิ่ม version",
+      "steps": [
+        [
+          "เปิด แก้เกณฑ์ ABC",
+          "—",
+          "มีช่องวันที่",
+          ""
+        ],
+        [
+          "ลบวันที่และบันทึก",
+          "วันที่ว่าง",
+          "เห็น วันที่เริ่มใช้ไม่ถูกต้อง; ไม่เพิ่ม version",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-007",
+      "grp": "abc",
+      "pri": "high",
+      "title": "รอบนับต้องเป็นบวก",
+      "why": "ตรวจว่ารอบนับต้องเป็นบวก",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต fixture ABC: ITEM-101/102/103/104 มูลค่า40/30/20/10 ความถี่4/3/2/1; policy basis=value,A70/B20/C10; ผู้ตรวจนับ PERSON-COUNT-01; W3 mock only",
+      "data": null,
+      "pass": "เห็น ช่วงเวลาและรอบนับต้องมากกว่า 0; policy เดิมคงอยู่",
+      "steps": [
+        [
+          "เปิด แก้เกณฑ์ ABC",
+          "—",
+          "รอบ A/B/C 1/3/6",
+          ""
+        ],
+        [
+          "กรอก รอบ A=0 แล้วบันทึก",
+          "0/3/6",
+          "เห็น ช่วงเวลาและรอบนับต้องมากกว่า 0; policy เดิมคงอยู่",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-008",
+      "grp": "plan",
+      "pri": "med",
+      "title": "สร้างแผน A จาก Jan31",
+      "why": "ตรวจว่าสร้างแผน A จาก Jan31",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต fixture ABC: ITEM-101/102/103/104 มูลค่า40/30/20/10 ความถี่4/3/2/1; policy basis=value,A70/B20/C10; ผู้ตรวจนับ PERSON-COUNT-01; W3 mock only",
+      "data": null,
+      "pass": "แถวใหม่ class A due2026-02-28 ผู้ตรวจนับ PERSON-COUNT-01; captured expected ไม่แสดงต่อ counter",
+      "steps": [
+        [
+          "เปิด แผนนับและงานนับ กด สร้างแผนนับ",
+          "—",
+          "drawer มีสินค้า/คลัง/ผู้ตรวจนับ/วันที่ล่าสุด",
+          ""
+        ],
+        [
+          "ค้นหาและเลือก ITEM-101",
+          "ITEM-101 WH-01; counter ปรียา; ล่าสุด2026-01-31",
+          "picker แสดงรหัสและชื่อสินค้า",
+          ""
+        ],
+        [
+          "คลิก สร้างแผน",
+          "—",
+          "แถวใหม่ class A due2026-02-28 ผู้ตรวจนับ PERSON-COUNT-01; captured expected ไม่แสดงต่อ counter",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-009",
+      "grp": "plan",
+      "pri": "med",
+      "title": "สร้างแผน B จาก Jan31",
+      "why": "ตรวจว่าสร้างแผน B จาก Jan31",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต fixture ABC: ITEM-101/102/103/104 มูลค่า40/30/20/10 ความถี่4/3/2/1; policy basis=value,A70/B20/C10; ผู้ตรวจนับ PERSON-COUNT-01; W3 mock only",
+      "data": null,
+      "pass": "แถว due2026-04-30",
+      "steps": [
+        [
+          "เปิด สร้างแผนนับ",
+          "—",
+          "drawer เปิด",
+          ""
+        ],
+        [
+          "เลือก ITEM-103 และวันที่ล่าสุด",
+          "2026-01-31",
+          "สินค้า ITEM-103 class B",
+          ""
+        ],
+        [
+          "คลิก สร้างแผน",
+          "—",
+          "แถว due2026-04-30",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-010",
+      "grp": "plan",
+      "pri": "med",
+      "title": "สร้างแผน C จาก Jan31",
+      "why": "ตรวจว่าสร้างแผน C จาก Jan31",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต fixture ABC: ITEM-101/102/103/104 มูลค่า40/30/20/10 ความถี่4/3/2/1; policy basis=value,A70/B20/C10; ผู้ตรวจนับ PERSON-COUNT-01; W3 mock only",
+      "data": null,
+      "pass": "แถว due2026-07-31",
+      "steps": [
+        [
+          "เปิด สร้างแผนนับ",
+          "—",
+          "drawer เปิด",
+          ""
+        ],
+        [
+          "เลือก ITEM-104 และวันที่ล่าสุด",
+          "2026-01-31",
+          "สินค้า ITEM-104 class C",
+          ""
+        ],
+        [
+          "คลิก สร้างแผน",
+          "—",
+          "แถว due2026-07-31",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-011",
+      "grp": "plan",
+      "pri": "med",
+      "title": "เปลี่ยนนโยบายไม่แก้ due ของแผนเก่า",
+      "why": "ตรวจว่าเปลี่ยนนโยบายไม่แก้ due ของแผนเก่า",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รัน TC-008 ก่อน จด due2026-02-28",
+      "data": null,
+      "pass": "policy snapshot/version และ due2026-02-28 เดิม",
+      "steps": [
+        [
+          "เปิด จัดชั้น ABC แก้ A/B/C",
+          "40/40/20",
+          "version ใหม่",
+          ""
+        ],
+        [
+          "กลับ แผนนับและงานนับ ดูแผนจาก TC-008",
+          "—",
+          "policy snapshot/version และ due2026-02-28 เดิม",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-012",
+      "grp": "blind",
+      "pri": "high",
+      "title": "ผู้ตรวจนับไม่เห็น expected ก่อนนับ",
+      "why": "ตรวจว่าผู้ตรวจนับไม่เห็น expected ก่อนนับ",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต fixture; role DEMO ผู้ตรวจนับ; CC-001 expected100 stored fixture",
+      "data": null,
+      "pass": "ไม่เห็น expected100, มูลค่า, ผลต่าง; DEMO badge แยกจาก user",
+      "steps": [
+        [
+          "เปิด แผนนับและงานนับ คลิก CC-001",
+          "—",
+          "เห็นสินค้า/ล็อต/ตำแหน่ง/หน่วย/กำหนด/สถานะ",
+          ""
+        ],
+        [
+          "ตรวจ drawer และตาราง",
+          "—",
+          "ไม่เห็น expected100, มูลค่า, ผลต่าง; DEMO badge แยกจาก user",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-013",
+      "grp": "blind",
+      "pri": "high",
+      "title": "จำนวนว่างส่งไม่ได้",
+      "why": "ตรวจว่าจำนวนว่างส่งไม่ได้",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "role DEMO ผู้ตรวจนับ; CC-001 assigned",
+      "data": null,
+      "pass": "เห็น กรอกจำนวนที่นับได้; ยัง assigned, ไม่มี attempt",
+      "steps": [
+        [
+          "คลิก CC-001 แล้ว บันทึกผลนับ",
+          "—",
+          "ช่องจำนวนว่าง",
+          ""
+        ],
+        [
+          "คลิก ส่งผลนับ",
+          "ว่าง",
+          "เห็น กรอกจำนวนที่นับได้; ยัง assigned, ไม่มี attempt",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-014",
+      "grp": "blind",
+      "pri": "high",
+      "title": "นับศูนย์ถูกต้องและ reviewer เห็นผลต่าง",
+      "why": "ตรวจว่านับศูนย์ถูกต้องและ reviewer เห็นผลต่าง",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "role DEMO ผู้ตรวจนับ; CC-001 expected100",
+      "data": null,
+      "pass": "เห็น expected100, counted0, delta−100",
+      "steps": [
+        [
+          "เปิด CC-001 บันทึกผลนับ",
+          "0",
+          "ช่องแสดง0",
+          ""
+        ],
+        [
+          "คลิก ส่งผลนับ",
+          "—",
+          "status รอตรวจ; counter ยังไม่เห็น expected/variance",
+          ""
+        ],
+        [
+          "สลับ DEMO ผู้ตรวจทาน เปิด ตรวจทานและประวัติ คลิก CC-001",
+          "—",
+          "เห็น expected100, counted0, delta−100",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-015",
+      "grp": "blind",
+      "pri": "high",
+      "title": "นับติดลบถูกปฏิเสธ",
+      "why": "ตรวจว่านับติดลบถูกปฏิเสธ",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "role DEMO ผู้ตรวจนับ; CC-001 assigned",
+      "data": null,
+      "pass": "เห็น กรอกจำนวนที่นับได้; ไม่มี attempt",
+      "steps": [
+        [
+          "เปิด CC-001 บันทึกผลนับ",
+          "−1",
+          "ช่องจำนวน",
+          ""
+        ],
+        [
+          "คลิก ส่งผลนับ",
+          "−1",
+          "เห็น กรอกจำนวนที่นับได้; ไม่มี attempt",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-016",
+      "grp": "review",
+      "pri": "high",
+      "title": "ส่งผลนับอย่างเดียวยังไม่มี StockAdj",
+      "why": "ตรวจว่าส่งผลนับอย่างเดียวยังไม่มี StockAdj",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "role DEMO ผู้ตรวจนับ; CC-001 expected100",
+      "data": null,
+      "pass": "เห็น delta+4 แต่ไม่มีปุ่ม ส่งผลต่าง ก่อนรับรอง",
+      "steps": [
+        [
+          "นับ104 แล้วส่งผล",
+          "104",
+          "status รอตรวจ",
+          ""
+        ],
+        [
+          "สลับ DEMO ผู้ตรวจทาน เปิด ตรวจทานและประวัติ",
+          "—",
+          "เห็น delta+4 แต่ไม่มีปุ่ม ส่งผลต่าง ก่อนรับรอง",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-017",
+      "grp": "review",
+      "pri": "high",
+      "title": "นับตรง100 รับรองแล้วไม่ส่งปรับยอด",
+      "why": "ตรวจว่านับตรง100 รับรองแล้วไม่ส่งปรับยอด",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต; CC-001 expected100",
+      "data": null,
+      "pass": "status ตรวจแล้ว; ไม่มีปุ่ม ส่งผลต่าง (mock); onHand fixture100",
+      "steps": [
+        [
+          "ผู้ตรวจนับส่ง100",
+          "100",
+          "status รอตรวจ",
+          ""
+        ],
+        [
+          "สลับ DEMO ผู้ตรวจทาน เปิด CC-001 ตรวจทาน",
+          "—",
+          "expected100,counted100,delta0",
+          ""
+        ],
+        [
+          "กรอกเหตุผลแล้วคลิก รับรองผล",
+          "ตรงตามจริง",
+          "status ตรวจแล้ว; ไม่มีปุ่ม ส่งผลต่าง (mock); onHand fixture100",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-018",
+      "grp": "review",
+      "pri": "high",
+      "title": "รับรองผลต่าง+4 แล้วส่ง mock หนึ่งครั้ง",
+      "why": "ตรวจว่ารับรองผลต่าง+4 แล้วส่ง mock หนึ่งครั้ง",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต; CC-001 expected100",
+      "data": null,
+      "pass": "toast ส่งคำขอปรับยอดจำลอง SA-MOCK-001; onHand100/movement unchanged",
+      "steps": [
+        [
+          "ผู้ตรวจนับส่ง104",
+          "104",
+          "รอตรวจ",
+          ""
+        ],
+        [
+          "ผู้ตรวจทานเปิด ตรวจทาน กรอกเหตุผลและรับรอง",
+          "ตรวจแล้ว",
+          "status ตรวจแล้ว, delta+4",
+          ""
+        ],
+        [
+          "เปิด CC-001 และคลิก ส่งผลต่าง (mock)",
+          "—",
+          "toast ส่งคำขอปรับยอดจำลอง SA-MOCK-001; onHand100/movement unchanged",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-019",
+      "grp": "review",
+      "pri": "high",
+      "title": "รับรองไม่มีเหตุผลถูกปฏิเสธ",
+      "why": "ตรวจว่ารับรองไม่มีเหตุผลถูกปฏิเสธ",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต; ผู้ตรวจนับส่ง104, reviewer DEMO",
+      "data": null,
+      "pass": "เห็น ระบุเหตุผลการรับรอง; status รอตรวจ",
+      "steps": [
+        [
+          "เปิด CC-001 คลิก ตรวจทาน",
+          "—",
+          "เห็น expected/count/delta",
+          ""
+        ],
+        [
+          "เว้นเหตุผลแล้วคลิก รับรองผล",
+          "ว่าง",
+          "เห็น ระบุเหตุผลการรับรอง; status รอตรวจ",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-020",
+      "grp": "recount",
+      "pri": "high",
+      "title": "ขอนับใหม่เปิดฟอร์มว่าง",
+      "why": "ตรวจว่าขอนับใหม่เปิดฟอร์มว่าง",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต; ผู้ตรวจนับส่ง97, reviewer DEMO",
+      "data": null,
+      "pass": "ช่องจำนวนว่าง, ไม่เห็น expected100/variance/97",
+      "steps": [
+        [
+          "เปิด CC-001 คลิก ตรวจทาน",
+          "expected100,counted97,delta−3",
+          "เห็นผลต่าง",
+          ""
+        ],
+        [
+          "คลิก ขอนับใหม่",
+          "—",
+          "status นับใหม่; attempt97 ล็อก",
+          ""
+        ],
+        [
+          "สลับ DEMO ผู้ตรวจนับ เปิด CC-001 บันทึกผลนับ",
+          "—",
+          "ช่องจำนวนว่าง, ไม่เห็น expected100/variance/97",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-021",
+      "grp": "recount",
+      "pri": "high",
+      "title": "นับใหม่99 ใช้ delta ล่าสุด−1",
+      "why": "ตรวจว่านับใหม่99 ใช้ delta ล่าสุด−1",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "ต่อจาก TC-020 recount requested",
+      "data": null,
+      "pass": "payload mock counted99/delta−1 ไม่ใช้97/−3; onHand100",
+      "steps": [
+        [
+          "ผู้ตรวจนับกรอก99 และส่ง",
+          "99",
+          "status รอตรวจ attempt รุ่น2",
+          ""
+        ],
+        [
+          "ผู้ตรวจทานเปิด ตรวจทานและประวัติ คลิก CC-001",
+          "—",
+          "expected100,counted99,delta−1",
+          ""
+        ],
+        [
+          "กรอกเหตุผล รับรอง แล้วส่งผลต่าง mock",
+          "นับใหม่แล้ว",
+          "payload mock counted99/delta−1 ไม่ใช้97/−3; onHand100",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-022",
+      "grp": "uom",
+      "pri": "med",
+      "title": "นับ3box snapshot12 เป็น36/base +12",
+      "why": "ตรวจว่านับ3box snapshot12 เป็น36/base +12",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต; CC-002 expectedBase24, factorSnapshot12pcs/box",
+      "data": null,
+      "pass": "payload expected24,counted36,delta+12; ไม่ปรับยอดจริง",
+      "steps": [
+        [
+          "ผู้ตรวจนับเปิด CC-002 และส่ง3",
+          "3 box",
+          "status รอตรวจ",
+          ""
+        ],
+        [
+          "ผู้ตรวจทานเปิด CC-002",
+          "—",
+          "expectedBase24,countedBase36,delta+12",
+          ""
+        ],
+        [
+          "รับรองพร้อมเหตุผลแล้วส่ง mock",
+          "ตรวจแล้ว",
+          "payload expected24,counted36,delta+12; ไม่ปรับยอดจริง",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-023",
+      "grp": "list",
+      "pri": "med",
+      "title": "ค้นหารหัสงานนับ",
+      "why": "ตรวจว่าค้นหารหัสงานนับ",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต fixture ABC: ITEM-101/102/103/104 มูลค่า40/30/20/10 ความถี่4/3/2/1; policy basis=value,A70/B20/C10; ผู้ตรวจนับ PERSON-COUNT-01; W3 mock only",
+      "data": null,
+      "pass": "เห็นเฉพาะ CC-001; footer แสดง1จาก2",
+      "steps": [
+        [
+          "เปิด แผนนับและงานนับ",
+          "—",
+          "เห็น CC-001/002",
+          ""
+        ],
+        [
+          "กรอกค้นหา",
+          "CC-001",
+          "เห็นเฉพาะ CC-001; footer แสดง1จาก2",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-024",
+      "grp": "list",
+      "pri": "med",
+      "title": "กรองสถานะรอนับ",
+      "why": "ตรวจว่ากรองสถานะรอนับ",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต fixture ABC: ITEM-101/102/103/104 มูลค่า40/30/20/10 ความถี่4/3/2/1; policy basis=value,A70/B20/C10; ผู้ตรวจนับ PERSON-COUNT-01; W3 mock only",
+      "data": null,
+      "pass": "แถวที่เห็นเป็นรอนับและ footer ตรงจำนวน",
+      "steps": [
+        [
+          "เปิด แผนนับและงานนับ",
+          "—",
+          "มีแถวรอนับ",
+          ""
+        ],
+        [
+          "เลือกตัวกรองสถานะ รอนับ",
+          "—",
+          "แถวที่เห็นเป็นรอนับและ footer ตรงจำนวน",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-025",
+      "grp": "list",
+      "pri": "med",
+      "title": "ล้างตัวกรองคืนรายการ",
+      "why": "ตรวจว่าล้างตัวกรองคืนรายการ",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต fixture ABC: ITEM-101/102/103/104 มูลค่า40/30/20/10 ความถี่4/3/2/1; policy basis=value,A70/B20/C10; ผู้ตรวจนับ PERSON-COUNT-01; W3 mock only",
+      "data": null,
+      "pass": "เห็นรายการเต็มและ footer ตรงทั้งหมด",
+      "steps": [
+        [
+          "ค้น CC-001 และเลือกสถานะรอนับ",
+          "—",
+          "ผลแคบลง",
+          ""
+        ],
+        [
+          "คลิก ล้างตัวกรอง",
+          "—",
+          "เห็นรายการเต็มและ footer ตรงทั้งหมด",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-026",
+      "grp": "list",
+      "pri": "med",
+      "title": "ส่งออกผู้ตรวจนับไม่รั่ว expected",
+      "why": "ตรวจว่าส่งออกผู้ตรวจนับไม่รั่ว expected",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "role DEMO ผู้ตรวจนับ; CC-001 มี attempt",
+      "data": null,
+      "pass": "CSV ไม่มี expected100, value หรือ variance; หากยังไม่มี browser ให้ blocked ไม่ใช่ pass",
+      "steps": [
+        [
+          "เปิด ตรวจทานและประวัติ",
+          "—",
+          "ช่องผลนับ/ผลต่างเป็น —",
+          ""
+        ],
+        [
+          "คลิก ส่งออก",
+          "—",
+          "CSV ไม่มี expected100, value หรือ variance; หากยังไม่มี browser ให้ blocked ไม่ใช่ pass",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-027",
+      "grp": "list",
+      "pri": "med",
+      "title": "event audit append-only",
+      "why": "ตรวจว่าevent audit append-only",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รัน TC-018 ก่อน",
+      "data": null,
+      "pass": "มี count.submitted/count.reviewed/stockadj.mock_ack ตามเวลา; ไม่มีปุ่มแก้/ลบ",
+      "steps": [
+        [
+          "เปิด ตรวจทานและประวัติ คลิก CC-001",
+          "—",
+          "สถานะส่งผลต่างแล้ว",
+          ""
+        ],
+        [
+          "ตรวจรายการเหตุการณ์",
+          "—",
+          "มี count.submitted/count.reviewed/stockadj.mock_ack ตามเวลา; ไม่มีปุ่มแก้/ลบ",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-028",
+      "grp": "list",
+      "pri": "med",
+      "title": "ยกเลิกแผนไม่เพิ่ม session",
+      "why": "ตรวจว่ายกเลิกแผนไม่เพิ่ม session",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต fixture ABC: ITEM-101/102/103/104 มูลค่า40/30/20/10 ความถี่4/3/2/1; policy basis=value,A70/B20/C10; ผู้ตรวจนับ PERSON-COUNT-01; W3 mock only",
+      "data": null,
+      "pass": "drawer ปิด; จำนวนแผนและ event เท่าฐาน",
+      "steps": [
+        [
+          "เปิด สร้างแผนนับ แล้วกรอกสินค้า",
+          "ITEM-101",
+          "drawer มีค่า",
+          ""
+        ],
+        [
+          "คลิก ยกเลิก",
+          "—",
+          "drawer ปิด; จำนวนแผนและ event เท่าฐาน",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-029",
+      "grp": "list",
+      "pri": "med",
+      "title": "แท็บใต้ page-head และ DEMO แยกผู้ใช้",
+      "why": "ตรวจว่าแท็บใต้ page-head และ DEMO แยกผู้ใช้",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต fixture ABC: ITEM-101/102/103/104 มูลค่า40/30/20/10 ความถี่4/3/2/1; policy basis=value,A70/B20/C10; ผู้ตรวจนับ PERSON-COUNT-01; W3 mock only",
+      "data": null,
+      "pass": "badge DEMO ส้มติด selector; ไม่มี hint/banner; ไม่อ้างว่าเป็นสิทธิ์จริง",
+      "steps": [
+        [
+          "เปิด จัดชั้น ABC",
+          "—",
+          "tab row ใต้ page-head, action ขวาบน",
+          ""
+        ],
+        [
+          "สลับ DEMO ผู้ตรวจนับ/ผู้ตรวจทาน",
+          "—",
+          "badge DEMO ส้มติด selector; ไม่มี hint/banner; ไม่อ้างว่าเป็นสิทธิ์จริง",
+          ""
+        ]
+      ],
+      "sys": false
+    },
+    {
+      "id": "TC-030",
+      "grp": "system",
+      "pri": "med",
+      "title": "default and weighted fixture ranking",
+      "why": "ตรวจว่าdefault and weighted fixture ranking",
+      "who": "backend tester",
+      "pre": "role=backend/integration tester; ต้อง simulate API/mocks; HTML-only ไม่ผ่าน",
+      "data": null,
+      "pass": "default X first; weighted Y score200 first, separate policy snapshots",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "X100×1 Y50×4",
+          "baseline/actor/version พร้อม",
+          ""
+        ],
+        [
+          "เรียกสัญญาที่ระบุ",
+          "X100×1 Y50×4",
+          "default X first; weighted Y score200 first, separate policy snapshots",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-031",
+      "grp": "system",
+      "pri": "med",
+      "title": "zero score all C and negative rejected",
+      "why": "ตรวจว่าzero score all C and negative rejected",
+      "who": "backend tester",
+      "pre": "role=backend/integration tester; ต้อง simulate API/mocks; HTML-only ไม่ผ่าน",
+      "data": null,
+      "pass": "all C without NaN; negative policy snapshot rejected",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "two zero items, then value−1",
+          "baseline/actor/version พร้อม",
+          ""
+        ],
+        [
+          "เรียกสัญญาที่ระบุ",
+          "two zero items, then value−1",
+          "all C without NaN; negative policy snapshot rejected",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-032",
+      "grp": "system",
+      "pri": "med",
+      "title": "stable tie overshoot",
+      "why": "ตรวจว่าstable tie overshoot",
+      "who": "backend tester",
+      "pre": "role=backend/integration tester; ต้อง simulate API/mocks; HTML-only ไม่ผ่าน",
+      "data": null,
+      "pass": "A,A,A,B actual A80/B20/C0; refresh stable",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "codes01–04 scores30/30/20/20",
+          "baseline/actor/version พร้อม",
+          ""
+        ],
+        [
+          "เรียกสัญญาที่ระบุ",
+          "codes01–04 scores30/30/20/20",
+          "A,A,A,B actual A80/B20/C0; refresh stable",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-033",
+      "grp": "system",
+      "pri": "med",
+      "title": "counter API projection redacted",
+      "why": "ตรวจว่าcounter API projection redacted",
+      "who": "backend tester",
+      "pre": "role=backend/integration tester; ต้อง simulate API/mocks; HTML-only ไม่ผ่าน",
+      "data": null,
+      "pass": "JSON/CSV/errors lack expected/value/variance, reviewer after submit has them",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "GET API-04 counter before/after/recount/export",
+          "baseline/actor/version พร้อม",
+          ""
+        ],
+        [
+          "เรียกสัญญาที่ระบุ",
+          "GET API-04 counter before/after/recount/export",
+          "JSON/CSV/errors lack expected/value/variance, reviewer after submit has them",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-034",
+      "grp": "system",
+      "pri": "med",
+      "title": "unassigned counter denied",
+      "why": "ตรวจว่าunassigned counter denied",
+      "who": "backend tester",
+      "pre": "role=backend/integration tester; ต้อง simulate API/mocks; HTML-only ไม่ผ่าน",
+      "data": null,
+      "pass": "403, no attempt/event; owner counter allowed",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "PERSON-X POST attempt CC-001",
+          "baseline/actor/version พร้อม",
+          ""
+        ],
+        [
+          "เรียกสัญญาที่ระบุ",
+          "PERSON-X POST attempt CC-001",
+          "403, no attempt/event; owner counter allowed",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-035",
+      "grp": "system",
+      "pri": "med",
+      "title": "same submit key replay once",
+      "why": "ตรวจว่าsame submit key replay once",
+      "who": "backend tester",
+      "pre": "role=backend/integration tester; ต้อง simulate API/mocks; HTML-only ไม่ผ่าน",
+      "data": null,
+      "pass": "one immutable attempt/ref and event",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "POST attempt count100 keyK1 twice",
+          "baseline/actor/version พร้อม",
+          ""
+        ],
+        [
+          "เรียกสัญญาที่ระบุ",
+          "POST attempt count100 keyK1 twice",
+          "one immutable attempt/ref and event",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-036",
+      "grp": "system",
+      "pri": "med",
+      "title": "same key different count conflict",
+      "why": "ตรวจว่าsame key different count conflict",
+      "who": "backend tester",
+      "pre": "role=backend/integration tester; ต้อง simulate API/mocks; HTML-only ไม่ผ่าน",
+      "data": null,
+      "pass": "IDEMPOTENCY_CONFLICT; no second attempt",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "keyK1 count100 then101",
+          "baseline/actor/version พร้อม",
+          ""
+        ],
+        [
+          "เรียกสัญญาที่ระบุ",
+          "keyK1 count100 then101",
+          "IDEMPOTENCY_CONFLICT; no second attempt",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-037",
+      "grp": "system",
+      "pri": "med",
+      "title": "old attempt review rejected after recount",
+      "why": "ตรวจว่าold attempt review rejected after recount",
+      "who": "backend tester",
+      "pre": "role=backend/integration tester; ต้อง simulate API/mocks; HTML-only ไม่ผ่าน",
+      "data": null,
+      "pass": "STALE_ATTEMPT; new99 remains pending",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "attempt97 old, then new99, accept old",
+          "baseline/actor/version พร้อม",
+          ""
+        ],
+        [
+          "เรียกสัญญาที่ระบุ",
+          "attempt97 old, then new99, accept old",
+          "STALE_ATTEMPT; new99 remains pending",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-038",
+      "grp": "system",
+      "pri": "med",
+      "title": "mock dispatch before review rejected",
+      "why": "ตรวจว่าmock dispatch before review rejected",
+      "who": "backend tester",
+      "pre": "role=backend/integration tester; ต้อง simulate API/mocks; HTML-only ไม่ผ่าน",
+      "data": null,
+      "pass": "PRE_REVIEW_DISPATCH; W3 mock count unchanged",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "submitted104 no review",
+          "baseline/actor/version พร้อม",
+          ""
+        ],
+        [
+          "เรียกสัญญาที่ระบุ",
+          "submitted104 no review",
+          "PRE_REVIEW_DISPATCH; W3 mock count unchanged",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-039",
+      "grp": "system",
+      "pri": "med",
+      "title": "zero delta no mock",
+      "why": "ตรวจว่าzero delta no mock",
+      "who": "backend tester",
+      "pre": "role=backend/integration tester; ต้อง simulate API/mocks; HTML-only ไม่ผ่าน",
+      "data": null,
+      "pass": "ZERO_DELTA; W3 mock count0",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "reviewed100 vs100",
+          "baseline/actor/version พร้อม",
+          ""
+        ],
+        [
+          "เรียกสัญญาที่ระบุ",
+          "reviewed100 vs100",
+          "ZERO_DELTA; W3 mock count0",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-040",
+      "grp": "system",
+      "pri": "med",
+      "title": "mock retry one ref unchanged stock",
+      "why": "ตรวจว่าmock retry one ref unchanged stock",
+      "who": "backend tester",
+      "pre": "role=backend/integration tester; ต้อง simulate API/mocks; HTML-only ไม่ผ่าน",
+      "data": null,
+      "pass": "one SA-MOCK ref; onHand/movement byte-equal baseline",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "reviewed104 keyD1 twice",
+          "baseline/actor/version พร้อม",
+          ""
+        ],
+        [
+          "เรียกสัญญาที่ระบุ",
+          "reviewed104 keyD1 twice",
+          "one SA-MOCK ref; onHand/movement byte-equal baseline",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-041",
+      "grp": "system",
+      "pri": "med",
+      "title": "UoM mapping change does not rewrite snapshot",
+      "why": "ตรวจว่าUoM mapping change does not rewrite snapshot",
+      "who": "backend tester",
+      "pre": "role=backend/integration tester; ต้อง simulate API/mocks; HTML-only ไม่ผ่าน",
+      "data": null,
+      "pass": "countedBase36/delta+12 immutable",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "CC-002 3box factor12 then source factor10",
+          "baseline/actor/version พร้อม",
+          ""
+        ],
+        [
+          "เรียกสัญญาที่ระบุ",
+          "CC-002 3box factor12 then source factor10",
+          "countedBase36/delta+12 immutable",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-042",
+      "grp": "system",
+      "pri": "med",
+      "title": "policy version does not reschedule old plan",
+      "why": "ตรวจว่าpolicy version does not reschedule old plan",
+      "who": "backend tester",
+      "pre": "role=backend/integration tester; ต้อง simulate API/mocks; HTML-only ไม่ผ่าน",
+      "data": null,
+      "pass": "old policySnapshot/due unchanged",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "Jan31 plan dueFeb28 then new policy",
+          "baseline/actor/version พร้อม",
+          ""
+        ],
+        [
+          "เรียกสัญญาที่ระบุ",
+          "Jan31 plan dueFeb28 then new policy",
+          "old policySnapshot/due unchanged",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-043",
+      "grp": "system",
+      "pri": "med",
+      "title": "cross-tenant RLS and reviewer authorization",
+      "why": "ตรวจว่าcross-tenant RLS and reviewer authorization",
+      "who": "backend tester",
+      "pre": "role=backend/integration tester; ต้อง simulate API/mocks; HTML-only ไม่ผ่าน",
+      "data": null,
+      "pass": "403 no disclosure/mutation",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "tenant other; counter tries review",
+          "baseline/actor/version พร้อม",
+          ""
+        ],
+        [
+          "เรียกสัญญาที่ระบุ",
+          "tenant other; counter tries review",
+          "403 no disclosure/mutation",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-044",
+      "grp": "system",
+      "pri": "med",
+      "title": "W3 StockAdj mock boundary",
+      "why": "ตรวจว่าW3 StockAdj mock boundary",
+      "who": "backend tester",
+      "pre": "role=backend/integration tester; ต้อง simulate API/mocks; HTML-only ไม่ผ่าน",
+      "data": null,
+      "pass": "ack/ref only; no actual adjustment approval/posting or stock mutation",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "reviewed nonzero payload",
+          "baseline/actor/version พร้อม",
+          ""
+        ],
+        [
+          "เรียกสัญญาที่ระบุ",
+          "reviewed nonzero payload",
+          "ack/ref only; no actual adjustment approval/posting or stock mutation",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-045",
+      "grp": "system",
+      "pri": "med",
+      "title": "CSQ draft only",
+      "why": "ตรวจว่าCSQ draft only",
+      "who": "backend tester",
+      "pre": "role=backend/integration tester; ต้อง simulate API/mocks; HTML-only ไม่ผ่าน",
+      "data": null,
+      "pass": "envelope draft; no 7C registration/stamp",
+      "steps": [
+        [
+          "เตรียม backend/mock fixture",
+          "count.reviewed candidate",
+          "baseline/actor/version พร้อม",
+          ""
+        ],
+        [
+          "เรียกสัญญาที่ระบุ",
+          "count.reviewed candidate",
+          "envelope draft; no 7C registration/stamp",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-046",
+      "grp": "system",
+      "pri": "med",
+      "title": "counter บังคับ reviewer view หรือ ABC value ไม่ผ่าน",
+      "why": "ตรวจว่าcounter บังคับ reviewer view หรือ ABC value ไม่ผ่าน",
+      "who": "backend tester",
+      "pre": "role=backend/integration tester; ต้อง simulate API/mocks; HTML-only ไม่ผ่าน",
+      "data": null,
+      "pass": "403 หรือ projection ปิด expected/value/variance ทุก response/CSV/error; DEMO switch ไม่เปลี่ยนสิทธิ์",
+      "steps": [
+        [
+          "เตรียม counter assigned CC-001",
+          "GET API-04 ?view=reviewer และ API-03 value/export",
+          "counter token",
+          ""
+        ],
+        [
+          "เรียก view/endpoint ข้ามสิทธิ์",
+          "counter token",
+          "403 หรือ projection ปิด expected/value/variance ทุก response/CSV/error; DEMO switch ไม่เปลี่ยนสิทธิ์",
+          ""
+        ]
+      ],
+      "sys": true
+    },
+    {
+      "id": "TC-047",
+      "grp": "plan",
+      "pri": "med",
+      "title": "future policy ใช้ตามวันที่แผน ไม่เปลี่ยนย้อนหลัง",
+      "why": "ตรวจว่าfuture policy ใช้ตามวันที่แผน ไม่เปลี่ยนย้อนหลัง",
+      "who": "Warehouse counter/reviewer DEMO",
+      "pre": "รีเซ็ต fixture ABC: ITEM-101/102/103/104 มูลค่า40/30/20/10 ความถี่4/3/2/1; policy basis=value,A70/B20/C10; ผู้ตรวจนับ PERSON-COUNT-01; W3 mock only",
+      "data": null,
+      "pass": "policy ABC-02,class B,due2026-04-30; แผน Sep20 ไม่เปลี่ยน",
+      "steps": [
+        [
+          "เปิด จัดชั้น ABC ตั้งนโยบายใหม่เริ่ม 2026-10-01",
+          "A40/B40/C20",
+          "version ใหม่รอมีผล; current Sep14 class ยัง A/A/B/C",
+          ""
+        ],
+        [
+          "สร้างแผน ITEM-102 วันที่สร้าง2026-09-20 ล่าสุด Jan31",
+          "—",
+          "policy ABC-01,class A,due2026-02-28",
+          ""
+        ],
+        [
+          "สร้างแผน ITEM-102 วันที่สร้าง2026-10-02 ล่าสุด Jan31",
+          "—",
+          "policy ABC-02,class B,due2026-04-30; แผน Sep20 ไม่เปลี่ยน",
+          ""
+        ]
+      ],
+      "sys": false
+    }
+  ]
+}
