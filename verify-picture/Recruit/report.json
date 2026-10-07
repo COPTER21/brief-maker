@@ -1,0 +1,67 @@
+{
+  "feature": {"code": "F-HR-RECRUIT", "name": "สรรหา (Recruit)", "module": "HR"},
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-10-06",
+  "round": 1,
+  "refs": "FRD v1.0 (FRD_Pack 9 ไฟล์) · HTML prototype สรรหา.html",
+  "scope": {
+    "checked": [
+      "UX/UI ทุกหน้าจอ: ตำแหน่งที่เปิด (req) / คลังผู้สมัคร (pool) / บอร์ดสรรหา (board) / รายงาน (report)",
+      "UX/UI ของ view drawer + form drawer + modal",
+      "การแสดงผล column / layout ตาราง / timeline / tab ใน drawer",
+      "การค้นหา-กรองรายการ และเอกสารแนบ"
+    ],
+    "not_checked": [
+      {"item": "Logic / กฎธุรกิจ: สายอนุมัติ DOA + SoD (maker≠approver), consent PDPA gate, masking ข้อมูล RESTRICTED ตาม role (3 persona), state machine req/candidate/offer, offer band freeze + out-of-band, handoff event ตอน hired, audit append-only", "reason": "รอบนี้ได้รับมอบหมายให้ตรวจเฉพาะ UX/UI"}
+    ]
+  },
+  "logic": [
+    {"item": "ค้นหา/กรองรายการด้วยแผนก (FN-90)", "expected": "ค้นด้วยแผนกแล้วกรองรายการได้", "actual": "ค้นหาด้วยแผนกไม่ได้ผล", "status": "fail", "bug": "BUG-02", "ref": "FN-90"}
+  ],
+  "ui_checked": true,
+  "ui": [
+    {"id": "U-02", "status": "note", "note": "column เลขที่ / ตำแหน่ง / ผู้สมัคร จัดวางและข้อมูลที่แสดงผล layout แปลก (ดู BUG-05)"},
+    {"item": "Timeline ในลิ้นชัก (drawer) จัดวางเพี้ยน", "status": "note", "note": "ดู BUG-06"},
+    {"item": "Tab ในลิ้นชัก (drawer) จัดวางเพี้ยน", "status": "note", "note": "ดู BUG-07"},
+    {"item": "ตัวควบคุม persona/ปุ่มทดสอบ (demo) โผล่บน prod", "status": "note", "note": "ควรมีเฉพาะใน demo HTML — ดู BUG-01"},
+    {"item": "ปุ่มย้อนกลับ/ถัดไปที่ footer ของ view drawer คลังผู้สมัคร ไม่มีใน design", "status": "note", "note": "ดู BUG-04"}
+  ],
+  "ux_checked": true,
+  "ux": [
+    {"id": "X-01", "status": "note", "note": "เอกสารแนบยังเป็น mock + เปิดไฟล์ดูไม่ได้ ทำให้ดูข้อมูลแนบจริงไม่จบ (ดู BUG-03)"}
+  ],
+  "bugs": [
+    {"id": "BUG-01", "title": "ตัวควบคุม persona / ปุ่มทดสอบ (demo) โผล่บน production", "severity": "medium",
+     "steps": ["เปิดระบบสรรหาบน prod", "สังเกตแถบ/ปุ่มสลับ persona (เจ้าหน้าที่สรรหา/ผู้จัดการ/ผู้ชม) ที่เป็นของ demo"],
+     "expected": "ไม่มีตัวสลับ persona/ปุ่มทดสอบบน prod — ควรมีเฉพาะใน demo HTML (Iron #105 demo-strip)",
+     "actual": "ตัวควบคุม demo ปรากฏบน prod",
+     "note": "ถ้าปุ่มสลับ persona เปลี่ยน role จริงได้ = ข้ามสิทธิ์ → ยกระดับเป็น Critical ต้องตรวจซ้ำ"},
+    {"id": "BUG-02", "title": "ค้นหาด้วยแผนกไม่ได้", "severity": "medium",
+     "steps": ["เข้าหน้ารายการ (ตำแหน่งที่เปิด หรือ คลังผู้สมัคร)", "พิมพ์ชื่อแผนกในช่องค้นหา"],
+     "expected": "กรองรายการตามแผนกที่ค้นได้",
+     "actual": "ค้นด้วยแผนกไม่ได้ผล",
+     "note": "ต้องให้ BA ยืนยันว่า 'แผนก' เป็นฟิลด์ที่ค้นได้ตาม spec หรือไม่ — ถ้าไม่อยู่ใน spec ให้ลดเป็นข้อเสนอแนะ"},
+    {"id": "BUG-03", "title": "เอกสารแนบยังเป็น mock และเปิดไฟล์ดูไม่ได้", "severity": "medium",
+     "steps": ["เปิด view drawer ที่มีส่วนเอกสารแนบ", "กดเปิด/ดาวน์โหลดไฟล์แนบ"],
+     "expected": "เปิด/ดาวน์โหลดไฟล์แนบจริงได้",
+     "actual": "ยังเป็นข้อมูล mock · กดเปิดไฟล์ไม่ขึ้น/เปิดไม่ได้"},
+    {"id": "BUG-04", "title": "view drawer คลังผู้สมัคร มีปุ่มย้อนกลับ/ถัดไปที่ footer ซึ่งไม่มีใน design", "severity": "medium",
+     "steps": ["เปิด view drawer ของผู้สมัคร (tab คลังผู้สมัคร)", "ดูที่ footer ของ drawer"],
+     "expected": "ตาม design (FRD §1.2 D-01 + prototype) ไม่มีปุ่มย้อนกลับ/ถัดไปใน footer ของ view drawer — ปุ่มเลื่อนสถานะอยู่ที่บอร์ด (P-03) เท่านั้น",
+     "actual": "มีปุ่มย้อนกลับ/ถัดไปโผล่ที่ footer drawer โดยไม่มีในแบบ",
+     "note": "ต้องยืนยันว่าปุ่มนี้ทำอะไร — ถ้าเลื่อนสถานะได้ข้ามการ์ดบอร์ด อาจกระทบ guard consent/offer ควรตรวจ Logic ซ้ำ"},
+    {"id": "BUG-05", "title": "column เลขที่ / ตำแหน่ง / ผู้สมัคร แสดงผล layout แปลก", "severity": "low",
+     "steps": ["เข้าหน้ารายการ", "ดู column เลขที่ / ตำแหน่ง / ผู้สมัคร"],
+     "expected": "ข้อมูลจัดวางเรียบร้อย 1 ช่อง 1 บรรทัด ตรงหัว column",
+     "actual": "layout/ข้อมูลที่แสดงผลดูแปลก (จัดวางไม่ตรง)"},
+    {"id": "BUG-06", "title": "Timeline ในลิ้นชัก (drawer) จัดวางเพี้ยน", "severity": "low",
+     "steps": ["เปิด view drawer ที่มี timeline (เช่น approval timeline / offer status / ประวัติ)", "ดูการจัดวาง timeline"],
+     "expected": "timeline จัดวางเรียบร้อย เส้น/จุด/ข้อความตรงแนว",
+     "actual": "layout timeline เพี้ยน"},
+    {"id": "BUG-07", "title": "Tab ในลิ้นชัก (drawer) จัดวางเพี้ยน", "severity": "low",
+     "steps": ["เปิด view drawer (4 tab: รายละเอียด/สัมภาษณ์-ประเมิน/ข้อเสนอ/ประวัติ)", "ดูแถบ tab"],
+     "expected": "แถบ tab จัดวางเรียบร้อย",
+     "actual": "layout tab เพี้ยน"}
+  ],
+  "suggestions": []
+}

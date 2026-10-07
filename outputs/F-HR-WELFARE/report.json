@@ -1,0 +1,77 @@
+{
+  "feature": {"code": "F-HR-WELFARE", "name": "สวัสดิการ (Welfare)", "module": "HR"},
+  "env": "Production",
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-10-07",
+  "round": 1,
+  "refs": "FRD F-HR-WELFARE Pack v1.0 (2026-09-08) · 24 FN · 05_RULES (BR/VR/§5.3)",
+  "scope": {
+    "checked": [
+      "ทะเบียนสวัสดิการ — list + drawer สร้าง/แก้/ดู ประเภท",
+      "คำขอใช้สิทธิ์ — list + drawer คำขอ 4 แท็บ (รายละเอียด/หลักฐาน/คงเหลือ/ประวัติ)",
+      "คงเหลือรายคน + ผู้ติดตาม",
+      "รายงานการใช้สิทธิ์",
+      "สิทธิ์การแสดงข้อมูล/ปุ่มตาม role (admin/manager/employee)",
+      "สายอนุมัติ DOA + timeline/ประวัติ",
+      "การแนบ/ดาวน์โหลดไฟล์หลักฐาน + ข้อความบนจอ + layout drawer/modal"
+    ],
+    "not_checked": [
+      {"item": "ความถูกต้องของการคำนวณยอดคงเหลือ/ตัดโควตา + บันทึกมูลค่าเข้า 7C·EC", "reason": "รอบนี้เน้น UX/UI — การคำนวณต้องมีชุดข้อมูลทดสอบแยก"},
+      {"item": "การกลับรายการ (reversal) + clawback ปลายทาง Payroll", "reason": "ต้องมีคำขอ approved + สถานะจ่ายจริง"},
+      {"item": "concurrent approve (2 คำขอสิทธิ์เดียวกันพร้อมกัน) + multi-tenant/RLS", "reason": "ต้องจัด scenario หลาย session พร้อมกัน"}
+    ]
+  },
+  "logic": [
+    {"item": "สิทธิ์การแสดงข้อมูล/ปุ่ม ตาม role (admin/manager/employee)", "expected": "mask มูลค่า/ผู้ติดตาม (•••) + ซ่อน/แสดงปุ่มตามสิทธิ์จริงของ user ตาม Permission Matrix §5.3 (enforce หลังบ้าน BR-DOA-6)", "actual": "ข้อมูลและปุ่มแสดงเหมือนกันทุก account ที่ลอง — เหมือนยังไม่ได้ตรวจสิทธิ์ของ user จริง", "status": "fail", "bug": "BUG-01", "ref": "§5.3 · BR-DOA-6 · OQ-05"},
+    {"item": "สายอนุมัติผ่าน DOA (resolve / freeze / เดิน 2 ขั้น)", "expected": "ดึงสายจาก DOA (GET /doa/resolve) + freeze snapshot + one-step advance", "actual": "พฤติกรรมไม่สอดคล้องกับ DOA จริง — เหมือนยังไม่ได้เชื่อมต่อ DOA", "status": "fail", "bug": "BUG-02", "ref": "BR-04 · BR-DOA-2/3 · FN-08"},
+    {"item": "ดาวน์โหลดไฟล์หลักฐานที่แนบในคำขอ", "expected": "เปิด/ดาวน์โหลดไฟล์แนบได้จริง", "actual": "กดแล้วขึ้นว่าเป็น mock — ดาวน์โหลดไม่ได้", "status": "fail", "bug": "BUG-03", "ref": "FN-07"},
+    {"item": "บันทึกประเภทสวัสดิการแบบสัดส่วน % (percent)", "expected": "บันทึกค่าสัดส่วน % ได้จริงและแสดงผลหลังบันทึก", "actual": "กดบันทึกแล้วขึ้นว่าเป็น mock — ไม่บันทึกจริง", "status": "fail", "bug": "BUG-04", "ref": "VR-01 (เว้น percent) · OQ-WEL-02"}
+  ],
+  "ui_checked": true,
+  "ui": [
+    {"id": "U-02", "status": "note", "note": "แท็บใน drawer คำขอ (รายละเอียด/หลักฐาน/คงเหลือ/ประวัติ) layout หลุด design — ดู BUG-05"},
+    {"id": "U-05", "status": "note", "note": "พบคำที่เป็นภาษาระบบ/ศัพท์เทคนิคโผล่บนจอ (ควรเป็นภาษาผู้ใช้) — ดู BUG-07"},
+    {"item": "timeline DOA + แท็บประวัติ", "status": "note", "note": "layout timeline DOA และประวัติเพี้ยน — ดู BUG-06"}
+  ],
+  "ux_checked": true,
+  "bugs": [
+    {"id": "BUG-01", "title": "สิทธิ์ (permission) ไม่ถูก enforce ตาม role — ข้อมูล/ปุ่มแสดงเท่ากันทุก account", "severity": "critical",
+     "steps": ["ล็อกอินด้วย account คนละ role (employee / manager / admin)", "เปิดหน้าคำขอใช้สิทธิ์ + หน้าคงเหลือรายคน", "สังเกตการ mask มูลค่า/ผู้ติดตาม และปุ่มอนุมัติ/กลับรายการ"],
+     "expected": "employee เห็นมูลค่าเป็น ••• และไม่เห็นปุ่มอนุมัติ/กลับรายการ · manager เห็นมูลค่าได้แต่ผู้ติดตามถูก mask (ตาม §5.3)",
+     "actual": "ข้อมูลและปุ่มแสดงเหมือนกันทุก account ที่ลอง — เหมือนยังไม่ได้ตรวจสิทธิ์ของ user จริง",
+     "status": "open"},
+    {"id": "BUG-02", "title": "สายอนุมัติยังไม่ได้ทำงานร่วมกับ DOA จริง", "severity": "critical",
+     "steps": ["เปิดคำขอ 1 ใบ กดส่งอนุมัติ", "ดู slot picker / ผู้อนุมัติที่ resolve มา", "ไล่กดอนุมัติทีละขั้น"],
+     "expected": "ดึงสายอนุมัติจาก DOA (GET /doa/resolve) + freeze snapshot + เดินทีละขั้น (one-step advance)",
+     "actual": "พฤติกรรมไม่สอดคล้องกับ DOA จริง — เหมือนยังไม่ได้เชื่อมต่อ DOA",
+     "status": "open"},
+    {"id": "BUG-03", "title": "ดาวน์โหลดไฟล์หลักฐานไม่ได้ (ยังเป็น mock)", "severity": "medium",
+     "steps": ["เปิดคำขอที่มีไฟล์แนบ", "ไปแท็บหลักฐาน", "กดดาวน์โหลด / เปิดไฟล์"],
+     "expected": "ดาวน์โหลด / เปิดไฟล์แนบได้จริง",
+     "actual": "ขึ้นข้อความว่าเป็น mock — ดาวน์โหลดไม่ได้",
+     "status": "open"},
+    {"id": "BUG-04", "title": "บันทึกค่าสัดส่วน % ยังเป็น mock", "severity": "medium",
+     "steps": ["สร้าง/แก้ประเภทสวัสดิการที่หน่วยเป็นสัดส่วน %", "กรอกค่า % แล้วกดบันทึก"],
+     "expected": "บันทึกค่า % ได้จริงและแสดงผลหลังบันทึก",
+     "actual": "ขึ้นว่าเป็น mock — ไม่บันทึกจริง",
+     "status": "open"},
+    {"id": "BUG-05", "title": "แท็บใน drawer คำขอ layout หลุด design", "severity": "low",
+     "steps": ["เปิดคำขอใช้สิทธิ์ 1 ใบ", "สลับแท็บ รายละเอียด/หลักฐาน/คงเหลือ/ประวัติ"],
+     "expected": "แท็บจัดวางตาม design (เรียงเสมอกัน ไม่หลุดกรอบ)",
+     "actual": "layout แท็บหลุด design",
+     "status": "open"},
+    {"id": "BUG-06", "title": "timeline DOA และแท็บประวัติ layout เพี้ยน", "severity": "low",
+     "steps": ["เปิดคำขอ ไปแท็บประวัติ / ดู timeline สายอนุมัติ"],
+     "expected": "timeline + ประวัติเรียงตามลำดับเวลา จัดแนวเรียบร้อย",
+     "actual": "layout เพี้ยน",
+     "status": "open"},
+    {"id": "BUG-07", "title": "มีคำที่เป็นภาษาระบบ/ศัพท์เทคนิคโผล่บนจอ", "severity": "low",
+     "steps": ["เปิดหน้า/overlay ต่างๆ ของฟีเจอร์", "อ่านข้อความ label / สถานะ"],
+     "expected": "ใช้ภาษาผู้ใช้ทั้งหมด ไม่มี code / ศัพท์ระบบ",
+     "actual": "พบคำภาษาระบบโผล่บนจอ",
+     "status": "open"}
+  ],
+  "suggestions": [
+    {"item": "เพิ่ม smoke test ก่อน deploy: ตรวจ permission matrix 3 role + DOA resolve + ไม่มี mock stub ค้างใน build", "reason": "4 จุด (สิทธิ์/DOA/ดาวน์โหลด/บันทึก %) เป็น mock หรือไม่ทำงานบน production — บ่งชี้ว่า build ที่ deploy อาจพก prototype stub มาด้วย"}
+  ]
+}

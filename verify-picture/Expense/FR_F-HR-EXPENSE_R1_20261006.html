@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>รายงานผลตรวจ — F-HR-EXPENSE เบิกค่าใช้จ่าย (Expense Claim)</title>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap">
+<style>:root{
+  --bg:#FAF8F5;--paper:#FFFFFF;--ink:#111;--ink2:#55524C;--ink3:#8A867E;
+  --line:#E7E2D9;--line2:#F1EDE6;--navy:#0B1D3A;--primary:#0B5CFF;
+  --pass:#00A88E;--pass-bg:#E6F6F3;--warn:#C96F00;--warn-bg:#FFF3E2;
+  --fail:#E0271D;--fail-bg:#FFECEA;--na:#8A867E;--na-bg:#F1EDE6;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:14px/1.6 'Satoshi','Noto Sans Thai',system-ui,-apple-system,'Segoe UI',sans-serif}
+.page{max-width:1040px;margin:0 auto;padding:32px 24px 64px}
+.sheet{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:32px 36px;position:relative}
+.toolbar{position:absolute;top:14px;right:16px}
+.toolbar button{font:inherit;font-size:12.5px;border:1px solid var(--line);background:var(--paper);color:var(--ink2);border-radius:6px;padding:4px 12px;cursor:pointer}
+.toolbar button:hover{border-color:var(--ink3);color:var(--ink)}
+.toolbar button:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+
+.head{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end;padding:16px 0 18px;border-bottom:2px solid var(--navy)}
+.head h1{margin:0;font-size:24px;line-height:1.3;color:var(--navy);font-weight:700}
+.head .feat{margin-top:2px;font-size:16px;font-weight:600}
+.docno{text-align:right;font-size:12px;color:var(--ink2)}
+.docno b{display:block;font-size:15px;color:var(--ink)}
+.meta{display:grid;grid-template-columns:repeat(3,1fr);margin-top:16px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.meta div{padding:8px 12px;border-right:1px solid var(--line2);border-bottom:1px solid var(--line2)}
+.meta div:nth-child(3n){border-right:0}
+.meta div:nth-last-child(-n+3){border-bottom:0}
+.meta small{display:block;font-size:11.5px;color:var(--ink3)}
+.meta span{font-weight:500}
+
+.verdict{display:grid;grid-template-columns:290px 1fr;margin-top:24px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.v-main{padding:18px 20px;border-right:1px solid var(--line)}
+.v-main small{font-size:12px;color:var(--ink2)}
+.v-main .v{font-size:22px;font-weight:700;margin:2px 0 6px}
+.v-main p{margin:0;font-size:13px;color:var(--ink2)}
+.v-main .next{margin-top:12px;padding-top:10px;border-top:1px solid rgba(0,0,0,.08);font-size:13px;font-weight:600;color:var(--ink)}
+.v-main .next small{display:block;font-weight:400}
+.v-pass .v-main{background:var(--pass-bg)}.v-pass .v{color:var(--pass)}
+.v-warn .v-main{background:var(--warn-bg)}.v-warn .v{color:var(--warn)}
+.v-fail .v-main{background:var(--fail-bg)}.v-fail .v{color:var(--fail)}
+.v-na .v-main{background:var(--na-bg)}.v-na .v{color:var(--na)}
+.v-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.v-cell{padding:16px 18px;border-right:1px solid var(--line2)}
+.v-cell:last-child{border-right:0}
+.v-cell small{display:block;font-size:12px;color:var(--ink3)}
+.v-cell .n{font-size:26px;font-weight:700;line-height:1.2;margin:4px 0;font-variant-numeric:tabular-nums}
+.v-cell .n span{font-size:15px;color:var(--ink3);font-weight:500}
+.v-cell .na-t{color:var(--ink3)}
+.v-cell .s{font-size:12.5px;color:var(--ink2)}
+.bars{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+
+h2{font-size:17px;color:var(--navy);margin:32px 0 4px;display:flex;align-items:baseline;gap:10px}
+h2 .no{font-size:13px;color:var(--ink3);font-weight:500}
+.lead{margin:0 0 12px;color:var(--ink2);font-size:13px}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#F6F3EE;text-align:left;font-weight:600;color:var(--ink2);padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--line2);vertical-align:top}
+tr:last-child td{border-bottom:0}
+tr.r-fail td{background:#FFF8F7}
+tr.r-note td{background:#FFFCF6}
+tr.r-na td{color:var(--ink3)}
+td.id{white-space:nowrap;color:var(--ink3);font-variant-numeric:tabular-nums}
+td.empty{text-align:center;color:var(--ink3);padding:16px}
+.ev a{color:var(--primary);text-decoration:none}
+.ev a:hover{text-decoration:underline}
+.file{display:inline-block;font-size:12px;color:var(--primary)}
+.shot{height:56px;max-width:120px;object-fit:cover;border:1px solid var(--line);border-radius:4px;cursor:zoom-in;vertical-align:top;margin:2px 4px 2px 0}
+.bug .shot{height:90px;max-width:200px;margin-top:6px}
+
+.chip{display:inline-block;padding:1px 9px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.pass{background:var(--pass-bg);color:var(--pass)}
+.warn{background:var(--warn-bg);color:var(--warn)}
+.fail{background:var(--fail-bg);color:var(--fail)}
+.na{background:var(--na-bg);color:var(--na)}
+.sev-c{background:#3A0B08;color:#fff}
+.sev-h{background:var(--fail-bg);color:var(--fail)}
+.sev-m{background:var(--warn-bg);color:var(--warn)}
+.sev-l{background:var(--na-bg);color:var(--ink2)}
+
+.scope{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.box{border:1px solid var(--line);border-radius:8px;padding:12px 16px}
+.box h3{margin:0 0 6px;font-size:13.5px}
+.box ul{margin:0;padding-left:18px;color:var(--ink2);font-size:13px}
+
+.bug{border:1px solid var(--line);border-radius:8px;margin-bottom:12px;overflow:hidden}
+.bug-h{display:flex;gap:10px;align-items:center;padding:10px 14px;background:#FBFAF7;border-bottom:1px solid var(--line2);flex-wrap:wrap}
+.bug-h b{font-size:13px;color:var(--ink3);font-weight:600}
+.bug-h .t{font-weight:600;flex:1;min-width:200px}
+.bug-b{display:grid;grid-template-columns:1fr 1fr 1fr}
+.bug-b>div{padding:10px 14px;border-right:1px solid var(--line2);font-size:13px}
+.bug-b>div:last-child{border-right:0}
+.bug-b small{display:block;color:var(--ink3);font-size:11.5px;margin-bottom:2px}
+.bug-b ol{margin:0;padding-left:18px}
+.none{margin:0;padding:14px 16px;border:1px dashed var(--line);border-radius:8px;color:var(--ink2);font-size:13px}
+
+.attest{margin-top:12px;padding:14px 16px;border-left:3px solid var(--navy);background:#F6F3EE;font-size:13.5px}
+.signs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+.sign{border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.sign small{color:var(--ink3);font-size:12px}
+.sign .line{height:40px;border-bottom:1px dashed var(--ink3);margin:8px 0}
+.sign .who{font-weight:600}
+.sign .d{font-size:12px;color:var(--ink2)}
+
+.rules{margin-top:28px;font-size:12.5px;color:var(--ink2);border-top:1px solid var(--line);padding-top:14px}
+.rules b{color:var(--ink)}
+.rules ul{margin:4px 0 8px;padding-left:18px}
+
+.lb{position:fixed;inset:0;background:rgba(17,17,17,.82);display:none;align-items:center;justify-content:center;z-index:900;padding:24px;cursor:zoom-out}
+.lb.on{display:flex}
+.lb img{max-width:100%;max-height:100%;border-radius:6px;background:#fff}
+
+@media (max-width:760px){
+  .page{padding:16px 12px 40px}
+  .sheet{padding:20px}
+  .toolbar{position:static;margin-bottom:8px}
+  .head{grid-template-columns:1fr}.docno{text-align:left}
+  .meta{grid-template-columns:1fr 1fr}
+  .meta div{border-right:1px solid var(--line2)!important;border-bottom:1px solid var(--line2)!important}
+  .verdict{grid-template-columns:1fr}.v-main{border-right:0;border-bottom:1px solid var(--line)}
+  .v-grid{grid-template-columns:1fr 1fr}
+  .v-cell{border-bottom:1px solid var(--line2)}
+  .scope,.signs,.bug-b{grid-template-columns:1fr}
+  .bug-b>div{border-right:0;border-bottom:1px solid var(--line2)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{
+  @page{size:A4;margin:12mm}
+  :root{padding:0}
+  body{background:#fff;font-size:12px}
+  .page{padding:0;max-width:none}
+  .sheet{border:0;padding:0}
+  .toolbar,.lb{display:none!important}
+  .bug,.sign,tr,.verdict,.scope{break-inside:avoid}
+  h2{break-after:avoid}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style></head>
+<body><div class="page"><div class="sheet">
+<div class="toolbar"><button type="button" onclick="window.print()">พิมพ์ / บันทึก PDF</button></div>
+<header class="head"><div><h1>รายงานผลตรวจฟีเจอร์</h1><div class="feat">F-HR-EXPENSE เบิกค่าใช้จ่าย (Expense Claim)</div></div>
+<div class="docno">เลขที่รายงาน<b>FR-2026-F-HR-EXPENSE-R1</b>รอบตรวจที่ 1</div></header>
+<div class="meta"><div><small>Module</small><span>Human Capital → Expense &amp; Reimbursement</span></div><div><small>Environment / Build</small><span>—</span></div><div><small>ผู้ตรวจ</small><span>กานต์ สายบัวทอง</span></div><div><small>วันที่ตรวจ</small><span>6 ต.ค. 2569</span></div><div><small>เอกสารอ้างอิง</small><span>FRD F-HR-EXPENSE Pack v1.0 (01_UI · 05_RULES §1.6 microcopy · 06_TESTS)</span></div><div><small>Dev ผู้รับผิดชอบ</small><span>—</span></div></div>
+
+<section class="verdict v-na">
+<div class="v-main"><small>ผลการตรวจ</small><div class="v">ยังสรุปไม่ได้</div><p>รอบนี้ตรวจเฉพาะ UX/UI (หน้าตา/การใช้งาน) ตามที่ได้รับมอบหมาย — พบ 5 จุดระดับ Low (cosmetic) ที่ควรเก็บให้เรียบร้อยก่อนปิดงาน UI · ส่วน Logic/กฎธุรกิจ (คำนวณเงิน·VAT · สายอนุมัติ DOA · การซ่อนตัวเลขตาม role · ออกเลข/7C) ไม่อยู่ในขอบเขตรอบนี้ (อ้างอิงผลเทสเดิมที่ผ่าน production แล้ว) จึงยังไม่ออกคำตัดสินรวมของฟีเจอร์จากรายงานฉบับนี้ · สิ่งที่ต้องทำต่อจริง: แก้ BUG-01..05 (Low) แล้วตรวจซ้ำเฉพาะจุด + ให้มิติ Logic อ้างอิงผลเทส production เดิมอย่างเป็นทางการ</p>
+<div class="next"><small>สิ่งที่ต้องทำต่อ</small>ระบุสิ่งที่ตรวจในข้อ 1 แล้วออกรายงานใหม่</div></div>
+<div class="v-grid">
+<div class="v-cell"><small>1 · Logic</small><div class="n na-t">—</div><div class="s">ไม่ได้ตรวจ</div></div>
+<div class="v-cell"><small>2 · UI ความเรียบร้อย</small><div class="n">4<span>/7</span></div><div class="s">มีข้อสังเกต 3</div></div>
+<div class="v-cell"><small>3 · UX ใช้งานง่าย</small><div class="n">6<span>/6</span></div><div class="s">ผ่านทุกข้อ</div></div>
+<div class="v-cell"><small>4 · Bug ที่พบ</small><div class="n">5</div><div class="bars"><span class="chip sev-l">Low 5</span></div></div>
+</div></section>
+
+<h2><span class="no">0</span>ขอบเขตการตรวจ</h2>
+<p class="lead">ส่วนที่ไม่ได้ตรวจ อยู่นอกความรับผิดชอบของรายงานฉบับนี้</p>
+<div class="scope"><div class="box"><h3>ตรวจแล้ว</h3><ul><li>UX/UI หน้าตาและการจัดวางของจอหลักทั้งหมด: รายการใบเบิก (list/filter) · สร้างใบเบิก wizard 5 ขั้น · รายละเอียดใบเบิก 4 แท็บ (รายละเอียด/PDF/ลายเซ็น/ประวัติ) · PDF Preview A4 · timeline DOA + ประวัติ · ช่องแนบเอกสาร</li><li>การใช้งานลื่นไหล (UX) ของ flow หลัก — ลองใช้แล้วไม่ติดขัด (ยกเว้นจุดหน้าตาในข้อ 4)</li></ul></div>
+<div class="box"><h3>ไม่ได้ตรวจ</h3><ul><li>Logic / กฎธุรกิจ — คำนวณเงิน·VAT (ไม่คิด/VAT/รวมแล้ว) · สายอนุมัติ DOA ตามวงเงิน · การซ่อนตัวเลขตาม role (mask) · ออกเลข EXP + PDF + ยิง 7C (FC/EC) — อาศัยผลเทสเดิมที่ผ่าน production แล้ว — นอกขอบเขตรอบ UX/UI นี้</li><li>พฤติกรรมข้ามสิทธิ์/SoD เชิงลึก (เจ้าหน้าที่ HR/Finance อนุมัติไม่ได้ · กันอนุมัติใบตัวเอง) — เป็นมิติ Logic/Permission — ไม่ได้ verify รอบนี้</li></ul></div></div>
+
+<h2><span class="no">1</span>Logic — ทำงานถูกตามกฎธุรกิจ</h2>
+<p class="lead">เทียบผลจริงกับ FRD / Test Case — ข้อที่ไม่ผ่านต้องผูกกับ Bug ในข้อ 4</p>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>กฎ / Scenario</th><th>ผลที่คาดหวัง</th><th>ผลจริง</th><th>ผล</th><th>อ้างอิง</th></tr></thead>
+<tbody><tr class="r-na"><td class="id">L-01</td><td>คำนวณยอด/VAT ต่อรายการ (ไม่คิด/VAT/รวมแล้ว) + ยอดรวม·VAT·สุทธิ</td><td>—</td><td>—</td><td><span class="chip na">ไม่ได้ตรวจ</span></td><td class="ev">BR-01 · AC-02</td></tr><tr class="r-na"><td class="id">L-02</td><td>ส่งอนุมัติ = resolve สาย DOA ตามวงเงิน + re-resolve เมื่อยอดข้ามช่วง</td><td>—</td><td>—</td><td><span class="chip na">ไม่ได้ตรวจ</span></td><td class="ev">BR-04/BR-05</td></tr><tr class="r-na"><td class="id">L-03</td><td>ซ่อนตัวเลขเงินตาม role (mask ฿•••••) + เจ้าหน้าที่ HR/Finance อนุมัติไม่ได้</td><td>—</td><td>—</td><td><span class="chip na">ไม่ได้ตรวจ</span></td><td class="ev">BR-12 · FN-94</td></tr><tr class="r-na"><td class="id">L-04</td><td>อนุมัติครบสาย → ออกเลข EXP-YYYY-NNNN + สำเนา PDF + ยิง 7C (FC/EC)</td><td>—</td><td>—</td><td><span class="chip na">ไม่ได้ตรวจ</span></td><td class="ev">BR-06/BR-07</td></tr><tr class="r-na"><td class="id">L-05</td><td>เกินเพดานหมวด → เตือน + บังคับเหตุผล (ไม่ hard block)</td><td>—</td><td>—</td><td><span class="chip na">ไม่ได้ตรวจ</span></td><td class="ev">BR-02</td></tr></tbody></table></div>
+
+<h2><span class="no">2</span>UI — ความเรียบร้อยของหน้าจอ</h2>
+<p class="lead">Checklist มาตรฐาน · "ผ่าน" = ผู้ตรวจดูแล้วไม่พบปัญหา</p>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>หัวข้อตรวจ</th><th>ผล</th><th>หมายเหตุ</th><th>หลักฐาน</th></tr></thead>
+<tbody><tr class="r-pass"><td class="id">U-01</td><td>สี / ฟอนต์ ตรง CI</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr><tr class="r-note"><td class="id">U-02</td><td>ระยะห่าง / การจัดแนว ฟอร์มและตาราง</td><td><span class="chip warn">มีข้อสังเกต</span></td><td>จุดจัดวางเพี้ยน: แท็บใน drawer รายละเอียด, timeline DOA/ประวัติ, ช่องแนบเอกสาร — ดู BUG-01/04/05</td><td class="ev">—</td></tr><tr class="r-pass"><td class="id">U-03</td><td>ตาราง 1 ช่อง = 1 บรรทัด ไม่ซ้อนข้อมูล</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr><tr class="r-pass"><td class="id">U-04</td><td>ปุ่ม / ไอคอน ขนาดและสไตล์สม่ำเสมอ</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr><tr class="r-note"><td class="id">U-05</td><td>ข้อความไทยถูกต้อง ไม่พิมพ์ผิด ไม่ตกบรรทัดแปลก</td><td><span class="chip warn">มีข้อสังเกต</span></td><td>พบคำว่า &quot;mock&quot; และบางข้อความยังเป็นศัพท์ระบบ ไม่ใช่ภาษาผู้ใช้ — ดู BUG-02</td><td class="ev">—</td></tr><tr class="r-pass"><td class="id">U-06</td><td>Dropdown / popup ไม่จม ไม่ล้นจอ</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr><tr class="r-note"><td class="id">U-07</td><td>หน้า PDF Preview (A4) ตรงเทมเพลตเอกสารมาตรฐานในระบบ</td><td><span class="chip warn">มีข้อสังเกต</span></td><td>หลุด design จากเอกสารตัวอื่นในระบบ — ดู BUG-03</td><td class="ev">—</td></tr></tbody></table></div>
+
+<h2><span class="no">3</span>UX — ใช้งานลื่นไหล</h2>
+<p class="lead">มองจากผู้ใช้จริง · "ผ่าน" = ผู้ตรวจลองใช้แล้วไม่ติดขัด</p>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>หัวข้อตรวจ</th><th>ผล</th><th>หมายเหตุ</th><th>หลักฐาน</th></tr></thead>
+<tbody><tr class="r-pass"><td class="id">X-01</td><td>ทำงานหลักจบได้เองโดยไม่ต้องเดา</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr><tr class="r-pass"><td class="id">X-02</td><td>กดแล้วระบบบอกผลทุกครั้ง (แจ้งเตือน / สถานะเปลี่ยน)</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr><tr class="r-pass"><td class="id">X-03</td><td>ข้อความ error บอกว่าผิดที่ไหน แก้ยังไง</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr><tr class="r-pass"><td class="id">X-04</td><td>ถามยืนยันก่อนลบ / ยกเลิก / สิ่งที่ย้อนไม่ได้</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr><tr class="r-pass"><td class="id">X-05</td><td>หน้าว่าง / กำลังโหลด / โหลดไม่สำเร็จ มีทางไปต่อ</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr><tr class="r-pass"><td class="id">X-06</td><td>ความเร็วตอบสนองรับได้</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr></tbody></table></div>
+
+<h2><span class="no">4</span>Bug ที่พบ</h2>
+<p class="lead">เรียงจากรุนแรงมากไปน้อย · ทำซ้ำได้ตามขั้นตอน</p>
+<div class="bug" id="BUG-01"><div class="bug-h"><b>BUG-01</b><span class="t">แท็บใน drawer รายละเอียดใบเบิก จัดวางหลุดจาก design</span><span class="chip sev-l">Low</span><span class="chip na">รอแก้</span></div><div class="bug-b"><div><small>ขั้นตอนทำซ้ำ</small><ol><li>เปิดหน้ารายการใบเบิก</li><li>คลิกแถวใบเบิกเพื่อเปิด drawer รายละเอียด</li><li>ดูแถบแท็บ รายละเอียด / PDF / ลายเซ็น / ประวัติ</li></ol></div><div><small>ผลที่ควรเป็น</small>แถบแท็บ 4 อันเรียงแนวเดียวตาม design ของ view drawer (FRD 01_UI P-03)</div><div><small>ผลที่เกิดจริง</small>layout แท็บหลุด/เพี้ยนจาก design</div></div></div><div class="bug" id="BUG-02"><div class="bug-h"><b>BUG-02</b><span class="t">มีคำว่า &quot;mock&quot; และศัพท์ระบบที่ยังไม่แปลงเป็นภาษาผู้ใช้ บนจอจริง</span><span class="chip sev-l">Low</span><span class="chip na">รอแก้</span></div><div class="bug-b"><div><small>ขั้นตอนทำซ้ำ</small><ol><li>เปิด wizard สร้างใบเบิก → ขั้น 5 ตรวจสอบและยืนยัน (กล่องงบ/สวัสดิการ/หักลบทดรอง)</li><li>เปิดใบเบิก → แท็บ ลายเซ็น/อนุมัติ (ช่วงวงเงิน DOA)</li><li>อ่านข้อความบนจอ</li></ol></div><div><small>ผลที่ควรเป็น</small>ไม่มีคำว่า &quot;mock&quot;/ศัพท์ dev บนจอ production · ข้อความเป็นภาษาผู้ใช้ (FRD §1.6 microcopy)</div><div><small>ผลที่เกิดจริง</small>พบคำว่า &quot;mock&quot; (เช่น ป้าย &quot;ตัวอย่าง/mock&quot;) และบางข้อความยังเป็นศัพท์ระบบ ไม่ใช่ภาษาคน</div></div></div><div class="bug" id="BUG-03"><div class="bug-h"><b>BUG-03</b><span class="t">หน้า PDF Preview (A4) ของใบเบิก ไม่ตรง design เอกสารมาตรฐานในระบบ</span><span class="chip sev-l">Low</span><span class="chip na">รอแก้</span></div><div class="bug-b"><div><small>ขั้นตอนทำซ้ำ</small><ol><li>เปิดใบเบิก → แท็บ PDF (หรือปุ่มพิมพ์/PDF)</li><li>เทียบกับเอกสาร A4 ตัวอื่นในระบบ</li></ol></div><div><small>ผลที่ควรเป็น</small>เอกสาร A4 ตามเทมเพลตมาตรฐาน (หัวบริษัท · ตารางรายการ · ยอดรวม/VAT · 3 ช่องลายเซ็น ผู้เบิก/ผู้อนุมัติ/การเงิน) ดูเป็นชุดเดียวกับเอกสารอื่น</div><div><small>ผลที่เกิดจริง</small>layout PDF หลุดจาก design เอกสารที่มีในระบบ</div></div></div><div class="bug" id="BUG-04"><div class="bug-h"><b>BUG-04</b><span class="t">เส้น timeline ของแท็บลายเซ็น/อนุมัติ (DOA) และแท็บประวัติ จัดวางเพี้ยน</span><span class="chip sev-l">Low</span><span class="chip na">รอแก้</span></div><div class="bug-b"><div><small>ขั้นตอนทำซ้ำ</small><ol><li>เปิดใบเบิกที่ส่งอนุมัติแล้ว</li><li>เปิดแท็บ ลายเซ็น/อนุมัติ (timeline สาย DOA)</li><li>เปิดแท็บ ประวัติ (audit)</li></ol></div><div><small>ผลที่ควรเป็น</small>timeline แสดงลำดับขั้น DOA + ประวัติ append-only อ่านง่าย จัดวางตาม design</div><div><small>ผลที่เกิดจริง</small>layout timeline ของทั้ง 2 แท็บเพี้ยน</div></div></div><div class="bug" id="BUG-05"><div class="bug-h"><b>BUG-05</b><span class="t">UI ช่องแนบเอกสาร (upload-zone) จัดวางไม่เรียบร้อยและเพี้ยน</span><span class="chip sev-l">Low</span><span class="chip na">รอแก้</span></div><div class="bug-b"><div><small>ขั้นตอนทำซ้ำ</small><ol><li>สร้างใบเบิก → wizard ขั้น 4 เอกสารแนบ (หรือ section เอกสารแนบในแท็บรายละเอียด)</li><li>ดูกล่องแนบไฟล์ + รายการไฟล์ที่แนบ</li></ol></div><div><small>ผลที่ควรเป็น</small>upload-zone + รายการไฟล์แนบ จัดวางเรียบร้อยตาม design</div><div><small>ผลที่เกิดจริง</small>UI ช่องแนบเอกสารไม่เรียบร้อย/เพี้ยน</div></div></div>
+
+
+<h2><span class="no">5</span>การรับรองผลตรวจ</h2>
+<div class="attest">ข้าพเจ้าได้ตรวจฟีเจอร์นี้ตามขอบเขตในข้อ 0 บน environment และ build ที่ระบุ ผลทั้งหมดมาจากการทดสอบจริง ข้อที่ระบุว่า "ผ่าน" คือได้ตรวจแล้วไม่พบปัญหา ส่วนที่ "ไม่ได้ตรวจ" อยู่นอกความรับผิดชอบของรายงานฉบับนี้</div>
+<div class="signs">
+<div class="sign"><small>ผู้ตรวจ</small><div class="line"></div><div class="who">กานต์ สายบัวทอง&nbsp;</div><div class="d">6 ต.ค. 2569</div></div>
+<div class="sign"><small>ผู้ทบทวนรายงาน</small><div class="line"></div><div class="who">&nbsp;</div><div class="d">____/____/____</div></div>
+<div class="sign"><small>Dev รับทราบ</small><div class="line"></div><div class="who">&nbsp;</div><div class="d">____/____/____</div></div>
+</div>
+
+<div class="rules"><b>เกณฑ์ตัดสินผล</b> (คำนวณอัตโนมัติ)
+<ul><li><b>ไม่ผ่าน</b> — มี Bug Critical ค้าง หรือ Logic ไม่ผ่านตั้งแต่ 3 ข้อ</li>
+<li><b>ผ่านแบบมีเงื่อนไข</b> — มี Bug High ค้าง หรือ Logic ไม่ผ่าน 1–2 ข้อ → แก้แล้วตรวจซ้ำเฉพาะจุด</li>
+<li><b>ผ่าน</b> — Logic ผ่านทุกข้อ ไม่มี Bug High ขึ้นไป (Medium / Low ตามแก้รอบถัดไป)</li></ul>
+<b>ระดับ Bug</b> · Critical ใช้งานไม่ได้ / ข้อมูลเสีย / ข้ามสิทธิ์หรือสายอนุมัติ · High ผลลัพธ์ผิด (เงิน สต๊อก สถานะ) · Medium ผิด spec แต่มีทางเลี่ยง · Low หน้าตา / ข้อความ</div>
+</div></div>
+<div class="lb" id="lb"><img alt=""></div>
+<script>
+(function(){
+  var lb=document.getElementById('lb');
+  document.querySelectorAll('.shot').forEach(function(i){
+    i.addEventListener('click',function(){lb.querySelector('img').src=i.src;lb.classList.add('on');});
+  });
+  lb.addEventListener('click',function(){lb.classList.remove('on');});
+  document.addEventListener('keydown',function(ev){if(ev.key==='Escape')lb.classList.remove('on');});
+})();
+</script>
+</body></html>
