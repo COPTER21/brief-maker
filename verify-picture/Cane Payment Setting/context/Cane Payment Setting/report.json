@@ -1,0 +1,81 @@
+{
+  "feature": {
+    "code": "F-AGM-012",
+    "name": "Cane Payment Setting",
+    "module": "AGM"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-10-14",
+  "round": 1,
+  "refs": "FRD F-AGM-012 · 02_API §2.1 · 06_TESTS AC-09 / AC-15 / AC-22",
+  "summary_note": "ตรวจ Logic การสร้าง แก้ไข และลบรายการตั้งค่าย่อยผ่านครบตามขอบเขตที่ผู้ตรวจระบุในรอบนี้",
+  "scope": {
+    "checked": [
+      "Logic การสร้าง Cane Payment Setting (Create)",
+      "Logic การแก้ไขและบันทึก Cane Payment Setting (Update)",
+      "Logic การลบรายการตั้งค่าย่อย ได้แก่รายการหักเพิ่มเติมและตารางวันจ่าย (Delete)"
+    ],
+    "not_checked": [
+      {
+        "item": "การปิดใช้งาน Payment Setting หลัก (Deactivate)",
+        "reason": "FRD กำหนดให้ Setting หลักใช้ Active/Inactive แทนการลบ และผู้ตรวจไม่ได้ระบุผล Deactivate แยกต่างหาก"
+      },
+      {
+        "item": "สูตรคำนวณ CCS ดอกเบี้ยบิลขาว ค่าธนาคาร VAT และผล Preview",
+        "reason": "ผลตรวจที่ได้รับระบุเฉพาะ Logic Create / Update / Delete โดยไม่ได้แจกแจงผลการคำนวณ"
+      },
+      {
+        "item": "Validation ช่วงวันจ่ายซ้อน ค่าไม่ถูกต้อง Unique Active และ Optimistic Lock",
+        "reason": "ไม่พบผลตรวจรายกรณีในข้อมูลที่ผู้ตรวจให้มา"
+      },
+      {
+        "item": "การเชื่อมต่อ Cane Payment เพื่ออ่าน Active Setting",
+        "reason": "อยู่นอกขอบเขตผลตรวจที่ผู้ตรวจระบุในรอบนี้"
+      },
+      {
+        "item": "UI และ Layout",
+        "reason": "รอบนี้ตรวจเฉพาะ Logic Create / Update / Delete"
+      },
+      {
+        "item": "UX และความลื่นไหลในการใช้งาน",
+        "reason": "รอบนี้ตรวจเฉพาะ Logic Create / Update / Delete"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้าง Cane Payment Setting (Create)",
+      "expected": "สามารถสร้าง Setting ตามฤดูหีบและสินค้าได้ตามเงื่อนไขใน FRD และรายการพร้อมใช้งาน",
+      "actual": "สร้างได้และใช้งานได้เรียบร้อย",
+      "status": "pass",
+      "ref": "FRD 02_API API-04"
+    },
+    {
+      "item": "แก้ไขและบันทึก Cane Payment Setting (Update)",
+      "expected": "สามารถแก้ไขและบันทึกค่าของ Setting ได้ตามเงื่อนไขใน FRD",
+      "actual": "แก้ไขและบันทึกได้เรียบร้อย",
+      "status": "pass",
+      "ref": "FRD 02_API API-03 / 06_TESTS AC-22"
+    },
+    {
+      "item": "ลบรายการตั้งค่าย่อย (Delete)",
+      "expected": "สามารถลบรายการหักเพิ่มเติมหรือช่วงตารางวันจ่ายที่เลือกได้ตามเงื่อนไขใน FRD",
+      "actual": "ลบได้เรียบร้อย",
+      "status": "pass",
+      "ref": "FRD 02_API API-CH / API-GS / API-WS · 06_TESTS AC-09 / AC-15"
+    },
+    {
+      "item": "ปิดใช้งาน Payment Setting หลัก (Deactivate)",
+      "expected": "เปลี่ยนสถานะ Active เป็น Inactive และไม่อนุญาตให้แก้ไข Setting ที่ Inactive",
+      "actual": "ไม่ได้ระบุผลตรวจรายกรณี",
+      "status": "na",
+      "ref": "FRD 02_API API-06 / 05_RULES §5.2"
+    }
+  ],
+  "ui_checked": false,
+  "ui": [],
+  "ux_checked": false,
+  "ux": [],
+  "bugs": [],
+  "suggestions": []
+}

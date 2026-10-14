@@ -1,0 +1,116 @@
+{
+  "feature": {
+    "code": "F-AGM-009",
+    "name": "AGM Area & Permission",
+    "module": "AGM"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-10-14",
+  "round": 1,
+  "refs": "FRD F-AGM-009 · 03_LOGIC · 05_RULES · 06_TESTS",
+  "summary_note": "ตรวจ Logic การสร้าง แก้ไข และลบตาม flow ที่ระบบรองรับ ผ่านครบตามขอบเขตที่ผู้ตรวจระบุในรอบนี้",
+  "scope": {
+    "checked": [
+      "Logic การสร้างข้อมูล (Create)",
+      "Logic การแก้ไขข้อมูล (Update)",
+      "Logic การลบข้อมูลตาม flow ที่ระบบรองรับ (Delete/Remove)"
+    ],
+    "not_checked": [
+      {
+        "item": "Validation และ edge case รายเงื่อนไข",
+        "reason": "ผลตรวจที่ได้รับระบุภาพรวมว่า Create Update Delete ผ่าน โดยไม่ได้แจกแจงผลรายกรณี"
+      },
+      {
+        "item": "Permission/RBAC สำหรับ System Admin, Director และผู้ใช้ read-only",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลการทดสอบสิทธิ์ในรอบนี้"
+      },
+      {
+        "item": "Audit trail, optimistic lock และ idempotency",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลการทดสอบกฎเชิงระบบในรอบนี้"
+      },
+      {
+        "item": "การเชื่อมต่อ ERP Employee, Geography Master, Farmer และ Quota",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลการทดสอบ integration ในรอบนี้"
+      },
+      {
+        "item": "UI และ Layout",
+        "reason": "รอบนี้ระบุผลเฉพาะ Logic Create Update Delete"
+      },
+      {
+        "item": "UX และความลื่นไหลในการใช้งาน",
+        "reason": "รอบนี้ระบุผลเฉพาะ Logic Create Update Delete"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างข้อมูล (Create)",
+      "expected": "ระบบสร้างข้อมูลตาม flow ของ Area & Permission ได้ และรายการใหม่พร้อมใช้งาน",
+      "actual": "ผู้ตรวจยืนยันว่าทดสอบ Logic Create ครบเรียบร้อย",
+      "status": "pass",
+      "ref": "FRD 03_LOGIC FN-02/FN-C · 06_TESTS AC-07..08, AC-17"
+    },
+    {
+      "item": "แก้ไขข้อมูล (Update)",
+      "expected": "ระบบบันทึกค่าที่แก้ไขและแสดงข้อมูลล่าสุดได้ถูกต้อง",
+      "actual": "ผู้ตรวจยืนยันว่าทดสอบ Logic Update ครบเรียบร้อย",
+      "status": "pass",
+      "ref": "FRD 03_LOGIC FN-03 · API-04"
+    },
+    {
+      "item": "ลบข้อมูลตาม flow ที่รองรับ (Delete/Remove)",
+      "expected": "ระบบลบหรือถอดรายการตาม flow ที่รองรับได้ และข้อมูลที่เกี่ยวข้องอัปเดตถูกต้อง",
+      "actual": "ผู้ตรวจยืนยันว่าทดสอบ Logic Delete ครบเรียบร้อย",
+      "status": "pass",
+      "ref": "FRD API-H2/API-D2 · 06_TESTS AC-16/AC-22"
+    },
+    {
+      "item": "Deactivate guard สำหรับ Area ที่มี Extension Code",
+      "expected": "ระบบไม่อนุญาตให้ปิด Area ที่ยังมี Extension Code",
+      "actual": "ไม่ได้ระบุผลตรวจรายกรณี",
+      "status": "na",
+      "ref": "FRD 05_RULES BR-AP-01 · 06_TESTS AC-11"
+    },
+    {
+      "item": "Geography cascade และรหัสไปรษณีย์อัตโนมัติ",
+      "expected": "จังหวัด อำเภอ ตำบลสัมพันธ์กัน และรหัสไปรษณีย์เติมอัตโนมัติ",
+      "actual": "ไม่ได้ระบุผลตรวจรายกรณี",
+      "status": "na",
+      "ref": "FRD 05_RULES BR-AP-02 · 06_TESTS AC-07"
+    },
+    {
+      "item": "Extension Code และสถานะ EMPTY/OCCUPIED",
+      "expected": "Code 4 หลักผูกได้เฉพาะ Active Area และเปลี่ยนสถานะตาม assign/unassign",
+      "actual": "ไม่ได้ระบุผลตรวจรายกรณี",
+      "status": "na",
+      "ref": "FRD 05_RULES BR-AP-03..05"
+    },
+    {
+      "item": "พนักงาน Active จาก ERP",
+      "expected": "เพิ่ม Head, Director หรือ Officer ได้เฉพาะพนักงานสถานะ Active",
+      "actual": "ไม่ได้ระบุผลตรวจรายกรณี",
+      "status": "na",
+      "ref": "FRD 05_RULES BR-AP-06/BR-AP-10"
+    },
+    {
+      "item": "RBAC write-gate",
+      "expected": "เฉพาะ System Admin และ Director สร้าง แก้ไข เปลี่ยนสถานะ หรือจัดการ role ได้",
+      "actual": "ไม่ได้ระบุผลตรวจรายกรณี",
+      "status": "na",
+      "ref": "FRD 05_RULES BR-AP-07 · 06_TESTS AC-26..27"
+    },
+    {
+      "item": "Audit trail ทุกการเปลี่ยนแปลง",
+      "expected": "ทุก mutation เพิ่มประวัติใหม่พร้อมข้อมูลก่อนและหลัง",
+      "actual": "ไม่ได้ระบุผลตรวจรายกรณี",
+      "status": "na",
+      "ref": "FRD 05_RULES BR-AP-09 · 06_TESTS AC-25"
+    }
+  ],
+  "ui_checked": false,
+  "ui": [],
+  "ux_checked": false,
+  "ux": [],
+  "bugs": [],
+  "suggestions": []
+}

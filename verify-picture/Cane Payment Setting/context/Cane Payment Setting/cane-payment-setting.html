@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ตั้งค่าการจ่ายเงินอ้อย (Payment Setting) · CUBE NATIVE</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+
+<style>
+/* ============== CSS VARIABLES (CUBE CI — Warm Light) ============== */
+:root {
+  --c-navy: #111111;
+  --c-navy-2: #111111;
+  --c-primary: #FF3B30;
+  --c-primary-hover: #E62E24;
+  --c-teal: #FF9A1F;
+  --c-teal-light: #FFB763;
+  --c-ink: #111111;
+  --c-mute: #54565C;
+  --c-mute-2: #73757B;
+  --c-mute-3: #9A9CA2;
+  --c-line: #DEDAD4;
+  --c-line-2: #E9E5E0;
+  --c-line-3: #F1EEEA;
+  --c-bg-off: #FAF8F5;
+  --c-success: #1F9D55;
+  --c-warning: #E8870F;
+  --c-danger: #E62E24;
+  --sidebar-w: 232px;
+  --shell-h: 52px;
+  --fs-h1: 22px; --fs-h2: 17px; --fs-h3: 15px; --fs-body: 14px;
+  --fs-sub: 13px; --fs-meta: 12px; --fs-cap: 11px; --fs-kpi: 28px;
+  --sp-xs: 4px; --sp-sm: 8px; --sp-md: 12px; --sp-lg: 20px; --sp-xl: 28px;
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-full: 999px;
+}
+
+/* ============== RESET ============== */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { scrollbar-gutter: stable; }
+
+/* ============== SCROLLBAR (Iron Rule #49) ============== */
+* { scrollbar-width: thin; scrollbar-color: rgba(17,17,17,.16) transparent; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(17,17,17,.14); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(17,17,17,.26); }
+.sidebar, .slide { scrollbar-color: rgba(255,255,255,.28) transparent; }
+.sidebar ::-webkit-scrollbar-thumb, .slide ::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb, .slide::-webkit-scrollbar-thumb { background: rgba(255,255,255,.28); }
+.sidebar ::-webkit-scrollbar-thumb:hover, .slide ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.42); }
+body {
+  font-family: 'Satoshi', 'Noto Sans Thai', system-ui, sans-serif;
+  background: var(--c-bg-off);
+  color: #2A2B2F;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-width: 1180px;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+[data-lucide] { flex-shrink: 0; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ============== SIDEBAR ============== */
+.sidebar {
+  position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w);
+  background: #111111; color: #E9E5E0; z-index: 20;
+  display: flex; flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.sb-brand { padding: 18px; display: flex; align-items: center; gap: 11px; border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
+.sb-logo {
+  width: 34px; height: 34px; background: linear-gradient(135deg, #FF3B30, #FF9A1F);
+  border-radius: 9px; display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; flex-shrink: 0; box-shadow: 0 4px 12px rgba(255,59,48,0.3);
+}
+.sb-name { font-weight: 700; font-size: 14px; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+.sb-sub { font-size: 10px; color: #9A9CA2; letter-spacing: 0.06em; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+.sb-nav { flex: 1; padding: 12px 8px; overflow-y: auto; }
+.sb-module { margin-bottom: 4px; }
+.sb-module-header {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 8px 10px; border-radius: 6px; background: transparent; border: 0;
+  color: #9A9CA2; font-family: inherit; font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 120ms; text-align: left;
+}
+.sb-module-header:hover { background: rgba(255,255,255,0.04); color: #DEDAD4; }
+.sb-module-header .mod-icon { flex-shrink: 0; opacity: 0.7; }
+.sb-module-header .mod-label { flex: 1; }
+.sb-module-header .mod-chevron { flex-shrink: 0; transition: transform 200ms; opacity: 0.7; }
+.sb-module[data-expanded="false"] .mod-chevron { transform: rotate(-90deg); }
+.sb-module[data-expanded="false"] .sb-features { display: none; }
+.sb-features { padding: 2px 0 6px 0; }
+.sb-item {
+  display: flex; align-items: center; gap: 10px; padding: 7px 12px 7px 14px;
+  border-radius: 6px; color: #DEDAD4; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 120ms; margin-bottom: 1px; position: relative; user-select: none;
+}
+.sb-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sb-item.is-active { background: #FF3B30; color: #fff; font-weight: 600; }
+.sb-item.is-active::before {
+  content: ''; position: absolute; left: -10px; top: 7px; bottom: 7px;
+  width: 3px; background: #fff; border-radius: 0 2px 2px 0;
+}
+.sb-item [data-lucide] { width: 16px; height: 16px; opacity: 0.85; }
+.sb-item.is-active [data-lucide] { opacity: 1; }
+.sb-item.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.sb-item.is-disabled:hover { background: transparent; color: #DEDAD4; }
+.sb-footer {
+  padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: #9A9CA2;
+}
+.pulse-dot { width: 7px; height: 7px; background: var(--c-teal); border-radius: 50%; box-shadow: 0 0 0 3px rgba(255,154,31,0.20); animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+/* ============== MAIN + SHELL BAR ============== */
+.main { margin-left: var(--sidebar-w); min-height: 100vh; background: var(--c-bg-off); }
+.shell-bar {
+  position: sticky; top: 0; background: #fff; border-bottom: 1px solid var(--c-line-2);
+  height: var(--shell-h); display: flex; align-items: center; padding: 0 22px; z-index: 19; gap: 12px;
+}
+.breadcrumb { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--c-mute); }
+.breadcrumb a { cursor: pointer; transition: color 120ms; }
+.breadcrumb a:hover { color: var(--c-primary); }
+.breadcrumb .sep { color: var(--c-mute-3); font-size: 10px; }
+.breadcrumb-current { color: var(--c-ink); font-weight: 500; }
+.icon-btn {
+  width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute); border-radius: 7px; position: relative; transition: all 120ms;
+}
+.icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.icon-btn [data-lucide] { width: 17px; height: 17px; }
+.notif-dot { position: absolute; top: 7px; right: 8px; width: 7px; height: 7px; background: var(--c-danger); border-radius: 50%; border: 2px solid #fff; }
+.user-chip { display: flex; align-items: center; gap: 9px; padding: 5px 10px 5px 12px; border-radius: 8px; cursor: pointer; transition: background 120ms; }
+.user-chip:hover { background: var(--c-line-3); }
+.user-text { line-height: 1.2; text-align: right; }
+.user-name { font-size: 12.5px; font-weight: 500; color: var(--c-ink); white-space: nowrap; }
+.user-role { font-size: 10.5px; color: var(--c-mute-2); white-space: nowrap; margin-top: 1px; }
+.avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; flex-shrink: 0;
+}
+.user-menu {
+  position: absolute; top: calc(var(--shell-h) - 4px); right: 22px; background: #fff;
+  border: 1px solid var(--c-line-2); border-radius: 10px; box-shadow: 0 12px 32px rgba(17,17,17,0.12);
+  width: 240px; z-index: 30; padding: 6px; display: none;
+}
+.user-menu.is-open { display: block; }
+.user-menu-item { display: flex; align-items: center; gap: 10px; padding: 8px 11px; border-radius: 6px; font-size: 13px; color: var(--c-ink); cursor: pointer; transition: background 120ms; }
+.user-menu-item:hover { background: var(--c-bg-off); }
+.user-menu-item [data-lucide] { width: 15px; height: 15px; color: var(--c-mute-2); }
+.user-menu-item.is-danger { color: var(--c-danger); }
+.user-menu-item.is-danger [data-lucide] { color: var(--c-danger); }
+.user-menu-divider { height: 1px; background: var(--c-line-2); margin: 5px 0; }
+
+/* ============== CONTENT (fluid — Iron Rule #30) ============== */
+.content { padding: 22px; }
+
+/* ============== PAGE HEADER ============== */
+.ph { margin-bottom: 18px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.ph > div:first-child { flex: 1 1 auto; min-width: 280px; }
+.ph-title-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px; }
+.ph-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 22px; font-weight: 700; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.ph-count { font-size: 12.5px; font-weight: 600; color: var(--c-mute-2); background: var(--c-line-3); padding: 3px 9px; border-radius: 999px; }
+.ph-sub { font-size: 13px; color: var(--c-mute); margin: 0; }
+.ph-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ============== BUTTONS (Iron Rule #36 — Thai optical center) ============== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px; padding: 2px 14px 0; border-radius: 8px; font-size: 13px; font-weight: 500;
+  border: 1px solid transparent; background: transparent; white-space: nowrap;
+  transition: all 120ms; user-select: none; cursor: pointer;
+}
+.btn [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; }
+.btn:disabled, .btn.is-disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+.btn-eq { min-width: 104px; }
+.btn-primary { background: var(--c-primary); color: #fff; }
+.btn-primary:hover { background: var(--c-primary-hover); box-shadow: 0 2px 8px rgba(255,59,48,0.30); }
+.btn-secondary { background: #fff; border-color: var(--c-line); color: var(--c-ink); }
+.btn-secondary:hover { background: var(--c-line-3); border-color: var(--c-mute-2); }
+.btn-ghost { color: var(--c-mute); }
+.btn-ghost:hover { background: var(--c-line-3); color: var(--c-ink); }
+.btn-danger { background: #fff; border-color: var(--c-line); color: var(--c-danger); }
+.btn-danger:hover { background: #FFE9E7; border-color: var(--c-danger); }
+.btn-danger.is-solid { background: var(--c-danger); border-color: var(--c-danger); color: #fff; }
+.btn-danger.is-solid:hover { background: #C81E15; }
+.btn-link { background: transparent; border: 0; padding: 0 4px; height: auto; color: var(--c-primary); font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn-sm { height: 30px; padding: 2px 11px 0; font-size: 12px; }
+
+/* ============== STATS ============== */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.stat { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; padding: 14px 16px; transition: all 150ms; }
+.stat:hover { border-color: var(--c-line); box-shadow: 0 2px 8px rgba(17,17,17,0.05); }
+.stat-label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--c-mute); }
+.stat-label [data-lucide] { width: 13px; height: 13px; color: var(--c-primary); }
+.stat-value { font-family: 'Noto Sans Thai', sans-serif; font-size: 26px; font-weight: 700; color: var(--c-navy); margin-top: 6px; letter-spacing: -0.01em; }
+.stat-meta { font-size: 11.5px; color: var(--c-mute-2); margin-top: 5px; display: flex; align-items: center; gap: 4px; }
+.stat-meta.is-warn { color: var(--c-warning); }
+.stat-meta [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== CARD / FILTER ============== */
+.card { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; overflow: hidden; }
+.filter-bar { padding: 14px 18px; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid var(--c-line-2); background: #fff; flex-wrap: wrap; }
+
+/* ============== INPUTS ============== */
+.input, .select {
+  height: 36px; padding: 0 12px; border: 1px solid var(--c-line); border-radius: 8px;
+  font-size: 13px; background: #fff; color: var(--c-ink); font-family: inherit; transition: all 120ms; width: 100%;
+}
+.input:focus, .select:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(255,59,48,0.10); }
+.input:disabled, .input[readonly] { background: var(--c-line-3); color: var(--c-mute-2); cursor: not-allowed; border-color: var(--c-line-2); }
+.select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat; background-position: right 10px center; padding-right: 32px; appearance: none;
+}
+.input-search { position: relative; flex: 1; max-width: 340px; }
+.input-search input { padding-left: 36px; }
+.input-search .lead-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--c-mute-2); pointer-events: none; }
+
+/* ===== SEARCH-SELECT (Iron Rule #34) ===== */
+.search-select { position: relative; width: 100%; }
+.search-select .ss-input { padding-left: 34px; padding-right: 34px; }
+.search-select .ss-lead { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--c-mute-3); pointer-events: none; }
+.search-select .ss-caret { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--c-mute-3); pointer-events: none; }
+.search-select .ss-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); display: inline-flex; padding: 3px; border: 0; background: transparent; color: var(--c-mute-2); cursor: pointer; border-radius: 6px; }
+.search-select .ss-clear:hover { background: var(--c-line-3); color: var(--c-ink); }
+.search-select.is-disabled .ss-input { background: var(--c-line-3); color: var(--c-mute-2); cursor: not-allowed; }
+.ss-list {
+  position: absolute; z-index: 70; left: 0; right: 0; margin-top: 4px; max-height: 280px; overflow-y: auto;
+  background: #fff; border: 1px solid var(--c-line); border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(17,17,17,0.10), 0 4px 10px rgba(17,17,17,0.05);
+}
+.ss-opt { width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 0; border-bottom: 1px solid var(--c-line-3); background: transparent; cursor: pointer; text-align: left; font-family: inherit; }
+.ss-opt:last-child { border-bottom: 0; }
+.ss-opt:hover, .ss-opt.is-active { background: rgba(255,59,48,0.06); }
+.ss-opt-ic { width: 16px; height: 16px; color: var(--c-primary); flex-shrink: 0; }
+.ss-opt-main { flex: 1; min-width: 0; }
+.ss-opt-label { display: block; font-size: 13px; color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-sub { display: block; font-size: 11.5px; color: var(--c-mute-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-right { flex-shrink: 0; font-size: 12px; color: var(--c-mute); }
+.ss-opt mark { background: rgba(255,59,48,0.16); color: inherit; padding: 0 1px; border-radius: 2px; }
+.ss-empty { padding: 20px 14px; text-align: center; font-size: 13px; color: var(--c-mute-2); }
+
+/* ============== TABLE ============== */
+.table-scroll { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table thead { background: var(--c-bg-off); }
+.table th {
+  padding: 11px 14px; text-align: left; font-weight: 600; color: var(--c-mute);
+  font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--c-line-2); white-space: nowrap;
+}
+.table th.col-check { width: 40px; padding-right: 0; }
+.table td { padding: 13px 14px 11px; border-bottom: 1px solid var(--c-line-2); color: var(--c-ink); vertical-align: middle; }
+.table tbody tr { transition: background 120ms; }
+.table tbody tr:hover { background: var(--c-bg-off); }
+.table tbody tr.is-selected { background: rgba(255,59,48,0.04); }
+.table tbody tr.is-selected:hover { background: rgba(255,59,48,0.07); }
+.table tbody tr:last-child td { border-bottom: 0; }
+.table tbody tr.is-clickable { cursor: pointer; }
+.table-scroll.is-sticky { max-height: 560px; overflow-y: auto; scrollbar-gutter: stable; }
+.table-scroll.is-sticky thead th { position: sticky; top: 0; z-index: 3; background: var(--c-bg-off); box-shadow: inset 0 -1px 0 var(--c-line-2); }
+.cell-truncate { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+th.col-num, td.col-num { text-align: right; }
+.mono { font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+
+/* ============== CHECKBOX ============== */
+.cb {
+  width: 16px; height: 16px; border: 1.5px solid var(--c-line); border-radius: 4px; background: #fff;
+  cursor: pointer; display: inline-block; position: relative; transition: all 120ms; flex-shrink: 0;
+}
+.cb.is-checked, .cb.is-partial { background: var(--c-primary); border-color: var(--c-primary); }
+.cb.is-checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.cb.is-partial::after { content: ''; position: absolute; left: 3px; top: 6px; width: 8px; height: 2px; background: #fff; }
+.cb:hover { border-color: var(--c-primary); }
+.cb.is-disabled { opacity: 0.35; cursor: not-allowed; }
+.cb.is-disabled:hover { border-color: var(--c-line); }
+
+/* ============== PILLS ============== */
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px 3px; border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.pill [data-lucide] { width: 11px; height: 11px; }
+.pill-info    { background: #E6F0FF; color: #1A5FCC; }
+.pill-success { background: #E4F4EB; color: #157A41; }
+.pill-warning { background: #FFF1DD; color: #B8690B; }
+.pill-danger  { background: #FFE9E7; color: #E62E24; }
+.pill-muted   { background: var(--c-line-3); color: var(--c-mute-2); }
+.pill-outline { background: #fff; border: 1px solid var(--c-line); color: var(--c-mute); }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.8s linear infinite; }
+
+/* ============== FORM SECTION (Iron Rule #45) ============== */
+.form-section { margin-top: var(--sp-xl); }
+.form-section:first-child { margin-top: 0; }
+.form-section-title {
+  font-size: var(--fs-cap); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--c-mute);
+  padding-bottom: var(--sp-sm); border-bottom: 1px solid var(--c-line-2); margin-bottom: var(--sp-md);
+}
+.form-grp { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 16px; }
+
+/* ============== ROW ACTIONS ============== */
+.row-actions { display: inline-flex; gap: 2px; }
+.ra-btn {
+  width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute-2); border-radius: 6px; transition: all 120ms;
+}
+.ra-btn:hover { background: var(--c-line-3); color: var(--c-primary); }
+.ra-btn.is-danger:hover { background: #FFE9E7; color: var(--c-danger); }
+.ra-btn [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== TABLE FOOTER / BULK BAR ============== */
+.table-footer {
+  padding: 12px 18px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2);
+  display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: var(--c-mute); flex-wrap: wrap; gap: 10px;
+}
+.pagination { display: inline-flex; gap: 4px; align-items: center; }
+.pg-btn {
+  min-width: 30px; height: 30px; padding: 0 8px; display: inline-flex; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid var(--c-line-2); border-radius: 6px; color: var(--c-mute);
+  font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 120ms;
+}
+.pg-btn:hover { border-color: var(--c-line); background: var(--c-bg-off); }
+.pg-btn.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.pg-btn.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn [data-lucide] { width: 13px; height: 13px; }
+.bulk-bar {
+  background: var(--c-navy); color: #fff; padding: 11px 18px; border-radius: 8px 8px 0 0;
+  display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--c-line-2); margin: -1px -1px 0; font-size: 13px;
+}
+.bulk-bar .btn { height: 30px; padding: 2px 11px 0; font-size: 12px; }
+.bulk-bar .btn-secondary { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.18); color: #fff; }
+.bulk-bar .btn-secondary:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.30); }
+
+/* ============== DRAWER v2 SHELL (Patterns B/C — locked) ============== */
+.overlay-wrap { position: fixed; inset: 0; z-index: 50; }
+.backdrop { position: absolute; inset: 0; background: rgba(17,17,17,0.40); }
+.drawer-panel {
+  position: absolute; top: 0; right: 0; bottom: 0; width: 920px; max-width: 96vw;
+  background: #fff; display: flex; flex-direction: column;
+  box-shadow: -16px 0 40px rgba(17,17,17,0.18);
+}
+.drawer-panel.standard { width: 680px; }
+.drawer-enter { transform: translateX(100%); }
+.drawer-active { transform: translateX(0); transition: transform 250ms ease-out; }
+.top-icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;
+  border: 0; background: transparent; border-radius: var(--r-sm); color: var(--c-mute-2);
+  cursor: pointer; transition: all 120ms; flex-shrink: 0;
+}
+.top-icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.dw-head { padding: 18px 24px 16px; border-bottom: 1px solid var(--c-line-2); flex-shrink: 0; }
+.dw-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.dw-eyebrow { display: flex; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-mute-2); margin-bottom: 4px; font-weight: 600; }
+.dw-title { font-size: 20px; font-weight: 700; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.dw-sub { font-size: var(--fs-meta); color: var(--c-mute-2); margin-top: 4px; }
+.dw-body { flex: 1; overflow-y: auto; padding: 22px 24px; scrollbar-gutter: stable; }
+.dw-footer {
+  padding: 14px 24px; border-top: 1px solid var(--c-line-2); background: var(--c-bg-off); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.dw-footer-right { display: flex; align-items: center; gap: 8px; }
+.dw-footer-meta { font-size: 12px; color: var(--c-mute-2); }
+.drawer-header-divider { width: 1px; height: 22px; background: var(--c-line-2); margin: 0 4px; flex-shrink: 0; }
+.dw-actions { display: flex; gap: 6px; align-items: center; }
+
+/* Tabs (view drawer) */
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--c-line-2); margin-top: 14px; }
+.tab {
+  display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px 7px;
+  font-size: 13px; font-weight: 500; color: var(--c-mute); background: transparent; border: 0;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; transition: all 120ms;
+}
+.tab [data-lucide] { width: 14px; height: 14px; }
+.tab:hover { color: var(--c-ink); }
+.tab.on { color: var(--c-primary); border-bottom-color: var(--c-primary); font-weight: 600; }
+
+/* View drawer detail grid */
+.dv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
+.dv-cell .dv-lbl { font-size: 11px; color: var(--c-mute-3); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-bottom: 3px; }
+.dv-cell .dv-val { font-size: 13.5px; font-weight: 600; color: var(--c-ink); word-break: break-word; }
+.dv-section { margin-bottom: 24px; }
+.dv-section-title { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; color: var(--c-navy); margin-bottom: 12px; }
+.dv-section-title [data-lucide] { width: 15px; height: 15px; color: var(--c-primary); }
+.dv-note { margin-top: 10px; padding: 10px 12px; background: #FFF1DD; border-radius: 8px; font-size: 12.5px; color: #B8690B; }
+
+/* Info banner (edit rejected — re-submit notice; warning ของ action จริง) */
+.note { padding: 11px 14px; border-radius: 8px; font-size: 12.5px; display: flex; gap: 9px; align-items: flex-start; }
+.note [data-lucide] { width: 15px; height: 15px; margin-top: 1px; }
+.note.is-info { background: #E6F0FF; color: #1A5FCC; }
+.note.is-warn { background: #FFF1DD; color: #B8690B; }
+
+/* ============== TIMELINE ============== */
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 4px; bottom: 4px; width: 2px; background: var(--c-line-2); }
+.tl-item { position: relative; margin-bottom: 16px; }
+.tl-item:last-child { margin-bottom: 0; }
+.tl-dot { position: absolute; left: -20px; top: 3px; width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 2px solid var(--c-primary); }
+.tl-dot.is-success { border-color: var(--c-success); }
+.tl-dot.is-warning { border-color: var(--c-warning); }
+.tl-dot.is-danger { border-color: var(--c-danger); }
+.tl-title { font-size: 13px; font-weight: 600; color: var(--c-ink); }
+.tl-meta { font-size: 11.5px; color: var(--c-mute-2); margin-top: 2px; }
+.tl-note { font-size: 12.5px; color: var(--c-mute); background: var(--c-bg-off); border: 1px solid var(--c-line-2); border-radius: 6px; padding: 7px 10px; margin-top: 6px; }
+
+/* ============== EMPTY STATE ============== */
+.empty { padding: 56px 24px; text-align: center; color: var(--c-mute); }
+.empty-icon { width: 52px; height: 52px; margin: 0 auto 14px; border-radius: 50%; background: var(--c-line-3); color: var(--c-mute-2); display: inline-flex; align-items: center; justify-content: center; }
+.empty-icon [data-lucide] { width: 22px; height: 22px; }
+.empty-title { font-size: 15.5px; font-weight: 600; color: var(--c-ink); margin-bottom: 5px; font-family: 'Noto Sans Thai', sans-serif; }
+.empty-desc { font-size: 13px; color: var(--c-mute); max-width: 320px; margin: 0 auto; }
+.empty .btn { margin-top: 16px; }
+.empty-actions { display: flex; gap: 8px; justify-content: center; }
+.empty-actions .btn { margin-top: 16px; }
+
+/* ============== MODAL ============== */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(17,17,17,0.50); z-index: 60; opacity: 0; pointer-events: none;
+  transition: opacity 200ms; display: flex; align-items: center; justify-content: center;
+}
+.modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: #fff; border-radius: 12px; width: 440px; max-width: 92vw; max-height: 90vh;
+  display: flex; flex-direction: column; transform: scale(0.96);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 24px 64px rgba(17,17,17,0.28); overflow: hidden;
+}
+.modal.is-lg { width: 680px; }
+.modal-backdrop.is-open .modal { transform: scale(1); }
+.modal-header { padding: 18px 22px 12px; display: flex; align-items: flex-start; gap: 12px; }
+.modal-header-icon {
+  width: 36px; height: 36px; border-radius: 8px; background: rgba(255,59,48,0.10); color: var(--c-primary);
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.modal-header-icon.is-danger { background: #FFE9E7; color: var(--c-danger); }
+.modal-header-icon.is-warning { background: #FFF1DD; color: var(--c-warning); }
+.modal-header-icon [data-lucide] { width: 18px; height: 18px; }
+.modal-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 16px; font-weight: 600; color: var(--c-navy); margin: 0 0 4px; }
+.modal-subtitle { font-size: 13px; color: var(--c-mute); margin: 0; line-height: 1.5; }
+.modal-body { padding: 6px 22px 18px; font-size: 13px; color: var(--c-ink); overflow-y: auto; scrollbar-gutter: stable; }
+.modal-footer { padding: 12px 22px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2); display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Import summary chips */
+.imp-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.imp-chip { border-radius: 8px; padding: 12px; text-align: center; border: 1px solid var(--c-line-2); }
+.imp-chip .v { font-size: 22px; font-weight: 700; font-family: 'Noto Sans Thai', sans-serif; }
+.imp-chip .l { font-size: 11.5px; margin-top: 2px; font-weight: 600; }
+.imp-chip.is-total { background: var(--c-bg-off); color: var(--c-mute); }
+.imp-chip.is-ok { background: #E4F4EB; color: #157A41; border-color: #CBE9D8; }
+.imp-chip.is-bad { background: #FFE9E7; color: #E62E24; border-color: #F6D0CC; }
+.imp-errors { border: 1px solid var(--c-line-2); border-radius: 8px; max-height: 220px; overflow-y: auto; }
+.imp-err-row { display: flex; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--c-line-3); font-size: 12.5px; align-items: baseline; }
+.imp-err-row:last-child { border-bottom: 0; }
+.imp-err-row .r { flex-shrink: 0; font-weight: 700; color: var(--c-danger); min-width: 52px; }
+.imp-err-row .f { flex-shrink: 0; color: var(--c-mute); min-width: 90px; }
+.imp-err-row .m { color: var(--c-ink); }
+.imp-err-row .d { color: var(--c-mute-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+
+/* ============== FIELDS ============== */
+.field { margin-bottom: 14px; }
+.field-label { display: block; font-size: 12.5px; font-weight: 500; color: var(--c-mute); margin-bottom: 6px; }
+.field-label .req { color: var(--c-danger); margin-left: 2px; }
+.field-input { width: 100%; }
+.field-help { font-size: 11.5px; color: var(--c-mute-2); margin-top: 4px; }
+.field-error { font-size: 11.5px; color: var(--c-danger); margin-top: 4px; min-height: 15px; visibility: hidden; }
+.field.is-invalid .input, .field.is-invalid .select { border-color: var(--c-danger); }
+.field.is-invalid .field-error { visibility: visible; }
+textarea.input { height: auto; min-height: 74px; padding: 9px 12px; resize: vertical; line-height: 1.55; }
+
+/* ============== TOAST ============== */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; background: var(--c-navy); color: #fff;
+  padding: 13px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; z-index: 80;
+  display: flex; align-items: center; gap: 10px; box-shadow: 0 12px 32px rgba(17,17,17,0.30);
+  transform: translateY(100px); opacity: 0; transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1); max-width: 380px;
+}
+.toast.is-visible { transform: translateY(0); opacity: 1; }
+.toast.is-success { background: var(--c-success); }
+.toast.is-info { background: var(--c-primary); }
+.toast.is-warning { background: var(--c-warning); }
+.toast.is-error { background: var(--c-danger); }
+.toast [data-lucide] { width: 17px; height: 17px; }
+
+/* ============== UTILITIES ============== */
+.hidden { display: none !important; }
+.text-mute { color: var(--c-mute); }
+.text-mute-2 { color: var(--c-mute-2); }
+.text-primary { color: var(--c-primary); }
+.text-danger { color: var(--c-danger); }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.w-2\.5 { width: 10px; }   .h-2\.5 { height: 10px; }
+.w-3   { width: 12px; }    .h-3   { height: 12px; }
+.w-3\.5 { width: 14px; }   .h-3\.5 { height: 14px; }
+.w-4   { width: 16px; }    .h-4   { height: 16px; }
+.w-5   { width: 20px; }    .h-5   { height: 20px; }
+svg.lucide { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; flex-shrink: 0; }
+svg.lucide.w-2\.5 { width: 10px; }   svg.lucide.h-2\.5 { height: 10px; }
+svg.lucide.w-3    { width: 12px; }   svg.lucide.h-3    { height: 12px; }
+svg.lucide.w-3\.5 { width: 14px; }   svg.lucide.h-3\.5 { height: 14px; }
+svg.lucide.w-4    { width: 16px; }   svg.lucide.h-4    { height: 16px; }
+svg.lucide.w-5    { width: 20px; }   svg.lucide.h-5    { height: 20px; }
+</style>
+</head><body>
+
+<!-- ===== SIDEBAR (Pattern N) ===== -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i data-lucide="box" class="w-4 h-4"></i></div>
+    <div><div class="sb-name">CUBE NATIVE</div><div class="sb-sub">AGM · WKN</div></div>
+  </div>
+  <nav class="sb-nav" id="sb-nav">
+    <div class="sb-module" data-module="agm" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sprout" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">เกษตรกรรม</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item is-disabled" data-feature="farmer-members"><i data-lucide="users" class="w-4 h-4"></i><span>จัดการสมาชิกเกษตรกร</span></a>
+        <a class="sb-item is-disabled" data-feature="quota"><i data-lucide="scale" class="w-4 h-4"></i><span>จัดการโควตา</span></a>
+        <a class="sb-item is-disabled" data-feature="plots"><i data-lucide="map" class="w-4 h-4"></i><span>จัดการแปลงที่ดิน</span></a>
+        <a class="sb-item is-disabled" data-feature="crops"><i data-lucide="wheat" class="w-4 h-4"></i><span>จัดการรอบปลูก</span></a>
+        <a class="sb-item is-disabled" data-feature="cane-contract"><i data-lucide="file-signature" class="w-4 h-4"></i><span>จัดการสัญญาส่งอ้อย</span></a>
+        <a class="sb-item is-disabled" data-feature="surveys"><i data-lucide="clipboard-list" class="w-4 h-4"></i><span>จัดการแบบสำรวจ</span></a>
+        <a class="sb-item is-disabled" data-feature="cane-bookings"><i data-lucide="calendar-clock" class="w-4 h-4"></i><span>จัดการจองรอบส่งอ้อย</span></a>
+        <a class="sb-item is-disabled" data-feature="debtors"><i data-lucide="wallet" class="w-4 h-4"></i><span>จัดการหนี้ลูกหนี้</span></a>
+        <a class="sb-item is-disabled" data-feature="areas"><i data-lucide="shield-check" class="w-4 h-4"></i><span>พื้นที่และการกำหนดสิทธิ์</span></a>
+        <a class="sb-item is-disabled" data-feature="checkin"><i data-lucide="log-in" class="w-4 h-4"></i><span>เช็คอินรับอ้อย</span></a>
+        <a class="sb-item is-disabled" data-feature="receiving"><i data-lucide="scale" class="w-4 h-4"></i><span>การรับอ้อย</span></a>
+        <a class="sb-item is-active" data-feature="payment-setting"><i data-lucide="banknote" class="w-4 h-4"></i><span>ตั้งค่าการจ่ายเงินอ้อย</span></a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="system" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sliders-horizontal" class="mod-icon w-3.5 h-3.5"></i><span class="mod-label">System</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features"><a class="sb-item is-disabled" data-feature="settings"><i data-lucide="settings" class="w-4 h-4"></i><span>Settings</span></a></div>
+    </div>
+  </nav>
+  <div class="sb-footer"><div class="pulse-dot"></div><span>WKN Prototype · v1.0.0</span></div>
+</aside>
+
+<main class="main">
+  <header class="shell-bar">
+    <nav class="breadcrumb">
+      <a data-breadcrumb-module="agm">เกษตรกรรม</a>
+      <i data-lucide="chevron-right" class="w-3 h-3 sep"></i>
+      <a>Cane Payment</a>
+      <i data-lucide="chevron-right" class="w-3 h-3 sep"></i>
+      <span class="breadcrumb-current">ตั้งค่าการจ่ายเงินอ้อย</span>
+    </nav>
+    <div style="display:flex; align-items:center; gap:6px; margin-left:auto;">
+      <div style="position:relative;"><button class="icon-btn" id="notifBtn"><i data-lucide="bell" class="w-4 h-4"></i><span class="notif-dot"></span></button></div>
+      <div style="position:relative;">
+        <div class="user-chip" onclick="toggleUserMenu()">
+          <div class="user-text"><div class="user-name">สมพร วงศ์ทะเบียน</div><div class="user-role">Finance Officer · WKN</div></div>
+          <div class="avatar">สว</div>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-item"><i data-lucide="user" class="w-3.5 h-3.5"></i><span>My Profile</span></div>
+          <div class="user-menu-item"><i data-lucide="settings" class="w-3.5 h-3.5"></i><span>Preferences</span></div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-item is-danger"><i data-lucide="log-out" class="w-3.5 h-3.5"></i><span>Sign out</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="content" id="page-content"></div>
+</main>
+
+<div id="overlay-root"></div>
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"><div class="modal" id="modalBox" onclick="event.stopPropagation()"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function loadLucide(){var v='0.469.0';var cdns=['https://unpkg.com/lucide@'+v+'/dist/umd/lucide.min.js','https://cdn.jsdelivr.net/npm/lucide@'+v+'/dist/umd/lucide.min.js','https://cdnjs.cloudflare.com/ajax/libs/lucide/'+v+'/lucide.min.js'];var i=0;function n(){if(i>=cdns.length){window.lucide=window.lucide||{createIcons:function(){}};window.dispatchEvent(new Event('lucide:ready'));return;}var s=document.createElement('script');s.src=cdns[i++];s.onload=function(){window.dispatchEvent(new Event('lucide:ready'));};s.onerror=n;document.head.appendChild(s);}n();})();
+</script>
+
+<script>
+// ============================================
+// USER (F-AGM-012 · Cane Payment Setting · WKN)
+// ============================================
+var CURRENT_ROLE = 'Finance Officer';
+var canWrite = true;
+const CURRENT_USER = { id:'u-wkn-fin-01', name:'สมพร วงศ์ทะเบียน', role:CURRENT_ROLE };
+
+// ---- Masters / constants ----
+const BASE_10CCS = 900.00; // Base price @ 10 CCS (บาท/ตัน)
+const PROVINCES = ['ขอนแก่น','กาญจนบุรี','ราชบุรี','นครปฐม'];
+const SEASONS = ['2024/2025','2023/2024','2022/2023'];
+const THAI_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const THAI_MONTHS_SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const NAV = [
+  { key:'general', icon:'settings', label:'ข้อมูลทั่วไป' },
+  { key:'ccs-delta', icon:'trending-up', label:'สูตรคำนวณ CCS' },
+  { key:'additional-charges', icon:'dollar-sign', label:'รายการหักเพิ่มเติม' },
+  { key:'tax', icon:'file-text', label:'ภาษี' },
+  { key:'payout-schedule', icon:'calendar', label:'ตารางกำหนดวันจ่าย' },
+  { key:'preview-test', icon:'eye', label:'ทดสอบและดูตัวอย่าง' }
+];
+
+// ============================================
+// STATE (source-of-truth config)
+// ============================================
+var _seq = 10;
+const state = {
+  section: 'general',
+  season: '2024/2025',
+  general: { product:'อ้อยสด', note:'', rateYear:'7.00', baseDays:'365', mainProvince:'', feeIn:'5.00', feeOut:'15.00' },
+  ccs: { k:'0.060', sampleCcs:'12' },
+  charges: [
+    { id:'c1', name:'ค่าขนส่ง', type:'amount', value:50, note:'หักต่อตัน' },
+    { id:'c2', name:'ค่าปรับความชื้น', type:'percent', value:2, note:'หักจากยอดรวม' }
+  ],
+  tax: { vatEnabled:false, vatRate:'7' },
+  payoutTab: 'green',
+  payout: {
+    green: [
+      { id:'g1', month:10, year:2568, from:1,  to:15, pay1:'2025-11-15', pay2:'2025-11-30', active:true },
+      { id:'g2', month:10, year:2568, from:16, to:30, pay1:'2025-11-30', pay2:'2025-12-15', active:true },
+      { id:'g3', month:11, year:2568, from:1,  to:15, pay1:'2025-12-15', pay2:'2025-12-30', active:true }
+    ],
+    white: [
+      { id:'w1', month:10, year:2568, from:1, to:7,  payType:'FIXED_DATE', payDate:'2025-11-12', active:true },
+      { id:'w2', month:10, year:2568, from:8, to:15, payType:'WITH_CANE',  payDate:'', active:true }
+    ]
+  },
+  preview: { ccs:'12', weight:'30', sendDate:'', bill1:'green', bill2:'white', debtPct:'10', province:'' },
+  previewResult: null,
+  modal: { open:false, type:null, data:null }
+};
+
+// ============================================
+// HELPERS
+// ============================================
+function renderIcons(){ if(window.lucide&&typeof window.lucide.createIcons==='function') window.lucide.createIcons(); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showToast(msg,variant,ms,desc){ variant=variant||'info'; ms=ms||3200; var el=document.getElementById('toast'); var im={success:'check-circle-2',info:'info',warning:'alert-triangle',error:'x-circle'}; el.className='toast is-'+variant; el.innerHTML='<i data-lucide="'+(im[variant]||'info')+'" class="w-4 h-4"></i><span>'+esc(msg)+(desc?'<br><span style="opacity:.85;font-weight:400;font-size:12px;">'+esc(desc)+'</span>':'')+'</span>'; renderIcons(); requestAnimationFrame(function(){ el.classList.add('is-visible'); }); clearTimeout(showToast._t); showToast._t=setTimeout(function(){ el.classList.remove('is-visible'); },ms); }
+function toggleModule(h){ var m=h.closest('.sb-module'); if(!m)return; var e=m.getAttribute('data-expanded')!=='false'; m.setAttribute('data-expanded',e?'false':'true'); }
+function toggleUserMenu(){ document.getElementById('userMenu').classList.toggle('is-open'); }
+document.addEventListener('click',function(e){ if(!e.target.closest('.user-chip')&&!e.target.closest('.user-menu')){ var um=document.getElementById('userMenu'); if(um)um.classList.remove('is-open'); } });
+
+function val(id){ var e=document.getElementById(id); return e?e.value:''; }
+function setTxt(id,v){ var e=document.getElementById(id); if(e)e.textContent=v; }
+function fmt2(n){ n=Number(n); if(isNaN(n))n=0; return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function round2(n){ n=Number(n); if(isNaN(n))n=0; return Math.round((n+Number.EPSILON)*100)/100; }
+function roundUp(n,dec){ var f=Math.pow(10,dec); return Math.ceil((Number(n)||0)*f)/f; }
+function dailyRateVal(){ var r=parseFloat(state.general.rateYear)||0; var b=parseFloat(state.general.baseDays)||0; if(b<=0)return 0; return roundUp(r/b,7); }
+function dailyRateStr(){ return dailyRateVal().toFixed(7); }
+function fmtThaiDate(iso){ if(!iso)return '-'; var p=String(iso).split('-'); if(p.length!==3)return esc(iso); var d=parseInt(p[2],10), m=parseInt(p[1],10)-1, y=parseInt(p[0],10)+543; if(isNaN(d)||isNaN(m)||isNaN(y)||m<0||m>11)return esc(iso); return d+' '+THAI_MONTHS_SHORT[m]+' '+y; }
+function rangeStr(r){ return THAI_MONTHS[r.month]+' '+r.year+' / วันที่ '+r.from+'–'+r.to; }
+
+function statusPill(active){ return active?'<span class="pill pill-success">ใช้งาน</span>':'<span class="pill pill-muted">ปิด</span>'; }
+function dvCell(l,v){ return '<div class="dv-cell"><div class="dv-lbl">'+esc(l)+'</div><div class="dv-val">'+v+'</div></div>'; }
+function field(label,inner){ return '<div class="field" style="margin-bottom:0;"><label class="field-label">'+esc(label)+'</label>'+inner+'</div>'; }
+function switchHTML(on,onclick){ return '<button type="button" onclick="'+onclick+'" style="width:42px;height:23px;border-radius:999px;border:0;padding:0;position:relative;flex-shrink:0;cursor:pointer;transition:background 150ms;background:'+(on?'var(--c-primary)':'var(--c-line)')+';"><span style="position:absolute;top:2px;left:'+(on?'21px':'2px')+';width:19px;height:19px;border-radius:50%;background:#fff;transition:left 150ms;box-shadow:0 1px 3px rgba(17,17,17,0.25);"></span></button>'; }
+function provinceOpts(sel,ph){ var o='<option value="" '+(sel?'':'selected')+' disabled hidden>'+esc(ph)+'</option>'; PROVINCES.forEach(function(p){ o+='<option value="'+esc(p)+'"'+(sel===p?' selected':'')+'>'+esc(p)+'</option>'; }); return o; }
+function seasonOpts(){ return SEASONS.map(function(s){ return '<option'+(state.season===s?' selected':'')+'>'+esc(s)+'</option>'; }).join(''); }
+function billOpts(sel){ return '<option value="green"'+(sel==='green'?' selected':'')+'>บิลเขียว (ปกติ)</option><option value="white"'+(sel==='white'?' selected':'')+'>บิลขาว (เบิกล่วงหน้า มีดอกเบี้ย)</option>'; }
+
+function emptyStateHTML(cfg){ cfg=cfg||{}; var acts=''; if(cfg.actions){ acts='<div class="empty-actions">'+cfg.actions.map(function(a){ return '<button class="btn '+(a.cls||'btn-primary')+'" onclick="'+a.onAction+'">'+(a.icon?'<i data-lucide="'+a.icon+'" class="w-4 h-4"></i>':'')+'<span>'+a.label+'</span></button>'; }).join('')+'</div>'; } return '<div class="empty"><div class="empty-icon"><i data-lucide="'+(cfg.icon||'inbox')+'" class="w-5 h-5"></i></div><div class="empty-title">'+(cfg.title||'ยังไม่มีข้อมูล')+'</div><div class="empty-desc">'+(cfg.desc||'')+'</div>'+acts+'</div>'; }
+
+// ---- inline field setters (avoid inline state access) ----
+function setNote(v){ state.general.note=v; }
+function setFeeIn(v){ state.general.feeIn=v; }
+function setFeeOut(v){ state.general.feeOut=v; }
+function setMainProvince(v){ state.general.mainProvince=v; }
+function setVatRate(v){ state.tax.vatRate=v; }
+function setSeason(v){ state.season=v; }
+
+// ============================================
+// ROUTER (single config route)
+// ============================================
+function getRoute(){ var h=location.hash; if(!h||h==='#'||h==='#/')return 'payment-setting'; return h.replace(/^#\//,''); }
+function navigate(r){ location.hash='#/'+r; }
+
+// ============================================
+// RENDER PRESERVATION
+// ============================================
+function preserveState(){ var a=document.activeElement; var isI=a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'); return { pageScroll:window.scrollY, focusKey:isI?{id:a.id||'',placeholder:a.placeholder||'',selStart:a.selectionStart,selEnd:a.selectionEnd}:null }; }
+function restoreState(s){ if(!s)return; requestAnimationFrame(function(){ if(s.pageScroll>0)window.scrollTo(0,s.pageScroll); if(s.focusKey){ var c=s.focusKey.id?document.getElementById(s.focusKey.id):null; if(!c){ var cs=document.querySelectorAll('input,textarea'); for(var i=0;i<cs.length;i++){ if((cs[i].placeholder||'')===s.focusKey.placeholder){ c=cs[i]; break; } } } if(c){ c.focus(); if(s.focusKey.selStart!=null&&c.setSelectionRange){ try{ c.setSelectionRange(s.focusKey.selStart,s.focusKey.selEnd); }catch(e){} } } } }); }
+
+// ============================================
+// PAGE RENDER
+// ============================================
+function render(){ var snap=preserveState(); renderConfig(); renderIcons(); restoreState(snap); }
+function setSection(k){ state.section=k; render(); }
+function setPayoutTab(t){ state.payoutTab=t; render(); }
+
+function phHeader(){
+  return '<div class="ph"><div><div class="ph-title-row"><h1 class="ph-title">Payment Setting Configuration</h1>'+statusPill(true)+'</div>'
+    +'<p class="ph-sub">แหล่งความจริงของค่าพื้นฐานที่ Cane Payment ใช้คำนวณ</p></div>'
+    +'<div class="ph-actions"><button class="btn btn-primary" onclick="saveSettings()"><i data-lucide="save" class="w-4 h-4"></i><span>บันทึก</span></button></div></div>';
+}
+function contextBar(){
+  return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-bottom:18px;padding:14px 16px;background:#fff;border:1px solid var(--c-line-2);border-radius:10px;">'
+    +'<div style="display:flex;align-items:center;gap:9px;">'
+    +'<span style="font-size:12.5px;font-weight:600;color:var(--c-mute);">ฤดูการหีบ (Crushing Season)</span>'
+    +'<select class="select" style="max-width:160px;" onchange="setSeason(this.value)">'+seasonOpts()+'</select>'
+    +'</div>'
+    +'<span style="width:1px;height:22px;background:var(--c-line-2);"></span>'
+    +'<span class="pill pill-muted">Product: อ้อยสด</span>'
+    +'<span class="pill pill-info">Base @10CCS: 900.00 บาท/ตัน</span>'
+    +'</div>';
+}
+function innerNav(){
+  return '<div style="display:flex;flex-direction:column;gap:2px;">'+NAV.map(function(n){
+    var on=state.section===n.key;
+    return '<button type="button" onclick="setSection(\''+n.key+'\')" style="display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 12px;border-radius:8px;border:1px solid '+(on?'var(--c-primary)':'transparent')+';background:'+(on?'rgba(255,59,48,0.06)':'transparent')+';color:'+(on?'var(--c-primary)':'var(--c-ink)')+';font-family:inherit;font-size:13px;font-weight:'+(on?'600':'500')+';cursor:pointer;transition:all 120ms;"><i data-lucide="'+n.icon+'" class="w-4 h-4"></i><span>'+esc(n.label)+'</span></button>';
+  }).join('')+'</div>';
+}
+function sectionBody(){
+  switch(state.section){
+    case 'general': return secGeneral();
+    case 'ccs-delta': return secCcs();
+    case 'additional-charges': return secCharges();
+    case 'tax': return secTax();
+    case 'payout-schedule': return secPayout();
+    case 'preview-test': return secPreview();
+    default: return secGeneral();
+  }
+}
+function renderConfig(){
+  document.getElementById('page-content').innerHTML =
+    phHeader()+contextBar()
+    +'<div style="display:grid;grid-template-columns:240px 1fr;gap:18px;align-items:start;">'
+    +'<div class="card" style="padding:10px;">'+innerNav()+'</div>'
+    +'<div class="card" style="padding:22px 24px;">'+sectionBody()+'</div>'
+    +'</div>';
+}
+
+// ============================================
+// SECTION 1 — ข้อมูลทั่วไป (General)
+// ============================================
+function onGeneralNum(){ var g=state.general; var r=document.getElementById('g-rate'); if(r)g.rateYear=r.value; var b=document.getElementById('g-base'); if(b)g.baseDays=b.value; var d=document.getElementById('g-daily'); if(d)d.value=dailyRateStr(); }
+function secGeneral(){
+  var g=state.general;
+  return '<div class="form-section" style="margin-top:0;">'
+    +'<div class="form-section-title">ข้อมูลสินค้า</div>'
+    +'<div class="form-grp">'
+    + field('สินค้าอ้อย','<select class="select"><option>อ้อยสด</option></select>')
+    + field('หมายเหตุ','<textarea class="input" placeholder="กรอกหมายเหตุเพิ่มเติม (ถ้าต้องการ)" oninput="setNote(this.value)">'+esc(g.note)+'</textarea>')
+    +'</div></div>'
+    +'<div class="form-section">'
+    +'<div class="form-section-title">ดอกเบี้ยบิลขาว</div>'
+    +'<div class="form-grp">'
+    + field('ดอกเบี้ยต่อปี (%)','<input class="input mono" id="g-rate" type="number" step="0.01" min="0" value="'+esc(g.rateYear)+'" oninput="onGeneralNum()">')
+    + field('วันฐาน (วัน)','<input class="input mono" id="g-base" type="number" min="1" value="'+esc(g.baseDays)+'" oninput="onGeneralNum()">')
+    + field('ดอกเบี้ยต่อวัน','<input class="input mono" id="g-daily" type="text" readonly value="'+dailyRateStr()+'">')
+    +'</div>'
+    +'<div class="note is-info" style="margin-top:12px;"><i data-lucide="info" class="w-4 h-4"></i><span>ระบบคำนวณ <b>ดอกเบี้ยต่อวัน</b> อัตโนมัติ = ดอกเบี้ยต่อปี ÷ วันฐาน (ปัดขึ้น 7 ตำแหน่ง) — ใช้คำนวณดอกเบี้ยของบิลขาว (เบิกล่วงหน้า)</span></div>'
+    +'</div>'
+    +'<div class="form-section">'
+    +'<div class="form-section-title">ค่าธนาคาร</div>'
+    +'<div class="form-grp">'
+    + field('จังหวัดหลัก','<select class="select" onchange="setMainProvince(this.value)">'+provinceOpts(g.mainProvince,'เลือกจังหวัด')+'</select>')
+    + field('ค่าธรรมเนียมในจังหวัด (บาท)','<input class="input mono" type="number" step="0.01" min="0" value="'+esc(g.feeIn)+'" oninput="setFeeIn(this.value)">')
+    + field('ค่าธรรมเนียมต่างจังหวัด (บาท)','<input class="input mono" type="number" step="0.01" min="0" value="'+esc(g.feeOut)+'" oninput="setFeeOut(this.value)">')
+    +'</div></div>';
+}
+
+// ============================================
+// SECTION 2 — สูตรคำนวณ CCS (CCS Delta)
+// ============================================
+function onCcsInput(){ var k=parseFloat(val('ccs-k'))||0; var c=parseFloat(val('ccs-sample'))||0; state.ccs.k=val('ccs-k'); state.ccs.sampleCcs=val('ccs-sample'); var base=BASE_10CCS; var per1=base*k; var perton=base+(c-10)*per1; var perkg=perton/1000; setTxt('ccs-base',fmt2(base)); setTxt('ccs-per1',fmt2(per1)); setTxt('ccs-perton',fmt2(perton)); setTxt('ccs-perkg',fmt2(perkg)); setTxt('ccs-perton-lbl','ราคาต่อตัน @'+c+' CCS'); }
+function ccsStat(label,valId,v,meta){ return '<div class="stat"><div class="stat-label">'+esc(label)+'</div><div class="stat-value num" id="'+valId+'">'+v+'</div><div class="stat-meta">'+esc(meta)+'</div></div>'; }
+function ccsStatL(label,lblId,valId,v,meta){ return '<div class="stat"><div class="stat-label" id="'+lblId+'">'+esc(label)+'</div><div class="stat-value num" id="'+valId+'">'+v+'</div><div class="stat-meta">'+esc(meta)+'</div></div>'; }
+function secCcs(){
+  var k=parseFloat(state.ccs.k)||0; var c=parseFloat(state.ccs.sampleCcs)||0;
+  var base=BASE_10CCS; var per1=base*k; var perton=base+(c-10)*per1; var perkg=perton/1000;
+  return '<div class="form-section" style="margin-top:0;">'
+    +'<div class="note is-info"><i data-lucide="info" class="w-4 h-4"></i><span>สูตร: ราคาต่อตัน = Base @10CCS + (CCS − 10) × (Base @10CCS × K)<br>โดยที่ K คือค่าคงที่สำหรับคำนวณราคาต่อ 1 CCS</span></div>'
+    +'<div class="form-grp" style="margin-top:16px;">'
+    + field('ค่า K','<input class="input mono" id="ccs-k" type="number" step="0.001" min="0" max="1" value="'+esc(state.ccs.k)+'" oninput="onCcsInput()">')
+    + field('ค่า CCS ตัวอย่าง','<input class="input mono" id="ccs-sample" type="number" step="0.1" value="'+esc(state.ccs.sampleCcs)+'" oninput="onCcsInput()">')
+    +'</div>'
+    +'<div class="stats" style="margin-top:18px;">'
+    + ccsStat('Base Price @10CCS','ccs-base',fmt2(base),'บาท/ตัน (ค่าคงที่)')
+    + ccsStat('ราคาต่อ 1 CCS','ccs-per1',fmt2(per1),'บาท (Base × K)')
+    + ccsStatL('ราคาต่อตัน @'+c+' CCS','ccs-perton-lbl','ccs-perton',fmt2(perton),'บาท/ตัน')
+    + ccsStat('ราคาต่อกิโลกรัม','ccs-perkg',fmt2(perkg),'บาท/กก. (÷1000)')
+    +'</div></div>';
+}
+
+// ============================================
+// SECTION 3 — รายการหักเพิ่มเติม (Additional Charges)
+// ============================================
+function secCharges(){
+  var rows=state.charges.map(function(c){
+    var typeLabel=c.type==='amount'?'จำนวนเงิน':'เปอร์เซ็นต์';
+    var valDisp=c.type==='amount'?(fmt2(c.value)+' บาท'):(fmt2(c.value)+' %');
+    return '<tr><td style="font-weight:600;">'+esc(c.name)+'</td><td>'+typeLabel+'</td><td class="mono">'+valDisp+'</td><td>'+esc(c.note||'-')+'</td>'
+      +'<td style="text-align:right;"><div class="row-actions" style="justify-content:flex-end;">'
+      +'<button class="ra-btn" onclick="editCharge(\''+c.id+'\')" title="แก้ไข"><i data-lucide="pencil" class="w-4 h-4"></i></button>'
+      +'<button class="ra-btn is-danger" onclick="deleteCharge(\''+c.id+'\')" title="ลบ"><i data-lucide="trash-2" class="w-4 h-4"></i></button>'
+      +'</div></td></tr>';
+  }).join('');
+  return '<div class="form-section" style="margin-top:0;">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">'
+    +'<div style="font-size:15px;font-weight:700;color:var(--c-navy);font-family:\'Noto Sans Thai\',sans-serif;">รายการหักเพิ่มเติม</div>'
+    +'<button class="btn btn-primary btn-sm" onclick="addCharge()"><i data-lucide="plus" class="w-4 h-4"></i><span>เพิ่มรายการ</span></button></div>'
+    +'<div class="table-scroll"><table class="table"><thead><tr><th>ชื่อรายการ</th><th>ประเภท</th><th>ค่า</th><th>หมายเหตุ</th><th style="text-align:right;">จัดการ</th></tr></thead><tbody>'+(state.charges.length?rows:'')+'</tbody></table>'
+    +(state.charges.length?'':emptyStateHTML({icon:'inbox',title:'ยังไม่มีรายการ',desc:'กดปุ่ม เพิ่มรายการ เพื่อเพิ่มรายการหักเพิ่มเติม'}))
+    +'</div></div>';
+}
+
+// ============================================
+// SECTION 4 — ภาษี (Tax)
+// ============================================
+function toggleVat(){ state.tax.vatEnabled=!state.tax.vatEnabled; render(); }
+function secTax(){
+  var t=state.tax;
+  return '<div class="form-section" style="margin-top:0;">'
+    +'<div class="note is-info"><i data-lucide="info" class="w-4 h-4"></i><span>หากเลือกหัก VAT → ระบบจะคำนวณ VAT ก่อน แล้วค่อยแบ่งยอดเป็นงวด 1/2</span></div>'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:18px;padding:14px 16px;border:1px solid var(--c-line-2);border-radius:10px;">'
+    +'<div><div style="font-size:13.5px;font-weight:600;color:var(--c-ink);">หัก VAT ก่อนแบ่งงวด</div><div style="font-size:12px;color:var(--c-mute-2);margin-top:2px;">เปิดเพื่อคำนวณภาษีมูลค่าเพิ่มก่อนแบ่งยอดงวด</div></div>'
+    + switchHTML(t.vatEnabled,'toggleVat()')
+    +'</div>'
+    + (t.vatEnabled?('<div class="form-grp" style="margin-top:14px;">'+field('อัตรา VAT (%)','<input class="input mono" type="number" step="0.01" min="0" value="'+esc(t.vatRate)+'" oninput="setVatRate(this.value)">')+'</div>'):'')
+    +'</div>';
+}
+
+// ============================================
+// SECTION 5 — ตารางกำหนดวันจ่าย (Payout Schedule)
+// ============================================
+function secPayout(){
+  var tab=state.payoutTab;
+  var tabs='<div class="tabs" style="margin-top:0;margin-bottom:16px;">'
+    +'<button class="tab '+(tab==='green'?'on':'')+'" onclick="setPayoutTab(\'green\')"><i data-lucide="calendar-check" class="w-3.5 h-3.5"></i><span>ตารางวันจ่ายบิลเขียว</span></button>'
+    +'<button class="tab '+(tab==='white'?'on':'')+'" onclick="setPayoutTab(\'white\')"><i data-lucide="calendar-days" class="w-3.5 h-3.5"></i><span>ตารางวันจ่ายบิลขาว</span></button>'
+    +'</div>';
+  return '<div class="form-section" style="margin-top:0;">'+tabs+(tab==='green'?greenTable():whiteTable())+'</div>';
+}
+function payoutHeader(tab){
+  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">'
+    +'<div style="font-size:12.5px;color:var(--c-mute);">'+(tab==='green'?'กำหนดวันจ่ายงวด 1 และ งวด 2 สำหรับบิลเขียว':'กำหนดวันจ่ายสำหรับบิลขาว (เบิกล่วงหน้า)')+'</div>'
+    +'<button class="btn btn-primary btn-sm" onclick="addPayout(\''+tab+'\')"><i data-lucide="plus" class="w-4 h-4"></i><span>เพิ่มช่วง</span></button></div>';
+}
+function greenTable(){
+  var rows=state.payout.green.map(function(r,i){
+    return '<tr><td class="mono">'+(i+1)+'</td>'
+      +'<td>'+esc(rangeStr(r))+'</td>'
+      +'<td class="mono">'+fmtThaiDate(r.pay1)+'</td>'
+      +'<td class="mono">'+fmtThaiDate(r.pay2)+'</td>'
+      +'<td>'+switchHTML(r.active,'togglePayoutActive(\'green\',\''+r.id+'\')')+'</td>'
+      +'<td style="text-align:right;"><div class="row-actions" style="justify-content:flex-end;">'
+      +'<button class="ra-btn" onclick="editPayout(\'green\',\''+r.id+'\')" title="แก้ไข"><i data-lucide="pencil" class="w-4 h-4"></i></button>'
+      +'<button class="ra-btn is-danger" onclick="deletePayout(\'green\',\''+r.id+'\')" title="ลบ"><i data-lucide="trash-2" class="w-4 h-4"></i></button>'
+      +'</div></td></tr>';
+  }).join('');
+  return payoutHeader('green')
+    +'<div class="table-scroll"><table class="table"><thead><tr><th style="width:44px;">#</th><th>ช่วงวันที่ส่ง/ขึ้นเงิน</th><th>วันจ่ายงวด 1</th><th>วันจ่ายงวด 2</th><th>การใช้งาน</th><th style="text-align:right;">จัดการ</th></tr></thead><tbody>'+(state.payout.green.length?rows:'')+'</tbody></table>'
+    +(state.payout.green.length?'':emptyStateHTML({icon:'calendar-x',title:'ยังไม่มีช่วงการจ่าย',desc:'กดปุ่ม เพิ่มช่วง เพื่อกำหนดตารางวันจ่ายบิลเขียว'}))
+    +'</div>';
+}
+function whiteTable(){
+  var rows=state.payout.white.map(function(r,i){
+    var payCell=r.payType==='FIXED_DATE'?('<span class="mono">'+fmtThaiDate(r.payDate)+'</span>'):'<span style="color:var(--c-mute);">ตามตารางบิลเขียว (ไม่คิดดอกเบี้ย)</span>';
+    return '<tr><td class="mono">'+(i+1)+'</td>'
+      +'<td>'+esc(rangeStr(r))+'</td>'
+      +'<td>'+payCell+'</td>'
+      +'<td>'+switchHTML(r.active,'togglePayoutActive(\'white\',\''+r.id+'\')')+'</td>'
+      +'<td style="text-align:right;"><div class="row-actions" style="justify-content:flex-end;">'
+      +'<button class="ra-btn" onclick="editPayout(\'white\',\''+r.id+'\')" title="แก้ไข"><i data-lucide="pencil" class="w-4 h-4"></i></button>'
+      +'<button class="ra-btn is-danger" onclick="deletePayout(\'white\',\''+r.id+'\')" title="ลบ"><i data-lucide="trash-2" class="w-4 h-4"></i></button>'
+      +'</div></td></tr>';
+  }).join('');
+  return payoutHeader('white')
+    +'<div class="table-scroll"><table class="table"><thead><tr><th style="width:44px;">#</th><th>ช่วงวันที่เบิกบิลขาว</th><th>วันจ่าย</th><th>การใช้งาน</th><th style="text-align:right;">จัดการ</th></tr></thead><tbody>'+(state.payout.white.length?rows:'')+'</tbody></table>'
+    +(state.payout.white.length?'':emptyStateHTML({icon:'calendar-x',title:'ยังไม่มีช่วงการจ่าย',desc:'กดปุ่ม เพิ่มช่วง เพื่อกำหนดตารางวันจ่ายบิลขาว'}))
+    +'</div>';
+}
+function findPayout(tab,id){ return state.payout[tab].find(function(x){ return x.id===id; }); }
+function togglePayoutActive(tab,id){ var r=findPayout(tab,id); if(r)r.active=!r.active; render(); }
+function addPayout(tab){ openModalBox('payout',{ tab:tab, mode:'add', id:null, month:10, year:2568, from:1, to:15, pay1:'', pay2:'', payType:'FIXED_DATE', payDate:'' },520); }
+function editPayout(tab,id){ var r=findPayout(tab,id); if(!r)return; openModalBox('payout',{ tab:tab, mode:'edit', id:r.id, month:r.month, year:r.year, from:r.from, to:r.to, pay1:r.pay1||'', pay2:r.pay2||'', payType:r.payType||'FIXED_DATE', payDate:r.payDate||'' },520); }
+function deletePayout(tab,id){ state.payout[tab]=state.payout[tab].filter(function(x){ return x.id!==id; }); render(); showToast('ลบช่วงการจ่ายสำเร็จ','success'); }
+function payoutSetPayType(v){ var d=state.modal.data; d.month=val('pm-month'); d.year=val('pm-year'); d.from=val('pm-from'); d.to=val('pm-to'); var pd=document.getElementById('pm-paydate'); if(pd)d.payDate=pd.value; d.payType=v; renderModal(); }
+function payoutSave(){
+  var d=state.modal.data; var tab=d.tab;
+  var month=parseInt(val('pm-month'),10); if(isNaN(month))month=d.month;
+  var year=parseInt(val('pm-year'),10)||0;
+  var from=parseInt(val('pm-from'),10)||0;
+  var to=parseInt(val('pm-to'),10)||0;
+  if(from>to){ showToast('วันเริ่มต้นต้องไม่เกินวันสิ้นสุด','warning'); return; }
+  var existing=d.id?findPayout(tab,d.id):null;
+  var active=existing?existing.active:true;
+  var row;
+  if(tab==='green'){
+    row={ id:d.id||('g'+(++_seq)), month:month, year:year, from:from, to:to, pay1:val('pm-pay1'), pay2:val('pm-pay2'), active:active };
+  } else {
+    var pt=val('pm-paytype')||d.payType;
+    var pd=(pt==='FIXED_DATE')?val('pm-paydate'):'';
+    if(pt==='FIXED_DATE' && !pd){ showToast('กรุณากรอกวันจ่ายเมื่อเลือกวันที่กำหนด','warning'); return; }
+    row={ id:d.id||('w'+(++_seq)), month:month, year:year, from:from, to:to, payType:pt, payDate:pd, active:active };
+  }
+  var list=state.payout[tab];
+  var idx=list.findIndex(function(x){ return x.id===row.id; });
+  if(idx>=0)list[idx]=row; else list.push(row);
+  closeModal(); render(); showToast('บันทึกช่วงการจ่ายสำเร็จ','success');
+}
+
+// ============================================
+// SECTION 6 — ทดสอบและดูตัวอย่าง (Preview & Test)
+// ============================================
+function runPreview(){
+  var p=state.preview;
+  p.ccs=val('pv-ccs'); p.weight=val('pv-weight'); p.sendDate=val('pv-date');
+  p.bill1=val('pv-bill1'); p.bill2=val('pv-bill2'); p.debtPct=val('pv-debt'); p.province=val('pv-prov');
+  var ccs=parseFloat(p.ccs)||0, w=parseFloat(p.weight)||0, k=parseFloat(state.ccs.k)||0;
+  var base=BASE_10CCS; var perTon=base+(ccs-10)*(base*k); var perKg=perTon/1000; var total=perTon*w;
+  var half=total/2; var debt=parseFloat(p.debtPct)||0; var dr=dailyRateVal();
+  var g=state.general; var inProv=!!p.province && p.province===g.mainProvince;
+  var fee=inProv?(parseFloat(g.feeIn)||0):(parseFloat(g.feeOut)||0);
+  function calc(bill,normalDate,actualDate){
+    var daysEarly=bill==='white'?30:0;
+    var before=half; var after=before*(1-debt/100);
+    var interest=bill==='white'?round2(after*(dr/100)*daysEarly):0;
+    var net=round2(after-interest-fee);
+    return { bill:bill, daysEarly:daysEarly, normalDate:normalDate, actualDate:actualDate, before:round2(before), after:round2(after), interest:interest, fee:round2(fee), net:net };
+  }
+  var i1=calc(p.bill1,'15 พ.ย. 2568', p.bill1==='white'?'16 ต.ค. 2568':'15 พ.ย. 2568');
+  var i2=calc(p.bill2,'30 พ.ย. 2568', p.bill2==='white'?'31 ต.ค. 2568':'30 พ.ย. 2568');
+  state.previewResult={ perTon:round2(perTon), perKg:round2(perKg), total:round2(total), inst1:i1, inst2:i2, inProvince:inProv, bankFee:round2(fee) };
+  render(); showToast('คำนวณสำเร็จ','success');
+}
+function instBlock(title,inst){
+  var pill=inst.bill==='white'?'<span class="pill pill-warning">บิลขาว</span>':'<span class="pill pill-success">บิลเขียว</span>';
+  return '<div class="dv-section"><div class="dv-section-title"><i data-lucide="receipt" class="w-4 h-4"></i>'+esc(title)+' '+pill+'</div><div class="dv-grid">'
+    + dvCell('วันจ่ายปกติ',esc(inst.normalDate))
+    + dvCell('วันจ่ายจริง',esc(inst.actualDate))
+    + dvCell('จำนวนวันล่วงหน้า','<span class="mono">'+inst.daysEarly+' วัน</span>')
+    + dvCell('ยอดก่อนหักหนี้','<span class="mono">'+fmt2(inst.before)+' บาท</span>')
+    + dvCell('ยอดหลังหักหนี้','<span class="mono">'+fmt2(inst.after)+' บาท</span>')
+    + dvCell('ดอกเบี้ย','<span class="mono">'+fmt2(inst.interest)+' บาท</span>')
+    + dvCell('ค่าธนาคาร','<span class="mono">'+fmt2(inst.fee)+' บาท</span>')
+    + dvCell('ยอดสุทธิ','<span class="mono" style="color:var(--c-primary);font-weight:700;">'+fmt2(inst.net)+' บาท</span>')
+    +'</div></div>';
+}
+function previewResultHTML(){
+  var r=state.previewResult;
+  return '<div class="form-section"><div class="form-section-title">ผลการคำนวณ</div>'
+    +'<div class="note is-info" style="margin-bottom:16px;"><i data-lucide="info" class="w-4 h-4"></i><span>วิธีจ่าย: โอนเข้าบัญชี (ค่าเริ่มต้น) · ค่าธนาคาร'+(r.inProvince?' ในจังหวัด ':' ต่างจังหวัด ')+fmt2(r.bankFee)+' บาท</span></div>'
+    +'<div class="dv-section"><div class="dv-section-title"><i data-lucide="coins" class="w-4 h-4"></i>ยอดรวม</div><div class="dv-grid">'
+    + dvCell('ราคาต่อตัน','<span class="mono">'+fmt2(r.perTon)+' บาท</span>')
+    + dvCell('ราคาต่อกิโลกรัม','<span class="mono">'+fmt2(r.perKg)+' บาท</span>')
+    + dvCell('ยอดรวม (price/ton × น้ำหนัก)','<span class="mono" style="color:var(--c-primary);font-weight:700;">'+fmt2(r.total)+' บาท</span>')
+    +'</div></div>'
+    + instBlock('งวดที่ 1',r.inst1)
+    + instBlock('งวดที่ 2',r.inst2)
+    +'</div>';
+}
+function secPreview(){
+  var p=state.preview;
+  var form='<div class="form-section" style="margin-top:0;"><div class="form-section-title">ข้อมูลทดสอบ</div>'
+    +'<div class="form-grp">'
+    + field('ค่า CCS','<input class="input mono" id="pv-ccs" type="number" step="0.1" value="'+esc(p.ccs)+'">')
+    + field('น้ำหนัก (ตัน)','<input class="input mono" id="pv-weight" type="number" step="0.01" value="'+esc(p.weight)+'">')
+    + field('วันที่ส่ง/ขึ้นเงิน','<input class="input" id="pv-date" type="date" value="'+esc(p.sendDate)+'">')
+    + field('ประเภทบิลงวด 1','<select class="select" id="pv-bill1">'+billOpts(p.bill1)+'</select>')
+    + field('ประเภทบิลงวด 2','<select class="select" id="pv-bill2">'+billOpts(p.bill2)+'</select>')
+    + field('% หักหนี้ (จาก Booking)','<input class="input mono" id="pv-debt" type="number" step="0.01" min="0" value="'+esc(p.debtPct)+'">')
+    + field('จังหวัดบัญชีเกษตรกร','<select class="select" id="pv-prov">'+provinceOpts(p.province,'เลือกจังหวัด')+'</select>')
+    +'</div>'
+    +'<div style="margin-top:16px;"><button class="btn btn-primary" onclick="runPreview()"><i data-lucide="calculator" class="w-4 h-4"></i><span>คำนวณ</span></button></div>'
+    +'</div>';
+  return form+(state.previewResult?previewResultHTML():'');
+}
+
+// ============================================
+// SAVE
+// ============================================
+function saveSettings(){
+  var g=state.general;
+  var rate=parseFloat(g.rateYear)||0;
+  var base=parseFloat(g.baseDays)||0;
+  var k=parseFloat(state.ccs.k);
+  if(rate<=0){ showToast('ดอกเบี้ยต่อปีต้องมากกว่า 0','warning'); return; }
+  if(base<=0){ showToast('วันฐานต้องมากกว่า 0','warning'); return; }
+  var feeUsed=((parseFloat(g.feeIn)||0)>0)||((parseFloat(g.feeOut)||0)>0);
+  if(feeUsed && !g.mainProvince){ showToast('กรุณาเลือกจังหวัดหลัก','warning'); return; }
+  if(isNaN(k)||k<0||k>1){ showToast('ค่า K ต้องอยู่ระหว่าง 0–1','warning'); return; }
+  showToast('บันทึกการตั้งค่าสำเร็จ','success',4200,'ฤดูการหีบ '+state.season+' · ดอกเบี้ยต่อวัน '+dailyRateStr());
+}
+
+// ============================================
+// MODALS (OV) — charge / payout
+// ============================================
+function openModalBox(type,data,widthPx){ state.modal={ open:true, type:type, data:data||{} }; var box=document.getElementById('modalBox'); box.className='modal'; if(widthPx)box.style.width=widthPx+'px'; else box.style.width=''; renderModal(); requestAnimationFrame(function(){ document.getElementById('modalBackdrop').classList.add('is-open'); }); }
+function closeModal(){ if(state.modal.data&&state.modal.data.busy)return; document.getElementById('modalBackdrop').classList.remove('is-open'); setTimeout(function(){ state.modal={ open:false, type:null, data:null }; },200); }
+function renderModal(){ var t=state.modal.type; if(t==='charge')renderChargeModal(); else if(t==='payout')renderPayoutModal(); }
+function modalCloseBtn(){ return '<button class="icon-btn" onclick="closeModal()"><i data-lucide="x" class="w-4 h-4"></i></button>'; }
+
+// ---- Additional charge add/edit ----
+function addCharge(){ openModalBox('charge',{ mode:'add', id:null, name:'', type:'amount', value:'', note:'' },460); }
+function editCharge(id){ var c=state.charges.find(function(x){ return x.id===id; }); if(!c)return; openModalBox('charge',{ mode:'edit', id:c.id, name:c.name, type:c.type, value:c.value, note:c.note },460); }
+function deleteCharge(id){ state.charges=state.charges.filter(function(x){ return x.id!==id; }); render(); showToast('ลบรายการสำเร็จ','success'); }
+function chargeSave(){
+  var d=state.modal.data;
+  var name=String(val('ch-name')||'').trim();
+  if(!name){ showToast('กรุณากรอกชื่อรายการ','warning'); return; }
+  var type=val('ch-type')||'amount';
+  var vs=String(val('ch-value')||'').trim();
+  if(vs===''||isNaN(parseFloat(vs))){ showToast('กรุณากรอกค่าให้ถูกต้อง','warning'); return; }
+  var note=val('ch-note');
+  var row={ id:d.id||('c'+(++_seq)), name:name, type:type, value:parseFloat(vs), note:note };
+  var idx=state.charges.findIndex(function(x){ return x.id===row.id; });
+  if(idx>=0)state.charges[idx]=row; else state.charges.push(row);
+  closeModal(); render(); showToast(d.mode==='edit'?'บันทึกรายการสำเร็จ':'เพิ่มรายการสำเร็จ','success');
+}
+function renderChargeModal(){
+  var d=state.modal.data;
+  var typeOpts='<option value="amount"'+(d.type==='amount'?' selected':'')+'>จำนวนเงิน</option><option value="percent"'+(d.type==='percent'?' selected':'')+'>เปอร์เซ็นต์</option>';
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="dollar-sign" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">'+(d.mode==='edit'?'แก้ไขรายการ':'เพิ่มรายการ')+'</h3><p class="modal-subtitle">รายการหักเพิ่มเติม</p></div>'+modalCloseBtn()+'</div>'
+    +'<div class="modal-body">'
+    +'<div class="field"><label class="field-label">ชื่อรายการ <span class="req">*</span></label><input class="input" id="ch-name" type="text" placeholder="เช่น ค่าขนส่ง" value="'+esc(d.name)+'"></div>'
+    +'<div class="field"><label class="field-label">ประเภท</label><select class="select" id="ch-type">'+typeOpts+'</select></div>'
+    +'<div class="field"><label class="field-label">ค่า <span class="req">*</span></label><input class="input mono" id="ch-value" type="number" step="0.01" min="0" placeholder="0.00" value="'+esc(d.value)+'"></div>'
+    +'<div class="field" style="margin-bottom:0;"><label class="field-label">หมายเหตุ</label><input class="input" id="ch-note" type="text" placeholder="หมายเหตุ (ถ้าต้องการ)" value="'+esc(d.note||'')+'"></div>'
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>'
+    +'<button class="btn btn-primary" onclick="chargeSave()"><i data-lucide="check" class="w-4 h-4"></i><span>บันทึก</span></button></div>';
+  renderIcons();
+}
+
+// ---- Payout range add/edit ----
+function renderPayoutModal(){
+  var d=state.modal.data; var tab=d.tab;
+  var monthOpts=THAI_MONTHS.map(function(m,i){ return '<option value="'+i+'"'+(i==d.month?' selected':'')+'>'+m+'</option>'; }).join('');
+  var base='<div class="form-grp">'
+    + field('เดือน','<select class="select" id="pm-month">'+monthOpts+'</select>')
+    + field('ปี พ.ศ.','<input class="input mono" id="pm-year" type="number" value="'+esc(d.year)+'">')
+    + field('วันเริ่มต้น','<input class="input mono" id="pm-from" type="number" min="1" max="31" value="'+esc(d.from)+'">')
+    + field('วันสิ้นสุด','<input class="input mono" id="pm-to" type="number" min="1" max="31" value="'+esc(d.to)+'">')
+    +'</div>';
+  var extra;
+  if(tab==='green'){
+    extra='<div class="form-grp" style="margin-top:12px;">'
+      + field('วันจ่ายงวด 1','<input class="input" id="pm-pay1" type="date" value="'+esc(d.pay1)+'">')
+      + field('วันจ่ายงวด 2','<input class="input" id="pm-pay2" type="date" value="'+esc(d.pay2)+'">')
+      +'</div>';
+  } else {
+    var ptOpts='<option value="FIXED_DATE"'+(d.payType==='FIXED_DATE'?' selected':'')+'>วันที่กำหนด</option><option value="WITH_CANE"'+(d.payType==='WITH_CANE'?' selected':'')+'>พร้อมค่าอ้อย</option>';
+    var dateField=d.payType==='FIXED_DATE'?field('วันจ่าย','<input class="input" id="pm-paydate" type="date" value="'+esc(d.payDate)+'">'):'';
+    var hint=d.payType==='WITH_CANE'?'<div class="note is-info" style="margin-top:12px;"><i data-lucide="info" class="w-4 h-4"></i><span>เลือก พร้อมค่าอ้อย — จ่ายตามตารางบิลเขียว (ไม่คิดดอกเบี้ย)</span></div>':'';
+    extra='<div class="form-grp" style="margin-top:12px;">'
+      + field('ประเภทวันจ่าย','<select class="select" id="pm-paytype" onchange="payoutSetPayType(this.value)">'+ptOpts+'</select>')
+      + dateField
+      +'</div>'+hint;
+  }
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="calendar-plus" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">เพิ่ม/แก้ไขช่วงการจ่าย</h3><p class="modal-subtitle">'+(tab==='green'?'ตารางวันจ่ายบิลเขียว':'ตารางวันจ่ายบิลขาว')+'</p></div>'+modalCloseBtn()+'</div>'
+    +'<div class="modal-body">'+base+extra+'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>'
+    +'<button class="btn btn-primary" onclick="payoutSave()"><i data-lucide="check" class="w-4 h-4"></i><span>บันทึก</span></button></div>';
+  renderIcons();
+}
+
+// ESC chain
+window.addEventListener('keydown',function(e){ if(e.key!=='Escape')return; if(state.modal.open)closeModal(); });
+
+// INIT
+window.addEventListener('hashchange',function(){ if(getRoute()!=='payment-setting')navigate('payment-setting'); render(); });
+var domReady=false,lucideReady=false;
+function bootIfReady(){ if(domReady&&lucideReady){ render(); renderIcons(); } }
+if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',function(){ domReady=true; bootIfReady(); }); else domReady=true;
+window.addEventListener('lucide:ready',function(){ lucideReady=true; bootIfReady(); });
+if(window.lucide&&typeof window.lucide.createIcons==='function')lucideReady=true;
+bootIfReady();
+setTimeout(function(){ if(!lucideReady){ lucideReady=true; bootIfReady(); } },5000);
+</script>
+</body></html>

@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>พื้นที่และการกำหนดสิทธิ์ (Area) · CUBE NATIVE</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+
+<style>
+/* ============== CSS VARIABLES (CUBE CI — Warm Light) ============== */
+:root {
+  --c-navy: #111111;
+  --c-navy-2: #111111;
+  --c-primary: #FF3B30;
+  --c-primary-hover: #E62E24;
+  --c-teal: #FF9A1F;
+  --c-teal-light: #FFB763;
+  --c-ink: #111111;
+  --c-mute: #54565C;
+  --c-mute-2: #73757B;
+  --c-mute-3: #9A9CA2;
+  --c-line: #DEDAD4;
+  --c-line-2: #E9E5E0;
+  --c-line-3: #F1EEEA;
+  --c-bg-off: #FAF8F5;
+  --c-success: #1F9D55;
+  --c-warning: #E8870F;
+  --c-danger: #E62E24;
+  --sidebar-w: 232px;
+  --shell-h: 52px;
+  --fs-h1: 22px; --fs-h2: 17px; --fs-h3: 15px; --fs-body: 14px;
+  --fs-sub: 13px; --fs-meta: 12px; --fs-cap: 11px; --fs-kpi: 28px;
+  --sp-xs: 4px; --sp-sm: 8px; --sp-md: 12px; --sp-lg: 20px; --sp-xl: 28px;
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-full: 999px;
+}
+
+/* ============== RESET ============== */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { scrollbar-gutter: stable; }
+
+/* ============== SCROLLBAR (Iron Rule #49) ============== */
+* { scrollbar-width: thin; scrollbar-color: rgba(17,17,17,.16) transparent; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(17,17,17,.14); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(17,17,17,.26); }
+.sidebar, .slide { scrollbar-color: rgba(255,255,255,.28) transparent; }
+.sidebar ::-webkit-scrollbar-thumb, .slide ::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb, .slide::-webkit-scrollbar-thumb { background: rgba(255,255,255,.28); }
+.sidebar ::-webkit-scrollbar-thumb:hover, .slide ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.42); }
+body {
+  font-family: 'Satoshi', 'Noto Sans Thai', system-ui, sans-serif;
+  background: var(--c-bg-off);
+  color: #2A2B2F;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-width: 1180px;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+[data-lucide] { flex-shrink: 0; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ============== SIDEBAR ============== */
+.sidebar {
+  position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w);
+  background: #111111; color: #E9E5E0; z-index: 20;
+  display: flex; flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.sb-brand { padding: 18px; display: flex; align-items: center; gap: 11px; border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
+.sb-logo {
+  width: 34px; height: 34px; background: linear-gradient(135deg, #FF3B30, #FF9A1F);
+  border-radius: 9px; display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; flex-shrink: 0; box-shadow: 0 4px 12px rgba(255,59,48,0.3);
+}
+.sb-name { font-weight: 700; font-size: 14px; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+.sb-sub { font-size: 10px; color: #9A9CA2; letter-spacing: 0.06em; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+.sb-nav { flex: 1; padding: 12px 8px; overflow-y: auto; }
+.sb-module { margin-bottom: 4px; }
+.sb-module-header {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 8px 10px; border-radius: 6px; background: transparent; border: 0;
+  color: #9A9CA2; font-family: inherit; font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 120ms; text-align: left;
+}
+.sb-module-header:hover { background: rgba(255,255,255,0.04); color: #DEDAD4; }
+.sb-module-header .mod-icon { flex-shrink: 0; opacity: 0.7; }
+.sb-module-header .mod-label { flex: 1; }
+.sb-module-header .mod-chevron { flex-shrink: 0; transition: transform 200ms; opacity: 0.7; }
+.sb-module[data-expanded="false"] .mod-chevron { transform: rotate(-90deg); }
+.sb-module[data-expanded="false"] .sb-features { display: none; }
+.sb-features { padding: 2px 0 6px 0; }
+.sb-item {
+  display: flex; align-items: center; gap: 10px; padding: 7px 12px 7px 14px;
+  border-radius: 6px; color: #DEDAD4; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 120ms; margin-bottom: 1px; position: relative; user-select: none;
+}
+.sb-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sb-item.is-active { background: #FF3B30; color: #fff; font-weight: 600; }
+.sb-item.is-active::before {
+  content: ''; position: absolute; left: -10px; top: 7px; bottom: 7px;
+  width: 3px; background: #fff; border-radius: 0 2px 2px 0;
+}
+.sb-item [data-lucide] { width: 16px; height: 16px; opacity: 0.85; }
+.sb-item.is-active [data-lucide] { opacity: 1; }
+.sb-item.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.sb-item.is-disabled:hover { background: transparent; color: #DEDAD4; }
+.sb-footer {
+  padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: #9A9CA2;
+}
+.pulse-dot { width: 7px; height: 7px; background: var(--c-teal); border-radius: 50%; box-shadow: 0 0 0 3px rgba(255,154,31,0.20); animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+/* ============== MAIN + SHELL BAR ============== */
+.main { margin-left: var(--sidebar-w); min-height: 100vh; background: var(--c-bg-off); }
+.shell-bar {
+  position: sticky; top: 0; background: #fff; border-bottom: 1px solid var(--c-line-2);
+  height: var(--shell-h); display: flex; align-items: center; padding: 0 22px; z-index: 19; gap: 12px;
+}
+.breadcrumb { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--c-mute); }
+.breadcrumb a { cursor: pointer; transition: color 120ms; }
+.breadcrumb a:hover { color: var(--c-primary); }
+.breadcrumb .sep { color: var(--c-mute-3); font-size: 10px; }
+.breadcrumb-current { color: var(--c-ink); font-weight: 500; }
+.icon-btn {
+  width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute); border-radius: 7px; position: relative; transition: all 120ms;
+}
+.icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.icon-btn [data-lucide] { width: 17px; height: 17px; }
+.notif-dot { position: absolute; top: 7px; right: 8px; width: 7px; height: 7px; background: var(--c-danger); border-radius: 50%; border: 2px solid #fff; }
+.user-chip { display: flex; align-items: center; gap: 9px; padding: 5px 10px 5px 12px; border-radius: 8px; cursor: pointer; transition: background 120ms; }
+.user-chip:hover { background: var(--c-line-3); }
+.user-text { line-height: 1.2; text-align: right; }
+.user-name { font-size: 12.5px; font-weight: 500; color: var(--c-ink); white-space: nowrap; }
+.user-role { font-size: 10.5px; color: var(--c-mute-2); white-space: nowrap; margin-top: 1px; }
+.avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; flex-shrink: 0;
+}
+.user-menu {
+  position: absolute; top: calc(var(--shell-h) - 4px); right: 22px; background: #fff;
+  border: 1px solid var(--c-line-2); border-radius: 10px; box-shadow: 0 12px 32px rgba(17,17,17,0.12);
+  width: 240px; z-index: 30; padding: 6px; display: none;
+}
+.user-menu.is-open { display: block; }
+.user-menu-item { display: flex; align-items: center; gap: 10px; padding: 8px 11px; border-radius: 6px; font-size: 13px; color: var(--c-ink); cursor: pointer; transition: background 120ms; }
+.user-menu-item:hover { background: var(--c-bg-off); }
+.user-menu-item [data-lucide] { width: 15px; height: 15px; color: var(--c-mute-2); }
+.user-menu-item.is-danger { color: var(--c-danger); }
+.user-menu-item.is-danger [data-lucide] { color: var(--c-danger); }
+.user-menu-divider { height: 1px; background: var(--c-line-2); margin: 5px 0; }
+
+/* ============== CONTENT (fluid — Iron Rule #30) ============== */
+.content { padding: 22px; }
+
+/* ============== PAGE HEADER ============== */
+.ph { margin-bottom: 18px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.ph > div:first-child { flex: 1 1 auto; min-width: 280px; }
+.ph-title-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px; }
+.ph-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 22px; font-weight: 700; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.ph-count { font-size: 12.5px; font-weight: 600; color: var(--c-mute-2); background: var(--c-line-3); padding: 3px 9px; border-radius: 999px; }
+.ph-sub { font-size: 13px; color: var(--c-mute); margin: 0; }
+.ph-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ============== BUTTONS (Iron Rule #36 — Thai optical center) ============== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px; padding: 2px 14px 0; border-radius: 8px; font-size: 13px; font-weight: 500;
+  border: 1px solid transparent; background: transparent; white-space: nowrap;
+  transition: all 120ms; user-select: none; cursor: pointer;
+}
+.btn [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; }
+.btn:disabled, .btn.is-disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+.btn-eq { min-width: 104px; }
+.btn-primary { background: var(--c-primary); color: #fff; }
+.btn-primary:hover { background: var(--c-primary-hover); box-shadow: 0 2px 8px rgba(255,59,48,0.30); }
+.btn-secondary { background: #fff; border-color: var(--c-line); color: var(--c-ink); }
+.btn-secondary:hover { background: var(--c-line-3); border-color: var(--c-mute-2); }
+.btn-ghost { color: var(--c-mute); }
+.btn-ghost:hover { background: var(--c-line-3); color: var(--c-ink); }
+.btn-danger { background: #fff; border-color: var(--c-line); color: var(--c-danger); }
+.btn-danger:hover { background: #FFE9E7; border-color: var(--c-danger); }
+.btn-danger.is-solid { background: var(--c-danger); border-color: var(--c-danger); color: #fff; }
+.btn-danger.is-solid:hover { background: #C81E15; }
+.btn-link { background: transparent; border: 0; padding: 0 4px; height: auto; color: var(--c-primary); font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn-sm { height: 30px; padding: 2px 11px 0; font-size: 12px; }
+
+/* ============== STATS ============== */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.stat { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; padding: 14px 16px; transition: all 150ms; }
+.stat:hover { border-color: var(--c-line); box-shadow: 0 2px 8px rgba(17,17,17,0.05); }
+.stat-label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--c-mute); }
+.stat-label [data-lucide] { width: 13px; height: 13px; color: var(--c-primary); }
+.stat-value { font-family: 'Noto Sans Thai', sans-serif; font-size: 26px; font-weight: 700; color: var(--c-navy); margin-top: 6px; letter-spacing: -0.01em; }
+.stat-meta { font-size: 11.5px; color: var(--c-mute-2); margin-top: 5px; display: flex; align-items: center; gap: 4px; }
+.stat-meta.is-warn { color: var(--c-warning); }
+.stat-meta [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== CARD / FILTER ============== */
+.card { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; overflow: hidden; }
+.filter-bar { padding: 14px 18px; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid var(--c-line-2); background: #fff; flex-wrap: wrap; }
+
+/* ============== INPUTS ============== */
+.input, .select {
+  height: 36px; padding: 0 12px; border: 1px solid var(--c-line); border-radius: 8px;
+  font-size: 13px; background: #fff; color: var(--c-ink); font-family: inherit; transition: all 120ms; width: 100%;
+}
+.input:focus, .select:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(255,59,48,0.10); }
+.input:disabled, .input[readonly] { background: var(--c-line-3); color: var(--c-mute-2); cursor: not-allowed; border-color: var(--c-line-2); }
+.select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat; background-position: right 10px center; padding-right: 32px; appearance: none;
+}
+.input-search { position: relative; flex: 1; max-width: 340px; }
+.input-search input { padding-left: 36px; }
+.input-search .lead-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--c-mute-2); pointer-events: none; }
+
+/* ===== SEARCH-SELECT (Iron Rule #34) ===== */
+.search-select { position: relative; width: 100%; }
+.search-select .ss-input { padding-left: 34px; padding-right: 34px; }
+.search-select .ss-lead { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--c-mute-3); pointer-events: none; }
+.search-select .ss-caret { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--c-mute-3); pointer-events: none; }
+.search-select .ss-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); display: inline-flex; padding: 3px; border: 0; background: transparent; color: var(--c-mute-2); cursor: pointer; border-radius: 6px; }
+.search-select .ss-clear:hover { background: var(--c-line-3); color: var(--c-ink); }
+.search-select.is-disabled .ss-input { background: var(--c-line-3); color: var(--c-mute-2); cursor: not-allowed; }
+.ss-list {
+  position: absolute; z-index: 70; left: 0; right: 0; margin-top: 4px; max-height: 280px; overflow-y: auto;
+  background: #fff; border: 1px solid var(--c-line); border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(17,17,17,0.10), 0 4px 10px rgba(17,17,17,0.05);
+}
+.ss-opt { width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 0; border-bottom: 1px solid var(--c-line-3); background: transparent; cursor: pointer; text-align: left; font-family: inherit; }
+.ss-opt:last-child { border-bottom: 0; }
+.ss-opt:hover, .ss-opt.is-active { background: rgba(255,59,48,0.06); }
+.ss-opt-ic { width: 16px; height: 16px; color: var(--c-primary); flex-shrink: 0; }
+.ss-opt-main { flex: 1; min-width: 0; }
+.ss-opt-label { display: block; font-size: 13px; color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-sub { display: block; font-size: 11.5px; color: var(--c-mute-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-right { flex-shrink: 0; font-size: 12px; color: var(--c-mute); }
+.ss-opt mark { background: rgba(255,59,48,0.16); color: inherit; padding: 0 1px; border-radius: 2px; }
+.ss-empty { padding: 20px 14px; text-align: center; font-size: 13px; color: var(--c-mute-2); }
+
+/* ============== TABLE ============== */
+.table-scroll { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table thead { background: var(--c-bg-off); }
+.table th {
+  padding: 11px 14px; text-align: left; font-weight: 600; color: var(--c-mute);
+  font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--c-line-2); white-space: nowrap;
+}
+.table th.col-check { width: 40px; padding-right: 0; }
+.table td { padding: 13px 14px 11px; border-bottom: 1px solid var(--c-line-2); color: var(--c-ink); vertical-align: middle; }
+.table tbody tr { transition: background 120ms; }
+.table tbody tr:hover { background: var(--c-bg-off); }
+.table tbody tr.is-selected { background: rgba(255,59,48,0.04); }
+.table tbody tr.is-selected:hover { background: rgba(255,59,48,0.07); }
+.table tbody tr:last-child td { border-bottom: 0; }
+.table tbody tr.is-clickable { cursor: pointer; }
+.table-scroll.is-sticky { max-height: 560px; overflow-y: auto; scrollbar-gutter: stable; }
+.table-scroll.is-sticky thead th { position: sticky; top: 0; z-index: 3; background: var(--c-bg-off); box-shadow: inset 0 -1px 0 var(--c-line-2); }
+.cell-truncate { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+th.col-num, td.col-num { text-align: right; }
+.mono { font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+
+/* ============== CHECKBOX ============== */
+.cb {
+  width: 16px; height: 16px; border: 1.5px solid var(--c-line); border-radius: 4px; background: #fff;
+  cursor: pointer; display: inline-block; position: relative; transition: all 120ms; flex-shrink: 0;
+}
+.cb.is-checked, .cb.is-partial { background: var(--c-primary); border-color: var(--c-primary); }
+.cb.is-checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.cb.is-partial::after { content: ''; position: absolute; left: 3px; top: 6px; width: 8px; height: 2px; background: #fff; }
+.cb:hover { border-color: var(--c-primary); }
+.cb.is-disabled { opacity: 0.35; cursor: not-allowed; }
+.cb.is-disabled:hover { border-color: var(--c-line); }
+
+/* ============== PILLS ============== */
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px 3px; border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.pill [data-lucide] { width: 11px; height: 11px; }
+.pill-info    { background: #E6F0FF; color: #1A5FCC; }
+.pill-success { background: #E4F4EB; color: #157A41; }
+.pill-warning { background: #FFF1DD; color: #B8690B; }
+.pill-danger  { background: #FFE9E7; color: #E62E24; }
+.pill-muted   { background: var(--c-line-3); color: var(--c-mute-2); }
+.pill-outline { background: #fff; border: 1px solid var(--c-line); color: var(--c-mute); }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.8s linear infinite; }
+
+/* ============== FORM SECTION (Iron Rule #45) ============== */
+.form-section { margin-top: var(--sp-xl); }
+.form-section:first-child { margin-top: 0; }
+.form-section-title {
+  font-size: var(--fs-cap); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--c-mute);
+  padding-bottom: var(--sp-sm); border-bottom: 1px solid var(--c-line-2); margin-bottom: var(--sp-md);
+}
+.form-grp { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 16px; }
+
+/* ============== ROW ACTIONS ============== */
+.row-actions { display: inline-flex; gap: 2px; }
+.ra-btn {
+  width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute-2); border-radius: 6px; transition: all 120ms;
+}
+.ra-btn:hover { background: var(--c-line-3); color: var(--c-primary); }
+.ra-btn.is-danger:hover { background: #FFE9E7; color: var(--c-danger); }
+.ra-btn [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== TABLE FOOTER / BULK BAR ============== */
+.table-footer {
+  padding: 12px 18px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2);
+  display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: var(--c-mute); flex-wrap: wrap; gap: 10px;
+}
+.pagination { display: inline-flex; gap: 4px; align-items: center; }
+.pg-btn {
+  min-width: 30px; height: 30px; padding: 0 8px; display: inline-flex; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid var(--c-line-2); border-radius: 6px; color: var(--c-mute);
+  font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 120ms;
+}
+.pg-btn:hover { border-color: var(--c-line); background: var(--c-bg-off); }
+.pg-btn.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.pg-btn.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn [data-lucide] { width: 13px; height: 13px; }
+.bulk-bar {
+  background: var(--c-navy); color: #fff; padding: 11px 18px; border-radius: 8px 8px 0 0;
+  display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--c-line-2); margin: -1px -1px 0; font-size: 13px;
+}
+.bulk-bar .btn { height: 30px; padding: 2px 11px 0; font-size: 12px; }
+.bulk-bar .btn-secondary { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.18); color: #fff; }
+.bulk-bar .btn-secondary:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.30); }
+
+/* ============== DRAWER v2 SHELL (Patterns B/C — locked) ============== */
+.overlay-wrap { position: fixed; inset: 0; z-index: 50; }
+.backdrop { position: absolute; inset: 0; background: rgba(17,17,17,0.40); }
+.drawer-panel {
+  position: absolute; top: 0; right: 0; bottom: 0; width: 920px; max-width: 96vw;
+  background: #fff; display: flex; flex-direction: column;
+  box-shadow: -16px 0 40px rgba(17,17,17,0.18);
+}
+.drawer-panel.standard { width: 680px; }
+.drawer-enter { transform: translateX(100%); }
+.drawer-active { transform: translateX(0); transition: transform 250ms ease-out; }
+.top-icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;
+  border: 0; background: transparent; border-radius: var(--r-sm); color: var(--c-mute-2);
+  cursor: pointer; transition: all 120ms; flex-shrink: 0;
+}
+.top-icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.dw-head { padding: 18px 24px 16px; border-bottom: 1px solid var(--c-line-2); flex-shrink: 0; }
+.dw-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.dw-eyebrow { display: flex; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-mute-2); margin-bottom: 4px; font-weight: 600; }
+.dw-title { font-size: 20px; font-weight: 700; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.dw-sub { font-size: var(--fs-meta); color: var(--c-mute-2); margin-top: 4px; }
+.dw-body { flex: 1; overflow-y: auto; padding: 22px 24px; scrollbar-gutter: stable; }
+.dw-footer {
+  padding: 14px 24px; border-top: 1px solid var(--c-line-2); background: var(--c-bg-off); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.dw-footer-right { display: flex; align-items: center; gap: 8px; }
+.dw-footer-meta { font-size: 12px; color: var(--c-mute-2); }
+.drawer-header-divider { width: 1px; height: 22px; background: var(--c-line-2); margin: 0 4px; flex-shrink: 0; }
+.dw-actions { display: flex; gap: 6px; align-items: center; }
+
+/* Tabs (view drawer) */
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--c-line-2); margin-top: 14px; }
+.tab {
+  display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px 7px;
+  font-size: 13px; font-weight: 500; color: var(--c-mute); background: transparent; border: 0;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; transition: all 120ms;
+}
+.tab [data-lucide] { width: 14px; height: 14px; }
+.tab:hover { color: var(--c-ink); }
+.tab.on { color: var(--c-primary); border-bottom-color: var(--c-primary); font-weight: 600; }
+
+/* View drawer detail grid */
+.dv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
+.dv-cell .dv-lbl { font-size: 11px; color: var(--c-mute-3); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-bottom: 3px; }
+.dv-cell .dv-val { font-size: 13.5px; font-weight: 600; color: var(--c-ink); word-break: break-word; }
+.dv-section { margin-bottom: 24px; }
+.dv-section-title { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; color: var(--c-navy); margin-bottom: 12px; }
+.dv-section-title [data-lucide] { width: 15px; height: 15px; color: var(--c-primary); }
+.dv-note { margin-top: 10px; padding: 10px 12px; background: #FFF1DD; border-radius: 8px; font-size: 12.5px; color: #B8690B; }
+
+/* Info banner (edit rejected — re-submit notice; warning ของ action จริง) */
+.note { padding: 11px 14px; border-radius: 8px; font-size: 12.5px; display: flex; gap: 9px; align-items: flex-start; }
+.note [data-lucide] { width: 15px; height: 15px; margin-top: 1px; }
+.note.is-info { background: #E6F0FF; color: #1A5FCC; }
+.note.is-warn { background: #FFF1DD; color: #B8690B; }
+
+/* ============== TIMELINE ============== */
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 4px; bottom: 4px; width: 2px; background: var(--c-line-2); }
+.tl-item { position: relative; margin-bottom: 16px; }
+.tl-item:last-child { margin-bottom: 0; }
+.tl-dot { position: absolute; left: -20px; top: 3px; width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 2px solid var(--c-primary); }
+.tl-dot.is-success { border-color: var(--c-success); }
+.tl-dot.is-warning { border-color: var(--c-warning); }
+.tl-dot.is-danger { border-color: var(--c-danger); }
+.tl-title { font-size: 13px; font-weight: 600; color: var(--c-ink); }
+.tl-meta { font-size: 11.5px; color: var(--c-mute-2); margin-top: 2px; }
+.tl-note { font-size: 12.5px; color: var(--c-mute); background: var(--c-bg-off); border: 1px solid var(--c-line-2); border-radius: 6px; padding: 7px 10px; margin-top: 6px; }
+
+/* ============== EMPTY STATE ============== */
+.empty { padding: 56px 24px; text-align: center; color: var(--c-mute); }
+.empty-icon { width: 52px; height: 52px; margin: 0 auto 14px; border-radius: 50%; background: var(--c-line-3); color: var(--c-mute-2); display: inline-flex; align-items: center; justify-content: center; }
+.empty-icon [data-lucide] { width: 22px; height: 22px; }
+.empty-title { font-size: 15.5px; font-weight: 600; color: var(--c-ink); margin-bottom: 5px; font-family: 'Noto Sans Thai', sans-serif; }
+.empty-desc { font-size: 13px; color: var(--c-mute); max-width: 320px; margin: 0 auto; }
+.empty .btn { margin-top: 16px; }
+.empty-actions { display: flex; gap: 8px; justify-content: center; }
+.empty-actions .btn { margin-top: 16px; }
+
+/* ============== MODAL ============== */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(17,17,17,0.50); z-index: 60; opacity: 0; pointer-events: none;
+  transition: opacity 200ms; display: flex; align-items: center; justify-content: center;
+}
+.modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: #fff; border-radius: 12px; width: 440px; max-width: 92vw; max-height: 90vh;
+  display: flex; flex-direction: column; transform: scale(0.96);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 24px 64px rgba(17,17,17,0.28); overflow: hidden;
+}
+.modal.is-lg { width: 680px; }
+.modal-backdrop.is-open .modal { transform: scale(1); }
+.modal-header { padding: 18px 22px 12px; display: flex; align-items: flex-start; gap: 12px; }
+.modal-header-icon {
+  width: 36px; height: 36px; border-radius: 8px; background: rgba(255,59,48,0.10); color: var(--c-primary);
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.modal-header-icon.is-danger { background: #FFE9E7; color: var(--c-danger); }
+.modal-header-icon.is-warning { background: #FFF1DD; color: var(--c-warning); }
+.modal-header-icon [data-lucide] { width: 18px; height: 18px; }
+.modal-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 16px; font-weight: 600; color: var(--c-navy); margin: 0 0 4px; }
+.modal-subtitle { font-size: 13px; color: var(--c-mute); margin: 0; line-height: 1.5; }
+.modal-body { padding: 6px 22px 18px; font-size: 13px; color: var(--c-ink); overflow-y: auto; scrollbar-gutter: stable; }
+.modal-footer { padding: 12px 22px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2); display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Import summary chips */
+.imp-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.imp-chip { border-radius: 8px; padding: 12px; text-align: center; border: 1px solid var(--c-line-2); }
+.imp-chip .v { font-size: 22px; font-weight: 700; font-family: 'Noto Sans Thai', sans-serif; }
+.imp-chip .l { font-size: 11.5px; margin-top: 2px; font-weight: 600; }
+.imp-chip.is-total { background: var(--c-bg-off); color: var(--c-mute); }
+.imp-chip.is-ok { background: #E4F4EB; color: #157A41; border-color: #CBE9D8; }
+.imp-chip.is-bad { background: #FFE9E7; color: #E62E24; border-color: #F6D0CC; }
+.imp-errors { border: 1px solid var(--c-line-2); border-radius: 8px; max-height: 220px; overflow-y: auto; }
+.imp-err-row { display: flex; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--c-line-3); font-size: 12.5px; align-items: baseline; }
+.imp-err-row:last-child { border-bottom: 0; }
+.imp-err-row .r { flex-shrink: 0; font-weight: 700; color: var(--c-danger); min-width: 52px; }
+.imp-err-row .f { flex-shrink: 0; color: var(--c-mute); min-width: 90px; }
+.imp-err-row .m { color: var(--c-ink); }
+.imp-err-row .d { color: var(--c-mute-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+
+/* ============== FIELDS ============== */
+.field { margin-bottom: 14px; }
+.field-label { display: block; font-size: 12.5px; font-weight: 500; color: var(--c-mute); margin-bottom: 6px; }
+.field-label .req { color: var(--c-danger); margin-left: 2px; }
+.field-input { width: 100%; }
+.field-help { font-size: 11.5px; color: var(--c-mute-2); margin-top: 4px; }
+.field-error { font-size: 11.5px; color: var(--c-danger); margin-top: 4px; min-height: 15px; visibility: hidden; }
+.field.is-invalid .input, .field.is-invalid .select { border-color: var(--c-danger); }
+.field.is-invalid .field-error { visibility: visible; }
+textarea.input { height: auto; min-height: 74px; padding: 9px 12px; resize: vertical; line-height: 1.55; }
+
+/* ============== TOAST ============== */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; background: var(--c-navy); color: #fff;
+  padding: 13px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; z-index: 80;
+  display: flex; align-items: center; gap: 10px; box-shadow: 0 12px 32px rgba(17,17,17,0.30);
+  transform: translateY(100px); opacity: 0; transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1); max-width: 380px;
+}
+.toast.is-visible { transform: translateY(0); opacity: 1; }
+.toast.is-success { background: var(--c-success); }
+.toast.is-info { background: var(--c-primary); }
+.toast.is-warning { background: var(--c-warning); }
+.toast.is-error { background: var(--c-danger); }
+.toast [data-lucide] { width: 17px; height: 17px; }
+
+/* ============== UTILITIES ============== */
+.hidden { display: none !important; }
+.text-mute { color: var(--c-mute); }
+.text-mute-2 { color: var(--c-mute-2); }
+.text-primary { color: var(--c-primary); }
+.text-danger { color: var(--c-danger); }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.w-2\.5 { width: 10px; }   .h-2\.5 { height: 10px; }
+.w-3   { width: 12px; }    .h-3   { height: 12px; }
+.w-3\.5 { width: 14px; }   .h-3\.5 { height: 14px; }
+.w-4   { width: 16px; }    .h-4   { height: 16px; }
+.w-5   { width: 20px; }    .h-5   { height: 20px; }
+svg.lucide { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; flex-shrink: 0; }
+svg.lucide.w-2\.5 { width: 10px; }   svg.lucide.h-2\.5 { height: 10px; }
+svg.lucide.w-3    { width: 12px; }   svg.lucide.h-3    { height: 12px; }
+svg.lucide.w-3\.5 { width: 14px; }   svg.lucide.h-3\.5 { height: 14px; }
+svg.lucide.w-4    { width: 16px; }   svg.lucide.h-4    { height: 16px; }
+svg.lucide.w-5    { width: 20px; }   svg.lucide.h-5    { height: 20px; }
+</style>
+</head><body>
+
+<!-- ===== SIDEBAR (Pattern N) ===== -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i data-lucide="box" class="w-4 h-4"></i></div>
+    <div><div class="sb-name">CUBE NATIVE</div><div class="sb-sub">AGM · WKN</div></div>
+  </div>
+  <nav class="sb-nav" id="sb-nav">
+    <div class="sb-module" data-module="agm" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sprout" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">เกษตรกรรม</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item is-disabled" data-feature="farmer-members"><i data-lucide="users" class="w-4 h-4"></i><span>จัดการสมาชิกเกษตรกร</span></a>
+        <a class="sb-item is-disabled" data-feature="quota"><i data-lucide="scale" class="w-4 h-4"></i><span>จัดการโควตา</span></a>
+        <a class="sb-item is-disabled" data-feature="plots"><i data-lucide="map" class="w-4 h-4"></i><span>จัดการแปลงที่ดิน</span></a>
+        <a class="sb-item is-disabled" data-feature="crops"><i data-lucide="wheat" class="w-4 h-4"></i><span>จัดการรอบปลูก</span></a>
+        <a class="sb-item is-disabled" data-feature="cane-contract"><i data-lucide="file-signature" class="w-4 h-4"></i><span>จัดการสัญญาส่งอ้อย</span></a>
+        <a class="sb-item is-disabled" data-feature="surveys"><i data-lucide="clipboard-list" class="w-4 h-4"></i><span>จัดการแบบสำรวจ</span></a>
+        <a class="sb-item is-disabled" data-feature="bookings"><i data-lucide="calendar-clock" class="w-4 h-4"></i><span>จัดการจองรอบส่งอ้อย</span></a>
+        <a class="sb-item is-disabled" data-feature="debtors"><i data-lucide="wallet" class="w-4 h-4"></i><span>จัดการหนี้ลูกหนี้</span></a>
+        <a class="sb-item is-active" data-feature="areas"><i data-lucide="shield-check" class="w-4 h-4"></i><span>พื้นที่และการกำหนดสิทธิ์</span></a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="system" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sliders-horizontal" class="mod-icon w-3.5 h-3.5"></i><span class="mod-label">System</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features"><a class="sb-item is-disabled" data-feature="settings"><i data-lucide="settings" class="w-4 h-4"></i><span>Settings</span></a></div>
+    </div>
+  </nav>
+  <div class="sb-footer"><div class="pulse-dot"></div><span>WKN Prototype · v1.0.0</span></div>
+</aside>
+
+<main class="main">
+  <header class="shell-bar">
+    <nav class="breadcrumb">
+      <a data-breadcrumb-module="agm">เกษตรกรรม</a>
+      <i data-lucide="chevron-right" class="w-3 h-3 sep"></i>
+      <a>การบริหาร</a>
+      <i data-lucide="chevron-right" class="w-3 h-3 sep"></i>
+      <span class="breadcrumb-current">พื้นที่และการกำหนดสิทธิ์</span>
+    </nav>
+    <div style="display:flex; align-items:center; gap:6px; margin-left:auto;">
+      <div style="position:relative;"><button class="icon-btn" id="notifBtn"><i data-lucide="bell" class="w-4 h-4"></i><span class="notif-dot"></span></button></div>
+      <div style="position:relative;">
+        <div class="user-chip" onclick="toggleUserMenu()">
+          <div class="user-text"><div class="user-name">สมพร วงศ์ทะเบียน</div><div class="user-role">ผู้ดูแลระบบ (System Admin) · WKN</div></div>
+          <div class="avatar">สว</div>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-item"><i data-lucide="user" class="w-3.5 h-3.5"></i><span>My Profile</span></div>
+          <div class="user-menu-item"><i data-lucide="settings" class="w-3.5 h-3.5"></i><span>Preferences</span></div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-item is-danger"><i data-lucide="log-out" class="w-3.5 h-3.5"></i><span>Sign out</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="content" id="page-content"></div>
+</main>
+
+<div id="overlay-root"></div>
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"><div class="modal" id="modalBox" onclick="event.stopPropagation()"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function loadLucide(){var v='0.469.0';var cdns=['https://unpkg.com/lucide@'+v+'/dist/umd/lucide.min.js','https://cdn.jsdelivr.net/npm/lucide@'+v+'/dist/umd/lucide.min.js','https://cdnjs.cloudflare.com/ajax/libs/lucide/'+v+'/lucide.min.js'];var i=0;function n(){if(i>=cdns.length){window.lucide=window.lucide||{createIcons:function(){}};window.dispatchEvent(new Event('lucide:ready'));return;}var s=document.createElement('script');s.src=cdns[i++];s.onload=function(){window.dispatchEvent(new Event('lucide:ready'));};s.onerror=n;document.head.appendChild(s);}n();})();
+</script>
+
+<script>
+// ============================================
+// USER + RBAC (BR-07)
+// ============================================
+// Demo runs as System Admin so every write button + the Roles tab are visible.
+// Write buttons and the Roles tab are gated by canWrite = ['System Admin','Director'].includes(CURRENT_ROLE) per BR-07.
+var CURRENT_ROLE = 'System Admin';
+var canWrite = ['System Admin','Director'].includes(CURRENT_ROLE);
+const CURRENT_USER = { id:'u-ag-01', name:'สมพร วงศ์ทะเบียน', role:CURRENT_ROLE };
+function daysAgo(n){ var d=new Date(); d.setDate(d.getDate()-n); return d.toISOString(); }
+
+// ---- Thai label maps (verbatim) ----
+const AREA_STATUS_LABEL = { Active:'เปิดใช้งาน', Inactive:'ปิดใช้งาน' };
+const CODE_STATUS_LABEL = { EMPTY:'ว่าง', OCCUPIED:'ใช้งานอยู่' };
+
+// ============================================
+// GEOGRAPHY MASTERS
+// ============================================
+const PROVINCES = [
+  { id:'P1', name:'กรุงเทพมหานคร' },
+  { id:'P2', name:'เชียงใหม่' },
+  { id:'P3', name:'เชียงราย' }
+];
+const DISTRICTS = {
+  P1:[ {id:'D101',name:'เขตพระนคร'}, {id:'D102',name:'เขตดุสิต'}, {id:'D103',name:'เขตบางรัก'} ],
+  P2:[ {id:'D201',name:'เมืองเชียงใหม่'}, {id:'D202',name:'สันทราย'}, {id:'D203',name:'แม่ริม'} ],
+  P3:[ {id:'D301',name:'เมืองเชียงราย'}, {id:'D302',name:'แม่สาย'}, {id:'D303',name:'เชียงของ'} ]
+};
+const SUBDISTRICTS = {
+  D101:[ {id:'S1011',name:'พระบรมมหาราชวัง',postal:'10200'}, {id:'S1012',name:'วังบูรพาภิรมย์',postal:'10200'} ],
+  D102:[ {id:'S1021',name:'ดุสิต',postal:'10300'}, {id:'S1022',name:'วชิรพยาบาล',postal:'10300'} ],
+  D103:[ {id:'S1031',name:'สีลม',postal:'10500'}, {id:'S1032',name:'สุริยวงศ์',postal:'10500'} ],
+  D201:[ {id:'S2011',name:'ศรีภูมิ',postal:'50200'}, {id:'S2012',name:'พระสิงห์',postal:'50200'} ],
+  D202:[ {id:'S2021',name:'หนองหาร',postal:'50290'}, {id:'S2022',name:'สันทรายน้อย',postal:'50210'} ],
+  D203:[ {id:'S2031',name:'ริมใต้',postal:'50180'}, {id:'S2032',name:'แม่ริม',postal:'50180'} ],
+  D301:[ {id:'S3011',name:'เวียง',postal:'57000'}, {id:'S3012',name:'รอบเวียง',postal:'57000'} ],
+  D302:[ {id:'S3021',name:'แม่สาย',postal:'57130'}, {id:'S3022',name:'เวียงพางคำ',postal:'57130'} ],
+  D303:[ {id:'S3031',name:'เวียง',postal:'57140'}, {id:'S3032',name:'สถาน',postal:'57140'} ]
+};
+function provinceName(id){ var p=PROVINCES.find(x=>x.id===id); return p?p.name:''; }
+function districtsOf(pid){ return DISTRICTS[pid]||[]; }
+function subdistrictsOf(did){ return SUBDISTRICTS[did]||[]; }
+function findSub(sid){ var out=null; Object.keys(SUBDISTRICTS).forEach(function(k){ var f=SUBDISTRICTS[k].find(s=>s.id===sid); if(f)out=f; }); return out; }
+function districtName(did){ var out=''; Object.keys(DISTRICTS).forEach(function(k){ var f=DISTRICTS[k].find(d=>d.id===did); if(f)out=f.name; }); return out; }
+
+// ============================================
+// SEED — Areas / ExtensionCodes / AreaHeads / Directors / ErpEmployees / Audit
+// ============================================
+function ar(o){ return Object.assign({ area_id:'', area_name:'', province_id:'', province_name:'', district_name:'', subdistrict_name:'', postal_code:'', address_line:'', description:'', status:'Active', heads_count:0, codes_count:0, version:1, created_at:daysAgo(120), created_by:'สมพร วงศ์ทะเบียน', updated_at:daysAgo(10), updated_by:'สมพร วงศ์ทะเบียน' }, o); }
+
+const state = {
+  areas: [
+    ar({ area_id:'AR-0001', area_name:'พื้นที่ภาคกลาง', province_id:'P1', province_name:'กรุงเทพมหานคร', district_name:'เขตพระนคร', subdistrict_name:'พระบรมมหาราชวัง', postal_code:'10200', address_line:'123 ถนนหน้าพระลาน', description:'พื้นที่ปฏิบัติการหลักภาคกลาง ครอบคลุมเขตเมืองหลวง', status:'Active', heads_count:2, codes_count:3, version:4, created_at:daysAgo(150), updated_at:daysAgo(3) }),
+    ar({ area_id:'AR-0002', area_name:'พื้นที่ภาคเหนือ', province_id:'P2', province_name:'เชียงใหม่', district_name:'เมืองเชียงใหม่', subdistrict_name:'ศรีภูมิ', postal_code:'50200', address_line:'45 ถนนราชวิถี', description:'พื้นที่ปฏิบัติการภาคเหนือ ศูนย์เชียงใหม่', status:'Active', heads_count:1, codes_count:2, version:2, created_at:daysAgo(120), updated_at:daysAgo(8) }),
+    ar({ area_id:'AR-0003', area_name:'พื้นที่ภาคเหนือตอนบน', province_id:'P3', province_name:'เชียงราย', district_name:'เมืองเชียงราย', subdistrict_name:'เวียง', postal_code:'57000', address_line:'9 ถนนธนาลัย', description:'พื้นที่ปฏิบัติการภาคเหนือตอนบน (ยังไม่เปิดใช้งาน)', status:'Inactive', heads_count:0, codes_count:0, version:1, created_at:daysAgo(90), updated_at:daysAgo(30) }),
+    ar({ area_id:'AR-0004', area_name:'พื้นที่ภาคกลางตะวันตก', province_id:'P1', province_name:'กรุงเทพมหานคร', district_name:'เขตบางรัก', subdistrict_name:'สีลม', postal_code:'10500', address_line:'88 ถนนสีลม', description:'พื้นที่ย่อยฝั่งตะวันตกของเขตเมือง มีโค้ดใช้งานอยู่', status:'Active', heads_count:0, codes_count:2, version:2, created_at:daysAgo(80), updated_at:daysAgo(5) }),
+    ar({ area_id:'AR-0005', area_name:'พื้นที่เชียงใหม่รอบนอก', province_id:'P2', province_name:'เชียงใหม่', district_name:'สันทราย', subdistrict_name:'หนองหาร', postal_code:'50290', address_line:'201 หมู่ 5 ตำบลหนองหาร', description:'พื้นที่รอบนอกเชียงใหม่ พร้อมเปิดใช้งาน (ยังไม่มีโค้ด)', status:'Active', heads_count:0, codes_count:0, version:1, created_at:daysAgo(40), updated_at:daysAgo(12) })
+  ],
+  codes: [
+    { ext_code_id:'EC-0001', display_code:'0101', area_id:'AR-0001', area_name:'พื้นที่ภาคกลาง', status:'OCCUPIED', note:'โค้ดหลักโซนเหนือ', assigned:{ employee_id:'E01', full_name:'สมชาย ใจกล้า', email:'somchai@wkn.co.th', assigned_at:daysAgo(40) }, version:2 },
+    { ext_code_id:'EC-0002', display_code:'0102', area_id:'AR-0001', area_name:'พื้นที่ภาคกลาง', status:'OCCUPIED', note:'โซนใต้', assigned:{ employee_id:'E02', full_name:'บุญมี ทองดี', email:'boonmee@wkn.co.th', assigned_at:daysAgo(30) }, version:2 },
+    { ext_code_id:'EC-0003', display_code:'0103', area_id:'AR-0001', area_name:'พื้นที่ภาคกลาง', status:'EMPTY', note:'สำรอง', assigned:null, version:1 },
+    { ext_code_id:'EC-0004', display_code:'0201', area_id:'AR-0002', area_name:'พื้นที่ภาคเหนือ', status:'OCCUPIED', note:'', assigned:{ employee_id:'E03', full_name:'ประเสริฐ สุขใจ', email:'prasert@wkn.co.th', assigned_at:daysAgo(25) }, version:2 },
+    { ext_code_id:'EC-0005', display_code:'0202', area_id:'AR-0002', area_name:'พื้นที่ภาคเหนือ', status:'EMPTY', note:'รอมอบหมาย', assigned:null, version:1 },
+    { ext_code_id:'EC-0006', display_code:'0401', area_id:'AR-0004', area_name:'พื้นที่ภาคกลางตะวันตก', status:'OCCUPIED', note:'โซนสีลม', assigned:{ employee_id:'E04', full_name:'วิไล งามตา', email:'wilai@wkn.co.th', assigned_at:daysAgo(18) }, version:2 },
+    { ext_code_id:'EC-0007', display_code:'0402', area_id:'AR-0004', area_name:'พื้นที่ภาคกลางตะวันตก', status:'EMPTY', note:'', assigned:null, version:1 }
+  ],
+  heads: [
+    { area_id:'AR-0001', employee_id:'E01', full_name:'สมชาย ใจกล้า', email:'somchai@wkn.co.th', assigned_at:daysAgo(45) },
+    { area_id:'AR-0001', employee_id:'E05', full_name:'วิภา แก้วมณี', email:'wipha@wkn.co.th', assigned_at:daysAgo(20) },
+    { area_id:'AR-0002', employee_id:'E03', full_name:'ประเสริฐ สุขใจ', email:'prasert@wkn.co.th', assigned_at:daysAgo(28) }
+  ],
+  directors: [
+    { employee_id:'E06', full_name:'ดำรง ผู้นำชัย', email:'damrong@wkn.co.th', dept:'บริหาร', title:'ผู้อำนวยการ', assigned_at:daysAgo(200) }
+  ],
+  employees: [
+    { employee_id:'E01', full_name:'สมชาย ใจกล้า', email:'somchai@wkn.co.th', dept:'ปฏิบัติการ', title:'เจ้าหน้าที่ภาคสนาม', status:'active' },
+    { employee_id:'E02', full_name:'บุญมี ทองดี', email:'boonmee@wkn.co.th', dept:'ปฏิบัติการ', title:'เจ้าหน้าที่ภาคสนาม', status:'active' },
+    { employee_id:'E03', full_name:'ประเสริฐ สุขใจ', email:'prasert@wkn.co.th', dept:'ปฏิบัติการ', title:'หัวหน้าชุด', status:'active' },
+    { employee_id:'E04', full_name:'วิไล งามตา', email:'wilai@wkn.co.th', dept:'ส่งเสริม', title:'เจ้าหน้าที่ส่งเสริม', status:'active' },
+    { employee_id:'E05', full_name:'วิภา แก้วมณี', email:'wipha@wkn.co.th', dept:'ปฏิบัติการ', title:'หัวหน้าชุด', status:'active' },
+    { employee_id:'E06', full_name:'ดำรง ผู้นำชัย', email:'damrong@wkn.co.th', dept:'บริหาร', title:'ผู้อำนวยการ', status:'active' },
+    { employee_id:'E07', full_name:'สมหญิง ลาพัก', email:'somying@wkn.co.th', dept:'ปฏิบัติการ', title:'เจ้าหน้าที่ภาคสนาม', status:'inactive' }
+  ],
+  audit: [
+    { id:'AU-0001', area_id:'AR-0001', action:'area.created', actor_name:'สมพร วงศ์ทะเบียน', timestamp:daysAgo(150), details:'สร้างพื้นที่: พื้นที่ภาคกลาง' },
+    { id:'AU-0002', area_id:'AR-0001', action:'head.added', actor_name:'สมพร วงศ์ทะเบียน', timestamp:daysAgo(45), details:'เพิ่มหัวหน้าพื้นที่: สมชาย ใจกล้า' },
+    { id:'AU-0003', area_id:'AR-0001', action:'code.created', actor_name:'สมพร วงศ์ทะเบียน', timestamp:daysAgo(40), details:'สร้าง Extension Code: 0101' },
+    { id:'AU-0004', area_id:'AR-0001', action:'area.updated', actor_name:'สมพร วงศ์ทะเบียน', timestamp:daysAgo(3), details:'ปรับปรุงข้อมูลที่อยู่พื้นที่' }
+  ],
+  filters:{ search:'', province:'all', status:'all' },
+  officerFilter:{ area:'all', status:'all' },
+  dirSearch:'',
+  pagination:{ page:1, pageSize:25 },
+  selectedIds: new Set(),
+  topTab:'areas',
+  roleTab:'directors',
+  modal:{ open:false, type:null, data:null },
+  form:null,
+  view:null
+};
+
+// ============================================
+// HELPERS
+// ============================================
+function renderIcons(){ if(window.lucide&&typeof window.lucide.createIcons==='function') window.lucide.createIcons(); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+const TH_MONTHS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function fmtDate(iso){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso); return d.getDate()+' '+TH_MONTHS[d.getMonth()]+' '+(d.getFullYear()+543); }
+function fmtDateTime(iso){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso); var hh=String(d.getHours()).padStart(2,'0'); var mm=String(d.getMinutes()).padStart(2,'0'); return d.getDate()+' '+TH_MONTHS[d.getMonth()]+' '+(d.getFullYear()+543)+' '+hh+':'+mm+' น.'; }
+function showToast(msg,variant,ms,desc){ variant=variant||'info'; ms=ms||3200; var el=document.getElementById('toast'); var im={success:'check-circle-2',info:'info',warning:'alert-triangle',error:'x-circle'}; el.className='toast is-'+variant; el.innerHTML='<i data-lucide="'+(im[variant]||'info')+'" class="w-4 h-4"></i><span>'+esc(msg)+(desc?'<br><span style="opacity:.85;font-weight:400;font-size:12px;">'+esc(desc)+'</span>':'')+'</span>'; renderIcons(); requestAnimationFrame(()=>el.classList.add('is-visible')); clearTimeout(showToast._t); showToast._t=setTimeout(()=>el.classList.remove('is-visible'),ms); }
+function toggleModule(h){ var m=h.closest('.sb-module'); if(!m)return; var e=m.getAttribute('data-expanded')!=='false'; m.setAttribute('data-expanded',e?'false':'true'); }
+function toggleUserMenu(){ document.getElementById('userMenu').classList.toggle('is-open'); }
+document.addEventListener('click',function(e){ if(!e.target.closest('.user-chip')&&!e.target.closest('.user-menu')){ var um=document.getElementById('userMenu'); if(um)um.classList.remove('is-open'); } });
+
+// ---- pill / badge builders ----
+function statusPill(st){ var c=(st==='Active')?'pill-success':'pill-muted'; return '<span class="pill '+c+'">'+esc(AREA_STATUS_LABEL[st]||st)+'</span>'; }
+function codeStatusPill(st){ var c=(st==='OCCUPIED')?'pill-info':'pill-outline'; return '<span class="pill '+c+'">'+esc(CODE_STATUS_LABEL[st]||st)+'</span>'; }
+function countBadge(n){ n=Number(n)||0; return '<span class="pill '+(n>0?'pill-info':'pill-muted')+'" style="min-width:26px;justify-content:center;">'+n+'</span>'; }
+function actionBadge(a){ var m={ 'area.created':['pill-info','สร้างพื้นที่'], 'area.updated':['pill-warning','แก้ไขพื้นที่'], 'head.added':['pill-success','เพิ่มหัวหน้า'], 'head.removed':['pill-danger','ลบหัวหน้า'], 'code.created':['pill-info','สร้างโค้ด'] }; var x=m[a]||['pill-muted',a]; return '<span class="pill '+x[0]+'">'+esc(x[1])+'</span>'; }
+function empStatusTag(st){ return st==='active'?'<span class="pill pill-success" style="font-size:10px;padding:2px 7px;">active</span>':'<span class="pill pill-muted" style="font-size:10px;padding:2px 7px;">inactive</span>'; }
+
+// ---- entity helpers ----
+function findArea(id){ return state.areas.find(a=>a.area_id===id); }
+function findEmp(id){ return state.employees.find(e=>e.employee_id===id); }
+function areaHeads(id){ return state.heads.filter(h=>h.area_id===id); }
+function areaCodes(id){ return state.codes.filter(c=>c.area_id===id); }
+function areaAudit(id){ return state.audit.filter(x=>x.area_id===id).slice().sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp)); }
+function recount(id){ var a=findArea(id); if(a){ a.heads_count=areaHeads(id).length; a.codes_count=areaCodes(id).length; a.updated_at=new Date().toISOString(); a.updated_by=CURRENT_USER.name; } }
+function pushAudit(areaId,action,details){ var mx=0; state.audit.forEach(function(x){ var n=parseInt(String(x.id).slice(-4),10); if(n>mx)mx=n; }); var id='AU-'+String(mx+1).padStart(4,'0'); state.audit.push({ id:id, area_id:areaId, action:action, actor_name:CURRENT_USER.name, timestamp:new Date().toISOString(), details:details }); }
+function nextAreaId(){ var mx=0; state.areas.forEach(function(a){ var n=parseInt(String(a.area_id).slice(-4),10); if(n>mx)mx=n; }); return 'AR-'+String(mx+1).padStart(4,'0'); }
+function nextCodeId(){ var mx=0; state.codes.forEach(function(c){ var n=parseInt(String(c.ext_code_id).slice(-4),10); if(n>mx)mx=n; }); return 'EC-'+String(mx+1).padStart(4,'0'); }
+function totalCodes(){ return state.codes.length; }
+function totalHeads(){ return state.heads.length; }
+
+// ============================================
+// ROUTER
+// ============================================
+function getRoute(){ var h=location.hash; if(!h||h==='#'||h==='#/')return 'areas'; return h.replace(/^#\//,''); }
+function navigate(r){ location.hash='#/'+r; }
+
+// ============================================
+// LIST FILTER / PAGE (Areas)
+// ============================================
+function getFiltered(){
+  var arr=state.areas.slice();
+  if(state.filters.province!=='all') arr=arr.filter(a=>a.province_id===state.filters.province);
+  if(state.filters.status!=='all') arr=arr.filter(a=>a.status===state.filters.status);
+  if(state.filters.search){
+    var q=state.filters.search.toLowerCase().trim();
+    arr=arr.filter(a=> a.area_id.toLowerCase().includes(q) || String(a.area_name).toLowerCase().includes(q) );
+  }
+  return arr;
+}
+function getPaged(){ var all=getFiltered(); var pg=state.pagination.page,ps=state.pagination.pageSize; var s=(pg-1)*ps; return {records:all.slice(s,s+ps),total:all.length,page:pg,totalPages:Math.max(1,Math.ceil(all.length/ps)),start:all.length===0?0:s+1,end:Math.min(s+ps,all.length)}; }
+function toggleSelect(id){ if(state.selectedIds.has(id))state.selectedIds.delete(id); else state.selectedIds.add(id); render(); }
+function toggleSelectAll(){ var sel=getPaged().records; var all=sel.length>0&&sel.every(d=>state.selectedIds.has(d.area_id)); if(all)sel.forEach(d=>state.selectedIds.delete(d.area_id)); else sel.forEach(d=>state.selectedIds.add(d.area_id)); render(); }
+function goToPage(n){ var tp=getPaged().totalPages; if(n<1||n>tp)return; state.pagination.page=n; render(); }
+function resetFilters(){ state.filters={search:'',province:'all',status:'all'}; state.pagination.page=1; state.selectedIds.clear(); render(); }
+var _st=null; function onSearchInput(v){ clearTimeout(_st); _st=setTimeout(function(){ state.filters.search=v; state.pagination.page=1; render(); },300); }
+function setFilter(k,v){ state.filters[k]=v; state.pagination.page=1; render(); }
+var _dt=null; function onDirSearch(v){ clearTimeout(_dt); _dt=setTimeout(function(){ state.dirSearch=v; render(); },300); }
+function setOfficerFilter(k,v){ state.officerFilter[k]=v; render(); }
+
+// RENDER PRESERVATION
+function preserveState(){ var a=document.activeElement; var isI=a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'); return { pageScroll:window.scrollY, focusKey:isI?{id:a.id||'',placeholder:a.placeholder||'',selStart:a.selectionStart,selEnd:a.selectionEnd}:null }; }
+function restoreState(s){ if(!s)return; requestAnimationFrame(function(){ if(s.pageScroll>0)window.scrollTo(0,s.pageScroll); if(s.focusKey){ var c=s.focusKey.id?document.getElementById(s.focusKey.id):null; if(!c){var cs=document.querySelectorAll('input,textarea'); for(var i=0;i<cs.length;i++){ if((cs[i].placeholder||'')===s.focusKey.placeholder){c=cs[i];break;} }} if(c){ c.focus(); if(s.focusKey.selStart!=null&&c.setSelectionRange){ try{c.setSelectionRange(s.focusKey.selStart,s.focusKey.selEnd);}catch(e){} } } } }); }
+
+function emptyStateHTML(cfg){ cfg=cfg||{}; var acts=''; if(cfg.actions){ acts='<div class="empty-actions">'+cfg.actions.map(function(a){ return '<button class="btn '+(a.cls||'btn-primary')+'" onclick="'+a.onAction+'">'+(a.icon?'<i data-lucide="'+a.icon+'" class="w-4 h-4"></i>':'')+'<span>'+a.label+'</span></button>'; }).join('')+'</div>'; } return '<div class="empty"><div class="empty-icon"><i data-lucide="'+(cfg.icon||'inbox')+'" class="w-5 h-5"></i></div><div class="empty-title">'+(cfg.title||'ยังไม่มีข้อมูล')+'</div><div class="empty-desc">'+(cfg.desc||'')+'</div>'+acts+'</div>'; }
+
+// ============================================
+// TOP TAB BAR (page-level: Areas | Roles)
+// ============================================
+function topTabBar(){
+  var t=state.topTab;
+  var h='<div class="tabs" style="margin-top:0;margin-bottom:20px;">';
+  h+='<button class="tab '+(t==='areas'?'on':'')+'" onclick="navigate(\'areas\')"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i><span>Areas</span></button>';
+  // Roles tab visible only when currentUser role in {System Admin, Director}
+  if(canWrite) h+='<button class="tab '+(t==='roles'?'on':'')+'" onclick="navigate(\'roles\')"><i data-lucide="shield" class="w-3.5 h-3.5"></i><span>Roles</span></button>';
+  h+='</div>';
+  return h;
+}
+
+// ============================================
+// PAGE RENDER (dispatch)
+// ============================================
+function render(){
+  var snap=preserveState();
+  var route=getRoute(); var parts=route.split('/');
+  var head=parts[0];
+  if(head!=='areas'&&head!=='roles'){ navigate('areas'); return; }
+  if(head==='roles'&&!canWrite){ navigate('areas'); return; }
+  state.topTab = head==='roles'?'roles':'areas';
+  if(state.topTab==='roles') renderRolesPage();
+  else renderAreasPage();
+  renderIcons(); restoreState(snap);
+
+  if(state.topTab==='areas' && parts.length>1 && parts[1]){
+    var a=findArea(parts[1]);
+    if(a){ if(!state.view||state.view.id!==a.area_id){ state.view={id:a.area_id,tab:'overview'}; mountViewDrawer(); } }
+    else { showToast('ไม่พบพื้นที่นี้','error'); navigate('areas'); }
+  } else if(state.view){ state.view=null; unmountOverlay(); }
+}
+
+// ============================================
+// AREAS LIST — BACKEND: API-01 area-list
+// ============================================
+function renderAreasPage(){
+  var pg=getPaged();
+  var all=state.areas;
+  var cActive=all.filter(a=>a.status==='Active').length;
+  var sel=pg.records; var allSel=sel.length>0&&sel.every(d=>state.selectedIds.has(d.area_id)); var someSel=!allSel&&sel.some(d=>state.selectedIds.has(d.area_id)); var selCount=state.selectedIds.size;
+
+  var rows=pg.records.map(function(a){
+    var checked=state.selectedIds.has(a.area_id);
+    return '<tr class="is-clickable '+(checked?'is-selected':'')+'" onclick="openView(\''+a.area_id+'\')">'
+      +'<td onclick="event.stopPropagation()"><div class="cb '+(checked?'is-checked':'')+'" onclick="toggleSelect(\''+a.area_id+'\')"></div></td>'
+      +'<td><span class="mono text-primary" style="font-weight:600;cursor:pointer;">'+esc(a.area_name)+'</span><div class="mono" style="font-size:11px;color:var(--c-mute-2);">'+esc(a.area_id)+'</div></td>'
+      +'<td>'+esc(a.province_name)+'</td>'
+      +'<td style="text-align:center;">'+countBadge(areaHeads(a.area_id).length)+'</td>'
+      +'<td style="text-align:center;">'+countBadge(areaCodes(a.area_id).length)+'</td>'
+      +'<td>'+statusPill(a.status)+'</td>'
+      +'<td onclick="event.stopPropagation()" style="text-align:right;width:130px;"><div class="row-actions">'
+      +'<button class="ra-btn" onclick="openView(\''+a.area_id+'\')" title="เปิด"><i data-lucide="eye" class="w-4 h-4"></i></button>'
+      +(canWrite?'<button class="ra-btn" onclick="editArea(\''+a.area_id+'\')" title="แก้ไข"><i data-lucide="pencil" class="w-4 h-4"></i></button>':'')
+      +(canWrite?'<button class="ra-btn" onclick="toggleAreaStatus(\''+a.area_id+'\')" title="เปิด/ปิดใช้งาน"><i data-lucide="power" class="w-4 h-4"></i></button>':'')
+      +'</div></td></tr>';
+  }).join('');
+
+  var noData=all.length===0; var emptyBlock='';
+  if(pg.records.length===0){
+    emptyBlock=noData?emptyStateHTML({icon:'map-pin',title:'ยังไม่มีพื้นที่',desc:'เริ่มต้นด้วยการสร้างพื้นที่ปฏิบัติการรายแรก',actions:canWrite?[{label:'สร้างพื้นที่ใหม่',icon:'plus',onAction:"openForm('area')"}]:[]})
+      :emptyStateHTML({icon:'search-x',title:'ไม่พบรายการที่ค้นหา',desc:'ลองปรับคำค้นหรือล้างตัวกรอง',actions:[{label:'ล้างตัวกรอง',icon:'rotate-ccw',cls:'btn-ghost',onAction:'resetFilters()'}]});
+  }
+  var pageNums=[]; for(var n=1;n<=pg.totalPages;n++)pageNums.push(n);
+
+  var provOpts='<option value="all"'+(state.filters.province==='all'?' selected':'')+'>ทุกจังหวัด</option>'+PROVINCES.map(p=>'<option value="'+p.id+'"'+(state.filters.province===p.id?' selected':'')+'>'+esc(p.name)+'</option>').join('');
+
+  document.getElementById('page-content').innerHTML=
+    topTabBar()
+    +'<div class="ph"><div><div class="ph-title-row"><h1 class="ph-title">พื้นที่ (Areas)</h1><span class="ph-count">'+pg.total+' รายการ</span></div>'
+    +'<p class="ph-sub">จัดการพื้นที่ปฏิบัติการ, สถานะ และหัวหน้าพื้นที่</p></div>'
+    +'<div class="ph-actions">'
+    +'<button class="btn btn-secondary" onclick="exportAreasCSV()"><i data-lucide="download" class="w-4 h-4"></i><span>Export CSV</span></button>'
+    +(canWrite?'<button class="btn btn-primary" onclick="openForm(\'area\')"><i data-lucide="plus" class="w-4 h-4"></i><span>สร้างพื้นที่</span></button>':'')
+    +'</div></div>'
+    +'<div class="stats">'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="map-pin" class="w-3 h-3"></i>พื้นที่ทั้งหมด</div><div class="stat-value num">'+all.length+'</div><div class="stat-meta">ทุกสถานะในระบบ</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="check-circle-2" class="w-3 h-3"></i>เปิดใช้งาน</div><div class="stat-value num">'+cActive+'</div><div class="stat-meta">สถานะเปิดใช้งาน</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="hash" class="w-3 h-3"></i>Extension Codes รวม</div><div class="stat-value num">'+totalCodes()+'</div><div class="stat-meta">ทุกพื้นที่</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="users" class="w-3 h-3"></i>Area Heads รวม</div><div class="stat-value num">'+totalHeads()+'</div><div class="stat-meta">หัวหน้าพื้นที่ทั้งหมด</div></div>'
+    +'</div>'
+    +'<div class="card">'
+    +'<div class="filter-bar"><div class="input-search"><i data-lucide="search" class="lead-icon w-4 h-4"></i>'
+    +'<input class="input" type="text" id="q-search" placeholder="ค้นหา ชื่อพื้นที่ / รหัส" value="'+esc(state.filters.search)+'" oninput="onSearchInput(this.value)"></div>'
+    +'<select class="select" style="max-width:180px;" onchange="setFilter(\'province\',this.value)">'+provOpts+'</select>'
+    +'<select class="select" style="max-width:170px;" onchange="setFilter(\'status\',this.value)">'
+    +'<option value="all"'+(state.filters.status==='all'?' selected':'')+'>ทุกสถานะ</option>'
+    +'<option value="Active"'+(state.filters.status==='Active'?' selected':'')+'>เปิดใช้งาน</option>'
+    +'<option value="Inactive"'+(state.filters.status==='Inactive'?' selected':'')+'>ปิดใช้งาน</option></select>'
+    +'<div style="flex:1;"></div><button class="btn btn-ghost btn-sm" onclick="resetFilters()"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i><span>ล้างตัวกรอง</span></button></div>'
+    +(selCount>0?'<div class="bulk-bar"><i data-lucide="check-square" class="w-4 h-4"></i><span>เลือกแล้ว '+selCount+' รายการ</span><div style="margin-left:auto;display:flex;gap:8px;"><button class="btn btn-secondary" onclick="exportAreasCSV()"><i data-lucide="download" class="w-3.5 h-3.5"></i><span>Export ที่เลือก</span></button><button class="btn btn-secondary" onclick="state.selectedIds.clear();render();"><span>ยกเลิกการเลือก</span></button></div></div>':'')
+    +'<div class="table-scroll is-sticky"><table class="table"><thead><tr>'
+    +'<th class="col-check"><div class="cb '+(allSel?'is-checked':'')+(someSel?' is-partial':'')+'" onclick="toggleSelectAll()" title="เลือกทั้งหมด"></div></th>'
+    +'<th>ชื่อพื้นที่</th><th>จังหวัด</th>'
+    +'<th style="text-align:center;">Heads</th><th style="text-align:center;">Codes</th><th>สถานะ</th>'
+    +'<th style="text-align:right;">การกระทำ</th></tr></thead><tbody>'+rows+'</tbody></table>'+emptyBlock+'</div>'
+    +'<div class="table-footer"><span>แสดง '+pg.start+'-'+pg.end+' จาก '+pg.total+' รายการ</span><div class="pagination">'
+    +'<button class="pg-btn '+(pg.page===1?'is-disabled':'')+'" onclick="goToPage('+(pg.page-1)+')"><i data-lucide="chevron-left" class="w-3 h-3"></i></button>'
+    +pageNums.map(n=>'<button class="pg-btn '+(n===pg.page?'is-active':'')+'" onclick="goToPage('+n+')">'+n+'</button>').join('')
+    +'<button class="pg-btn '+(pg.page===pg.totalPages?'is-disabled':'')+'" onclick="goToPage('+(pg.page+1)+')"><i data-lucide="chevron-right" class="w-3 h-3"></i></button></div></div></div>';
+}
+
+function exportAreasCSV(){ showToast('กำลังเตรียมไฟล์ CSV','info',3400); }
+function editArea(id){ if(!canWrite)return; var a=findArea(id); if(!a)return; showToast('เปิดฟอร์มแก้ไขพื้นที่ (ตัวอย่าง)','info'); }
+
+// ---- Toggle status DEACTIVATE GUARD ----
+function toggleAreaStatus(id){
+  if(!canWrite)return;
+  var a=findArea(id); if(!a)return;
+  if(a.status==='Active'){
+    if(areaCodes(id).length>0){ showToast('ไม่สามารถปิดใช้งานพื้นที่ที่มีโค้ดที่ถูกใช้','error',4000,'กรุณาย้ายหรือลบโค้ดที่ใช้งานอยู่ก่อน'); return; }
+    a.status='Inactive'; a.updated_at=new Date().toISOString(); a.updated_by=CURRENT_USER.name; pushAudit(id,'area.updated','ปิดใช้งานพื้นที่');
+  } else {
+    a.status='Active'; a.updated_at=new Date().toISOString(); a.updated_by=CURRENT_USER.name; pushAudit(id,'area.updated','เปิดใช้งานพื้นที่');
+  }
+  if(state.view)renderViewDrawer(); render(); showToast('เปลี่ยนสถานะสำเร็จ','success');
+}
+
+// ============================================
+// OVERLAY SHELL (Drawer v2)
+// ============================================
+function unmountOverlay(){ document.getElementById('overlay-root').innerHTML=''; }
+function mountPanel(cid,standard){ document.getElementById('overlay-root').innerHTML='<div class="overlay-wrap"><div class="backdrop" onclick="closeTopDrawer()"></div><div id="drawer-panel" class="drawer-panel'+(standard?' standard':'')+' drawer-enter"><div id="'+cid+'" style="display:flex;flex-direction:column;height:100%;"></div></div></div>'; var p=document.getElementById('drawer-panel'); requestAnimationFrame(()=>p.classList.add('drawer-active')); }
+function closePanel(after){ var p=document.getElementById('drawer-panel'); if(p){p.classList.remove('drawer-active');p.classList.add('drawer-enter');} setTimeout(function(){ unmountOverlay(); if(after)after(); },200); }
+function closeTopDrawer(){ if(state.form)closeForm(); else if(state.view)closeView(); }
+
+// ============================================
+// AREA DETAIL DRAWER (view) — 920px, 4 tabs
+// BACKEND: API-02 area-detail · API-05 area-heads · API-06 area-codes · API-09 audit
+// ============================================
+function openView(code){ navigate('areas/'+code); }
+function mountViewDrawer(){ mountPanel('view-content'); renderViewDrawer(); }
+function closeView(){ state.view=null; closePanel(function(){ if(getRoute()!=='areas')navigate('areas'); }); }
+function setViewTab(t){ if(state.view){ state.view.tab=t; renderViewDrawer(); } }
+
+function avOverviewTab(a){
+  function cell(l,v){ return '<div class="dv-cell"><div class="dv-lbl">'+l+'</div><div class="dv-val">'+v+'</div></div>'; }
+  var info='<div class="dv-section"><div class="dv-section-title"><i data-lucide="info" class="w-4 h-4"></i>ข้อมูลพื้นที่</div><div class="dv-grid">'
+    +cell('ชื่อพื้นที่',esc(a.area_name))
+    +cell('จังหวัด',esc(a.province_name))
+    +cell('อำเภอ/เขต',esc(a.district_name))
+    +cell('ตำบล/แขวง',esc(a.subdistrict_name))
+    +cell('รหัสไปรษณีย์','<span class="mono">'+esc(a.postal_code)+'</span>')
+    +cell('สถานะ',statusPill(a.status))
+    +cell('ที่อยู่',esc(a.address_line||'—'))
+    +cell('คำอธิบาย',esc(a.description||'—'))
+    +cell('สร้างเมื่อ',fmtDateTime(a.created_at)+' · โดย '+esc(a.created_by))
+    +cell('แก้ไขล่าสุด',fmtDateTime(a.updated_at)+' · โดย '+esc(a.updated_by))
+    +'</div></div>';
+  var summary='<div class="dv-section"><div class="dv-section-title"><i data-lucide="bar-chart-3" class="w-4 h-4"></i>สรุป</div><div class="dv-grid">'
+    +cell('Area Heads','<span class="num">'+areaHeads(a.area_id).length+'</span> คน')
+    +cell('Extension Codes','<span class="num">'+areaCodes(a.area_id).length+'</span> โค้ด')
+    +cell('เวอร์ชัน','<span class="mono">v'+a.version+'</span>')
+    +'</div></div>';
+  return info+summary;
+}
+function avHeadsTab(a){
+  var hs=areaHeads(a.area_id);
+  var head=canWrite?'<div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-sm btn-primary" onclick="openModalBox(\'addhead\',{area_id:\''+a.area_id+'\'},560)"><i data-lucide="user-plus" class="w-3.5 h-3.5"></i><span>เพิ่มหัวหน้าพื้นที่</span></button></div>':'';
+  if(hs.length===0) return head+emptyStateHTML({icon:'user-x',title:'ยังไม่มีหัวหน้าพื้นที่',desc:'พื้นที่นี้ยังไม่มีการมอบหมายหัวหน้าพื้นที่'});
+  var rows=hs.map(function(h){
+    return '<tr>'
+      +'<td><div style="font-weight:600;">'+esc(h.full_name)+'</div><div class="mono" style="font-size:11px;color:var(--c-mute-2);">'+esc(h.employee_id)+'</div></td>'
+      +'<td>'+esc(h.email)+'</td>'
+      +'<td>'+fmtDate(h.assigned_at)+'</td>'
+      +'<td style="text-align:right;width:70px;">'+(canWrite?'<button class="ra-btn is-danger" onclick="askRemoveHead(\''+a.area_id+'\',\''+h.employee_id+'\')" title="ลบ"><i data-lucide="trash-2" class="w-4 h-4"></i></button>':'—')+'</td>'
+      +'</tr>';
+  }).join('');
+  return head+'<div class="table-scroll"><table class="table"><thead><tr>'
+    +'<th>ชื่อ-สกุล</th><th>Email</th><th>มอบหมายเมื่อ</th><th style="text-align:right;">ลบ</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
+function avCodesTab(a){
+  var cs=areaCodes(a.area_id);
+  var head=canWrite?'<div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-sm btn-primary" onclick="openModalBox(\'createcode\',{area_id:\''+a.area_id+'\'},560)"><i data-lucide="plus" class="w-3.5 h-3.5"></i><span>Create Code</span></button></div>':'';
+  if(cs.length===0) return head+emptyStateHTML({icon:'hash',title:'ยังไม่มี Extension Codes ในพื้นที่นี้',desc:'สร้าง Extension Code เพื่อมอบหมายเจ้าหน้าที่ในพื้นที่นี้'});
+  var rows=cs.map(function(c){
+    return '<tr>'
+      +'<td><span class="mono text-primary" style="font-weight:600;">'+esc(c.display_code)+'</span></td>'
+      +'<td>'+codeStatusPill(c.status)+'</td>'
+      +'<td>'+(c.assigned?('<div style="font-weight:600;">'+esc(c.assigned.full_name)+'</div><div style="font-size:11px;color:var(--c-mute-2);">'+esc(c.assigned.email)+'</div>'):'<span class="text-mute-2">—</span>')+'</td>'
+      +'<td>'+esc(c.note||'—')+'</td>'
+      +'</tr>';
+  }).join('');
+  return head+'<div class="table-scroll"><table class="table"><thead><tr>'
+    +'<th>หมายเลขโค้ด</th><th>สถานะ</th><th>มอบหมายให้</th><th>หมายเหตุ</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
+function avAuditTab(a){
+  var arr=areaAudit(a.area_id);
+  if(arr.length===0) return emptyStateHTML({icon:'history',title:'ยังไม่มีประวัติการเปลี่ยนแปลง',desc:'พื้นที่นี้ยังไม่มีบันทึกการเปลี่ยนแปลง'});
+  var dot={ 'area.created':'', 'area.updated':'is-warning', 'head.added':'is-success', 'head.removed':'is-danger', 'code.created':'' };
+  return '<div class="timeline">'+arr.map(function(x){
+    return '<div class="tl-item"><div class="tl-dot '+(dot[x.action]||'')+'"></div>'
+      +'<div class="tl-title">'+actionBadge(x.action)+' <span style="margin-left:6px;">'+esc(x.actor_name)+'</span></div>'
+      +'<div class="tl-meta">'+fmtDateTime(x.timestamp)+'</div>'
+      +(x.details?'<div class="tl-note">'+esc(x.details)+'</div>':'')
+      +'</div>';
+  }).join('')+'</div>';
+}
+
+function renderViewDrawer(){
+  if(!state.view)return; var a=findArea(state.view.id); if(!a)return;
+  var tab=state.view.tab||'overview';
+  var hCount=areaHeads(a.area_id).length; var cCount=areaCodes(a.area_id).length;
+  var body;
+  if(tab==='heads') body=avHeadsTab(a);
+  else if(tab==='codes') body=avCodesTab(a);
+  else if(tab==='audit') body=avAuditTab(a);
+  else body=avOverviewTab(a);
+
+  function tb(id,icon,label,badge){ return '<button class="tab '+(tab===id?'on':'')+'" onclick="setViewTab(\''+id+'\')"><i data-lucide="'+icon+'" class="w-3.5 h-3.5"></i><span>'+label+'</span>'+(badge!=null?' <span class="ph-count" style="padding:1px 7px;">'+badge+'</span>':'')+'</button>'; }
+
+  document.getElementById('view-content').innerHTML=
+    '<div class="dw-head"><div class="dw-head-row"><div>'
+    +'<div class="dw-eyebrow"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> พื้นที่ · <span class="mono">'+esc(a.area_id)+'</span></div>'
+    +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><h2 class="dw-title">'+esc(a.area_name)+'</h2>'+statusPill(a.status)+'</div>'
+    +'<div class="dw-sub">'+esc(a.province_name)+' · '+esc(a.district_name)+' · อัปเดต: '+fmtDate(a.updated_at)+'</div>'
+    +'</div>'
+    +'<div class="dw-actions">'
+    +(canWrite?'<button class="btn btn-sm btn-secondary" onclick="editArea(\''+a.area_id+'\')"><i data-lucide="pencil" class="w-3.5 h-3.5"></i><span>แก้ไข</span></button>':'')
+    +(canWrite?'<button class="btn btn-sm btn-secondary" onclick="toggleAreaStatus(\''+a.area_id+'\')"><i data-lucide="power" class="w-3.5 h-3.5"></i><span>'+(a.status==='Active'?'ปิดใช้งาน':'เปิดใช้งาน')+'</span></button>':'')
+    +'<button class="btn btn-sm btn-secondary" onclick="exportAreasCSV()"><i data-lucide="download" class="w-3.5 h-3.5"></i><span>Export</span></button>'
+    +'<span class="drawer-header-divider"></span><button class="top-icon-btn" onclick="closeView()"><i data-lucide="x" class="w-5 h-5"></i></button></div></div>'
+    +'<div class="tabs">'
+    +tb('overview','layout-dashboard','ภาพรวม')
+    +tb('heads','users','Area Heads',hCount)
+    +tb('codes','hash','Extension Codes',cCount)
+    +tb('audit','history','Audit')
+    +'</div></div>'
+    +'<div class="dw-body">'+body+'</div>'
+    +'<div class="dw-footer"><div class="dw-footer-meta">สร้างเมื่อ '+fmtDate(a.created_at)+' · โดย '+esc(a.created_by)+'</div><div class="dw-footer-right"><button class="btn btn-secondary" onclick="closeView()">ปิด</button></div></div>';
+  renderIcons();
+}
+
+// head remove (confirm)
+function askRemoveHead(areaId,empId){
+  var h=state.heads.find(x=>x.area_id===areaId&&x.employee_id===empId); if(!h)return;
+  openConfirm({ title:'ยืนยันลบหัวหน้าพื้นที่?', desc:'ต้องการลบ '+h.full_name+' ออกจากหัวหน้าพื้นที่นี้ใช่หรือไม่', confirmLabel:'ลบหัวหน้าพื้นที่', danger:true, onConfirm:function(){ removeHead(areaId,empId); } });
+}
+function removeHead(areaId,empId){
+  state.heads=state.heads.filter(h=>!(h.area_id===areaId&&h.employee_id===empId));
+  recount(areaId); pushAudit(areaId,'head.removed','ลบหัวหน้าพื้นที่');
+  if(state.view)renderViewDrawer(); render(); showToast('ลบหัวหน้าพื้นที่สำเร็จ','success');
+}
+
+// ============================================
+// CREATE-AREA DRAWER (OV) — 680px · geography cascade · BACKEND: API-03 create-area
+// ============================================
+function blankArea(){ return { area_name:'', province_id:'', district_id:'', subdistrict_id:'', postal_code:'', address_line:'', description:'' }; }
+function openForm(kind){
+  if(!canWrite)return;
+  if(state.view){ state.view=null; if(getRoute()!=='areas')navigate('areas'); }
+  state.form={ kind:kind, data:blankArea(), submitting:false };
+  mountPanel('form-content',true); renderAreaForm();
+}
+function closeForm(){ if(state.form&&state.form.submitting)return; state.form=null; closePanel(); }
+function captureAreaText(){ if(!state.form)return; var d=state.form.data; var g=function(id){var e=document.getElementById(id);return e?e.value:undefined;}; var v; v=g('ar-name'); if(v!==undefined)d.area_name=v; v=g('ar-address'); if(v!==undefined)d.address_line=v; v=g('ar-desc'); if(v!==undefined)d.description=v; }
+function setAreaProvince(v){ captureAreaText(); var d=state.form.data; d.province_id=v; d.district_id=''; d.subdistrict_id=''; d.postal_code=''; renderAreaForm(); }
+function setAreaDistrict(v){ captureAreaText(); var d=state.form.data; d.district_id=v; d.subdistrict_id=''; d.postal_code=''; renderAreaForm(); }
+function setAreaSub(v){ captureAreaText(); var d=state.form.data; d.subdistrict_id=v; var s=findSub(v); d.postal_code=s?s.postal:''; renderAreaForm(); }
+
+function renderAreaForm(){
+  var f=state.form; if(!f)return; var d=f.data;
+  var provOpts='<option value="">— เลือกจังหวัด —</option>'+PROVINCES.map(p=>'<option value="'+p.id+'"'+(d.province_id===p.id?' selected':'')+'>'+esc(p.name)+'</option>').join('');
+  var distList=districtsOf(d.province_id);
+  var distOpts='<option value="">— เลือกอำเภอ/เขต —</option>'+distList.map(x=>'<option value="'+x.id+'"'+(d.district_id===x.id?' selected':'')+'>'+esc(x.name)+'</option>').join('');
+  var subList=subdistrictsOf(d.district_id);
+  var subOpts='<option value="">— เลือกตำบล/แขวง —</option>'+subList.map(x=>'<option value="'+x.id+'"'+(d.subdistrict_id===x.id?' selected':'')+'>'+esc(x.name)+'</option>').join('');
+
+  document.getElementById('form-content').innerHTML=
+    '<div class="dw-head"><div class="dw-head-row"><div>'
+    +'<div class="dw-eyebrow"><i data-lucide="plus" class="w-3.5 h-3.5"></i> สร้างพื้นที่</div>'
+    +'<h2 class="dw-title">สร้างพื้นที่ปฏิบัติการ</h2>'
+    +'<div class="dw-sub">พื้นที่ใหม่เริ่มต้นที่สถานะ “เปิดใช้งาน”</div>'
+    +'</div><button class="top-icon-btn" onclick="closeForm()"><i data-lucide="x" class="w-5 h-5"></i></button></div></div>'
+    +'<div class="dw-body">'
+    +'<div class="form-section"><div class="form-section-title">ข้อมูลพื้นที่</div><div class="field"><label class="field-label">ชื่อพื้นที่ <span class="req">*</span></label><input class="input field-input" id="ar-name" type="text" placeholder="เช่น พื้นที่ภาคกลาง" value="'+esc(d.area_name)+'"><div class="field-error"></div></div></div>'
+    +'<div class="form-section"><div class="form-section-title">ที่ตั้ง (เลือกตามลำดับ)</div><div class="form-grp">'
+    +'<div class="field"><label class="field-label">จังหวัด <span class="req">*</span></label><select class="select field-input" id="ar-prov" onchange="setAreaProvince(this.value)">'+provOpts+'</select><div class="field-error"></div></div>'
+    +'<div class="field"><label class="field-label">อำเภอ/เขต <span class="req">*</span></label><select class="select field-input" id="ar-dist" onchange="setAreaDistrict(this.value)"'+(d.province_id?'':' disabled')+'>'+distOpts+'</select><div class="field-help">'+(d.province_id?'เลือกอำเภอในจังหวัดที่เลือก':'กรุณาเลือกจังหวัดก่อน')+'</div></div>'
+    +'<div class="field"><label class="field-label">ตำบล/แขวง <span class="req">*</span></label><select class="select field-input" id="ar-sub" onchange="setAreaSub(this.value)"'+(d.district_id?'':' disabled')+'>'+subOpts+'</select><div class="field-help">'+(d.district_id?'เลือกตำบลในอำเภอที่เลือก':'กรุณาเลือกอำเภอก่อน')+'</div></div>'
+    +'<div class="field"><label class="field-label">รหัสไปรษณีย์</label><input class="input field-input mono" id="ar-postal" type="text" value="'+esc(d.postal_code)+'" placeholder="เติมอัตโนมัติจากตำบล" readonly></div>'
+    +'</div></div>'
+    +'<div class="form-section"><div class="form-section-title">รายละเอียด</div>'
+    +'<div class="field"><label class="field-label">ที่อยู่</label><input class="input field-input" id="ar-address" type="text" placeholder="บ้านเลขที่ / ถนน / หมู่" value="'+esc(d.address_line)+'"></div>'
+    +'<div class="field" style="margin-bottom:0;"><label class="field-label">คำอธิบาย</label><textarea class="input" id="ar-desc" placeholder="คำอธิบายพื้นที่ (ถ้ามี)">'+esc(d.description||'')+'</textarea></div>'
+    +'</div>'
+    +'</div>'
+    +'<div class="dw-footer"><div></div><div class="dw-footer-right">'
+    +'<button class="btn btn-ghost" onclick="closeForm()">ยกเลิก</button>'
+    +'<button class="btn btn-primary" id="ar-submit" onclick="submitArea()"><i data-lucide="check" class="w-4 h-4"></i><span>สร้างพื้นที่</span></button>'
+    +'</div></div>';
+  renderIcons();
+}
+function submitArea(){
+  var f=state.form; if(!f||f.submitting)return; captureAreaText(); var d=f.data;
+  if(!String(d.area_name).trim()){ showToast('กรุณากรอกชื่อพื้นที่','warning'); return; }
+  if(!d.province_id){ showToast('กรุณาเลือกจังหวัด','warning'); return; }
+  if(!d.district_id){ showToast('กรุณาเลือกอำเภอ','warning'); return; }
+  if(!d.subdistrict_id){ showToast('กรุณาเลือกตำบล','warning'); return; }
+  f.submitting=true;
+  var id=nextAreaId(); var now=new Date().toISOString(); var sub=findSub(d.subdistrict_id);
+  state.areas.unshift(ar({ area_id:id, area_name:String(d.area_name).trim(), province_id:d.province_id, province_name:provinceName(d.province_id), district_name:districtName(d.district_id), subdistrict_name:sub?sub.name:'', postal_code:d.postal_code||(sub?sub.postal:''), address_line:String(d.address_line||'').trim(), description:String(d.description||'').trim(), status:'Active', heads_count:0, codes_count:0, version:1, created_at:now, created_by:CURRENT_USER.name, updated_at:now, updated_by:CURRENT_USER.name }));
+  pushAudit(id,'area.created','สร้างพื้นที่: '+String(d.area_name).trim());
+  state.form=null; closePanel(function(){ navigate('areas/'+id); }); render(); showToast('สร้างพื้นที่สำเร็จ','success',4200);
+}
+
+// ============================================
+// ROLES PAGE (visible to System Admin / Director)
+// ============================================
+function setRoleTab(t){ state.roleTab=t; render(); }
+function renderRolesPage(){
+  var t=state.roleTab||'directors';
+  function stb(id,icon,label,badge){ return '<button class="tab '+(t===id?'on':'')+'" onclick="setRoleTab(\''+id+'\')"><i data-lucide="'+icon+'" class="w-3.5 h-3.5"></i><span>'+label+'</span>'+(badge!=null?' <span class="ph-count" style="padding:1px 7px;">'+badge+'</span>':'')+'</button>'; }
+  var body;
+  if(t==='heads') body=rolesHeadsView();
+  else if(t==='officers') body=rolesOfficersView();
+  else body=rolesDirectorsView();
+
+  document.getElementById('page-content').innerHTML=
+    topTabBar()
+    +'<div class="ph"><div><div class="ph-title-row"><h1 class="ph-title">บทบาท (Roles)</h1></div>'
+    +'<p class="ph-sub">จัดการบทบาทระดับโลก: Directors, Area Heads และ Extension Officers</p></div></div>'
+    +'<div class="card"><div style="padding:6px 18px 0;"><div class="tabs" style="margin-top:0;">'
+    +stb('directors','crown','Directors',state.directors.length)
+    +stb('heads','users','Area Heads',state.heads.length)
+    +stb('officers','hash','Extension Officers',state.codes.filter(c=>c.status==='OCCUPIED').length)
+    +'</div></div><div style="padding:18px;">'+body+'</div></div>';
+}
+function rolesDirectorsView(){
+  var q=String(state.dirSearch||'').toLowerCase().trim();
+  var arr=state.directors.filter(function(d){ if(!q)return true; return d.employee_id.toLowerCase().includes(q)||String(d.full_name).toLowerCase().includes(q)||String(d.email).toLowerCase().includes(q); });
+  var toolbar='<div class="filter-bar" style="padding:0 0 14px;border-bottom:1px solid var(--c-line-2);margin-bottom:14px;">'
+    +'<div class="input-search"><i data-lucide="search" class="lead-icon w-4 h-4"></i><input class="input" type="text" id="dir-search" placeholder="ค้นหา Director (ชื่อ / รหัส / email)" value="'+esc(state.dirSearch)+'" oninput="onDirSearch(this.value)"></div>'
+    +'<div style="flex:1;"></div>'
+    +(canWrite?'<button class="btn btn-primary btn-sm" onclick="openModalBox(\'adddirector\',{},560)"><i data-lucide="user-plus" class="w-3.5 h-3.5"></i><span>เพิ่ม Director</span></button>':'')
+    +'</div>';
+  if(arr.length===0) return toolbar+emptyStateHTML({icon:'crown',title:'ยังไม่มี Director',desc:'ยังไม่มีการมอบหมาย Director ในระบบ'});
+  var rows=arr.map(function(d){
+    return '<tr>'
+      +'<td><span class="mono">'+esc(d.employee_id)+'</span></td>'
+      +'<td style="font-weight:600;">'+esc(d.full_name)+'</td>'
+      +'<td>'+esc(d.email)+'</td>'
+      +'<td>'+esc(d.dept)+' / '+esc(d.title)+'</td>'
+      +'<td>'+fmtDate(d.assigned_at)+'</td>'
+      +'<td style="text-align:right;width:70px;">'+(canWrite?'<button class="ra-btn is-danger" onclick="askRemoveDirector(\''+d.employee_id+'\')" title="ลบ"><i data-lucide="trash-2" class="w-4 h-4"></i></button>':'—')+'</td>'
+      +'</tr>';
+  }).join('');
+  return toolbar+'<div class="table-scroll"><table class="table"><thead><tr>'
+    +'<th>รหัสพนักงาน</th><th>ชื่อ-สกุล</th><th>Email</th><th>แผนก/ตำแหน่ง</th><th>มอบหมายเมื่อ</th><th style="text-align:right;">ลบ</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
+function rolesHeadsView(){
+  if(state.heads.length===0) return emptyStateHTML({icon:'users',title:'ยังไม่มีหัวหน้าพื้นที่',desc:'ยังไม่มีการมอบหมายหัวหน้าพื้นที่ในระบบ'});
+  var rows=state.heads.map(function(h){ var a=findArea(h.area_id);
+    return '<tr>'
+      +'<td><div style="font-weight:600;">'+esc(h.full_name)+'</div><div class="mono" style="font-size:11px;color:var(--c-mute-2);">'+esc(h.employee_id)+'</div></td>'
+      +'<td>'+esc(h.email)+'</td>'
+      +'<td>'+esc(a?a.area_name:h.area_id)+' <span class="mono" style="font-size:11px;color:var(--c-mute-2);">'+esc(h.area_id)+'</span></td>'
+      +'<td>'+fmtDate(h.assigned_at)+'</td>'
+      +'</tr>';
+  }).join('');
+  return '<div class="table-scroll"><table class="table"><thead><tr>'
+    +'<th>ชื่อ-สกุล</th><th>Email</th><th>พื้นที่</th><th>มอบหมายเมื่อ</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
+function rolesOfficersView(){
+  var arr=state.codes.slice();
+  if(state.officerFilter.area!=='all') arr=arr.filter(c=>c.area_id===state.officerFilter.area);
+  if(state.officerFilter.status!=='all') arr=arr.filter(c=>c.status===state.officerFilter.status);
+  var areaOpts='<option value="all"'+(state.officerFilter.area==='all'?' selected':'')+'>ทุกพื้นที่</option>'+state.areas.map(a=>'<option value="'+a.area_id+'"'+(state.officerFilter.area===a.area_id?' selected':'')+'>'+esc(a.area_name)+'</option>').join('');
+  var toolbar='<div class="filter-bar" style="padding:0 0 14px;border-bottom:1px solid var(--c-line-2);margin-bottom:14px;">'
+    +'<select class="select" style="max-width:220px;" onchange="setOfficerFilter(\'area\',this.value)">'+areaOpts+'</select>'
+    +'<select class="select" style="max-width:180px;" onchange="setOfficerFilter(\'status\',this.value)">'
+    +'<option value="all"'+(state.officerFilter.status==='all'?' selected':'')+'>ทุกสถานะ</option>'
+    +'<option value="EMPTY"'+(state.officerFilter.status==='EMPTY'?' selected':'')+'>ว่าง (EMPTY)</option>'
+    +'<option value="OCCUPIED"'+(state.officerFilter.status==='OCCUPIED'?' selected':'')+'>ใช้งานอยู่ (OCCUPIED)</option></select>'
+    +'<div style="flex:1;"></div>'
+    +(canWrite?'<button class="btn btn-primary btn-sm" onclick="openModalBox(\'createcode\',{},560)"><i data-lucide="plus" class="w-3.5 h-3.5"></i><span>Create Code</span></button>':'')
+    +'</div>';
+  if(arr.length===0) return toolbar+emptyStateHTML({icon:'hash',title:'ไม่พบ Extension Codes',desc:'ลองปรับตัวกรองพื้นที่หรือสถานะ'});
+  var rows=arr.map(function(c){ var a=findArea(c.area_id);
+    return '<tr>'
+      +'<td><span class="mono text-primary" style="font-weight:600;">'+esc(c.display_code)+'</span></td>'
+      +'<td>'+esc(a?a.area_name:c.area_id)+'</td>'
+      +'<td>'+(c.assigned?('<div style="font-weight:600;">'+esc(c.assigned.full_name)+'</div><div style="font-size:11px;color:var(--c-mute-2);">'+esc(c.assigned.email)+'</div>'):'<span class="text-mute-2">—</span>')+'</td>'
+      +'<td>'+codeStatusPill(c.status)+'</td>'
+      +'<td style="text-align:right;width:70px;"><button class="ra-btn" onclick="openView(\''+c.area_id+'\')" title="เปิด"><i data-lucide="external-link" class="w-4 h-4"></i></button></td>'
+      +'</tr>';
+  }).join('');
+  return toolbar+'<div class="table-scroll"><table class="table"><thead><tr>'
+    +'<th>หมายเลขโค้ด</th><th>พื้นที่</th><th>มอบหมายให้</th><th>สถานะ</th><th style="text-align:right;">เปิด</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
+function askRemoveDirector(empId){
+  var d=state.directors.find(x=>x.employee_id===empId); if(!d)return;
+  openConfirm({ title:'ยืนยันลบ Director?', desc:'ต้องการลบ '+d.full_name+' ออกจากบทบาท Director ใช่หรือไม่', confirmLabel:'ลบ Director', danger:true, onConfirm:function(){ removeDirector(empId); } });
+}
+function removeDirector(empId){ state.directors=state.directors.filter(d=>d.employee_id!==empId); render(); showToast('ลบ Director สำเร็จ','success'); }
+
+// ============================================
+// MODALS — addhead / adddirector / createcode / confirm — OV
+// ============================================
+function openModalBox(type,data,widthPx){ if(!canWrite){ return; } state.modal={open:true,type:type,data:data||{}}; if(state.modal.data.selectedId===undefined)state.modal.data.selectedId=null; var box=document.getElementById('modalBox'); box.className='modal'; if(widthPx)box.style.width=widthPx+'px'; else box.style.width=''; renderModal(); requestAnimationFrame(()=>document.getElementById('modalBackdrop').classList.add('is-open')); }
+function closeModal(){ if(state.modal.data&&state.modal.data.busy)return; document.getElementById('modalBackdrop').classList.remove('is-open'); setTimeout(()=>state.modal={open:false,type:null,data:null},200); }
+function renderModal(){ if(state.modal.type==='addhead')renderAddHeadModal(); else if(state.modal.type==='adddirector')renderAddDirectorModal(); else if(state.modal.type==='createcode')renderCreateCodeModal(); else if(state.modal.type==='confirm')renderConfirmModal(); }
+
+// ---- generic confirm ----
+function openConfirm(cfg){ openModalBox('confirm',cfg,460); }
+function confirmYes(){ var cb=state.modal.data?state.modal.data.onConfirm:null; closeModal(); if(cb)cb(); }
+function renderConfirmModal(){
+  var d=state.modal.data;
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon'+(d.danger?' is-danger':'')+'"><i data-lucide="'+(d.danger?'alert-triangle':'help-circle')+'" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">'+esc(d.title||'ยืนยัน')+'</h3><p class="modal-subtitle">'+esc(d.desc||'')+'</p></div>'
+    +'<button class="icon-btn" onclick="closeModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>'
+    +'<button class="btn '+(d.danger?'btn-danger is-solid':'btn-primary')+'" onclick="confirmYes()"><span>'+esc(d.confirmLabel||'ยืนยัน')+'</span></button></div>';
+  renderIcons();
+}
+
+// ---- ERP employee options for search-select ----
+function empOptions(){ return state.employees.map(function(e){ return { value:e.employee_id, label:e.full_name, sub:e.employee_id+' · '+e.email, icon:'user', right:empStatusTag(e.status) }; }); }
+function updateEmpPreview(previewId,btnId){
+  var d=state.modal.data; var e=d.selectedId?findEmp(d.selectedId):null; var pv=document.getElementById(previewId);
+  if(pv){ pv.innerHTML=e?('<div class="dv-lbl">พนักงานที่เลือก</div><div style="font-weight:600;margin-top:2px;">'+esc(e.full_name)+' · <span class="mono">'+esc(e.employee_id)+'</span> '+empStatusTag(e.status)+'</div><div style="font-size:12px;color:var(--c-mute-2);margin-top:2px;">'+esc(e.email)+' · '+esc(e.dept)+' / '+esc(e.title)+'</div>'):'<span style="color:var(--c-mute-2);font-size:12.5px;">ยังไม่ได้เลือกพนักงาน</span>'; }
+  var b=document.getElementById(btnId); if(b)b.disabled=!d.selectedId;
+}
+
+// ---- Add Area Head ----
+function renderAddHeadModal(){
+  var d=state.modal.data; var a=findArea(d.area_id);
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="user-plus" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">เพิ่มหัวหน้าพื้นที่</h3><p class="modal-subtitle">ค้นหาและเลือกพนักงานจาก ERP เพื่อเพิ่มเป็นหัวหน้าพื้นที่'+(a?' · '+esc(a.area_name):'')+'</p></div>'
+    +'<button class="icon-btn" onclick="closeModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>'
+    +'<div class="modal-body">'
+    +'<div class="field"><label class="field-label">ค้นหาพนักงาน (ชื่อ / รหัส / email)</label>'+searchSelectHTML('emphead',{placeholder:'พิมพ์เพื่อค้นหาพนักงาน'})+'</div>'
+    +'<div style="padding:10px 12px;background:var(--c-bg-off);border:1px solid var(--c-line-2);border-radius:8px;margin-top:6px;" id="emp-preview"></div>'
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>'
+    +'<button class="btn btn-primary" id="ah-submit" onclick="submitAddHead()"'+(d.selectedId?'':' disabled')+'><i data-lucide="check" class="w-4 h-4"></i><span>เพิ่ม</span></button></div>';
+  renderIcons();
+  initSearchSelect('emphead',{ options:empOptions(), value:d.selectedId, emptyText:'ไม่พบพนักงาน', onSelect:function(v){ state.modal.data.selectedId=v; updateEmpPreview('emp-preview','ah-submit'); } });
+  updateEmpPreview('emp-preview','ah-submit');
+}
+function submitAddHead(){
+  var d=state.modal.data; if(!d.selectedId){ showToast('กรุณาเลือกพนักงาน','warning'); return; }
+  var e=findEmp(d.selectedId); if(!e)return;
+  if(e.status!=='active'){ showToast('พนักงานไม่active','error',3800,'ไม่สามารถเพิ่มพนักงานที่ไม่ได้ใช้งานเป็นหัวหน้าพื้นที่'); return; }
+  if(state.heads.some(h=>h.area_id===d.area_id&&h.employee_id===e.employee_id)){ showToast('พนักงานคนนี้เป็นหัวหน้าพื้นที่นี้อยู่แล้ว','warning'); return; }
+  state.heads.push({ area_id:d.area_id, employee_id:e.employee_id, full_name:e.full_name, email:e.email, assigned_at:new Date().toISOString() });
+  recount(d.area_id); pushAudit(d.area_id,'head.added','เพิ่มหัวหน้าพื้นที่: '+e.full_name);
+  closeModal(); if(state.view)renderViewDrawer(); render(); showToast('เพิ่มหัวหน้าพื้นที่สำเร็จ','success');
+}
+
+// ---- Add Director ----
+function renderAddDirectorModal(){
+  var d=state.modal.data;
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="crown" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">เพิ่ม Director</h3><p class="modal-subtitle">ค้นหาและเลือกพนักงานจาก ERP เพื่อมอบหมายเป็น Director</p></div>'
+    +'<button class="icon-btn" onclick="closeModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>'
+    +'<div class="modal-body">'
+    +'<div class="field"><label class="field-label">ค้นหาพนักงาน (ชื่อ / รหัส / email)</label>'+searchSelectHTML('empdir',{placeholder:'พิมพ์เพื่อค้นหาพนักงาน'})+'</div>'
+    +'<div style="padding:10px 12px;background:var(--c-bg-off);border:1px solid var(--c-line-2);border-radius:8px;margin-top:6px;" id="dir-preview"></div>'
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>'
+    +'<button class="btn btn-primary" id="ad-submit" onclick="submitAddDirector()"'+(d.selectedId?'':' disabled')+'><i data-lucide="check" class="w-4 h-4"></i><span>เพิ่ม</span></button></div>';
+  renderIcons();
+  initSearchSelect('empdir',{ options:empOptions(), value:d.selectedId, emptyText:'ไม่พบพนักงาน', onSelect:function(v){ state.modal.data.selectedId=v; updateEmpPreview('dir-preview','ad-submit'); } });
+  updateEmpPreview('dir-preview','ad-submit');
+}
+function submitAddDirector(){
+  var d=state.modal.data; if(!d.selectedId){ showToast('กรุณาเลือกพนักงาน','warning'); return; }
+  var e=findEmp(d.selectedId); if(!e)return;
+  if(e.status!=='active'){ showToast('พนักงานไม่active','error',3800,'ไม่สามารถมอบหมายพนักงานที่ไม่ได้ใช้งานเป็น Director'); return; }
+  if(state.directors.some(x=>x.employee_id===e.employee_id)){ showToast('พนักงานคนนี้เป็น Director อยู่แล้ว','warning'); return; }
+  state.directors.push({ employee_id:e.employee_id, full_name:e.full_name, email:e.email, dept:e.dept, title:e.title, assigned_at:new Date().toISOString() });
+  closeModal(); render(); showToast('เพิ่ม Director สำเร็จ','success');
+}
+
+// ---- Create Extension Code ----
+function renderCreateCodeModal(){
+  var d=state.modal.data;
+  var activeAreas=state.areas.filter(a=>a.status==='Active');
+  var opts='<option value="">— เลือกพื้นที่ —</option>'+activeAreas.map(a=>'<option value="'+a.area_id+'"'+(d.area_id===a.area_id?' selected':'')+'>'+esc(a.area_name)+' ('+esc(a.area_id)+')</option>').join('');
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="hash" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">สร้าง Extension Code</h3><p class="modal-subtitle">เลือกได้เฉพาะพื้นที่ที่เปิดใช้งาน · หมายเลขโค้ด 4 หลัก</p></div>'
+    +'<button class="icon-btn" onclick="closeModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>'
+    +'<div class="modal-body">'
+    +'<div class="field"><label class="field-label">เลือกพื้นที่ <span class="req">*</span></label><select class="select" id="cc-area">'+opts+'</select></div>'
+    +'<div class="field"><label class="field-label">หมายเลขโค้ด (4 หลัก) <span class="req">*</span></label><input class="input mono" id="cc-code" type="text" inputmode="numeric" maxlength="4" placeholder="เช่น 0123" value="'+esc(d.code||'')+'"><div class="field-help">กรอกตัวเลข 4 หลัก</div></div>'
+    +'<div class="field" style="margin-bottom:0;"><label class="field-label">หมายเหตุ</label><textarea class="input" id="cc-note" placeholder="หมายเหตุ (ถ้ามี)">'+esc(d.note||'')+'</textarea></div>'
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>'
+    +'<button class="btn btn-primary" id="cc-submit" onclick="submitCreateCode()"><i data-lucide="check" class="w-4 h-4"></i><span>สร้างโค้ด</span></button></div>';
+  renderIcons();
+}
+function submitCreateCode(){
+  var d=state.modal.data;
+  var areaEl=document.getElementById('cc-area'); var codeEl=document.getElementById('cc-code'); var noteEl=document.getElementById('cc-note');
+  d.area_id=areaEl?areaEl.value:''; d.code=codeEl?codeEl.value:''; d.note=noteEl?noteEl.value:'';
+  if(!d.area_id){ showToast('กรุณาเลือกพื้นที่','warning'); return; }
+  if(!/^\d{4}$/.test(String(d.code).trim())){ showToast('รูปแบบหมายเลขโค้ดไม่ถูกต้อง','error',3800,'กรอกตัวเลข 4 หลัก เช่น 0123'); return; }
+  var code=String(d.code).trim();
+  if(state.codes.some(c=>c.area_id===d.area_id&&c.display_code===code)){ showToast('หมายเลขโค้ดนี้มีอยู่แล้วในพื้นที่','warning'); return; }
+  var a=findArea(d.area_id);
+  state.codes.push({ ext_code_id:nextCodeId(), display_code:code, area_id:d.area_id, area_name:a?a.area_name:'', status:'EMPTY', note:String(d.note||'').trim(), assigned:null, version:1 });
+  recount(d.area_id); pushAudit(d.area_id,'code.created','สร้าง Extension Code: '+code);
+  closeModal(); if(state.view)renderViewDrawer(); render(); showToast('สร้างโค้ดสำเร็จ','success');
+}
+
+// ============================================
+// SEARCH-SELECT helper (Iron Rule #34)
+// ============================================
+window.__ss=window.__ss||{};
+function ssGet(k){return window.__ss[k];}
+function ssEsc(s){return String(s).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function searchSelectHTML(key,opt){ opt=opt||{}; var ph=opt.placeholder||'ค้นหา...'; return '<div class="search-select" id="ss-'+key+'"><i data-lucide="search" class="ss-lead w-4 h-4"></i><input type="text" class="input ss-input" id="ss-input-'+key+'" autocomplete="off" placeholder="'+ph+'" oninput="ssOnInput(\''+key+'\',this.value)" onfocus="ssOpen(\''+key+'\')" onkeydown="ssOnKey(\''+key+'\',event)"><button type="button" class="ss-clear hidden" id="ss-clear-'+key+'" tabindex="-1" onclick="ssClear(\''+key+'\')"><i data-lucide="x" class="w-4 h-4"></i></button><i data-lucide="chevron-down" class="ss-caret w-4 h-4" id="ss-caret-'+key+'"></i><div class="ss-list hidden" id="ss-list-'+key+'"></div></div>'; }
+function initSearchSelect(key,cfg){ cfg=cfg||{}; window.__ss[key]={options:cfg.options||[],value:cfg.value!=null?cfg.value:null,onSelect:cfg.onSelect||function(){},emptyText:cfg.emptyText||'ไม่พบรายการ',query:'',open:false,hi:0}; ssSetText(key); ssSyncChrome(key); renderIcons(); }
+function ssFiltered(key){ var s=ssGet(key); if(!s)return []; var q=(s.query||'').toLowerCase().trim(); if(!q)return s.options; return s.options.filter(o=>String(o.label).toLowerCase().includes(q)||String(o.value).toLowerCase().includes(q)||String(o.sub||'').toLowerCase().includes(q)); }
+function ssSyncChrome(key){ var s=ssGet(key); if(!s)return; var sel=s.options.find(o=>o.value===s.value); var c=document.getElementById('ss-clear-'+key); if(c)c.classList.toggle('hidden',!sel); var k=document.getElementById('ss-caret-'+key); if(k)k.classList.toggle('hidden',!!sel); }
+function ssSetText(key){ var s=ssGet(key); if(!s)return; var inp=document.getElementById('ss-input-'+key); if(!inp)return; var sel=s.options.find(o=>o.value===s.value); inp.value=s.open?s.query:(sel?sel.label:''); }
+function ssRenderList(key){ var s=ssGet(key); if(!s)return; var list=document.getElementById('ss-list-'+key); if(!list)return; var items=ssFiltered(key); if(items.length===0){ list.innerHTML='<div class="ss-empty">'+s.emptyText+'</div>'; } else { var q=(s.query||'').toLowerCase().trim(); var hl=function(t){return q?String(t).replace(new RegExp('('+ssEsc(q)+')','gi'),'<mark>$1</mark>'):String(t);}; list.innerHTML=items.map(function(o,i){return '<button type="button" class="ss-opt '+(i===s.hi?'is-active':'')+'" onmousedown="event.preventDefault()" onclick="ssPick(\''+key+'\','+i+')">'+(o.icon?'<i data-lucide="'+o.icon+'" class="ss-opt-ic w-4 h-4"></i>':'')+'<span class="ss-opt-main"><span class="ss-opt-label">'+hl(o.label)+'</span>'+(o.sub?'<span class="ss-opt-sub">'+hl(o.sub)+'</span>':'')+'</span>'+(o.right?'<span class="ss-opt-right">'+o.right+'</span>':'')+'</button>';}).join(''); } list.classList.toggle('hidden',!s.open); renderIcons(); }
+function ssOpen(key){ var s=ssGet(key); if(!s)return; var inp=document.getElementById('ss-input-'+key); if(inp&&inp.disabled)return; s.open=true; s.query=''; s.hi=0; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+function ssOnInput(key,val){ var s=ssGet(key); if(!s)return; s.query=val; s.open=true; s.hi=0; s.value=null; ssSyncChrome(key); ssRenderList(key); }
+function ssPick(key,i){ var s=ssGet(key); if(!s)return; var o=ssFiltered(key)[i]; if(!o)return; s.value=o.value; s.query=''; s.open=false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); s.onSelect(o.value,o); }
+function ssClear(key){ var s=ssGet(key); if(!s)return; s.value=null; s.query=''; s.open=true; ssSetText(key); ssSyncChrome(key); ssRenderList(key); var inp=document.getElementById('ss-input-'+key); if(inp)inp.focus(); s.onSelect(null,null); }
+function ssOnKey(key,e){ var s=ssGet(key); if(!s)return; var items=ssFiltered(key); if(e.key==='ArrowDown'){e.preventDefault(); s.open=true; s.hi=Math.min(items.length-1,s.hi+1); ssRenderList(key);} else if(e.key==='ArrowUp'){e.preventDefault(); s.hi=Math.max(0,s.hi-1); ssRenderList(key);} else if(e.key==='Enter'){e.preventDefault(); if(items[s.hi])ssPick(key,s.hi);} else if(e.key==='Escape'){s.open=false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); e.stopPropagation();} }
+document.addEventListener('click',function(e){ Object.keys(window.__ss||{}).forEach(function(key){ var w=document.getElementById('ss-'+key); var s=ssGet(key); if(w&&s&&s.open&&!w.contains(e.target)){ s.open=false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); } }); });
+
+// ESC chain
+window.addEventListener('keydown',function(e){ if(e.key!=='Escape')return; if(state.modal.open)closeModal(); else if(state.form)closeForm(); else if(state.view)closeView(); });
+
+// INIT
+window.addEventListener('hashchange',function(){ render(); });
+var domReady=false,lucideReady=false;
+function bootIfReady(){ if(domReady&&lucideReady){ render(); renderIcons(); } }
+if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',function(){domReady=true;bootIfReady();}); else domReady=true;
+window.addEventListener('lucide:ready',function(){lucideReady=true;bootIfReady();});
+if(window.lucide&&typeof window.lucide.createIcons==='function')lucideReady=true;
+bootIfReady();
+setTimeout(function(){ if(!lucideReady){lucideReady=true;bootIfReady();} },5000);
+</script>
+</body></html>
