@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>จัดการสัญญาส่งอ้อย · CUBE NATIVE</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+
+<style>
+/* ============== CSS VARIABLES (CUBE CI — Warm Light) ============== */
+:root {
+  --c-navy: #111111;
+  --c-navy-2: #111111;
+  --c-primary: #FF3B30;
+  --c-primary-hover: #E62E24;
+  --c-teal: #FF9A1F;
+  --c-teal-light: #FFB763;
+  --c-ink: #111111;
+  --c-mute: #54565C;
+  --c-mute-2: #73757B;
+  --c-mute-3: #9A9CA2;
+  --c-line: #DEDAD4;
+  --c-line-2: #E9E5E0;
+  --c-line-3: #F1EEEA;
+  --c-bg-off: #FAF8F5;
+  --c-success: #1F9D55;
+  --c-warning: #E8870F;
+  --c-danger: #E62E24;
+  --sidebar-w: 232px;
+  --shell-h: 52px;
+  --fs-h1: 22px; --fs-h2: 17px; --fs-h3: 15px; --fs-body: 14px;
+  --fs-sub: 13px; --fs-meta: 12px; --fs-cap: 11px; --fs-kpi: 28px;
+  --sp-xs: 4px; --sp-sm: 8px; --sp-md: 12px; --sp-lg: 20px; --sp-xl: 28px;
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-full: 999px;
+}
+
+/* ============== RESET ============== */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { scrollbar-gutter: stable; }
+
+/* ============== SCROLLBAR (Iron Rule #49) ============== */
+* { scrollbar-width: thin; scrollbar-color: rgba(17,17,17,.16) transparent; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(17,17,17,.14); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(17,17,17,.26); }
+.sidebar, .slide { scrollbar-color: rgba(255,255,255,.28) transparent; }
+.sidebar ::-webkit-scrollbar-thumb, .slide ::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb, .slide::-webkit-scrollbar-thumb { background: rgba(255,255,255,.28); }
+.sidebar ::-webkit-scrollbar-thumb:hover, .slide ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.42); }
+body {
+  font-family: 'Satoshi', 'Noto Sans Thai', system-ui, sans-serif;
+  background: var(--c-bg-off);
+  color: #2A2B2F;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-width: 1180px;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+[data-lucide] { flex-shrink: 0; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ============== SIDEBAR ============== */
+.sidebar {
+  position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w);
+  background: #111111; color: #E9E5E0; z-index: 20;
+  display: flex; flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.sb-brand { padding: 18px; display: flex; align-items: center; gap: 11px; border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
+.sb-logo {
+  width: 34px; height: 34px; background: linear-gradient(135deg, #FF3B30, #FF9A1F);
+  border-radius: 9px; display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; flex-shrink: 0; box-shadow: 0 4px 12px rgba(255,59,48,0.3);
+}
+.sb-name { font-weight: 700; font-size: 14px; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+.sb-sub { font-size: 10px; color: #9A9CA2; letter-spacing: 0.06em; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+.sb-nav { flex: 1; padding: 12px 8px; overflow-y: auto; }
+.sb-module { margin-bottom: 4px; }
+.sb-module-header {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 8px 10px; border-radius: 6px; background: transparent; border: 0;
+  color: #9A9CA2; font-family: inherit; font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 120ms; text-align: left;
+}
+.sb-module-header:hover { background: rgba(255,255,255,0.04); color: #DEDAD4; }
+.sb-module-header .mod-icon { flex-shrink: 0; opacity: 0.7; }
+.sb-module-header .mod-label { flex: 1; }
+.sb-module-header .mod-chevron { flex-shrink: 0; transition: transform 200ms; opacity: 0.7; }
+.sb-module[data-expanded="false"] .mod-chevron { transform: rotate(-90deg); }
+.sb-module[data-expanded="false"] .sb-features { display: none; }
+.sb-features { padding: 2px 0 6px 0; }
+.sb-item {
+  display: flex; align-items: center; gap: 10px; padding: 7px 12px 7px 14px;
+  border-radius: 6px; color: #DEDAD4; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 120ms; margin-bottom: 1px; position: relative; user-select: none;
+}
+.sb-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sb-item.is-active { background: #FF3B30; color: #fff; font-weight: 600; }
+.sb-item.is-active::before {
+  content: ''; position: absolute; left: -10px; top: 7px; bottom: 7px;
+  width: 3px; background: #fff; border-radius: 0 2px 2px 0;
+}
+.sb-item [data-lucide] { width: 16px; height: 16px; opacity: 0.85; }
+.sb-item.is-active [data-lucide] { opacity: 1; }
+.sb-item.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.sb-item.is-disabled:hover { background: transparent; color: #DEDAD4; }
+.sb-footer {
+  padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: #9A9CA2;
+}
+.pulse-dot { width: 7px; height: 7px; background: var(--c-teal); border-radius: 50%; box-shadow: 0 0 0 3px rgba(255,154,31,0.20); animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+/* ============== MAIN + SHELL BAR ============== */
+.main { margin-left: var(--sidebar-w); min-height: 100vh; background: var(--c-bg-off); }
+.shell-bar {
+  position: sticky; top: 0; background: #fff; border-bottom: 1px solid var(--c-line-2);
+  height: var(--shell-h); display: flex; align-items: center; padding: 0 22px; z-index: 19; gap: 12px;
+}
+.breadcrumb { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--c-mute); }
+.breadcrumb a { cursor: pointer; transition: color 120ms; }
+.breadcrumb a:hover { color: var(--c-primary); }
+.breadcrumb .sep { color: var(--c-mute-3); font-size: 10px; }
+.breadcrumb-current { color: var(--c-ink); font-weight: 500; }
+.icon-btn {
+  width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute); border-radius: 7px; position: relative; transition: all 120ms;
+}
+.icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.icon-btn [data-lucide] { width: 17px; height: 17px; }
+.notif-dot { position: absolute; top: 7px; right: 8px; width: 7px; height: 7px; background: var(--c-danger); border-radius: 50%; border: 2px solid #fff; }
+.user-chip { display: flex; align-items: center; gap: 9px; padding: 5px 10px 5px 12px; border-radius: 8px; cursor: pointer; transition: background 120ms; }
+.user-chip:hover { background: var(--c-line-3); }
+.user-text { line-height: 1.2; text-align: right; }
+.user-name { font-size: 12.5px; font-weight: 500; color: var(--c-ink); white-space: nowrap; }
+.user-role { font-size: 10.5px; color: var(--c-mute-2); white-space: nowrap; margin-top: 1px; }
+.avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; flex-shrink: 0;
+}
+.user-menu {
+  position: absolute; top: calc(var(--shell-h) - 4px); right: 22px; background: #fff;
+  border: 1px solid var(--c-line-2); border-radius: 10px; box-shadow: 0 12px 32px rgba(17,17,17,0.12);
+  width: 240px; z-index: 30; padding: 6px; display: none;
+}
+.user-menu.is-open { display: block; }
+.user-menu-item { display: flex; align-items: center; gap: 10px; padding: 8px 11px; border-radius: 6px; font-size: 13px; color: var(--c-ink); cursor: pointer; transition: background 120ms; }
+.user-menu-item:hover { background: var(--c-bg-off); }
+.user-menu-item [data-lucide] { width: 15px; height: 15px; color: var(--c-mute-2); }
+.user-menu-item.is-danger { color: var(--c-danger); }
+.user-menu-item.is-danger [data-lucide] { color: var(--c-danger); }
+.user-menu-divider { height: 1px; background: var(--c-line-2); margin: 5px 0; }
+
+/* ============== CONTENT (fluid — Iron Rule #30) ============== */
+.content { padding: 22px; }
+
+/* ============== PAGE HEADER ============== */
+.ph { margin-bottom: 18px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.ph > div:first-child { flex: 1 1 auto; min-width: 280px; }
+.ph-title-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px; }
+.ph-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 22px; font-weight: 700; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.ph-count { font-size: 12.5px; font-weight: 600; color: var(--c-mute-2); background: var(--c-line-3); padding: 3px 9px; border-radius: 999px; }
+.ph-sub { font-size: 13px; color: var(--c-mute); margin: 0; }
+.ph-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ============== BUTTONS (Iron Rule #36 — Thai optical center) ============== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px; padding: 2px 14px 0; border-radius: 8px; font-size: 13px; font-weight: 500;
+  border: 1px solid transparent; background: transparent; white-space: nowrap;
+  transition: all 120ms; user-select: none; cursor: pointer;
+}
+.btn [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; }
+.btn:disabled, .btn.is-disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+.btn-eq { min-width: 104px; }
+.btn-primary { background: var(--c-primary); color: #fff; }
+.btn-primary:hover { background: var(--c-primary-hover); box-shadow: 0 2px 8px rgba(255,59,48,0.30); }
+.btn-secondary { background: #fff; border-color: var(--c-line); color: var(--c-ink); }
+.btn-secondary:hover { background: var(--c-line-3); border-color: var(--c-mute-2); }
+.btn-ghost { color: var(--c-mute); }
+.btn-ghost:hover { background: var(--c-line-3); color: var(--c-ink); }
+.btn-danger { background: #fff; border-color: var(--c-line); color: var(--c-danger); }
+.btn-danger:hover { background: #FFE9E7; border-color: var(--c-danger); }
+.btn-danger.is-solid { background: var(--c-danger); border-color: var(--c-danger); color: #fff; }
+.btn-danger.is-solid:hover { background: #C81E15; }
+.btn-link { background: transparent; border: 0; padding: 0 4px; height: auto; color: var(--c-primary); font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn-sm { height: 30px; padding: 2px 11px 0; font-size: 12px; }
+
+/* ============== STATS ============== */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.stat { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; padding: 14px 16px; transition: all 150ms; }
+.stat:hover { border-color: var(--c-line); box-shadow: 0 2px 8px rgba(17,17,17,0.05); }
+.stat-label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--c-mute); }
+.stat-label [data-lucide] { width: 13px; height: 13px; color: var(--c-primary); }
+.stat-value { font-family: 'Noto Sans Thai', sans-serif; font-size: 26px; font-weight: 700; color: var(--c-navy); margin-top: 6px; letter-spacing: -0.01em; }
+.stat-meta { font-size: 11.5px; color: var(--c-mute-2); margin-top: 5px; display: flex; align-items: center; gap: 4px; }
+.stat-meta.is-warn { color: var(--c-warning); }
+.stat-meta [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== CARD / FILTER ============== */
+.card { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; overflow: hidden; }
+.filter-bar { padding: 14px 18px; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid var(--c-line-2); background: #fff; flex-wrap: wrap; }
+
+/* ============== INPUTS ============== */
+.input, .select {
+  height: 36px; padding: 0 12px; border: 1px solid var(--c-line); border-radius: 8px;
+  font-size: 13px; background: #fff; color: var(--c-ink); font-family: inherit; transition: all 120ms; width: 100%;
+}
+.input:focus, .select:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(255,59,48,0.10); }
+.input:disabled, .input[readonly] { background: var(--c-line-3); color: var(--c-mute-2); cursor: not-allowed; border-color: var(--c-line-2); }
+.select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat; background-position: right 10px center; padding-right: 32px; appearance: none;
+}
+.input-search { position: relative; flex: 1; max-width: 340px; }
+.input-search input { padding-left: 36px; }
+.input-search .lead-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--c-mute-2); pointer-events: none; }
+
+/* ===== SEARCH-SELECT (Iron Rule #34) ===== */
+.search-select { position: relative; width: 100%; }
+.search-select .ss-input { padding-left: 34px; padding-right: 34px; }
+.search-select .ss-lead { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--c-mute-3); pointer-events: none; }
+.search-select .ss-caret { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--c-mute-3); pointer-events: none; }
+.search-select .ss-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); display: inline-flex; padding: 3px; border: 0; background: transparent; color: var(--c-mute-2); cursor: pointer; border-radius: 6px; }
+.search-select .ss-clear:hover { background: var(--c-line-3); color: var(--c-ink); }
+.search-select.is-disabled .ss-input { background: var(--c-line-3); color: var(--c-mute-2); cursor: not-allowed; }
+.ss-list {
+  position: absolute; z-index: 70; left: 0; right: 0; margin-top: 4px; max-height: 280px; overflow-y: auto;
+  background: #fff; border: 1px solid var(--c-line); border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(17,17,17,0.10), 0 4px 10px rgba(17,17,17,0.05);
+}
+.ss-opt { width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 0; border-bottom: 1px solid var(--c-line-3); background: transparent; cursor: pointer; text-align: left; font-family: inherit; }
+.ss-opt:last-child { border-bottom: 0; }
+.ss-opt:hover, .ss-opt.is-active { background: rgba(255,59,48,0.06); }
+.ss-opt-ic { width: 16px; height: 16px; color: var(--c-primary); flex-shrink: 0; }
+.ss-opt-main { flex: 1; min-width: 0; }
+.ss-opt-label { display: block; font-size: 13px; color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-sub { display: block; font-size: 11.5px; color: var(--c-mute-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-right { flex-shrink: 0; font-size: 12px; color: var(--c-mute); }
+.ss-opt mark { background: rgba(255,59,48,0.16); color: inherit; padding: 0 1px; border-radius: 2px; }
+.ss-empty { padding: 20px 14px; text-align: center; font-size: 13px; color: var(--c-mute-2); }
+
+/* ============== TABLE ============== */
+.table-scroll { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table thead { background: var(--c-bg-off); }
+.table th {
+  padding: 11px 14px; text-align: left; font-weight: 600; color: var(--c-mute);
+  font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--c-line-2); white-space: nowrap;
+}
+.table th.col-check { width: 40px; padding-right: 0; }
+.table td { padding: 13px 14px 11px; border-bottom: 1px solid var(--c-line-2); color: var(--c-ink); vertical-align: middle; }
+.table tbody tr { transition: background 120ms; }
+.table tbody tr:hover { background: var(--c-bg-off); }
+.table tbody tr.is-selected { background: rgba(255,59,48,0.04); }
+.table tbody tr.is-selected:hover { background: rgba(255,59,48,0.07); }
+.table tbody tr:last-child td { border-bottom: 0; }
+.table tbody tr.is-clickable { cursor: pointer; }
+.table-scroll.is-sticky { max-height: 560px; overflow-y: auto; scrollbar-gutter: stable; }
+.table-scroll.is-sticky thead th { position: sticky; top: 0; z-index: 3; background: var(--c-bg-off); box-shadow: inset 0 -1px 0 var(--c-line-2); }
+.cell-truncate { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+th.col-num, td.col-num { text-align: right; }
+.mono { font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+
+/* ============== CHECKBOX ============== */
+.cb {
+  width: 16px; height: 16px; border: 1.5px solid var(--c-line); border-radius: 4px; background: #fff;
+  cursor: pointer; display: inline-block; position: relative; transition: all 120ms; flex-shrink: 0;
+}
+.cb.is-checked, .cb.is-partial { background: var(--c-primary); border-color: var(--c-primary); }
+.cb.is-checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.cb.is-partial::after { content: ''; position: absolute; left: 3px; top: 6px; width: 8px; height: 2px; background: #fff; }
+.cb:hover { border-color: var(--c-primary); }
+.cb.is-disabled { opacity: 0.35; cursor: not-allowed; }
+.cb.is-disabled:hover { border-color: var(--c-line); }
+
+/* ============== PILLS ============== */
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px 3px; border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.pill [data-lucide] { width: 11px; height: 11px; }
+.pill-info    { background: #E6F0FF; color: #1A5FCC; }
+.pill-success { background: #E4F4EB; color: #157A41; }
+.pill-warning { background: #FFF1DD; color: #B8690B; }
+.pill-danger  { background: #FFE9E7; color: #E62E24; }
+.pill-muted   { background: var(--c-line-3); color: var(--c-mute-2); }
+.pill-outline { background: #fff; border: 1px solid var(--c-line); color: var(--c-mute); }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.8s linear infinite; }
+
+/* ============== FORM SECTION (Iron Rule #45) ============== */
+.form-section { margin-top: var(--sp-xl); }
+.form-section:first-child { margin-top: 0; }
+.form-section-title {
+  font-size: var(--fs-cap); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--c-mute);
+  padding-bottom: var(--sp-sm); border-bottom: 1px solid var(--c-line-2); margin-bottom: var(--sp-md);
+}
+.form-grp { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 16px; }
+
+/* ============== ROW ACTIONS ============== */
+.row-actions { display: inline-flex; gap: 2px; }
+.ra-btn {
+  width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute-2); border-radius: 6px; transition: all 120ms;
+}
+.ra-btn:hover { background: var(--c-line-3); color: var(--c-primary); }
+.ra-btn.is-danger:hover { background: #FFE9E7; color: var(--c-danger); }
+.ra-btn [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== TABLE FOOTER / BULK BAR ============== */
+.table-footer {
+  padding: 12px 18px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2);
+  display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: var(--c-mute); flex-wrap: wrap; gap: 10px;
+}
+.pagination { display: inline-flex; gap: 4px; align-items: center; }
+.pg-btn {
+  min-width: 30px; height: 30px; padding: 0 8px; display: inline-flex; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid var(--c-line-2); border-radius: 6px; color: var(--c-mute);
+  font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 120ms;
+}
+.pg-btn:hover { border-color: var(--c-line); background: var(--c-bg-off); }
+.pg-btn.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.pg-btn.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn [data-lucide] { width: 13px; height: 13px; }
+.bulk-bar {
+  background: var(--c-navy); color: #fff; padding: 11px 18px; border-radius: 8px 8px 0 0;
+  display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--c-line-2); margin: -1px -1px 0; font-size: 13px;
+}
+.bulk-bar .btn { height: 30px; padding: 2px 11px 0; font-size: 12px; }
+.bulk-bar .btn-secondary { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.18); color: #fff; }
+.bulk-bar .btn-secondary:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.30); }
+
+/* ============== DRAWER v2 SHELL (Patterns B/C — locked) ============== */
+.overlay-wrap { position: fixed; inset: 0; z-index: 50; }
+.backdrop { position: absolute; inset: 0; background: rgba(17,17,17,0.40); }
+.drawer-panel {
+  position: absolute; top: 0; right: 0; bottom: 0; width: 920px; max-width: 96vw;
+  background: #fff; display: flex; flex-direction: column;
+  box-shadow: -16px 0 40px rgba(17,17,17,0.18);
+}
+.drawer-panel.standard { width: 680px; }
+.drawer-enter { transform: translateX(100%); }
+.drawer-active { transform: translateX(0); transition: transform 250ms ease-out; }
+.top-icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;
+  border: 0; background: transparent; border-radius: var(--r-sm); color: var(--c-mute-2);
+  cursor: pointer; transition: all 120ms; flex-shrink: 0;
+}
+.top-icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.dw-head { padding: 18px 24px 16px; border-bottom: 1px solid var(--c-line-2); flex-shrink: 0; }
+.dw-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.dw-eyebrow { display: flex; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-mute-2); margin-bottom: 4px; font-weight: 600; }
+.dw-title { font-size: 20px; font-weight: 700; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.dw-sub { font-size: var(--fs-meta); color: var(--c-mute-2); margin-top: 4px; }
+.dw-body { flex: 1; overflow-y: auto; padding: 22px 24px; scrollbar-gutter: stable; }
+.dw-footer {
+  padding: 14px 24px; border-top: 1px solid var(--c-line-2); background: var(--c-bg-off); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.dw-footer-right { display: flex; align-items: center; gap: 8px; }
+.dw-footer-meta { font-size: 12px; color: var(--c-mute-2); }
+.drawer-header-divider { width: 1px; height: 22px; background: var(--c-line-2); margin: 0 4px; flex-shrink: 0; }
+.dw-actions { display: flex; gap: 6px; align-items: center; }
+
+/* Tabs (view drawer) */
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--c-line-2); margin-top: 14px; }
+.tab {
+  display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px 7px;
+  font-size: 13px; font-weight: 500; color: var(--c-mute); background: transparent; border: 0;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; transition: all 120ms;
+}
+.tab [data-lucide] { width: 14px; height: 14px; }
+.tab:hover { color: var(--c-ink); }
+.tab.on { color: var(--c-primary); border-bottom-color: var(--c-primary); font-weight: 600; }
+
+/* View drawer detail grid */
+.dv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
+.dv-cell .dv-lbl { font-size: 11px; color: var(--c-mute-3); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-bottom: 3px; }
+.dv-cell .dv-val { font-size: 13.5px; font-weight: 600; color: var(--c-ink); word-break: break-word; }
+.dv-section { margin-bottom: 24px; }
+.dv-section-title { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; color: var(--c-navy); margin-bottom: 12px; }
+.dv-section-title [data-lucide] { width: 15px; height: 15px; color: var(--c-primary); }
+.dv-note { margin-top: 10px; padding: 10px 12px; background: #FFF1DD; border-radius: 8px; font-size: 12.5px; color: #B8690B; }
+
+/* Info banner (edit rejected — re-submit notice; warning ของ action จริง) */
+.note { padding: 11px 14px; border-radius: 8px; font-size: 12.5px; display: flex; gap: 9px; align-items: flex-start; }
+.note [data-lucide] { width: 15px; height: 15px; margin-top: 1px; }
+.note.is-info { background: #E6F0FF; color: #1A5FCC; }
+.note.is-warn { background: #FFF1DD; color: #B8690B; }
+
+/* ============== TIMELINE ============== */
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 4px; bottom: 4px; width: 2px; background: var(--c-line-2); }
+.tl-item { position: relative; margin-bottom: 16px; }
+.tl-item:last-child { margin-bottom: 0; }
+.tl-dot { position: absolute; left: -20px; top: 3px; width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 2px solid var(--c-primary); }
+.tl-dot.is-success { border-color: var(--c-success); }
+.tl-dot.is-warning { border-color: var(--c-warning); }
+.tl-dot.is-danger { border-color: var(--c-danger); }
+.tl-title { font-size: 13px; font-weight: 600; color: var(--c-ink); }
+.tl-meta { font-size: 11.5px; color: var(--c-mute-2); margin-top: 2px; }
+.tl-note { font-size: 12.5px; color: var(--c-mute); background: var(--c-bg-off); border: 1px solid var(--c-line-2); border-radius: 6px; padding: 7px 10px; margin-top: 6px; }
+
+/* ============== EMPTY STATE ============== */
+.empty { padding: 56px 24px; text-align: center; color: var(--c-mute); }
+.empty-icon { width: 52px; height: 52px; margin: 0 auto 14px; border-radius: 50%; background: var(--c-line-3); color: var(--c-mute-2); display: inline-flex; align-items: center; justify-content: center; }
+.empty-icon [data-lucide] { width: 22px; height: 22px; }
+.empty-title { font-size: 15.5px; font-weight: 600; color: var(--c-ink); margin-bottom: 5px; font-family: 'Noto Sans Thai', sans-serif; }
+.empty-desc { font-size: 13px; color: var(--c-mute); max-width: 320px; margin: 0 auto; }
+.empty .btn { margin-top: 16px; }
+.empty-actions { display: flex; gap: 8px; justify-content: center; }
+.empty-actions .btn { margin-top: 16px; }
+
+/* ============== MODAL ============== */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(17,17,17,0.50); z-index: 60; opacity: 0; pointer-events: none;
+  transition: opacity 200ms; display: flex; align-items: center; justify-content: center;
+}
+.modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: #fff; border-radius: 12px; width: 440px; max-width: 92vw; max-height: 90vh;
+  display: flex; flex-direction: column; transform: scale(0.96);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 24px 64px rgba(17,17,17,0.28); overflow: hidden;
+}
+.modal.is-lg { width: 680px; }
+.modal-backdrop.is-open .modal { transform: scale(1); }
+.modal-header { padding: 18px 22px 12px; display: flex; align-items: flex-start; gap: 12px; }
+.modal-header-icon {
+  width: 36px; height: 36px; border-radius: 8px; background: rgba(255,59,48,0.10); color: var(--c-primary);
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.modal-header-icon.is-danger { background: #FFE9E7; color: var(--c-danger); }
+.modal-header-icon.is-warning { background: #FFF1DD; color: var(--c-warning); }
+.modal-header-icon [data-lucide] { width: 18px; height: 18px; }
+.modal-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 16px; font-weight: 600; color: var(--c-navy); margin: 0 0 4px; }
+.modal-subtitle { font-size: 13px; color: var(--c-mute); margin: 0; line-height: 1.5; }
+.modal-body { padding: 6px 22px 18px; font-size: 13px; color: var(--c-ink); overflow-y: auto; scrollbar-gutter: stable; }
+.modal-footer { padding: 12px 22px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2); display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Import summary chips */
+.imp-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.imp-chip { border-radius: 8px; padding: 12px; text-align: center; border: 1px solid var(--c-line-2); }
+.imp-chip .v { font-size: 22px; font-weight: 700; font-family: 'Noto Sans Thai', sans-serif; }
+.imp-chip .l { font-size: 11.5px; margin-top: 2px; font-weight: 600; }
+.imp-chip.is-total { background: var(--c-bg-off); color: var(--c-mute); }
+.imp-chip.is-ok { background: #E4F4EB; color: #157A41; border-color: #CBE9D8; }
+.imp-chip.is-bad { background: #FFE9E7; color: #E62E24; border-color: #F6D0CC; }
+.imp-errors { border: 1px solid var(--c-line-2); border-radius: 8px; max-height: 220px; overflow-y: auto; }
+.imp-err-row { display: flex; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--c-line-3); font-size: 12.5px; align-items: baseline; }
+.imp-err-row:last-child { border-bottom: 0; }
+.imp-err-row .r { flex-shrink: 0; font-weight: 700; color: var(--c-danger); min-width: 52px; }
+.imp-err-row .f { flex-shrink: 0; color: var(--c-mute); min-width: 90px; }
+.imp-err-row .m { color: var(--c-ink); }
+.imp-err-row .d { color: var(--c-mute-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+
+/* ============== FIELDS ============== */
+.field { margin-bottom: 14px; }
+.field-label { display: block; font-size: 12.5px; font-weight: 500; color: var(--c-mute); margin-bottom: 6px; }
+.field-label .req { color: var(--c-danger); margin-left: 2px; }
+.field-input { width: 100%; }
+.field-help { font-size: 11.5px; color: var(--c-mute-2); margin-top: 4px; }
+.field-error { font-size: 11.5px; color: var(--c-danger); margin-top: 4px; min-height: 15px; visibility: hidden; }
+.field.is-invalid .input, .field.is-invalid .select { border-color: var(--c-danger); }
+.field.is-invalid .field-error { visibility: visible; }
+textarea.input { height: auto; min-height: 74px; padding: 9px 12px; resize: vertical; line-height: 1.55; }
+
+/* ============== TOAST ============== */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; background: var(--c-navy); color: #fff;
+  padding: 13px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; z-index: 80;
+  display: flex; align-items: center; gap: 10px; box-shadow: 0 12px 32px rgba(17,17,17,0.30);
+  transform: translateY(100px); opacity: 0; transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1); max-width: 380px;
+}
+.toast.is-visible { transform: translateY(0); opacity: 1; }
+.toast.is-success { background: var(--c-success); }
+.toast.is-info { background: var(--c-primary); }
+.toast.is-warning { background: var(--c-warning); }
+.toast.is-error { background: var(--c-danger); }
+.toast [data-lucide] { width: 17px; height: 17px; }
+
+/* ============== UTILITIES ============== */
+.hidden { display: none !important; }
+.text-mute { color: var(--c-mute); }
+.text-mute-2 { color: var(--c-mute-2); }
+.text-primary { color: var(--c-primary); }
+.text-danger { color: var(--c-danger); }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.w-2\.5 { width: 10px; }   .h-2\.5 { height: 10px; }
+.w-3   { width: 12px; }    .h-3   { height: 12px; }
+.w-3\.5 { width: 14px; }   .h-3\.5 { height: 14px; }
+.w-4   { width: 16px; }    .h-4   { height: 16px; }
+.w-5   { width: 20px; }    .h-5   { height: 20px; }
+svg.lucide { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; flex-shrink: 0; }
+svg.lucide.w-2\.5 { width: 10px; }   svg.lucide.h-2\.5 { height: 10px; }
+svg.lucide.w-3    { width: 12px; }   svg.lucide.h-3    { height: 12px; }
+svg.lucide.w-3\.5 { width: 14px; }   svg.lucide.h-3\.5 { height: 14px; }
+svg.lucide.w-4    { width: 16px; }   svg.lucide.h-4    { height: 16px; }
+svg.lucide.w-5    { width: 20px; }   svg.lucide.h-5    { height: 20px; }
+</style>
+</head>
+<body>
+
+<!-- ===== SIDEBAR (Pattern N) ===== -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i data-lucide="box" class="w-4 h-4"></i></div>
+    <div><div class="sb-name">CUBE NATIVE</div><div class="sb-sub">AGM · WKN</div></div>
+  </div>
+  <nav class="sb-nav" id="sb-nav">
+    <div class="sb-module" data-module="agm" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sprout" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">เกษตรกรรม</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item is-disabled" data-feature="farmer-members"><i data-lucide="users" class="w-4 h-4"></i><span>จัดการสมาชิกเกษตรกร</span></a>
+        <a class="sb-item is-disabled" data-feature="quota"><i data-lucide="scale" class="w-4 h-4"></i><span>จัดการโควตา</span></a>
+        <a class="sb-item is-disabled" data-feature="plots"><i data-lucide="map" class="w-4 h-4"></i><span>จัดการแปลงที่ดิน</span></a>
+        <a class="sb-item is-disabled" data-feature="crops"><i data-lucide="wheat" class="w-4 h-4"></i><span>จัดการรอบปลูก</span></a>
+        <a class="sb-item is-active" data-feature="contracts"><i data-lucide="file-signature" class="w-4 h-4"></i><span>จัดการสัญญาส่งอ้อย</span></a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="system" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sliders-horizontal" class="mod-icon w-3.5 h-3.5"></i><span class="mod-label">System</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features"><a class="sb-item is-disabled" data-feature="settings"><i data-lucide="settings" class="w-4 h-4"></i><span>Settings</span></a></div>
+    </div>
+  </nav>
+  <div class="sb-footer"><div class="pulse-dot"></div><span>WKN Prototype · v1.0.0</span></div>
+</aside>
+
+<main class="main">
+  <header class="shell-bar">
+    <nav class="breadcrumb">
+      <a data-breadcrumb-module="agm">เกษตรกรรม</a>
+      <i data-lucide="chevron-right" class="w-3 h-3 sep"></i>
+      <span class="breadcrumb-current">จัดการสัญญาส่งอ้อย</span>
+    </nav>
+    <div style="display:flex; align-items:center; gap:6px; margin-left:auto;">
+      <div style="position:relative;"><button class="icon-btn" id="notifBtn"><i data-lucide="bell" class="w-4 h-4"></i><span class="notif-dot"></span></button></div>
+      <div style="position:relative;">
+        <div class="user-chip" onclick="toggleUserMenu()">
+          <div class="user-text"><div class="user-name">สมพร วงศ์ทะเบียน</div><div class="user-role">เจ้าหน้าที่ทะเบียนสัญญา · WKN</div></div>
+          <div class="avatar">สว</div>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-item"><i data-lucide="user" class="w-3.5 h-3.5"></i><span>My Profile</span></div>
+          <div class="user-menu-item"><i data-lucide="settings" class="w-3.5 h-3.5"></i><span>Preferences</span></div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-item is-danger"><i data-lucide="log-out" class="w-3.5 h-3.5"></i><span>Sign out</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="content" id="page-content"></div>
+</main>
+
+<div id="overlay-root"></div>
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"><div class="modal" id="modalBox" onclick="event.stopPropagation()"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function loadLucide(){var v='0.469.0';var cdns=['https://unpkg.com/lucide@'+v+'/dist/umd/lucide.min.js','https://cdn.jsdelivr.net/npm/lucide@'+v+'/dist/umd/lucide.min.js','https://cdnjs.cloudflare.com/ajax/libs/lucide/'+v+'/lucide.min.js'];var i=0;function n(){if(i>=cdns.length){window.lucide=window.lucide||{createIcons:function(){}};window.dispatchEvent(new Event('lucide:ready'));return;}var s=document.createElement('script');s.src=cdns[i++];s.onload=function(){window.dispatchEvent(new Event('lucide:ready'));};s.onerror=n;document.head.appendChild(s);}n();})();
+</script>
+
+<script>
+// ============================================
+// USERS + constants
+// ============================================
+const CURRENT_USER = { id:'u-ct-01', name:'สมพร วงศ์ทะเบียน', role:'เจ้าหน้าที่ทะเบียนสัญญา' };
+const CHECKER = { id:'u-chk-01', name:'ธนพล อนุมัติ', role:'ผู้อนุมัติ' };
+function daysAgo(n){ var d=new Date(); d.setDate(d.getDate()-n); return d.toISOString(); }
+
+// 5 contract types (verbatim จาก create page — invariants §1b)
+const TYPES = {
+  'price-per-ton':   'สัญญาตันสูญเปล่า',
+  'support':         'สัญญาส่งเสริม',
+  'promotion-7':     'สัญญาโปรโมชั่น โปร 7 วัน',
+  'promotion-crane': 'สัญญาโปรโมชั่นเครน',
+  'early-purchase':  'สัญญาตกเขียว'
+};
+const TYPE_ORDER = ['price-per-ton','support','promotion-7','promotion-crane','early-purchase'];
+const PROMO7_PERIODS = ['โปรโมชัน 7 วันหลังเปิดหีบ','โปรโมชัน 7 วันก่อนปิดปีใหม่','โปรโมชัน 7 วันหลังเปิดปีใหม่','โปรโมชัน 7 วันก่อนปิดหีบ'];
+const CRANES = ['กุดโดน','ชื่นชม2','หนองกุงสวรรค์','โนนสำราญ'];
+// FRD create §4 — ประเภทส่งเสริม (dropdown 5 masters)
+const SUPPORT_TYPES = ['ปุ๋ย/ยาปราบ','เครื่องจักร','พันธุ์อ้อย','ยาปราบ','เงินส่งเสริม'];
+
+// ============================================
+// CROSS-MODULE: QUOTA (mock) — BACKEND: API-13 quota-search (F-AGM-002, read-only)
+// ค้นหา + farmer snapshot · 1 quota : N plots : N crops
+// ============================================
+const QUOTAS = [
+  { quota_id:'QT-2569-001', farmer_name:'สมหญิง รักดี',     citizen_id:'3710100234572', phone:'0823456789' },
+  { quota_id:'QT-2569-002', farmer_name:'สุรพล เก่งการไร่', citizen_id:'3710100234694', phone:'0945678901' },
+  { quota_id:'QT-2569-003', farmer_name:'ทองดี พูลผล',      citizen_id:'3710100234638', phone:'0889012345' },
+  { quota_id:'QT-2569-004', farmer_name:'ประนอม ใจเพชร',    citizen_id:'4405600033333', phone:'0833334444' }
+];
+function findQuota(id){ return QUOTAS.find(q=>q.quota_id===id); }
+
+// ============================================
+// CROSS-MODULE: PLOT (mock) — BACKEND: API-14 available-items / plots-by-quota (F-AGM-003, read-only)
+// ============================================
+const PLOTS = [
+  { plot_id:'PLT-2569-001', quota_id:'QT-2569-001', address:'99 หมู่ 3 · วังขนาย ท่าม่วง กาญจนบุรี 71110' },
+  { plot_id:'PLT-2569-002', quota_id:'QT-2569-001', address:'101 หมู่ 3 · ท่าม่วง ท่าม่วง กาญจนบุรี 71110' },
+  { plot_id:'PLT-2569-003', quota_id:'QT-2569-002', address:'18 หมู่ 2 · สองพี่น้อง สองพี่น้อง สุพรรณบุรี 72110' },
+  { plot_id:'PLT-2569-004', quota_id:'QT-2569-002', address:'20 หมู่ 2 · ต้นตาล สองพี่น้อง สุพรรณบุรี 72110' },
+  { plot_id:'PLT-2569-005', quota_id:'QT-2569-003', address:'77 หมู่ 1 · โพธาราม โพธาราม ราชบุรี 70120' },
+  { plot_id:'PLT-2569-006', quota_id:'QT-2569-003', address:'5 หมู่ 5 · ท่าผา บ้านโป่ง ราชบุรี 70110' },
+  { plot_id:'PLT-2569-007', quota_id:'QT-2569-004', address:'8 หมู่ 5 · บ้านโป่ง บ้านโป่ง ราชบุรี 70110' },
+  { plot_id:'PLT-2569-008', quota_id:'QT-2569-004', address:'80 หมู่ 1 · คลองตาคต โพธาราม ราชบุรี 70120' }
+];
+function findPlot(id){ return PLOTS.find(p=>p.plot_id===id); }
+// BACKEND: API-14 available-items (read) — plots ของโควตา
+function plotsForQuota(qid){ return PLOTS.filter(p=>p.quota_id===qid); }
+
+// ============================================
+// CROSS-MODULE: CROP (mock, verified) — BACKEND: API-14 available-items (F-AGM-004, read)
+// license_status: 'none' (เลือกได้) | 'contracted' (ทำสัญญาแล้ว — กันเลือกซ้ำ · in-memory write-back target)
+// ทุก crop = verified · exclusion ใน create checklist = license_status==='contracted' (BR-AGT-07)
+// ============================================
+const CROPS = [
+  { crop_id:'CRP-2569-0000001', quota_id:'QT-2569-001', plot_id:'PLT-2569-001', total_tons:120, verify_status:'verified', license_status:'none' },
+  { crop_id:'CRP-2569-0000002', quota_id:'QT-2569-001', plot_id:'PLT-2569-001', total_tons:90,  verify_status:'verified', license_status:'none' },
+  { crop_id:'CRP-2569-0000003', quota_id:'QT-2569-001', plot_id:'PLT-2569-002', total_tons:80,  verify_status:'verified', license_status:'none' },
+  { crop_id:'CRP-2569-0000004', quota_id:'QT-2569-002', plot_id:'PLT-2569-003', total_tons:200, verify_status:'verified', license_status:'none' },
+  { crop_id:'CRP-2569-0000005', quota_id:'QT-2569-002', plot_id:'PLT-2569-003', total_tons:150, verify_status:'verified', license_status:'none' },
+  { crop_id:'CRP-2569-0000006', quota_id:'QT-2569-002', plot_id:'PLT-2569-004', total_tons:100, verify_status:'verified', license_status:'none' },
+  { crop_id:'CRP-2569-0000007', quota_id:'QT-2569-003', plot_id:'PLT-2569-005', total_tons:60,  verify_status:'verified', license_status:'none' },
+  { crop_id:'CRP-2569-0000008', quota_id:'QT-2569-003', plot_id:'PLT-2569-006', total_tons:75,  verify_status:'verified', license_status:'none' },
+  { crop_id:'CRP-2569-0000009', quota_id:'QT-2569-004', plot_id:'PLT-2569-007', total_tons:150, verify_status:'verified', license_status:'none' },
+  { crop_id:'CRP-2569-0000010', quota_id:'QT-2569-004', plot_id:'PLT-2569-008', total_tons:90,  verify_status:'verified', license_status:'none' },
+  { crop_id:'CRP-2569-0000011', quota_id:'QT-2569-004', plot_id:'PLT-2569-007', total_tons:110, verify_status:'verified', license_status:'none' },
+  { crop_id:'CRP-2569-0000012', quota_id:'QT-2569-001', plot_id:'PLT-2569-002', total_tons:60,  verify_status:'verified', license_status:'none' },
+  { crop_id:'CRP-2569-0000013', quota_id:'QT-2569-003', plot_id:'PLT-2569-005', total_tons:95,  verify_status:'verified', license_status:'none' },
+  { crop_id:'CRP-2569-0000014', quota_id:'QT-2569-002', plot_id:'PLT-2569-004', total_tons:130, verify_status:'verified', license_status:'none' }
+];
+function findCropRec(id){ return CROPS.find(c=>c.crop_id===id); }
+// BACKEND: API-14 available-items (read) — verified crops ของโควตา (contracted จะถูก grey ใน UI)
+function cropsForQuota(qid){ return CROPS.filter(c=>c.quota_id===qid && c.verify_status==='verified'); }
+function sumCrops(ids){ return ids.reduce(function(s,id){ var c=findCropRec(id); return s+(c?parseFloat(c.total_tons):0); },0); }
+function licenseLabel(ls){ return ls==='contracted'?'ทำสัญญาแล้ว':'คืนแล้ว'; }
+// XT-01/02/03 WRITE-BACK ⭐ — mutate in-memory CROPS license_status
+function setCropsLicense(ids,val){ ids.forEach(function(id){ var c=findCropRec(id); if(c)c.license_status=val; }); }
+
+// ============================================
+// CONTRACT mock seed — BACKEND: API-01 list · API-04 detail
+// ============================================
+function ctmock(seq,qid,type,plotIds,cropIds,st,opts){
+  opts=opts||{};
+  var q=findQuota(qid); var age=opts.age!=null?opts.age:10; var created=daysAgo(age);
+  var code='CT-2569-'+String(seq).padStart(3,'0');
+  var tons=sumCrops(cropIds);
+  var r={ id:'ct-'+seq, contract_id:code, quota_id:qid,
+    farmer_name:q?q.farmer_name:'', farmer_phone:q?q.phone:'',
+    contract_type:type, plot_ids:plotIds.slice(), crop_ids:cropIds.slice(),
+    total_tons:tons, plot_count:plotIds.length, crop_count:cropIds.length,
+    support_items:(opts.support_items||[]).slice(), promotion7_period:opts.promotion7_period||'', selected_crane:opts.selected_crane||'',
+    attachments:(opts.attachments||[]).slice(),
+    status:st, reject_reason:opts.reject_reason||null,
+    version:1, is_deleted:false,
+    approved_by:null, approved_at:null, rejected_by:null, rejected_at:null,
+    created_by:CURRENT_USER.name, created_at:created, updated_at:created,
+    history:[ {event:'create',actor:CURRENT_USER.name,at:created,note:'ผูกโควตา '+qid+' · '+plotIds.length+' แปลง · '+cropIds.length+' รอบปลูก'},
+              {event:'license-write',actor:'ระบบ (write-back)',at:created,note:'ตั้งสถานะสิทธิ์รอบปลูก → ทำสัญญาแล้ว · '+cropIds.join(', ')} ] };
+  if(st==='verified'){ var va=daysAgo(Math.max(0,age-2)); r.updated_at=va; r.version=2; r.approved_by=CHECKER.name; r.approved_at=va; r.history.push({event:'approve',actor:CHECKER.name,at:va,note:opts.approve_note||null}); }
+  if(st==='reject'){ var vj=daysAgo(Math.max(0,age-1)); r.updated_at=vj; r.version=2; r.rejected_by=CHECKER.name; r.rejected_at=vj; r.history.push({event:'reject',actor:CHECKER.name,at:vj,note:r.reject_reason}); r.history.push({event:'license-revert',actor:'ระบบ (write-back)',at:vj,note:'คืนสถานะสิทธิ์รอบปลูก → ไม่มีสัญญา · '+cropIds.join(', ')}); }
+  return r;
+}
+
+const state = {
+  records: [
+    ctmock(1,'QT-2569-001','price-per-ton',   ['PLT-2569-002'],               ['CRP-2569-0000003'],                        'waiting_for_verify',{age:2,attachments:['contract_ct001_scan.pdf']}),
+    ctmock(2,'QT-2569-002','support',         ['PLT-2569-003'],               ['CRP-2569-0000004','CRP-2569-0000005'],     'verified',{age:20,support_items:[{support_type:'ปุ๋ย/ยาปราบ',price:4500,received_date:'2026-01-10'},{support_type:'ยาปราบ',price:1200,received_date:'2026-01-15'}],approve_note:'เอกสารครบถ้วน',attachments:['support_plan.pdf','id_card.jpg']}),
+    ctmock(3,'QT-2569-003','promotion-7',     ['PLT-2569-005'],               ['CRP-2569-0000007'],                        'reject',{age:12,promotion7_period:'โปรโมชัน 7 วันหลังเปิดหีบ',reject_reason:'เอกสารสิทธิ์แปลงไม่ครบถ้วน กรุณาแนบเพิ่มเติมแล้วยื่นใหม่'}),
+    ctmock(4,'QT-2569-004','promotion-crane', ['PLT-2569-007'],               ['CRP-2569-0000009'],                        'waiting_for_verify',{age:1,selected_crane:'กุดโดน'}),
+    ctmock(5,'QT-2569-004','early-purchase',  ['PLT-2569-007','PLT-2569-008'],['CRP-2569-0000011'],                        'waiting_for_verify',{age:9,attachments:['green_purchase_agreement.pdf']}),
+    ctmock(6,'QT-2569-003','promotion-crane', ['PLT-2569-006'],               ['CRP-2569-0000013'],                        'reject',{age:15,selected_crane:'โนนสำราญ',reject_reason:'ปริมาณตันไม่สอดคล้องกับรอบปลูกที่ตรวจสอบ'}),
+    ctmock(7,'QT-2569-001','support',         ['PLT-2569-002'],               ['CRP-2569-0000012'],                        'verified',{age:25,support_items:[{support_type:'เงินส่งเสริม',price:8000,received_date:'2026-02-01'}],approve_note:null}),
+    ctmock(8,'QT-2569-002','early-purchase',  ['PLT-2569-004'],               ['CRP-2569-0000014'],                        'waiting_for_verify',{age:5})
+  ],
+  filters:{ search:'', status:'all', type:'all' },
+  pagination:{ page:1, pageSize:20 },
+  sort:{ col:null, dir:'asc' },
+  selectedIds: new Set(),
+  modal:{ open:false, type:null, data:null },
+  form:null,
+  view:null
+};
+// seed write-back: crops ของสัญญาที่ยัง active (waiting/verified) = contracted (reject ถูกคืนแล้วใน ctmock history)
+state.records.forEach(function(ct){ if(ct.status==='waiting_for_verify'||ct.status==='verified'){ setCropsLicense(ct.crop_ids,'contracted'); } });
+
+// ============================================
+// HELPERS
+// ============================================
+function renderIcons(){ if(window.lucide&&typeof window.lucide.createIcons==='function') window.lucide.createIcons(); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDateTime(iso){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso); return d.toLocaleString('th-TH',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+function fmtTons(n){ var x=parseFloat(n); if(isNaN(x))return '—'; return x.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtBaht(n){ var x=parseFloat(n); if(isNaN(x))return '—'; return x.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+// support item backward-compat: legacy free-text string → structured object
+function normalizeSupportItem(s){ if(s&&typeof s==='object')return {support_type:s.support_type||'',price:(s.price!=null?s.price:''),received_date:s.received_date||''}; return {support_type:(s==null?'':String(s)),price:'',received_date:''}; }
+function countSupportItems(arr){ return (arr||[]).map(normalizeSupportItem).filter(function(s){return String(s.support_type||'').trim();}).length; }
+function maskCitizen(c){ if(!c||c.length!==13)return '—'; return c[0]+'-XXXX-XXXX-XX-'+c[12]; }
+function typeLabel(t){ return TYPES[t]||t||'—'; }
+function statusLabel(st){ return ({waiting_for_verify:'รอการตรวจสอบ',verified:'อนุมัติแล้ว',reject:'ปฏิเสธ'})[st]||st; }
+function statusPill(st){ var c=({waiting_for_verify:'pill-warning',verified:'pill-success',reject:'pill-danger'})[st]||'pill-muted'; return '<span class="pill '+c+'">'+statusLabel(st)+'</span>'; }
+function findContract(id){ return state.records.find(c=>c.id===id||c.contract_id===id); }
+function addHistory(c,ev,actor,note){ c.history.push({event:ev,actor:actor,at:new Date().toISOString(),note:note||null}); }
+function nextContractCode(){ var mx=0; state.records.forEach(function(c){ var m=/CT-2569-(\d+)/.exec(c.contract_id); if(m){var n=parseInt(m[1],10); if(n>mx)mx=n;} }); return 'CT-2569-'+String(mx+1).padStart(3,'0'); }
+function typeSpecificSummary(c){
+  if(c.contract_type==='support'){ var n=countSupportItems(c.support_items); return n?('รายการส่งเสริม '+n+' รายการ'):'—'; }
+  if(c.contract_type==='promotion-7') return c.promotion7_period?('ช่วงโปรโมชั่น '+c.promotion7_period):'—';
+  if(c.contract_type==='promotion-crane') return c.selected_crane?('เครน '+c.selected_crane):'—';
+  return '—';
+}
+function showToast(msg,variant,ms){ variant=variant||'info'; ms=ms||3200; var el=document.getElementById('toast'); var im={success:'check-circle-2',info:'info',warning:'alert-triangle',error:'x-circle'}; el.className='toast is-'+variant; el.innerHTML='<i data-lucide="'+(im[variant]||'info')+'" class="w-4 h-4"></i><span>'+msg+'</span>'; renderIcons(); requestAnimationFrame(()=>el.classList.add('is-visible')); clearTimeout(showToast._t); showToast._t=setTimeout(()=>el.classList.remove('is-visible'),ms); }
+function toggleModule(h){ var m=h.closest('.sb-module'); if(!m)return; var e=m.getAttribute('data-expanded')!=='false'; m.setAttribute('data-expanded',e?'false':'true'); }
+function toggleUserMenu(){ document.getElementById('userMenu').classList.toggle('is-open'); }
+document.addEventListener('click',function(e){ if(!e.target.closest('.user-chip')&&!e.target.closest('.user-menu')){ var um=document.getElementById('userMenu'); if(um)um.classList.remove('is-open'); } });
+
+// ROUTER
+function getRoute(){ var h=location.hash; if(!h||h==='#'||h==='#/')return 'contracts'; return h.replace(/^#\//,''); }
+function navigate(r){ location.hash='#/'+r; }
+
+// LIST
+function getFiltered(){
+  var arr=state.records.filter(c=>!c.is_deleted);
+  if(state.filters.status!=='all') arr=arr.filter(c=>c.status===state.filters.status);
+  if(state.filters.type!=='all') arr=arr.filter(c=>c.contract_type===state.filters.type);
+  if(state.filters.search){ var s=state.filters.search.toLowerCase().trim(); arr=arr.filter(c=> c.contract_id.toLowerCase().includes(s)||c.quota_id.toLowerCase().includes(s)||c.farmer_name.toLowerCase().includes(s) ); }
+  if(state.sort.col){ var col=state.sort.col; arr=arr.slice().sort(function(a,b){ var r; if(col==='total_tons'){ r=(parseFloat(a[col])||0)-(parseFloat(b[col])||0); } else if(col==='updated_at'){ r=new Date(a[col])-new Date(b[col]); } else { r=String(a[col]==null?'':a[col]).localeCompare(String(b[col]==null?'':b[col]),'th'); } return state.sort.dir==='asc'?r:-r; }); }
+  return arr;
+}
+function getPaged(){ var all=getFiltered(); var pg=state.pagination.page,ps=state.pagination.pageSize; var s=(pg-1)*ps; return {records:all.slice(s,s+ps),total:all.length,page:pg,totalPages:Math.max(1,Math.ceil(all.length/ps)),start:all.length===0?0:s+1,end:Math.min(s+ps,all.length)}; }
+// Export CSV — ตามตัวกรองปัจจุบัน (FRD List Export · UTF-8; backend export API = Pending Spec ตาม TC-522)
+function exportContracts(){ var rows=getFiltered(); if(!rows.length){ showToast('ไม่มีข้อมูลให้ส่งออก','warning'); return; }
+  var cols=['contract_id','quota_id','farmer_name','contract_type','total_tons','plots_count','crops_count','status','created_by','created_at'];
+  function csv(v){ v=(v==null?'':String(v)); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+  var out='﻿'+cols.join(',')+'\n'+rows.map(function(c){ return [c.contract_id,c.quota_id,c.farmer_name,typeLabel(c.contract_type),c.total_tons,c.plot_count,c.crop_count,statusLabel(c.status),c.created_by,c.created_at].map(csv).join(','); }).join('\n')+'\n';
+  var b=new Blob([out],{type:'text/csv;charset=utf-8;'}); var l=document.createElement('a'); l.href=URL.createObjectURL(b); l.download='contracts_export.csv'; l.click(); showToast('ส่งออกข้อมูล '+rows.length+' รายการสำเร็จ','success'); }
+function sortBy(c){ if(state.sort.col===c)state.sort.dir=state.sort.dir==='asc'?'desc':'asc'; else{state.sort.col=c;state.sort.dir='asc';} render(); }
+function toggleSelect(id){ if(state.selectedIds.has(id))state.selectedIds.delete(id); else state.selectedIds.add(id); render(); }
+function toggleSelectAll(){ var sel=getPaged().records.filter(c=>c.status==='waiting_for_verify'); var all=sel.length>0&&sel.every(c=>state.selectedIds.has(c.id)); if(all)sel.forEach(c=>state.selectedIds.delete(c.id)); else sel.forEach(c=>state.selectedIds.add(c.id)); render(); }
+function goToPage(n){ var tp=getPaged().totalPages; if(n<1||n>tp)return; state.pagination.page=n; render(); }
+function resetFilters(){ state.filters={search:'',status:'all',type:'all'}; state.pagination.page=1; state.selectedIds.clear(); render(); }
+var _st=null; function onSearchInput(v){ clearTimeout(_st); _st=setTimeout(function(){ state.filters.search=v; state.pagination.page=1; render(); },300); }
+
+// RENDER PRESERVATION
+function preserveState(){ var a=document.activeElement; var isI=a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'); return { pageScroll:window.scrollY, focusKey:isI?{id:a.id||'',placeholder:a.placeholder||'',selStart:a.selectionStart,selEnd:a.selectionEnd}:null }; }
+function restoreState(s){ if(!s)return; requestAnimationFrame(function(){ if(s.pageScroll>0)window.scrollTo(0,s.pageScroll); if(s.focusKey){ var c=s.focusKey.id?document.getElementById(s.focusKey.id):null; if(!c){var cs=document.querySelectorAll('input,textarea'); for(var i=0;i<cs.length;i++){ if((cs[i].placeholder||'')===s.focusKey.placeholder){c=cs[i];break;} }} if(c){ c.focus(); if(s.focusKey.selStart!=null&&c.setSelectionRange){ try{c.setSelectionRange(s.focusKey.selStart,s.focusKey.selEnd);}catch(e){} } } } }); }
+
+function emptyStateHTML(cfg){ cfg=cfg||{}; var acts=''; if(cfg.actions){ acts='<div class="empty-actions">'+cfg.actions.map(function(a){ return '<button class="btn '+(a.cls||'btn-primary')+'" onclick="'+a.onAction+'">'+(a.icon?'<i data-lucide="'+a.icon+'" class="w-4 h-4"></i>':'')+'<span>'+a.label+'</span></button>'; }).join('')+'</div>'; } return '<div class="empty"><div class="empty-icon"><i data-lucide="'+(cfg.icon||'inbox')+'" class="w-5 h-5"></i></div><div class="empty-title">'+(cfg.title||'ยังไม่มีข้อมูล')+'</div><div class="empty-desc">'+(cfg.desc||'')+'</div>'+acts+'</div>'; }
+
+// ============================================
+// PAGE RENDER (P-01) — BACKEND: API-01 list
+// ============================================
+function render(){
+  var snap=preserveState();
+  var route=getRoute(); var parts=route.split('/');
+  if(parts[0]!=='contracts'){ navigate('contracts'); return; }
+  var pg=getPaged();
+  var all=state.records.filter(c=>!c.is_deleted);
+  var cW=all.filter(c=>c.status==='waiting_for_verify').length, cV=all.filter(c=>c.status==='verified').length, cR=all.filter(c=>c.status==='reject').length;
+  var sev=7*24*3600*1000; var cWold=all.filter(c=>c.status==='waiting_for_verify'&&(Date.now()-new Date(c.created_at).getTime())>sev).length;
+  var sel=pg.records.filter(c=>c.status==='waiting_for_verify'); var allSel=sel.length>0&&sel.every(c=>state.selectedIds.has(c.id)); var someSel=!allSel&&sel.some(c=>state.selectedIds.has(c.id)); var selCount=state.selectedIds.size;
+
+  var rows=pg.records.map(function(c){
+    var can=c.status==='waiting_for_verify';
+    return '<tr class="is-clickable '+(state.selectedIds.has(c.id)?'is-selected':'')+'" onclick="openView(\''+c.contract_id+'\')">'
+      +'<td onclick="event.stopPropagation()"><div class="cb '+(state.selectedIds.has(c.id)?'is-checked':'')+(can?'':' is-disabled')+'" '+(can?'onclick="toggleSelect(\''+c.id+'\')"':'title="เลือกได้เฉพาะรายการรอการตรวจสอบ"')+'></div></td>'
+      +'<td><span class="mono text-primary" style="font-weight:600;">'+c.contract_id+'</span></td>'
+      +'<td><span class="mono">'+esc(c.quota_id)+'</span></td>'
+      +'<td>'+esc(c.farmer_name)+'</td>'
+      +'<td>'+esc(typeLabel(c.contract_type))+'</td>'
+      +'<td class="col-num"><span class="num">'+fmtTons(c.total_tons)+'</span></td>'
+      +'<td><span class="num">'+c.plot_count+'</span> แปลง · <span class="num">'+c.crop_count+'</span> รอบ</td>'
+      +'<td>'+statusPill(c.status)+'</td>'
+      +'<td onclick="event.stopPropagation()" style="text-align:right;width:88px;"><div class="row-actions">'
+      +'<button class="ra-btn" onclick="openForm(\'edit\',\''+c.id+'\')" title="แก้ไข"><i data-lucide="pencil" class="w-4 h-4"></i></button>'
+      +'<button class="ra-btn is-danger" onclick="openDeleteModal(\''+c.id+'\')" title="ลบ"><i data-lucide="trash-2" class="w-4 h-4"></i></button>'
+      +'</div></td></tr>';
+  }).join('');
+
+  var noData=all.length===0; var emptyBlock='';
+  if(pg.records.length===0){
+    emptyBlock=noData?emptyStateHTML({icon:'file-signature',title:'ยังไม่มีสัญญา',desc:'เริ่มต้นด้วยการสร้างสัญญาส่งอ้อยฉบับแรก',actions:[{label:'สร้างสัญญา',icon:'plus',onAction:"openForm('create')"}]})
+      :emptyStateHTML({icon:'search-x',title:'ไม่พบรายการที่ค้นหา',desc:'ลองปรับคำค้นหรือล้างตัวกรอง',actions:[{label:'ล้างตัวกรอง',icon:'rotate-ccw',cls:'btn-ghost',onAction:'resetFilters()'}]});
+  }
+  var pageNums=[]; for(var n=1;n<=pg.totalPages;n++)pageNums.push(n);
+  var typeOpts='<option value="all"'+(state.filters.type==='all'?' selected':'')+'>ทุกประเภทสัญญา</option>'+TYPE_ORDER.map(t=>'<option value="'+t+'"'+(state.filters.type===t?' selected':'')+'>'+TYPES[t]+'</option>').join('');
+
+  document.getElementById('page-content').innerHTML=
+    '<div class="ph"><div><div class="ph-title-row"><h1 class="ph-title">จัดการสัญญาส่งอ้อย</h1><span class="ph-count">'+pg.total+' รายการ</span></div>'
+    +'<p class="ph-sub">ทะเบียนสัญญาส่งอ้อย · รวมรอบปลูกที่ตรวจแล้ว · อนุมัติเดี่ยว/กลุ่ม</p></div>'
+    +'<div class="ph-actions">'
+    +'<button class="btn btn-secondary" '+(pg.total===0?'disabled':'')+' onclick="exportContracts()"><i data-lucide="download" class="w-4 h-4"></i><span>Export CSV</span></button>'
+    +'<button class="btn btn-secondary" '+(selCount===0?'disabled':'')+' onclick="openVerifyModal()"><i data-lucide="shield-check" class="w-4 h-4"></i><span>ตรวจสอบที่เลือก ('+selCount+')</span></button>'
+    +'<button class="btn btn-primary" onclick="openForm(\'create\')"><i data-lucide="plus" class="w-4 h-4"></i><span>สร้างสัญญา</span></button>'
+    +'</div></div>'
+    +'<div class="stats">'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="file-signature" class="w-3 h-3"></i>สัญญาทั้งหมด</div><div class="stat-value num">'+all.length+'</div><div class="stat-meta">ไม่รวมที่ลบ</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="clock" class="w-3 h-3"></i>รอการตรวจสอบ</div><div class="stat-value num">'+cW+'</div>'+(cWold>0?'<div class="stat-meta is-warn"><i data-lucide="alert-triangle" class="w-3 h-3"></i>ค้างเกิน 7 วัน '+cWold+' รายการ</div>':'<div class="stat-meta">SLA ตรวจภายใน 3 วันทำการ</div>')+'</div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="check-circle-2" class="w-3 h-3"></i>อนุมัติแล้ว</div><div class="stat-value num">'+cV+'</div><div class="stat-meta">สัญญามีผล</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="x-circle" class="w-3 h-3"></i>ปฏิเสธ</div><div class="stat-value num">'+cR+'</div><div class="stat-meta">คืนสิทธิ์รอบปลูกแล้ว</div></div>'
+    +'</div>'
+    +'<div class="card">'
+    +'<div class="filter-bar"><div class="input-search"><i data-lucide="search" class="lead-icon w-4 h-4"></i>'
+    +'<input class="input" type="text" id="q-search" placeholder="ค้นหา เลขสัญญา / โควตา / เกษตรกร" value="'+esc(state.filters.search)+'" oninput="onSearchInput(this.value)"></div>'
+    +'<select class="select" style="max-width:170px;" onchange="state.filters.status=this.value;state.pagination.page=1;render();">'
+    +'<option value="all"'+(state.filters.status==='all'?' selected':'')+'>ทุกสถานะ</option>'
+    +'<option value="waiting_for_verify"'+(state.filters.status==='waiting_for_verify'?' selected':'')+'>รอการตรวจสอบ</option>'
+    +'<option value="verified"'+(state.filters.status==='verified'?' selected':'')+'>อนุมัติแล้ว</option>'
+    +'<option value="reject"'+(state.filters.status==='reject'?' selected':'')+'>ปฏิเสธ</option></select>'
+    +'<select class="select" style="max-width:190px;" onchange="state.filters.type=this.value;state.pagination.page=1;render();">'+typeOpts+'</select>'
+    +'<div style="flex:1;"></div><button class="btn btn-ghost btn-sm" onclick="resetFilters()"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i><span>ล้างตัวกรอง</span></button></div>'
+    +(selCount>0?'<div class="bulk-bar"><i data-lucide="check-square" class="w-4 h-4"></i><span>เลือก '+selCount+' รายการ (รอการตรวจสอบ)</span><div style="margin-left:auto;display:flex;gap:8px;"><button class="btn btn-secondary" onclick="openVerifyModal()"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i><span>ตรวจสอบที่เลือก</span></button><button class="btn btn-secondary" onclick="state.selectedIds.clear();render();"><span>ยกเลิกการเลือก</span></button></div></div>':'')
+    +'<div class="table-scroll is-sticky"><table class="table"><thead><tr>'
+    +'<th class="col-check"><div class="cb '+(allSel?'is-checked':'')+(someSel?' is-partial':'')+'" onclick="toggleSelectAll()" title="เลือกทั้งหมด (เฉพาะรอการตรวจสอบ)"></div></th>'
+    +'<th class="is-sortable" onclick="sortBy(\'contract_id\')">เลขสัญญา</th>'
+    +'<th>เลขโควตา</th><th>เกษตรกร</th><th>ประเภทสัญญา</th>'
+    +'<th class="col-num is-sortable" onclick="sortBy(\'total_tons\')">รวมตัน</th>'
+    +'<th>แปลง / รอบปลูก</th>'
+    +'<th>สถานะ</th><th style="text-align:right;">การดำเนินการ</th></tr></thead><tbody>'+rows+'</tbody></table>'+emptyBlock+'</div>'
+    +'<div class="table-footer"><div class="pagination">'
+    +'<button class="pg-btn '+(pg.page===1?'is-disabled':'')+'" onclick="goToPage('+(pg.page-1)+')"><i data-lucide="chevron-left" class="w-3 h-3"></i></button>'
+    +pageNums.map(n=>'<button class="pg-btn '+(n===pg.page?'is-active':'')+'" onclick="goToPage('+n+')">'+n+'</button>').join('')
+    +'<button class="pg-btn '+(pg.page===pg.totalPages?'is-disabled':'')+'" onclick="goToPage('+(pg.page+1)+')"><i data-lucide="chevron-right" class="w-3 h-3"></i></button></div>'
+    +'<span>'+pg.start+' – '+pg.end+' จาก '+pg.total+' รายการ</span></div></div>';
+
+  renderIcons(); restoreState(snap);
+  if(parts.length>1&&parts[1]){ var c=findContract(parts[1]); if(c&&!c.is_deleted){ if(!state.view||state.view.id!==c.id){ state.view={id:c.id,tab:'general'}; mountViewDrawer(); } } else if(!c||c.is_deleted){ showToast('ไม่พบข้อมูลสัญญาที่เลือก','error'); navigate('contracts'); } }
+  else if(state.view){ state.view=null; unmountOverlay(); }
+}
+
+// OVERLAY
+function unmountOverlay(){ document.getElementById('overlay-root').innerHTML=''; }
+function mountPanel(cid){ document.getElementById('overlay-root').innerHTML='<div class="overlay-wrap"><div class="backdrop" onclick="closeTopDrawer()"></div><div id="drawer-panel" class="drawer-panel drawer-enter"><div id="'+cid+'" style="display:flex;flex-direction:column;height:100%;"></div></div></div>'; var p=document.getElementById('drawer-panel'); requestAnimationFrame(()=>p.classList.add('drawer-active')); }
+function closePanel(after){ var p=document.getElementById('drawer-panel'); if(p){p.classList.remove('drawer-active');p.classList.add('drawer-enter');} setTimeout(function(){ unmountOverlay(); if(after)after(); },200); }
+function closeTopDrawer(){ if(state.form)closeForm(); else if(state.view)closeView(); }
+
+// ============================================
+// VIEW DRAWER (P-02, 5 tabs) — BACKEND: API-04 detail · API-12 audit
+// ============================================
+function openView(code){ navigate('contracts/'+code); }
+function mountViewDrawer(){ mountPanel('view-content'); renderViewDrawer(); }
+function closeView(){ state.view=null; closePanel(function(){ if(getRoute()!=='contracts')navigate('contracts'); }); }
+function setViewTab(t){ if(!state.view)return; state.view.tab=t; renderViewDrawer(); }
+function renderViewDrawer(){
+  if(!state.view)return; var c=findContract(state.view.id); if(!c)return; var isW=c.status==='waiting_for_verify'; var tab=state.view.tab;
+  var q=findQuota(c.quota_id);
+  var actions='<button class="btn btn-sm btn-secondary" onclick="openForm(\'edit\',\''+c.id+'\')"><i data-lucide="pencil" class="w-3.5 h-3.5"></i><span>แก้ไข</span></button>';
+  if(isW){ actions+='<button class="btn btn-sm btn-primary" onclick="openVerifyModal(\''+c.id+'\',\'verified\')"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i><span>อนุมัติ</span></button>';
+           actions+='<button class="btn btn-sm btn-danger" onclick="openVerifyModal(\''+c.id+'\',\'reject\')"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i><span>ปฏิเสธ</span></button>'; }
+  actions+='<button class="btn btn-sm btn-danger" onclick="openDeleteModal(\''+c.id+'\')"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i><span>ลบ</span></button>';
+  function cell(l,v){ return '<div class="dv-cell"><div class="dv-lbl">'+l+'</div><div class="dv-val">'+v+'</div></div>'; }
+  var body='';
+  if(tab==='general'){
+    var typeSpecific='';
+    if(c.contract_type==='support'){
+      var items=(c.support_items||[]).map(normalizeSupportItem).filter(function(s){return String(s.support_type||'').trim();});
+      typeSpecific='<div class="dv-section"><div class="dv-section-title"><i data-lucide="gift" class="w-4 h-4"></i>รายการส่งเสริม</div>'
+        +(items.length?'<div style="display:flex;flex-direction:column;gap:6px;">'+items.map(function(s){ return '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--c-line-2);border-radius:8px;font-size:13px;"><i data-lucide="check" class="w-4 h-4" style="color:var(--c-success);"></i><span style="flex:1;">'+esc(s.support_type)+'</span><span class="num" style="color:var(--c-mute);">'+(s.price!==''&&s.price!=null?fmtBaht(s.price)+' บาท':'')+'</span><span style="color:var(--c-mute-2);font-size:12px;">'+(s.received_date?esc(s.received_date):'')+'</span></div>'; }).join('')+'</div>':'<div style="border:1px dashed var(--c-line);border-radius:8px;padding:16px;text-align:center;color:var(--c-mute-2);font-size:12.5px;">ไม่มีรายการส่งเสริม</div>')
+        +'</div>';
+    } else if(c.contract_type==='promotion-7'){
+      typeSpecific='<div class="dv-section"><div class="dv-section-title"><i data-lucide="calendar-clock" class="w-4 h-4"></i>ช่วงโปรโมชั่น (โปร 7 วัน)</div><div class="dv-grid">'+cell('ช่วงที่เลือก',esc(c.promotion7_period||'—'))+'</div></div>';
+    } else if(c.contract_type==='promotion-crane'){
+      typeSpecific='<div class="dv-section"><div class="dv-section-title"><i data-lucide="construction" class="w-4 h-4"></i>เครน</div><div class="dv-grid">'+cell('เครนที่เลือก',esc(c.selected_crane||'—'))+'</div></div>';
+    }
+    body='<div class="dv-section"><div class="dv-section-title"><i data-lucide="file-text" class="w-4 h-4"></i>ข้อมูลสัญญา</div><div class="dv-grid">'
+      +cell('ประเภทสัญญา',esc(typeLabel(c.contract_type)))
+      +cell('รวมตัน','<span class="num">'+fmtTons(c.total_tons)+'</span> ตัน')
+      +cell('จำนวนแปลง','<span class="num">'+c.plot_count+'</span> แปลง')
+      +cell('จำนวนรอบปลูก','<span class="num">'+c.crop_count+'</span> รอบ')
+      +'</div></div>'
+      +typeSpecific
+      +(c.status==='reject'&&c.reject_reason?'<div class="note is-warn" style="background:#FFE9E7;color:#E62E24;"><i data-lucide="x-circle" class="w-4 h-4"></i><span><b>เหตุผลที่ปฏิเสธ:</b> '+esc(c.reject_reason)+'</span></div>':'');
+  } else if(tab==='plots'){
+    var pls=c.plot_ids.map(findPlot).filter(Boolean);
+    body='<div class="dv-section"><div class="dv-section-title"><i data-lucide="map-pin" class="w-4 h-4"></i>แปลงที่ผูกกับสัญญา ('+c.plot_ids.length+')</div>'
+      +(pls.length?pls.map(function(p){ return '<div style="border:1px solid var(--c-line-2);border-radius:8px;padding:12px 14px;margin-bottom:10px;"><div style="font-weight:600;"><span class="mono text-primary">'+esc(p.plot_id)+'</span></div><div style="font-size:12.5px;color:var(--c-mute);margin-top:3px;">'+esc(p.address)+'</div></div>'; }).join('')
+        :'<div style="border:1px dashed var(--c-line);border-radius:8px;padding:20px;text-align:center;color:var(--c-mute-2);font-size:12.5px;">ไม่มีแปลง</div>')
+      +'</div>';
+  } else if(tab==='crops'){
+    var crs=c.crop_ids.map(findCropRec).filter(Boolean);
+    body='<div class="dv-section"><div class="dv-section-title"><i data-lucide="wheat" class="w-4 h-4"></i>รอบปลูกที่ผูกกับสัญญา ('+c.crop_ids.length+')</div>'
+      +(crs.length?crs.map(function(cr){ var lic=cr.license_status==='contracted'; return '<div style="border:1px solid var(--c-line-2);border-radius:8px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;"><i data-lucide="wheat" class="w-5 h-5" style="color:var(--c-teal);"></i><div style="flex:1;"><div style="font-weight:600;"><span class="mono text-primary">'+esc(cr.crop_id)+'</span></div><div style="font-size:12px;color:var(--c-mute-2);margin-top:2px;">สิทธิ์: <span class="pill '+(lic?'pill-success':'pill-muted')+'">'+licenseLabel(cr.license_status)+'</span></div></div><div class="num" style="font-weight:600;">'+fmtTons(cr.total_tons)+' ตัน</div></div>'; }).join('')
+        :'<div style="border:1px dashed var(--c-line);border-radius:8px;padding:20px;text-align:center;color:var(--c-mute-2);font-size:12.5px;">ไม่มีรอบปลูก</div>')
+      +'<div class="dv-grid mt-3">'+cell('รวมตันทั้งหมด','<span class="num">'+fmtTons(c.total_tons)+'</span> ตัน')+'</div></div>';
+  } else if(tab==='docs'){
+    // BACKEND: API-19 attachments (read-only presign download)
+    var att=c.attachments||[];
+    body='<div class="dv-section"><div class="dv-section-title"><i data-lucide="paperclip" class="w-4 h-4"></i>เอกสารแนบ ('+att.length+')</div>'
+      +(att.length?att.map(function(fn){ return '<div style="border:1px solid var(--c-line-2);border-radius:8px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;"><i data-lucide="file-text" class="w-5 h-5" style="color:var(--c-teal);"></i><div style="flex:1;font-weight:600;">'+esc(fn)+'</div><a class="btn-link" onclick="showToast(\'จำลองดาวน์โหลด '+esc(fn)+'\',\'info\')"><i data-lucide="download" class="w-3.5 h-3.5"></i> ดาวน์โหลด</a></div>'; }).join('')
+        :'<div style="border:1px dashed var(--c-line);border-radius:8px;padding:20px;text-align:center;color:var(--c-mute-2);font-size:12.5px;">ยังไม่มีเอกสารแนบ</div>')
+      +'</div>';
+  } else {
+    var evMap={create:{t:'สร้างสัญญา',dot:''},edit:{t:'แก้ไขข้อมูลสัญญา',dot:''},approve:{t:'ตรวจสอบ — อนุมัติ',dot:'is-success'},reject:{t:'ตรวจสอบ — ปฏิเสธ',dot:'is-danger'},'delete':{t:'ลบสัญญา',dot:'is-danger'},'license-write':{t:'เขียนสิทธิ์รอบปลูก (write-back)',dot:'is-success'},'license-revert':{t:'คืนสิทธิ์รอบปลูก (write-back)',dot:'is-warning'}};
+    var items=c.history.slice().reverse().map(function(h){ var ev=evMap[h.event]||{t:h.event,dot:''}; return '<div class="tl-item"><div class="tl-dot '+ev.dot+'"></div><div class="flex justify-between items-center"><div class="tl-title">'+ev.t+'</div><div class="tl-meta">'+fmtDateTime(h.at)+'</div></div><div class="tl-meta">โดย '+esc(h.actor)+'</div>'+(h.note?'<div class="tl-note">'+esc(h.note)+'</div>':'')+'</div>'; }).join('');
+    body='<div class="timeline">'+items+'</div>';
+  }
+  var snapCard='<div style="margin:0 0 4px;padding:12px 14px;background:rgba(255,154,31,0.08);border:1px solid var(--c-line-2);border-radius:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">'
+      +'<i data-lucide="link" class="w-4 h-4" style="color:var(--c-teal);"></i><div style="flex:1;min-width:200px;"><div style="font-size:12px;color:var(--c-mute-2);">โควตา · เกษตรกร · ประเภท</div>'
+      +'<div style="font-weight:600;">โควตา <span class="mono text-primary">'+esc(c.quota_id)+'</span> · '+esc(c.farmer_name)+' · '+esc(typeLabel(c.contract_type))+'</div></div>'
+      +'<button class="btn btn-sm btn-secondary" onclick="showToast(\'จำลองเปิดหน้าโควตา '+esc(c.quota_id)+'\',\'info\')"><i data-lucide="external-link" class="w-3.5 h-3.5"></i><span>ดูโควตา</span></button></div>';
+
+  document.getElementById('view-content').innerHTML=
+    '<div class="dw-head" style="padding-bottom:0;"><div class="dw-head-row"><div>'
+    +'<div class="dw-eyebrow"><i data-lucide="file-signature" class="w-3.5 h-3.5"></i> สัญญาส่งอ้อย · <span class="mono">'+esc(c.quota_id)+'</span></div>'
+    +'<div style="display:flex;align-items:center;gap:8px;"><h2 class="dw-title mono">'+esc(c.contract_id)+'</h2>'+statusPill(c.status)+'</div></div>'
+    +'<div class="dw-actions">'+actions+'<span class="drawer-header-divider"></span><button class="top-icon-btn" onclick="closeView()"><i data-lucide="x" class="w-5 h-5"></i></button></div></div>'
+    +'<div style="padding:14px 0 0;">'+snapCard+'</div>'
+    +'<div class="tabs">'
+    +'<button class="tab '+(tab==='general'?'on':'')+'" onclick="setViewTab(\'general\')"><i data-lucide="file-text" class="w-3.5 h-3.5"></i><span>ข้อมูลทั่วไป</span></button>'
+    +'<button class="tab '+(tab==='plots'?'on':'')+'" onclick="setViewTab(\'plots\')"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i><span>แปลง</span></button>'
+    +'<button class="tab '+(tab==='crops'?'on':'')+'" onclick="setViewTab(\'crops\')"><i data-lucide="wheat" class="w-3.5 h-3.5"></i><span>รอบปลูก</span></button>'
+    +'<button class="tab '+(tab==='docs'?'on':'')+'" onclick="setViewTab(\'docs\')"><i data-lucide="paperclip" class="w-3.5 h-3.5"></i><span>เอกสาร</span></button>'
+    +'<button class="tab '+(tab==='history'?'on':'')+'" onclick="setViewTab(\'history\')"><i data-lucide="history" class="w-3.5 h-3.5"></i><span>ประวัติ</span></button></div></div>'
+    +'<div class="dw-body">'+body+'</div>'
+    +'<div class="dw-footer"><div class="dw-footer-meta">อัปเดตล่าสุด '+fmtDateTime(c.updated_at)+' · เวอร์ชัน '+c.version+'</div><div class="dw-footer-right"><button class="btn btn-secondary" onclick="closeView()">ปิด</button></div></div>';
+  renderIcons();
+}
+
+// ============================================
+// CREATE / EDIT DRAWER (OV-01/02) — build-path cascade + fields gated (LOCK-03)
+// BACKEND: API-02 create · API-05 edit · API-13 quota-search · API-14 available-items (read-only)
+// ============================================
+function blankForm(){ return { quota_id:'', plot_ids:[], crop_ids:[], contract_type:'', total_tons:'', support_items:[], promotion7_period:'', selected_crane:'', attachments:[] }; }
+function openForm(mode,id){
+  var data, rec=null, quota=null;
+  if(mode==='edit'){ rec=findContract(id); if(!rec)return; data={ quota_id:rec.quota_id, plot_ids:rec.plot_ids.slice(), crop_ids:rec.crop_ids.slice(), contract_type:rec.contract_type, total_tons:(rec.total_tons!=null?rec.total_tons:''), support_items:(rec.support_items||[]).map(normalizeSupportItem), promotion7_period:rec.promotion7_period, selected_crane:rec.selected_crane, attachments:(rec.attachments||[]).slice() }; quota=findQuota(rec.quota_id); }
+  else data=blankForm();
+  state.form={ mode:mode, id:rec?rec.id:null, data:data, submitting:false, quota:quota, version:rec?rec.version:null };
+  if(state.view){ state.view=null; if(getRoute()!=='contracts')navigate('contracts'); }
+  mountPanel('form-content'); renderFormDrawer();
+}
+function closeForm(){ if(state.form&&state.form.submitting)return; state.form=null; closePanel(); }
+function captureContractForm(){ if(!state.form)return; var d=state.form.data;
+  var ts=document.getElementById('f-type'); if(ts)d.contract_type=ts.value;
+  var tt=document.getElementById('f-total_tons'); if(tt)d.total_tons=tt.value;
+  var pp=document.getElementById('f-promo7'); if(pp)d.promotion7_period=pp.value;
+  var cr=document.getElementById('f-crane'); if(cr)d.selected_crane=cr.value;
+  var cards=document.querySelectorAll('.si-card');
+  if(cards.length){ d.support_items=Array.prototype.map.call(cards,function(card){ var t=card.querySelector('.si-type'),p=card.querySelector('.si-price'),dt=card.querySelector('.si-date'); return { support_type:t?t.value:'', price:p?p.value:'', received_date:dt?dt.value:'' }; }); }
+}
+function supportItemFilled(s){ return s&&String(s.support_type||'').trim(); }
+function lockContractFields(){ var wrap=document.getElementById('contract-fields'); if(!wrap)return;
+  wrap.querySelectorAll('input,select,textarea,button').forEach(function(el){ el.disabled=true; });
+  wrap.style.opacity='0.55'; wrap.style.pointerEvents='none';
+}
+
+// Section 0 build-path toggles (create)
+function selectQuota(id){ captureContractForm(); var f=state.form; if(!id){ f.quota=null; f.data.quota_id=''; f.data.plot_ids=[]; f.data.crop_ids=[]; renderFormDrawer(); return; } var q=findQuota(id); if(!q)return; if(f.data.quota_id!==id){ f.data.plot_ids=[]; f.data.crop_ids=[]; } f.quota=q; f.data.quota_id=id; renderFormDrawer(); }
+function clearQuota(){ captureContractForm(); var f=state.form; f.quota=null; f.data.quota_id=''; f.data.plot_ids=[]; f.data.crop_ids=[]; renderFormDrawer(); }
+function toggleFormPlot(pid){ captureContractForm(); var d=state.form.data; var i=d.plot_ids.indexOf(pid); if(i>=0)d.plot_ids.splice(i,1); else d.plot_ids.push(pid); renderFormDrawer(); }
+function toggleFormCrop(cid){ captureContractForm(); var c=findCropRec(cid); if(!c||c.license_status==='contracted'){ showToast('รอบปลูกนี้ทำสัญญาแล้ว','warning'); return; } var d=state.form.data; var i=d.crop_ids.indexOf(cid); if(i>=0)d.crop_ids.splice(i,1); else d.crop_ids.push(cid); renderFormDrawer(); }
+// type-specific
+function onTypeChange(v){ captureContractForm(); state.form.data.contract_type=v; renderFormDrawer(); }
+function addSupportItem(){ captureContractForm(); state.form.data.support_items.push({support_type:'',price:'',received_date:''}); renderFormDrawer(); }
+function removeSupportItem(i){ captureContractForm(); state.form.data.support_items.splice(i,1); renderFormDrawer(); }
+function useCropSumTons(){ captureContractForm(); state.form.data.total_tons=sumCrops(state.form.data.crop_ids); renderFormDrawer(); }
+// attachments (simulated) — BACKEND: API-02 attachments upload (dev เชื่อม Document Storage จริง)
+function attachDoc(){ captureContractForm(); var d=state.form.data; d.attachments.push('contract_doc_'+(d.attachments.length+1)+'_'+Date.now()+'.pdf'); showToast('จำลองแนบเอกสาร (PDF/JPG ≤5MB)','info'); renderFormDrawer(); }
+function removeDoc(i){ captureContractForm(); var d=state.form.data; d.attachments.splice(i,1); renderFormDrawer(); }
+
+function renderFormDrawer(){
+  var f=state.form; if(!f)return; var isEdit=f.mode==='edit'; var d=f.data;
+  var q=f.quota;
+  var locked = !isEdit && (!d.quota_id || d.plot_ids.length<1 || d.crop_ids.length<1); // LOCK-03 — gate จน quota+≥1 plot+≥1 crop
+  var liveTons=sumCrops(d.crop_ids);
+  // FRD create §4 — จำนวนตันที่ทำสัญญา (บังคับ >0 ทุกประเภท)
+  var totalTonsField='<div class="form-section"><div class="form-section-title">จำนวนตันที่ทำสัญญา</div>'
+    +'<div class="field" style="margin-bottom:0;"><label class="field-label">จำนวนตันที่ทำสัญญา (ตัน) <span class="req">*</span></label>'
+    +'<input class="input num" id="f-total_tons" type="number" inputmode="decimal" step="0.01" placeholder="เช่น 120.00" value="'+esc(d.total_tons!=null?d.total_tons:'')+'">'
+    +'<div class="field-help">รวมจากรอบปลูกที่เลือก: <span class="num">'+fmtTons(liveTons)+'</span> ตัน · <button type="button" class="btn-link" onclick="useCropSumTons()">ใช้ค่านี้</button></div></div></div>';
+
+  // ---- Section 0 ----
+  var section0='';
+  if(isEdit){
+    section0='<div class="note is-info mb-3"><i data-lucide="link" class="w-4 h-4"></i><span>โควตา <b class="mono">'+esc(d.quota_id)+'</b> · <b>'+d.plot_ids.length+'</b> แปลง · <b>'+d.crop_ids.length+'</b> รอบปลูก — แก้ไม่ได้</span></div>';
+  } else {
+    // 0a — quota search / snapshot
+    var s0a='';
+    if(q){
+      s0a='<div style="padding:12px 14px;background:rgba(255,154,31,0.08);border:1px solid var(--c-line-2);border-radius:8px;display:flex;align-items:flex-start;gap:12px;">'
+        +'<i data-lucide="user-check" class="w-4 h-4" style="color:var(--c-teal);margin-top:2px;"></i><div style="flex:1;"><div style="font-size:12px;color:var(--c-mute-2);">เจ้าของโควตา (อ่านอย่างเดียว)</div>'
+        +'<div style="font-weight:600;"><span class="mono text-primary">'+esc(q.quota_id)+'</span> · '+esc(q.farmer_name)+' · <span class="num">'+esc(q.phone)+'</span></div>'
+        +'<div style="font-size:11.5px;color:var(--c-mute-2);margin-top:2px;">เลขบัตร <span class="mono">'+maskCitizen(q.citizen_id)+'</span></div></div>'
+        +'<button class="btn btn-sm btn-secondary" onclick="clearQuota()"><i data-lucide="repeat" class="w-3.5 h-3.5"></i><span>เปลี่ยนโควตา</span></button></div>';
+    } else {
+      s0a='<div class="field"><label class="field-label">ค้นหาโควตา (Quota Id) <span class="req">*</span></label>'+searchSelectHTML('quota',{placeholder:'พิมพ์เลขโควตา หรือ ชื่อเกษตรกร'})+'<div class="field-help">ระบบจะดึงข้อมูลเจ้าของโควตาให้อัตโนมัติ (F-AGM-002)</div></div>';
+    }
+    // 0b — plot checklist
+    var s0b='';
+    if(q){
+      var plist=plotsForQuota(q.quota_id);
+      var plotRows=plist.length?plist.map(function(p){ var checked=d.plot_ids.indexOf(p.plot_id)>=0; return '<label style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-bottom:1px solid var(--c-line-3);cursor:pointer;"><div class="cb '+(checked?'is-checked':'')+'" onclick="toggleFormPlot(\''+p.plot_id+'\')"></div><div style="flex:1;"><div style="font-weight:600;font-size:13px;"><span class="mono text-primary">'+esc(p.plot_id)+'</span></div><div style="font-size:12px;color:var(--c-mute-2);margin-top:2px;">'+esc(p.address)+'</div></div></label>'; }).join('')
+        :'<div style="padding:16px;text-align:center;color:var(--c-mute-2);font-size:12.5px;">ไม่พบแปลงของโควตานี้</div>';
+      s0b='<div class="field" style="margin-top:16px;margin-bottom:0;"><label class="field-label">เลือกแปลง (ของโควตา) <span class="req">*</span></label>'
+        +'<div style="border:1px solid var(--c-line-2);border-radius:8px;overflow:hidden;">'+plotRows+'</div>'
+        +'<div class="field-help">เลือกอย่างน้อย 1 แปลง · เลือกแล้ว <b>'+d.plot_ids.length+'</b> แปลง</div></div>';
+    }
+    // 0c — crop checklist (verified · exclude contracted)
+    var s0c='';
+    if(q){
+      var clist=cropsForQuota(q.quota_id);
+      var cropRows=clist.length?clist.map(function(cr){ var contracted=cr.license_status==='contracted'; var checked=d.crop_ids.indexOf(cr.crop_id)>=0;
+        return '<label style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-bottom:1px solid var(--c-line-3);'+(contracted?'opacity:0.5;cursor:not-allowed;background:var(--c-line-3);':'cursor:pointer;')+'">'
+          +'<div class="cb '+(checked?'is-checked':'')+(contracted?' is-disabled':'')+'" '+(contracted?'title="รอบปลูกนี้ทำสัญญาแล้ว"':'onclick="toggleFormCrop(\''+cr.crop_id+'\')"')+'></div>'
+          +'<div style="flex:1;"><div style="font-weight:600;font-size:13px;"><span class="mono '+(contracted?'':'text-primary')+'">'+esc(cr.crop_id)+'</span>'+(contracted?'<span style="color:var(--c-mute-2);font-weight:500;"> · ทำสัญญาแล้ว</span>':'')+'</div>'
+          +'<div style="font-size:12px;color:var(--c-mute-2);margin-top:2px;">'+esc(cr.plot_id)+' · <span class="num">'+fmtTons(cr.total_tons)+'</span> ตัน</div></div></label>'; }).join('')
+        :'<div style="padding:16px;text-align:center;color:var(--c-mute-2);font-size:12.5px;">ไม่พบรอบปลูกที่ตรวจแล้วของโควตานี้</div>';
+      s0c='<div class="field" style="margin-top:16px;margin-bottom:0;"><label class="field-label">เลือกรอบปลูก (ตรวจแล้ว ของโควตา) <span class="req">*</span></label>'
+        +'<div style="border:1px solid var(--c-line-2);border-radius:8px;overflow:hidden;">'+cropRows+'</div>'
+        +'<div class="field-help">เลือกอย่างน้อย 1 รอบปลูก · รอบปลูกที่ทำสัญญาแล้วจะถูกปิดไม่ให้เลือกซ้ำ</div>'
+        +'<div style="margin-top:8px;padding:9px 12px;background:rgba(31,157,85,0.08);border:1px solid var(--c-line-2);border-radius:8px;font-size:13px;font-weight:600;color:var(--c-ink);">รวม: <span class="num">'+fmtTons(liveTons)+'</span> ตัน · <span class="num">'+d.crop_ids.length+'</span> รอบปลูก</div></div>';
+    }
+    section0='<div class="form-section"><div class="form-section-title">เลือกโควตา แปลง และรอบปลูก (บังคับก่อน)</div>'+s0a+s0b+s0c+'</div>';
+  }
+
+  // ---- type-specific block ----
+  var typeBlock='';
+  if(d.contract_type==='support'){
+    var siRows=(d.support_items||[]).map(function(s,i){ s=s||{}; var typeOpt='<option value="">— เลือกประเภทส่งเสริม —</option>'+SUPPORT_TYPES.map(function(t){ return '<option value="'+esc(t)+'"'+(s.support_type===t?' selected':'')+'>'+esc(t)+'</option>'; }).join('');
+      return '<div class="si-card" data-si-idx="'+i+'" style="border:1px solid var(--c-line-2);border-radius:8px;padding:12px;margin-bottom:8px;">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><span style="font-size:12.5px;font-weight:600;color:var(--c-ink);">รายการที่ '+(i+1)+'</span><button type="button" class="ra-btn is-danger" onclick="removeSupportItem('+i+')"><i data-lucide="x" class="w-4 h-4"></i></button></div>'
+        +'<div class="form-grp">'
+        +'<div class="field" style="margin-bottom:8px;"><label class="field-label">ประเภทส่งเสริม <span class="req">*</span></label><select class="select si-type">'+typeOpt+'</select></div>'
+        +'<div class="field" style="margin-bottom:8px;"><label class="field-label">ราคา (บาท) <span class="req">*</span></label><input class="input si-price num" type="number" inputmode="decimal" step="0.01" placeholder="0.00" value="'+esc(s.price!=null?s.price:'')+'"></div>'
+        +'</div>'
+        +'<div class="field" style="margin-bottom:0;"><label class="field-label">วันที่รับส่งเสริม <span class="req">*</span></label><input class="input si-date" type="date" value="'+esc(s.received_date||'')+'"></div>'
+        +'</div>'; }).join('');
+    typeBlock='<div class="form-section"><div class="form-section-title">รายการส่งเสริม</div>'
+      +(siRows||'<div class="field-help" style="margin-bottom:8px;">ยังไม่มีรายการ · กดปุ่มด้านล่างเพื่อเพิ่ม</div>')
+      +'<button type="button" class="btn btn-secondary btn-sm" onclick="addSupportItem()"><i data-lucide="plus" class="w-3.5 h-3.5"></i><span>เพิ่มรายการส่งเสริม</span></button></div>';
+  } else if(d.contract_type==='promotion-7'){
+    typeBlock='<div class="form-section"><div class="form-section-title">ช่วงโปรโมชั่น (โปร 7 วัน)</div>'
+      +'<div class="field" style="margin-bottom:0;"><label class="field-label">เลือกช่วงโปรโมชั่น <span class="req">*</span></label><select class="select" id="f-promo7"><option value="">— เลือกช่วงโปรโมชั่น —</option>'+PROMO7_PERIODS.map(function(p){ return '<option value="'+esc(p)+'"'+(d.promotion7_period===p?' selected':'')+'>'+esc(p)+'</option>'; }).join('')+'</select></div></div>';
+  } else if(d.contract_type==='promotion-crane'){
+    typeBlock='<div class="form-section"><div class="form-section-title">เลือกเครน</div>'
+      +'<div class="field" style="margin-bottom:0;"><label class="field-label">เครน <span class="req">*</span></label><select class="select" id="f-crane"><option value="">— เลือกเครน —</option>'+CRANES.map(function(cr){ return '<option value="'+esc(cr)+'"'+(d.selected_crane===cr?' selected':'')+'>'+esc(cr)+'</option>'; }).join('')+'</select></div></div>';
+  }
+
+  // ---- attachments block ----
+  var attBlock='<div class="form-section"><div class="form-section-title">เอกสารแนบ</div>'
+    +'<div class="field" style="margin-bottom:0;"><label class="field-label">เอกสารสัญญา (PDF/JPG ≤5MB · แนบได้หลายไฟล์)</label>'
+    +'<button type="button" class="btn btn-secondary" onclick="attachDoc()"><i data-lucide="paperclip" class="w-4 h-4"></i><span>แนบเอกสาร</span></button>'
+    +((d.attachments&&d.attachments.length)?'<div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">'+d.attachments.map(function(fn,i){ return '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--c-line-2);border-radius:8px;font-size:12.5px;"><i data-lucide="file-text" class="w-4 h-4" style="color:var(--c-teal);"></i><span style="flex:1;">'+esc(fn)+'</span><button type="button" class="ra-btn is-danger" onclick="removeDoc('+i+')"><i data-lucide="x" class="w-4 h-4"></i></button></div>'; }).join('')+'</div>':'<div class="field-help">ยังไม่มีเอกสารแนบ · จำลองในต้นแบบ (dev เชื่อม Document Storage จริง)</div>')
+    +'</div></div>';
+
+  document.getElementById('form-content').innerHTML=
+    '<div class="dw-head"><div class="dw-head-row"><div>'
+    +'<div class="dw-eyebrow"><i data-lucide="'+(isEdit?'pencil':'plus')+'" class="w-3.5 h-3.5"></i> '+(isEdit?'แก้ไขสัญญา':'สร้างสัญญา')+'</div>'
+    +'<h2 class="dw-title">'+(isEdit?'แก้ไข <span class="mono text-primary">'+esc(findContract(f.id).contract_id)+'</span>':'สร้างสัญญาส่งอ้อย')+'</h2>'
+    +(isEdit?'<div class="dw-sub">สถานะ: '+statusLabel(findContract(f.id).status)+' · เวอร์ชัน '+f.version+'</div>':'')
+    +'</div><button class="top-icon-btn" onclick="closeForm()"><i data-lucide="x" class="w-5 h-5"></i></button></div></div>'
+    +'<div class="dw-body">'
+    +section0
+    +'<div id="contract-fields">'
+    +(locked?'<div class="note is-info mb-3"><i data-lucide="lock" class="w-4 h-4"></i><span>เลือกโควตา · แปลง (≥1) · รอบปลูก (≥1) ก่อน จึงจะเลือกประเภทสัญญาและกรอกข้อมูลได้</span></div>':'')
+    +'<div class="form-section"><div class="form-section-title">ประเภทสัญญา</div>'
+    +'<div class="field" style="margin-bottom:0;"><label class="field-label">เลือกประเภทสัญญา <span class="req">*</span></label><select class="select" id="f-type" onchange="onTypeChange(this.value)"><option value="">— เลือกประเภทสัญญา —</option>'+TYPE_ORDER.map(function(t){ return '<option value="'+t+'"'+(d.contract_type===t?' selected':'')+'>'+TYPES[t]+'</option>'; }).join('')+'</select></div></div>'
+    +(d.contract_type?totalTonsField:'')
+    +typeBlock
+    +'<div class="form-section"><div class="form-section-title">สรุปสัญญา</div><div class="dv-grid" style="grid-template-columns:1fr 1fr;">'
+    +'<div class="dv-cell"><div class="dv-lbl">ประเภทสัญญา</div><div class="dv-val">'+esc(typeLabel(d.contract_type))+'</div></div>'
+    +'<div class="dv-cell"><div class="dv-lbl">จำนวนตันที่ทำสัญญา</div><div class="dv-val"><span class="num">'+fmtTons(String(d.total_tons).trim()!==''?d.total_tons:liveTons)+'</span> ตัน</div></div>'
+    +'<div class="dv-cell"><div class="dv-lbl">จำนวนแปลง</div><div class="dv-val"><span class="num">'+d.plot_ids.length+'</span> แปลง</div></div>'
+    +'<div class="dv-cell"><div class="dv-lbl">จำนวนรอบปลูก</div><div class="dv-val"><span class="num">'+d.crop_ids.length+'</span> รอบ</div></div>'
+    +'</div></div>'
+    +(d.contract_type==='early-purchase'?'':attBlock)
+    +'</div>'
+    +'</div>'
+    +'<div class="dw-footer"><div></div><div class="dw-footer-right">'
+    +'<button class="btn btn-ghost" onclick="closeForm()">ยกเลิก</button>'
+    +'<button class="btn btn-primary" id="f-submit" onclick="submitForm()"><i data-lucide="check" class="w-4 h-4"></i><span>'+(isEdit?'บันทึกการแก้ไข':'ยืนยันสร้าง')+'</span></button>'
+    +'</div></div>';
+  renderIcons();
+  if(!isEdit&&!q) initQuotaSearch();
+  if(locked) lockContractFields();
+}
+// BACKEND: API-13 quota-search
+function initQuotaSearch(){
+  initSearchSelect('quota',{
+    options: QUOTAS.map(q=>({value:q.quota_id,label:q.quota_id+' · '+q.farmer_name,sub:q.phone+' · '+maskCitizen(q.citizen_id),icon:'scale'})),
+    value: state.form.data.quota_id||null, emptyText:'ไม่พบโควตา',
+    onSelect:function(val){ selectQuota(val); }
+  });
+}
+
+async function submitForm(){
+  var f=state.form; if(!f||f.submitting)return;
+  captureContractForm(); var d=f.data;
+  if(f.mode==='create'){
+    if(!d.quota_id||d.plot_ids.length<1||d.crop_ids.length<1){ showToast('กรุณาตรวจสอบข้อมูลให้ครบถ้วน','warning'); return; }
+    if(!d.contract_type){ showToast('เลือกประเภทสัญญา','warning'); return; }
+  }
+  // VR — จำนวนตันที่ทำสัญญา ต้อง > 0 (ทุกประเภท)
+  if(!(String(d.total_tons).trim()!=='' && parseFloat(d.total_tons)>0)){ showToast('กรอกจำนวนตันที่ทำสัญญา (มากกว่า 0)','warning'); return; }
+  // VR-05 type-specific required
+  if(d.contract_type==='promotion-7'&&!(d.promotion7_period||'').trim()){ showToast('เลือกช่วงโปรโมชั่น','warning'); return; }
+  if(d.contract_type==='promotion-crane'&&!(d.selected_crane||'').trim()){ showToast('เลือกเครน','warning'); return; }
+  if(d.contract_type==='support'){ var sfull=(d.support_items||[]).map(normalizeSupportItem).filter(supportItemFilled); if(sfull.length<1){ showToast('เพิ่มรายการส่งเสริมอย่างน้อย 1 รายการ (เลือกประเภท)','warning'); return; } var bad=sfull.some(function(s){ return !(String(s.price).trim()!==''&&parseFloat(s.price)>=0) || !String(s.received_date).trim(); }); if(bad){ showToast('กรอกราคาและวันที่รับส่งเสริมให้ครบทุกรายการ','warning'); return; } }
+  f.submitting=true; var btn=document.getElementById('f-submit'); btn.disabled=true; btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังบันทึก…</span>'; renderIcons();
+  // BACKEND: create=API-02 (FN-01 validate, FN-04 save, FN-12 write-back) · edit=API-05 (FN-03 optimistic) · double-submit guard (BR-AGT-10)
+  await new Promise(r=>setTimeout(r,600));
+  var msg='', variant='success';
+  var supportItems=(d.support_items||[]).map(normalizeSupportItem).filter(supportItemFilled);
+  if(f.mode==='create'){
+    var now=new Date().toISOString(); var q=f.quota; var code=nextContractCode(); var tons=(String(d.total_tons).trim()!==''?parseFloat(d.total_tons):sumCrops(d.crop_ids));
+    var nc={ id:'ct-'+code, contract_id:code, quota_id:d.quota_id,
+      farmer_name:q?q.farmer_name:'', farmer_phone:q?q.phone:'',
+      contract_type:d.contract_type, plot_ids:d.plot_ids.slice(), crop_ids:d.crop_ids.slice(),
+      total_tons:tons, plot_count:d.plot_ids.length, crop_count:d.crop_ids.length,
+      support_items:(d.contract_type==='support'?supportItems:[]), promotion7_period:(d.contract_type==='promotion-7'?d.promotion7_period:''), selected_crane:(d.contract_type==='promotion-crane'?d.selected_crane:''),
+      attachments:(d.attachments||[]).slice(),
+      status:'waiting_for_verify', reject_reason:null,
+      version:1, is_deleted:false,
+      approved_by:null, approved_at:null, rejected_by:null, rejected_at:null,
+      created_by:CURRENT_USER.name, created_at:now, updated_at:now,
+      history:[ {event:'create',actor:CURRENT_USER.name,at:now,note:'ผูกโควตา '+d.quota_id+' · '+d.plot_ids.length+' แปลง · '+d.crop_ids.length+' รอบปลูก'} ] };
+    // XT-01 WRITE-BACK ⭐ — crop license → contracted + history event
+    setCropsLicense(d.crop_ids,'contracted');
+    nc.history.push({event:'license-write',actor:'ระบบ (write-back)',at:now,note:'ตั้งสถานะสิทธิ์รอบปลูก → ทำสัญญาแล้ว · '+d.crop_ids.join(', ')});
+    state.records.unshift(nc);
+    msg='สร้างสัญญาสำเร็จ — '+code;
+  } else {
+    var c=findContract(f.id);
+    c.contract_type=d.contract_type;
+    c.total_tons=(String(d.total_tons).trim()!==''?parseFloat(d.total_tons):sumCrops(d.crop_ids));
+    c.support_items=(d.contract_type==='support'?supportItems:[]);
+    c.promotion7_period=(d.contract_type==='promotion-7'?d.promotion7_period:'');
+    c.selected_crane=(d.contract_type==='promotion-crane'?d.selected_crane:'');
+    c.attachments=(d.attachments||[]).slice();
+    c.updated_at=new Date().toISOString(); c.version=(c.version||1)+1;
+    addHistory(c,'edit',CURRENT_USER.name,'แก้ไขประเภทสัญญา/เอกสารแนบ');
+    msg='บันทึกการแก้ไขแล้ว';
+  }
+  state.form=null; closePanel(); render(); showToast(msg,variant,4200);
+}
+
+// ============================================
+// SEARCH-SELECT helper (Iron Rule #34)
+// ============================================
+window.__ss=window.__ss||{};
+function ssGet(k){return window.__ss[k];}
+function ssEsc(s){return String(s).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function searchSelectHTML(key,opt){ opt=opt||{}; var ph=opt.placeholder||'ค้นหา...'; return '<div class="search-select" id="ss-'+key+'"><i data-lucide="search" class="ss-lead w-4 h-4"></i><input type="text" class="input ss-input" id="ss-input-'+key+'" autocomplete="off" placeholder="'+ph+'" oninput="ssOnInput(\''+key+'\',this.value)" onfocus="ssOpen(\''+key+'\')" onkeydown="ssOnKey(\''+key+'\',event)"><button type="button" class="ss-clear hidden" id="ss-clear-'+key+'" tabindex="-1" onclick="ssClear(\''+key+'\')"><i data-lucide="x" class="w-4 h-4"></i></button><i data-lucide="chevron-down" class="ss-caret w-4 h-4" id="ss-caret-'+key+'"></i><div class="ss-list hidden" id="ss-list-'+key+'"></div></div>'; }
+function initSearchSelect(key,cfg){ cfg=cfg||{}; window.__ss[key]={options:cfg.options||[],value:cfg.value!=null?cfg.value:null,onSelect:cfg.onSelect||function(){},emptyText:cfg.emptyText||'ไม่พบรายการ',query:'',open:false,hi:0}; ssSetText(key); ssSyncChrome(key); renderIcons(); }
+function ssFiltered(key){ var s=ssGet(key); if(!s)return []; var q=(s.query||'').toLowerCase().trim(); if(!q)return s.options; return s.options.filter(o=>String(o.label).toLowerCase().includes(q)||String(o.value).toLowerCase().includes(q)||String(o.sub||'').toLowerCase().includes(q)); }
+function ssSyncChrome(key){ var s=ssGet(key); if(!s)return; var sel=s.options.find(o=>o.value===s.value); var c=document.getElementById('ss-clear-'+key); if(c)c.classList.toggle('hidden',!sel); var k=document.getElementById('ss-caret-'+key); if(k)k.classList.toggle('hidden',!!sel); }
+function ssSetText(key){ var s=ssGet(key); if(!s)return; var inp=document.getElementById('ss-input-'+key); if(!inp)return; var sel=s.options.find(o=>o.value===s.value); inp.value=s.open?s.query:(sel?sel.label:''); }
+function ssRenderList(key){ var s=ssGet(key); if(!s)return; var list=document.getElementById('ss-list-'+key); if(!list)return; var items=ssFiltered(key); if(items.length===0){ list.innerHTML='<div class="ss-empty">'+s.emptyText+'</div>'; } else { var q=(s.query||'').toLowerCase().trim(); var hl=function(t){return q?String(t).replace(new RegExp('('+ssEsc(q)+')','gi'),'<mark>$1</mark>'):String(t);}; list.innerHTML=items.map(function(o,i){return '<button type="button" class="ss-opt '+(i===s.hi?'is-active':'')+'" onmousedown="event.preventDefault()" onclick="ssPick(\''+key+'\','+i+')">'+(o.icon?'<i data-lucide="'+o.icon+'" class="ss-opt-ic w-4 h-4"></i>':'')+'<span class="ss-opt-main"><span class="ss-opt-label">'+hl(o.label)+'</span>'+(o.sub?'<span class="ss-opt-sub">'+hl(o.sub)+'</span>':'')+'</span>'+(o.right?'<span class="ss-opt-right">'+o.right+'</span>':'')+'</button>';}).join(''); } list.classList.toggle('hidden',!s.open); renderIcons(); }
+function ssOpen(key){ var s=ssGet(key); if(!s)return; var inp=document.getElementById('ss-input-'+key); if(inp&&inp.disabled)return; s.open=true; s.query=''; s.hi=0; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+function ssOnInput(key,val){ var s=ssGet(key); if(!s)return; s.query=val; s.open=true; s.hi=0; s.value=null; ssSyncChrome(key); ssRenderList(key); }
+function ssPick(key,i){ var s=ssGet(key); if(!s)return; var o=ssFiltered(key)[i]; if(!o)return; s.value=o.value; s.query=''; s.open=false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); s.onSelect(o.value,o); }
+function ssClear(key){ var s=ssGet(key); if(!s)return; s.value=null; s.query=''; s.open=true; ssSetText(key); ssSyncChrome(key); ssRenderList(key); var inp=document.getElementById('ss-input-'+key); if(inp)inp.focus(); s.onSelect(null,null); }
+function ssOnKey(key,e){ var s=ssGet(key); if(!s)return; var items=ssFiltered(key); if(e.key==='ArrowDown'){e.preventDefault(); s.open=true; s.hi=Math.min(items.length-1,s.hi+1); ssRenderList(key);} else if(e.key==='ArrowUp'){e.preventDefault(); s.hi=Math.max(0,s.hi-1); ssRenderList(key);} else if(e.key==='Enter'){e.preventDefault(); if(items[s.hi])ssPick(key,s.hi);} else if(e.key==='Escape'){s.open=false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); e.stopPropagation();} }
+document.addEventListener('click',function(e){ Object.keys(window.__ss||{}).forEach(function(key){ var w=document.getElementById('ss-'+key); var s=ssGet(key); if(w&&s&&s.open&&!w.contains(e.target)){ s.open=false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); } }); });
+
+// ============================================
+// MODALS (verify / delete)
+// ============================================
+function openModalBox(type,data,isLg){ state.modal={open:true,type:type,data:data||{}}; var box=document.getElementById('modalBox'); box.className='modal'+(isLg?' is-lg':''); renderModal(); requestAnimationFrame(()=>document.getElementById('modalBackdrop').classList.add('is-open')); }
+function closeModal(){ if(state.modal.data&&state.modal.data.busy)return; document.getElementById('modalBackdrop').classList.remove('is-open'); setTimeout(()=>state.modal={open:false,type:null,data:null},200); }
+function renderModal(){ var t=state.modal.type; if(t==='verify')renderVerifyModal(); else if(t==='delete')renderDeleteModal(); }
+
+// APPROVE / REJECT (OV-03) — BACKEND: single=API-07/08 · bulk=API-09 (FN-06/07) + status guard 409
+function openVerifyModal(singleId,preset){ var ids=singleId?[singleId]:Array.from(state.selectedIds); ids=ids.filter(function(id){ var c=findContract(id); return c&&!c.is_deleted&&c.status==='waiting_for_verify'; }); if(ids.length===0){ showToast('เลือกได้เฉพาะรายการที่รอการตรวจสอบ','warning'); return; } openModalBox('verify',{ids:ids,result:preset||'',reason:'',note:'',busy:false}); }
+function setVerifyResult(v){ var rn=document.getElementById('v-reason'); if(rn)state.modal.data.reason=rn.value; var nt=document.getElementById('v-note'); if(nt)state.modal.data.note=nt.value; state.modal.data.result=v; renderVerifyModal(); }
+function renderVerifyModal(){
+  var d=state.modal.data; var contracts=d.ids.map(findContract).filter(Boolean); var isBulk=contracts.length>1; var single=contracts[0];
+  var listHtml='';
+  if(isBulk){ listHtml='<div class="field"><label class="field-label">รายการที่เลือก ('+contracts.length+' รายการ)</label><div class="imp-errors" style="max-height:160px;">'+contracts.map(c=>'<div class="imp-err-row"><span class="r mono" style="color:var(--c-ink);">'+c.contract_id+'</span><span class="m">'+esc(c.farmer_name)+'</span><span class="d mono">'+c.quota_id+' · '+esc(typeLabel(c.contract_type))+'</span></div>').join('')+'</div><div class="field-help">ใช้เหตุผลเดียวกันทุกรายการ (เมื่อเลือก "ปฏิเสธ") · ข้ามรายการที่ไม่ใช่สถานะรอการตรวจสอบ</div></div>'; }
+  else { listHtml='<div style="font-size:13px;color:var(--c-mute);margin-bottom:12px;line-height:1.7;"><div>เลขสัญญา: <span class="mono" style="color:var(--c-ink);font-weight:600;">'+single.contract_id+'</span></div><div><strong style="color:var(--c-ink);">'+esc(single.farmer_name)+'</strong> · โควตา <span class="mono">'+single.quota_id+'</span> · '+esc(typeLabel(single.contract_type))+'</div><div>รวม <span class="num">'+fmtTons(single.total_tons)+'</span> ตัน · '+single.plot_count+' แปลง · '+single.crop_count+' รอบปลูก</div></div>'; }
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="shield-check" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">ตรวจสอบสัญญา'+(isBulk?' ('+contracts.length+' รายการ)':'')+'</h3><p class="modal-subtitle">เลือกผลการตรวจสอบ · หากปฏิเสธต้องระบุเหตุผล</p></div>'
+    +'<button class="icon-btn" onclick="closeModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>'
+    +'<div class="modal-body">'+listHtml
+    +'<div class="field"><label class="field-label">ผลตรวจสอบ <span class="req">*</span></label><div style="display:flex;flex-direction:column;gap:8px;">'
+    +'<label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13px;padding:9px 12px;border:1px solid '+(d.result==='verified'?'var(--c-success)':'var(--c-line)')+';border-radius:8px;background:'+(d.result==='verified'?'#E4F4EB':'#fff')+';"><input type="radio" name="vr" value="verified" '+(d.result==='verified'?'checked':'')+' onchange="setVerifyResult(\'verified\')" style="accent-color:var(--c-success);"> อนุมัติ</label>'
+    +'<label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13px;padding:9px 12px;border:1px solid '+(d.result==='reject'?'var(--c-danger)':'var(--c-line)')+';border-radius:8px;background:'+(d.result==='reject'?'#FFE9E7':'#fff')+';"><input type="radio" name="vr" value="reject" '+(d.result==='reject'?'checked':'')+' onchange="setVerifyResult(\'reject\')" style="accent-color:var(--c-danger);"> ปฏิเสธ</label>'
+    +'</div><div class="field-error" id="err-vr"></div></div>'
+    +(d.result==='reject'?'<div class="field" style="margin-bottom:0;"><label class="field-label">เหตุผลในการปฏิเสธ <span class="req">*</span></label><textarea class="input" id="v-reason" placeholder="กรุณาระบุเหตุผลในการปฏิเสธ...">'+esc(d.reason)+'</textarea><div class="field-error" id="err-reason"></div><div class="note is-warn mt-2"><i data-lucide="info" class="w-4 h-4"></i><span>เมื่อปฏิเสธ ระบบจะคืนสถานะสิทธิ์รอบปลูกที่ผูกไว้ (→ ไม่มีสัญญา)'+(isBulk?' · ใช้เหตุผลเดียวกันนี้กับทุกรายการที่เลือก':'')+'</span></div></div>':'')
+    +(d.result==='verified'?'<div class="field" style="margin-bottom:0;"><label class="field-label">หมายเหตุ (ไม่บังคับ)</label><textarea class="input" id="v-note" placeholder="หมายเหตุเพิ่มเติม (ไม่บังคับ)">'+esc(d.note)+'</textarea></div>':'')
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" id="v-submit" onclick="submitVerify()"><i data-lucide="check" class="w-4 h-4"></i><span>ยืนยัน</span></button></div>';
+  renderIcons();
+  var n=document.getElementById('v-reason'); if(n)n.value=d.reason; var nt=document.getElementById('v-note'); if(nt)nt.value=d.note;
+}
+async function submitVerify(){
+  var d=state.modal.data; if(d.busy)return; var n=document.getElementById('v-reason'); if(n)d.reason=n.value; var nt=document.getElementById('v-note'); if(nt)d.note=nt.value;
+  if(!d.result){ var e=document.getElementById('err-vr'); e.textContent='กรุณาเลือกผลการตรวจสอบ'; e.style.visibility='visible'; showToast('กรุณาเลือกผลการตรวจสอบ','warning'); return; }
+  if(d.result==='reject'&&!(d.reason||'').trim()){ var er=document.getElementById('err-reason'); if(er){er.textContent='กรุณากรอกเหตุผลในการปฏิเสธ'; er.style.visibility='visible';} showToast('กรุณากรอกเหตุผลในการปฏิเสธ','warning'); return; }
+  d.busy=true; var btn=document.getElementById('v-submit'); btn.disabled=true; btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังดำเนินการ…</span>'; renderIcons();
+  // BACKEND: FN-06/07 apply approve/reject + optimistic (BR-AGT-10) · audit with bulk count (BR-AGT-09) · reject → FN-12 write-back revert
+  await new Promise(r=>setTimeout(r,700));
+  var ok=0,fail=0; var reason=(d.reason||'').trim(); var note=(d.note||'').trim(); var now=new Date().toISOString();
+  d.ids.forEach(function(id){ var c=findContract(id); if(!c||c.is_deleted){fail++;return;} if(c.status!=='waiting_for_verify'){fail++;return;}
+    if(d.result==='verified'){ c.status='verified'; c.reject_reason=null; c.approved_by=CHECKER.name; c.approved_at=now; addHistory(c,'approve',CHECKER.name,(d.ids.length>1?('ตรวจสอบกลุ่ม '+d.ids.length+' รายการ'):null)||(note||null)); /* XT: crop license คง contracted */ }
+    else { c.status='reject'; c.reject_reason=reason; c.rejected_by=CHECKER.name; c.rejected_at=now; addHistory(c,'reject',CHECKER.name,reason+(d.ids.length>1?(' · ตรวจสอบกลุ่ม '+d.ids.length+' รายการ'):''));
+      // XT-02 WRITE-BACK ⭐ — crop license revert → none + history event
+      setCropsLicense(c.crop_ids,'none'); addHistory(c,'license-revert','ระบบ (write-back)','คืนสถานะสิทธิ์รอบปลูก → ไม่มีสัญญา · '+c.crop_ids.join(', ')); }
+    c.updated_at=now; c.version++; ok++;
+  });
+  d.busy=false; state.selectedIds.clear(); closeModal(); render(); if(state.view)renderViewDrawer();
+  if(d.ids.length===1) showToast(d.result==='verified'?'อนุมัติเรียบร้อย':'ปฏิเสธเรียบร้อย — คืนสถานะสิทธิ์รอบปลูกแล้ว',d.result==='verified'?'success':'info',4200);
+  else showToast('ตรวจสอบกลุ่มเสร็จสิ้น — สำเร็จ '+ok+' ล้มเหลว '+fail,fail>0?'warning':'success',4800);
+}
+
+// DELETE (OV-04) — BACKEND: API-11 (FN-08) soft delete + attachments + audit (BR-AGT-08) + FN-12 write-back
+function openDeleteModal(id){ var c=findContract(id); if(!c)return; openModalBox('delete',{id:id,busy:false}); }
+function renderDeleteModal(){
+  var d=state.modal.data; var c=findContract(d.id); if(!c)return;
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon is-danger"><i data-lucide="trash-2" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">ยืนยันการลบสัญญา</h3><p class="modal-subtitle">สัญญา <strong>"'+c.contract_id+' — '+esc(c.farmer_name)+'"</strong></p></div>'
+    +'<button class="icon-btn" onclick="closeModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>'
+    +'<div class="modal-body">'
+    +'<div class="note is-warn" style="background:#FFE9E7;color:#E62E24;"><i data-lucide="alert-triangle" class="w-4 h-4"></i><span>ข้อมูลสัญญาและไฟล์เอกสารที่แนบจะถูกลบ และระบบจะคืนสถานะสิทธิ์รอบปลูกที่ผูกไว้ (→ ไม่มีสัญญา)</span></div>'
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-danger is-solid" id="d-submit" onclick="confirmDelete()"><i data-lucide="trash-2" class="w-4 h-4"></i><span>ลบสัญญา</span></button></div>';
+  renderIcons();
+}
+async function confirmDelete(){
+  var d=state.modal.data; if(d.busy)return;
+  d.busy=true; var btn=document.getElementById('d-submit'); btn.disabled=true; btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังดำเนินการ…</span>'; renderIcons();
+  await new Promise(r=>setTimeout(r,550));
+  var c=findContract(d.id); var now=new Date().toISOString();
+  if(c){ state.selectedIds.delete(c.id); c.updated_at=now; c.version=(c.version||1)+1;
+    c.is_deleted=true; c.attachments=[]; addHistory(c,'delete',CURRENT_USER.name,'ลบสัญญา + ลบไฟล์เอกสารแนบ');
+    // EC-12 WRITE-BACK ⭐ — คืนสถานะสิทธิ์รอบปลูก → none (เหมือน reject)
+    setCropsLicense(c.crop_ids,'none'); addHistory(c,'license-revert','ระบบ (write-back)','คืนสถานะสิทธิ์รอบปลูก → ไม่มีสัญญา · '+c.crop_ids.join(', '));
+  }
+  d.busy=false; closeModal();
+  if(state.view&&state.view.id===d.id) closeView();
+  render(); showToast('ลบสัญญาแล้ว','success',4000);
+}
+
+// ESC chain
+window.addEventListener('keydown',function(e){ if(e.key!=='Escape')return; if(state.modal.open)closeModal(); else if(state.form)closeForm(); else if(state.view)closeView(); });
+
+// INIT
+window.addEventListener('hashchange',function(){ render(); });
+var domReady=false,lucideReady=false;
+function bootIfReady(){ if(domReady&&lucideReady){ render(); renderIcons(); } }
+if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',function(){domReady=true;bootIfReady();}); else domReady=true;
+window.addEventListener('lucide:ready',function(){lucideReady=true;bootIfReady();});
+if(window.lucide&&typeof window.lucide.createIcons==='function')lucideReady=true;
+bootIfReady();
+setTimeout(function(){ if(!lucideReady){lucideReady=true;bootIfReady();} },5000);
+</script>
+</body>
+</html>

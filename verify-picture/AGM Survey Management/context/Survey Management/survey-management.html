@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>จัดการแบบสำรวจ · CUBE NATIVE</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+
+<style>
+/* ============== CSS VARIABLES (CUBE CI — Warm Light) ============== */
+:root {
+  --c-navy: #111111;
+  --c-navy-2: #111111;
+  --c-primary: #FF3B30;
+  --c-primary-hover: #E62E24;
+  --c-teal: #FF9A1F;
+  --c-teal-light: #FFB763;
+  --c-ink: #111111;
+  --c-mute: #54565C;
+  --c-mute-2: #73757B;
+  --c-mute-3: #9A9CA2;
+  --c-line: #DEDAD4;
+  --c-line-2: #E9E5E0;
+  --c-line-3: #F1EEEA;
+  --c-bg-off: #FAF8F5;
+  --c-success: #1F9D55;
+  --c-warning: #E8870F;
+  --c-danger: #E62E24;
+  --sidebar-w: 232px;
+  --shell-h: 52px;
+  --fs-h1: 22px; --fs-h2: 17px; --fs-h3: 15px; --fs-body: 14px;
+  --fs-sub: 13px; --fs-meta: 12px; --fs-cap: 11px; --fs-kpi: 28px;
+  --sp-xs: 4px; --sp-sm: 8px; --sp-md: 12px; --sp-lg: 20px; --sp-xl: 28px;
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-full: 999px;
+}
+
+/* ============== RESET ============== */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { scrollbar-gutter: stable; }
+
+/* ============== SCROLLBAR (Iron Rule #49) ============== */
+* { scrollbar-width: thin; scrollbar-color: rgba(17,17,17,.16) transparent; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(17,17,17,.14); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(17,17,17,.26); }
+.sidebar, .slide { scrollbar-color: rgba(255,255,255,.28) transparent; }
+.sidebar ::-webkit-scrollbar-thumb, .slide ::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb, .slide::-webkit-scrollbar-thumb { background: rgba(255,255,255,.28); }
+.sidebar ::-webkit-scrollbar-thumb:hover, .slide ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.42); }
+body {
+  font-family: 'Satoshi', 'Noto Sans Thai', system-ui, sans-serif;
+  background: var(--c-bg-off);
+  color: #2A2B2F;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-width: 1180px;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+[data-lucide] { flex-shrink: 0; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ============== SIDEBAR ============== */
+.sidebar {
+  position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w);
+  background: #111111; color: #E9E5E0; z-index: 20;
+  display: flex; flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.sb-brand { padding: 18px; display: flex; align-items: center; gap: 11px; border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
+.sb-logo {
+  width: 34px; height: 34px; background: linear-gradient(135deg, #FF3B30, #FF9A1F);
+  border-radius: 9px; display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; flex-shrink: 0; box-shadow: 0 4px 12px rgba(255,59,48,0.3);
+}
+.sb-name { font-weight: 700; font-size: 14px; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+.sb-sub { font-size: 10px; color: #9A9CA2; letter-spacing: 0.06em; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+.sb-nav { flex: 1; padding: 12px 8px; overflow-y: auto; }
+.sb-module { margin-bottom: 4px; }
+.sb-module-header {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 8px 10px; border-radius: 6px; background: transparent; border: 0;
+  color: #9A9CA2; font-family: inherit; font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 120ms; text-align: left;
+}
+.sb-module-header:hover { background: rgba(255,255,255,0.04); color: #DEDAD4; }
+.sb-module-header .mod-icon { flex-shrink: 0; opacity: 0.7; }
+.sb-module-header .mod-label { flex: 1; }
+.sb-module-header .mod-chevron { flex-shrink: 0; transition: transform 200ms; opacity: 0.7; }
+.sb-module[data-expanded="false"] .mod-chevron { transform: rotate(-90deg); }
+.sb-module[data-expanded="false"] .sb-features { display: none; }
+.sb-features { padding: 2px 0 6px 0; }
+.sb-item {
+  display: flex; align-items: center; gap: 10px; padding: 7px 12px 7px 14px;
+  border-radius: 6px; color: #DEDAD4; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 120ms; margin-bottom: 1px; position: relative; user-select: none;
+}
+.sb-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sb-item.is-active { background: #FF3B30; color: #fff; font-weight: 600; }
+.sb-item.is-active::before {
+  content: ''; position: absolute; left: -10px; top: 7px; bottom: 7px;
+  width: 3px; background: #fff; border-radius: 0 2px 2px 0;
+}
+.sb-item [data-lucide] { width: 16px; height: 16px; opacity: 0.85; }
+.sb-item.is-active [data-lucide] { opacity: 1; }
+.sb-item.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.sb-item.is-disabled:hover { background: transparent; color: #DEDAD4; }
+.sb-footer {
+  padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: #9A9CA2;
+}
+.pulse-dot { width: 7px; height: 7px; background: var(--c-teal); border-radius: 50%; box-shadow: 0 0 0 3px rgba(255,154,31,0.20); animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+/* ============== MAIN + SHELL BAR ============== */
+.main { margin-left: var(--sidebar-w); min-height: 100vh; background: var(--c-bg-off); }
+.shell-bar {
+  position: sticky; top: 0; background: #fff; border-bottom: 1px solid var(--c-line-2);
+  height: var(--shell-h); display: flex; align-items: center; padding: 0 22px; z-index: 19; gap: 12px;
+}
+.breadcrumb { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--c-mute); }
+.breadcrumb a { cursor: pointer; transition: color 120ms; }
+.breadcrumb a:hover { color: var(--c-primary); }
+.breadcrumb .sep { color: var(--c-mute-3); font-size: 10px; }
+.breadcrumb-current { color: var(--c-ink); font-weight: 500; }
+.icon-btn {
+  width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute); border-radius: 7px; position: relative; transition: all 120ms;
+}
+.icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.icon-btn [data-lucide] { width: 17px; height: 17px; }
+.notif-dot { position: absolute; top: 7px; right: 8px; width: 7px; height: 7px; background: var(--c-danger); border-radius: 50%; border: 2px solid #fff; }
+.user-chip { display: flex; align-items: center; gap: 9px; padding: 5px 10px 5px 12px; border-radius: 8px; cursor: pointer; transition: background 120ms; }
+.user-chip:hover { background: var(--c-line-3); }
+.user-text { line-height: 1.2; text-align: right; }
+.user-name { font-size: 12.5px; font-weight: 500; color: var(--c-ink); white-space: nowrap; }
+.user-role { font-size: 10.5px; color: var(--c-mute-2); white-space: nowrap; margin-top: 1px; }
+.avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; flex-shrink: 0;
+}
+.user-menu {
+  position: absolute; top: calc(var(--shell-h) - 4px); right: 22px; background: #fff;
+  border: 1px solid var(--c-line-2); border-radius: 10px; box-shadow: 0 12px 32px rgba(17,17,17,0.12);
+  width: 240px; z-index: 30; padding: 6px; display: none;
+}
+.user-menu.is-open { display: block; }
+.user-menu-item { display: flex; align-items: center; gap: 10px; padding: 8px 11px; border-radius: 6px; font-size: 13px; color: var(--c-ink); cursor: pointer; transition: background 120ms; }
+.user-menu-item:hover { background: var(--c-bg-off); }
+.user-menu-item [data-lucide] { width: 15px; height: 15px; color: var(--c-mute-2); }
+.user-menu-item.is-danger { color: var(--c-danger); }
+.user-menu-item.is-danger [data-lucide] { color: var(--c-danger); }
+.user-menu-divider { height: 1px; background: var(--c-line-2); margin: 5px 0; }
+
+/* ============== CONTENT (fluid — Iron Rule #30) ============== */
+.content { padding: 22px; }
+
+/* ============== PAGE HEADER ============== */
+.ph { margin-bottom: 18px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.ph > div:first-child { flex: 1 1 auto; min-width: 280px; }
+.ph-title-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px; }
+.ph-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 22px; font-weight: 700; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.ph-count { font-size: 12.5px; font-weight: 600; color: var(--c-mute-2); background: var(--c-line-3); padding: 3px 9px; border-radius: 999px; }
+.ph-sub { font-size: 13px; color: var(--c-mute); margin: 0; }
+.ph-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ============== BUTTONS (Iron Rule #36 — Thai optical center) ============== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px; padding: 2px 14px 0; border-radius: 8px; font-size: 13px; font-weight: 500;
+  border: 1px solid transparent; background: transparent; white-space: nowrap;
+  transition: all 120ms; user-select: none; cursor: pointer;
+}
+.btn [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; }
+.btn:disabled, .btn.is-disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+.btn-eq { min-width: 104px; }
+.btn-primary { background: var(--c-primary); color: #fff; }
+.btn-primary:hover { background: var(--c-primary-hover); box-shadow: 0 2px 8px rgba(255,59,48,0.30); }
+.btn-secondary { background: #fff; border-color: var(--c-line); color: var(--c-ink); }
+.btn-secondary:hover { background: var(--c-line-3); border-color: var(--c-mute-2); }
+.btn-ghost { color: var(--c-mute); }
+.btn-ghost:hover { background: var(--c-line-3); color: var(--c-ink); }
+.btn-danger { background: #fff; border-color: var(--c-line); color: var(--c-danger); }
+.btn-danger:hover { background: #FFE9E7; border-color: var(--c-danger); }
+.btn-danger.is-solid { background: var(--c-danger); border-color: var(--c-danger); color: #fff; }
+.btn-danger.is-solid:hover { background: #C81E15; }
+.btn-link { background: transparent; border: 0; padding: 0 4px; height: auto; color: var(--c-primary); font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn-sm { height: 30px; padding: 2px 11px 0; font-size: 12px; }
+
+/* ============== STATS ============== */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.stat { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; padding: 14px 16px; transition: all 150ms; }
+.stat:hover { border-color: var(--c-line); box-shadow: 0 2px 8px rgba(17,17,17,0.05); }
+.stat-label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--c-mute); }
+.stat-label [data-lucide] { width: 13px; height: 13px; color: var(--c-primary); }
+.stat-value { font-family: 'Noto Sans Thai', sans-serif; font-size: 26px; font-weight: 700; color: var(--c-navy); margin-top: 6px; letter-spacing: -0.01em; }
+.stat-meta { font-size: 11.5px; color: var(--c-mute-2); margin-top: 5px; display: flex; align-items: center; gap: 4px; }
+.stat-meta.is-warn { color: var(--c-warning); }
+.stat-meta [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== CARD / FILTER ============== */
+.card { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; overflow: hidden; }
+.filter-bar { padding: 14px 18px; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid var(--c-line-2); background: #fff; flex-wrap: wrap; }
+
+/* ============== INPUTS ============== */
+.input, .select {
+  height: 36px; padding: 0 12px; border: 1px solid var(--c-line); border-radius: 8px;
+  font-size: 13px; background: #fff; color: var(--c-ink); font-family: inherit; transition: all 120ms; width: 100%;
+}
+.input:focus, .select:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(255,59,48,0.10); }
+.input:disabled, .input[readonly] { background: var(--c-line-3); color: var(--c-mute-2); cursor: not-allowed; border-color: var(--c-line-2); }
+.select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat; background-position: right 10px center; padding-right: 32px; appearance: none;
+}
+.input-search { position: relative; flex: 1; max-width: 340px; }
+.input-search input { padding-left: 36px; }
+.input-search .lead-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--c-mute-2); pointer-events: none; }
+
+/* ===== SEARCH-SELECT (Iron Rule #34) ===== */
+.search-select { position: relative; width: 100%; }
+.search-select .ss-input { padding-left: 34px; padding-right: 34px; }
+.search-select .ss-lead { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--c-mute-3); pointer-events: none; }
+.search-select .ss-caret { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--c-mute-3); pointer-events: none; }
+.search-select .ss-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); display: inline-flex; padding: 3px; border: 0; background: transparent; color: var(--c-mute-2); cursor: pointer; border-radius: 6px; }
+.search-select .ss-clear:hover { background: var(--c-line-3); color: var(--c-ink); }
+.search-select.is-disabled .ss-input { background: var(--c-line-3); color: var(--c-mute-2); cursor: not-allowed; }
+.ss-list {
+  position: absolute; z-index: 70; left: 0; right: 0; margin-top: 4px; max-height: 280px; overflow-y: auto;
+  background: #fff; border: 1px solid var(--c-line); border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(17,17,17,0.10), 0 4px 10px rgba(17,17,17,0.05);
+}
+.ss-opt { width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 0; border-bottom: 1px solid var(--c-line-3); background: transparent; cursor: pointer; text-align: left; font-family: inherit; }
+.ss-opt:last-child { border-bottom: 0; }
+.ss-opt:hover, .ss-opt.is-active { background: rgba(255,59,48,0.06); }
+.ss-opt-ic { width: 16px; height: 16px; color: var(--c-primary); flex-shrink: 0; }
+.ss-opt-main { flex: 1; min-width: 0; }
+.ss-opt-label { display: block; font-size: 13px; color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-sub { display: block; font-size: 11.5px; color: var(--c-mute-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-right { flex-shrink: 0; font-size: 12px; color: var(--c-mute); }
+.ss-opt mark { background: rgba(255,59,48,0.16); color: inherit; padding: 0 1px; border-radius: 2px; }
+.ss-empty { padding: 20px 14px; text-align: center; font-size: 13px; color: var(--c-mute-2); }
+
+/* ============== TABLE ============== */
+.table-scroll { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table thead { background: var(--c-bg-off); }
+.table th {
+  padding: 11px 14px; text-align: left; font-weight: 600; color: var(--c-mute);
+  font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--c-line-2); white-space: nowrap;
+}
+.table th.col-check { width: 40px; padding-right: 0; }
+.table td { padding: 13px 14px 11px; border-bottom: 1px solid var(--c-line-2); color: var(--c-ink); vertical-align: middle; }
+.table tbody tr { transition: background 120ms; }
+.table tbody tr:hover { background: var(--c-bg-off); }
+.table tbody tr.is-selected { background: rgba(255,59,48,0.04); }
+.table tbody tr.is-selected:hover { background: rgba(255,59,48,0.07); }
+.table tbody tr:last-child td { border-bottom: 0; }
+.table tbody tr.is-clickable { cursor: pointer; }
+.table-scroll.is-sticky { max-height: 560px; overflow-y: auto; scrollbar-gutter: stable; }
+.table-scroll.is-sticky thead th { position: sticky; top: 0; z-index: 3; background: var(--c-bg-off); box-shadow: inset 0 -1px 0 var(--c-line-2); }
+.cell-truncate { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+th.col-num, td.col-num { text-align: right; }
+.mono { font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+
+/* ============== CHECKBOX ============== */
+.cb {
+  width: 16px; height: 16px; border: 1.5px solid var(--c-line); border-radius: 4px; background: #fff;
+  cursor: pointer; display: inline-block; position: relative; transition: all 120ms; flex-shrink: 0;
+}
+.cb.is-checked, .cb.is-partial { background: var(--c-primary); border-color: var(--c-primary); }
+.cb.is-checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.cb.is-partial::after { content: ''; position: absolute; left: 3px; top: 6px; width: 8px; height: 2px; background: #fff; }
+.cb:hover { border-color: var(--c-primary); }
+.cb.is-disabled { opacity: 0.35; cursor: not-allowed; }
+.cb.is-disabled:hover { border-color: var(--c-line); }
+
+/* ============== PILLS ============== */
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px 3px; border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.pill [data-lucide] { width: 11px; height: 11px; }
+.pill-info    { background: #E6F0FF; color: #1A5FCC; }
+.pill-success { background: #E4F4EB; color: #157A41; }
+.pill-warning { background: #FFF1DD; color: #B8690B; }
+.pill-danger  { background: #FFE9E7; color: #E62E24; }
+.pill-muted   { background: var(--c-line-3); color: var(--c-mute-2); }
+.pill-outline { background: #fff; border: 1px solid var(--c-line); color: var(--c-mute); }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.8s linear infinite; }
+
+/* ============== FORM SECTION (Iron Rule #45) ============== */
+.form-section { margin-top: var(--sp-xl); }
+.form-section:first-child { margin-top: 0; }
+.form-section-title {
+  font-size: var(--fs-cap); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--c-mute);
+  padding-bottom: var(--sp-sm); border-bottom: 1px solid var(--c-line-2); margin-bottom: var(--sp-md);
+}
+.form-grp { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 16px; }
+
+/* ============== ROW ACTIONS ============== */
+.row-actions { display: inline-flex; gap: 2px; }
+.ra-btn {
+  width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute-2); border-radius: 6px; transition: all 120ms;
+}
+.ra-btn:hover { background: var(--c-line-3); color: var(--c-primary); }
+.ra-btn.is-danger:hover { background: #FFE9E7; color: var(--c-danger); }
+.ra-btn [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== TABLE FOOTER / BULK BAR ============== */
+.table-footer {
+  padding: 12px 18px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2);
+  display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: var(--c-mute); flex-wrap: wrap; gap: 10px;
+}
+.pagination { display: inline-flex; gap: 4px; align-items: center; }
+.pg-btn {
+  min-width: 30px; height: 30px; padding: 0 8px; display: inline-flex; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid var(--c-line-2); border-radius: 6px; color: var(--c-mute);
+  font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 120ms;
+}
+.pg-btn:hover { border-color: var(--c-line); background: var(--c-bg-off); }
+.pg-btn.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.pg-btn.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn [data-lucide] { width: 13px; height: 13px; }
+.bulk-bar {
+  background: var(--c-navy); color: #fff; padding: 11px 18px; border-radius: 8px 8px 0 0;
+  display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--c-line-2); margin: -1px -1px 0; font-size: 13px;
+}
+.bulk-bar .btn { height: 30px; padding: 2px 11px 0; font-size: 12px; }
+.bulk-bar .btn-secondary { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.18); color: #fff; }
+.bulk-bar .btn-secondary:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.30); }
+
+/* ============== DRAWER v2 SHELL (Patterns B/C — locked) ============== */
+.overlay-wrap { position: fixed; inset: 0; z-index: 50; }
+.backdrop { position: absolute; inset: 0; background: rgba(17,17,17,0.40); }
+.drawer-panel {
+  position: absolute; top: 0; right: 0; bottom: 0; width: 920px; max-width: 96vw;
+  background: #fff; display: flex; flex-direction: column;
+  box-shadow: -16px 0 40px rgba(17,17,17,0.18);
+}
+.drawer-panel.standard { width: 680px; }
+.drawer-enter { transform: translateX(100%); }
+.drawer-active { transform: translateX(0); transition: transform 250ms ease-out; }
+.top-icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;
+  border: 0; background: transparent; border-radius: var(--r-sm); color: var(--c-mute-2);
+  cursor: pointer; transition: all 120ms; flex-shrink: 0;
+}
+.top-icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.dw-head { padding: 18px 24px 16px; border-bottom: 1px solid var(--c-line-2); flex-shrink: 0; }
+.dw-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.dw-eyebrow { display: flex; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-mute-2); margin-bottom: 4px; font-weight: 600; }
+.dw-title { font-size: 20px; font-weight: 700; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.dw-sub { font-size: var(--fs-meta); color: var(--c-mute-2); margin-top: 4px; }
+.dw-body { flex: 1; overflow-y: auto; padding: 22px 24px; scrollbar-gutter: stable; }
+.dw-footer {
+  padding: 14px 24px; border-top: 1px solid var(--c-line-2); background: var(--c-bg-off); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.dw-footer-right { display: flex; align-items: center; gap: 8px; }
+.dw-footer-meta { font-size: 12px; color: var(--c-mute-2); }
+.drawer-header-divider { width: 1px; height: 22px; background: var(--c-line-2); margin: 0 4px; flex-shrink: 0; }
+.dw-actions { display: flex; gap: 6px; align-items: center; }
+
+/* Tabs (view drawer) */
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--c-line-2); margin-top: 14px; }
+.tab {
+  display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px 7px;
+  font-size: 13px; font-weight: 500; color: var(--c-mute); background: transparent; border: 0;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; transition: all 120ms;
+}
+.tab [data-lucide] { width: 14px; height: 14px; }
+.tab:hover { color: var(--c-ink); }
+.tab.on { color: var(--c-primary); border-bottom-color: var(--c-primary); font-weight: 600; }
+
+/* View drawer detail grid */
+.dv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
+.dv-cell .dv-lbl { font-size: 11px; color: var(--c-mute-3); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-bottom: 3px; }
+.dv-cell .dv-val { font-size: 13.5px; font-weight: 600; color: var(--c-ink); word-break: break-word; }
+.dv-section { margin-bottom: 24px; }
+.dv-section-title { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; color: var(--c-navy); margin-bottom: 12px; }
+.dv-section-title [data-lucide] { width: 15px; height: 15px; color: var(--c-primary); }
+.dv-note { margin-top: 10px; padding: 10px 12px; background: #FFF1DD; border-radius: 8px; font-size: 12.5px; color: #B8690B; }
+
+/* Info banner (edit rejected — re-submit notice; warning ของ action จริง) */
+.note { padding: 11px 14px; border-radius: 8px; font-size: 12.5px; display: flex; gap: 9px; align-items: flex-start; }
+.note [data-lucide] { width: 15px; height: 15px; margin-top: 1px; }
+.note.is-info { background: #E6F0FF; color: #1A5FCC; }
+.note.is-warn { background: #FFF1DD; color: #B8690B; }
+
+/* ============== TIMELINE ============== */
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 4px; bottom: 4px; width: 2px; background: var(--c-line-2); }
+.tl-item { position: relative; margin-bottom: 16px; }
+.tl-item:last-child { margin-bottom: 0; }
+.tl-dot { position: absolute; left: -20px; top: 3px; width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 2px solid var(--c-primary); }
+.tl-dot.is-success { border-color: var(--c-success); }
+.tl-dot.is-warning { border-color: var(--c-warning); }
+.tl-dot.is-danger { border-color: var(--c-danger); }
+.tl-title { font-size: 13px; font-weight: 600; color: var(--c-ink); }
+.tl-meta { font-size: 11.5px; color: var(--c-mute-2); margin-top: 2px; }
+.tl-note { font-size: 12.5px; color: var(--c-mute); background: var(--c-bg-off); border: 1px solid var(--c-line-2); border-radius: 6px; padding: 7px 10px; margin-top: 6px; }
+
+/* ============== EMPTY STATE ============== */
+.empty { padding: 56px 24px; text-align: center; color: var(--c-mute); }
+.empty-icon { width: 52px; height: 52px; margin: 0 auto 14px; border-radius: 50%; background: var(--c-line-3); color: var(--c-mute-2); display: inline-flex; align-items: center; justify-content: center; }
+.empty-icon [data-lucide] { width: 22px; height: 22px; }
+.empty-title { font-size: 15.5px; font-weight: 600; color: var(--c-ink); margin-bottom: 5px; font-family: 'Noto Sans Thai', sans-serif; }
+.empty-desc { font-size: 13px; color: var(--c-mute); max-width: 320px; margin: 0 auto; }
+.empty .btn { margin-top: 16px; }
+.empty-actions { display: flex; gap: 8px; justify-content: center; }
+.empty-actions .btn { margin-top: 16px; }
+
+/* ============== MODAL ============== */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(17,17,17,0.50); z-index: 60; opacity: 0; pointer-events: none;
+  transition: opacity 200ms; display: flex; align-items: center; justify-content: center;
+}
+.modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: #fff; border-radius: 12px; width: 440px; max-width: 92vw; max-height: 90vh;
+  display: flex; flex-direction: column; transform: scale(0.96);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 24px 64px rgba(17,17,17,0.28); overflow: hidden;
+}
+.modal.is-lg { width: 680px; }
+.modal-backdrop.is-open .modal { transform: scale(1); }
+.modal-header { padding: 18px 22px 12px; display: flex; align-items: flex-start; gap: 12px; }
+.modal-header-icon {
+  width: 36px; height: 36px; border-radius: 8px; background: rgba(255,59,48,0.10); color: var(--c-primary);
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.modal-header-icon.is-danger { background: #FFE9E7; color: var(--c-danger); }
+.modal-header-icon.is-warning { background: #FFF1DD; color: var(--c-warning); }
+.modal-header-icon [data-lucide] { width: 18px; height: 18px; }
+.modal-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 16px; font-weight: 600; color: var(--c-navy); margin: 0 0 4px; }
+.modal-subtitle { font-size: 13px; color: var(--c-mute); margin: 0; line-height: 1.5; }
+.modal-body { padding: 6px 22px 18px; font-size: 13px; color: var(--c-ink); overflow-y: auto; scrollbar-gutter: stable; }
+.modal-footer { padding: 12px 22px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2); display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Import summary chips */
+.imp-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.imp-chip { border-radius: 8px; padding: 12px; text-align: center; border: 1px solid var(--c-line-2); }
+.imp-chip .v { font-size: 22px; font-weight: 700; font-family: 'Noto Sans Thai', sans-serif; }
+.imp-chip .l { font-size: 11.5px; margin-top: 2px; font-weight: 600; }
+.imp-chip.is-total { background: var(--c-bg-off); color: var(--c-mute); }
+.imp-chip.is-ok { background: #E4F4EB; color: #157A41; border-color: #CBE9D8; }
+.imp-chip.is-bad { background: #FFE9E7; color: #E62E24; border-color: #F6D0CC; }
+.imp-errors { border: 1px solid var(--c-line-2); border-radius: 8px; max-height: 220px; overflow-y: auto; }
+.imp-err-row { display: flex; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--c-line-3); font-size: 12.5px; align-items: baseline; }
+.imp-err-row:last-child { border-bottom: 0; }
+.imp-err-row .r { flex-shrink: 0; font-weight: 700; color: var(--c-danger); min-width: 52px; }
+.imp-err-row .f { flex-shrink: 0; color: var(--c-mute); min-width: 90px; }
+.imp-err-row .m { color: var(--c-ink); }
+.imp-err-row .d { color: var(--c-mute-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+
+/* ============== FIELDS ============== */
+.field { margin-bottom: 14px; }
+.field-label { display: block; font-size: 12.5px; font-weight: 500; color: var(--c-mute); margin-bottom: 6px; }
+.field-label .req { color: var(--c-danger); margin-left: 2px; }
+.field-input { width: 100%; }
+.field-help { font-size: 11.5px; color: var(--c-mute-2); margin-top: 4px; }
+.field-error { font-size: 11.5px; color: var(--c-danger); margin-top: 4px; min-height: 15px; visibility: hidden; }
+.field.is-invalid .input, .field.is-invalid .select { border-color: var(--c-danger); }
+.field.is-invalid .field-error { visibility: visible; }
+textarea.input { height: auto; min-height: 74px; padding: 9px 12px; resize: vertical; line-height: 1.55; }
+
+/* ============== TOAST ============== */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; background: var(--c-navy); color: #fff;
+  padding: 13px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; z-index: 80;
+  display: flex; align-items: center; gap: 10px; box-shadow: 0 12px 32px rgba(17,17,17,0.30);
+  transform: translateY(100px); opacity: 0; transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1); max-width: 380px;
+}
+.toast.is-visible { transform: translateY(0); opacity: 1; }
+.toast.is-success { background: var(--c-success); }
+.toast.is-info { background: var(--c-primary); }
+.toast.is-warning { background: var(--c-warning); }
+.toast.is-error { background: var(--c-danger); }
+.toast [data-lucide] { width: 17px; height: 17px; }
+
+/* ============== UTILITIES ============== */
+.hidden { display: none !important; }
+.text-mute { color: var(--c-mute); }
+.text-mute-2 { color: var(--c-mute-2); }
+.text-primary { color: var(--c-primary); }
+.text-danger { color: var(--c-danger); }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.w-2\.5 { width: 10px; }   .h-2\.5 { height: 10px; }
+.w-3   { width: 12px; }    .h-3   { height: 12px; }
+.w-3\.5 { width: 14px; }   .h-3\.5 { height: 14px; }
+.w-4   { width: 16px; }    .h-4   { height: 16px; }
+.w-5   { width: 20px; }    .h-5   { height: 20px; }
+svg.lucide { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; flex-shrink: 0; }
+svg.lucide.w-2\.5 { width: 10px; }   svg.lucide.h-2\.5 { height: 10px; }
+svg.lucide.w-3    { width: 12px; }   svg.lucide.h-3    { height: 12px; }
+svg.lucide.w-3\.5 { width: 14px; }   svg.lucide.h-3\.5 { height: 14px; }
+svg.lucide.w-4    { width: 16px; }   svg.lucide.h-4    { height: 16px; }
+svg.lucide.w-5    { width: 20px; }   svg.lucide.h-5    { height: 20px; }
+</style>
+</head>
+<body>
+
+<!-- ===== SIDEBAR (Pattern N) ===== -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i data-lucide="box" class="w-4 h-4"></i></div>
+    <div><div class="sb-name">CUBE NATIVE</div><div class="sb-sub">AGM · WKN</div></div>
+  </div>
+  <nav class="sb-nav" id="sb-nav">
+    <div class="sb-module" data-module="agm" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sprout" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">เกษตรกรรม</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item is-disabled" data-feature="farmer-members"><i data-lucide="users" class="w-4 h-4"></i><span>จัดการสมาชิกเกษตรกร</span></a>
+        <a class="sb-item is-disabled" data-feature="quota"><i data-lucide="scale" class="w-4 h-4"></i><span>จัดการโควตา</span></a>
+        <a class="sb-item is-disabled" data-feature="plots"><i data-lucide="map" class="w-4 h-4"></i><span>จัดการแปลงที่ดิน</span></a>
+        <a class="sb-item is-disabled" data-feature="crops"><i data-lucide="wheat" class="w-4 h-4"></i><span>จัดการรอบปลูก</span></a>
+        <a class="sb-item is-disabled" data-feature="cane-delivery"><i data-lucide="truck" class="w-4 h-4"></i><span>จัดการสัญญาส่งอ้อย</span></a>
+        <a class="sb-item is-active" data-feature="surveys"><i data-lucide="clipboard-list" class="w-4 h-4"></i><span>จัดการแบบสำรวจ</span></a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="system" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sliders-horizontal" class="mod-icon w-3.5 h-3.5"></i><span class="mod-label">System</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features"><a class="sb-item is-disabled" data-feature="settings"><i data-lucide="settings" class="w-4 h-4"></i><span>Settings</span></a></div>
+    </div>
+  </nav>
+  <div class="sb-footer"><div class="pulse-dot"></div><span>WKN Prototype · v1.0.0</span></div>
+</aside>
+
+<main class="main">
+  <header class="shell-bar">
+    <nav class="breadcrumb">
+      <a data-breadcrumb-module="agm">เกษตรกรรม</a>
+      <i data-lucide="chevron-right" class="w-3 h-3 sep"></i>
+      <span class="breadcrumb-current">จัดการแบบสำรวจ</span>
+    </nav>
+    <div style="display:flex; align-items:center; gap:6px; margin-left:auto;">
+      <div style="position:relative;"><button class="icon-btn" id="notifBtn"><i data-lucide="bell" class="w-4 h-4"></i><span class="notif-dot"></span></button></div>
+      <div style="position:relative;">
+        <div class="user-chip" onclick="toggleUserMenu()">
+          <div class="user-text"><div class="user-name">สมพร วงศ์ทะเบียน</div><div class="user-role">เจ้าหน้าที่สำรวจภาคสนาม · WKN</div></div>
+          <div class="avatar">สว</div>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-item"><i data-lucide="user" class="w-3.5 h-3.5"></i><span>My Profile</span></div>
+          <div class="user-menu-item"><i data-lucide="settings" class="w-3.5 h-3.5"></i><span>Preferences</span></div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-item is-danger"><i data-lucide="log-out" class="w-3.5 h-3.5"></i><span>Sign out</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="content" id="page-content"></div>
+</main>
+
+<div id="overlay-root"></div>
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"><div class="modal" id="modalBox" onclick="event.stopPropagation()"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function loadLucide(){var v='0.469.0';var cdns=['https://unpkg.com/lucide@'+v+'/dist/umd/lucide.min.js','https://cdn.jsdelivr.net/npm/lucide@'+v+'/dist/umd/lucide.min.js','https://cdnjs.cloudflare.com/ajax/libs/lucide/'+v+'/lucide.min.js'];var i=0;function n(){if(i>=cdns.length){window.lucide=window.lucide||{createIcons:function(){}};window.dispatchEvent(new Event('lucide:ready'));return;}var s=document.createElement('script');s.src=cdns[i++];s.onload=function(){window.dispatchEvent(new Event('lucide:ready'));};s.onerror=n;document.head.appendChild(s);}n();})();
+</script>
+
+<script>
+// ============================================
+// USERS + constants
+// ============================================
+const CURRENT_USER = { id:'u-sv-01', name:'สมพร วงศ์ทะเบียน', role:'เจ้าหน้าที่สำรวจภาคสนาม' };
+const CHECKER = { id:'u-chk-01', name:'ธนพล ตรวจสอบ', role:'ผู้ตรวจสอบ' };
+const THAI_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function daysAgo(n){ var d=new Date(); d.setDate(d.getDate()-n); return d.toISOString(); }
+function dateStr(n){ var d=new Date(); d.setDate(d.getDate()-n); return d.toISOString().slice(0,10); }
+
+// Agronomic enums (invariants §1 · OQ-SV4)
+const SOIL_COLORS = ['ดำ','น้ำตาล','แดง','เทา','อื่นๆ'];
+const LEAF_CHECKS = ['ปกติ','เหลือง','เขียวเข้ม','อื่นๆ'];
+const DISEASE_LEVELS = ['ไม่พบ','น้อย','ปานกลาง','มาก'];
+const CANE_VARIETIES = ['ขอนแก่น 3','LK92-11','K88-92','อู่ทอง 12','กำแพงแสน 01'];
+const CANE_TYPES = ['อ้อยใหม่','อ้อยตอ'];
+const SOIL_TYPES = ['ดินร่วน','ดินร่วนปนทราย','ดินเหนียว','ดินทราย','ดินร่วนปนดินเหนียว','อื่นๆ'];
+const WEED_DENSITIES = ['ไม่มี','น้อย','ปานกลาง','มาก'];
+const DISEASE_FOUND = ['ไม่พบ','พบ'];
+// photos 4 หมวด (BR-AGS-06)
+const PHOTO_CATS = [
+  { key:'field', label:'รูปกับแปลง',    icon:'image' },
+  { key:'crop',  label:'รูปพืชผล',      icon:'sprout' },
+  { key:'stalk', label:'รูปลำต้นในกอ',  icon:'wheat' },
+  { key:'soil',  label:'รูปสีดิน',      icon:'mountain' }
+];
+
+// ============================================
+// CROSS-MODULE: QUOTA (mock) — BACKEND: API-13 quota-search (F-AGM-002, read-only, no write-back)
+// เลือกได้เฉพาะ verified · 1 quota : N plots
+// ============================================
+const QUOTAS = [
+  { quota_id:'QT-2569-001', status:'verified', farmer_name:'สมหญิง รักดี',     citizen_id:'3710100234572', phone:'0823456789' },
+  { quota_id:'QT-2569-002', status:'verified', farmer_name:'สุรพล เก่งการไร่', citizen_id:'3710100234694', phone:'0945678901' },
+  { quota_id:'QT-2569-003', status:'verified', farmer_name:'ทองดี พูลผล',      citizen_id:'3710100234638', phone:'0889012345' },
+  { quota_id:'QT-2569-004', status:'verified', farmer_name:'ประนอม ใจเพชร',    citizen_id:'4405600033333', phone:'0833334444' }
+];
+function findQuotaById(id){ return QUOTAS.find(q=>q.quota_id===id); }
+function verifiedQuotas(){ return QUOTAS.filter(q=>q.status==='verified'); }
+
+// ============================================
+// CROSS-MODULE: PLOT (mock) — BACKEND: API-14 cascade read (plots-by-owner, F-AGM-003, read-only)
+// เลือกได้เฉพาะแปลงของเจ้าของโควตา + verified
+// ============================================
+const PLOTS = [
+  { plot_id:'PLT-2569-001', quota_id:'QT-2569-001', verify_status:'verified', size_rai:12.50, address_line:'99 หมู่ 3',  province:'กาญจนบุรี',  district:'ท่าม่วง',    subdistrict:'วังขนาย',    postal:'71110' },
+  { plot_id:'PLT-2569-002', quota_id:'QT-2569-001', verify_status:'verified', size_rai:8.75,  address_line:'101 หมู่ 3', province:'กาญจนบุรี',  district:'ท่าม่วง',    subdistrict:'ท่าม่วง',    postal:'71110' },
+  { plot_id:'PLT-2569-003', quota_id:'QT-2569-002', verify_status:'verified', size_rai:25.00, address_line:'18 หมู่ 2',  province:'สุพรรณบุรี', district:'สองพี่น้อง', subdistrict:'สองพี่น้อง', postal:'72110' },
+  { plot_id:'PLT-2569-004', quota_id:'QT-2569-002', verify_status:'verified', size_rai:30.40, address_line:'20 หมู่ 2',  province:'สุพรรณบุรี', district:'สองพี่น้อง', subdistrict:'ต้นตาล',     postal:'72110' },
+  { plot_id:'PLT-2569-005', quota_id:'QT-2569-003', verify_status:'verified', size_rai:15.20, address_line:'77 หมู่ 1',  province:'ราชบุรี',    district:'โพธาราม',    subdistrict:'โพธาราม',    postal:'70120' },
+  { plot_id:'PLT-2569-006', quota_id:'QT-2569-004', verify_status:'verified', size_rai:6.00,  address_line:'5 หมู่ 5',   province:'ราชบุรี',    district:'บ้านโป่ง',   subdistrict:'ท่าผา',      postal:'70110' },
+  { plot_id:'PLT-2569-007', quota_id:'QT-2569-004', verify_status:'verified', size_rai:18.90, address_line:'8 หมู่ 5',   province:'ราชบุรี',    district:'บ้านโป่ง',   subdistrict:'บ้านโป่ง',   postal:'70110' }
+];
+function findPlotById(id){ return PLOTS.find(p=>p.plot_id===id); }
+function plotsForQuota(qid){ return PLOTS.filter(p=>p.quota_id===qid && p.verify_status==='verified'); }
+
+// ============================================
+// CROSS-MODULE: CROP (mock) — BACKEND: API-14 cascade read (crops-by-plot, F-AGM-004, read-only)
+// รอบปลูกของแปลง · 1 crop : N surveys (OQ-SV3 · สำรวจหลายรอบได้)
+// ============================================
+const CROPS = [
+  { crop_id:'CRP-2569-0000001', plot_id:'PLT-2569-001', quota_id:'QT-2569-001', year_be:2569, planted_month:1  },
+  { crop_id:'CRP-2569-0000002', plot_id:'PLT-2569-001', quota_id:'QT-2569-001', year_be:2569, planted_month:2  },
+  { crop_id:'CRP-2569-0000003', plot_id:'PLT-2569-003', quota_id:'QT-2569-002', year_be:2569, planted_month:12 },
+  { crop_id:'CRP-2569-0000004', plot_id:'PLT-2569-005', quota_id:'QT-2569-003', year_be:2569, planted_month:3  },
+  { crop_id:'CRP-2569-0000005', plot_id:'PLT-2569-006', quota_id:'QT-2569-004', year_be:2569, planted_month:5  },
+  { crop_id:'CRP-2569-0000006', plot_id:'PLT-2569-002', quota_id:'QT-2569-001', year_be:2569, planted_month:4  },
+  { crop_id:'CRP-2569-0000007', plot_id:'PLT-2569-004', quota_id:'QT-2569-002', year_be:2569, planted_month:6  }
+];
+function findCropById(id){ return CROPS.find(c=>c.crop_id===id); }
+function cropsForPlot(pid){ return CROPS.filter(c=>c.plot_id===pid); }
+
+// ============================================
+// MOCK SURVEY DATA (FRD 04_DB · T_survey) — BACKEND: API-01 list · API-04 detail
+// ============================================
+function emptyPhotos(){ return { field:[], crop:[], stalk:[], soil:[] }; }
+function clonePhotos(p){ p=p||{}; return { field:(p.field||[]).slice(), crop:(p.crop||[]).slice(), stalk:(p.stalk||[]).slice(), soil:(p.soil||[]).slice() }; }
+function photoCount(p){ p=p||{}; return (p.field||[]).length+(p.crop||[]).length+(p.stalk||[]).length+(p.soil||[]).length; }
+
+function svmock(seq,cropId,st,opts){
+  opts=opts||{};
+  var cr=findCropById(cropId); var q=cr?findQuotaById(cr.quota_id):null; var pl=cr?findPlotById(cr.plot_id):null;
+  var age=opts.age!=null?opts.age:10;
+  var created=daysAgo(age);
+  var code='SV-2569-'+String(seq).padStart(7,'0');
+  var r={ id:'s-'+seq, survey_id:code,
+    quota_id:cr?cr.quota_id:'', plot_id:cr?cr.plot_id:'', crop_id:cropId,
+    farmer_name:q?q.farmer_name:'', farmer_phone:q?q.phone:'', farmer_citizen:q?q.citizen_id:'',
+    plot_address:pl?pl.address_line:'', province:pl?pl.province:'', district:pl?pl.district:'', subdistrict:pl?pl.subdistrict:'', postal_code:pl?pl.postal:'',
+    survey_date:opts.survey_date||dateStr(age),
+    surveyor:opts.surveyor||'ภาคภูมิ เดินดง',
+    production_year_be:opts.year||2569,
+    planted_month:opts.planted_month!=null?opts.planted_month:((seq%12)+1),
+    cane_variety:opts.variety||'ขอนแก่น 3',
+    cane_type:opts.cane_type!=null?opts.cane_type:['อ้อยใหม่','อ้อยตอ'][seq%2],
+    cane_age_months:caneAgeMonths(opts.year||2569,opts.planted_month!=null?opts.planted_month:((seq%12)+1)),
+    yield_estimate:opts.yield!=null?opts.yield:0,
+    plot_size_rai:opts.size!=null?opts.size:(pl?pl.size_rai:0),
+    soil_type:opts.soil_type||['ดินร่วน','ดินร่วนปนทราย','ดินเหนียว'][seq%3],
+    soil_color:opts.soil||'', leaf_color_check:opts.leaf||'', weed_density:opts.weed_density||['ไม่มี','น้อย','ปานกลาง'][seq%3],
+    disease_pest_found:opts.disease_pest_found||(opts.disease&&opts.disease!=='ไม่พบ'?'พบ':'ไม่พบ'), disease_pest_level:opts.disease||'', disease_pest_detail:opts.disease_pest_detail||'',
+    row_spacing_cm:opts.row_spacing_cm||150, cane_height_head_cm:opts.cane_height_head_cm||280, cane_height_mid_cm:opts.cane_height_mid_cm||250, cane_height_tail_cm:opts.cane_height_tail_cm||210,
+    internode_length_cm:opts.internode_length_cm||12, diameter_cm:opts.diameter_cm||2.6, average_stalks_per_clump:opts.average_stalks_per_clump||9, clumps_in_10m:opts.clumps_in_10m||14,
+    coordinate:opts.coord||'', survey_postal_code:opts.survey_postal_code||(pl?pl.postal:''),
+    photos:opts.photos||emptyPhotos(),
+    status:st, reject_reason:opts.reject_reason||null, cancel_reason:opts.cancel_reason||null, delete_reason:null,
+    version:1, is_deleted:(st==='deleted'),
+    verified_by:null, created_at:created, created_by:CURRENT_USER.name, updated_at:created, updated_by:CURRENT_USER.name,
+    history:[{event:'create',actor:CURRENT_USER.name,at:created,note:'ผูกโควตา '+(cr?cr.quota_id:'')+' · แปลง '+(cr?cr.plot_id:'')+' · รอบปลูก '+cropId}] };
+  if(st==='verified'){ var va=daysAgo(Math.max(0,age-2)); r.verified_by=CHECKER.name; r.updated_at=va; r.version=2; r.history.push({event:'verify',actor:CHECKER.name,at:va,note:opts.verify_note||null}); }
+  if(st==='rejected'){ var vj=daysAgo(Math.max(0,age-1)); r.verified_by=CHECKER.name; r.updated_at=vj; r.version=2; r.history.push({event:'reject',actor:CHECKER.name,at:vj,note:r.reject_reason}); }
+  if(st==='cancelled'){ var vc=daysAgo(Math.max(0,age-1)); r.updated_at=vc; r.version=2; r.history.push({event:'cancel',actor:CURRENT_USER.name,at:vc,note:r.cancel_reason}); }
+  return r;
+}
+
+const state = {
+  records: [
+    // waiting · CRP-...001 (survey #1 — demonstrates 1 crop : N surveys กับ record ถัดไป)
+    svmock(1,'CRP-2569-0000001','waiting_for_verify',{age:6,surveyor:'ภาคภูมิ เดินดง',variety:'ขอนแก่น 3',yield:145.50,size:12.50,soil:'น้ำตาล',leaf:'ปกติ',disease:'ไม่พบ',coord:'14.023145,99.512088',photos:{field:['sv_001_field_1.jpg'],crop:['sv_001_crop_1.jpg','sv_001_crop_2.jpg'],stalk:['sv_001_stalk_1.jpg'],soil:['sv_001_soil_1.jpg']}}),
+    // waiting · CRP-...001 ซ้ำ (survey #2 บนรอบปลูกเดิม — สำรวจซ้ำรอบ)
+    svmock(2,'CRP-2569-0000001','waiting_for_verify',{age:2,surveyor:'ภาคภูมิ เดินดง',variety:'ขอนแก่น 3',yield:151.00,size:12.50,soil:'น้ำตาล',leaf:'เขียวเข้ม',disease:'น้อย',coord:'14.023200,99.512150',photos:{field:['sv_002_field_1.jpg'],crop:['sv_002_crop_1.jpg'],stalk:[],soil:['sv_002_soil_1.jpg']}}),
+    // verified · CRP-...003
+    svmock(3,'CRP-2569-0000003','verified',{age:20,surveyor:'ธีรเดช ไร่กว้าง',variety:'LK92-11',yield:280.00,size:25.00,soil:'ดำ',leaf:'ปกติ',disease:'ไม่พบ',coord:'14.230011,99.998812',verify_note:'ข้อมูลครบถ้วน พิกัดตรงแปลง',photos:{field:['sv_003_field_1.jpg'],crop:['sv_003_crop_1.jpg'],stalk:['sv_003_stalk_1.jpg'],soil:[]}}),
+    // waiting · CRP-...004
+    svmock(4,'CRP-2569-0000004','waiting_for_verify',{age:9,surveyor:'อารยา สวนอ้อย',variety:'K88-92',yield:98.75,size:15.20,soil:'แดง',leaf:'เหลือง',disease:'ปานกลาง',coord:'13.752300,99.815500',photos:{field:['sv_004_field_1.jpg'],crop:[],stalk:['sv_004_stalk_1.jpg'],soil:['sv_004_soil_1.jpg']}}),
+    // verified · CRP-...005
+    svmock(5,'CRP-2569-0000005','verified',{age:16,surveyor:'ภาคภูมิ เดินดง',variety:'ขอนแก่น 3',yield:62.40,size:6.00,soil:'น้ำตาล',leaf:'ปกติ',disease:'ไม่พบ',coord:'13.812044,99.752100',verify_note:'ผ่านการตรวจสอบภาคสนาม',photos:{field:['sv_005_field_1.jpg','sv_005_field_2.jpg'],crop:['sv_005_crop_1.jpg'],stalk:['sv_005_stalk_1.jpg'],soil:['sv_005_soil_1.jpg']}}),
+    // waiting · CRP-...006
+    svmock(6,'CRP-2569-0000006','waiting_for_verify',{age:11,surveyor:'อารยา สวนอ้อย',variety:'LK92-11',yield:110.20,size:8.75,soil:'เทา',leaf:'เขียวเข้ม',disease:'น้อย',coord:'14.021900,99.510044',photos:{field:['sv_006_field_1.jpg'],crop:['sv_006_crop_1.jpg'],stalk:[],soil:[]}}),
+    // rejected · CRP-...003 (มี reject_reason)
+    svmock(7,'CRP-2569-0000003','rejected',{age:22,surveyor:'ธีรเดช ไร่กว้าง',variety:'LK92-11',yield:305.00,size:25.00,soil:'ดำ',leaf:'ปกติ',disease:'มาก',coord:'14.229500,99.998000',reject_reason:'ประมาณการผลผลิตสูงผิดปกติเมื่อเทียบกับขนาดแปลง และพบโรค/ศัตรูพืชระดับมาก กรุณาสำรวจซ้ำ',photos:{field:['sv_007_field_1.jpg'],crop:['sv_007_crop_1.jpg'],stalk:['sv_007_stalk_1.jpg'],soil:['sv_007_soil_1.jpg']}}),
+    // cancelled · CRP-...005 (มี cancel_reason)
+    svmock(8,'CRP-2569-0000005','cancelled',{age:14,surveyor:'ภาคภูมิ เดินดง',variety:'ขอนแก่น 3',yield:55.00,size:6.00,soil:'น้ำตาล',leaf:'ปกติ',disease:'ไม่พบ',coord:'13.812000,99.752000',cancel_reason:'สำรวจซ้ำซ้อนกับแบบสำรวจอื่นในรอบปลูกเดียวกัน',photos:{field:['sv_008_field_1.jpg'],crop:[],stalk:[],soil:[]}})
+  ],
+  filters:{ search:'', status:'all', year:'all' },
+  pagination:{ page:1, pageSize:20 },
+  sort:{ col:null, dir:'asc' },
+  selectedIds: new Set(),
+  modal:{ open:false, type:null, data:null },
+  form:null,
+  view:null
+};
+
+// ============================================
+// HELPERS
+// ============================================
+function renderIcons(){ if(window.lucide&&typeof window.lucide.createIcons==='function') window.lucide.createIcons(); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDateTime(iso){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso); return d.toLocaleString('th-TH',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+function fmtDate(iso){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso); return d.toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'}); }
+function maskCitizen(c){ if(!c||c.length!==13)return '—'; return c[0]+'-XXXX-XXXX-XX-'+c[12]; }
+function fmtTons(n){ var x=parseFloat(n); if(isNaN(x))return '—'; return x.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtRai(n){ var x=parseFloat(n); if(isNaN(x))return '—'; return x.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtNum(n){ if(n===''||n==null)return '—'; var x=parseFloat(n); if(isNaN(x))return '—'; return String(x); }
+function monthLabel(m){ var i=parseInt(m,10); return (i>=1&&i<=12)?(i+' · '+THAI_MONTHS[i-1]):'—'; }
+function statusLabel(st){ return ({waiting_for_verify:'รอตรวจสอบ',verified:'ยืนยันแล้ว',rejected:'ปฏิเสธ',cancelled:'ยกเลิก',deleted:'ลบ'})[st]||st; }
+function statusPill(st){ var c=({waiting_for_verify:'pill-warning',verified:'pill-success',rejected:'pill-danger',cancelled:'pill-muted',deleted:'pill-muted'})[st]||'pill-muted'; return '<span class="pill '+c+'">'+statusLabel(st)+'</span>'; }
+function findSurvey(id){ return state.records.find(s=>s.id===id||s.survey_id===id); }
+function addHistory(s,ev,actor,note){ s.history.push({event:ev,actor:actor,at:new Date().toISOString(),note:note||null}); }
+function nextSurveyCode(){ var mx=0; state.records.forEach(function(s){ var m=/SV-2569-(\d+)/.exec(s.survey_id); if(m){var n=parseInt(m[1],10); if(n>mx)mx=n;} }); return 'SV-2569-'+String(mx+1).padStart(7,'0'); }
+function showToast(msg,variant,ms){ variant=variant||'info'; ms=ms||3200; var el=document.getElementById('toast'); var im={success:'check-circle-2',info:'info',warning:'alert-triangle',error:'x-circle'}; el.className='toast is-'+variant; el.innerHTML='<i data-lucide="'+(im[variant]||'info')+'" class="w-4 h-4"></i><span>'+msg+'</span>'; renderIcons(); requestAnimationFrame(()=>el.classList.add('is-visible')); clearTimeout(showToast._t); showToast._t=setTimeout(()=>el.classList.remove('is-visible'),ms); }
+function toggleModule(h){ var m=h.closest('.sb-module'); if(!m)return; var e=m.getAttribute('data-expanded')!=='false'; m.setAttribute('data-expanded',e?'false':'true'); }
+function toggleUserMenu(){ document.getElementById('userMenu').classList.toggle('is-open'); }
+document.addEventListener('click',function(e){ if(!e.target.closest('.user-chip')&&!e.target.closest('.user-menu')){ var um=document.getElementById('userMenu'); if(um)um.classList.remove('is-open'); } });
+
+// ROUTER
+function getRoute(){ var h=location.hash; if(!h||h==='#'||h==='#/')return 'surveys'; return h.replace(/^#\//,''); }
+function navigate(r){ location.hash='#/'+r; }
+
+// LIST
+function getYears(){ var set={}; state.records.filter(s=>s.status!=='deleted'&&!s.is_deleted).forEach(s=>set[s.production_year_be]=true); return Object.keys(set).map(Number).sort((a,b)=>b-a); }
+// Export CSV — ตามตัวกรองปัจจุบัน (FRD List Export · UTF-8; backend export = Pending Spec ตาม TC-606)
+function exportSurveys(){ var rows=getFiltered(); if(!rows.length){ showToast('ไม่มีข้อมูลให้ส่งออก','warning'); return; }
+  var cols=['survey_id','survey_date','recorder','quota_id','plot_id','crop_id','farmer_name','production_year_be','planted_month','cane_age_months','cane_variety','cane_type','total_tons','status','updated_at'];
+  function csv(v){ v=(v==null?'':String(v)); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+  var out='﻿'+cols.join(',')+'\n'+rows.map(function(s){ return [s.survey_id,s.survey_date,s.surveyor,s.quota_id,s.plot_id,s.crop_id,s.farmer_name,s.production_year_be,(s.planted_month||''),(s.cane_age_months!=null?s.cane_age_months:caneAgeMonths(s.production_year_be,s.planted_month)),s.cane_variety,(s.cane_type||''),s.yield_estimate,statusLabel(s.status),s.updated_at].map(csv).join(','); }).join('\n')+'\n';
+  var b=new Blob([out],{type:'text/csv;charset=utf-8;'}); var l=document.createElement('a'); l.href=URL.createObjectURL(b); l.download='surveys_export.csv'; l.click(); showToast('ส่งออกข้อมูล '+rows.length+' รายการสำเร็จ','success'); }
+function getFiltered(){
+  var arr=state.records.filter(s=>s.status!=='deleted'&&!s.is_deleted);
+  if(state.filters.status!=='all') arr=arr.filter(s=>s.status===state.filters.status);
+  if(state.filters.year!=='all') arr=arr.filter(s=>String(s.production_year_be)===String(state.filters.year));
+  if(state.filters.search){ var q=state.filters.search.toLowerCase().trim(); arr=arr.filter(s=> s.survey_id.toLowerCase().includes(q)||s.quota_id.toLowerCase().includes(q)||s.plot_id.toLowerCase().includes(q)||s.crop_id.toLowerCase().includes(q)||String(s.surveyor||'').toLowerCase().includes(q) ); }
+  if(state.sort.col){ var col=state.sort.col; arr=arr.slice().sort(function(a,b){ var r; if(col==='yield_estimate'){ r=(parseFloat(a[col])||0)-(parseFloat(b[col])||0); } else if(col==='survey_date'||col==='updated_at'){ r=new Date(a[col])-new Date(b[col]); } else { r=String(a[col]==null?'':a[col]).localeCompare(String(b[col]==null?'':b[col]),'th'); } return state.sort.dir==='asc'?r:-r; }); }
+  return arr;
+}
+function getPaged(){ var all=getFiltered(); var pg=state.pagination.page,ps=state.pagination.pageSize; var s=(pg-1)*ps; return {records:all.slice(s,s+ps),total:all.length,page:pg,totalPages:Math.max(1,Math.ceil(all.length/ps)),start:all.length===0?0:s+1,end:Math.min(s+ps,all.length)}; }
+function sortBy(c){ if(state.sort.col===c)state.sort.dir=state.sort.dir==='asc'?'desc':'asc'; else{state.sort.col=c;state.sort.dir='asc';} render(); }
+function toggleSelect(id){ if(state.selectedIds.has(id))state.selectedIds.delete(id); else state.selectedIds.add(id); render(); }
+function toggleSelectAll(){ var sel=getPaged().records.filter(s=>s.status==='waiting_for_verify'); var all=sel.length>0&&sel.every(s=>state.selectedIds.has(s.id)); if(all)sel.forEach(s=>state.selectedIds.delete(s.id)); else sel.forEach(s=>state.selectedIds.add(s.id)); render(); }
+function goToPage(n){ var tp=getPaged().totalPages; if(n<1||n>tp)return; state.pagination.page=n; render(); }
+function resetFilters(){ state.filters={search:'',status:'all',year:'all'}; state.pagination.page=1; state.selectedIds.clear(); render(); }
+var _st=null; function onSearchInput(v){ clearTimeout(_st); _st=setTimeout(function(){ state.filters.search=v; state.pagination.page=1; render(); },300); }
+
+// RENDER PRESERVATION
+function preserveState(){ var a=document.activeElement; var isI=a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'); return { pageScroll:window.scrollY, focusKey:isI?{id:a.id||'',placeholder:a.placeholder||'',selStart:a.selectionStart,selEnd:a.selectionEnd}:null }; }
+function restoreState(s){ if(!s)return; requestAnimationFrame(function(){ if(s.pageScroll>0)window.scrollTo(0,s.pageScroll); if(s.focusKey){ var c=s.focusKey.id?document.getElementById(s.focusKey.id):null; if(!c){var cs=document.querySelectorAll('input,textarea'); for(var i=0;i<cs.length;i++){ if((cs[i].placeholder||'')===s.focusKey.placeholder){c=cs[i];break;} }} if(c){ c.focus(); if(s.focusKey.selStart!=null&&c.setSelectionRange){ try{c.setSelectionRange(s.focusKey.selStart,s.focusKey.selEnd);}catch(e){} } } } }); }
+
+function emptyStateHTML(cfg){ cfg=cfg||{}; var acts=''; if(cfg.actions){ acts='<div class="empty-actions">'+cfg.actions.map(function(a){ return '<button class="btn '+(a.cls||'btn-primary')+'" onclick="'+a.onAction+'">'+(a.icon?'<i data-lucide="'+a.icon+'" class="w-4 h-4"></i>':'')+'<span>'+a.label+'</span></button>'; }).join('')+'</div>'; } return '<div class="empty"><div class="empty-icon"><i data-lucide="'+(cfg.icon||'inbox')+'" class="w-5 h-5"></i></div><div class="empty-title">'+(cfg.title||'ยังไม่มีข้อมูล')+'</div><div class="empty-desc">'+(cfg.desc||'')+'</div>'+acts+'</div>'; }
+
+// ============================================
+// PAGE RENDER (P-01) — BACKEND: API-01 list
+// ============================================
+function render(){
+  var snap=preserveState();
+  var route=getRoute(); var parts=route.split('/');
+  if(parts[0]!=='surveys'){ navigate('surveys'); return; }
+  var pg=getPaged();
+  var all=state.records.filter(s=>s.status!=='deleted'&&!s.is_deleted);
+  var cW=all.filter(s=>s.status==='waiting_for_verify').length, cV=all.filter(s=>s.status==='verified').length, cR=all.filter(s=>s.status==='rejected').length;
+  var sev=7*24*3600*1000; var cWold=all.filter(s=>s.status==='waiting_for_verify'&&(Date.now()-new Date(s.created_at).getTime())>sev).length;
+  var sel=pg.records.filter(s=>s.status==='waiting_for_verify'); var allSel=sel.length>0&&sel.every(s=>state.selectedIds.has(s.id)); var someSel=!allSel&&sel.some(s=>state.selectedIds.has(s.id)); var selCount=state.selectedIds.size;
+
+  var rows=pg.records.map(function(s){
+    var can=s.status==='waiting_for_verify';
+    return '<tr class="is-clickable '+(state.selectedIds.has(s.id)?'is-selected':'')+'" onclick="openView(\''+s.survey_id+'\')">'
+      +'<td onclick="event.stopPropagation()"><div class="cb '+(state.selectedIds.has(s.id)?'is-checked':'')+(can?'':' is-disabled')+'" '+(can?'onclick="toggleSelect(\''+s.id+'\')"':'title="เลือกได้เฉพาะรายการรอตรวจสอบ"')+'></div></td>'
+      +'<td><span class="mono text-primary" style="font-weight:600;">'+s.survey_id+'</span></td>'
+      +'<td>'+fmtDate(s.survey_date)+'</td>'
+      +'<td><span class="mono">'+esc(s.quota_id)+'</span></td>'
+      +'<td><span class="mono">'+esc(s.plot_id)+'</span></td>'
+      +'<td><span class="mono">'+esc(s.crop_id)+'</span></td>'
+      +'<td>'+esc(s.cane_variety)+'</td>'
+      +'<td class="col-num"><span class="num">'+fmtTons(s.yield_estimate)+'</span></td>'
+      +'<td>'+statusPill(s.status)+'</td>'
+      +'<td onclick="event.stopPropagation()" style="text-align:right;width:88px;"><div class="row-actions">'
+      +'<button class="ra-btn" onclick="openForm(\'edit\',\''+s.id+'\')" title="แก้ไข"><i data-lucide="pencil" class="w-4 h-4"></i></button>'
+      +(can?'<button class="ra-btn is-danger" onclick="openDeleteModal(\''+s.id+'\')" title="ยกเลิก/ลบ"><i data-lucide="trash-2" class="w-4 h-4"></i></button>':'')
+      +'</div></td></tr>';
+  }).join('');
+
+  var noData=all.length===0; var emptyBlock='';
+  if(pg.records.length===0){
+    emptyBlock=noData?emptyStateHTML({icon:'clipboard-list',title:'ยังไม่มีแบบสำรวจ',desc:'เริ่มต้นด้วยการสร้างแบบสำรวจแรก หรือนำเข้าจากไฟล์ CSV',actions:[{label:'สร้างแบบสำรวจ',icon:'plus',onAction:"openForm('create')"},{label:'Upload CSV',icon:'upload',cls:'btn-secondary',onAction:'openImportModal()'}]})
+      :emptyStateHTML({icon:'search-x',title:'ไม่พบรายการที่ค้นหา',desc:'ลองปรับคำค้นหรือล้างตัวกรอง',actions:[{label:'ล้างตัวกรอง',icon:'rotate-ccw',cls:'btn-ghost',onAction:'resetFilters()'}]});
+  }
+  var pageNums=[]; for(var n=1;n<=pg.totalPages;n++)pageNums.push(n);
+  var yearOpts='<option value="all"'+(state.filters.year==='all'?' selected':'')+'>ทุกปี (พ.ศ.)</option>'+getYears().map(y=>'<option value="'+y+'"'+(String(state.filters.year)===String(y)?' selected':'')+'>'+y+'</option>').join('');
+
+  document.getElementById('page-content').innerHTML=
+    '<div class="ph"><div><div class="ph-title-row"><h1 class="ph-title">จัดการแบบสำรวจ</h1><span class="ph-count">'+pg.total+' รายการ</span></div>'
+    +'<p class="ph-sub">ทะเบียนแบบสำรวจแปลง · ผูกโควตา→แปลง→รอบปลูก · ตรวจสอบยืนยันและนำเข้า CSV</p></div>'
+    +'<div class="ph-actions">'
+    +'<button class="btn btn-secondary" onclick="openImportModal()"><i data-lucide="upload" class="w-4 h-4"></i><span>Upload CSV</span></button>'
+    +'<button class="btn btn-secondary" '+(pg.total===0?'disabled':'')+' onclick="exportSurveys()"><i data-lucide="download" class="w-4 h-4"></i><span>Export CSV</span></button>'
+    +'<button class="btn btn-secondary" '+(selCount===0?'disabled':'')+' onclick="openVerifyModal()"><i data-lucide="shield-check" class="w-4 h-4"></i><span>ตรวจสอบที่เลือก ('+selCount+')</span></button>'
+    +'<button class="btn btn-primary" onclick="openForm(\'create\')"><i data-lucide="plus" class="w-4 h-4"></i><span>สร้างแบบสำรวจ</span></button>'
+    +'</div></div>'
+    +'<div class="stats">'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="clipboard-list" class="w-3 h-3"></i>สำรวจทั้งหมด</div><div class="stat-value num">'+all.length+'</div><div class="stat-meta">ไม่รวมที่ยกเลิก/ลบ</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="clock" class="w-3 h-3"></i>รอตรวจสอบ</div><div class="stat-value num">'+cW+'</div>'+(cWold>0?'<div class="stat-meta is-warn"><i data-lucide="alert-triangle" class="w-3 h-3"></i>ค้างเกิน 7 วัน '+cWold+' รายการ</div>':'<div class="stat-meta">SLA ตรวจภายใน 3 วันทำการ</div>')+'</div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="check-circle-2" class="w-3 h-3"></i>ยืนยันแล้ว</div><div class="stat-value num">'+cV+'</div><div class="stat-meta">ป้อนเข้าแท็บสำรวจของรอบปลูก</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="x-circle" class="w-3 h-3"></i>ปฏิเสธ</div><div class="stat-value num">'+cR+'</div><div class="stat-meta">มีเหตุผลระบุ</div></div>'
+    +'</div>'
+    +'<div class="card">'
+    +'<div class="filter-bar"><div class="input-search"><i data-lucide="search" class="lead-icon w-4 h-4"></i>'
+    +'<input class="input" type="text" id="q-search" placeholder="ค้นหา เลขสำรวจ / โควตา / แปลง / รอบปลูก / ผู้สำรวจ" value="'+esc(state.filters.search)+'" oninput="onSearchInput(this.value)"></div>'
+    +'<select class="select" style="max-width:170px;" onchange="state.filters.status=this.value;state.pagination.page=1;render();">'
+    +'<option value="all"'+(state.filters.status==='all'?' selected':'')+'>ทุกสถานะ</option>'
+    +'<option value="waiting_for_verify"'+(state.filters.status==='waiting_for_verify'?' selected':'')+'>รอตรวจสอบ</option>'
+    +'<option value="verified"'+(state.filters.status==='verified'?' selected':'')+'>ยืนยันแล้ว</option>'
+    +'<option value="rejected"'+(state.filters.status==='rejected'?' selected':'')+'>ปฏิเสธ</option>'
+    +'<option value="cancelled"'+(state.filters.status==='cancelled'?' selected':'')+'>ยกเลิก</option></select>'
+    +'<select class="select" style="max-width:150px;" onchange="state.filters.year=this.value;state.pagination.page=1;render();">'+yearOpts+'</select>'
+    +'<div style="flex:1;"></div><button class="btn btn-ghost btn-sm" onclick="resetFilters()"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i><span>ล้างตัวกรอง</span></button></div>'
+    +(selCount>0?'<div class="bulk-bar"><i data-lucide="check-square" class="w-4 h-4"></i><span>เลือก '+selCount+' รายการ (รอตรวจสอบ)</span><div style="margin-left:auto;display:flex;gap:8px;"><button class="btn btn-secondary" onclick="openVerifyModal()"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i><span>ตรวจสอบที่เลือก</span></button><button class="btn btn-secondary" onclick="state.selectedIds.clear();render();"><span>ยกเลิกการเลือก</span></button></div></div>':'')
+    +'<div class="table-scroll is-sticky"><table class="table"><thead><tr>'
+    +'<th class="col-check"><div class="cb '+(allSel?'is-checked':'')+(someSel?' is-partial':'')+'" onclick="toggleSelectAll()" title="เลือกทั้งหมด (เฉพาะรอตรวจสอบ)"></div></th>'
+    +'<th class="is-sortable" onclick="sortBy(\'survey_id\')">เลขสำรวจ</th>'
+    +'<th class="is-sortable" onclick="sortBy(\'survey_date\')">วันที่สำรวจ</th>'
+    +'<th>เลขโควตา</th><th>เลขแปลง</th><th>เลขรอบปลูก</th><th>พันธุ์อ้อย</th>'
+    +'<th class="col-num is-sortable" onclick="sortBy(\'yield_estimate\')">ประมาณการผลผลิต (ตัน)</th>'
+    +'<th>สถานะ</th><th style="text-align:right;">การดำเนินการ</th></tr></thead><tbody>'+rows+'</tbody></table>'+emptyBlock+'</div>'
+    +'<div class="table-footer"><div class="pagination">'
+    +'<button class="pg-btn '+(pg.page===1?'is-disabled':'')+'" onclick="goToPage('+(pg.page-1)+')"><i data-lucide="chevron-left" class="w-3 h-3"></i></button>'
+    +pageNums.map(n=>'<button class="pg-btn '+(n===pg.page?'is-active':'')+'" onclick="goToPage('+n+')">'+n+'</button>').join('')
+    +'<button class="pg-btn '+(pg.page===pg.totalPages?'is-disabled':'')+'" onclick="goToPage('+(pg.page+1)+')"><i data-lucide="chevron-right" class="w-3 h-3"></i></button></div>'
+    +'<span>'+pg.start+' – '+pg.end+' จาก '+pg.total+' รายการ</span></div></div>';
+
+  renderIcons(); restoreState(snap);
+  if(parts.length>1&&parts[1]){ var s=findSurvey(parts[1]); if(s&&s.status!=='deleted'&&!s.is_deleted){ if(!state.view||state.view.id!==s.id){ state.view={id:s.id,tab:'info'}; mountViewDrawer(); } } else if(!s||s.status==='deleted'||s.is_deleted){ showToast('ไม่พบข้อมูลแบบสำรวจที่เลือก','error'); navigate('surveys'); } }
+  else if(state.view){ state.view=null; unmountOverlay(); }
+}
+
+// OVERLAY
+function unmountOverlay(){ document.getElementById('overlay-root').innerHTML=''; }
+function mountPanel(cid){ document.getElementById('overlay-root').innerHTML='<div class="overlay-wrap"><div class="backdrop" onclick="closeTopDrawer()"></div><div id="drawer-panel" class="drawer-panel drawer-enter"><div id="'+cid+'" style="display:flex;flex-direction:column;height:100%;"></div></div></div>'; var p=document.getElementById('drawer-panel'); requestAnimationFrame(()=>p.classList.add('drawer-active')); }
+function closePanel(after){ var p=document.getElementById('drawer-panel'); if(p){p.classList.remove('drawer-active');p.classList.add('drawer-enter');} setTimeout(function(){ unmountOverlay(); if(after)after(); },200); }
+function closeTopDrawer(){ if(state.form)closeForm(); else if(state.view)closeView(); }
+
+// ============================================
+// VIEW DRAWER (P-02, 3 tabs) — BACKEND: API-04 detail · API-12 audit
+// ============================================
+function openView(code){ navigate('surveys/'+code); }
+function mountViewDrawer(){ mountPanel('view-content'); renderViewDrawer(); }
+function closeView(){ state.view=null; closePanel(function(){ if(getRoute()!=='surveys')navigate('surveys'); }); }
+function setViewTab(t){ if(!state.view)return; state.view.tab=t; renderViewDrawer(); }
+function renderViewDrawer(){
+  if(!state.view)return; var s=findSurvey(state.view.id); if(!s)return; var isW=s.status==='waiting_for_verify'; var tab=state.view.tab;
+  var actions='<button class="btn btn-sm btn-secondary" onclick="openForm(\'edit\',\''+s.id+'\')"><i data-lucide="pencil" class="w-3.5 h-3.5"></i><span>แก้ไข</span></button>';
+  if(isW){ actions+='<button class="btn btn-sm btn-primary" onclick="openVerifyModal(\''+s.id+'\')"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i><span>ตรวจสอบ</span></button>'; }
+  actions+='<button class="btn btn-sm btn-danger" onclick="openDeleteModal(\''+s.id+'\')"><i data-lucide="ban" class="w-3.5 h-3.5"></i><span>ยกเลิก/ลบ</span></button>';
+  function cell(l,v){ return '<div class="dv-cell"><div class="dv-lbl">'+l+'</div><div class="dv-val">'+v+'</div></div>'; }
+  var body='';
+  if(tab==='info'){
+    body='<div class="dv-section"><div class="dv-section-title"><i data-lucide="calendar" class="w-4 h-4"></i>ข้อมูลพื้นฐาน</div><div class="dv-grid">'
+      +cell('วันที่สำรวจ',fmtDate(s.survey_date))+cell('ผู้สำรวจ (ผู้บันทึก)',esc(s.surveyor))
+      +cell('ปีผลิต (พ.ศ.)','<span class="num">'+esc(s.production_year_be)+'</span>')
+      +cell('เดือนที่ปลูก',s.planted_month?(s.planted_month+' · '+THAI_MONTHS[s.planted_month-1]):'—')
+      +cell('อายุอ้อย (คำนวณ)',(s.cane_age_months!=null?s.cane_age_months+' เดือน':(caneAgeMonths(s.production_year_be,s.planted_month)!=null?caneAgeMonths(s.production_year_be,s.planted_month)+' เดือน':'—')))
+      +'</div></div>'
+      +'<div class="dv-section"><div class="dv-section-title"><i data-lucide="sprout" class="w-4 h-4"></i>ข้อมูลพืชผล</div><div class="dv-grid">'
+      +cell('พันธุ์อ้อย',esc(s.cane_variety))
+      +cell('ประเภทอ้อย',esc(s.cane_type||'—'))
+      +cell('ปริมาณรวม (ตัน)','<span class="num">'+fmtTons(s.yield_estimate)+'</span>')
+      +cell('ขนาดแปลง (ไร่)','<span class="num">'+fmtRai(s.plot_size_rai)+'</span>')
+      +'</div></div>'
+      +'<div class="dv-section"><div class="dv-section-title"><i data-lucide="ruler" class="w-4 h-4"></i>การวัดขนาดอ้อย</div><div class="dv-grid">'
+      +cell('ระยะร่อง (ซม.)',fmtNum(s.row_spacing_cm))
+      +cell('ความสูง หัว/กลาง/ท้าย (ซม.)',fmtNum(s.cane_height_head_cm)+' / '+fmtNum(s.cane_height_mid_cm)+' / '+fmtNum(s.cane_height_tail_cm))
+      +cell('ความยาวปล้อง (ซม.)',fmtNum(s.internode_length_cm))
+      +cell('เส้นผ่านศูนย์กลางลำ (ซม.)',fmtNum(s.diameter_cm))
+      +cell('ลำเฉลี่ยต่อกอ',fmtNum(s.average_stalks_per_clump))
+      +cell('กอใน 10 เมตร',fmtNum(s.clumps_in_10m))
+      +'</div></div>'
+      +'<div class="dv-section"><div class="dv-section-title"><i data-lucide="mountain" class="w-4 h-4"></i>ดิน / สภาพแปลง / โรค</div><div class="dv-grid">'
+      +cell('ชนิดดิน',esc(s.soil_type||'—'))
+      +cell('สีดิน',esc(s.soil_color||'—'))
+      +cell('การตรวจสีใบ',esc(s.leaf_color_check||'—'))
+      +cell('ความหนาแน่นวัชพืช',esc(s.weed_density||'—'))
+      +cell('พบโรค/ศัตรูพืช',esc(s.disease_pest_found||s.disease_pest_level||'—'))
+      +cell('ระดับความรุนแรง',esc(s.disease_pest_level||'—'))
+      +(s.disease_pest_detail?'<div class="dv-cell" style="grid-column:1/-1;"><div class="dv-lbl">รายละเอียดโรค/ศัตรูพืช</div><div class="dv-val">'+esc(s.disease_pest_detail)+'</div></div>':'')
+      +'<div class="dv-cell"><div class="dv-lbl">พิกัด (lat,long)</div><div class="dv-val mono">'+esc(s.coordinate||'—')+'</div></div>'
+      +cell('รหัสไปรษณีย์',esc(s.survey_postal_code||'—'))
+      +'</div></div>'
+      +(s.status==='rejected'&&s.reject_reason?'<div class="note is-warn" style="background:#FFE9E7;color:#E62E24;"><i data-lucide="x-circle" class="w-4 h-4"></i><span><b>เหตุผลที่ปฏิเสธ:</b> '+esc(s.reject_reason)+'</span></div>':'')
+      +(s.status==='cancelled'&&s.cancel_reason?'<div class="note is-warn"><i data-lucide="ban" class="w-4 h-4"></i><span><b>เหตุผลที่ยกเลิก:</b> '+esc(s.cancel_reason)+'</span></div>':'');
+  } else if(tab==='photos'){
+    // BACKEND: API-18 photos (read-only presign download) · 4 หมวด (BR-AGS-06)
+    body='<div class="dv-section"><div class="dv-section-title"><i data-lucide="image" class="w-4 h-4"></i>รูปภาพประกอบ (4 หมวด)</div>'
+      +PHOTO_CATS.map(function(cat){
+        var list=(s.photos&&s.photos[cat.key])||[];
+        return '<div style="margin-bottom:14px;"><div style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;margin-bottom:8px;"><i data-lucide="'+cat.icon+'" class="w-4 h-4" style="color:var(--c-teal);"></i>'+cat.label+' <span class="pill pill-muted">'+list.length+'</span></div>'
+          +(list.length?('<div style="display:flex;flex-direction:column;gap:6px;">'+list.map(function(fn){ return '<div style="border:1px solid var(--c-line-2);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px;"><i data-lucide="image" class="w-4 h-4" style="color:var(--c-teal);"></i><div style="flex:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(fn)+'</div><a class="btn-link" onclick="showToast(\'จำลองดาวน์โหลด '+esc(fn)+'\',\'info\')"><i data-lucide="download" class="w-3.5 h-3.5"></i> ดาวน์โหลด</a></div>'; }).join('')+'</div>')
+            :'<div style="border:1px dashed var(--c-line);border-radius:8px;padding:14px;text-align:center;color:var(--c-mute-2);font-size:12px;">ยังไม่มีรูปในหมวดนี้</div>')
+          +'</div>';
+      }).join('')
+      +'</div>';
+  } else {
+    var evMap={create:{t:'สร้างแบบสำรวจ',dot:''},edit:{t:'แก้ไขข้อมูล',dot:''},verify:{t:'ตรวจสอบ — ยืนยัน',dot:'is-success'},reject:{t:'ตรวจสอบ — ปฏิเสธ',dot:'is-danger'},cancel:{t:'ยกเลิกแบบสำรวจ',dot:'is-warning'},delete:{t:'ลบแบบสำรวจ',dot:'is-danger'}};
+    var items=s.history.slice().reverse().map(function(h){ var ev=evMap[h.event]||{t:h.event,dot:''}; return '<div class="tl-item"><div class="tl-dot '+ev.dot+'"></div><div class="flex justify-between items-center"><div class="tl-title">'+ev.t+'</div><div class="tl-meta">'+fmtDateTime(h.at)+'</div></div><div class="tl-meta">โดย '+esc(h.actor)+'</div>'+(h.note?'<div class="tl-note">'+esc(h.note)+'</div>':'')+'</div>'; }).join('');
+    body='<div class="timeline">'+items+'</div>';
+  }
+  var snapCard='<div style="margin:0 0 4px;padding:12px 14px;background:rgba(255,154,31,0.08);border:1px solid var(--c-line-2);border-radius:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">'
+      +'<i data-lucide="link" class="w-4 h-4" style="color:var(--c-teal);"></i><div style="flex:1;min-width:200px;"><div style="font-size:12px;color:var(--c-mute-2);">โควตา · แปลง · รอบปลูก · เกษตรกร</div>'
+      +'<div style="font-weight:600;">โควตา <span class="mono text-primary">'+esc(s.quota_id)+'</span> · แปลง <span class="mono text-primary">'+esc(s.plot_id)+'</span> · รอบปลูก <span class="mono text-primary">'+esc(s.crop_id)+'</span> · '+esc(s.farmer_name)+'</div></div>'
+      +'<button class="btn btn-sm btn-secondary" onclick="showToast(\'จำลองเปิดหน้ารอบปลูก '+esc(s.crop_id)+'\',\'info\')"><i data-lucide="external-link" class="w-3.5 h-3.5"></i><span>ดูรอบปลูก</span></button></div>';
+
+  document.getElementById('view-content').innerHTML=
+    '<div class="dw-head" style="padding-bottom:0;"><div class="dw-head-row"><div>'
+    +'<div class="dw-eyebrow"><i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i> แบบสำรวจ · <span class="mono">'+esc(s.quota_id)+' · '+esc(s.plot_id)+' · '+esc(s.crop_id)+'</span></div>'
+    +'<div style="display:flex;align-items:center;gap:8px;"><h2 class="dw-title mono">'+esc(s.survey_id)+'</h2>'+statusPill(s.status)+'</div></div>'
+    +'<div class="dw-actions">'+actions+'<span class="drawer-header-divider"></span><button class="top-icon-btn" onclick="closeView()"><i data-lucide="x" class="w-5 h-5"></i></button></div></div>'
+    +'<div style="padding:14px 0 0;">'+snapCard+'</div>'
+    +'<div class="tabs">'
+    +'<button class="tab '+(tab==='info'?'on':'')+'" onclick="setViewTab(\'info\')"><i data-lucide="file-text" class="w-3.5 h-3.5"></i><span>ข้อมูลสำรวจ</span></button>'
+    +'<button class="tab '+(tab==='photos'?'on':'')+'" onclick="setViewTab(\'photos\')"><i data-lucide="image" class="w-3.5 h-3.5"></i><span>รูปภาพ</span></button>'
+    +'<button class="tab '+(tab==='history'?'on':'')+'" onclick="setViewTab(\'history\')"><i data-lucide="history" class="w-3.5 h-3.5"></i><span>ประวัติ</span></button></div></div>'
+    +'<div class="dw-body">'+body+'</div>'
+    +'<div class="dw-footer"><div class="dw-footer-meta">อัปเดตล่าสุด '+fmtDateTime(s.updated_at)+' · เวอร์ชัน '+s.version+'</div><div class="dw-footer-right"><button class="btn btn-secondary" onclick="closeView()">ปิด</button></div></div>';
+  renderIcons();
+}
+
+// ============================================
+// CREATE / EDIT DRAWER (OV-01/02) — triple cascade + fields gated (LOCK-03)
+// BACKEND: API-02/03 create · API-05 edit · API-13 quota-search · API-14 cascade read (read-only)
+// ============================================
+function blankForm(){ return { quota_id:'', plot_id:'', crop_id:'', survey_date:'', surveyor:'', production_year_be:'2569', planted_month:'', cane_variety:'', cane_type:'', yield_estimate:'', plot_size_rai:'', soil_color:'', soil_type:'', leaf_color_check:'', weed_density:'', disease_pest_level:'', disease_pest_found:'', disease_pest_detail:'', row_spacing_cm:'', cane_height_head_cm:'', cane_height_mid_cm:'', cane_height_tail_cm:'', internode_length_cm:'', diameter_cm:'', average_stalks_per_clump:'', clumps_in_10m:'', coordinate:'', postal_code:'', photos:emptyPhotos() }; }
+function openForm(mode,id){
+  var data, rec=null, quota=null, plot=null, crop=null;
+  if(mode==='edit'){ rec=findSurvey(id); if(!rec)return; data={ quota_id:rec.quota_id, plot_id:rec.plot_id, crop_id:rec.crop_id, survey_date:rec.survey_date, surveyor:rec.surveyor, production_year_be:rec.production_year_be, planted_month:rec.planted_month||'', cane_variety:rec.cane_variety, cane_type:rec.cane_type||'', yield_estimate:rec.yield_estimate, plot_size_rai:rec.plot_size_rai, soil_color:rec.soil_color, soil_type:rec.soil_type||'', leaf_color_check:rec.leaf_color_check, weed_density:rec.weed_density||'', disease_pest_level:rec.disease_pest_level, disease_pest_found:rec.disease_pest_found||'', disease_pest_detail:rec.disease_pest_detail||'', row_spacing_cm:rec.row_spacing_cm||'', cane_height_head_cm:rec.cane_height_head_cm||'', cane_height_mid_cm:rec.cane_height_mid_cm||'', cane_height_tail_cm:rec.cane_height_tail_cm||'', internode_length_cm:rec.internode_length_cm||'', diameter_cm:rec.diameter_cm||'', average_stalks_per_clump:rec.average_stalks_per_clump||'', clumps_in_10m:rec.clumps_in_10m||'', coordinate:rec.coordinate, postal_code:rec.survey_postal_code||'', photos:clonePhotos(rec.photos) }; quota=findQuotaById(rec.quota_id); plot=findPlotById(rec.plot_id); crop=findCropById(rec.crop_id); }
+  else data=blankForm();
+  state.form={ mode:mode, id:rec?rec.id:null, data:data, submitting:false, quota:quota, plot:plot, crop:crop, version:rec?rec.version:null };
+  if(state.view){ state.view=null; if(getRoute()!=='surveys')navigate('surveys'); }
+  mountPanel('form-content'); renderFormDrawer();
+}
+function closeForm(){ if(state.form&&state.form.submitting)return; state.form=null; closePanel(); }
+function captureForm(){ if(!state.form)return; var d=state.form.data;
+  [['f-survey_date','survey_date'],['f-surveyor','surveyor'],['f-production_year_be','production_year_be'],['f-planted_month','planted_month'],['f-cane_variety','cane_variety'],['f-cane_type','cane_type'],['f-yield_estimate','yield_estimate'],['f-plot_size_rai','plot_size_rai'],['f-soil_type','soil_type'],['f-soil_color','soil_color'],['f-leaf_color_check','leaf_color_check'],['f-weed_density','weed_density'],['f-disease_pest_found','disease_pest_found'],['f-disease_pest_level','disease_pest_level'],['f-disease_pest_detail','disease_pest_detail'],['f-row_spacing_cm','row_spacing_cm'],['f-cane_height_head_cm','cane_height_head_cm'],['f-cane_height_mid_cm','cane_height_mid_cm'],['f-cane_height_tail_cm','cane_height_tail_cm'],['f-internode_length_cm','internode_length_cm'],['f-diameter_cm','diameter_cm'],['f-average_stalks_per_clump','average_stalks_per_clump'],['f-clumps_in_10m','clumps_in_10m'],['f-coordinate','coordinate'],['f-postal_code','postal_code']].forEach(function(pr){ var el=document.getElementById(pr[0]); if(el)d[pr[1]]=el.value; });
+}
+function field(label,id,type,val,ph,req,extra,cls){ return '<div class="field"><label class="field-label">'+label+(req?' <span class="req">*</span>':'')+'</label><input class="input field-input '+(cls||'')+'" id="'+id+'" type="'+type+'" placeholder="'+(ph||'')+'" value="'+esc(val)+'" '+(extra||'')+'><div class="field-error"></div></div>'; }
+function selectField(label,id,val,opts,req,help){ var o='<option value="">— เลือก —</option>'+opts.map(function(x){ return '<option value="'+esc(x)+'"'+(String(val)===String(x)?' selected':'')+'>'+esc(x)+'</option>'; }).join(''); return '<div class="field"><label class="field-label">'+label+(req?' <span class="req">*</span>':'')+'</label><select class="select field-input" id="'+id+'">'+o+'</select>'+(help?'<div class="field-help">'+help+'</div>':'')+'<div class="field-error"></div></div>'; }
+function monthField(label,id,val,req,extra){ var opts=''; for(var m=1;m<=12;m++){ opts+='<option value="'+m+'"'+(String(val)===String(m)?' selected':'')+'>'+m+' · '+THAI_MONTHS[m-1]+'</option>'; } return '<div class="field"><label class="field-label">'+label+(req?' <span class="req">*</span>':'')+'</label><select class="select field-input" id="'+id+'" '+(extra||'')+'><option value="">— เลือกเดือน —</option>'+opts+'</select><div class="field-error"></div></div>'; }
+function taField(label,id,val,ph){ return '<div class="field"><label class="field-label">'+label+'</label><textarea class="input field-input" id="'+id+'" rows="2" placeholder="'+(ph||'')+'">'+esc(val||'')+'</textarea><div class="field-error"></div></div>'; }
+// FN-AT-CROP-192 — cane_age_months จากเดือนปลูก + ปีผลิต (พ.ศ.−543 → นับเดือนถึงปัจจุบัน floor ≥0)
+function caneAgeMonths(yearBe,month){ var y=parseInt(yearBe,10),m=parseInt(month,10); if(isNaN(y)||isNaN(m)||m<1||m>12)return null; var gy=y-543; var now=new Date(); var diff=(now.getFullYear()-gy)*12+(now.getMonth()+1-m); return diff<0?0:diff; }
+function caneAgeField(yearBe,month){ var a=caneAgeMonths(yearBe,month); var txt=(a==null)?'— (กรอกปี+เดือนเพื่อคำนวณ)':(a+' เดือน'); return '<div class="field"><label class="field-label">อายุอ้อย (เดือน) · คำนวณอัตโนมัติ</label><input class="input field-input num" id="f-cane_age_months" value="'+esc(txt)+'" disabled><div class="field-help">FN-AT-CROP-192</div></div>'; }
+function updateCaneAge(){ var y=document.getElementById('f-production_year_be'),m=document.getElementById('f-planted_month'),o=document.getElementById('f-cane_age_months'); if(!o)return; var a=caneAgeMonths(y?y.value:'',m?m.value:''); o.value=(a==null)?'— (กรอกปี+เดือนเพื่อคำนวณ)':(a+' เดือน'); }
+function lockSurveyFields(){ var wrap=document.getElementById('survey-fields'); if(!wrap)return;
+  wrap.querySelectorAll('input,select,textarea,button').forEach(function(el){ el.disabled=true; });
+  wrap.querySelectorAll('.search-select').forEach(function(ss){ ss.classList.add('is-disabled'); });
+  wrap.style.opacity='0.55'; wrap.style.pointerEvents='none';
+}
+function renderFormDrawer(){
+  var f=state.form; if(!f)return; var isEdit=f.mode==='edit'; var d=f.data;
+  var locked = !isEdit && (!d.quota_id || !d.plot_id || !d.crop_id); // LOCK-03 — gate จนครบ quota+plot+crop
+  var q=f.quota, plot=f.plot, crop=f.crop;
+
+  // ---- Section 0 — triple cascade (create) / read-only banner (edit) ----
+  var section0='';
+  if(isEdit){
+    section0='<div class="note is-info mb-3"><i data-lucide="link" class="w-4 h-4"></i><span>โควตา <b class="mono">'+esc(d.quota_id)+'</b> · แปลง <b class="mono">'+esc(d.plot_id)+'</b> · รอบปลูก <b class="mono">'+esc(d.crop_id)+'</b> — แก้ไม่ได้</span></div>'
+      +'<div class="note is-warn mb-3"><i data-lucide="alert-triangle" class="w-4 h-4"></i><span>แก้ไขแบบสำรวจที่ยืนยันแล้ว บันทึกจะกลับสู่สถานะรอตรวจสอบ</span></div>';
+  } else {
+    // 0a — quota search
+    var s0a='';
+    if(q){
+      s0a='<div style="padding:12px 14px;background:rgba(255,154,31,0.08);border:1px solid var(--c-line-2);border-radius:8px;display:flex;align-items:flex-start;gap:12px;">'
+        +'<i data-lucide="user-check" class="w-4 h-4" style="color:var(--c-teal);margin-top:2px;"></i><div style="flex:1;"><div style="font-size:12px;color:var(--c-mute-2);">เจ้าของโควตา</div>'
+        +'<div style="font-weight:600;"><span class="mono text-primary">'+esc(q.quota_id)+'</span> · '+esc(q.farmer_name)+' · <span class="num">'+esc(q.phone)+'</span></div>'
+        +'<div style="font-size:11.5px;color:var(--c-mute-2);margin-top:2px;">เลขบัตร <span class="mono">'+maskCitizen(q.citizen_id)+'</span></div></div>'
+        +'<button class="btn btn-sm btn-secondary" onclick="clearQuota()"><i data-lucide="repeat" class="w-3.5 h-3.5"></i><span>เปลี่ยนโควตา</span></button></div>';
+    } else {
+      s0a='<div class="field"><label class="field-label">ค้นหาโควตา (Quota Id · exact) <span class="req">*</span></label>'+searchSelectHTML('quota',{placeholder:'พิมพ์เลขโควตา หรือ ชื่อเกษตรกร'})+'<div class="field-help">เลือกได้เฉพาะโควตาที่ยืนยันแล้ว (verified) · ระบบจะดึงข้อมูลเจ้าของให้อัตโนมัติ</div></div>';
+    }
+    // 0b — plot select (หลังเลือก quota)
+    var s0b='';
+    if(q){
+      if(plot){
+        s0b='<div style="margin-top:12px;padding:12px 14px;background:rgba(31,157,85,0.06);border:1px solid var(--c-line-2);border-radius:8px;display:flex;align-items:flex-start;gap:12px;">'
+          +'<i data-lucide="map-pin" class="w-4 h-4" style="color:var(--c-success);margin-top:2px;"></i><div style="flex:1;"><div style="font-size:12px;color:var(--c-mute-2);">แปลงที่เลือก</div>'
+          +'<div style="font-weight:600;"><span class="mono text-primary">'+esc(plot.plot_id)+'</span> · '+esc(plot.address_line)+' · '+esc(plot.subdistrict)+' '+esc(plot.district)+' '+esc(plot.province)+'</div>'
+          +'<div style="font-size:11.5px;color:var(--c-mute-2);margin-top:2px;">ขนาด <span class="num">'+fmtRai(plot.size_rai)+'</span> ไร่</div></div>'
+          +'<button class="btn btn-sm btn-secondary" onclick="clearPlot()"><i data-lucide="repeat" class="w-3.5 h-3.5"></i><span>เปลี่ยนแปลง</span></button></div>';
+      } else {
+        var pList=plotsForQuota(q.quota_id);
+        s0b='<div class="field" style="margin-top:12px;margin-bottom:0;"><label class="field-label">เลือกแปลง (ของโควตา · verified) <span class="req">*</span></label>'+searchSelectHTML('plot',{placeholder:'เลือกแปลงของ '+q.farmer_name})+'<div class="field-help">'+(pList.length?'แสดงเฉพาะแปลงที่ยืนยันแล้วของเจ้าของโควตานี้ ('+pList.length+' แปลง)':'ไม่พบแปลงที่ยืนยันแล้วของเจ้าของโควตานี้')+'</div></div>';
+      }
+    }
+    // 0c — crop select (หลังเลือก plot)
+    var s0c='';
+    if(q&&plot){
+      if(crop){
+        s0c='<div style="margin-top:12px;padding:12px 14px;background:rgba(255,59,48,0.05);border:1px solid var(--c-line-2);border-radius:8px;display:flex;align-items:flex-start;gap:12px;">'
+          +'<i data-lucide="wheat" class="w-4 h-4" style="color:var(--c-primary);margin-top:2px;"></i><div style="flex:1;"><div style="font-size:12px;color:var(--c-mute-2);">รอบปลูกที่เลือก</div>'
+          +'<div style="font-weight:600;"><span class="mono text-primary">'+esc(crop.crop_id)+'</span> · ปี '+esc(crop.year_be)+' · เดือน '+esc(monthLabel(crop.planted_month))+'</div>'
+          +'<div style="font-size:11.5px;color:var(--c-mute-2);margin-top:2px;">สำรวจรอบปลูกเดิมได้หลายครั้ง (1 รอบปลูก : หลายแบบสำรวจ)</div></div>'
+          +'<button class="btn btn-sm btn-secondary" onclick="clearCrop()"><i data-lucide="repeat" class="w-3.5 h-3.5"></i><span>เปลี่ยนรอบปลูก</span></button></div>';
+      } else {
+        var cList=cropsForPlot(plot.plot_id);
+        s0c='<div class="field" style="margin-top:12px;margin-bottom:0;"><label class="field-label">เลือกรอบปลูก (ของแปลง) <span class="req">*</span></label>'+searchSelectHTML('crop',{placeholder:'เลือกรอบปลูกของแปลง '+plot.plot_id})+'<div class="field-help">'+(cList.length?'แสดงรอบปลูกของแปลงนี้ ('+cList.length+' รอบปลูก)':'ไม่พบรอบปลูกของแปลงนี้')+'</div></div>';
+      }
+    }
+    section0='<div class="form-section"><div class="form-section-title">เลือกโควตา แปลง รอบปลูก (บังคับก่อนกรอกข้อมูล)</div>'+s0a+s0b+s0c+'</div>';
+  }
+
+  document.getElementById('form-content').innerHTML=
+    '<div class="dw-head"><div class="dw-head-row"><div>'
+    +'<div class="dw-eyebrow"><i data-lucide="'+(isEdit?'pencil':'plus')+'" class="w-3.5 h-3.5"></i> '+(isEdit?'แก้ไขแบบสำรวจ':'สร้างแบบสำรวจ')+'</div>'
+    +'<h2 class="dw-title">'+(isEdit?'แก้ไข <span class="mono text-primary">'+esc(findSurvey(f.id).survey_id)+'</span>':'สร้างแบบสำรวจ')+'</h2>'
+    +(isEdit?'<div class="dw-sub">สถานะ: '+statusLabel(findSurvey(f.id).status)+' · เวอร์ชัน '+f.version+'</div>':'')
+    +'</div><button class="top-icon-btn" onclick="closeForm()"><i data-lucide="x" class="w-5 h-5"></i></button></div></div>'
+    +'<div class="dw-body">'
+    +section0
+    +'<div id="survey-fields">'
+    +(locked?'<div class="note is-info mb-3"><i data-lucide="lock" class="w-4 h-4"></i><span>เลือกโควตา แปลง และรอบปลูกก่อนจึงจะกรอกข้อมูลแบบสำรวจได้</span></div>':'')
+    +'<div class="form-section"><div class="form-section-title">ข้อมูลพื้นฐาน</div><div class="form-grp">'
+    +field('วันที่สำรวจ','f-survey_date','date',d.survey_date,'',true,'','')
+    +field('ผู้สำรวจ (ผู้บันทึก)','f-surveyor','text',d.surveyor,'ชื่อ-นามสกุลผู้สำรวจ',true,'','')
+    +field('ปีผลิต (พ.ศ.)','f-production_year_be','number',d.production_year_be,'เช่น 2569',true,'inputmode="numeric" oninput="updateCaneAge()"','num')
+    +monthField('เดือนที่ปลูก','f-planted_month',d.planted_month,false,'oninput="updateCaneAge()"')
+    +caneAgeField(d.production_year_be,d.planted_month)
+    +'</div></div>'
+    +'<div class="form-section"><div class="form-section-title">ข้อมูลพืชผล</div><div class="form-grp">'
+    +selectField('พันธุ์อ้อย','f-cane_variety',d.cane_variety,CANE_VARIETIES,true,'')
+    +selectField('ประเภทอ้อย','f-cane_type',d.cane_type,CANE_TYPES,false,'')
+    +field('ปริมาณรวม (ตัน)','f-yield_estimate','number',d.yield_estimate,'มากกว่าหรือเท่ากับ 0',true,'inputmode="decimal" step="0.01" min="0"','num')
+    +field('ขนาดแปลง (ไร่)','f-plot_size_rai','number',d.plot_size_rai,'มากกว่า 0',true,'inputmode="decimal" step="0.01" min="0"','num')
+    +'</div></div>'
+    +'<div class="form-section"><div class="form-section-title">การวัดขนาดอ้อย (ไม่บังคับ)</div><div class="form-grp">'
+    +field('ระยะร่อง (ซม.)','f-row_spacing_cm','number',d.row_spacing_cm,'',false,'inputmode="decimal" step="0.1" min="0"','num')
+    +field('ความสูงลำต้น-หัว (ซม.)','f-cane_height_head_cm','number',d.cane_height_head_cm,'',false,'inputmode="decimal" step="0.1" min="0"','num')
+    +field('ความสูงลำต้น-กลาง (ซม.)','f-cane_height_mid_cm','number',d.cane_height_mid_cm,'',false,'inputmode="decimal" step="0.1" min="0"','num')
+    +field('ความสูงลำต้น-ท้าย (ซม.)','f-cane_height_tail_cm','number',d.cane_height_tail_cm,'',false,'inputmode="decimal" step="0.1" min="0"','num')
+    +field('ความยาวปล้อง (ซม.)','f-internode_length_cm','number',d.internode_length_cm,'',false,'inputmode="decimal" step="0.1" min="0"','num')
+    +field('เส้นผ่านศูนย์กลางลำ (ซม.)','f-diameter_cm','number',d.diameter_cm,'',false,'inputmode="decimal" step="0.1" min="0"','num')
+    +field('จำนวนลำเฉลี่ยต่อกอ','f-average_stalks_per_clump','number',d.average_stalks_per_clump,'',false,'inputmode="decimal" step="1" min="0"','num')
+    +field('จำนวนกอใน 10 เมตร','f-clumps_in_10m','number',d.clumps_in_10m,'',false,'inputmode="decimal" step="1" min="0"','num')
+    +'</div></div>'
+    +'<div class="form-section"><div class="form-section-title">ดิน / สภาพแปลง</div><div class="form-grp">'
+    +selectField('ชนิดดิน','f-soil_type',d.soil_type,SOIL_TYPES,false,'')
+    +selectField('สีดิน','f-soil_color',d.soil_color,SOIL_COLORS,false,'')
+    +selectField('การตรวจสีใบ','f-leaf_color_check',d.leaf_color_check,LEAF_CHECKS,false,'')
+    +selectField('ความหนาแน่นวัชพืช','f-weed_density',d.weed_density,WEED_DENSITIES,false,'')
+    +'</div></div>'
+    +'<div class="form-section"><div class="form-section-title">โรค / ศัตรูพืช</div><div class="form-grp">'
+    +selectField('พบโรค/ศัตรูพืช','f-disease_pest_found',d.disease_pest_found,DISEASE_FOUND,false,'')
+    +selectField('ระดับความรุนแรง','f-disease_pest_level',d.disease_pest_level,DISEASE_LEVELS,false,'')
+    +'</div>'
+    +taField('รายละเอียดโรค/ศัตรูพืช','f-disease_pest_detail',d.disease_pest_detail,'ระบุอาการ/ชนิดที่พบ (ถ้ามี)')
+    +'</div>'
+    +'<div class="form-section"><div class="form-section-title">ตำแหน่ง (ไม่บังคับ)</div><div class="form-grp">'
+    +field('พิกัด (lat,long)','f-coordinate','text',d.coordinate,'13.7563,100.5018',false,'','num')
+    +field('รหัสไปรษณีย์','f-postal_code','text',d.postal_code,'5 หลัก',false,'inputmode="numeric" maxlength="5"','num')
+    +'</div></div>'
+    +'<div class="form-section"><div class="form-section-title">รูปภาพประกอบ (4 หมวด)</div>'
+    +'<div class="form-grp">'+PHOTO_CATS.map(function(cat){
+        var list=(d.photos[cat.key]||[]);
+        return '<div style="border:1px solid var(--c-line-2);border-radius:8px;padding:12px;">'
+          +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;"><div style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;"><i data-lucide="'+cat.icon+'" class="w-4 h-4" style="color:var(--c-teal);"></i>'+cat.label+'</div><span class="pill pill-muted">'+list.length+'</span></div>'
+          +'<button type="button" class="btn btn-secondary btn-sm" onclick="attachSurveyPhoto(\''+cat.key+'\',\''+cat.label+'\')"><i data-lucide="image-plus" class="w-3.5 h-3.5"></i><span>แนบรูป</span></button>'
+          +(list.length?('<div style="margin-top:8px;display:flex;flex-direction:column;gap:5px;">'+list.map(function(fn,i){ return '<div style="display:flex;align-items:center;gap:6px;padding:5px 9px;border:1px solid var(--c-line-2);border-radius:6px;font-size:11.5px;"><i data-lucide="image" class="w-3.5 h-3.5" style="color:var(--c-teal);"></i><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(fn)+'</span><button type="button" class="ra-btn is-danger" onclick="removeSurveyPhoto(\''+cat.key+'\','+i+')"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div>'; }).join('')+'</div>'):'')
+          +'</div>';
+      }).join('')+'</div>'
+    +'<div class="field-help" style="margin-top:8px;">จำลองในต้นแบบ (dev เชื่อม Document Storage จริง) · JPG/PNG ≤5MB · แนบได้หลายไฟล์/หมวด</div>'
+    +'</div>'
+    +'</div>'
+    +'</div>'
+    +'<div class="dw-footer"><div></div><div class="dw-footer-right">'
+    +'<button class="btn btn-ghost" onclick="closeForm()">ยกเลิก</button>'
+    +'<button class="btn btn-primary" id="f-submit" onclick="submitForm()"><i data-lucide="check" class="w-4 h-4"></i><span>'+(isEdit?'บันทึกการแก้ไข':'ยืนยันสร้าง')+'</span></button>'
+    +'</div></div>';
+  renderIcons();
+  if(!isEdit&&!q) initQuotaSearch();
+  if(!isEdit&&q&&!plot) initPlotSearch();
+  if(!isEdit&&q&&plot&&!crop) initCropSearch();
+  if(locked) lockSurveyFields();
+}
+// quota search (exact, verified only) — BACKEND: API-13
+function initQuotaSearch(){
+  initSearchSelect('quota',{
+    options: verifiedQuotas().map(q=>({value:q.quota_id,label:q.quota_id+' · '+q.farmer_name,sub:q.phone+' · '+maskCitizen(q.citizen_id),icon:'scale'})),
+    value: state.form.data.quota_id||null, emptyText:'ไม่พบ Quota หรือสถานะไม่เป็น verified',
+    onSelect:function(val){ selectQuota(val); }
+  });
+}
+// plot load (ของเจ้าของโควตา + verified) — BACKEND: API-14 cascade read
+function initPlotSearch(){
+  var q=state.form.quota; if(!q)return;
+  initSearchSelect('plot',{
+    options: plotsForQuota(q.quota_id).map(p=>({value:p.plot_id,label:p.plot_id+' · '+p.address_line,sub:p.subdistrict+' '+p.district+' '+p.province,right:fmtRai(p.size_rai)+' ไร่',icon:'map-pin'})),
+    value: state.form.data.plot_id||null, emptyText:'ไม่พบแปลงของเจ้าของโควตา หรือแปลงยังไม่ผ่านการตรวจสอบ',
+    onSelect:function(val){ selectPlot(val); }
+  });
+}
+// crop load (ของแปลง) — BACKEND: API-14 cascade read
+function initCropSearch(){
+  var plot=state.form.plot; if(!plot)return;
+  initSearchSelect('crop',{
+    options: cropsForPlot(plot.plot_id).map(c=>({value:c.crop_id,label:c.crop_id,sub:'ปี '+c.year_be+' · เดือน '+monthLabel(c.planted_month),icon:'wheat'})),
+    value: state.form.data.crop_id||null, emptyText:'ไม่พบรอบปลูกของแปลงนี้',
+    onSelect:function(val){ selectCrop(val); }
+  });
+}
+function selectQuota(id){ captureForm(); var f=state.form; if(!id){ f.quota=null; f.plot=null; f.crop=null; f.data.quota_id=''; f.data.plot_id=''; f.data.crop_id=''; renderFormDrawer(); return; } var q=findQuotaById(id); if(!q||q.status!=='verified')return; if(f.data.quota_id!==id){ f.plot=null; f.crop=null; f.data.plot_id=''; f.data.crop_id=''; } f.quota=q; f.data.quota_id=id; renderFormDrawer(); }
+function selectPlot(id){ captureForm(); var f=state.form; if(!id){ f.plot=null; f.crop=null; f.data.plot_id=''; f.data.crop_id=''; renderFormDrawer(); return; } var pl=findPlotById(id); if(!pl)return; if(f.data.plot_id!==id){ f.crop=null; f.data.crop_id=''; } f.plot=pl; f.data.plot_id=id; if(!(String(f.data.plot_size_rai||'').trim()))f.data.plot_size_rai=pl.size_rai; renderFormDrawer(); }
+function selectCrop(id){ captureForm(); var f=state.form; if(!id){ f.crop=null; f.data.crop_id=''; renderFormDrawer(); return; } var cr=findCropById(id); if(!cr)return; f.crop=cr; f.data.crop_id=id; if(!(String(f.data.production_year_be||'').trim()))f.data.production_year_be=cr.year_be; renderFormDrawer(); }
+function clearQuota(){ captureForm(); var f=state.form; f.quota=null; f.plot=null; f.crop=null; f.data.quota_id=''; f.data.plot_id=''; f.data.crop_id=''; renderFormDrawer(); }
+function clearPlot(){ captureForm(); var f=state.form; f.plot=null; f.crop=null; f.data.plot_id=''; f.data.crop_id=''; renderFormDrawer(); }
+function clearCrop(){ captureForm(); var f=state.form; f.crop=null; f.data.crop_id=''; renderFormDrawer(); }
+// photos (simulated) — 4 หมวด
+function attachSurveyPhoto(catKey,catLabel){ captureForm(); var d=state.form.data; d.photos[catKey]=d.photos[catKey]||[]; d.photos[catKey].push('survey_'+catKey+'_'+(d.photos[catKey].length+1)+'_'+Date.now()+'.jpg'); showToast('จำลองแนบรูป '+catLabel+' (JPG/PNG ≤5MB)','info'); renderFormDrawer(); }
+function removeSurveyPhoto(catKey,i){ captureForm(); var d=state.form.data; d.photos[catKey].splice(i,1); renderFormDrawer(); }
+
+function vReq(msg){ return function(v){ return v.trim()?'':msg; }; }
+function validateField(el,val){ var f=el.closest('.field'); if(!f)return true; var msg=''; try{msg=val?val(el.value,el):'';}catch(e){msg='';} var e=f.querySelector('.field-error'); if(msg){f.classList.add('is-invalid'); if(e)e.textContent=msg; return false;} f.classList.remove('is-invalid'); return true; }
+function validateFormAll(){
+  captureForm(); var d=state.form.data; var ok=true;
+  function vf(id,fn){ var el=document.getElementById(id); if(el&&!validateField(el,fn))ok=false; }
+  if(state.form.mode==='create'&&(!d.quota_id||!d.plot_id||!d.crop_id)){ showToast('กรุณาเลือกโควตา แปลง และรอบปลูกก่อน','warning'); return false; }
+  vf('f-survey_date',vReq('กรุณาระบุวันที่สำรวจ'));
+  vf('f-surveyor',vReq('กรุณาระบุผู้สำรวจ'));
+  vf('f-production_year_be',function(v){ if(!v.trim())return 'กรุณากรอกปีผลิต พ.ศ.'; var n=parseInt(v,10); if(isNaN(n)||n<2500||n>2600)return 'ปี พ.ศ. ต้องอยู่ระหว่าง 2500-2600'; return ''; });
+  vf('f-cane_variety',vReq('กรุณาเลือกพันธุ์อ้อย'));
+  vf('f-yield_estimate',function(v){ if(!v.trim())return 'กรุณากรอกประมาณการผลผลิต'; var n=parseFloat(v); if(isNaN(n)||n<0)return 'กรุณาใส่ค่าที่ถูกต้อง'; return ''; });
+  vf('f-plot_size_rai',function(v){ if(!v.trim())return 'กรุณากรอกขนาดแปลง'; var n=parseFloat(v); if(isNaN(n)||n<=0)return 'กรุณาใส่ค่าที่ถูกต้อง'; return ''; });
+  return ok;
+}
+async function submitForm(){
+  var f=state.form; if(!f||f.submitting)return;
+  if(!validateFormAll()){ showToast('กรุณากรอกข้อมูลให้ครบถ้วน','warning'); return; }
+  f.submitting=true; var btn=document.getElementById('f-submit'); btn.disabled=true; btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังบันทึก…</span>'; renderIcons();
+  // BACKEND: create=API-02/03 (FN-01 validate, FN-04 save) · edit=API-05 (FN-03 optimistic) · idempotency + double-submit guard (BR-AGS-10)
+  await new Promise(r=>setTimeout(r,600));
+  var d=f.data, msg='', variant='success';
+  if(f.mode==='create'){
+    var now=new Date().toISOString(); var q=f.quota, plot=f.plot, crop=f.crop; var code=nextSurveyCode();
+    var ns={ id:'s-'+code, survey_id:code, quota_id:d.quota_id, plot_id:d.plot_id, crop_id:d.crop_id,
+      farmer_name:q?q.farmer_name:'', farmer_phone:q?q.phone:'', farmer_citizen:q?q.citizen_id:'',
+      plot_address:plot?plot.address_line:'', province:plot?plot.province:'', district:plot?plot.district:'', subdistrict:plot?plot.subdistrict:'', postal_code:plot?plot.postal:'',
+      survey_date:d.survey_date, surveyor:d.surveyor, production_year_be:parseInt(d.production_year_be,10),
+      planted_month:(d.planted_month?parseInt(d.planted_month,10):null), cane_age_months:caneAgeMonths(d.production_year_be,d.planted_month),
+      cane_variety:d.cane_variety, cane_type:d.cane_type, yield_estimate:parseFloat(d.yield_estimate), plot_size_rai:parseFloat(d.plot_size_rai),
+      soil_type:d.soil_type, soil_color:d.soil_color, leaf_color_check:d.leaf_color_check, weed_density:d.weed_density,
+      disease_pest_found:d.disease_pest_found, disease_pest_level:d.disease_pest_level, disease_pest_detail:d.disease_pest_detail,
+      row_spacing_cm:d.row_spacing_cm, cane_height_head_cm:d.cane_height_head_cm, cane_height_mid_cm:d.cane_height_mid_cm, cane_height_tail_cm:d.cane_height_tail_cm,
+      internode_length_cm:d.internode_length_cm, diameter_cm:d.diameter_cm, average_stalks_per_clump:d.average_stalks_per_clump, clumps_in_10m:d.clumps_in_10m,
+      coordinate:d.coordinate, survey_postal_code:d.postal_code,
+      photos:clonePhotos(d.photos),
+      status:'waiting_for_verify', reject_reason:null, cancel_reason:null, delete_reason:null,
+      version:1, is_deleted:false,
+      verified_by:null, created_at:now, created_by:CURRENT_USER.name, updated_at:now, updated_by:CURRENT_USER.name,
+      history:[{event:'create',actor:CURRENT_USER.name,at:now,note:'ผูกโควตา '+d.quota_id+' · แปลง '+d.plot_id+' · รอบปลูก '+d.crop_id}] };
+    state.records.unshift(ns);
+    msg='สร้างแบบสำรวจสำเร็จ — '+code;
+  } else {
+    var s=findSurvey(f.id); var wasVerified=(s.status==='verified');
+    s.survey_date=d.survey_date; s.surveyor=d.surveyor; s.production_year_be=parseInt(d.production_year_be,10);
+    s.planted_month=(d.planted_month?parseInt(d.planted_month,10):null); s.cane_age_months=caneAgeMonths(d.production_year_be,d.planted_month);
+    s.cane_variety=d.cane_variety; s.cane_type=d.cane_type; s.yield_estimate=parseFloat(d.yield_estimate); s.plot_size_rai=parseFloat(d.plot_size_rai);
+    s.soil_type=d.soil_type; s.soil_color=d.soil_color; s.leaf_color_check=d.leaf_color_check; s.weed_density=d.weed_density;
+    s.disease_pest_found=d.disease_pest_found; s.disease_pest_level=d.disease_pest_level; s.disease_pest_detail=d.disease_pest_detail;
+    s.row_spacing_cm=d.row_spacing_cm; s.cane_height_head_cm=d.cane_height_head_cm; s.cane_height_mid_cm=d.cane_height_mid_cm; s.cane_height_tail_cm=d.cane_height_tail_cm;
+    s.internode_length_cm=d.internode_length_cm; s.diameter_cm=d.diameter_cm; s.average_stalks_per_clump=d.average_stalks_per_clump; s.clumps_in_10m=d.clumps_in_10m;
+    s.coordinate=d.coordinate; s.survey_postal_code=d.postal_code;
+    s.photos=clonePhotos(d.photos);
+    s.updated_at=new Date().toISOString(); s.updated_by=CURRENT_USER.name; s.version=(s.version||1)+1;
+    if(wasVerified){ // BR-AGS-05 / LOCK-07 — edit verified → กลับ waiting_for_verify
+      s.status='waiting_for_verify'; s.verified_by=null;
+      addHistory(s,'edit',CURRENT_USER.name,'แก้ไขหลังยืนยันแล้ว — กลับสู่สถานะรอตรวจสอบ');
+      msg='บันทึกแล้ว — กลับสู่สถานะรอตรวจสอบ'; variant='warning';
+    } else {
+      addHistory(s,'edit',CURRENT_USER.name,null);
+      msg='บันทึกการแก้ไขแล้ว';
+    }
+  }
+  state.form=null; closePanel(); render(); showToast(msg,variant,4200);
+}
+
+// ============================================
+// SEARCH-SELECT helper (Iron Rule #34)
+// ============================================
+window.__ss=window.__ss||{};
+function ssGet(k){return window.__ss[k];}
+function ssEsc(s){return String(s).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function searchSelectHTML(key,opt){ opt=opt||{}; var ph=opt.placeholder||'ค้นหา...'; return '<div class="search-select" id="ss-'+key+'"><i data-lucide="search" class="ss-lead w-4 h-4"></i><input type="text" class="input ss-input" id="ss-input-'+key+'" autocomplete="off" placeholder="'+ph+'" oninput="ssOnInput(\''+key+'\',this.value)" onfocus="ssOpen(\''+key+'\')" onkeydown="ssOnKey(\''+key+'\',event)"><button type="button" class="ss-clear hidden" id="ss-clear-'+key+'" tabindex="-1" onclick="ssClear(\''+key+'\')"><i data-lucide="x" class="w-4 h-4"></i></button><i data-lucide="chevron-down" class="ss-caret w-4 h-4" id="ss-caret-'+key+'"></i><div class="ss-list hidden" id="ss-list-'+key+'"></div></div>'; }
+function initSearchSelect(key,cfg){ cfg=cfg||{}; window.__ss[key]={options:cfg.options||[],value:cfg.value!=null?cfg.value:null,onSelect:cfg.onSelect||function(){},emptyText:cfg.emptyText||'ไม่พบรายการ',query:'',open:false,hi:0}; ssSetText(key); ssSyncChrome(key); renderIcons(); }
+function ssFiltered(key){ var s=ssGet(key); if(!s)return []; var q=(s.query||'').toLowerCase().trim(); if(!q)return s.options; return s.options.filter(o=>String(o.label).toLowerCase().includes(q)||String(o.value).toLowerCase().includes(q)||String(o.sub||'').toLowerCase().includes(q)); }
+function ssSyncChrome(key){ var s=ssGet(key); if(!s)return; var sel=s.options.find(o=>o.value===s.value); var c=document.getElementById('ss-clear-'+key); if(c)c.classList.toggle('hidden',!sel); var k=document.getElementById('ss-caret-'+key); if(k)k.classList.toggle('hidden',!!sel); }
+function ssSetText(key){ var s=ssGet(key); if(!s)return; var inp=document.getElementById('ss-input-'+key); if(!inp)return; var sel=s.options.find(o=>o.value===s.value); inp.value=s.open?s.query:(sel?sel.label:''); }
+function ssRenderList(key){ var s=ssGet(key); if(!s)return; var list=document.getElementById('ss-list-'+key); if(!list)return; var items=ssFiltered(key); if(items.length===0){ list.innerHTML='<div class="ss-empty">'+s.emptyText+'</div>'; } else { var q=(s.query||'').toLowerCase().trim(); var hl=function(t){return q?String(t).replace(new RegExp('('+ssEsc(q)+')','gi'),'<mark>$1</mark>'):String(t);}; list.innerHTML=items.map(function(o,i){return '<button type="button" class="ss-opt '+(i===s.hi?'is-active':'')+'" onmousedown="event.preventDefault()" onclick="ssPick(\''+key+'\','+i+')">'+(o.icon?'<i data-lucide="'+o.icon+'" class="ss-opt-ic w-4 h-4"></i>':'')+'<span class="ss-opt-main"><span class="ss-opt-label">'+hl(o.label)+'</span>'+(o.sub?'<span class="ss-opt-sub">'+hl(o.sub)+'</span>':'')+'</span>'+(o.right?'<span class="ss-opt-right">'+o.right+'</span>':'')+'</button>';}).join(''); } list.classList.toggle('hidden',!s.open); renderIcons(); }
+function ssOpen(key){ var s=ssGet(key); if(!s)return; var inp=document.getElementById('ss-input-'+key); if(inp&&inp.disabled)return; s.open=true; s.query=''; s.hi=0; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+function ssOnInput(key,val){ var s=ssGet(key); if(!s)return; s.query=val; s.open=true; s.hi=0; s.value=null; ssSyncChrome(key); ssRenderList(key); }
+function ssPick(key,i){ var s=ssGet(key); if(!s)return; var o=ssFiltered(key)[i]; if(!o)return; s.value=o.value; s.query=''; s.open=false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); s.onSelect(o.value,o); }
+function ssClear(key){ var s=ssGet(key); if(!s)return; s.value=null; s.query=''; s.open=true; ssSetText(key); ssSyncChrome(key); ssRenderList(key); var inp=document.getElementById('ss-input-'+key); if(inp)inp.focus(); s.onSelect(null,null); }
+function ssOnKey(key,e){ var s=ssGet(key); if(!s)return; var items=ssFiltered(key); if(e.key==='ArrowDown'){e.preventDefault(); s.open=true; s.hi=Math.min(items.length-1,s.hi+1); ssRenderList(key);} else if(e.key==='ArrowUp'){e.preventDefault(); s.hi=Math.max(0,s.hi-1); ssRenderList(key);} else if(e.key==='Enter'){e.preventDefault(); if(items[s.hi])ssPick(key,s.hi);} else if(e.key==='Escape'){s.open=false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); e.stopPropagation();} }
+document.addEventListener('click',function(e){ Object.keys(window.__ss||{}).forEach(function(key){ var w=document.getElementById('ss-'+key); var s=ssGet(key); if(w&&s&&s.open&&!w.contains(e.target)){ s.open=false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); } }); });
+
+// ============================================
+// MODALS (verify / delete / import)
+// ============================================
+function openModalBox(type,data,isLg){ state.modal={open:true,type:type,data:data||{}}; var box=document.getElementById('modalBox'); box.className='modal'+(isLg?' is-lg':''); renderModal(); requestAnimationFrame(()=>document.getElementById('modalBackdrop').classList.add('is-open')); }
+function closeModal(){ if(state.modal.data&&state.modal.data.busy)return; document.getElementById('modalBackdrop').classList.remove('is-open'); setTimeout(()=>state.modal={open:false,type:null,data:null},200); }
+function renderModal(){ var t=state.modal.type; if(t==='verify')renderVerifyModal(); else if(t==='delete')renderDeleteModal(); else if(t==='import')renderImportModal(); }
+
+// VERIFY / REJECT (OV-03) — BACKEND: single=API-07 · bulk=API-08 (FN-06/07) + status guard 409
+function openVerifyModal(singleId){ var ids=singleId?[singleId]:Array.from(state.selectedIds); ids=ids.filter(function(id){ var s=findSurvey(id); return s&&s.status==='waiting_for_verify'; }); if(ids.length===0){ showToast('เลือกได้เฉพาะรายการที่รอตรวจสอบ','warning'); return; } openModalBox('verify',{ids:ids,result:'',reason:'',note:'',busy:false}); }
+function setVerifyResult(v){ var rn=document.getElementById('v-reason'); if(rn)state.modal.data.reason=rn.value; var nt=document.getElementById('v-note'); if(nt)state.modal.data.note=nt.value; state.modal.data.result=v; renderVerifyModal(); }
+function renderVerifyModal(){
+  var d=state.modal.data; var surveys=d.ids.map(findSurvey).filter(Boolean); var isBulk=surveys.length>1; var single=surveys[0];
+  var listHtml='';
+  if(isBulk){ listHtml='<div class="field"><label class="field-label">รายการที่เลือก ('+surveys.length+' รายการ)</label><div class="imp-errors" style="max-height:160px;">'+surveys.map(s=>'<div class="imp-err-row"><span class="r mono" style="color:var(--c-ink);">'+s.survey_id+'</span><span class="m">'+esc(s.surveyor)+'</span><span class="d mono">'+s.crop_id+'</span></div>').join('')+'</div><div class="field-help">ใช้เหตุผลเดียวกันทุกรายการ (เมื่อเลือก "ปฏิเสธ") · ข้ามรายการที่ไม่ใช่สถานะรอตรวจสอบ</div></div>'; }
+  else { listHtml='<div style="font-size:13px;color:var(--c-mute);margin-bottom:12px;line-height:1.7;"><div>เลขสำรวจ: <span class="mono" style="color:var(--c-ink);font-weight:600;">'+single.survey_id+'</span></div><div><strong style="color:var(--c-ink);">'+esc(single.surveyor)+'</strong> · โควตา <span class="mono">'+single.quota_id+'</span> · แปลง <span class="mono">'+single.plot_id+'</span> · รอบปลูก <span class="mono">'+single.crop_id+'</span></div><div>วันที่สำรวจ '+fmtDate(single.survey_date)+' · '+esc(single.cane_variety)+' · ผลผลิต <span class="num">'+fmtTons(single.yield_estimate)+'</span> ตัน</div></div>'; }
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="shield-check" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">ตรวจสอบแบบสำรวจ'+(isBulk?' ('+surveys.length+' รายการ)':'')+'</h3><p class="modal-subtitle">เลือกผลการตรวจสอบ · หากปฏิเสธต้องระบุเหตุผล</p></div>'
+    +'<button class="icon-btn" onclick="closeModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>'
+    +'<div class="modal-body">'+listHtml
+    +'<div class="field"><label class="field-label">ผลตรวจสอบ <span class="req">*</span></label><div style="display:flex;flex-direction:column;gap:8px;">'
+    +'<label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13px;padding:9px 12px;border:1px solid '+(d.result==='verified'?'var(--c-success)':'var(--c-line)')+';border-radius:8px;background:'+(d.result==='verified'?'#E4F4EB':'#fff')+';"><input type="radio" name="vr" value="verified" '+(d.result==='verified'?'checked':'')+' onchange="setVerifyResult(\'verified\')" style="accent-color:var(--c-success);"> ยืนยัน</label>'
+    +'<label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13px;padding:9px 12px;border:1px solid '+(d.result==='rejected'?'var(--c-danger)':'var(--c-line)')+';border-radius:8px;background:'+(d.result==='rejected'?'#FFE9E7':'#fff')+';"><input type="radio" name="vr" value="rejected" '+(d.result==='rejected'?'checked':'')+' onchange="setVerifyResult(\'rejected\')" style="accent-color:var(--c-danger);"> ปฏิเสธ</label>'
+    +'</div><div class="field-error" id="err-vr"></div></div>'
+    +(d.result==='rejected'?'<div class="field" style="margin-bottom:0;"><label class="field-label">เหตุผลในการปฏิเสธ <span class="req">*</span></label><textarea class="input" id="v-reason" placeholder="กรุณาระบุเหตุผลในการปฏิเสธ...">'+esc(d.reason)+'</textarea><div class="field-error" id="err-reason"></div>'+(isBulk?'<div class="note is-warn mt-2"><i data-lucide="info" class="w-4 h-4"></i><span>ใช้เหตุผลเดียวกันนี้กับทุกรายการที่เลือก</span></div>':'')+'</div>':'')
+    +(d.result==='verified'?'<div class="field" style="margin-bottom:0;"><label class="field-label">หมายเหตุ (ไม่บังคับ)</label><textarea class="input" id="v-note" placeholder="หมายเหตุเพิ่มเติม (ไม่บังคับ)">'+esc(d.note)+'</textarea></div>':'')
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" id="v-submit" onclick="submitVerify()"><i data-lucide="check" class="w-4 h-4"></i><span>ยืนยัน</span></button></div>';
+  renderIcons();
+  var n=document.getElementById('v-reason'); if(n)n.value=d.reason; var nt=document.getElementById('v-note'); if(nt)nt.value=d.note;
+}
+async function submitVerify(){
+  var d=state.modal.data; if(d.busy)return; var n=document.getElementById('v-reason'); if(n)d.reason=n.value; var nt=document.getElementById('v-note'); if(nt)d.note=nt.value;
+  if(!d.result){ var e=document.getElementById('err-vr'); e.textContent='กรุณาเลือกผลการตรวจสอบ'; e.style.visibility='visible'; showToast('กรุณาเลือกผลการตรวจสอบ','warning'); return; }
+  if(d.result==='rejected'&&!(d.reason||'').trim()){ var er=document.getElementById('err-reason'); if(er){er.textContent='กรุณากรอกเหตุผลในการปฏิเสธ'; er.style.visibility='visible';} showToast('กรุณากรอกเหตุผลในการปฏิเสธ','warning'); return; }
+  d.busy=true; var btn=document.getElementById('v-submit'); btn.disabled=true; btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังดำเนินการ…</span>'; renderIcons();
+  // BACKEND: FN-06/07 apply verify/reject + optimistic (BR-AGS-10) · audit with bulk count (BR-AGS-09) · verified feeds Crop survey tab (BR-AGS-11)
+  await new Promise(r=>setTimeout(r,700));
+  var ok=0,fail=0; var reason=(d.reason||'').trim(); var note=(d.note||'').trim();
+  d.ids.forEach(function(id){ var s=findSurvey(id); if(!s||s.is_deleted){fail++;return;} if(s.status!=='waiting_for_verify'){fail++;return;}
+    if(d.result==='verified'){ s.status='verified'; s.reject_reason=null; addHistory(s,'verify',CHECKER.name,(d.ids.length>1?('ตรวจสอบกลุ่ม '+d.ids.length+' รายการ'):null)||(note||null)); }
+    else { s.status='rejected'; s.reject_reason=reason; addHistory(s,'reject',CHECKER.name,reason+(d.ids.length>1?(' · ตรวจสอบกลุ่ม '+d.ids.length+' รายการ'):'')); }
+    s.verified_by=CHECKER.name; s.updated_at=new Date().toISOString(); s.version++; ok++;
+  });
+  d.busy=false; state.selectedIds.clear(); closeModal(); render(); if(state.view)renderViewDrawer();
+  if(d.ids.length===1) showToast(d.result==='verified'?'ยืนยันเรียบร้อย':'ปฏิเสธเรียบร้อย',d.result==='verified'?'success':'info',4000);
+  else showToast('ตรวจสอบกลุ่มเสร็จสิ้น — สำเร็จ '+ok+' ล้มเหลว '+fail,fail>0?'warning':'success',4800);
+}
+
+// CANCEL / DELETE (OV-04) — BACKEND: API-11 (FN-08) soft + audit (BR-AGS-08/09) + idempotency
+function openDeleteModal(id){ var s=findSurvey(id); if(!s)return; openModalBox('delete',{id:id,dtype:'cancelled',reason:'',busy:false}); }
+function setDeleteType(t){ var rn=document.getElementById('del-reason'); if(rn)state.modal.data.reason=rn.value; state.modal.data.dtype=t; renderDeleteModal(); }
+function renderDeleteModal(){
+  var d=state.modal.data; var s=findSurvey(d.id); if(!s)return;
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon is-danger"><i data-lucide="ban" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">ยกเลิก/ลบแบบสำรวจ?</h3><p class="modal-subtitle">แบบสำรวจ <strong>"'+s.survey_id+' — '+esc(s.surveyor)+'"</strong></p></div>'
+    +'<button class="icon-btn" onclick="closeModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>'
+    +'<div class="modal-body">'
+    +'<div class="field"><label class="field-label">ประเภท <span class="req">*</span></label><div style="display:flex;flex-direction:column;gap:8px;">'
+    +'<label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13px;padding:9px 12px;border:1px solid '+(d.dtype==='cancelled'?'var(--c-primary)':'var(--c-line)')+';border-radius:8px;background:'+(d.dtype==='cancelled'?'rgba(255,59,48,0.05)':'#fff')+';"><input type="radio" name="del-type" value="cancelled" '+(d.dtype==='cancelled'?'checked':'')+' onchange="setDeleteType(\'cancelled\')" style="accent-color:var(--c-primary);"> ยกเลิก (cancelled) — ยังคงอยู่ในรายการ สถานะ "ยกเลิก"</label>'
+    +'<label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13px;padding:9px 12px;border:1px solid '+(d.dtype==='deleted'?'var(--c-danger)':'var(--c-line)')+';border-radius:8px;background:'+(d.dtype==='deleted'?'#FFE9E7':'#fff')+';"><input type="radio" name="del-type" value="deleted" '+(d.dtype==='deleted'?'checked':'')+' onchange="setDeleteType(\'deleted\')" style="accent-color:var(--c-danger);"> ลบ (deleted) — ซ่อนจากรายการ (soft delete)</label>'
+    +'</div></div>'
+    +'<div class="field" style="margin-bottom:0;"><label class="field-label">เหตุผล <span class="req">*</span></label><textarea class="input" id="del-reason" placeholder="กรุณากรอกเหตุผล...">'+esc(d.reason||'')+'</textarea><div class="field-error" id="err-del-reason"></div></div>'
+    +(d.dtype==='deleted'?'<div class="note is-warn mt-2" style="background:#FFE9E7;color:#E62E24;"><i data-lucide="alert-triangle" class="w-4 h-4"></i><span>รายการจะถูกซ่อนจากรายการ (soft delete) และบันทึกลงประวัติ</span></div>':'<div class="note is-warn mt-2"><i data-lucide="info" class="w-4 h-4"></i><span>รายการจะเปลี่ยนเป็นสถานะ "ยกเลิก" และยังคงแสดงในรายการ</span></div>')
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-danger is-solid" id="d-submit" onclick="confirmDelete()"><i data-lucide="'+(d.dtype==='deleted'?'trash-2':'ban')+'" class="w-4 h-4"></i><span>'+(d.dtype==='deleted'?'ลบแบบสำรวจ':'ยกเลิกแบบสำรวจ')+'</span></button></div>';
+  renderIcons();
+  var rn=document.getElementById('del-reason'); if(rn)rn.value=d.reason||'';
+}
+async function confirmDelete(){
+  var d=state.modal.data; if(d.busy)return; var rn=document.getElementById('del-reason'); if(rn)d.reason=rn.value;
+  var sel=document.querySelector('input[name="del-type"]:checked'); d.dtype=sel?sel.value:'cancelled';
+  if(!(d.reason||'').trim()){ var er=document.getElementById('err-del-reason'); if(er){er.textContent='กรุณากรอกเหตุผล'; er.style.visibility='visible';} showToast('กรุณากรอกเหตุผล','warning'); return; }
+  d.busy=true; var btn=document.getElementById('d-submit'); btn.disabled=true; btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังดำเนินการ…</span>'; renderIcons();
+  await new Promise(r=>setTimeout(r,550));
+  var s=findSurvey(d.id); var reason=(d.reason||'').trim();
+  if(s){ state.selectedIds.delete(s.id); s.updated_at=new Date().toISOString(); s.updated_by=CURRENT_USER.name; s.version=(s.version||1)+1;
+    if(d.dtype==='deleted'){ s.status='deleted'; s.is_deleted=true; s.delete_reason=reason; addHistory(s,'delete',CURRENT_USER.name,reason); }
+    else { s.status='cancelled'; s.cancel_reason=reason; addHistory(s,'cancel',CURRENT_USER.name,reason); }
+  }
+  d.busy=false; closeModal();
+  if(state.view&&state.view.id===d.id){ if(d.dtype==='deleted')closeView(); else renderViewDrawer(); }
+  render(); showToast(d.dtype==='deleted'?'ลบแบบสำรวจแล้ว':'ยกเลิกแบบสำรวจแล้ว','success',4000);
+}
+
+// CSV UPLOAD (OV-05, wizard) — BACKEND: API-09 (FN-09) partial success (BR-AGS-07) · ทุกแถว waiting_for_verify
+var CSV_COLS=['quota_id','plot_id','crop_id','survey_date','surveyor','production_year_be','cane_variety','yield_estimate','plot_size_rai'];
+function openImportModal(){ openModalBox('import',{phase:'pick',file:null,rows:[],errors:[],validRows:[],busy:false,applied:null},true); }
+function renderImportModal(){
+  var d=state.modal.data;
+  var html='<div class="modal-header"><div class="modal-header-icon"><i data-lucide="upload" class="w-5 h-5"></i></div><div style="flex:1;"><h3 class="modal-title">นำเข้าแบบสำรวจจากไฟล์ CSV</h3><p class="modal-subtitle">.csv (UTF-8) ≤5MB · ทุกแถวสถานะ "รอตรวจสอบ" · โควตา/แปลง/รอบปลูกต้องผูกถูกต้อง</p></div><button class="icon-btn" onclick="closeModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div><div class="modal-body">';
+  if(d.phase==='pick'||d.phase==='preview'){
+    html+='<div class="note is-info mb-3" style="justify-content:space-between;align-items:center;"><span style="display:flex;gap:9px;align-items:center;"><i data-lucide="download" class="w-4 h-4"></i>ดาวน์โหลดแม่แบบ CSV (schema = create)</span><button class="btn btn-sm btn-secondary" onclick="dlTemplate()"><i data-lucide="download" class="w-3.5 h-3.5"></i><span>ดาวน์โหลดแม่แบบ</span></button></div>';
+    html+='<div class="field"><label class="field-label">เลือกไฟล์ CSV</label><input type="file" id="csv-file" accept=".csv" class="hidden" onchange="onCsvPicked(this)"><div style="display:flex;align-items:center;gap:12px;"><button class="btn btn-secondary" onclick="document.getElementById(\'csv-file\').click()"><i data-lucide="upload" class="w-4 h-4"></i><span>เลือกไฟล์</span></button>'+(d.file?'<span style="font-size:12.5px;color:var(--c-mute);">'+esc(d.file.name)+' ('+(d.file.size/1024).toFixed(1)+' KB)</span>':'<span style="font-size:12.5px;color:var(--c-mute-3);">ยังไม่ได้เลือกไฟล์</span>')+'</div><div class="field-error" id="err-csv"></div></div>';
+    if(d.phase==='preview'){
+      var okN=d.validRows.length,badN=d.errors.length,totalN=d.rows.length;
+      html+='<div class="imp-summary"><div class="imp-chip is-total"><div class="v num">'+totalN+'</div><div class="l">แถวทั้งหมด</div></div><div class="imp-chip is-ok"><div class="v num">'+okN+'</div><div class="l">ผ่าน</div></div><div class="imp-chip is-bad"><div class="v num">'+badN+'</div><div class="l">ไม่ผ่าน</div></div></div>';
+      if(badN>0){ html+='<div class="flex justify-between items-center mb-2"><span style="font-size:12.5px;font-weight:600;">รายละเอียดข้อผิดพลาด (แถวเสียจะถูกข้าม)</span><button class="btn btn-sm btn-secondary" onclick="dlErrors()"><i data-lucide="download" class="w-3.5 h-3.5"></i><span>ดาวน์โหลดรายงาน</span></button></div><div class="imp-errors">'+d.errors.map(e=>'<div class="imp-err-row"><span class="r">แถว '+e.row+'</span><span class="f">'+esc(e.field)+'</span><span class="m">'+esc(e.message)+'</span><span class="d">'+esc(e.data)+'</span></div>').join('')+'</div>'; }
+      else html+='<div class="note is-info"><i data-lucide="check-circle-2" class="w-4 h-4"></i><span>ทุกแถวผ่านการตรวจสอบ ไม่มีข้อผิดพลาด</span></div>';
+    } else { html+='<div style="font-size:12.5px;color:var(--c-mute);line-height:1.8;"><div style="font-weight:600;">คำแนะนำ</div><div>· header ตรงแม่แบบ 9 คอลัมน์ · UTF-8 · โควตาต้อง verified · แปลงเป็นของเจ้าของโควตา + verified · รอบปลูกเป็นของแปลง</div><div>· วันที่สำรวจ YYYY-MM-DD · ปี พ.ศ. 2500-2600 · ผลผลิต ≥ 0 · ขนาดแปลง > 0</div></div>'; }
+  } else if(d.phase==='done'){
+    var r=d.applied;
+    html+='<div class="imp-summary"><div class="imp-chip is-total"><div class="v num">'+r.total+'</div><div class="l">แถวทั้งหมด</div></div><div class="imp-chip is-ok"><div class="v num">'+r.created+'</div><div class="l">สร้างสำเร็จ</div></div><div class="imp-chip is-bad"><div class="v num">'+r.failed+'</div><div class="l">ล้มเหลว</div></div></div>';
+    if(r.failed>0)html+='<div class="flex justify-between items-center mb-2"><span style="font-size:12.5px;font-weight:600;">แถวที่ล้มเหลว</span><button class="btn btn-sm btn-secondary" onclick="dlErrors()"><i data-lucide="download" class="w-3.5 h-3.5"></i><span>ดาวน์โหลดรายงาน</span></button></div><div class="imp-errors">'+d.errors.map(e=>'<div class="imp-err-row"><span class="r">แถว '+e.row+'</span><span class="f">'+esc(e.field)+'</span><span class="m">'+esc(e.message)+'</span><span class="d">'+esc(e.data)+'</span></div>').join('')+'</div>';
+    else html+='<div class="note is-info"><i data-lucide="check-circle-2" class="w-4 h-4"></i><span>นำเข้าสำเร็จทั้งหมด ไม่มีข้อผิดพลาด · ทุกแถวสถานะ "รอตรวจสอบ"</span></div>';
+  }
+  html+='</div>';
+  if(d.phase==='done')html+='<div class="modal-footer"><button class="btn btn-primary" onclick="closeModal();render();">ปิด</button></div>';
+  else html+='<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" id="imp-submit" '+(d.phase==='preview'&&d.validRows.length>0?'':'disabled')+' onclick="applyImport()"><i data-lucide="check" class="w-4 h-4"></i><span>ยืนยันนำเข้า'+(d.phase==='preview'?' ('+d.validRows.length+' แถว)':'')+'</span></button></div>';
+  document.getElementById('modalBox').innerHTML=html; renderIcons();
+}
+function dlTemplate(){ var c='﻿'+CSV_COLS.join(',')+'\n'+'QT-2569-001,PLT-2569-001,CRP-2569-0000001,'+dateStr(3)+',ภาคภูมิ เดินดง,2569,ขอนแก่น 3,145.50,12.50\n'+'QT-2569-002,PLT-2569-003,CRP-2569-0000003,'+dateStr(5)+',ธีรเดช ไร่กว้าง,2569,LK92-11,280.00,25.00\n'; var b=new Blob([c],{type:'text/csv;charset=utf-8;'}); var l=document.createElement('a'); l.href=URL.createObjectURL(b); l.download='survey_template.csv'; l.click(); }
+function dlErrors(){ var d=state.modal.data; if(!d.errors.length)return; var c='﻿'+'แถว,ฟิลด์,ข้อผิดพลาด,ข้อมูล\n'+d.errors.map(e=>[e.row,e.field,'"'+e.message+'"','"'+String(e.data).replace(/"/g,'""')+'"'].join(',')).join('\n'); var b=new Blob([c],{type:'text/csv;charset=utf-8;'}); var l=document.createElement('a'); l.href=URL.createObjectURL(b); l.download='survey-upload-errors.csv'; l.click(); }
+function parseCsv(t){ var rows=[],row=[],cur='',q=false; for(var i=0;i<t.length;i++){ var ch=t[i]; if(q){ if(ch==='"'){ if(t[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=ch; } else { if(ch==='"')q=true; else if(ch===','){row.push(cur);cur='';} else if(ch==='\n'||ch==='\r'){ if(ch==='\r'&&t[i+1]==='\n')i++; row.push(cur);cur=''; if(row.length>1||row[0]!=='')rows.push(row); row=[]; } else cur+=ch; } } if(cur!==''||row.length){row.push(cur); if(row.length>1||row[0]!=='')rows.push(row);} return rows; }
+function onCsvPicked(input){ var d=state.modal.data; var file=input.files&&input.files[0]; if(!file)return;
+  if(!/\.csv$/i.test(file.name)){ showToast('ไฟล์ไม่ถูกต้อง กรุณาอัปโหลดไฟล์ CSV','error'); input.value=''; return; }
+  if(file.size>5*1024*1024){ showToast('ขนาดไฟล์ต้องไม่เกิน 5MB','error'); input.value=''; return; }
+  d.file=file; var rd=new FileReader();
+  rd.onload=function(){ var text=String(rd.result||'').replace(/^﻿/,''); var rows=parseCsv(text); if(rows.length===0){showToast('ไฟล์ว่าง','error');return;}
+    var header=rows[0].map(h=>h.trim()); var mism=[]; CSV_COLS.forEach((c,i)=>{if(header[i]!==c)mism.push(c);});
+    if(header.length!==CSV_COLS.length||mism.length){ d.rows=[];d.errors=[];d.validRows=[];d.phase='pick'; renderImportModal(); var er=document.getElementById('err-csv'); if(er){er.textContent='คอลัมน์ไฟล์ไม่ตรงแม่แบบ: '+(mism.length?mism.join(', '):'จำนวนคอลัมน์ไม่ถูกต้อง ('+header.length+'/'+CSV_COLS.length+')'); er.style.visibility='visible';} showToast('ไฟล์ถูกปฏิเสธทั้งไฟล์ — header ไม่ตรงแม่แบบ','error'); return; }
+    validateCsv(rows.slice(1)); d.phase='preview'; renderImportModal();
+  };
+  rd.readAsText(file,'UTF-8');
+}
+// FN-09 per-row validate (schema=create) — cascade (quota/plot/crop) + agronomic fields
+function validateCsv(dataRows){ var d=state.modal.data; d.rows=dataRows; d.errors=[]; d.validRows=[];
+  dataRows.forEach(function(cols,idx){ var rowNo=idx+2; var r={}; CSV_COLS.forEach((c,i)=>r[c]=(cols[i]||'').trim()); var ds=r.quota_id+' · '+r.plot_id+' · '+r.crop_id;
+    function bad(field,msg){ d.errors.push({row:rowNo,field:field,message:msg,data:ds+(r[field]?' · '+field+'='+r[field]:'')}); }
+    var ok=true;
+    if(!r.quota_id){ bad('quota_id','กรุณากรอก quota_id'); ok=false; }
+    else { var q=findQuotaById(r.quota_id); if(!q||q.status!=='verified'){ bad('quota_id','ไม่พบ Quota หรือสถานะไม่เป็น verified'); ok=false; } }
+    if(!r.plot_id){ bad('plot_id','กรุณากรอก plot_id'); ok=false; }
+    else { var pl=findPlotById(r.plot_id); if(!pl||pl.verify_status!=='verified'||pl.quota_id!==r.quota_id){ bad('plot_id','ไม่พบแปลงของเจ้าของโควตา หรือแปลงยังไม่ผ่านการตรวจสอบ'); ok=false; } }
+    if(!r.crop_id){ bad('crop_id','กรุณากรอก crop_id'); ok=false; }
+    else { var cr=findCropById(r.crop_id); if(!cr||cr.plot_id!==r.plot_id){ bad('crop_id','ไม่พบรอบปลูกของแปลงที่ระบุ'); ok=false; } }
+    if(!r.survey_date){ bad('survey_date','กรุณากรอกวันที่สำรวจ'); ok=false; }
+    else if(isNaN(new Date(r.survey_date).getTime())){ bad('survey_date','วันที่สำรวจไม่ถูกต้อง (YYYY-MM-DD)'); ok=false; }
+    if(!r.surveyor){ bad('surveyor','กรุณากรอกผู้สำรวจ'); ok=false; }
+    if(!r.cane_variety){ bad('cane_variety','กรุณากรอกพันธุ์อ้อย'); ok=false; }
+    var yr=parseInt(r.production_year_be,10); if(isNaN(yr)||yr<2500||yr>2600){ bad('production_year_be','ปี พ.ศ. ต้องอยู่ระหว่าง 2500-2600'); ok=false; }
+    var yld=parseFloat(r.yield_estimate); if(isNaN(yld)||yld<0){ bad('yield_estimate','กรุณาใส่ค่าที่ถูกต้อง (≥ 0)'); ok=false; }
+    var sz=parseFloat(r.plot_size_rai); if(isNaN(sz)||sz<=0){ bad('plot_size_rai','กรุณาใส่ค่าที่ถูกต้อง (> 0)'); ok=false; }
+    if(ok)d.validRows.push(r);
+  });
+}
+async function applyImport(){ var d=state.modal.data; if(d.busy||d.phase!=='preview'||d.validRows.length===0)return; d.busy=true; var btn=document.getElementById('imp-submit'); btn.disabled=true; btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังนำเข้า…</span>'; renderIcons();
+  // BACKEND: API-09 (FN-09) batch commit — ทุกแถว waiting_for_verify + error report (BR-AGS-07)
+  await new Promise(r=>setTimeout(r,900)); var now=new Date().toISOString();
+  d.validRows.forEach(function(r){ var q=findQuotaById(r.quota_id); var pl=findPlotById(r.plot_id); var code=nextSurveyCode(); state.records.unshift({ id:'s-'+code, survey_id:code, quota_id:r.quota_id, plot_id:r.plot_id, crop_id:r.crop_id,
+    farmer_name:q?q.farmer_name:'', farmer_phone:q?q.phone:'', farmer_citizen:q?q.citizen_id:'',
+    plot_address:pl?pl.address_line:'', province:pl?pl.province:'', district:pl?pl.district:'', subdistrict:pl?pl.subdistrict:'', postal_code:pl?pl.postal:'',
+    survey_date:r.survey_date, surveyor:r.surveyor, production_year_be:parseInt(r.production_year_be,10),
+    cane_variety:r.cane_variety, yield_estimate:parseFloat(r.yield_estimate), plot_size_rai:parseFloat(r.plot_size_rai),
+    soil_color:'', leaf_color_check:'', disease_pest_level:'', coordinate:'', photos:emptyPhotos(),
+    status:'waiting_for_verify', reject_reason:null, cancel_reason:null, delete_reason:null,
+    version:1, is_deleted:false,
+    verified_by:null, created_at:now, created_by:CURRENT_USER.name+' (CSV)', updated_at:now, updated_by:CURRENT_USER.name,
+    history:[{event:'create',actor:CURRENT_USER.name+' (CSV import)',at:now,note:'นำเข้าจาก CSV · ผูกโควตา '+r.quota_id+' · แปลง '+r.plot_id+' · รอบปลูก '+r.crop_id}] }); });
+  d.applied={total:d.rows.length,created:d.validRows.length,failed:d.errors.length}; d.busy=false; d.phase='done'; renderImportModal();
+  showToast('นำเข้าแบบสำรวจ '+d.applied.created+' รายการสำเร็จ'+(d.applied.failed?' — ข้าม '+d.applied.failed+' แถว':''),d.applied.failed?'warning':'success',4500);
+}
+
+// ESC chain
+window.addEventListener('keydown',function(e){ if(e.key!=='Escape')return; if(state.modal.open)closeModal(); else if(state.form)closeForm(); else if(state.view)closeView(); });
+
+// INIT
+window.addEventListener('hashchange',function(){ render(); });
+var domReady=false,lucideReady=false;
+function bootIfReady(){ if(domReady&&lucideReady){ render(); renderIcons(); } }
+if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',function(){domReady=true;bootIfReady();}); else domReady=true;
+window.addEventListener('lucide:ready',function(){lucideReady=true;bootIfReady();});
+if(window.lucide&&typeof window.lucide.createIcons==='function')lucideReady=true;
+bootIfReady();
+setTimeout(function(){ if(!lucideReady){lucideReady=true;bootIfReady();} },5000);
+</script>
+</body>
+</html>

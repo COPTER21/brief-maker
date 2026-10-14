@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>จัดการแปลงที่ดิน · CUBE NATIVE</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+
+<style>
+/* ============== CSS VARIABLES (CUBE CI — Warm Light) ============== */
+:root {
+  --c-navy: #111111;
+  --c-navy-2: #111111;
+  --c-primary: #FF3B30;
+  --c-primary-hover: #E62E24;
+  --c-teal: #FF9A1F;
+  --c-teal-light: #FFB763;
+  --c-ink: #111111;
+  --c-mute: #54565C;
+  --c-mute-2: #73757B;
+  --c-mute-3: #9A9CA2;
+  --c-line: #DEDAD4;
+  --c-line-2: #E9E5E0;
+  --c-line-3: #F1EEEA;
+  --c-bg-off: #FAF8F5;
+  --c-success: #1F9D55;
+  --c-warning: #E8870F;
+  --c-danger: #E62E24;
+  --sidebar-w: 232px;
+  --shell-h: 52px;
+  --fs-h1: 22px; --fs-h2: 17px; --fs-h3: 15px; --fs-body: 14px;
+  --fs-sub: 13px; --fs-meta: 12px; --fs-cap: 11px; --fs-kpi: 28px;
+  --sp-xs: 4px; --sp-sm: 8px; --sp-md: 12px; --sp-lg: 20px; --sp-xl: 28px;
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-full: 999px;
+}
+
+/* ============== RESET ============== */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { scrollbar-gutter: stable; }
+
+/* ============== SCROLLBAR (Iron Rule #49) ============== */
+* { scrollbar-width: thin; scrollbar-color: rgba(17,17,17,.16) transparent; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(17,17,17,.14); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(17,17,17,.26); }
+.sidebar, .slide { scrollbar-color: rgba(255,255,255,.28) transparent; }
+.sidebar ::-webkit-scrollbar-thumb, .slide ::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb, .slide::-webkit-scrollbar-thumb { background: rgba(255,255,255,.28); }
+.sidebar ::-webkit-scrollbar-thumb:hover, .slide ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.42); }
+body {
+  font-family: 'Satoshi', 'Noto Sans Thai', system-ui, sans-serif;
+  background: var(--c-bg-off);
+  color: #2A2B2F;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-width: 1180px;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+[data-lucide] { flex-shrink: 0; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ============== SIDEBAR ============== */
+.sidebar {
+  position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w);
+  background: #111111; color: #E9E5E0; z-index: 20;
+  display: flex; flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.sb-brand { padding: 18px; display: flex; align-items: center; gap: 11px; border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
+.sb-logo {
+  width: 34px; height: 34px; background: linear-gradient(135deg, #FF3B30, #FF9A1F);
+  border-radius: 9px; display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; flex-shrink: 0; box-shadow: 0 4px 12px rgba(255,59,48,0.3);
+}
+.sb-name { font-weight: 700; font-size: 14px; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+.sb-sub { font-size: 10px; color: #9A9CA2; letter-spacing: 0.06em; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+.sb-nav { flex: 1; padding: 12px 8px; overflow-y: auto; }
+.sb-module { margin-bottom: 4px; }
+.sb-module-header {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 8px 10px; border-radius: 6px; background: transparent; border: 0;
+  color: #9A9CA2; font-family: inherit; font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 120ms; text-align: left;
+}
+.sb-module-header:hover { background: rgba(255,255,255,0.04); color: #DEDAD4; }
+.sb-module-header .mod-icon { flex-shrink: 0; opacity: 0.7; }
+.sb-module-header .mod-label { flex: 1; }
+.sb-module-header .mod-chevron { flex-shrink: 0; transition: transform 200ms; opacity: 0.7; }
+.sb-module[data-expanded="false"] .mod-chevron { transform: rotate(-90deg); }
+.sb-module[data-expanded="false"] .sb-features { display: none; }
+.sb-features { padding: 2px 0 6px 0; }
+.sb-item {
+  display: flex; align-items: center; gap: 10px; padding: 7px 12px 7px 14px;
+  border-radius: 6px; color: #DEDAD4; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 120ms; margin-bottom: 1px; position: relative; user-select: none;
+}
+.sb-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sb-item.is-active { background: #FF3B30; color: #fff; font-weight: 600; }
+.sb-item.is-active::before {
+  content: ''; position: absolute; left: -10px; top: 7px; bottom: 7px;
+  width: 3px; background: #fff; border-radius: 0 2px 2px 0;
+}
+.sb-item [data-lucide] { width: 16px; height: 16px; opacity: 0.85; }
+.sb-item.is-active [data-lucide] { opacity: 1; }
+.sb-item.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.sb-item.is-disabled:hover { background: transparent; color: #DEDAD4; }
+.sb-footer {
+  padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: #9A9CA2;
+}
+.pulse-dot { width: 7px; height: 7px; background: var(--c-teal); border-radius: 50%; box-shadow: 0 0 0 3px rgba(255,154,31,0.20); animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+/* ============== MAIN + SHELL BAR ============== */
+.main { margin-left: var(--sidebar-w); min-height: 100vh; background: var(--c-bg-off); }
+.shell-bar {
+  position: sticky; top: 0; background: #fff; border-bottom: 1px solid var(--c-line-2);
+  height: var(--shell-h); display: flex; align-items: center; padding: 0 22px; z-index: 19; gap: 12px;
+}
+.breadcrumb { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--c-mute); }
+.breadcrumb a { cursor: pointer; transition: color 120ms; }
+.breadcrumb a:hover { color: var(--c-primary); }
+.breadcrumb .sep { color: var(--c-mute-3); font-size: 10px; }
+.breadcrumb-current { color: var(--c-ink); font-weight: 500; }
+.icon-btn {
+  width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute); border-radius: 7px; position: relative; transition: all 120ms;
+}
+.icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.icon-btn [data-lucide] { width: 17px; height: 17px; }
+.notif-dot { position: absolute; top: 7px; right: 8px; width: 7px; height: 7px; background: var(--c-danger); border-radius: 50%; border: 2px solid #fff; }
+.user-chip { display: flex; align-items: center; gap: 9px; padding: 5px 10px 5px 12px; border-radius: 8px; cursor: pointer; transition: background 120ms; }
+.user-chip:hover { background: var(--c-line-3); }
+.user-text { line-height: 1.2; text-align: right; }
+.user-name { font-size: 12.5px; font-weight: 500; color: var(--c-ink); white-space: nowrap; }
+.user-role { font-size: 10.5px; color: var(--c-mute-2); white-space: nowrap; margin-top: 1px; }
+.avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; flex-shrink: 0;
+}
+.user-menu {
+  position: absolute; top: calc(var(--shell-h) - 4px); right: 22px; background: #fff;
+  border: 1px solid var(--c-line-2); border-radius: 10px; box-shadow: 0 12px 32px rgba(17,17,17,0.12);
+  width: 240px; z-index: 30; padding: 6px; display: none;
+}
+.user-menu.is-open { display: block; }
+.user-menu-item { display: flex; align-items: center; gap: 10px; padding: 8px 11px; border-radius: 6px; font-size: 13px; color: var(--c-ink); cursor: pointer; transition: background 120ms; }
+.user-menu-item:hover { background: var(--c-bg-off); }
+.user-menu-item [data-lucide] { width: 15px; height: 15px; color: var(--c-mute-2); }
+.user-menu-item.is-danger { color: var(--c-danger); }
+.user-menu-item.is-danger [data-lucide] { color: var(--c-danger); }
+.user-menu-divider { height: 1px; background: var(--c-line-2); margin: 5px 0; }
+
+/* ============== CONTENT (fluid — Iron Rule #30) ============== */
+.content { padding: 22px; }
+
+/* ============== PAGE HEADER ============== */
+.ph { margin-bottom: 18px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.ph > div:first-child { flex: 1 1 auto; min-width: 280px; }
+.ph-title-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px; }
+.ph-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 22px; font-weight: 700; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.ph-count { font-size: 12.5px; font-weight: 600; color: var(--c-mute-2); background: var(--c-line-3); padding: 3px 9px; border-radius: 999px; }
+.ph-sub { font-size: 13px; color: var(--c-mute); margin: 0; }
+.ph-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ============== BUTTONS (Iron Rule #36 — Thai optical center) ============== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px; padding: 2px 14px 0; border-radius: 8px; font-size: 13px; font-weight: 500;
+  border: 1px solid transparent; background: transparent; white-space: nowrap;
+  transition: all 120ms; user-select: none; cursor: pointer;
+}
+.btn [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; }
+.btn:disabled, .btn.is-disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+.btn-eq { min-width: 104px; }
+.btn-primary { background: var(--c-primary); color: #fff; }
+.btn-primary:hover { background: var(--c-primary-hover); box-shadow: 0 2px 8px rgba(255,59,48,0.30); }
+.btn-secondary { background: #fff; border-color: var(--c-line); color: var(--c-ink); }
+.btn-secondary:hover { background: var(--c-line-3); border-color: var(--c-mute-2); }
+.btn-ghost { color: var(--c-mute); }
+.btn-ghost:hover { background: var(--c-line-3); color: var(--c-ink); }
+.btn-danger { background: #fff; border-color: var(--c-line); color: var(--c-danger); }
+.btn-danger:hover { background: #FFE9E7; border-color: var(--c-danger); }
+.btn-danger.is-solid { background: var(--c-danger); border-color: var(--c-danger); color: #fff; }
+.btn-danger.is-solid:hover { background: #C81E15; }
+.btn-link { background: transparent; border: 0; padding: 0 4px; height: auto; color: var(--c-primary); font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn-sm { height: 30px; padding: 2px 11px 0; font-size: 12px; }
+
+/* ============== STATS ============== */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.stat { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; padding: 14px 16px; transition: all 150ms; }
+.stat:hover { border-color: var(--c-line); box-shadow: 0 2px 8px rgba(17,17,17,0.05); }
+.stat-label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--c-mute); }
+.stat-label [data-lucide] { width: 13px; height: 13px; color: var(--c-primary); }
+.stat-value { font-family: 'Noto Sans Thai', sans-serif; font-size: 26px; font-weight: 700; color: var(--c-navy); margin-top: 6px; letter-spacing: -0.01em; }
+.stat-meta { font-size: 11.5px; color: var(--c-mute-2); margin-top: 5px; display: flex; align-items: center; gap: 4px; }
+.stat-meta.is-warn { color: var(--c-warning); }
+.stat-meta [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== CARD / FILTER ============== */
+.card { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; overflow: hidden; }
+.filter-bar { padding: 14px 18px; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid var(--c-line-2); background: #fff; flex-wrap: wrap; }
+
+/* ============== INPUTS ============== */
+.input, .select {
+  height: 36px; padding: 0 12px; border: 1px solid var(--c-line); border-radius: 8px;
+  font-size: 13px; background: #fff; color: var(--c-ink); font-family: inherit; transition: all 120ms; width: 100%;
+}
+.input:focus, .select:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(255,59,48,0.10); }
+.input:disabled, .input[readonly] { background: var(--c-line-3); color: var(--c-mute-2); cursor: not-allowed; border-color: var(--c-line-2); }
+.select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat; background-position: right 10px center; padding-right: 32px; appearance: none;
+}
+.input-search { position: relative; flex: 1; max-width: 340px; }
+.input-search input { padding-left: 36px; }
+.input-search .lead-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--c-mute-2); pointer-events: none; }
+
+/* ===== SEARCH-SELECT (Iron Rule #34) ===== */
+.search-select { position: relative; width: 100%; }
+.search-select .ss-input { padding-left: 34px; padding-right: 34px; }
+.search-select .ss-lead { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--c-mute-3); pointer-events: none; }
+.search-select .ss-caret { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--c-mute-3); pointer-events: none; }
+.search-select .ss-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); display: inline-flex; padding: 3px; border: 0; background: transparent; color: var(--c-mute-2); cursor: pointer; border-radius: 6px; }
+.search-select .ss-clear:hover { background: var(--c-line-3); color: var(--c-ink); }
+.search-select.is-disabled .ss-input { background: var(--c-line-3); color: var(--c-mute-2); cursor: not-allowed; }
+.ss-list {
+  position: absolute; z-index: 70; left: 0; right: 0; margin-top: 4px; max-height: 280px; overflow-y: auto;
+  background: #fff; border: 1px solid var(--c-line); border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(17,17,17,0.10), 0 4px 10px rgba(17,17,17,0.05);
+}
+.ss-opt { width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 0; border-bottom: 1px solid var(--c-line-3); background: transparent; cursor: pointer; text-align: left; font-family: inherit; }
+.ss-opt:last-child { border-bottom: 0; }
+.ss-opt:hover, .ss-opt.is-active { background: rgba(255,59,48,0.06); }
+.ss-opt-ic { width: 16px; height: 16px; color: var(--c-primary); flex-shrink: 0; }
+.ss-opt-main { flex: 1; min-width: 0; }
+.ss-opt-label { display: block; font-size: 13px; color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-sub { display: block; font-size: 11.5px; color: var(--c-mute-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-right { flex-shrink: 0; font-size: 12px; color: var(--c-mute); }
+.ss-opt mark { background: rgba(255,59,48,0.16); color: inherit; padding: 0 1px; border-radius: 2px; }
+.ss-empty { padding: 20px 14px; text-align: center; font-size: 13px; color: var(--c-mute-2); }
+
+/* ============== TABLE ============== */
+.table-scroll { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table thead { background: var(--c-bg-off); }
+.table th {
+  padding: 11px 14px; text-align: left; font-weight: 600; color: var(--c-mute);
+  font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--c-line-2); white-space: nowrap;
+}
+.table th.col-check { width: 40px; padding-right: 0; }
+.table td { padding: 13px 14px 11px; border-bottom: 1px solid var(--c-line-2); color: var(--c-ink); vertical-align: middle; }
+.table tbody tr { transition: background 120ms; }
+.table tbody tr:hover { background: var(--c-bg-off); }
+.table tbody tr.is-selected { background: rgba(255,59,48,0.04); }
+.table tbody tr.is-selected:hover { background: rgba(255,59,48,0.07); }
+.table tbody tr:last-child td { border-bottom: 0; }
+.table tbody tr.is-clickable { cursor: pointer; }
+.table-scroll.is-sticky { max-height: 560px; overflow-y: auto; scrollbar-gutter: stable; }
+.table-scroll.is-sticky thead th { position: sticky; top: 0; z-index: 3; background: var(--c-bg-off); box-shadow: inset 0 -1px 0 var(--c-line-2); }
+.cell-truncate { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+th.col-num, td.col-num { text-align: right; }
+.mono { font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+
+/* ============== CHECKBOX ============== */
+.cb {
+  width: 16px; height: 16px; border: 1.5px solid var(--c-line); border-radius: 4px; background: #fff;
+  cursor: pointer; display: inline-block; position: relative; transition: all 120ms; flex-shrink: 0;
+}
+.cb.is-checked, .cb.is-partial { background: var(--c-primary); border-color: var(--c-primary); }
+.cb.is-checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.cb.is-partial::after { content: ''; position: absolute; left: 3px; top: 6px; width: 8px; height: 2px; background: #fff; }
+.cb:hover { border-color: var(--c-primary); }
+.cb.is-disabled { opacity: 0.35; cursor: not-allowed; }
+.cb.is-disabled:hover { border-color: var(--c-line); }
+
+/* ============== PILLS ============== */
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px 3px; border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.pill [data-lucide] { width: 11px; height: 11px; }
+.pill-info    { background: #E6F0FF; color: #1A5FCC; }
+.pill-success { background: #E4F4EB; color: #157A41; }
+.pill-warning { background: #FFF1DD; color: #B8690B; }
+.pill-danger  { background: #FFE9E7; color: #E62E24; }
+.pill-muted   { background: var(--c-line-3); color: var(--c-mute-2); }
+.pill-outline { background: #fff; border: 1px solid var(--c-line); color: var(--c-mute); }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.8s linear infinite; }
+
+/* ============== FORM SECTION (Iron Rule #45) ============== */
+.form-section { margin-top: var(--sp-xl); }
+.form-section:first-child { margin-top: 0; }
+.form-section-title {
+  font-size: var(--fs-cap); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--c-mute);
+  padding-bottom: var(--sp-sm); border-bottom: 1px solid var(--c-line-2); margin-bottom: var(--sp-md);
+}
+.form-grp { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 16px; }
+
+/* ============== ROW ACTIONS ============== */
+.row-actions { display: inline-flex; gap: 2px; }
+.ra-btn {
+  width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute-2); border-radius: 6px; transition: all 120ms;
+}
+.ra-btn:hover { background: var(--c-line-3); color: var(--c-primary); }
+.ra-btn.is-danger:hover { background: #FFE9E7; color: var(--c-danger); }
+.ra-btn [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== TABLE FOOTER / BULK BAR ============== */
+.table-footer {
+  padding: 12px 18px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2);
+  display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: var(--c-mute); flex-wrap: wrap; gap: 10px;
+}
+.pagination { display: inline-flex; gap: 4px; align-items: center; }
+.pg-btn {
+  min-width: 30px; height: 30px; padding: 0 8px; display: inline-flex; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid var(--c-line-2); border-radius: 6px; color: var(--c-mute);
+  font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 120ms;
+}
+.pg-btn:hover { border-color: var(--c-line); background: var(--c-bg-off); }
+.pg-btn.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.pg-btn.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn [data-lucide] { width: 13px; height: 13px; }
+.bulk-bar {
+  background: var(--c-navy); color: #fff; padding: 11px 18px; border-radius: 8px 8px 0 0;
+  display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--c-line-2); margin: -1px -1px 0; font-size: 13px;
+}
+.bulk-bar .btn { height: 30px; padding: 2px 11px 0; font-size: 12px; }
+.bulk-bar .btn-secondary { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.18); color: #fff; }
+.bulk-bar .btn-secondary:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.30); }
+
+/* ============== DRAWER v2 SHELL (Patterns B/C — locked) ============== */
+.overlay-wrap { position: fixed; inset: 0; z-index: 50; }
+.backdrop { position: absolute; inset: 0; background: rgba(17,17,17,0.40); }
+.drawer-panel {
+  position: absolute; top: 0; right: 0; bottom: 0; width: 920px; max-width: 96vw;
+  background: #fff; display: flex; flex-direction: column;
+  box-shadow: -16px 0 40px rgba(17,17,17,0.18);
+}
+.drawer-panel.standard { width: 680px; }
+.drawer-enter { transform: translateX(100%); }
+.drawer-active { transform: translateX(0); transition: transform 250ms ease-out; }
+.top-icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;
+  border: 0; background: transparent; border-radius: var(--r-sm); color: var(--c-mute-2);
+  cursor: pointer; transition: all 120ms; flex-shrink: 0;
+}
+.top-icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.dw-head { padding: 18px 24px 16px; border-bottom: 1px solid var(--c-line-2); flex-shrink: 0; }
+.dw-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.dw-eyebrow { display: flex; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-mute-2); margin-bottom: 4px; font-weight: 600; }
+.dw-title { font-size: 20px; font-weight: 700; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.dw-sub { font-size: var(--fs-meta); color: var(--c-mute-2); margin-top: 4px; }
+.dw-body { flex: 1; overflow-y: auto; padding: 22px 24px; scrollbar-gutter: stable; }
+.dw-footer {
+  padding: 14px 24px; border-top: 1px solid var(--c-line-2); background: var(--c-bg-off); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.dw-footer-right { display: flex; align-items: center; gap: 8px; }
+.dw-footer-meta { font-size: 12px; color: var(--c-mute-2); }
+.drawer-header-divider { width: 1px; height: 22px; background: var(--c-line-2); margin: 0 4px; flex-shrink: 0; }
+.dw-actions { display: flex; gap: 6px; align-items: center; }
+
+/* Tabs (view drawer) */
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--c-line-2); margin-top: 14px; }
+.tab {
+  display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px 7px;
+  font-size: 13px; font-weight: 500; color: var(--c-mute); background: transparent; border: 0;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; transition: all 120ms;
+}
+.tab [data-lucide] { width: 14px; height: 14px; }
+.tab:hover { color: var(--c-ink); }
+.tab.on { color: var(--c-primary); border-bottom-color: var(--c-primary); font-weight: 600; }
+
+/* View drawer detail grid */
+.dv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
+.dv-cell .dv-lbl { font-size: 11px; color: var(--c-mute-3); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-bottom: 3px; }
+.dv-cell .dv-val { font-size: 13.5px; font-weight: 600; color: var(--c-ink); word-break: break-word; }
+.dv-section { margin-bottom: 24px; }
+.dv-section-title { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; color: var(--c-navy); margin-bottom: 12px; }
+.dv-section-title [data-lucide] { width: 15px; height: 15px; color: var(--c-primary); }
+.dv-note { margin-top: 10px; padding: 10px 12px; background: #FFF1DD; border-radius: 8px; font-size: 12.5px; color: #B8690B; }
+
+/* Info banner (edit rejected — re-submit notice; warning ของ action จริง) */
+.note { padding: 11px 14px; border-radius: 8px; font-size: 12.5px; display: flex; gap: 9px; align-items: flex-start; }
+.note [data-lucide] { width: 15px; height: 15px; margin-top: 1px; }
+.note.is-info { background: #E6F0FF; color: #1A5FCC; }
+.note.is-warn { background: #FFF1DD; color: #B8690B; }
+
+/* ============== TIMELINE ============== */
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 4px; bottom: 4px; width: 2px; background: var(--c-line-2); }
+.tl-item { position: relative; margin-bottom: 16px; }
+.tl-item:last-child { margin-bottom: 0; }
+.tl-dot { position: absolute; left: -20px; top: 3px; width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 2px solid var(--c-primary); }
+.tl-dot.is-success { border-color: var(--c-success); }
+.tl-dot.is-warning { border-color: var(--c-warning); }
+.tl-dot.is-danger { border-color: var(--c-danger); }
+.tl-title { font-size: 13px; font-weight: 600; color: var(--c-ink); }
+.tl-meta { font-size: 11.5px; color: var(--c-mute-2); margin-top: 2px; }
+.tl-note { font-size: 12.5px; color: var(--c-mute); background: var(--c-bg-off); border: 1px solid var(--c-line-2); border-radius: 6px; padding: 7px 10px; margin-top: 6px; }
+
+/* ============== EMPTY STATE ============== */
+.empty { padding: 56px 24px; text-align: center; color: var(--c-mute); }
+.empty-icon { width: 52px; height: 52px; margin: 0 auto 14px; border-radius: 50%; background: var(--c-line-3); color: var(--c-mute-2); display: inline-flex; align-items: center; justify-content: center; }
+.empty-icon [data-lucide] { width: 22px; height: 22px; }
+.empty-title { font-size: 15.5px; font-weight: 600; color: var(--c-ink); margin-bottom: 5px; font-family: 'Noto Sans Thai', sans-serif; }
+.empty-desc { font-size: 13px; color: var(--c-mute); max-width: 320px; margin: 0 auto; }
+.empty .btn { margin-top: 16px; }
+.empty-actions { display: flex; gap: 8px; justify-content: center; }
+.empty-actions .btn { margin-top: 16px; }
+
+/* ============== MODAL ============== */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(17,17,17,0.50); z-index: 60; opacity: 0; pointer-events: none;
+  transition: opacity 200ms; display: flex; align-items: center; justify-content: center;
+}
+.modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: #fff; border-radius: 12px; width: 440px; max-width: 92vw; max-height: 90vh;
+  display: flex; flex-direction: column; transform: scale(0.96);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 24px 64px rgba(17,17,17,0.28); overflow: hidden;
+}
+.modal.is-lg { width: 680px; }
+.modal-backdrop.is-open .modal { transform: scale(1); }
+.modal-header { padding: 18px 22px 12px; display: flex; align-items: flex-start; gap: 12px; }
+.modal-header-icon {
+  width: 36px; height: 36px; border-radius: 8px; background: rgba(255,59,48,0.10); color: var(--c-primary);
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.modal-header-icon.is-danger { background: #FFE9E7; color: var(--c-danger); }
+.modal-header-icon.is-warning { background: #FFF1DD; color: var(--c-warning); }
+.modal-header-icon [data-lucide] { width: 18px; height: 18px; }
+.modal-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 16px; font-weight: 600; color: var(--c-navy); margin: 0 0 4px; }
+.modal-subtitle { font-size: 13px; color: var(--c-mute); margin: 0; line-height: 1.5; }
+.modal-body { padding: 6px 22px 18px; font-size: 13px; color: var(--c-ink); overflow-y: auto; scrollbar-gutter: stable; }
+.modal-footer { padding: 12px 22px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2); display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Import summary chips */
+.imp-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.imp-chip { border-radius: 8px; padding: 12px; text-align: center; border: 1px solid var(--c-line-2); }
+.imp-chip .v { font-size: 22px; font-weight: 700; font-family: 'Noto Sans Thai', sans-serif; }
+.imp-chip .l { font-size: 11.5px; margin-top: 2px; font-weight: 600; }
+.imp-chip.is-total { background: var(--c-bg-off); color: var(--c-mute); }
+.imp-chip.is-ok { background: #E4F4EB; color: #157A41; border-color: #CBE9D8; }
+.imp-chip.is-bad { background: #FFE9E7; color: #E62E24; border-color: #F6D0CC; }
+.imp-errors { border: 1px solid var(--c-line-2); border-radius: 8px; max-height: 220px; overflow-y: auto; }
+.imp-err-row { display: flex; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--c-line-3); font-size: 12.5px; align-items: baseline; }
+.imp-err-row:last-child { border-bottom: 0; }
+.imp-err-row .r { flex-shrink: 0; font-weight: 700; color: var(--c-danger); min-width: 52px; }
+.imp-err-row .f { flex-shrink: 0; color: var(--c-mute); min-width: 90px; }
+.imp-err-row .m { color: var(--c-ink); }
+.imp-err-row .d { color: var(--c-mute-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+
+/* ============== FIELDS ============== */
+.field { margin-bottom: 14px; }
+.field-label { display: block; font-size: 12.5px; font-weight: 500; color: var(--c-mute); margin-bottom: 6px; }
+.field-label .req { color: var(--c-danger); margin-left: 2px; }
+.field-input { width: 100%; }
+.field-help { font-size: 11.5px; color: var(--c-mute-2); margin-top: 4px; }
+.field-error { font-size: 11.5px; color: var(--c-danger); margin-top: 4px; min-height: 15px; visibility: hidden; }
+.field.is-invalid .input, .field.is-invalid .select { border-color: var(--c-danger); }
+.field.is-invalid .field-error { visibility: visible; }
+textarea.input { height: auto; min-height: 74px; padding: 9px 12px; resize: vertical; line-height: 1.55; }
+
+/* ============== TOAST ============== */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; background: var(--c-navy); color: #fff;
+  padding: 13px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; z-index: 80;
+  display: flex; align-items: center; gap: 10px; box-shadow: 0 12px 32px rgba(17,17,17,0.30);
+  transform: translateY(100px); opacity: 0; transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1); max-width: 380px;
+}
+.toast.is-visible { transform: translateY(0); opacity: 1; }
+.toast.is-success { background: var(--c-success); }
+.toast.is-info { background: var(--c-primary); }
+.toast.is-warning { background: var(--c-warning); }
+.toast.is-error { background: var(--c-danger); }
+.toast [data-lucide] { width: 17px; height: 17px; }
+
+/* ============== UTILITIES ============== */
+.hidden { display: none !important; }
+.text-mute { color: var(--c-mute); }
+.text-mute-2 { color: var(--c-mute-2); }
+.text-primary { color: var(--c-primary); }
+.text-danger { color: var(--c-danger); }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.w-2\.5 { width: 10px; }   .h-2\.5 { height: 10px; }
+.w-3   { width: 12px; }    .h-3   { height: 12px; }
+.w-3\.5 { width: 14px; }   .h-3\.5 { height: 14px; }
+.w-4   { width: 16px; }    .h-4   { height: 16px; }
+.w-5   { width: 20px; }    .h-5   { height: 20px; }
+svg.lucide { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; flex-shrink: 0; }
+svg.lucide.w-2\.5 { width: 10px; }   svg.lucide.h-2\.5 { height: 10px; }
+svg.lucide.w-3    { width: 12px; }   svg.lucide.h-3    { height: 12px; }
+svg.lucide.w-3\.5 { width: 14px; }   svg.lucide.h-3\.5 { height: 14px; }
+svg.lucide.w-4    { width: 16px; }   svg.lucide.h-4    { height: 16px; }
+svg.lucide.w-5    { width: 20px; }   svg.lucide.h-5    { height: 20px; }
+</style>
+</head>
+<body>
+
+<!-- ===== SIDEBAR (Pattern N) ===== -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i data-lucide="box" class="w-4 h-4"></i></div>
+    <div><div class="sb-name">CUBE NATIVE</div><div class="sb-sub">AGM · WKN</div></div>
+  </div>
+  <nav class="sb-nav" id="sb-nav">
+    <div class="sb-module" data-module="agm" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sprout" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">เกษตรกรรม</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item is-disabled" data-feature="farmer-members"><i data-lucide="users" class="w-4 h-4"></i><span>จัดการสมาชิกเกษตรกร</span></a>
+        <a class="sb-item is-disabled" data-feature="quota"><i data-lucide="scale" class="w-4 h-4"></i><span>จัดการโควตา</span></a>
+        <a class="sb-item is-active" data-feature="plots"><i data-lucide="map" class="w-4 h-4"></i><span>จัดการแปลงที่ดิน</span></a>
+        <a class="sb-item is-disabled" data-feature="cane-delivery"><i data-lucide="truck" class="w-4 h-4"></i><span>การส่งอ้อยเข้าโรงงาน</span></a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="system" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sliders-horizontal" class="mod-icon w-3.5 h-3.5"></i><span class="mod-label">System</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features"><a class="sb-item is-disabled" data-feature="settings"><i data-lucide="settings" class="w-4 h-4"></i><span>Settings</span></a></div>
+    </div>
+  </nav>
+  <div class="sb-footer"><div class="pulse-dot"></div><span>WKN Prototype · v1.0.0</span></div>
+</aside>
+
+<main class="main">
+  <header class="shell-bar">
+    <nav class="breadcrumb">
+      <a data-breadcrumb-module="agm">เกษตรกรรม</a>
+      <i data-lucide="chevron-right" class="w-3 h-3 sep"></i>
+      <span class="breadcrumb-current">จัดการแปลงที่ดิน</span>
+    </nav>
+    <div style="display:flex; align-items:center; gap:6px; margin-left:auto;">
+      <div style="position:relative;"><button class="icon-btn" id="notifBtn"><i data-lucide="bell" class="w-4 h-4"></i><span class="notif-dot"></span></button></div>
+      <div style="position:relative;">
+        <div class="user-chip" onclick="toggleUserMenu()">
+          <div class="user-text"><div class="user-name">สมพร วงศ์ทะเบียน</div><div class="user-role">เจ้าหน้าที่ทะเบียนแปลง · WKN</div></div>
+          <div class="avatar">สว</div>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-item"><i data-lucide="user" class="w-3.5 h-3.5"></i><span>My Profile</span></div>
+          <div class="user-menu-item"><i data-lucide="settings" class="w-3.5 h-3.5"></i><span>Preferences</span></div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-item is-danger"><i data-lucide="log-out" class="w-3.5 h-3.5"></i><span>Sign out</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="content" id="page-content"></div>
+</main>
+
+<div id="overlay-root"></div>
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"><div class="modal" id="modalBox" onclick="event.stopPropagation()"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function loadLucide(){var v='0.469.0';var cdns=['https://unpkg.com/lucide@'+v+'/dist/umd/lucide.min.js','https://cdn.jsdelivr.net/npm/lucide@'+v+'/dist/umd/lucide.min.js','https://cdnjs.cloudflare.com/ajax/libs/lucide/'+v+'/lucide.min.js'];var i=0;function n(){if(i>=cdns.length){window.lucide=window.lucide||{createIcons:function(){}};window.dispatchEvent(new Event('lucide:ready'));return;}var s=document.createElement('script');s.src=cdns[i++];s.onload=function(){window.dispatchEvent(new Event('lucide:ready'));};s.onerror=n;document.head.appendChild(s);}n();})();
+</script>
+
+<script>
+// ============================================
+// M-01 ADDRESS MASTER (mock) — BACKEND: M-01 lookup API
+// ============================================
+const ADDRESS = [
+  { p:'กาญจนบุรี', districts:[
+    { d:'ท่าม่วง', subs:[{s:'วังขนาย',z:'71110'},{s:'ท่าม่วง',z:'71110'},{s:'ม่วงชุม',z:'71110'}] },
+    { d:'ท่ามะกา', subs:[{s:'ท่ามะกา',z:'71120'},{s:'พงตึก',z:'71120'}] },
+    { d:'เมืองกาญจนบุรี', subs:[{s:'บ้านเหนือ',z:'71000'},{s:'ปากแพรก',z:'71000'}] } ]},
+  { p:'ราชบุรี', districts:[
+    { d:'บ้านโป่ง', subs:[{s:'บ้านโป่ง',z:'70110'},{s:'ท่าผา',z:'70110'}] },
+    { d:'โพธาราม', subs:[{s:'โพธาราม',z:'70120'},{s:'คลองตาคต',z:'70120'}] } ]},
+  { p:'สุพรรณบุรี', districts:[
+    { d:'สองพี่น้อง', subs:[{s:'สองพี่น้อง',z:'72110'},{s:'ต้นตาล',z:'72110'}] } ]}
+];
+function getDistricts(p){var x=ADDRESS.find(a=>a.p===p);return x?x.districts:[];}
+function getSubs(p,d){var x=getDistricts(p).find(y=>y.d===d);return x?x.subs:[];}
+function getPostal(p,d,s){var x=getSubs(p,d).find(y=>y.s===s);return x?x.z:'';}
+
+const CURRENT_USER = { id:'u-fld-01', name:'สมพร วงศ์ทะเบียน', role:'Field Officer' };
+const STEWARD = { id:'u-std-01', name:'ธนพล ตรวจสอบ', role:'Data Steward' };
+const OWNERSHIP = ['โฉนด','นส.3','นส.3ก','สปก.'];
+
+function daysAgo(n){var d=new Date();d.setDate(d.getDate()-n);return d.toISOString();}
+
+// ============================================
+// CROSS-MODULE: QUOTA (mock, verified only) — BACKEND: API-13 quota-search (F-AGM-002 read-only, no write-back)
+// Plot ค้นหา+ยืนยัน quota ก่อนสร้าง → ผูก quota_no snapshot · 1 quota : N plots
+// ============================================
+const QUOTAS = [
+  { quota_no:'QT-2569-001', farmer_name:'สมหญิง รักดี', citizen_id:'3710100234572', phone:'0823456789',
+    address_line:'99 หมู่ 3', province:'กาญจนบุรี', district:'ท่าม่วง', subdistrict:'วังขนาย', postal:'71110' },
+  { quota_no:'QT-2569-002', farmer_name:'สุรพล เก่งการไร่', citizen_id:'3710100234694', phone:'0945678901',
+    address_line:'18 หมู่ 2', province:'สุพรรณบุรี', district:'สองพี่น้อง', subdistrict:'สองพี่น้อง', postal:'72110' },
+  { quota_no:'QT-2569-003', farmer_name:'ทองดี พูลผล', citizen_id:'3710100234638', phone:'0889012345',
+    address_line:'77 หมู่ 1', province:'ราชบุรี', district:'โพธาราม', subdistrict:'โพธาราม', postal:'70120' },
+  { quota_no:'QT-2569-004', farmer_name:'ประนอม ใจเพชร', citizen_id:'4405600033333', phone:'0833334444',
+    address_line:'5 หมู่ 5', province:'ราชบุรี', district:'บ้านโป่ง', subdistrict:'ท่าผา', postal:'70110' },
+  { quota_no:'QT-2569-005', farmer_name:'สมพงษ์ ทองแท้', citizen_id:'4405600055555', phone:'0855556666',
+    address_line:'12 หมู่ 4', province:'กาญจนบุรี', district:'ท่ามะกา', subdistrict:'ท่ามะกา', postal:'71120' }
+];
+function findQuotaByNo(no){ return QUOTAS.find(q=>q.quota_no===no); }
+
+// ============================================
+// MOCK PLOT DATA (FRD 04_DB · T_plot)
+// ============================================
+function pmock(seq,qno,own,deed,issue,owner,addr,prov,dist,sub,lat,lng,area,st,opts){
+  opts=opts||{};
+  var q=findQuotaByNo(qno);
+  var age=opts.age!=null?opts.age:10;
+  var created=daysAgo(age);
+  var code='PLT-2569-'+String(seq).padStart(3,'0');
+  var r={ id:'p-'+seq, plot_code:code, quota_no:qno,
+    farmer_name:q?q.farmer_name:'', farmer_phone:q?q.phone:'', farmer_citizen:q?q.citizen_id:'',
+    ownership_type:own, deed_number:deed, deed_issue_date:issue, deed_owner_name:owner,
+    address_line:addr, province:prov, district:dist, subdistrict:sub, postal_code:getPostal(prov,dist,sub),
+    latitude:lat, longitude:lng, area_rai:area,
+    shapefile_url:'plot_'+code+'.zip', document_file:opts.doc||'',
+    verify_status:st, fail_reason:null, version:1, is_deleted:false, delete_type:null, delete_reason:null,
+    verified_by:null, created_at:created, created_by:CURRENT_USER.name, updated_at:created, updated_by:CURRENT_USER.name,
+    history:[{event:'create',actor:CURRENT_USER.name,at:created,note:'ผูกกับโควตา '+qno+' · '+(q?q.farmer_name:'')}] };
+  if(st==='verified'){ var va=daysAgo(age-2); r.verified_by=STEWARD.name; r.updated_at=va; r.version=2; r.history.push({event:'verify_pass',actor:STEWARD.name,at:va,note:null}); }
+  if(st==='failed'){ var vf=daysAgo(age-1); r.verified_by=STEWARD.name; r.fail_reason=opts.reason||'พิกัดไม่ตรงกับเอกสารสิทธิ์'; r.updated_at=vf; r.version=2; r.history.push({event:'verify_fail',actor:STEWARD.name,at:vf,note:r.fail_reason}); }
+  return r;
+}
+
+const state = {
+  records: [
+    // 1:N — QT-2569-001 ผูก 2 แปลง (PLT-001, PLT-002)
+    pmock(1,'QT-2569-001','โฉนด','12345','2555-03-12','สมหญิง รักดี','99 หมู่ 3','กาญจนบุรี','ท่าม่วง','วังขนาย',14.023145,99.512088,12.50,'waiting',{age:12}),
+    pmock(2,'QT-2569-001','นส.3ก','12346','2556-07-01','สมหญิง รักดี','101 หมู่ 3','กาญจนบุรี','ท่าม่วง','ท่าม่วง',14.031002,99.520411,8.75,'waiting',{age:9}),
+    pmock(3,'QT-2569-002','โฉนด','22001','2554-11-20','สุรพล เก่งการไร่','18 หมู่ 2','สุพรรณบุรี','สองพี่น้อง','สองพี่น้อง',14.240515,100.021336,25.00,'waiting',{age:5}),
+    pmock(4,'QT-2569-003','สปก.','33005','2558-01-05','ทองดี พูลผล','77 หมู่ 1','ราชบุรี','โพธาราม','โพธาราม',13.694210,99.851774,15.20,'waiting',{age:20}),
+    pmock(5,'QT-2569-002','โฉนด','22050','2553-09-14','สุรพล เก่งการไร่','20 หมู่ 2','สุพรรณบุรี','สองพี่น้อง','ต้นตาล',14.251880,100.033901,30.40,'verified',{age:15}),
+    pmock(6,'QT-2569-004','นส.3','44010','2557-05-30','ประนอม ใจเพชร','5 หมู่ 5','ราชบุรี','บ้านโป่ง','ท่าผา',13.812477,99.865210,6.00,'verified',{age:25}),
+    pmock(7,'QT-2569-005','โฉนด','55020','2556-02-18','สมพงษ์ ทองแท้','12 หมู่ 4','กาญจนบุรี','ท่ามะกา','ท่ามะกา',13.982004,99.770145,18.90,'failed',{age:8,reason:'เอกสารสิทธิ์ไม่ชัดเจน · ต้องแนบฉบับใหม่'}),
+    pmock(8,'QT-2569-003','นส.3ก','33099','2559-08-22','ทองดี พูลผล','80 หมู่ 1','ราชบุรี','โพธาราม','คลองตาคต',13.700331,99.860442,9.30,'failed',{age:30,reason:'พิกัดอยู่นอกเขตพื้นที่ที่ระบุในโควตา'})
+  ],
+  filters:{ search:'', status:'all', province:'all' },
+  pagination:{ page:1, pageSize:20 },
+  sort:{ col:null, dir:'asc' },
+  selectedIds: new Set(),
+  modal:{ open:false, type:null, data:null },
+  form:null,
+  view:null
+};
+
+// ============================================
+// HELPERS
+// ============================================
+function renderIcons(){ if(window.lucide&&typeof window.lucide.createIcons==='function') window.lucide.createIcons(); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDateTime(iso){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso); return d.toLocaleString('th-TH',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+function maskCitizen(c){ if(!c||c.length!==13)return '—'; return c[0]+'-XXXX-XXXX-XX-'+c[12]; }
+function fmtArea(n){ var x=parseFloat(n); if(isNaN(x))return '—'; return x.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function statusLabel(st){ return st==='verified'?'ตรวจแล้ว':st==='failed'?'ไม่ผ่าน':'รอตรวจสอบ'; }
+function statusPill(st){ var c=st==='verified'?'pill-success':st==='failed'?'pill-danger':'pill-warning'; return '<span class="pill '+c+'">'+statusLabel(st)+'</span>'; }
+function findPlot(id){ return state.records.find(p=>p.id===id||p.plot_code===id); }
+function addHistory(p,ev,actor,note){ p.history.push({event:ev,actor:actor,at:new Date().toISOString(),note:note||null}); }
+function nextPlotCode(){ var mx=0; state.records.forEach(function(p){ var m=/PLT-2569-(\d+)/.exec(p.plot_code); if(m){var n=parseInt(m[1],10); if(n>mx)mx=n;} }); return 'PLT-2569-'+String(mx+1).padStart(3,'0'); }
+function showToast(msg,variant,ms){ variant=variant||'info'; ms=ms||3200; var el=document.getElementById('toast'); var im={success:'check-circle-2',info:'info',warning:'alert-triangle',error:'x-circle'}; el.className='toast is-'+variant; el.innerHTML='<i data-lucide="'+(im[variant]||'info')+'" class="w-4 h-4"></i><span>'+msg+'</span>'; renderIcons(); requestAnimationFrame(()=>el.classList.add('is-visible')); clearTimeout(showToast._t); showToast._t=setTimeout(()=>el.classList.remove('is-visible'),ms); }
+function toggleModule(h){ var m=h.closest('.sb-module'); if(!m)return; var e=m.getAttribute('data-expanded')!=='false'; m.setAttribute('data-expanded',e?'false':'true'); }
+function toggleUserMenu(){ document.getElementById('userMenu').classList.toggle('is-open'); }
+document.addEventListener('click',function(e){ if(!e.target.closest('.user-chip')&&!e.target.closest('.user-menu')){ var um=document.getElementById('userMenu'); if(um)um.classList.remove('is-open'); } });
+
+// ROUTER
+function getRoute(){ var h=location.hash; if(!h||h==='#'||h==='#/')return 'plots'; return h.replace(/^#\//,''); }
+function navigate(r){ location.hash='#/'+r; }
+
+// LIST
+// Export CSV (P-01, API-14) — เคารพ filter/search ปัจจุบัน
+function exportPlots(){
+  var rows=getFiltered(); if(!rows.length){ showToast('ไม่มีข้อมูลให้ส่งออก','error'); return; }
+  var cols=['plot_code','quota_no','farmer_name','ownership_type','deed_number','address_line','province','district','subdistrict','postal_code','latitude','longitude','area_rai','verify_status'];
+  var head=['รหัสแปลง','เลขโควตา','ชื่อเกษตรกร','กรรมสิทธิ์','เลขที่เอกสาร','ที่อยู่','จังหวัด','อำเภอ','ตำบล','ไปรษณีย์','ละติจูด','ลองจิจูด','พื้นที่(ไร่)','สถานะ'];
+  var body=rows.map(function(p){ return cols.map(function(c){ var v=p[c]==null?'':String(p[c]); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }).join(','); }).join('\n');
+  var csv='﻿'+head.join(',')+'\n'+body+'\n';
+  var b=new Blob([csv],{type:'text/csv;charset=utf-8;'}); var l=document.createElement('a'); l.href=URL.createObjectURL(b); l.download='plots_export_'+new Date().toISOString().slice(0,10)+'.csv'; l.click();
+  showToast('ส่งออกข้อมูล '+rows.length+' รายการสำเร็จ','success');
+}
+function getFiltered(){
+  var arr=state.records.filter(p=>!p.is_deleted);
+  if(state.filters.status!=='all') arr=arr.filter(p=>p.verify_status===state.filters.status);
+  if(state.filters.province!=='all') arr=arr.filter(p=>p.province===state.filters.province);
+  if(state.filters.search){ var s=state.filters.search.toLowerCase().trim(); arr=arr.filter(p=> p.plot_code.toLowerCase().includes(s)||p.quota_no.toLowerCase().includes(s)||p.farmer_name.toLowerCase().includes(s)||String(p.deed_number).toLowerCase().includes(s)||p.province.toLowerCase().includes(s) ); }
+  if(state.sort.col){ var c=state.sort.col; arr=arr.slice().sort(function(a,b){ var r; if(c==='area_rai'){ r=(parseFloat(a[c])||0)-(parseFloat(b[c])||0); } else { r=String(a[c]==null?'':a[c]).localeCompare(String(b[c]==null?'':b[c]),'th'); } return state.sort.dir==='asc'?r:-r; }); }
+  return arr;
+}
+function getPaged(){ var all=getFiltered(); var pg=state.pagination.page,ps=state.pagination.pageSize; var s=(pg-1)*ps; return {records:all.slice(s,s+ps),total:all.length,page:pg,totalPages:Math.max(1,Math.ceil(all.length/ps)),start:all.length===0?0:s+1,end:Math.min(s+ps,all.length)}; }
+function sortBy(c){ if(state.sort.col===c)state.sort.dir=state.sort.dir==='asc'?'desc':'asc'; else{state.sort.col=c;state.sort.dir='asc';} render(); }
+function toggleSelect(id){ if(state.selectedIds.has(id))state.selectedIds.delete(id); else state.selectedIds.add(id); render(); }
+function toggleSelectAll(){ var sel=getPaged().records.filter(p=>p.verify_status==='waiting'); var all=sel.length>0&&sel.every(p=>state.selectedIds.has(p.id)); if(all)sel.forEach(p=>state.selectedIds.delete(p.id)); else sel.forEach(p=>state.selectedIds.add(p.id)); render(); }
+function goToPage(n){ var tp=getPaged().totalPages; if(n<1||n>tp)return; state.pagination.page=n; render(); }
+function resetFilters(){ state.filters={search:'',status:'all',province:'all'}; state.pagination.page=1; state.selectedIds.clear(); render(); }
+var _st=null; function onSearchInput(v){ clearTimeout(_st); _st=setTimeout(function(){ state.filters.search=v; state.pagination.page=1; render(); },300); }
+
+// RENDER PRESERVATION
+function preserveState(){ var a=document.activeElement; var isI=a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'); return { pageScroll:window.scrollY, focusKey:isI?{id:a.id||'',placeholder:a.placeholder||'',selStart:a.selectionStart,selEnd:a.selectionEnd}:null }; }
+function restoreState(s){ if(!s)return; requestAnimationFrame(function(){ if(s.pageScroll>0)window.scrollTo(0,s.pageScroll); if(s.focusKey){ var c=s.focusKey.id?document.getElementById(s.focusKey.id):null; if(!c){var cs=document.querySelectorAll('input,textarea'); for(var i=0;i<cs.length;i++){ if((cs[i].placeholder||'')===s.focusKey.placeholder){c=cs[i];break;} }} if(c){ c.focus(); if(s.focusKey.selStart!=null&&c.setSelectionRange){ try{c.setSelectionRange(s.focusKey.selStart,s.focusKey.selEnd);}catch(e){} } } } }); }
+
+function emptyStateHTML(cfg){ cfg=cfg||{}; var acts=''; if(cfg.actions){ acts='<div class="empty-actions">'+cfg.actions.map(function(a){ return '<button class="btn '+(a.cls||'btn-primary')+'" onclick="'+a.onAction+'">'+(a.icon?'<i data-lucide="'+a.icon+'" class="w-4 h-4"></i>':'')+'<span>'+a.label+'</span></button>'; }).join('')+'</div>'; } return '<div class="empty"><div class="empty-icon"><i data-lucide="'+(cfg.icon||'inbox')+'" class="w-5 h-5"></i></div><div class="empty-title">'+(cfg.title||'ยังไม่มีข้อมูล')+'</div><div class="empty-desc">'+(cfg.desc||'')+'</div>'+acts+'</div>'; }
+
+// ============================================
+// PAGE RENDER (P-01) — BACKEND: API-01 list · API-14 export
+// ============================================
+function render(){
+  var snap=preserveState();
+  var route=getRoute(); var parts=route.split('/');
+  if(parts[0]!=='plots'){ navigate('plots'); return; }
+  var pg=getPaged();
+  var all=state.records.filter(p=>!p.is_deleted);
+  var cW=all.filter(p=>p.verify_status==='waiting').length, cV=all.filter(p=>p.verify_status==='verified').length, cF=all.filter(p=>p.verify_status==='failed').length;
+  var sev=7*24*3600*1000; var cWold=all.filter(p=>p.verify_status==='waiting'&&(Date.now()-new Date(p.created_at).getTime())>sev).length;
+  var sel=pg.records.filter(p=>p.verify_status==='waiting'); var allSel=sel.length>0&&sel.every(p=>state.selectedIds.has(p.id)); var someSel=!allSel&&sel.some(p=>state.selectedIds.has(p.id)); var selCount=state.selectedIds.size;
+
+  var rows=pg.records.map(function(p){
+    var can=p.verify_status==='waiting';
+    return '<tr class="is-clickable '+(state.selectedIds.has(p.id)?'is-selected':'')+'" onclick="openView(\''+p.plot_code+'\')">'
+      +'<td onclick="event.stopPropagation()"><div class="cb '+(state.selectedIds.has(p.id)?'is-checked':'')+(can?'':' is-disabled')+'" '+(can?'onclick="toggleSelect(\''+p.id+'\')"':'title="เลือกได้เฉพาะรายการรอตรวจสอบ"')+'></div></td>'
+      +'<td><span class="mono text-primary" style="font-weight:600;">'+p.plot_code+'</span></td>'
+      +'<td><span class="mono">'+esc(p.quota_no)+'</span></td>'
+      +'<td>'+esc(p.farmer_name)+'</td>'
+      +'<td>'+esc(p.province)+'</td>'
+      +'<td class="col-num"><span class="num">'+fmtArea(p.area_rai)+'</span></td>'
+      +'<td><span class="mono">'+esc(p.deed_number)+'</span></td>'
+      +'<td>'+statusPill(p.verify_status)+'</td>'
+      +'<td onclick="event.stopPropagation()" style="text-align:right;width:88px;"><div class="row-actions">'
+      +'<button class="ra-btn" onclick="openForm(\'edit\',\''+p.id+'\')" title="แก้ไข"><i data-lucide="pencil" class="w-4 h-4"></i></button>'
+      +(can?'<button class="ra-btn is-danger" onclick="openDeleteModal(\''+p.id+'\')" title="ลบ"><i data-lucide="trash-2" class="w-4 h-4"></i></button>':'')
+      +'</div></td></tr>';
+  }).join('');
+
+  var noData=all.length===0; var emptyBlock='';
+  if(pg.records.length===0){
+    emptyBlock=noData?emptyStateHTML({icon:'map',title:'ยังไม่มีแปลงที่ดิน',desc:'เริ่มต้นด้วยการสร้างแปลงแรก หรือนำเข้าจากไฟล์ CSV',actions:[{label:'สร้างแปลง',icon:'plus',onAction:"openForm('create')"},{label:'Import CSV',icon:'upload',cls:'btn-secondary',onAction:'openImportModal()'}]})
+      :emptyStateHTML({icon:'search-x',title:'ไม่พบรายการที่ค้นหา',desc:'ลองปรับคำค้นหรือล้างตัวกรอง',actions:[{label:'ล้างตัวกรอง',icon:'rotate-ccw',cls:'btn-ghost',onAction:'resetFilters()'}]});
+  }
+  var pageNums=[]; for(var n=1;n<=pg.totalPages;n++)pageNums.push(n);
+  var provOpts='<option value="all"'+(state.filters.province==='all'?' selected':'')+'>ทุกจังหวัด</option>'+ADDRESS.map(a=>'<option value="'+a.p+'"'+(state.filters.province===a.p?' selected':'')+'>'+a.p+'</option>').join('');
+
+  document.getElementById('page-content').innerHTML=
+    '<div class="ph"><div><div class="ph-title-row"><h1 class="ph-title">จัดการแปลงที่ดิน</h1><span class="ph-count">'+pg.total+' รายการ</span></div>'
+    +'<p class="ph-sub">ทะเบียนแปลงชาวไร่ · ผูกกับโควตา · ตรวจสอบยืนยันและนำเข้า CSV</p></div>'
+    +'<div class="ph-actions">'
+    +'<button class="btn btn-secondary" '+(pg.total===0?'disabled':'')+' onclick="exportPlots()"><i data-lucide="download" class="w-4 h-4"></i><span>Export CSV</span></button>'
+    +'<button class="btn btn-secondary" onclick="openImportModal()"><i data-lucide="upload" class="w-4 h-4"></i><span>Import CSV</span></button>'
+    +'<button class="btn btn-secondary" '+(selCount===0?'disabled':'')+' onclick="openVerifyModal()"><i data-lucide="shield-check" class="w-4 h-4"></i><span>ตรวจสอบที่เลือก ('+selCount+')</span></button>'
+    +'<button class="btn btn-primary" onclick="openForm(\'create\')"><i data-lucide="plus" class="w-4 h-4"></i><span>สร้างแปลง</span></button>'
+    +'</div></div>'
+    +'<div class="stats">'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="map" class="w-3 h-3"></i>แปลงทั้งหมด</div><div class="stat-value num">'+all.length+'</div><div class="stat-meta">ไม่รวมที่ถูกลบ</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="clock" class="w-3 h-3"></i>รอตรวจสอบ</div><div class="stat-value num">'+cW+'</div>'+(cWold>0?'<div class="stat-meta is-warn"><i data-lucide="alert-triangle" class="w-3 h-3"></i>ค้างเกิน 7 วัน '+cWold+' รายการ</div>':'<div class="stat-meta">SLA ตรวจภายใน 3 วันทำการ</div>')+'</div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="check-circle-2" class="w-3 h-3"></i>ตรวจแล้ว</div><div class="stat-value num">'+cV+'</div><div class="stat-meta">พร้อมทำสัญญา</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="x-circle" class="w-3 h-3"></i>ไม่ผ่าน</div><div class="stat-value num">'+cF+'</div><div class="stat-meta">มีเหตุผลระบุ</div></div>'
+    +'</div>'
+    +'<div class="card">'
+    +'<div class="filter-bar"><div class="input-search"><i data-lucide="search" class="lead-icon w-4 h-4"></i>'
+    +'<input class="input" type="text" id="q-search" placeholder="ค้นหา เลขแปลง / โควตา / ชื่อเกษตรกร / เลขที่เอกสาร / จังหวัด" value="'+esc(state.filters.search)+'" oninput="onSearchInput(this.value)"></div>'
+    +'<select class="select" style="max-width:170px;" onchange="state.filters.status=this.value;state.pagination.page=1;render();">'
+    +'<option value="all"'+(state.filters.status==='all'?' selected':'')+'>ทุกสถานะ</option>'
+    +'<option value="waiting"'+(state.filters.status==='waiting'?' selected':'')+'>รอตรวจสอบ</option>'
+    +'<option value="verified"'+(state.filters.status==='verified'?' selected':'')+'>ตรวจแล้ว</option>'
+    +'<option value="failed"'+(state.filters.status==='failed'?' selected':'')+'>ไม่ผ่าน</option></select>'
+    +'<select class="select" style="max-width:170px;" onchange="state.filters.province=this.value;state.pagination.page=1;render();">'+provOpts+'</select>'
+    +'<div style="flex:1;"></div><button class="btn btn-ghost btn-sm" onclick="resetFilters()"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i><span>ล้างตัวกรอง</span></button></div>'
+    +(selCount>0?'<div class="bulk-bar"><i data-lucide="check-square" class="w-4 h-4"></i><span>เลือก '+selCount+' รายการ (รอตรวจสอบ)</span><div style="margin-left:auto;display:flex;gap:8px;"><button class="btn btn-secondary" onclick="openVerifyModal()"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i><span>ตรวจสอบที่เลือก</span></button><button class="btn btn-secondary" onclick="state.selectedIds.clear();render();"><span>ยกเลิกการเลือก</span></button></div></div>':'')
+    +'<div class="table-scroll is-sticky"><table class="table"><thead><tr>'
+    +'<th class="col-check"><div class="cb '+(allSel?'is-checked':'')+(someSel?' is-partial':'')+'" onclick="toggleSelectAll()" title="เลือกทั้งหมด (เฉพาะรอตรวจสอบ)"></div></th>'
+    +'<th class="is-sortable" onclick="sortBy(\'plot_code\')">เลขแปลง</th>'
+    +'<th>เลขโควตา</th><th>ชื่อเกษตรกร</th><th>จังหวัด</th>'
+    +'<th class="col-num is-sortable" onclick="sortBy(\'area_rai\')">พื้นที่ (ไร่)</th>'
+    +'<th class="is-sortable" onclick="sortBy(\'deed_number\')">เลขที่เอกสาร</th>'
+    +'<th>สถานะ</th><th style="text-align:right;">การดำเนินการ</th></tr></thead><tbody>'+rows+'</tbody></table>'+emptyBlock+'</div>'
+    +'<div class="table-footer"><div class="pagination">'
+    +'<button class="pg-btn '+(pg.page===1?'is-disabled':'')+'" onclick="goToPage('+(pg.page-1)+')"><i data-lucide="chevron-left" class="w-3 h-3"></i></button>'
+    +pageNums.map(n=>'<button class="pg-btn '+(n===pg.page?'is-active':'')+'" onclick="goToPage('+n+')">'+n+'</button>').join('')
+    +'<button class="pg-btn '+(pg.page===pg.totalPages?'is-disabled':'')+'" onclick="goToPage('+(pg.page+1)+')"><i data-lucide="chevron-right" class="w-3 h-3"></i></button></div>'
+    +'<span>'+pg.start+' – '+pg.end+' จาก '+pg.total+' รายการ</span></div></div>';
+
+  renderIcons(); restoreState(snap);
+  if(parts.length>1&&parts[1]){ var p=findPlot(parts[1]); if(p&&!p.is_deleted){ if(!state.view||state.view.id!==p.id){ state.view={id:p.id,tab:'overview'}; mountViewDrawer(); } } else if(!p){ showToast('ไม่พบข้อมูลแปลงที่เลือก','error'); navigate('plots'); } }
+  else if(state.view){ state.view=null; unmountOverlay(); }
+}
+
+// OVERLAY
+function unmountOverlay(){ document.getElementById('overlay-root').innerHTML=''; }
+function mountPanel(cid){ document.getElementById('overlay-root').innerHTML='<div class="overlay-wrap"><div class="backdrop" onclick="closeTopDrawer()"></div><div id="drawer-panel" class="drawer-panel drawer-enter"><div id="'+cid+'" style="display:flex;flex-direction:column;height:100%;"></div></div></div>'; var p=document.getElementById('drawer-panel'); requestAnimationFrame(()=>p.classList.add('drawer-active')); }
+function closePanel(after){ var p=document.getElementById('drawer-panel'); if(p){p.classList.remove('drawer-active');p.classList.add('drawer-enter');} setTimeout(function(){ unmountOverlay(); if(after)after(); },200); }
+function closeTopDrawer(){ if(state.form)closeForm(); else if(state.view)closeView(); }
+
+// ============================================
+// VIEW DRAWER (P-02, 3 tabs) — BACKEND: API-04 detail · API-12 history
+// ============================================
+function openView(code){ navigate('plots/'+code); }
+function mountViewDrawer(){ mountPanel('view-content'); renderViewDrawer(); }
+function closeView(){ state.view=null; closePanel(function(){ if(getRoute()!=='plots')navigate('plots'); }); }
+function setViewTab(t){ if(!state.view)return; state.view.tab=t; renderViewDrawer(); }
+function renderViewDrawer(){
+  if(!state.view)return; var p=findPlot(state.view.id); if(!p)return; var isW=p.verify_status==='waiting'; var tab=state.view.tab;
+  var q=findQuotaByNo(p.quota_no);
+  var actions='<button class="btn btn-sm btn-secondary" onclick="openForm(\'edit\',\''+p.id+'\')"><i data-lucide="pencil" class="w-3.5 h-3.5"></i><span>แก้ไข</span></button>';
+  if(isW){ actions+='<button class="btn btn-sm btn-primary" onclick="openVerifyModal(\''+p.id+'\')"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i><span>ตรวจสอบ</span></button>'; }
+  actions+='<button class="btn btn-sm btn-danger" onclick="openDeleteModal(\''+p.id+'\')"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i><span>ลบ</span></button>';
+  function cell(l,v){ return '<div class="dv-cell"><div class="dv-lbl">'+l+'</div><div class="dv-val">'+v+'</div></div>'; }
+  var body='';
+  if(tab==='overview'){
+    body='<div class="dv-section"><div class="dv-section-title"><i data-lucide="scroll-text" class="w-4 h-4"></i>ข้อมูลกรรมสิทธิ์</div><div class="dv-grid">'
+      +cell('ประเภทกรรมสิทธิ์',esc(p.ownership_type))+cell('เลขที่เอกสารสิทธิ์','<span class="mono">'+esc(p.deed_number)+'</span>')
+      +cell('วันที่ออกเอกสาร',esc(p.deed_issue_date))+cell('ชื่อเจ้าของตามเอกสาร',esc(p.deed_owner_name))
+      +'</div></div>'
+      +'<div class="dv-section"><div class="dv-section-title"><i data-lucide="map-pin" class="w-4 h-4"></i>ที่อยู่แปลง</div><div class="dv-grid">'
+      +'<div class="dv-cell" style="grid-column:1/-1;"><div class="dv-lbl">ที่อยู่</div><div class="dv-val">'+esc(p.address_line)+'</div></div>'
+      +cell('จังหวัด',esc(p.province))+cell('อำเภอ',esc(p.district))+cell('ตำบล',esc(p.subdistrict))+cell('รหัสไปรษณีย์','<span class="num">'+esc(p.postal_code)+'</span>')
+      +'</div></div>'
+      +'<div class="dv-section"><div class="dv-section-title"><i data-lucide="locate" class="w-4 h-4"></i>พิกัด & พื้นที่</div><div class="dv-grid">'
+      +cell('ละติจูด','<span class="num">'+esc(p.latitude)+'</span>')+cell('ลองจิจูด','<span class="num">'+esc(p.longitude)+'</span>')
+      +cell('พื้นที่ (ไร่)','<span class="num">'+fmtArea(p.area_rai)+'</span>')
+      +'<div class="dv-cell"><div class="dv-lbl">แผนที่</div><div class="dv-val"><a class="btn-link" onclick="showToast(\'จำลองเปิด Google Maps ตามพิกัด\',\'info\')"><i data-lucide="external-link" class="w-3.5 h-3.5"></i> เปิดแผนที่</a></div></div>'
+      +'</div></div>'
+      +(p.verify_status==='failed'&&p.fail_reason?'<div class="note is-warn" style="background:#FFE9E7;color:#E62E24;"><i data-lucide="x-circle" class="w-4 h-4"></i><span><b>เหตุผลที่ไม่ผ่าน:</b> '+esc(p.fail_reason)+'</span></div>':'');
+  } else if(tab==='files'){
+    function fileCard(t,f,ic){ return f?'<div style="border:1px solid var(--c-line-2);border-radius:8px;padding:14px;margin-bottom:10px;"><div style="font-weight:600;margin-bottom:6px;">'+t+'</div><a class="btn-link" onclick="showToast(\'จำลองดาวน์โหลด '+esc(f)+'\',\'info\')"><i data-lucide="'+ic+'" class="w-3.5 h-3.5"></i> '+esc(f)+'</a></div>':'<div style="border:1px dashed var(--c-line);border-radius:8px;padding:14px;margin-bottom:10px;color:var(--c-mute-2);font-size:12.5px;">'+t+' — ไม่มีไฟล์</div>'; }
+    body='<div class="dv-section"><div class="dv-section-title"><i data-lucide="paperclip" class="w-4 h-4"></i>ไฟล์ที่อัปโหลด</div>'
+      +fileCard('ไฟล์ลักษณะแปลง (Shapefile)',p.shapefile_url,'file-archive')
+      +fileCard('เอกสารสิทธิ์',p.document_file,'file-text')+'</div>';
+  } else {
+    var evMap={create:{t:'สร้างแปลง',dot:''},edit:{t:'แก้ไขข้อมูล',dot:''},verify_pass:{t:'ตรวจสอบ — ผ่าน',dot:'is-success'},verify_fail:{t:'ตรวจสอบ — ไม่ผ่าน',dot:'is-danger'},delete:{t:'ลบแปลง',dot:'is-danger'}};
+    var items=p.history.slice().reverse().map(function(h){ var ev=evMap[h.event]||{t:h.event,dot:''}; return '<div class="tl-item"><div class="tl-dot '+ev.dot+'"></div><div class="flex justify-between items-center"><div class="tl-title">'+ev.t+'</div><div class="tl-meta">'+fmtDateTime(h.at)+'</div></div><div class="tl-meta">โดย '+esc(h.actor)+'</div>'+(h.note?'<div class="tl-note">'+esc(h.note)+'</div>':'')+'</div>'; }).join('');
+    body='<div class="timeline">'+items+'</div>';
+  }
+  var farmerCard = q ? '<div style="margin:0 0 4px;padding:12px 14px;background:rgba(255,154,31,0.08);border:1px solid var(--c-line-2);border-radius:8px;display:flex;align-items:center;gap:12px;">'
+      +'<i data-lucide="user-check" class="w-4 h-4" style="color:var(--c-teal);"></i><div style="flex:1;"><div style="font-size:12px;color:var(--c-mute-2);">ผูกกับโควตา</div>'
+      +'<div style="font-weight:600;"><span class="mono text-primary">'+esc(p.quota_no)+'</span> · '+esc(q.farmer_name)+' · <span class="num">'+esc(q.phone)+'</span></div></div>'
+      +'<button class="btn btn-sm btn-secondary" onclick="showToast(\'จำลองเปิดหน้าโควตา '+esc(p.quota_no)+'\',\'info\')"><i data-lucide="external-link" class="w-3.5 h-3.5"></i><span>ดูโควตา</span></button></div>'
+    : '<div style="margin:0 0 4px;padding:10px 14px;background:var(--c-line-3);border-radius:8px;font-size:12.5px;color:var(--c-mute);"><i data-lucide="alert-triangle" class="w-3.5 h-3.5" style="vertical-align:middle;"></i> โควตา <span class="mono">'+esc(p.quota_no)+'</span> ถูกลบหลังผูก — คงหมายเลขโควตาไว้ (snapshot)</div>';
+
+  document.getElementById('view-content').innerHTML=
+    '<div class="dw-head" style="padding-bottom:0;"><div class="dw-head-row"><div>'
+    +'<div class="dw-eyebrow"><i data-lucide="map" class="w-3.5 h-3.5"></i> แปลงที่ดิน · <span class="mono">'+esc(p.quota_no)+'</span></div>'
+    +'<div style="display:flex;align-items:center;gap:8px;"><h2 class="dw-title mono">'+esc(p.plot_code)+'</h2>'+statusPill(p.verify_status)+'</div></div>'
+    +'<div class="dw-actions">'+actions+'<span class="drawer-header-divider"></span><button class="top-icon-btn" onclick="closeView()"><i data-lucide="x" class="w-5 h-5"></i></button></div></div>'
+    +'<div style="padding:14px 0 0;">'+farmerCard+'</div>'
+    +'<div class="tabs">'
+    +'<button class="tab '+(tab==='overview'?'on':'')+'" onclick="setViewTab(\'overview\')"><i data-lucide="file-text" class="w-3.5 h-3.5"></i><span>ข้อมูลทั่วไป</span></button>'
+    +'<button class="tab '+(tab==='files'?'on':'')+'" onclick="setViewTab(\'files\')"><i data-lucide="paperclip" class="w-3.5 h-3.5"></i><span>ไฟล์ที่อัปโหลด</span></button>'
+    +'<button class="tab '+(tab==='history'?'on':'')+'" onclick="setViewTab(\'history\')"><i data-lucide="history" class="w-3.5 h-3.5"></i><span>ประวัติ</span></button></div></div>'
+    +'<div class="dw-body">'+body+'</div>'
+    +'<div class="dw-footer"><div class="dw-footer-meta">อัปเดตล่าสุด '+fmtDateTime(p.updated_at)+' · เวอร์ชัน '+p.version+'</div><div class="dw-footer-right"><button class="btn btn-secondary" onclick="closeView()">ปิด</button></div></div>';
+  renderIcons();
+}
+
+// ============================================
+// CREATE / EDIT DRAWER (OV-01/02) — quota search sub-flow + fields gated (LOCK-03)
+// BACKEND: API-02/03 create · API-05 edit · API-13 quota-search (read-only)
+// ============================================
+function blankForm(){ return { quota_no:'', ownership_type:'', deed_number:'', deed_issue_date:'', deed_owner_name:'',
+  address_line:'', province:'', district:'', subdistrict:'', postal_code:'',
+  latitude:'', longitude:'', area_rai:'', shapefile_url:'', document_file:'' }; }
+function openForm(mode,id){
+  var data, rec=null, quota=null;
+  if(mode==='edit'){ rec=findPlot(id); if(!rec)return; data=JSON.parse(JSON.stringify(rec)); quota=findQuotaByNo(rec.quota_no); }
+  else data=blankForm();
+  state.form={ mode:mode, id:rec?rec.id:null, data:data, submitting:false, quota:quota, version:rec?rec.version:null };
+  if(state.view){ state.view=null; if(getRoute()!=='plots')navigate('plots'); }
+  mountPanel('form-content'); renderFormDrawer();
+}
+function closeForm(){ if(state.form&&state.form.submitting)return; state.form=null; closePanel(); }
+function captureForm(){ if(!state.form)return; var d=state.form.data;
+  [['f-ownership_type','ownership_type'],['f-deed_number','deed_number'],['f-deed_issue_date','deed_issue_date'],['f-deed_owner_name','deed_owner_name'],['f-address_line','address_line'],['f-latitude','latitude'],['f-longitude','longitude'],['f-area_rai','area_rai']].forEach(function(pr){ var el=document.getElementById(pr[0]); if(el)d[pr[1]]=el.value; });
+}
+function renderFormDrawer(){
+  var f=state.form; if(!f)return; var isEdit=f.mode==='edit'; var d=f.data;
+  var locked = !isEdit && !d.quota_no; // fields gated จนกว่าเลือกโควตา
+  // Section 0 — quota binding
+  var section0='';
+  if(isEdit){
+    section0='<div class="note is-info mb-3"><i data-lucide="scale" class="w-4 h-4"></i><span>โควตา <b>'+esc(d.quota_no)+'</b> · '+esc(f.quota?f.quota.farmer_name:'')+' — แก้ไขการผูกไม่ได้ในหน้านี้</span></div>'
+      +'<div class="note is-warn mb-3"><i data-lucide="info" class="w-4 h-4"></i><span>แก้ไขข้อมูลแล้วสถานะคงเดิม</span></div>';
+  } else if(f.quota){
+    var q=f.quota;
+    section0='<div class="form-section"><div class="form-section-title">ค้นหาโควตา (บังคับก่อนกรอกข้อมูล)</div>'
+      +'<div style="padding:12px 14px;background:rgba(255,154,31,0.08);border:1px solid var(--c-line-2);border-radius:8px;display:flex;align-items:flex-start;gap:12px;">'
+      +'<i data-lucide="user-check" class="w-4 h-4" style="color:var(--c-teal);margin-top:2px;"></i><div style="flex:1;"><div style="font-size:12px;color:var(--c-mute-2);">ผูกกับโควตา</div>'
+      +'<div style="font-weight:600;"><span class="mono text-primary">'+esc(q.quota_no)+'</span> · '+esc(q.farmer_name)+' · <span class="num">'+esc(q.phone)+'</span></div>'
+      +'<div style="font-size:11.5px;color:var(--c-mute-2);margin-top:2px;">เลขบัตร <span class="mono">'+maskCitizen(q.citizen_id)+'</span></div></div>'
+      +'<button class="btn btn-sm btn-secondary" onclick="clearQuota()"><i data-lucide="repeat" class="w-3.5 h-3.5"></i><span>เปลี่ยนโควตา</span></button></div></div>';
+  } else {
+    section0='<div class="form-section"><div class="form-section-title">ค้นหาโควตา (บังคับก่อนกรอกข้อมูล)</div>'
+      +'<div class="field"><label class="field-label">ค้นหาเลขโควตา (Quota No.) <span class="req">*</span></label>'+searchSelectHTML('quota',{placeholder:'ค้นหาเลขโควตา หรือ ชื่อเกษตรกร'})+'<div class="field-help">เลือกโควตาที่ตรวจแล้ว · เลือกได้หลายแปลงต่อ 1 โควตา (1:N) · ระบบจะดึงข้อมูลเกษตรกรให้อัตโนมัติ</div></div></div>';
+  }
+
+  document.getElementById('form-content').innerHTML=
+    '<div class="dw-head"><div class="dw-head-row"><div>'
+    +'<div class="dw-eyebrow"><i data-lucide="'+(isEdit?'pencil':'plus')+'" class="w-3.5 h-3.5"></i> '+(isEdit?'แก้ไขแปลงที่ดิน':'สร้างแปลงที่ดิน')+'</div>'
+    +'<h2 class="dw-title">'+(isEdit?'แก้ไขแปลง <span class="mono text-primary">'+esc(d.plot_code)+'</span>':'สร้างแปลง')+'</h2>'
+    +(isEdit?'<div class="dw-sub">สถานะ: '+statusLabel(findPlot(f.id).verify_status)+' · เวอร์ชัน '+f.version+'</div>':'')
+    +'</div><button class="top-icon-btn" onclick="closeForm()"><i data-lucide="x" class="w-5 h-5"></i></button></div></div>'
+    +'<div class="dw-body">'
+    +section0
+    +'<div id="plot-fields">'
+    +(locked?'<div class="note is-info mb-3"><i data-lucide="lock" class="w-4 h-4"></i><span>เลือกโควตาก่อนจึงจะกรอกข้อมูลแปลงได้</span></div>':'')
+    +'<div class="form-section"><div class="form-section-title">ข้อมูลกรรมสิทธิ์</div><div class="form-grp">'
+    +selField('ประเภทกรรมสิทธิ์','f-ownership_type',d.ownership_type,OWNERSHIP,true)
+    +field('เลขที่เอกสารสิทธิ์','f-deed_number','text',d.deed_number,'เช่น 12345',true,'onblur="checkDeed()"','mono')
+    +field('วันที่ออกเอกสาร','f-deed_issue_date','date',d.deed_issue_date,'',true)
+    +field('ชื่อเจ้าของตามเอกสาร','f-deed_owner_name','text',d.deed_owner_name,'ชื่อ-นามสกุล',true)
+    +'</div></div>'
+    +'<div class="form-section"><div class="form-section-title">ที่อยู่แปลง</div>'
+    +'<div class="field"><label class="field-label">ที่อยู่ <span class="req">*</span></label><textarea class="input field-input" id="f-address_line" placeholder="บ้านเลขที่ หมู่ ซอย ถนน">'+esc(d.address_line)+'</textarea><div class="field-error"></div></div>'
+    +'<div class="form-grp">'
+    +'<div class="field"><label class="field-label">จังหวัด <span class="req">*</span></label>'+searchSelectHTML('province',{placeholder:'เลือกจังหวัด'})+'<div class="field-error" id="err-province"></div></div>'
+    +'<div class="field"><label class="field-label">อำเภอ <span class="req">*</span></label>'+searchSelectHTML('district',{placeholder:'เลือกอำเภอ'})+'<div class="field-error" id="err-district"></div></div>'
+    +'<div class="field"><label class="field-label">ตำบล <span class="req">*</span></label>'+searchSelectHTML('subdistrict',{placeholder:'เลือกตำบล'})+'<div class="field-error" id="err-subdistrict"></div></div>'
+    +'<div class="field"><label class="field-label">รหัสไปรษณีย์</label><input class="input field-input num" id="f-postal_code" type="text" readonly value="'+esc(d.postal_code)+'"><div class="field-help">ระบบกำหนดให้อัตโนมัติจากตำบล</div></div>'
+    +'</div></div>'
+    +'<div class="form-section"><div class="form-section-title">พิกัด & พื้นที่</div><div class="form-grp">'
+    +field('ละติจูด','f-latitude','text',d.latitude,'-90 ถึง 90',true,'inputmode="decimal"','num')
+    +field('ลองจิจูด','f-longitude','text',d.longitude,'-180 ถึง 180',true,'inputmode="decimal"','num')
+    +field('พื้นที่ (ไร่)','f-area_rai','text',d.area_rai,'มากกว่า 0',true,'inputmode="decimal"','num')
+    +'</div></div>'
+    +'<div class="form-section"><div class="form-section-title">เอกสารแนบ</div>'
+    +'<div class="field"><label class="field-label">ไฟล์ลักษณะแปลง (Shapefile) <span class="req">*</span></label>'
+    +'<div style="border:2px dashed '+(d.shapefile_url?'var(--c-success)':'var(--c-line)')+';border-radius:8px;padding:16px;text-align:center;color:var(--c-mute-2);cursor:pointer;" onclick="attachFile(\'shapefile\')"><i data-lucide="'+(d.shapefile_url?'file-archive':'upload')+'" class="w-5 h-5"></i><div style="margin-top:6px;font-size:12.5px;">'+(d.shapefile_url?'<span style="color:var(--c-success);font-weight:600;">'+esc(d.shapefile_url)+'</span> · คลิกเพื่อเปลี่ยน':'คลิกเพื่อแนบไฟล์ Shapefile (.zip ≤50MB) — บังคับ')+'</div></div>'
+    +'<div class="field-error" id="err-shapefile"></div></div>'
+    +'<div class="field"><label class="field-label">เอกสารสิทธิ์ (ไม่บังคับ)</label>'
+    +'<div style="border:2px dashed '+(d.document_file?'var(--c-success)':'var(--c-line)')+';border-radius:8px;padding:16px;text-align:center;color:var(--c-mute-2);cursor:pointer;" onclick="attachFile(\'document\')"><i data-lucide="'+(d.document_file?'file-text':'upload')+'" class="w-5 h-5"></i><div style="margin-top:6px;font-size:12.5px;">'+(d.document_file?'<span style="color:var(--c-success);font-weight:600;">'+esc(d.document_file)+'</span> · คลิกเพื่อเปลี่ยน':'คลิกเพื่อแนบเอกสารสิทธิ์ (PDF/JPG ≤5MB)')+'</div></div>'
+    +'<div class="field-help">จำลองในต้นแบบ — dev เชื่อม Document Storage จริง</div></div></div>'
+    +'</div>'
+    +'</div>'
+    +'<div class="dw-footer"><div></div><div class="dw-footer-right">'
+    +'<button class="btn btn-ghost" onclick="closeForm()">ยกเลิก</button>'
+    +'<button class="btn btn-primary" id="f-submit" onclick="submitForm()"><i data-lucide="check" class="w-4 h-4"></i><span>'+(isEdit?'บันทึกการแก้ไข':'ยืนยันสร้าง')+'</span></button>'
+    +'</div></div>';
+  renderIcons();
+  if(!isEdit&&!f.quota) initQuotaSearch();
+  initPlotAddr();
+  if(locked) lockPlotFields();
+}
+function field(label,id,type,val,ph,req,extra,cls){ return '<div class="field"><label class="field-label">'+label+(req?' <span class="req">*</span>':'')+'</label><input class="input field-input '+(cls||'')+'" id="'+id+'" type="'+type+'" placeholder="'+(ph||'')+'" value="'+esc(val)+'" '+(extra||'')+'><div class="field-error"></div></div>'; }
+function selField(label,id,val,opts,req){ return '<div class="field"><label class="field-label">'+label+(req?' <span class="req">*</span>':'')+'</label><select class="select field-input" id="'+id+'"><option value="">— เลือก —</option>'+opts.map(o=>'<option value="'+o+'"'+(o===val?' selected':'')+'>'+o+'</option>').join('')+'</select><div class="field-error"></div></div>'; }
+function lockPlotFields(){ var wrap=document.getElementById('plot-fields'); if(!wrap)return;
+  wrap.querySelectorAll('input,select,textarea').forEach(function(el){ el.disabled=true; });
+  wrap.querySelectorAll('.search-select').forEach(function(ss){ ss.classList.add('is-disabled'); });
+  wrap.style.opacity='0.55'; wrap.style.pointerEvents='none';
+}
+function initQuotaSearch(){
+  initSearchSelect('quota',{
+    options: QUOTAS.map(q=>({value:q.quota_no,label:q.quota_no+' · '+q.farmer_name,sub:q.phone+' · '+maskCitizen(q.citizen_id),icon:'scale'})),
+    value: state.form.data.quota_no||null, emptyText:'ไม่พบโควตาที่ตรงกับหมายเลขที่กรอก',
+    onSelect:function(val){ selectQuota(val); }
+  });
+}
+function selectQuota(no){ captureForm(); if(!no){ state.form.quota=null; state.form.data.quota_no=''; renderFormDrawer(); return; } var q=findQuotaByNo(no); if(!q)return; state.form.quota=q; state.form.data.quota_no=no; renderFormDrawer(); }
+function clearQuota(){ captureForm(); state.form.quota=null; state.form.data.quota_no=''; renderFormDrawer(); }
+function attachFile(kind){ captureForm(); var d=state.form.data;
+  if(kind==='shapefile'){ d.shapefile_url='plot_shape_'+Date.now()+'.zip'; showToast('จำลองแนบไฟล์ลักษณะแปลง (Shapefile .zip ≤50MB)','info'); }
+  else { d.document_file='deed_document_'+Date.now()+'.pdf'; showToast('จำลองแนบเอกสารสิทธิ์ (PDF/JPG ≤5MB)','info'); }
+  renderFormDrawer();
+}
+function initPlotAddr(){
+  var d=state.form.data;
+  initSearchSelect('province',{ options:ADDRESS.map(a=>({value:a.p,label:a.p,icon:'map-pin'})), value:d.province||null,
+    onSelect:function(val){ captureForm(); if(d.province!==val){ d.province=val||''; d.district=''; d.subdistrict=''; d.postal_code=''; refreshPlotAddr(); } } });
+  refreshPlotAddr();
+}
+function refreshPlotAddr(){
+  var d=state.form.data;
+  initSearchSelect('district',{ options:getDistricts(d.province).map(x=>({value:x.d,label:x.d})), value:d.district||null, emptyText:d.province?'ไม่พบอำเภอ':'เลือกจังหวัดก่อน',
+    onSelect:function(val){ captureForm(); if(d.district!==val){ d.district=val||''; d.subdistrict=''; d.postal_code=''; refreshPlotAddr(); } } });
+  initSearchSelect('subdistrict',{ options:getSubs(d.province,d.district).map(x=>({value:x.s,label:x.s,right:x.z})), value:d.subdistrict||null, emptyText:d.district?'ไม่พบตำบล':'เลือกอำเภอก่อน',
+    onSelect:function(val){ captureForm(); d.subdistrict=val||''; d.postal_code=val?getPostal(d.province,d.district,val):''; var pz=document.getElementById('f-postal_code'); if(pz)pz.value=d.postal_code; } });
+  var dEl=document.querySelector('#ss-district .ss-input'); if(dEl){dEl.disabled=!d.province; dEl.closest('.search-select').classList.toggle('is-disabled',!d.province);}
+  var sEl=document.querySelector('#ss-subdistrict .ss-input'); if(sEl){sEl.disabled=!d.district; sEl.closest('.search-select').classList.toggle('is-disabled',!d.district);}
+  var pz=document.getElementById('f-postal_code'); if(pz)pz.value=d.postal_code||'';
+}
+function checkDeed(){ // VR-07 deed_number uniqueness (exclude self)
+  captureForm(); var dn=(state.form.data.deed_number||'').trim(); if(!dn)return;
+  var dup=state.records.find(p=>!p.is_deleted&&String(p.deed_number)===dn&&p.id!==state.form.id);
+  var el=document.getElementById('f-deed_number'); var fl=el.closest('.field');
+  if(dup){ fl.classList.add('is-invalid'); fl.querySelector('.field-error').textContent='เลขที่เอกสารสิทธิ์ซ้ำ'; } else fl.classList.remove('is-invalid');
+}
+function vReq(msg){ return function(v){ return v.trim()?'':msg; }; }
+function validateField(el,val){ var f=el.closest('.field'); if(!f)return true; var msg=''; try{msg=val?val(el.value,el):'';}catch(e){msg='';} var e=f.querySelector('.field-error'); if(msg){f.classList.add('is-invalid'); if(e)e.textContent=msg; return false;} f.classList.remove('is-invalid'); return true; }
+function setSelErr(key,msg){ var el=document.getElementById('err-'+key); if(!el)return; var f=el.closest('.field'); if(msg){el.textContent=msg; f.classList.add('is-invalid'); el.style.visibility='visible';} else {f.classList.remove('is-invalid'); el.style.visibility='hidden';} }
+function validateFormAll(){
+  captureForm(); var d=state.form.data; var ok=true;
+  function vf(id,fn){ var el=document.getElementById(id); if(el&&!validateField(el,fn))ok=false; }
+  if(state.form.mode==='create'&&!d.quota_no){ showToast('กรุณาค้นหาและเลือกโควตาก่อน','warning'); return false; }
+  vf('f-ownership_type',vReq('กรุณาเลือกประเภทกรรมสิทธิ์'));
+  vf('f-deed_number',vReq('กรุณากรอกเลขที่เอกสารสิทธิ์'));
+  vf('f-deed_issue_date',vReq('กรุณาเลือกวันที่ออกเอกสาร'));
+  vf('f-deed_owner_name',vReq('กรุณากรอกชื่อเจ้าของตามเอกสาร'));
+  vf('f-address_line',vReq('กรุณากรอกที่อยู่'));
+  setSelErr('province',d.province?'':'กรุณาเลือกจังหวัด'); if(!d.province)ok=false;
+  setSelErr('district',d.district?'':'กรุณาเลือกอำเภอ'); if(!d.district)ok=false;
+  setSelErr('subdistrict',d.subdistrict?'':'กรุณาเลือกตำบล'); if(!d.subdistrict)ok=false;
+  vf('f-latitude',function(v){ if(!v.trim())return 'กรุณากรอกละติจูด'; var n=parseFloat(v); if(isNaN(n)||n<-90||n>90)return 'พิกัดละติจูดต้องอยู่ระหว่าง -90 ถึง 90'; return ''; });
+  vf('f-longitude',function(v){ if(!v.trim())return 'กรุณากรอกลองจิจูด'; var n=parseFloat(v); if(isNaN(n)||n<-180||n>180)return 'พิกัดลองจิจูดต้องอยู่ระหว่าง -180 ถึง 180'; return ''; });
+  vf('f-area_rai',function(v){ if(!v.trim())return 'กรุณากรอกพื้นที่'; var n=parseFloat(v); if(isNaN(n)||n<=0)return 'พื้นที่ต้องเป็นตัวเลขที่มากกว่า 0'; return ''; });
+  if(d.postal_code&&!/^\d{5}$/.test(d.postal_code)){ setSelErr('subdistrict','รหัสไปรษณีย์ต้องเป็นตัวเลข 5 หลัก'); ok=false; }
+  if(d.deed_number){ var dup=state.records.find(p=>!p.is_deleted&&String(p.deed_number)===String(d.deed_number).trim()&&p.id!==state.form.id); if(dup){ var de=document.getElementById('f-deed_number'); de.closest('.field').classList.add('is-invalid'); de.closest('.field').querySelector('.field-error').textContent='เลขที่เอกสารสิทธิ์ซ้ำ'; ok=false; } }
+  var se=document.getElementById('err-shapefile'); if(!d.shapefile_url){ if(se){se.textContent='กรุณาแนบไฟล์ลักษณะแปลง (Shapefile)'; se.style.visibility='visible';} ok=false; } else if(se){ se.style.visibility='hidden'; }
+  return ok;
+}
+async function submitForm(){
+  var f=state.form; if(!f||f.submitting)return;
+  if(!validateFormAll()){ showToast('กรุณากรอกข้อมูลให้ครบถ้วน','warning'); return; }
+  f.submitting=true; var btn=document.getElementById('f-submit'); btn.disabled=true; btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังบันทึก…</span>'; renderIcons();
+  // BACKEND: create=API-02/03 (FN-04 validate, FN-05 save) · edit=API-05 (optimistic version) · idempotency + double-submit guard (BR-11)
+  await new Promise(r=>setTimeout(r,600));
+  var d=f.data, msg='';
+  if(f.mode==='create'){
+    var now=new Date().toISOString(); var q=f.quota; var code=nextPlotCode();
+    var np={ id:'p-'+code, plot_code:code, quota_no:d.quota_no,
+      farmer_name:q?q.farmer_name:'', farmer_phone:q?q.phone:'', farmer_citizen:q?q.citizen_id:'',
+      ownership_type:d.ownership_type, deed_number:d.deed_number, deed_issue_date:d.deed_issue_date, deed_owner_name:d.deed_owner_name,
+      address_line:d.address_line, province:d.province, district:d.district, subdistrict:d.subdistrict, postal_code:d.postal_code,
+      latitude:d.latitude, longitude:d.longitude, area_rai:d.area_rai,
+      shapefile_url:d.shapefile_url, document_file:d.document_file,
+      verify_status:'waiting', fail_reason:null, version:1, is_deleted:false, delete_type:null, delete_reason:null,
+      verified_by:null, created_at:now, created_by:CURRENT_USER.name, updated_at:now, updated_by:CURRENT_USER.name,
+      history:[{event:'create',actor:CURRENT_USER.name,at:now,note:'ผูกกับโควตา '+d.quota_no+' · '+(q?q.farmer_name:'')}] };
+    state.records.unshift(np);
+    msg='สร้างแปลงสำเร็จ — '+code;
+  } else {
+    var p=findPlot(f.id);
+    ['ownership_type','deed_number','deed_issue_date','deed_owner_name','address_line','province','district','subdistrict','postal_code','latitude','longitude','area_rai','shapefile_url','document_file'].forEach(function(k){ p[k]=d[k]; });
+    p.updated_at=new Date().toISOString(); p.updated_by=CURRENT_USER.name; p.version=(p.version||1)+1;
+    addHistory(p,'edit',CURRENT_USER.name,null); // BR-06 status ไม่เปลี่ยน
+    msg='บันทึกการแก้ไขแล้ว';
+  }
+  state.form=null; closePanel(); render(); showToast(msg,'success',4200);
+}
+
+// ============================================
+// SEARCH-SELECT helper (Iron Rule #34)
+// ============================================
+window.__ss=window.__ss||{};
+function ssGet(k){return window.__ss[k];}
+function ssEsc(s){return String(s).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function searchSelectHTML(key,opt){ opt=opt||{}; var ph=opt.placeholder||'ค้นหา...'; return '<div class="search-select" id="ss-'+key+'"><i data-lucide="search" class="ss-lead w-4 h-4"></i><input type="text" class="input ss-input" id="ss-input-'+key+'" autocomplete="off" placeholder="'+ph+'" oninput="ssOnInput(\''+key+'\',this.value)" onfocus="ssOpen(\''+key+'\')" onkeydown="ssOnKey(\''+key+'\',event)"><button type="button" class="ss-clear hidden" id="ss-clear-'+key+'" tabindex="-1" onclick="ssClear(\''+key+'\')"><i data-lucide="x" class="w-4 h-4"></i></button><i data-lucide="chevron-down" class="ss-caret w-4 h-4" id="ss-caret-'+key+'"></i><div class="ss-list hidden" id="ss-list-'+key+'"></div></div>'; }
+function initSearchSelect(key,cfg){ cfg=cfg||{}; window.__ss[key]={options:cfg.options||[],value:cfg.value!=null?cfg.value:null,onSelect:cfg.onSelect||function(){},emptyText:cfg.emptyText||'ไม่พบรายการ',query:'',open:false,hi:0}; ssSetText(key); ssSyncChrome(key); renderIcons(); }
+function ssFiltered(key){ var s=ssGet(key); if(!s)return []; var q=(s.query||'').toLowerCase().trim(); if(!q)return s.options; return s.options.filter(o=>String(o.label).toLowerCase().includes(q)||String(o.value).toLowerCase().includes(q)||String(o.sub||'').toLowerCase().includes(q)); }
+function ssSyncChrome(key){ var s=ssGet(key); if(!s)return; var sel=s.options.find(o=>o.value===s.value); var c=document.getElementById('ss-clear-'+key); if(c)c.classList.toggle('hidden',!sel); var k=document.getElementById('ss-caret-'+key); if(k)k.classList.toggle('hidden',!!sel); }
+function ssSetText(key){ var s=ssGet(key); if(!s)return; var inp=document.getElementById('ss-input-'+key); if(!inp)return; var sel=s.options.find(o=>o.value===s.value); inp.value=s.open?s.query:(sel?sel.label:''); }
+function ssRenderList(key){ var s=ssGet(key); if(!s)return; var list=document.getElementById('ss-list-'+key); if(!list)return; var items=ssFiltered(key); if(items.length===0){ list.innerHTML='<div class="ss-empty">'+s.emptyText+'</div>'; } else { var q=(s.query||'').toLowerCase().trim(); var hl=function(t){return q?String(t).replace(new RegExp('('+ssEsc(q)+')','gi'),'<mark>$1</mark>'):String(t);}; list.innerHTML=items.map(function(o,i){return '<button type="button" class="ss-opt '+(i===s.hi?'is-active':'')+'" onmousedown="event.preventDefault()" onclick="ssPick(\''+key+'\','+i+')">'+(o.icon?'<i data-lucide="'+o.icon+'" class="ss-opt-ic w-4 h-4"></i>':'')+'<span class="ss-opt-main"><span class="ss-opt-label">'+hl(o.label)+'</span>'+(o.sub?'<span class="ss-opt-sub">'+hl(o.sub)+'</span>':'')+'</span>'+(o.right?'<span class="ss-opt-right">'+o.right+'</span>':'')+'</button>';}).join(''); } list.classList.toggle('hidden',!s.open); renderIcons(); }
+function ssOpen(key){ var s=ssGet(key); if(!s)return; var inp=document.getElementById('ss-input-'+key); if(inp&&inp.disabled)return; s.open=true; s.query=''; s.hi=0; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+function ssOnInput(key,val){ var s=ssGet(key); if(!s)return; s.query=val; s.open=true; s.hi=0; s.value=null; ssSyncChrome(key); ssRenderList(key); }
+function ssPick(key,i){ var s=ssGet(key); if(!s)return; var o=ssFiltered(key)[i]; if(!o)return; s.value=o.value; s.query=''; s.open=false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); s.onSelect(o.value,o); }
+function ssClear(key){ var s=ssGet(key); if(!s)return; s.value=null; s.query=''; s.open=true; ssSetText(key); ssSyncChrome(key); ssRenderList(key); var inp=document.getElementById('ss-input-'+key); if(inp)inp.focus(); s.onSelect(null,null); }
+function ssOnKey(key,e){ var s=ssGet(key); if(!s)return; var items=ssFiltered(key); if(e.key==='ArrowDown'){e.preventDefault(); s.open=true; s.hi=Math.min(items.length-1,s.hi+1); ssRenderList(key);} else if(e.key==='ArrowUp'){e.preventDefault(); s.hi=Math.max(0,s.hi-1); ssRenderList(key);} else if(e.key==='Enter'){e.preventDefault(); if(items[s.hi])ssPick(key,s.hi);} else if(e.key==='Escape'){s.open=false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); e.stopPropagation();} }
+document.addEventListener('click',function(e){ Object.keys(window.__ss||{}).forEach(function(key){ var w=document.getElementById('ss-'+key); var s=ssGet(key); if(w&&s&&s.open&&!w.contains(e.target)){ s.open=false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); } }); });
+
+// ============================================
+// MODALS (verify / delete / import)
+// ============================================
+function openModalBox(type,data,isLg){ state.modal={open:true,type:type,data:data||{}}; var box=document.getElementById('modalBox'); box.className='modal'+(isLg?' is-lg':''); renderModal(); requestAnimationFrame(()=>document.getElementById('modalBackdrop').classList.add('is-open')); }
+function closeModal(){ if(state.modal.data&&state.modal.data.busy)return; document.getElementById('modalBackdrop').classList.remove('is-open'); setTimeout(()=>state.modal={open:false,type:null,data:null},200); }
+function renderModal(){ var t=state.modal.type; if(t==='verify')renderVerifyModal(); else if(t==='delete')renderDeleteModal(); else if(t==='import')renderImportModal(); }
+
+// VERIFY (OV-03) — BACKEND: single=API-07 · bulk=API-08 (FN-06/07) + status guard 409
+function openVerifyModal(singleId){ var ids=singleId?[singleId]:Array.from(state.selectedIds); ids=ids.filter(function(id){ var p=findPlot(id); return p&&!p.is_deleted&&p.verify_status==='waiting'; }); if(ids.length===0){ showToast('เลือกได้เฉพาะรายการที่รอตรวจสอบ','warning'); return; } openModalBox('verify',{ids:ids,result:'',reason:'',busy:false}); }
+function setVerifyResult(v){ var rn=document.getElementById('v-reason'); if(rn)state.modal.data.reason=rn.value; state.modal.data.result=v; renderVerifyModal(); }
+function renderVerifyModal(){
+  var d=state.modal.data; var plots=d.ids.map(findPlot).filter(Boolean); var isBulk=plots.length>1; var single=plots[0];
+  var listHtml='';
+  if(isBulk){ listHtml='<div class="field"><label class="field-label">รายการที่เลือก ('+plots.length+' รายการ)</label><div class="imp-errors" style="max-height:160px;">'+plots.map(p=>'<div class="imp-err-row"><span class="r mono" style="color:var(--c-ink);">'+p.plot_code+'</span><span class="m">'+esc(p.farmer_name)+'</span><span class="d mono">'+p.quota_no+'</span></div>').join('')+'</div><div class="field-help">ใช้เหตุผลเดียวกันทุกรายการ (เมื่อเลือก “ไม่ผ่าน”)</div></div>'; }
+  else { listHtml='<div style="font-size:13px;color:var(--c-mute);margin-bottom:12px;line-height:1.7;"><div>เลขแปลง: <span class="mono" style="color:var(--c-ink);font-weight:600;">'+single.plot_code+'</span></div><div><strong style="color:var(--c-ink);">'+esc(single.farmer_name)+'</strong> · โควตา <span class="mono">'+single.quota_no+'</span></div><div>เลขที่เอกสาร: <span class="mono">'+esc(single.deed_number)+'</span></div></div>'; }
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="shield-check" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">ตรวจสอบแปลง'+(isBulk?' ('+plots.length+' รายการ)':'')+'</h3><p class="modal-subtitle">เลือกผลการตรวจสอบ · หากไม่ผ่านต้องระบุเหตุผล</p></div>'
+    +'<button class="icon-btn" onclick="closeModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>'
+    +'<div class="modal-body">'+listHtml
+    +'<div class="field"><label class="field-label">ผลตรวจสอบ <span class="req">*</span></label><div style="display:flex;flex-direction:column;gap:8px;">'
+    +'<label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13px;padding:9px 12px;border:1px solid '+(d.result==='verified'?'var(--c-success)':'var(--c-line)')+';border-radius:8px;background:'+(d.result==='verified'?'#E4F4EB':'#fff')+';"><input type="radio" name="vr" value="verified" '+(d.result==='verified'?'checked':'')+' onchange="setVerifyResult(\'verified\')" style="accent-color:var(--c-success);"> ผ่าน</label>'
+    +'<label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13px;padding:9px 12px;border:1px solid '+(d.result==='failed'?'var(--c-danger)':'var(--c-line)')+';border-radius:8px;background:'+(d.result==='failed'?'#FFE9E7':'#fff')+';"><input type="radio" name="vr" value="failed" '+(d.result==='failed'?'checked':'')+' onchange="setVerifyResult(\'failed\')" style="accent-color:var(--c-danger);"> ไม่ผ่าน</label>'
+    +'</div><div class="field-error" id="err-vr"></div></div>'
+    +(d.result==='failed'?'<div class="field" style="margin-bottom:0;"><label class="field-label">เหตุผลที่ไม่ผ่าน <span class="req">*</span></label><textarea class="input" id="v-reason" placeholder="ระบุเหตุผลที่ไม่ผ่านการตรวจสอบ...">'+esc(d.reason)+'</textarea><div class="field-error" id="err-reason"></div>'+(isBulk?'<div class="note is-warn mt-2"><i data-lucide="info" class="w-4 h-4"></i><span>ใช้เหตุผลเดียวกันนี้กับทุกรายการที่เลือก</span></div>':'')+'</div>':'')
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" id="v-submit" onclick="submitVerify()"><i data-lucide="check" class="w-4 h-4"></i><span>ยืนยัน</span></button></div>';
+  renderIcons();
+  var n=document.getElementById('v-reason'); if(n)n.value=d.reason;
+}
+async function submitVerify(){
+  var d=state.modal.data; if(d.busy)return; var n=document.getElementById('v-reason'); if(n)d.reason=n.value;
+  if(!d.result){ var e=document.getElementById('err-vr'); e.textContent='กรุณาเลือกผลการตรวจสอบ'; e.style.visibility='visible'; showToast('กรุณาเลือกผลการตรวจสอบ','warning'); return; }
+  if(d.result==='failed'&&!(d.reason||'').trim()){ var er=document.getElementById('err-reason'); if(er){er.textContent='กรุณากรอกเหตุผล'; er.style.visibility='visible';} showToast('กรุณากรอกเหตุผล','warning'); return; }
+  d.busy=true; var btn=document.getElementById('v-submit'); btn.disabled=true; btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังดำเนินการ…</span>'; renderIcons();
+  // BACKEND: FN-06/07 apply verify + optimistic (BR-11) · audit with bulk count (BR-07)
+  await new Promise(r=>setTimeout(r,700));
+  var ok=0,fail=0; var reason=(d.reason||'').trim();
+  d.ids.forEach(function(id){ var p=findPlot(id); if(!p||p.is_deleted){fail++;return;} if(p.verify_status!=='waiting'){fail++;return;}
+    if(d.result==='verified'){ p.verify_status='verified'; p.fail_reason=null; addHistory(p,'verify_pass',STEWARD.name,d.ids.length>1?('ตรวจสอบกลุ่ม '+d.ids.length+' รายการ'):null); }
+    else { p.verify_status='failed'; p.fail_reason=reason; addHistory(p,'verify_fail',STEWARD.name,reason+(d.ids.length>1?(' · ตรวจสอบกลุ่ม '+d.ids.length+' รายการ'):'')); }
+    p.verified_by=STEWARD.name; p.updated_at=new Date().toISOString(); p.version++; ok++;
+  });
+  d.busy=false; state.selectedIds.clear(); closeModal(); render(); if(state.view)renderViewDrawer();
+  if(d.ids.length===1) showToast(d.result==='verified'?'ยืนยันเรียบร้อย':'ทำเครื่องหมายไม่ผ่านแล้ว',d.result==='verified'?'success':'info',4000);
+  else showToast('ตรวจสอบกลุ่มเสร็จสิ้น — สำเร็จ '+ok+' ล้มเหลว '+fail,fail>0?'warning':'success',4800);
+}
+
+// DELETE (OV-04) — BACKEND: API-11 (FN-08) soft/hard + audit (BR-08) + idempotency
+function openDeleteModal(id){ var p=findPlot(id); if(!p)return; openModalBox('delete',{id:id,dtype:'soft',busy:false}); }
+function setDeleteType(t){ var rn=document.getElementById('del-reason'); if(rn)state.modal.data.reason=rn.value; state.modal.data.dtype=t; renderDeleteModal(); }
+function renderDeleteModal(){
+  var d=state.modal.data; var p=findPlot(d.id); if(!p)return;
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon is-danger"><i data-lucide="trash-2" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">ลบแปลง?</h3><p class="modal-subtitle">ต้องการลบ <strong>"'+p.plot_code+' — '+esc(p.farmer_name)+'"</strong> ใช่หรือไม่</p></div>'
+    +'<button class="icon-btn" onclick="closeModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>'
+    +'<div class="modal-body">'
+    +'<div class="field"><label class="field-label">ประเภทการลบ <span class="req">*</span></label><div style="display:flex;flex-direction:column;gap:8px;">'
+    +'<label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13px;padding:9px 12px;border:1px solid '+(d.dtype==='soft'?'var(--c-primary)':'var(--c-line)')+';border-radius:8px;background:'+(d.dtype==='soft'?'rgba(255,59,48,0.05)':'#fff')+';"><input type="radio" name="del-type" value="soft" '+(d.dtype==='soft'?'checked':'')+' onchange="setDeleteType(\'soft\')" style="accent-color:var(--c-primary);"> ลบชั่วคราว (Soft) — ซ่อนจากรายการ กู้คืนได้</label>'
+    +'<label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13px;padding:9px 12px;border:1px solid '+(d.dtype==='hard'?'var(--c-danger)':'var(--c-line)')+';border-radius:8px;background:'+(d.dtype==='hard'?'#FFE9E7':'#fff')+';"><input type="radio" name="del-type" value="hard" '+(d.dtype==='hard'?'checked':'')+' onchange="setDeleteType(\'hard\')" style="accent-color:var(--c-danger);"> ลบถาวร (Hard) — ลบออกจากระบบ</label>'
+    +'</div></div>'
+    +'<div class="field"><label class="field-label">เหตุผล (ไม่บังคับ)</label><textarea class="input" id="del-reason" placeholder="ระบุเหตุผลการลบ...">'+esc(d.reason||'')+'</textarea></div>'
+    +(d.dtype==='hard'?'<div class="note is-warn" style="background:#FFE9E7;color:#E62E24;"><i data-lucide="alert-triangle" class="w-4 h-4"></i><span>การลบถาวรไม่สามารถกู้คืนได้</span></div>':'<div class="note is-warn"><i data-lucide="info" class="w-4 h-4"></i><span>รายการจะถูกซ่อน (soft delete) และบันทึกลงประวัติ</span></div>')
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-danger is-solid" id="d-submit" onclick="confirmDelete()"><i data-lucide="trash-2" class="w-4 h-4"></i><span>ลบแปลง</span></button></div>';
+  renderIcons();
+  var rn=document.getElementById('del-reason'); if(rn)rn.value=d.reason||'';
+}
+async function confirmDelete(){
+  var d=state.modal.data; if(d.busy)return; var rn=document.getElementById('del-reason'); if(rn)d.reason=rn.value;
+  var sel=document.querySelector('input[name="del-type"]:checked'); d.dtype=sel?sel.value:'soft';
+  d.busy=true; var btn=document.getElementById('d-submit'); btn.disabled=true; btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังลบ…</span>'; renderIcons();
+  await new Promise(r=>setTimeout(r,550));
+  var p=findPlot(d.id); var reason=(d.reason||'').trim();
+  if(p){ state.selectedIds.delete(p.id);
+    if(d.dtype==='hard'){ var i=state.records.indexOf(p); if(i>=0)state.records.splice(i,1); }
+    else { p.is_deleted=true; p.deleted_at=new Date().toISOString(); p.delete_type='soft'; p.delete_reason=reason||null; addHistory(p,'delete',CURRENT_USER.name,'ลบชั่วคราว'+(reason?(' · '+reason):'')); }
+  }
+  d.busy=false; closeModal(); if(state.view&&state.view.id===d.id)closeView(); render(); showToast('ลบแปลงแล้ว','success',4000);
+}
+
+// CSV IMPORT (OV-05, wizard) — BACKEND: API-09 (FN-09) partial success (BR-10) · ทุกแถว Waiting for verify
+var CSV_COLS=['quota_no','ownership_type','deed_number','deed_issue_date','deed_owner_name','address','province','district','subdistrict','latitude','longitude','area','shapefile_url'];
+function openImportModal(){ openModalBox('import',{phase:'pick',file:null,rows:[],errors:[],validRows:[],busy:false,applied:null},true); }
+function renderImportModal(){
+  var d=state.modal.data;
+  var html='<div class="modal-header"><div class="modal-header-icon"><i data-lucide="upload" class="w-5 h-5"></i></div><div style="flex:1;"><h3 class="modal-title">นำเข้าแปลงที่ดินจากไฟล์ CSV</h3><p class="modal-subtitle">.csv (UTF-8) ≤5MB · ทุกแถวสถานะ "รอตรวจสอบ" · โควตาต้องมีในระบบ · เลขที่เอกสารไม่ซ้ำ</p></div><button class="icon-btn" onclick="closeModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div><div class="modal-body">';
+  if(d.phase==='pick'||d.phase==='preview'){
+    html+='<div class="note is-info mb-3" style="justify-content:space-between;align-items:center;"><span style="display:flex;gap:9px;align-items:center;"><i data-lucide="download" class="w-4 h-4"></i>ดาวน์โหลดแม่แบบ CSV</span><button class="btn btn-sm btn-secondary" onclick="dlTemplate()"><i data-lucide="download" class="w-3.5 h-3.5"></i><span>ดาวน์โหลดแม่แบบ</span></button></div>';
+    html+='<div class="field"><label class="field-label">เลือกไฟล์ CSV</label><input type="file" id="csv-file" accept=".csv" class="hidden" onchange="onCsvPicked(this)"><div style="display:flex;align-items:center;gap:12px;"><button class="btn btn-secondary" onclick="document.getElementById(\'csv-file\').click()"><i data-lucide="upload" class="w-4 h-4"></i><span>เลือกไฟล์</span></button>'+(d.file?'<span style="font-size:12.5px;color:var(--c-mute);">'+esc(d.file.name)+' ('+(d.file.size/1024).toFixed(1)+' KB)</span>':'<span style="font-size:12.5px;color:var(--c-mute-3);">ยังไม่ได้เลือกไฟล์</span>')+'</div><div class="field-error" id="err-csv"></div></div>';
+    if(d.phase==='preview'){
+      var okN=d.validRows.length,badN=d.errors.length,totalN=d.rows.length;
+      html+='<div class="imp-summary"><div class="imp-chip is-total"><div class="v num">'+totalN+'</div><div class="l">แถวทั้งหมด</div></div><div class="imp-chip is-ok"><div class="v num">'+okN+'</div><div class="l">ผ่าน</div></div><div class="imp-chip is-bad"><div class="v num">'+badN+'</div><div class="l">ไม่ผ่าน</div></div></div>';
+      if(badN>0){ html+='<div class="flex justify-between items-center mb-2"><span style="font-size:12.5px;font-weight:600;">รายละเอียดข้อผิดพลาด (แถวเสียจะถูกข้าม)</span><button class="btn btn-sm btn-secondary" onclick="dlErrors()"><i data-lucide="download" class="w-3.5 h-3.5"></i><span>ดาวน์โหลดรายงาน</span></button></div><div class="imp-errors">'+d.errors.map(e=>'<div class="imp-err-row"><span class="r">แถว '+e.row+'</span><span class="f">'+esc(e.field)+'</span><span class="m">'+esc(e.message)+'</span><span class="d">'+esc(e.data)+'</span></div>').join('')+'</div>'; }
+      else html+='<div class="note is-info"><i data-lucide="check-circle-2" class="w-4 h-4"></i><span>ทุกแถวผ่านการตรวจสอบ ไม่มีข้อผิดพลาด</span></div>';
+    } else { html+='<div style="font-size:12.5px;color:var(--c-mute);line-height:1.8;"><div style="font-weight:600;">คำแนะนำ</div><div>· header ตรงแม่แบบ 13 คอลัมน์ · UTF-8 · โควตาต้องเป็นเลขที่มีในระบบ · ไฟล์ Shapefile (URL) บังคับทุกแถว</div><div>· ละติจูด [-90,90] · ลองจิจูด [-180,180] · พื้นที่ > 0 · เลขที่เอกสารซ้ำ (ในระบบ/ไฟล์) = แถวเสีย</div></div>'; }
+  } else if(d.phase==='done'){
+    var r=d.applied;
+    html+='<div class="imp-summary"><div class="imp-chip is-total"><div class="v num">'+r.total+'</div><div class="l">แถวทั้งหมด</div></div><div class="imp-chip is-ok"><div class="v num">'+r.created+'</div><div class="l">สร้างสำเร็จ</div></div><div class="imp-chip is-bad"><div class="v num">'+r.failed+'</div><div class="l">ล้มเหลว</div></div></div>';
+    if(r.failed>0)html+='<div class="flex justify-between items-center mb-2"><span style="font-size:12.5px;font-weight:600;">แถวที่ล้มเหลว</span><button class="btn btn-sm btn-secondary" onclick="dlErrors()"><i data-lucide="download" class="w-3.5 h-3.5"></i><span>ดาวน์โหลดรายงาน</span></button></div><div class="imp-errors">'+d.errors.map(e=>'<div class="imp-err-row"><span class="r">แถว '+e.row+'</span><span class="f">'+esc(e.field)+'</span><span class="m">'+esc(e.message)+'</span><span class="d">'+esc(e.data)+'</span></div>').join('')+'</div>';
+    else html+='<div class="note is-info"><i data-lucide="check-circle-2" class="w-4 h-4"></i><span>นำเข้าสำเร็จทั้งหมด ไม่มีข้อผิดพลาด · ทุกแถวสถานะ "รอตรวจสอบ"</span></div>';
+  }
+  html+='</div>';
+  if(d.phase==='done')html+='<div class="modal-footer"><button class="btn btn-primary" onclick="closeModal();render();">ปิด</button></div>';
+  else html+='<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" id="imp-submit" '+(d.phase==='preview'&&d.validRows.length>0?'':'disabled')+' onclick="applyImport()"><i data-lucide="check" class="w-4 h-4"></i><span>ยืนยันนำเข้า'+(d.phase==='preview'?' ('+d.validRows.length+' แถว)':'')+'</span></button></div>';
+  document.getElementById('modalBox').innerHTML=html; renderIcons();
+}
+function dlTemplate(){ var c='﻿'+CSV_COLS.join(',')+'\n'+'QT-2569-001,โฉนด,90001,2555-03-12,สมหญิง รักดี,120 หมู่ 5,กาญจนบุรี,ท่าม่วง,วังขนาย,14.021000,99.510000,10.50,plot_QT-2569-001.zip\n'+'QT-2569-002,นส.3ก,90002,2556-08-20,สุรพล เก่งการไร่,22 หมู่ 2,สุพรรณบุรี,สองพี่น้อง,ต้นตาล,14.250000,100.030000,7.25,plot_QT-2569-002.zip\n'; var b=new Blob([c],{type:'text/csv;charset=utf-8;'}); var l=document.createElement('a'); l.href=URL.createObjectURL(b); l.download='plot_template.csv'; l.click(); }
+function dlErrors(){ var d=state.modal.data; if(!d.errors.length)return; var c='﻿'+'แถว,ฟิลด์,ข้อผิดพลาด,ข้อมูล\n'+d.errors.map(e=>[e.row,e.field,'"'+e.message+'"','"'+String(e.data).replace(/"/g,'""')+'"'].join(',')).join('\n'); var b=new Blob([c],{type:'text/csv;charset=utf-8;'}); var l=document.createElement('a'); l.href=URL.createObjectURL(b); l.download='plot-upload-errors.csv'; l.click(); }
+function parseCsv(t){ var rows=[],row=[],cur='',q=false; for(var i=0;i<t.length;i++){ var ch=t[i]; if(q){ if(ch==='"'){ if(t[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=ch; } else { if(ch==='"')q=true; else if(ch===','){row.push(cur);cur='';} else if(ch==='\n'||ch==='\r'){ if(ch==='\r'&&t[i+1]==='\n')i++; row.push(cur);cur=''; if(row.length>1||row[0]!=='')rows.push(row); row=[]; } else cur+=ch; } } if(cur!==''||row.length){row.push(cur); if(row.length>1||row[0]!=='')rows.push(row);} return rows; }
+function onCsvPicked(input){ var d=state.modal.data; var file=input.files&&input.files[0]; if(!file)return;
+  if(!/\.csv$/i.test(file.name)){ showToast('ไฟล์ไม่ถูกต้อง กรุณาอัปโหลดไฟล์ CSV','error'); input.value=''; return; }
+  if(file.size>5*1024*1024){ showToast('ขนาดไฟล์ต้องไม่เกิน 5MB','error'); input.value=''; return; }
+  d.file=file; var rd=new FileReader();
+  rd.onload=function(){ var text=String(rd.result||'').replace(/^﻿/,''); var rows=parseCsv(text); if(rows.length===0){showToast('ไฟล์ว่าง','error');return;}
+    var header=rows[0].map(h=>h.trim()); var mism=[]; CSV_COLS.forEach((c,i)=>{if(header[i]!==c)mism.push(c);});
+    if(header.length!==CSV_COLS.length||mism.length){ d.rows=[];d.errors=[];d.validRows=[];d.phase='pick'; renderImportModal(); var er=document.getElementById('err-csv'); if(er){er.textContent='คอลัมน์ไฟล์ไม่ตรงแม่แบบ: '+(mism.length?mism.join(', '):'จำนวนคอลัมน์ไม่ถูกต้อง ('+header.length+'/13)'); er.style.visibility='visible';} showToast('ไฟล์ถูกปฏิเสธทั้งไฟล์ — header ไม่ตรงแม่แบบ','error'); return; }
+    validateCsv(rows.slice(1)); d.phase='preview'; renderImportModal();
+  };
+  rd.readAsText(file,'UTF-8');
+}
+function validateCsv(dataRows){ var d=state.modal.data; d.rows=dataRows; d.errors=[]; d.validRows=[]; var seen={};
+  dataRows.forEach(function(cols,idx){ var rowNo=idx+2; var r={}; CSV_COLS.forEach((c,i)=>r[c]=(cols[i]||'').trim()); var ds=r.plot_code||(r.quota_no+' · '+r.deed_owner_name);
+    function bad(field,msg){ d.errors.push({row:rowNo,field:field,message:msg,data:ds+(r[field]?' · '+field+'='+r[field]:'')}); }
+    var ok=true;
+    ['quota_no','ownership_type','deed_number','deed_owner_name','address','province','district','subdistrict','shapefile_url'].forEach(c=>{ if(!r[c]){bad(c,'กรุณากรอก'+({quota_no:'เลขโควตา',ownership_type:'ประเภทกรรมสิทธิ์',deed_number:'เลขที่เอกสารสิทธิ์',deed_owner_name:'ชื่อเจ้าของ',address:'ที่อยู่',province:'จังหวัด',district:'อำเภอ',subdistrict:'ตำบล',shapefile_url:'ไฟล์ลักษณะแปลง (Shapefile) — บังคับ'})[c]); ok=false;} });
+    if(r.quota_no&&!findQuotaByNo(r.quota_no)){ bad('quota_no','ไม่พบโควตาที่ตรงกับหมายเลขที่กรอก'); ok=false; }
+    var lat=parseFloat(r.latitude); if(isNaN(lat)||lat<-90||lat>90){ bad('latitude','พิกัดละติจูดต้องอยู่ระหว่าง -90 ถึง 90'); ok=false; }
+    var lng=parseFloat(r.longitude); if(isNaN(lng)||lng<-180||lng>180){ bad('longitude','พิกัดลองจิจูดต้องอยู่ระหว่าง -180 ถึง 180'); ok=false; }
+    var area=parseFloat(r.area); if(isNaN(area)||area<=0){ bad('area','พื้นที่ต้องเป็นตัวเลขที่มากกว่า 0'); ok=false; }
+    if(r.deed_number){ if(seen[r.deed_number]){ bad('deed_number','เลขที่เอกสารสิทธิ์ซ้ำ (ภายในไฟล์ แถว '+seen[r.deed_number]+')'); ok=false; } else seen[r.deed_number]=rowNo; if(state.records.find(p=>!p.is_deleted&&String(p.deed_number)===r.deed_number)){ bad('deed_number','เลขที่เอกสารสิทธิ์ซ้ำ'); ok=false; } }
+    if(r.province){ if(!getDistricts(r.province).length){ bad('province','ไม่พบจังหวัดในระบบ'); ok=false; } else if(!getDistricts(r.province).find(x=>x.d===r.district)){ bad('district','ไม่พบอำเภอในจังหวัด'+r.province); ok=false; } else { var found=getSubs(r.province,r.district).find(s=>s.s===r.subdistrict); if(!found){ bad('subdistrict','ไม่พบตำบลใน'+r.district); ok=false; } else { r.postal=found.z; if(!/^\d{5}$/.test(r.postal)){ bad('postal','รหัสไปรษณีย์ต้องเป็นตัวเลข 5 หลัก'); ok=false; } } } }
+    if(ok)d.validRows.push(r);
+  });
+}
+async function applyImport(){ var d=state.modal.data; if(d.busy||d.phase!=='preview'||d.validRows.length===0)return; d.busy=true; var btn=document.getElementById('imp-submit'); btn.disabled=true; btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังนำเข้า…</span>'; renderIcons();
+  // BACKEND: API-09 (FN-09) batch commit — ทุกแถว Waiting for verify + error report (BR-10)
+  await new Promise(r=>setTimeout(r,900)); var now=new Date().toISOString();
+  d.validRows.forEach(function(r){ var q=findQuotaByNo(r.quota_no); var code=nextPlotCode(); state.records.unshift({ id:'p-'+code, plot_code:code, quota_no:r.quota_no,
+    farmer_name:q?q.farmer_name:'', farmer_phone:q?q.phone:'', farmer_citizen:q?q.citizen_id:'',
+    ownership_type:r.ownership_type, deed_number:r.deed_number, deed_issue_date:r.deed_issue_date, deed_owner_name:r.deed_owner_name,
+    address_line:r.address, province:r.province, district:r.district, subdistrict:r.subdistrict, postal_code:r.postal,
+    latitude:r.latitude, longitude:r.longitude, area_rai:r.area, shapefile_url:r.shapefile_url, document_file:'',
+    verify_status:'waiting', fail_reason:null, version:1, is_deleted:false, delete_type:null, delete_reason:null,
+    verified_by:null, created_at:now, created_by:CURRENT_USER.name+' (CSV)', updated_at:now, updated_by:CURRENT_USER.name,
+    history:[{event:'create',actor:CURRENT_USER.name+' (CSV import)',at:now,note:'นำเข้าจาก CSV · ผูกกับโควตา '+r.quota_no}] }); });
+  d.applied={total:d.rows.length,created:d.validRows.length,failed:d.errors.length}; d.busy=false; d.phase='done'; renderImportModal();
+  showToast('นำเข้าแปลง '+d.applied.created+' รายการสำเร็จ'+(d.applied.failed?' — ข้าม '+d.applied.failed+' แถว':''),d.applied.failed?'warning':'success',4500);
+}
+
+// ESC chain
+window.addEventListener('keydown',function(e){ if(e.key!=='Escape')return; if(state.modal.open)closeModal(); else if(state.form)closeForm(); else if(state.view)closeView(); });
+
+// INIT
+window.addEventListener('hashchange',function(){ render(); });
+var domReady=false,lucideReady=false;
+function bootIfReady(){ if(domReady&&lucideReady){ render(); renderIcons(); } }
+if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',function(){domReady=true;bootIfReady();}); else domReady=true;
+window.addEventListener('lucide:ready',function(){lucideReady=true;bootIfReady();});
+if(window.lucide&&typeof window.lucide.createIcons==='function')lucideReady=true;
+bootIfReady();
+setTimeout(function(){ if(!lucideReady){lucideReady=true;bootIfReady();} },5000);
+</script>
+</body>
+</html>
