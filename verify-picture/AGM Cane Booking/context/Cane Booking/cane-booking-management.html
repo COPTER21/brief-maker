@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>จัดการจองรอบส่งอ้อย (CBM) · CUBE NATIVE</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+
+<style>
+/* ============== CSS VARIABLES (CUBE CI — Warm Light) ============== */
+:root {
+  --c-navy: #111111;
+  --c-navy-2: #111111;
+  --c-primary: #FF3B30;
+  --c-primary-hover: #E62E24;
+  --c-teal: #FF9A1F;
+  --c-teal-light: #FFB763;
+  --c-ink: #111111;
+  --c-mute: #54565C;
+  --c-mute-2: #73757B;
+  --c-mute-3: #9A9CA2;
+  --c-line: #DEDAD4;
+  --c-line-2: #E9E5E0;
+  --c-line-3: #F1EEEA;
+  --c-bg-off: #FAF8F5;
+  --c-success: #1F9D55;
+  --c-warning: #E8870F;
+  --c-danger: #E62E24;
+  --sidebar-w: 232px;
+  --shell-h: 52px;
+  --fs-h1: 22px; --fs-h2: 17px; --fs-h3: 15px; --fs-body: 14px;
+  --fs-sub: 13px; --fs-meta: 12px; --fs-cap: 11px; --fs-kpi: 28px;
+  --sp-xs: 4px; --sp-sm: 8px; --sp-md: 12px; --sp-lg: 20px; --sp-xl: 28px;
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-full: 999px;
+}
+
+/* ============== RESET ============== */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { scrollbar-gutter: stable; }
+
+/* ============== SCROLLBAR (Iron Rule #49) ============== */
+* { scrollbar-width: thin; scrollbar-color: rgba(17,17,17,.16) transparent; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(17,17,17,.14); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(17,17,17,.26); }
+.sidebar, .slide { scrollbar-color: rgba(255,255,255,.28) transparent; }
+.sidebar ::-webkit-scrollbar-thumb, .slide ::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb, .slide::-webkit-scrollbar-thumb { background: rgba(255,255,255,.28); }
+.sidebar ::-webkit-scrollbar-thumb:hover, .slide ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.42); }
+body {
+  font-family: 'Satoshi', 'Noto Sans Thai', system-ui, sans-serif;
+  background: var(--c-bg-off);
+  color: #2A2B2F;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-width: 1180px;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+[data-lucide] { flex-shrink: 0; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ============== SIDEBAR ============== */
+.sidebar {
+  position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w);
+  background: #111111; color: #E9E5E0; z-index: 20;
+  display: flex; flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.sb-brand { padding: 18px; display: flex; align-items: center; gap: 11px; border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
+.sb-logo {
+  width: 34px; height: 34px; background: linear-gradient(135deg, #FF3B30, #FF9A1F);
+  border-radius: 9px; display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; flex-shrink: 0; box-shadow: 0 4px 12px rgba(255,59,48,0.3);
+}
+.sb-name { font-weight: 700; font-size: 14px; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+.sb-sub { font-size: 10px; color: #9A9CA2; letter-spacing: 0.06em; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+.sb-nav { flex: 1; padding: 12px 8px; overflow-y: auto; }
+.sb-module { margin-bottom: 4px; }
+.sb-module-header {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 8px 10px; border-radius: 6px; background: transparent; border: 0;
+  color: #9A9CA2; font-family: inherit; font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 120ms; text-align: left;
+}
+.sb-module-header:hover { background: rgba(255,255,255,0.04); color: #DEDAD4; }
+.sb-module-header .mod-icon { flex-shrink: 0; opacity: 0.7; }
+.sb-module-header .mod-label { flex: 1; }
+.sb-module-header .mod-chevron { flex-shrink: 0; transition: transform 200ms; opacity: 0.7; }
+.sb-module[data-expanded="false"] .mod-chevron { transform: rotate(-90deg); }
+.sb-module[data-expanded="false"] .sb-features { display: none; }
+.sb-features { padding: 2px 0 6px 0; }
+.sb-item {
+  display: flex; align-items: center; gap: 10px; padding: 7px 12px 7px 14px;
+  border-radius: 6px; color: #DEDAD4; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 120ms; margin-bottom: 1px; position: relative; user-select: none;
+}
+.sb-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sb-item.is-active { background: #FF3B30; color: #fff; font-weight: 600; }
+.sb-item.is-active::before {
+  content: ''; position: absolute; left: -10px; top: 7px; bottom: 7px;
+  width: 3px; background: #fff; border-radius: 0 2px 2px 0;
+}
+.sb-item [data-lucide] { width: 16px; height: 16px; opacity: 0.85; }
+.sb-item.is-active [data-lucide] { opacity: 1; }
+.sb-item.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.sb-item.is-disabled:hover { background: transparent; color: #DEDAD4; }
+.sb-footer {
+  padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: #9A9CA2;
+}
+.pulse-dot { width: 7px; height: 7px; background: var(--c-teal); border-radius: 50%; box-shadow: 0 0 0 3px rgba(255,154,31,0.20); animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+/* ============== MAIN + SHELL BAR ============== */
+.main { margin-left: var(--sidebar-w); min-height: 100vh; background: var(--c-bg-off); }
+.shell-bar {
+  position: sticky; top: 0; background: #fff; border-bottom: 1px solid var(--c-line-2);
+  height: var(--shell-h); display: flex; align-items: center; padding: 0 22px; z-index: 19; gap: 12px;
+}
+.breadcrumb { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--c-mute); }
+.breadcrumb a { cursor: pointer; transition: color 120ms; }
+.breadcrumb a:hover { color: var(--c-primary); }
+.breadcrumb .sep { color: var(--c-mute-3); font-size: 10px; }
+.breadcrumb-current { color: var(--c-ink); font-weight: 500; }
+.icon-btn {
+  width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute); border-radius: 7px; position: relative; transition: all 120ms;
+}
+.icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.icon-btn [data-lucide] { width: 17px; height: 17px; }
+.notif-dot { position: absolute; top: 7px; right: 8px; width: 7px; height: 7px; background: var(--c-danger); border-radius: 50%; border: 2px solid #fff; }
+.user-chip { display: flex; align-items: center; gap: 9px; padding: 5px 10px 5px 12px; border-radius: 8px; cursor: pointer; transition: background 120ms; }
+.user-chip:hover { background: var(--c-line-3); }
+.user-text { line-height: 1.2; text-align: right; }
+.user-name { font-size: 12.5px; font-weight: 500; color: var(--c-ink); white-space: nowrap; }
+.user-role { font-size: 10.5px; color: var(--c-mute-2); white-space: nowrap; margin-top: 1px; }
+.avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; flex-shrink: 0;
+}
+.user-menu {
+  position: absolute; top: calc(var(--shell-h) - 4px); right: 22px; background: #fff;
+  border: 1px solid var(--c-line-2); border-radius: 10px; box-shadow: 0 12px 32px rgba(17,17,17,0.12);
+  width: 240px; z-index: 30; padding: 6px; display: none;
+}
+.user-menu.is-open { display: block; }
+.user-menu-item { display: flex; align-items: center; gap: 10px; padding: 8px 11px; border-radius: 6px; font-size: 13px; color: var(--c-ink); cursor: pointer; transition: background 120ms; }
+.user-menu-item:hover { background: var(--c-bg-off); }
+.user-menu-item [data-lucide] { width: 15px; height: 15px; color: var(--c-mute-2); }
+.user-menu-item.is-danger { color: var(--c-danger); }
+.user-menu-item.is-danger [data-lucide] { color: var(--c-danger); }
+.user-menu-divider { height: 1px; background: var(--c-line-2); margin: 5px 0; }
+
+/* ============== CONTENT (fluid — Iron Rule #30) ============== */
+.content { padding: 22px; }
+
+/* ============== PAGE HEADER ============== */
+.ph { margin-bottom: 18px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.ph > div:first-child { flex: 1 1 auto; min-width: 280px; }
+.ph-title-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px; }
+.ph-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 22px; font-weight: 700; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.ph-count { font-size: 12.5px; font-weight: 600; color: var(--c-mute-2); background: var(--c-line-3); padding: 3px 9px; border-radius: 999px; }
+.ph-sub { font-size: 13px; color: var(--c-mute); margin: 0; }
+.ph-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ============== BUTTONS (Iron Rule #36 — Thai optical center) ============== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px; padding: 2px 14px 0; border-radius: 8px; font-size: 13px; font-weight: 500;
+  border: 1px solid transparent; background: transparent; white-space: nowrap;
+  transition: all 120ms; user-select: none; cursor: pointer;
+}
+.btn [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; }
+.btn:disabled, .btn.is-disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+.btn-eq { min-width: 104px; }
+.btn-primary { background: var(--c-primary); color: #fff; }
+.btn-primary:hover { background: var(--c-primary-hover); box-shadow: 0 2px 8px rgba(255,59,48,0.30); }
+.btn-secondary { background: #fff; border-color: var(--c-line); color: var(--c-ink); }
+.btn-secondary:hover { background: var(--c-line-3); border-color: var(--c-mute-2); }
+.btn-ghost { color: var(--c-mute); }
+.btn-ghost:hover { background: var(--c-line-3); color: var(--c-ink); }
+.btn-danger { background: #fff; border-color: var(--c-line); color: var(--c-danger); }
+.btn-danger:hover { background: #FFE9E7; border-color: var(--c-danger); }
+.btn-danger.is-solid { background: var(--c-danger); border-color: var(--c-danger); color: #fff; }
+.btn-danger.is-solid:hover { background: #C81E15; }
+.btn-link { background: transparent; border: 0; padding: 0 4px; height: auto; color: var(--c-primary); font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn-sm { height: 30px; padding: 2px 11px 0; font-size: 12px; }
+
+/* ============== STATS ============== */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.stat { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; padding: 14px 16px; transition: all 150ms; }
+.stat:hover { border-color: var(--c-line); box-shadow: 0 2px 8px rgba(17,17,17,0.05); }
+.stat-label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--c-mute); }
+.stat-label [data-lucide] { width: 13px; height: 13px; color: var(--c-primary); }
+.stat-value { font-family: 'Noto Sans Thai', sans-serif; font-size: 26px; font-weight: 700; color: var(--c-navy); margin-top: 6px; letter-spacing: -0.01em; }
+.stat-meta { font-size: 11.5px; color: var(--c-mute-2); margin-top: 5px; display: flex; align-items: center; gap: 4px; }
+.stat-meta.is-warn { color: var(--c-warning); }
+.stat-meta [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== CARD / FILTER ============== */
+.card { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; overflow: hidden; }
+.filter-bar { padding: 14px 18px; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid var(--c-line-2); background: #fff; flex-wrap: wrap; }
+
+/* ============== INPUTS ============== */
+.input, .select {
+  height: 36px; padding: 0 12px; border: 1px solid var(--c-line); border-radius: 8px;
+  font-size: 13px; background: #fff; color: var(--c-ink); font-family: inherit; transition: all 120ms; width: 100%;
+}
+.input:focus, .select:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(255,59,48,0.10); }
+.input:disabled, .input[readonly] { background: var(--c-line-3); color: var(--c-mute-2); cursor: not-allowed; border-color: var(--c-line-2); }
+.select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat; background-position: right 10px center; padding-right: 32px; appearance: none;
+}
+.input-search { position: relative; flex: 1; max-width: 340px; }
+.input-search input { padding-left: 36px; }
+.input-search .lead-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--c-mute-2); pointer-events: none; }
+
+/* ===== SEARCH-SELECT (Iron Rule #34) ===== */
+.search-select { position: relative; width: 100%; }
+.search-select .ss-input { padding-left: 34px; padding-right: 34px; }
+.search-select .ss-lead { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--c-mute-3); pointer-events: none; }
+.search-select .ss-caret { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--c-mute-3); pointer-events: none; }
+.search-select .ss-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); display: inline-flex; padding: 3px; border: 0; background: transparent; color: var(--c-mute-2); cursor: pointer; border-radius: 6px; }
+.search-select .ss-clear:hover { background: var(--c-line-3); color: var(--c-ink); }
+.search-select.is-disabled .ss-input { background: var(--c-line-3); color: var(--c-mute-2); cursor: not-allowed; }
+.ss-list {
+  position: absolute; z-index: 70; left: 0; right: 0; margin-top: 4px; max-height: 280px; overflow-y: auto;
+  background: #fff; border: 1px solid var(--c-line); border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(17,17,17,0.10), 0 4px 10px rgba(17,17,17,0.05);
+}
+.ss-opt { width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 0; border-bottom: 1px solid var(--c-line-3); background: transparent; cursor: pointer; text-align: left; font-family: inherit; }
+.ss-opt:last-child { border-bottom: 0; }
+.ss-opt:hover, .ss-opt.is-active { background: rgba(255,59,48,0.06); }
+.ss-opt-ic { width: 16px; height: 16px; color: var(--c-primary); flex-shrink: 0; }
+.ss-opt-main { flex: 1; min-width: 0; }
+.ss-opt-label { display: block; font-size: 13px; color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-sub { display: block; font-size: 11.5px; color: var(--c-mute-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-right { flex-shrink: 0; font-size: 12px; color: var(--c-mute); }
+.ss-opt mark { background: rgba(255,59,48,0.16); color: inherit; padding: 0 1px; border-radius: 2px; }
+.ss-empty { padding: 20px 14px; text-align: center; font-size: 13px; color: var(--c-mute-2); }
+
+/* ============== TABLE ============== */
+.table-scroll { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table thead { background: var(--c-bg-off); }
+.table th {
+  padding: 11px 14px; text-align: left; font-weight: 600; color: var(--c-mute);
+  font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--c-line-2); white-space: nowrap;
+}
+.table th.col-check { width: 40px; padding-right: 0; }
+.table td { padding: 13px 14px 11px; border-bottom: 1px solid var(--c-line-2); color: var(--c-ink); vertical-align: middle; }
+.table tbody tr { transition: background 120ms; }
+.table tbody tr:hover { background: var(--c-bg-off); }
+.table tbody tr.is-selected { background: rgba(255,59,48,0.04); }
+.table tbody tr.is-selected:hover { background: rgba(255,59,48,0.07); }
+.table tbody tr:last-child td { border-bottom: 0; }
+.table tbody tr.is-clickable { cursor: pointer; }
+.table-scroll.is-sticky { max-height: 560px; overflow-y: auto; scrollbar-gutter: stable; }
+.table-scroll.is-sticky thead th { position: sticky; top: 0; z-index: 3; background: var(--c-bg-off); box-shadow: inset 0 -1px 0 var(--c-line-2); }
+.cell-truncate { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+th.col-num, td.col-num { text-align: right; }
+.mono { font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+
+/* ============== CHECKBOX ============== */
+.cb {
+  width: 16px; height: 16px; border: 1.5px solid var(--c-line); border-radius: 4px; background: #fff;
+  cursor: pointer; display: inline-block; position: relative; transition: all 120ms; flex-shrink: 0;
+}
+.cb.is-checked, .cb.is-partial { background: var(--c-primary); border-color: var(--c-primary); }
+.cb.is-checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.cb.is-partial::after { content: ''; position: absolute; left: 3px; top: 6px; width: 8px; height: 2px; background: #fff; }
+.cb:hover { border-color: var(--c-primary); }
+.cb.is-disabled { opacity: 0.35; cursor: not-allowed; }
+.cb.is-disabled:hover { border-color: var(--c-line); }
+
+/* ============== PILLS ============== */
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px 3px; border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.pill [data-lucide] { width: 11px; height: 11px; }
+.pill-info    { background: #E6F0FF; color: #1A5FCC; }
+.pill-success { background: #E4F4EB; color: #157A41; }
+.pill-warning { background: #FFF1DD; color: #B8690B; }
+.pill-danger  { background: #FFE9E7; color: #E62E24; }
+.pill-muted   { background: var(--c-line-3); color: var(--c-mute-2); }
+.pill-outline { background: #fff; border: 1px solid var(--c-line); color: var(--c-mute); }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.8s linear infinite; }
+
+/* ============== FORM SECTION (Iron Rule #45) ============== */
+.form-section { margin-top: var(--sp-xl); }
+.form-section:first-child { margin-top: 0; }
+.form-section-title {
+  font-size: var(--fs-cap); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--c-mute);
+  padding-bottom: var(--sp-sm); border-bottom: 1px solid var(--c-line-2); margin-bottom: var(--sp-md);
+}
+.form-grp { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 16px; }
+
+/* ============== ROW ACTIONS ============== */
+.row-actions { display: inline-flex; gap: 2px; }
+.ra-btn {
+  width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute-2); border-radius: 6px; transition: all 120ms;
+}
+.ra-btn:hover { background: var(--c-line-3); color: var(--c-primary); }
+.ra-btn.is-danger:hover { background: #FFE9E7; color: var(--c-danger); }
+.ra-btn [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== TABLE FOOTER / BULK BAR ============== */
+.table-footer {
+  padding: 12px 18px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2);
+  display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: var(--c-mute); flex-wrap: wrap; gap: 10px;
+}
+.pagination { display: inline-flex; gap: 4px; align-items: center; }
+.pg-btn {
+  min-width: 30px; height: 30px; padding: 0 8px; display: inline-flex; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid var(--c-line-2); border-radius: 6px; color: var(--c-mute);
+  font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 120ms;
+}
+.pg-btn:hover { border-color: var(--c-line); background: var(--c-bg-off); }
+.pg-btn.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.pg-btn.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn [data-lucide] { width: 13px; height: 13px; }
+.bulk-bar {
+  background: var(--c-navy); color: #fff; padding: 11px 18px; border-radius: 8px 8px 0 0;
+  display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--c-line-2); margin: -1px -1px 0; font-size: 13px;
+}
+.bulk-bar .btn { height: 30px; padding: 2px 11px 0; font-size: 12px; }
+.bulk-bar .btn-secondary { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.18); color: #fff; }
+.bulk-bar .btn-secondary:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.30); }
+
+/* ============== DRAWER v2 SHELL (Patterns B/C — locked) ============== */
+.overlay-wrap { position: fixed; inset: 0; z-index: 50; }
+.backdrop { position: absolute; inset: 0; background: rgba(17,17,17,0.40); }
+.drawer-panel {
+  position: absolute; top: 0; right: 0; bottom: 0; width: 920px; max-width: 96vw;
+  background: #fff; display: flex; flex-direction: column;
+  box-shadow: -16px 0 40px rgba(17,17,17,0.18);
+}
+.drawer-panel.standard { width: 680px; }
+.drawer-enter { transform: translateX(100%); }
+.drawer-active { transform: translateX(0); transition: transform 250ms ease-out; }
+.top-icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;
+  border: 0; background: transparent; border-radius: var(--r-sm); color: var(--c-mute-2);
+  cursor: pointer; transition: all 120ms; flex-shrink: 0;
+}
+.top-icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.dw-head { padding: 18px 24px 16px; border-bottom: 1px solid var(--c-line-2); flex-shrink: 0; }
+.dw-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.dw-eyebrow { display: flex; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-mute-2); margin-bottom: 4px; font-weight: 600; }
+.dw-title { font-size: 20px; font-weight: 700; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.dw-sub { font-size: var(--fs-meta); color: var(--c-mute-2); margin-top: 4px; }
+.dw-body { flex: 1; overflow-y: auto; padding: 22px 24px; scrollbar-gutter: stable; }
+.dw-footer {
+  padding: 14px 24px; border-top: 1px solid var(--c-line-2); background: var(--c-bg-off); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.dw-footer-right { display: flex; align-items: center; gap: 8px; }
+.dw-footer-meta { font-size: 12px; color: var(--c-mute-2); }
+.drawer-header-divider { width: 1px; height: 22px; background: var(--c-line-2); margin: 0 4px; flex-shrink: 0; }
+.dw-actions { display: flex; gap: 6px; align-items: center; }
+
+/* Tabs (view drawer) */
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--c-line-2); margin-top: 14px; }
+.tab {
+  display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px 7px;
+  font-size: 13px; font-weight: 500; color: var(--c-mute); background: transparent; border: 0;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; transition: all 120ms;
+}
+.tab [data-lucide] { width: 14px; height: 14px; }
+.tab:hover { color: var(--c-ink); }
+.tab.on { color: var(--c-primary); border-bottom-color: var(--c-primary); font-weight: 600; }
+
+/* View drawer detail grid */
+.dv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
+.dv-cell .dv-lbl { font-size: 11px; color: var(--c-mute-3); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-bottom: 3px; }
+.dv-cell .dv-val { font-size: 13.5px; font-weight: 600; color: var(--c-ink); word-break: break-word; }
+.dv-section { margin-bottom: 24px; }
+.dv-section-title { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; color: var(--c-navy); margin-bottom: 12px; }
+.dv-section-title [data-lucide] { width: 15px; height: 15px; color: var(--c-primary); }
+.dv-note { margin-top: 10px; padding: 10px 12px; background: #FFF1DD; border-radius: 8px; font-size: 12.5px; color: #B8690B; }
+
+/* Info banner (edit rejected — re-submit notice; warning ของ action จริง) */
+.note { padding: 11px 14px; border-radius: 8px; font-size: 12.5px; display: flex; gap: 9px; align-items: flex-start; }
+.note [data-lucide] { width: 15px; height: 15px; margin-top: 1px; }
+.note.is-info { background: #E6F0FF; color: #1A5FCC; }
+.note.is-warn { background: #FFF1DD; color: #B8690B; }
+
+/* ============== TIMELINE ============== */
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 4px; bottom: 4px; width: 2px; background: var(--c-line-2); }
+.tl-item { position: relative; margin-bottom: 16px; }
+.tl-item:last-child { margin-bottom: 0; }
+.tl-dot { position: absolute; left: -20px; top: 3px; width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 2px solid var(--c-primary); }
+.tl-dot.is-success { border-color: var(--c-success); }
+.tl-dot.is-warning { border-color: var(--c-warning); }
+.tl-dot.is-danger { border-color: var(--c-danger); }
+.tl-title { font-size: 13px; font-weight: 600; color: var(--c-ink); }
+.tl-meta { font-size: 11.5px; color: var(--c-mute-2); margin-top: 2px; }
+.tl-note { font-size: 12.5px; color: var(--c-mute); background: var(--c-bg-off); border: 1px solid var(--c-line-2); border-radius: 6px; padding: 7px 10px; margin-top: 6px; }
+
+/* ============== EMPTY STATE ============== */
+.empty { padding: 56px 24px; text-align: center; color: var(--c-mute); }
+.empty-icon { width: 52px; height: 52px; margin: 0 auto 14px; border-radius: 50%; background: var(--c-line-3); color: var(--c-mute-2); display: inline-flex; align-items: center; justify-content: center; }
+.empty-icon [data-lucide] { width: 22px; height: 22px; }
+.empty-title { font-size: 15.5px; font-weight: 600; color: var(--c-ink); margin-bottom: 5px; font-family: 'Noto Sans Thai', sans-serif; }
+.empty-desc { font-size: 13px; color: var(--c-mute); max-width: 320px; margin: 0 auto; }
+.empty .btn { margin-top: 16px; }
+.empty-actions { display: flex; gap: 8px; justify-content: center; }
+.empty-actions .btn { margin-top: 16px; }
+
+/* ============== MODAL ============== */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(17,17,17,0.50); z-index: 60; opacity: 0; pointer-events: none;
+  transition: opacity 200ms; display: flex; align-items: center; justify-content: center;
+}
+.modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: #fff; border-radius: 12px; width: 440px; max-width: 92vw; max-height: 90vh;
+  display: flex; flex-direction: column; transform: scale(0.96);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 24px 64px rgba(17,17,17,0.28); overflow: hidden;
+}
+.modal.is-lg { width: 680px; }
+.modal-backdrop.is-open .modal { transform: scale(1); }
+.modal-header { padding: 18px 22px 12px; display: flex; align-items: flex-start; gap: 12px; }
+.modal-header-icon {
+  width: 36px; height: 36px; border-radius: 8px; background: rgba(255,59,48,0.10); color: var(--c-primary);
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.modal-header-icon.is-danger { background: #FFE9E7; color: var(--c-danger); }
+.modal-header-icon.is-warning { background: #FFF1DD; color: var(--c-warning); }
+.modal-header-icon [data-lucide] { width: 18px; height: 18px; }
+.modal-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 16px; font-weight: 600; color: var(--c-navy); margin: 0 0 4px; }
+.modal-subtitle { font-size: 13px; color: var(--c-mute); margin: 0; line-height: 1.5; }
+.modal-body { padding: 6px 22px 18px; font-size: 13px; color: var(--c-ink); overflow-y: auto; scrollbar-gutter: stable; }
+.modal-footer { padding: 12px 22px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2); display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Import summary chips */
+.imp-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.imp-chip { border-radius: 8px; padding: 12px; text-align: center; border: 1px solid var(--c-line-2); }
+.imp-chip .v { font-size: 22px; font-weight: 700; font-family: 'Noto Sans Thai', sans-serif; }
+.imp-chip .l { font-size: 11.5px; margin-top: 2px; font-weight: 600; }
+.imp-chip.is-total { background: var(--c-bg-off); color: var(--c-mute); }
+.imp-chip.is-ok { background: #E4F4EB; color: #157A41; border-color: #CBE9D8; }
+.imp-chip.is-bad { background: #FFE9E7; color: #E62E24; border-color: #F6D0CC; }
+.imp-errors { border: 1px solid var(--c-line-2); border-radius: 8px; max-height: 220px; overflow-y: auto; }
+.imp-err-row { display: flex; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--c-line-3); font-size: 12.5px; align-items: baseline; }
+.imp-err-row:last-child { border-bottom: 0; }
+.imp-err-row .r { flex-shrink: 0; font-weight: 700; color: var(--c-danger); min-width: 52px; }
+.imp-err-row .f { flex-shrink: 0; color: var(--c-mute); min-width: 90px; }
+.imp-err-row .m { color: var(--c-ink); }
+.imp-err-row .d { color: var(--c-mute-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+
+/* ============== FIELDS ============== */
+.field { margin-bottom: 14px; }
+.field-label { display: block; font-size: 12.5px; font-weight: 500; color: var(--c-mute); margin-bottom: 6px; }
+.field-label .req { color: var(--c-danger); margin-left: 2px; }
+.field-input { width: 100%; }
+.field-help { font-size: 11.5px; color: var(--c-mute-2); margin-top: 4px; }
+.field-error { font-size: 11.5px; color: var(--c-danger); margin-top: 4px; min-height: 15px; visibility: hidden; }
+.field.is-invalid .input, .field.is-invalid .select { border-color: var(--c-danger); }
+.field.is-invalid .field-error { visibility: visible; }
+textarea.input { height: auto; min-height: 74px; padding: 9px 12px; resize: vertical; line-height: 1.55; }
+
+/* ============== TOAST ============== */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; background: var(--c-navy); color: #fff;
+  padding: 13px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; z-index: 80;
+  display: flex; align-items: center; gap: 10px; box-shadow: 0 12px 32px rgba(17,17,17,0.30);
+  transform: translateY(100px); opacity: 0; transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1); max-width: 380px;
+}
+.toast.is-visible { transform: translateY(0); opacity: 1; }
+.toast.is-success { background: var(--c-success); }
+.toast.is-info { background: var(--c-primary); }
+.toast.is-warning { background: var(--c-warning); }
+.toast.is-error { background: var(--c-danger); }
+.toast [data-lucide] { width: 17px; height: 17px; }
+
+/* ============== UTILITIES ============== */
+.hidden { display: none !important; }
+.text-mute { color: var(--c-mute); }
+.text-mute-2 { color: var(--c-mute-2); }
+.text-primary { color: var(--c-primary); }
+.text-danger { color: var(--c-danger); }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.w-2\.5 { width: 10px; }   .h-2\.5 { height: 10px; }
+.w-3   { width: 12px; }    .h-3   { height: 12px; }
+.w-3\.5 { width: 14px; }   .h-3\.5 { height: 14px; }
+.w-4   { width: 16px; }    .h-4   { height: 16px; }
+.w-5   { width: 20px; }    .h-5   { height: 20px; }
+svg.lucide { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; flex-shrink: 0; }
+svg.lucide.w-2\.5 { width: 10px; }   svg.lucide.h-2\.5 { height: 10px; }
+svg.lucide.w-3    { width: 12px; }   svg.lucide.h-3    { height: 12px; }
+svg.lucide.w-3\.5 { width: 14px; }   svg.lucide.h-3\.5 { height: 14px; }
+svg.lucide.w-4    { width: 16px; }   svg.lucide.h-4    { height: 16px; }
+svg.lucide.w-5    { width: 20px; }   svg.lucide.h-5    { height: 20px; }
+</style>
+</head>
+<body>
+
+<!-- ===== SIDEBAR (Pattern N) ===== -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i data-lucide="box" class="w-4 h-4"></i></div>
+    <div><div class="sb-name">CUBE NATIVE</div><div class="sb-sub">AGM · WKN</div></div>
+  </div>
+  <nav class="sb-nav" id="sb-nav">
+    <div class="sb-module" data-module="agm" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sprout" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">เกษตรกรรม</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item is-disabled" data-feature="farmer-members"><i data-lucide="users" class="w-4 h-4"></i><span>จัดการสมาชิกเกษตรกร</span></a>
+        <a class="sb-item is-disabled" data-feature="quota"><i data-lucide="scale" class="w-4 h-4"></i><span>จัดการโควตา</span></a>
+        <a class="sb-item is-disabled" data-feature="plots"><i data-lucide="map" class="w-4 h-4"></i><span>จัดการแปลงที่ดิน</span></a>
+        <a class="sb-item is-disabled" data-feature="crops"><i data-lucide="wheat" class="w-4 h-4"></i><span>จัดการรอบปลูก</span></a>
+        <a class="sb-item is-disabled" data-feature="cane-contract"><i data-lucide="file-signature" class="w-4 h-4"></i><span>จัดการสัญญาส่งอ้อย</span></a>
+        <a class="sb-item is-disabled" data-feature="surveys"><i data-lucide="clipboard-list" class="w-4 h-4"></i><span>จัดการแบบสำรวจ</span></a>
+        <a class="sb-item is-active" data-feature="bookings"><i data-lucide="calendar-clock" class="w-4 h-4"></i><span>จัดการจองรอบส่งอ้อย</span></a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="system" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sliders-horizontal" class="mod-icon w-3.5 h-3.5"></i><span class="mod-label">System</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features"><a class="sb-item is-disabled" data-feature="settings"><i data-lucide="settings" class="w-4 h-4"></i><span>Settings</span></a></div>
+    </div>
+  </nav>
+  <div class="sb-footer"><div class="pulse-dot"></div><span>WKN Prototype · v1.0.0</span></div>
+</aside>
+
+<main class="main">
+  <header class="shell-bar">
+    <nav class="breadcrumb">
+      <a data-breadcrumb-module="agm">เกษตรกรรม</a>
+      <i data-lucide="chevron-right" class="w-3 h-3 sep"></i>
+      <span class="breadcrumb-current">จัดการจองรอบส่งอ้อย</span>
+    </nav>
+    <div style="display:flex; align-items:center; gap:6px; margin-left:auto;">
+      <div style="position:relative;"><button class="icon-btn" id="notifBtn"><i data-lucide="bell" class="w-4 h-4"></i><span class="notif-dot"></span></button></div>
+      <div style="position:relative;">
+        <div class="user-chip" onclick="toggleUserMenu()">
+          <div class="user-text"><div class="user-name">สมพร วงศ์ทะเบียน</div><div class="user-role">เจ้าหน้าที่จองรอบ · WKN</div></div>
+          <div class="avatar">สว</div>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-item"><i data-lucide="user" class="w-3.5 h-3.5"></i><span>My Profile</span></div>
+          <div class="user-menu-item"><i data-lucide="settings" class="w-3.5 h-3.5"></i><span>Preferences</span></div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-item is-danger"><i data-lucide="log-out" class="w-3.5 h-3.5"></i><span>Sign out</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="content" id="page-content"></div>
+</main>
+
+<div id="overlay-root"></div>
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"><div class="modal" id="modalBox" onclick="event.stopPropagation()"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function loadLucide(){var v='0.469.0';var cdns=['https://unpkg.com/lucide@'+v+'/dist/umd/lucide.min.js','https://cdn.jsdelivr.net/npm/lucide@'+v+'/dist/umd/lucide.min.js','https://cdnjs.cloudflare.com/ajax/libs/lucide/'+v+'/lucide.min.js'];var i=0;function n(){if(i>=cdns.length){window.lucide=window.lucide||{createIcons:function(){}};window.dispatchEvent(new Event('lucide:ready'));return;}var s=document.createElement('script');s.src=cdns[i++];s.onload=function(){window.dispatchEvent(new Event('lucide:ready'));};s.onerror=n;document.head.appendChild(s);}n();})();
+</script>
+
+<script>
+// ============================================
+// USERS + constants
+// ============================================
+const CURRENT_USER = { id:'u-cbm-01', name:'สมพร วงศ์ทะเบียน', role:'เจ้าหน้าที่จองรอบ' };
+const SYS_ACTOR = 'ระบบภายนอก';
+function daysAgo(n){ var d=new Date(); d.setDate(d.getDate()-n); return d.toISOString(); }
+function dtDaysFwd(n){ var d=new Date(); d.setDate(d.getDate()+n); d.setHours(8,0,0,0); return d.toISOString(); }
+
+// Enums (invariants §1)
+const VEHICLE_TYPES = [
+  { v:'e-tan',          l:'รถอีแต๋น' },
+  { v:'six_wheels',     l:'รถ 6 ล้อ' },
+  { v:'ten_wheels',     l:'รถ 10 ล้อ' },
+  { v:'sixteen_wheels', l:'รถ 16 ล้อ' }
+];
+const PAYMENT_TYPES = [ { v:'green_bill', l:'บิลเขียว' }, { v:'white_bill', l:'บิลขาว' } ];
+const LOCATIONS = [ { v:'factory', l:'หน้าโรงงาน' }, { v:'crane', l:'ลานเครน/คิวเครน' } ];
+const SEASONS = ['2568/69', '2567/68'];
+const SLOTS = ['06:00-08:00','08:00-10:00','10:00-12:00','13:00-15:00','15:00-17:00'];
+const LANES = ['A1','A2','B1','B2','C1'];
+
+function vehLabel(v){ var x=VEHICLE_TYPES.find(t=>t.v===v); return x?x.l:(v||'—'); }
+function payLabel(v){ var x=PAYMENT_TYPES.find(t=>t.v===v); return x?x.l:(v||'—'); }
+function locLabel(v){ var x=LOCATIONS.find(t=>t.v===v); return x?x.l:(v||'—'); }
+
+// Combined progress — 10-step FINAL chain (invariants §2)
+const STEPS = ['รออนุมัติ','อนุมัติรอบจองแล้ว','รอส่งอนุมัติตัด','รออนุมัติตัด','รอตัด','รอจัดส่ง','อยู่ระหว่างจัดส่ง','รอผลการเท','รอทำจ่าย','เสร็จสิ้น'];
+const SYS_STEP = { 'รอผลการเท':true, 'รอทำจ่าย':true, 'เสร็จสิ้น':true }; // system-controlled (badge "ระบบกำหนด" 🔒)
+
+// ============================================
+// CROSS-MODULE: QUOTA (mock) — BACKEND: API-13 quota-search (read-only, farmer snapshot + debt snapshot)
+// ============================================
+const QUOTAS = [
+  { quota_id:'QUO-2568-0001', farmer_name:'สมชาย',    lastname:'ไร่ทอง',    phone:'0812345678', outstanding:125000 },
+  { quota_id:'QUO-2568-0002', farmer_name:'บุญมี',    lastname:'ทุ่งกว้าง',  phone:'0898765432', outstanding:null },
+  { quota_id:'QUO-2568-0003', farmer_name:'ประเสริฐ', lastname:'ใจดี',      phone:'0861112222', outstanding:48000 },
+  { quota_id:'QUO-2568-0004', farmer_name:'วิไล',     lastname:'สวนอ้อย',    phone:'0873334444', outstanding:null }
+];
+function findQuota(id){ return QUOTAS.find(q=>q.quota_id===id); }
+
+// CROSS-MODULE: CROP (mock, optional) — BACKEND: API-14 cascade read (crops-by-quota, read-only)
+const CROPS = [
+  { crop_id:'CRP-2568-0001', quota_id:'QUO-2568-0001', label:'รอบปลูกตอ 1 · 2568' },
+  { crop_id:'CRP-2568-0002', quota_id:'QUO-2568-0001', label:'รอบปลูกใหม่ · 2568' },
+  { crop_id:'CRP-2568-0003', quota_id:'QUO-2568-0002', label:'รอบปลูกใหม่ · 2568' },
+  { crop_id:'CRP-2568-0004', quota_id:'QUO-2568-0003', label:'รอบปลูกตอ 2 · 2568' },
+  { crop_id:'CRP-2568-0005', quota_id:'QUO-2568-0004', label:'รอบปลูกใหม่ · 2568' }
+];
+function cropsForQuota(qid){ return CROPS.filter(c=>c.quota_id===qid); }
+
+// ============================================
+// MOCK BOOKING DATA (T_cbm_bookings) — BACKEND: API-01 list · API-04 detail
+// seedBooking วางฟิลด์ 3 แกน + history สะสมตาม pipeline (no-skip) ให้ครบทั้ง 10 combined states
+// ============================================
+function seedBooking(seq, qid, stage, o){
+  o = o || {};
+  var qq = findQuota(qid);
+  var t0 = daysAgo(o.age || 12);
+  var b = {
+    booking_id:'CBM-2568-'+String(seq).padStart(7,'0'), seq:seq,
+    quota_id:qid, crop_id:o.crop || null,
+    farmer_name:qq.farmer_name, farmer_lastname:qq.lastname, farmer_phone:qq.phone,
+    season:o.season || '2568/69', location:o.location || 'factory',
+    booking_datetime:o.dt || dtDaysFwd(2), slot:o.slot || '08:00-10:00', lane:o.lane || 'A1',
+    vehicle_type:o.vt || 'six_wheels', vehicle_plate:o.plate || '70-1234 กจ', driver:o.driver || 'สมศักดิ์ ขับดี',
+    estimated_tons:o.tons != null ? o.tons : 18.50,
+    payment_type:o.pay || 'green_bill', debt_deduction_percent:o.debt != null ? o.debt : 0,
+    debtor_outstanding:qq.outstanding,
+    cutting_method:o.cm || 'person', cutting_summary:o.cs || '',
+    // AXIS A / B / C (invariants §1)
+    approval_status:'waiting_for_verify', cut_transport_status:null, cut_transport_closed_at:null,
+    payment_status:'not_due', dispatch_started_at:null, checkin_at:null, dump_result_confirmed:false,
+    reject_reason:null, cancel_reason:null,
+    row_version:1, created_at:t0, updated_at:t0, created_by:CURRENT_USER.name,
+    history:[{ event:'create', actor:CURRENT_USER.name, at:t0, note:'สร้างการจอง · โควตา '+qid }]
+  };
+  function adv(ev, actor, note, dot){ var at=daysAgo(Math.max(0,(o.age||12)-b.history.length*1)); b.updated_at=at; b.row_version++; b.history.push({event:ev,actor:actor,at:at,note:note||null,dot:dot||null}); }
+  var s = stage;
+  if(s==='rejected'){ b.approval_status='rejected'; b.reject_reason=o.reason||'ข้อมูลทะเบียนรถไม่ตรงกับที่แจ้ง กรุณาแก้ไขและส่งใหม่'; adv('reject',CURRENT_USER.name,b.reject_reason,'is-danger'); return b; }
+  if(s==='cancelled'){ b.approval_status='cancelled'; b.cancel_reason=o.reason||'เกษตรกรขอยกเลิกรอบส่ง'; adv('cancel',CURRENT_USER.name,b.cancel_reason,'is-warning'); return b; }
+  if(s==='waiting') return b;
+  b.approval_status='verified'; adv('approve',CURRENT_USER.name,'อนุมัติรอบจอง','is-success');
+  if(s==='verified_nocut') return b;
+  b.cut_transport_status='awaiting_cut_approval'; adv('cut_send',CURRENT_USER.name,'ส่งขออนุมัติตัด');
+  if(s==='cut_approval') return b;
+  b.cut_transport_status='awaiting_cutting'; adv('cut_approve','ผจก.แปลงตัด','อนุมัติตัด');
+  if(s==='cutting') return b;
+  b.cut_transport_status='awaiting_dispatch'; b.cutting_summary=o.cs||'ตัดด้วยแรงงานคน 6 คน · เสร็จตามแผน'; adv('cut_finish','ผจก.แปลงตัด','จบการตัด');
+  if(s==='dispatch') return b;
+  b.cut_transport_status='dispatching'; b.dispatch_started_at=daysAgo(1); adv('dispatch_start','ผจก.จัดส่ง','เริ่มจัดส่ง');
+  if(s==='dispatching') return b;
+  b.checkin_at=daysAgo(1); adv('checkin',SYS_ACTOR,'เช็คอินโรงงาน (ระบบ)','is-success');
+  if(s==='checkin') return b;
+  b.cut_transport_closed_at=daysAgo(0); b.payment_status='awaiting_payment'; b.dump_result_confirmed=true; adv('receiving',SYS_ACTOR,'รับอ้อยเสร็จ — ปิดงานขนส่ง + ตั้งรอทำจ่าย (ระบบ)','is-success');
+  if(s==='payment') return b;
+  b.payment_status='completed'; adv('payment',SYS_ACTOR,'จ่ายเงินเสร็จ (ระบบ)','is-success');
+  return b;
+}
+
+const state = {
+  records: [
+    seedBooking(1, 'QUO-2568-0001', 'waiting',       { age:2,  crop:'CRP-2568-0001', vt:'six_wheels',     plate:'70-1234 กจ', driver:'สมศักดิ์ ขับดี',  tons:18.50, lane:'A1', slot:'08:00-10:00', pay:'green_bill', debt:10 }),
+    seedBooking(2, 'QUO-2568-0002', 'rejected',      { age:4,  vt:'ten_wheels',     plate:'82-5567 กจ', driver:'ประยงค์ ทางไกล', tons:26.00, lane:'B1', slot:'10:00-12:00', pay:'white_bill', debt:0 }),
+    seedBooking(3, 'QUO-2568-0003', 'verified_nocut',{ age:5,  crop:'CRP-2568-0004', vt:'e-tan',          plate:'บบ-9021 กจ', driver:'ทวี ไร่ใกล้',   tons:6.20,  lane:'C1', slot:'06:00-08:00', pay:'green_bill', debt:15 }),
+    seedBooking(4, 'QUO-2568-0004', 'cut_approval',  { age:6,  vt:'sixteen_wheels', plate:'90-3311 นฐ', driver:'เดชา แรงงาน',   tons:34.80, lane:'A2', slot:'13:00-15:00', pay:'white_bill', debt:0 }),
+    seedBooking(5, 'QUO-2568-0001', 'cutting',       { age:7,  crop:'CRP-2568-0002', vt:'ten_wheels',    plate:'70-8890 กจ', driver:'สมศักดิ์ ขับดี', tons:24.10, lane:'B2', slot:'15:00-17:00', pay:'green_bill', debt:20 }),
+    seedBooking(6, 'QUO-2568-0002', 'dispatch',      { age:8,  vt:'six_wheels',     plate:'82-1102 กจ', driver:'ประยงค์ ทางไกล', tons:17.30, lane:'A1', slot:'08:00-10:00', pay:'green_bill', debt:0,  cm:'machine', cs:'ตัดด้วยรถตัดอ้อย · 1 คัน' }),
+    seedBooking(7, 'QUO-2568-0003', 'dispatching',   { age:9,  vt:'sixteen_wheels', plate:'90-4478 นฐ', driver:'เดชา แรงงาน',   tons:33.50, lane:'C1', slot:'10:00-12:00', pay:'white_bill', debt:5 }),
+    seedBooking(8, 'QUO-2568-0004', 'checkin',       { age:10, vt:'ten_wheels',     plate:'90-7781 นฐ', driver:'มานพ นำทาง',    tons:25.90, lane:'B1', slot:'13:00-15:00', pay:'green_bill', debt:0 }),
+    seedBooking(9, 'QUO-2568-0001', 'payment',       { age:11, crop:'CRP-2568-0001', vt:'ten_wheels',    plate:'70-2020 กจ', driver:'สมศักดิ์ ขับดี', tons:23.40, lane:'A2', slot:'06:00-08:00', pay:'green_bill', debt:30 }),
+    seedBooking(10,'QUO-2568-0003', 'completed',     { age:14, vt:'six_wheels',      plate:'90-6655 นฐ', driver:'มานพ นำทาง',    tons:16.80, lane:'A1', slot:'08:00-10:00', pay:'white_bill', debt:12 })
+  ],
+  filters:{ search:'', season:'all', approval:'all', cut:'all', payment:'all' },
+  pagination:{ page:1, pageSize:20 },
+  sort:{ col:null, dir:'asc' },
+  selectedIds: new Set(),
+  modal:{ open:false, type:null, data:null },
+  form:null,
+  view:null
+};
+
+// ============================================
+// HELPERS
+// ============================================
+function renderIcons(){ if(window.lucide&&typeof window.lucide.createIcons==='function') window.lucide.createIcons(); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDateTime(iso){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso); return d.toLocaleString('th-TH',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+function fmtDate(iso){ if(!iso)return '—'; var d=new Date(iso); if(isNaN(d))return String(iso); return d.toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'}); }
+function fmtTons(n){ var x=parseFloat(n); if(isNaN(x))return '—'; return x.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtBaht(n){ if(n==null)return null; return Number(n).toLocaleString('th-TH')+' บาท'; }
+function findBooking(id){ return state.records.find(b=>b.id===id||b.booking_id===id); }
+function showToast(msg,variant,ms){ variant=variant||'info'; ms=ms||3200; var el=document.getElementById('toast'); var im={success:'check-circle-2',info:'info',warning:'alert-triangle',error:'x-circle'}; el.className='toast is-'+variant; el.innerHTML='<i data-lucide="'+(im[variant]||'info')+'" class="w-4 h-4"></i><span>'+esc(msg)+'</span>'; renderIcons(); requestAnimationFrame(()=>el.classList.add('is-visible')); clearTimeout(showToast._t); showToast._t=setTimeout(()=>el.classList.remove('is-visible'),ms); }
+function toggleModule(h){ var m=h.closest('.sb-module'); if(!m)return; var e=m.getAttribute('data-expanded')!=='false'; m.setAttribute('data-expanded',e?'false':'true'); }
+function toggleUserMenu(){ document.getElementById('userMenu').classList.toggle('is-open'); }
+document.addEventListener('click',function(e){ if(!e.target.closest('.user-chip')&&!e.target.closest('.user-menu')){ var um=document.getElementById('userMenu'); if(um)um.classList.remove('is-open'); } });
+
+// ============================================
+// DERIVATION — combinedProgress + per-axis display (invariants §2 · §5)
+// ============================================
+function combinedProgress(b){
+  if(b.approval_status==='rejected') return 'ปฏิเสธ';
+  if(b.approval_status==='cancelled') return 'ยกเลิก';
+  if(b.approval_status!=='verified') return 'รออนุมัติ';
+  if(b.cut_transport_status==null) return 'รอส่งอนุมัติตัด';
+  if(b.cut_transport_status==='awaiting_cut_approval') return 'รออนุมัติตัด';
+  if(b.cut_transport_status==='awaiting_cutting') return 'รอตัด';
+  if(b.cut_transport_status==='awaiting_dispatch') return 'รอจัดส่ง';
+  if(b.cut_transport_status==='dispatching' && !b.checkin_at) return 'อยู่ระหว่างจัดส่ง';
+  if(b.checkin_at && !b.dump_result_confirmed && b.payment_status==='not_due') return 'รอผลการเท';
+  if(b.payment_status==='awaiting_payment') return 'รอทำจ่าย';
+  if(b.payment_status==='completed') return 'เสร็จสิ้น';
+  return 'รออนุมัติ';
+}
+// combined chip — color by phase family (approval=warning/success · cut=info · payment=warning/success)
+function combinedPill(b){
+  var lbl=combinedProgress(b);
+  var map={
+    'ปฏิเสธ':'pill-danger','ยกเลิก':'pill-muted',
+    'รออนุมัติ':'pill-warning','อนุมัติรอบจองแล้ว':'pill-success',
+    'รอส่งอนุมัติตัด':'pill-outline','รออนุมัติตัด':'pill-info','รอตัด':'pill-info','รอจัดส่ง':'pill-info','อยู่ระหว่างจัดส่ง':'pill-info',
+    'รอผลการเท':'pill-warning','รอทำจ่าย':'pill-warning','เสร็จสิ้น':'pill-success'
+  };
+  var sys=SYS_STEP[lbl];
+  return '<span class="pill '+(map[lbl]||'pill-muted')+'">'+esc(lbl)+(sys?' <i data-lucide="lock" class="w-2.5 h-2.5"></i>':'')+'</span>';
+}
+// Axis A — approval (verified label = "อนุมัติรอบจองแล้ว" · LOCK-07)
+function statusLabel(st){ return ({waiting_for_verify:'รออนุมัติ',verified:'อนุมัติรอบจองแล้ว',rejected:'ปฏิเสธ',cancelled:'ยกเลิก'})[st]||st; }
+function displayApproval(b){ var c=({waiting_for_verify:'pill-warning',verified:'pill-success',rejected:'pill-danger',cancelled:'pill-muted'})[b.approval_status]||'pill-muted'; return '<span class="pill '+c+'">'+statusLabel(b.approval_status)+'</span>'; }
+// Axis B — cut & transport
+function cutLabel(st){ return ({awaiting_cut_approval:'รออนุมัติตัด',awaiting_cutting:'รอตัด',awaiting_dispatch:'รอจัดส่ง',dispatching:'อยู่ระหว่างจัดส่ง'})[st]||st; }
+function displayCut(b){
+  if(b.approval_status!=='verified') return '<span class="text-mute-2">-</span>';
+  if(b.cut_transport_closed_at!=null) return '<span class="pill pill-success">ปิดงานขนส่ง <i data-lucide="lock" class="w-2.5 h-2.5"></i></span>';
+  if(b.cut_transport_status==null) return '<span class="pill pill-outline">รอส่งอนุมัติตัด</span>';
+  return '<span class="pill pill-info">'+cutLabel(b.cut_transport_status)+'</span>';
+}
+// Axis C — payment (system badge 🔒 · "-" ก่อนแกน B ปิด)
+function displayPayment(b){
+  if(b.cut_transport_closed_at==null) return '<span class="text-mute-2">-</span>';
+  if(b.payment_status==='awaiting_payment') return '<span class="pill pill-warning">รอทำจ่าย <i data-lucide="lock" class="w-2.5 h-2.5"></i></span>';
+  if(b.payment_status==='completed') return '<span class="pill pill-success">เสร็จสิ้น <i data-lucide="lock" class="w-2.5 h-2.5"></i></span>';
+  return '<span class="text-mute-2">-</span>';
+}
+// print gate ranks (BR-07)
+function cutRank(b){ if(!b.cut_transport_status)return 0; return ({awaiting_cut_approval:1,awaiting_cutting:2,awaiting_dispatch:3,dispatching:4})[b.cut_transport_status]||0; }
+function canPrintCut(b){ return cutRank(b)>=2; }
+function canPrintDlv(b){ return cutRank(b)>=3; }
+function isTerminal(b){ return b.approval_status==='rejected'||b.approval_status==='cancelled'; }
+function isCompleted(b){ return b.payment_status==='completed'; }
+
+// ============================================
+// ROUTER
+// ============================================
+function getRoute(){ var h=location.hash; if(!h||h==='#'||h==='#/')return 'bookings'; return h.replace(/^#\//,''); }
+function navigate(r){ location.hash='#/'+r; }
+
+// ============================================
+// LIST FILTER / PAGE / SORT
+// ============================================
+function getFiltered(){
+  var arr=state.records.slice();
+  if(state.filters.season!=='all') arr=arr.filter(b=>b.season===state.filters.season);
+  if(state.filters.approval!=='all') arr=arr.filter(b=>b.approval_status===state.filters.approval);
+  if(state.filters.cut!=='all'){
+    var f=state.filters.cut;
+    arr=arr.filter(function(b){
+      if(f==='not_started') return b.approval_status!=='verified';            // แสดง "-"
+      if(f==='pending_send') return b.approval_status==='verified'&&b.cut_transport_status==null; // รอส่งอนุมัติตัด
+      if(f==='closed') return b.cut_transport_closed_at!=null;
+      return b.cut_transport_status===f;
+    });
+  }
+  if(state.filters.payment!=='all'){
+    var p=state.filters.payment;
+    arr=arr.filter(function(b){
+      if(p==='not_started') return b.cut_transport_closed_at==null;            // แสดง "-"
+      return b.cut_transport_closed_at!=null && b.payment_status===p;
+    });
+  }
+  if(state.filters.search){
+    var q=state.filters.search.toLowerCase().trim();
+    arr=arr.filter(b=> b.booking_id.toLowerCase().includes(q)||String(b.quota_id).toLowerCase().includes(q)||(b.farmer_name+' '+b.farmer_lastname).toLowerCase().includes(q)||String(b.vehicle_plate).toLowerCase().includes(q) );
+  }
+  if(state.sort.col){ var col=state.sort.col; arr=arr.slice().sort(function(a,b){ var r; if(col==='updated_at'){ r=new Date(a[col])-new Date(b[col]); } else { r=String(a[col]==null?'':a[col]).localeCompare(String(b[col]==null?'':b[col]),'th'); } return state.sort.dir==='asc'?r:-r; }); }
+  return arr;
+}
+function getPaged(){ var all=getFiltered(); var pg=state.pagination.page,ps=state.pagination.pageSize; var s=(pg-1)*ps; return {records:all.slice(s,s+ps),total:all.length,page:pg,totalPages:Math.max(1,Math.ceil(all.length/ps)),start:all.length===0?0:s+1,end:Math.min(s+ps,all.length)}; }
+function sortBy(c){ if(state.sort.col===c)state.sort.dir=state.sort.dir==='asc'?'desc':'asc'; else{state.sort.col=c;state.sort.dir='asc';} render(); }
+function toggleSelect(id){ if(state.selectedIds.has(id))state.selectedIds.delete(id); else state.selectedIds.add(id); render(); }
+function toggleSelectAll(){ var sel=getPaged().records.filter(b=>b.approval_status==='waiting_for_verify'); var all=sel.length>0&&sel.every(b=>state.selectedIds.has(b.booking_id)); if(all)sel.forEach(b=>state.selectedIds.delete(b.booking_id)); else sel.forEach(b=>state.selectedIds.add(b.booking_id)); render(); }
+function goToPage(n){ var tp=getPaged().totalPages; if(n<1||n>tp)return; state.pagination.page=n; render(); }
+function resetFilters(){ state.filters={search:'',season:'all',approval:'all',cut:'all',payment:'all'}; state.pagination.page=1; state.selectedIds.clear(); render(); }
+var _st=null; function onSearchInput(v){ clearTimeout(_st); _st=setTimeout(function(){ state.filters.search=v; state.pagination.page=1; render(); },300); }
+function setFilter(k,v){ state.filters[k]=v; state.pagination.page=1; render(); }
+
+// RENDER PRESERVATION
+function preserveState(){ var a=document.activeElement; var isI=a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'); return { pageScroll:window.scrollY, focusKey:isI?{id:a.id||'',placeholder:a.placeholder||'',selStart:a.selectionStart,selEnd:a.selectionEnd}:null }; }
+function restoreState(s){ if(!s)return; requestAnimationFrame(function(){ if(s.pageScroll>0)window.scrollTo(0,s.pageScroll); if(s.focusKey){ var c=s.focusKey.id?document.getElementById(s.focusKey.id):null; if(!c){var cs=document.querySelectorAll('input,textarea'); for(var i=0;i<cs.length;i++){ if((cs[i].placeholder||'')===s.focusKey.placeholder){c=cs[i];break;} }} if(c){ c.focus(); if(s.focusKey.selStart!=null&&c.setSelectionRange){ try{c.setSelectionRange(s.focusKey.selStart,s.focusKey.selEnd);}catch(e){} } } } }); }
+
+function emptyStateHTML(cfg){ cfg=cfg||{}; var acts=''; if(cfg.actions){ acts='<div class="empty-actions">'+cfg.actions.map(function(a){ return '<button class="btn '+(a.cls||'btn-primary')+'" onclick="'+a.onAction+'">'+(a.icon?'<i data-lucide="'+a.icon+'" class="w-4 h-4"></i>':'')+'<span>'+a.label+'</span></button>'; }).join('')+'</div>'; } return '<div class="empty"><div class="empty-icon"><i data-lucide="'+(cfg.icon||'inbox')+'" class="w-5 h-5"></i></div><div class="empty-title">'+(cfg.title||'ยังไม่มีข้อมูล')+'</div><div class="empty-desc">'+(cfg.desc||'')+'</div>'+acts+'</div>'; }
+
+// ============================================
+// PAGE RENDER (P-01 Booking List) — BACKEND: API-01 list
+// ============================================
+function render(){
+  var snap=preserveState();
+  var route=getRoute(); var parts=route.split('/');
+  if(parts[0]!=='bookings'){ navigate('bookings'); return; }
+  var pg=getPaged();
+  var all=state.records;
+  var cWait=all.filter(b=>b.approval_status==='waiting_for_verify').length;
+  var cCut=all.filter(b=>cutRank(b)>=1 && !b.cut_transport_closed_at).length;
+  var cDone=all.filter(b=>b.payment_status==='completed').length;
+  var sel=pg.records.filter(b=>b.approval_status==='waiting_for_verify'); var allSel=sel.length>0&&sel.every(b=>state.selectedIds.has(b.booking_id)); var someSel=!allSel&&sel.some(b=>state.selectedIds.has(b.booking_id)); var selCount=state.selectedIds.size;
+
+  var rows=pg.records.map(function(b){
+    var can=b.approval_status==='waiting_for_verify';
+    var cutBtn='<button class="btn btn-sm btn-secondary'+(canPrintCut(b)?'':' is-disabled')+'" onclick="event.stopPropagation();printCut(\''+b.booking_id+'\')" '+(canPrintCut(b)?'':'title="ต้องอนุมัติตัดก่อน จึงจะพิมพ์ใบสั่งตัดได้"')+'><i data-lucide="scissors" class="w-3.5 h-3.5"></i><span>ใบสั่งตัด</span></button>';
+    var dlvBtn='<button class="btn btn-sm btn-secondary'+(canPrintDlv(b)?'':' is-disabled')+'" onclick="event.stopPropagation();printDlv(\''+b.booking_id+'\')" '+(canPrintDlv(b)?'':'title="ต้องอยู่สถานะรอจัดส่งขึ้นไป จึงจะพิมพ์ใบนำส่งได้"')+'><i data-lucide="truck" class="w-3.5 h-3.5"></i><span>ใบส่งอ้อย</span></button>';
+    return '<tr class="is-clickable '+(state.selectedIds.has(b.booking_id)?'is-selected':'')+'" onclick="openView(\''+b.booking_id+'\')">'
+      +'<td onclick="event.stopPropagation()"><div class="cb '+(state.selectedIds.has(b.booking_id)?'is-checked':'')+(can?'':' is-disabled')+'" '+(can?'onclick="toggleSelect(\''+b.booking_id+'\')"':'title="เลือกได้เฉพาะรายการรออนุมัติ"')+'></div></td>'
+      +'<td><span class="mono text-primary" style="font-weight:600;">'+esc(b.booking_id)+'</span></td>'
+      +'<td><div style="font-weight:600;">'+esc(b.farmer_name+' '+b.farmer_lastname)+'</div><div class="mono" style="font-size:11.5px;color:var(--c-mute-2);">'+esc(b.quota_id)+'</div></td>'
+      +'<td><span class="num">'+esc(b.season)+'</span></td>'
+      +'<td><div>'+fmtDateTime(b.booking_datetime)+'</div><div style="font-size:11.5px;color:var(--c-mute-2);">เลน '+esc(b.lane)+' · '+esc(b.slot)+'</div></td>'
+      +'<td><div>'+esc(vehLabel(b.vehicle_type))+'</div><div class="mono" style="font-size:11.5px;color:var(--c-mute-2);">'+esc(b.vehicle_plate)+'</div></td>'
+      +'<td>'+displayApproval(b)+'</td>'
+      +'<td>'+displayCut(b)+'</td>'
+      +'<td>'+displayPayment(b)+'</td>'
+      +'<td>'+combinedPill(b)+'</td>'
+      +'<td onclick="event.stopPropagation()"><div style="display:flex;gap:5px;">'+cutBtn+dlvBtn+'</div></td>'
+      +'<td onclick="event.stopPropagation()" style="text-align:right;width:56px;"><div class="row-actions">'
+      +'<button class="ra-btn" onclick="openView(\''+b.booking_id+'\')" title="ดูรายละเอียด"><i data-lucide="pencil" class="w-4 h-4"></i></button>'
+      +'</div></td></tr>';
+  }).join('');
+
+  var noData=all.length===0; var emptyBlock='';
+  if(pg.records.length===0){
+    emptyBlock=noData?emptyStateHTML({icon:'calendar-clock',title:'ยังไม่มีการจอง',desc:'เริ่มต้นด้วยการสร้างการจองรอบส่งอ้อยแรก',actions:[{label:'สร้างการจอง',icon:'plus',onAction:"openForm('create')"}]})
+      :emptyStateHTML({icon:'search-x',title:'ไม่พบรายการที่ค้นหา',desc:'ลองปรับคำค้นหรือล้างตัวกรอง',actions:[{label:'ล้างตัวกรอง',icon:'rotate-ccw',cls:'btn-ghost',onAction:'resetFilters()'}]});
+  }
+  var pageNums=[]; for(var n=1;n<=pg.totalPages;n++)pageNums.push(n);
+  var seasonOpts='<option value="all"'+(state.filters.season==='all'?' selected':'')+'>ทุกฤดูกาล</option>'+SEASONS.map(y=>'<option value="'+esc(y)+'"'+(state.filters.season===y?' selected':'')+'>'+esc(y)+'</option>').join('');
+
+  document.getElementById('page-content').innerHTML=
+    '<div class="ph"><div><div class="ph-title-row"><h1 class="ph-title">จัดการจองรอบส่งอ้อย</h1><span class="ph-count">'+pg.total+' รายการ</span></div>'
+    +'<p class="ph-sub">ทะเบียนการจองส่งอ้อย · สถานะ 3 แกน (อนุมัติ · ตัด&amp;ขนส่ง · ชำระเงิน) · พิมพ์เอกสาร</p></div>'
+    +'<div class="ph-actions">'
+    +'<button class="btn btn-secondary" '+(selCount===0?'disabled':'')+' onclick="bulkApprove()"><i data-lucide="shield-check" class="w-4 h-4"></i><span>ตรวจสอบที่เลือก ('+selCount+')</span></button>'
+    +'<button class="btn btn-primary" onclick="openForm(\'create\')"><i data-lucide="plus" class="w-4 h-4"></i><span>สร้างการจอง</span></button>'
+    +'</div></div>'
+    +'<div class="stats">'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="calendar-clock" class="w-3 h-3"></i>การจองทั้งหมด</div><div class="stat-value num">'+all.length+'</div><div class="stat-meta">ทุกสถานะในระบบ</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="clock" class="w-3 h-3"></i>รออนุมัติ</div><div class="stat-value num">'+cWait+'</div><div class="stat-meta">รอเจ้าหน้าที่ตรวจสอบ</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="scissors" class="w-3 h-3"></i>กำลังตัด/ขนส่ง</div><div class="stat-value num">'+cCut+'</div><div class="stat-meta">แกนตัด&amp;ขนส่งยังไม่ปิด</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="check-circle-2" class="w-3 h-3"></i>เสร็จสิ้น</div><div class="stat-value num">'+cDone+'</div><div class="stat-meta">จ่ายเงินเสร็จแล้ว</div></div>'
+    +'</div>'
+    +'<div class="card">'
+    +'<div class="filter-bar"><div class="input-search"><i data-lucide="search" class="lead-icon w-4 h-4"></i>'
+    +'<input class="input" type="text" id="q-search" placeholder="ค้นหา เลขจอง / โควตา / เกษตรกร / ทะเบียนรถ" value="'+esc(state.filters.search)+'" oninput="onSearchInput(this.value)"></div>'
+    +'<select class="select" style="max-width:150px;" onchange="setFilter(\'season\',this.value)">'+seasonOpts+'</select>'
+    +'<select class="select" style="max-width:160px;" onchange="setFilter(\'approval\',this.value)">'
+    +'<option value="all"'+(state.filters.approval==='all'?' selected':'')+'>การอนุมัติ: ทั้งหมด</option>'
+    +'<option value="waiting_for_verify"'+(state.filters.approval==='waiting_for_verify'?' selected':'')+'>รออนุมัติ</option>'
+    +'<option value="verified"'+(state.filters.approval==='verified'?' selected':'')+'>อนุมัติรอบจองแล้ว</option>'
+    +'<option value="rejected"'+(state.filters.approval==='rejected'?' selected':'')+'>ปฏิเสธ</option>'
+    +'<option value="cancelled"'+(state.filters.approval==='cancelled'?' selected':'')+'>ยกเลิก</option></select>'
+    +'<select class="select" style="max-width:170px;" onchange="setFilter(\'cut\',this.value)">'
+    +'<option value="all"'+(state.filters.cut==='all'?' selected':'')+'>ตัด&amp;ขนส่ง: ทั้งหมด</option>'
+    +'<option value="not_started"'+(state.filters.cut==='not_started'?' selected':'')+'>ยังไม่เริ่ม (-)</option>'
+    +'<option value="pending_send"'+(state.filters.cut==='pending_send'?' selected':'')+'>รอส่งอนุมัติตัด</option>'
+    +'<option value="awaiting_cut_approval"'+(state.filters.cut==='awaiting_cut_approval'?' selected':'')+'>รออนุมัติตัด</option>'
+    +'<option value="awaiting_cutting"'+(state.filters.cut==='awaiting_cutting'?' selected':'')+'>รอตัด</option>'
+    +'<option value="awaiting_dispatch"'+(state.filters.cut==='awaiting_dispatch'?' selected':'')+'>รอจัดส่ง</option>'
+    +'<option value="dispatching"'+(state.filters.cut==='dispatching'?' selected':'')+'>อยู่ระหว่างจัดส่ง</option>'
+    +'<option value="closed"'+(state.filters.cut==='closed'?' selected':'')+'>ปิดงานขนส่ง</option></select>'
+    +'<select class="select" style="max-width:170px;" onchange="setFilter(\'payment\',this.value)">'
+    +'<option value="all"'+(state.filters.payment==='all'?' selected':'')+'>การชำระเงิน: ทั้งหมด</option>'
+    +'<option value="not_started"'+(state.filters.payment==='not_started'?' selected':'')+'>ยังไม่เริ่ม (-)</option>'
+    +'<option value="awaiting_payment"'+(state.filters.payment==='awaiting_payment'?' selected':'')+'>รอทำจ่าย</option>'
+    +'<option value="completed"'+(state.filters.payment==='completed'?' selected':'')+'>เสร็จสิ้น</option></select>'
+    +'<div style="flex:1;"></div><button class="btn btn-ghost btn-sm" onclick="resetFilters()"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i><span>ล้างตัวกรอง</span></button></div>'
+    +(selCount>0?'<div class="bulk-bar"><i data-lucide="check-square" class="w-4 h-4"></i><span>เลือก '+selCount+' รายการ (รออนุมัติ)</span><div style="margin-left:auto;display:flex;gap:8px;"><button class="btn btn-secondary" onclick="bulkApprove()"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i><span>อนุมัติที่เลือก</span></button><button class="btn btn-secondary" onclick="state.selectedIds.clear();render();"><span>ยกเลิกการเลือก</span></button></div></div>':'')
+    +'<div class="table-scroll is-sticky"><table class="table"><thead><tr>'
+    +'<th class="col-check"><div class="cb '+(allSel?'is-checked':'')+(someSel?' is-partial':'')+'" onclick="toggleSelectAll()" title="เลือกทั้งหมด (เฉพาะรออนุมัติ)"></div></th>'
+    +'<th class="is-sortable" onclick="sortBy(\'booking_id\')">เลขจอง</th>'
+    +'<th>เกษตรกร / โควตา</th><th>ฤดูกาล</th><th>วันเวลา / เลน</th><th>รถ (ทะเบียน)</th>'
+    +'<th>การอนุมัติ</th><th>ตัด&amp;ขนส่ง</th><th>การชำระเงิน</th><th>ความคืบหน้า</th>'
+    +'<th>ดาวน์โหลด</th><th style="text-align:right;">การดำเนินการ</th></tr></thead><tbody>'+rows+'</tbody></table>'+emptyBlock+'</div>'
+    +'<div class="table-footer"><div class="pagination">'
+    +'<button class="pg-btn '+(pg.page===1?'is-disabled':'')+'" onclick="goToPage('+(pg.page-1)+')"><i data-lucide="chevron-left" class="w-3 h-3"></i></button>'
+    +pageNums.map(n=>'<button class="pg-btn '+(n===pg.page?'is-active':'')+'" onclick="goToPage('+n+')">'+n+'</button>').join('')
+    +'<button class="pg-btn '+(pg.page===pg.totalPages?'is-disabled':'')+'" onclick="goToPage('+(pg.page+1)+')"><i data-lucide="chevron-right" class="w-3 h-3"></i></button></div>'
+    +'<span>'+pg.start+' – '+pg.end+' จาก '+pg.total+' รายการ</span></div></div>';
+
+  renderIcons(); restoreState(snap);
+  if(parts.length>1&&parts[1]){ var b=findBooking(parts[1]); if(b){ if(!state.view||state.view.id!==b.booking_id){ state.view={id:b.booking_id}; mountViewDrawer(); } } else { showToast('ไม่พบข้อมูลการจองที่เลือก','error'); navigate('bookings'); } }
+  else if(state.view){ state.view=null; unmountOverlay(); }
+}
+
+// ============================================
+// OVERLAY SHELL
+// ============================================
+function unmountOverlay(){ document.getElementById('overlay-root').innerHTML=''; }
+function mountPanel(cid){ document.getElementById('overlay-root').innerHTML='<div class="overlay-wrap"><div class="backdrop" onclick="closeTopDrawer()"></div><div id="drawer-panel" class="drawer-panel drawer-enter"><div id="'+cid+'" style="display:flex;flex-direction:column;height:100%;"></div></div></div>'; var p=document.getElementById('drawer-panel'); requestAnimationFrame(()=>p.classList.add('drawer-active')); }
+function closePanel(after){ var p=document.getElementById('drawer-panel'); if(p){p.classList.remove('drawer-active');p.classList.add('drawer-enter');} setTimeout(function(){ unmountOverlay(); if(after)after(); },200); }
+function closeTopDrawer(){ if(state.form)closeForm(); else if(state.view)closeView(); }
+
+// ============================================
+// P-02 DETAIL DRAWER (view) — combined 10-step timeline + 3-axis + sections + actions
+// BACKEND: API-04 detail · API-12 audit
+// ============================================
+function openView(code){ navigate('bookings/'+code); }
+function mountViewDrawer(){ mountPanel('view-content'); renderViewDrawer(); }
+function closeView(){ state.view=null; closePanel(function(){ if(getRoute()!=='bookings')navigate('bookings'); }); }
+
+function stepperHTML(b){
+  var cur=STEPS.indexOf(combinedProgress(b)); var terminal=isTerminal(b);
+  var html='<div style="display:flex;align-items:flex-start;overflow-x:auto;padding:6px 2px 2px;">';
+  STEPS.forEach(function(lbl,i){
+    if(i>0){ var lc=(!terminal&&i<=cur)?'var(--c-success)':'var(--c-line-2)'; html+='<div style="flex:1;height:2px;background:'+lc+';margin-top:13px;min-width:10px;"></div>'; }
+    var st = terminal ? 'future' : (i<cur?'done':(i===cur?'current':'future'));
+    var sys=SYS_STEP[lbl];
+    var bg = st==='done'?'var(--c-success)':(st==='current'?'var(--c-primary)':'#fff');
+    var bd = st==='future'?'var(--c-line)':(st==='done'?'var(--c-success)':'var(--c-primary)');
+    var col = st==='future'?'var(--c-mute-3)':(st==='current'?'var(--c-primary)':'var(--c-ink)');
+    var inner;
+    if(st==='done') inner='<i data-lucide="check" class="w-3 h-3" style="color:#fff;"></i>';
+    else if(sys) inner='<i data-lucide="lock" class="w-3 h-3" style="color:'+(st==='current'?'#fff':'var(--c-mute-3)')+';"></i>';
+    else inner='<span style="font-size:10px;font-weight:700;color:'+(st==='current'?'#fff':'var(--c-mute-3)')+';">'+(i+1)+'</span>';
+    html+='<div style="display:flex;flex-direction:column;align-items:center;min-width:72px;flex:1;">'
+      +'<div style="width:26px;height:26px;border-radius:50%;background:'+bg+';border:2px solid '+bd+';display:flex;align-items:center;justify-content:center;">'+inner+'</div>'
+      +'<div style="font-size:10.5px;text-align:center;margin-top:6px;color:'+col+';font-weight:'+(st==='current'?'700':'500')+';line-height:1.3;">'+esc(lbl)+(sys?' <i data-lucide="lock" class="w-2.5 h-2.5"></i>':'')+'</div></div>';
+  });
+  html+='</div>';
+  return html;
+}
+
+function detailActions(b){
+  var out='';
+  if(isCompleted(b)) return '';
+  if(isTerminal(b)) return '';
+  if(b.approval_status==='waiting_for_verify'){
+    out+='<button class="btn btn-sm btn-primary" onclick="approveBooking(\''+b.booking_id+'\')"><i data-lucide="check" class="w-3.5 h-3.5"></i><span>อนุมัติ</span></button>';
+    out+='<button class="btn btn-sm btn-danger" onclick="openReasonModal(\'reject\',\''+b.booking_id+'\')"><i data-lucide="x" class="w-3.5 h-3.5"></i><span>ปฏิเสธ</span></button>';
+    out+='<button class="btn btn-sm btn-secondary" onclick="openReasonModal(\'cancel\',\''+b.booking_id+'\')"><i data-lucide="ban" class="w-3.5 h-3.5"></i><span>ยกเลิก</span></button>';
+  } else if(b.approval_status==='verified'){
+    if(b.cut_transport_status==null) out+='<button class="btn btn-sm btn-primary" onclick="sendCutApproval(\''+b.booking_id+'\')"><i data-lucide="send" class="w-3.5 h-3.5"></i><span>ขออนุมัติตัด</span></button>';
+    else if(b.cut_transport_status==='awaiting_cut_approval') out+='<button class="btn btn-sm btn-primary" onclick="approveCut(\''+b.booking_id+'\')"><i data-lucide="scissors" class="w-3.5 h-3.5"></i><span>อนุมัติตัด</span></button>';
+    else if(b.cut_transport_status==='awaiting_cutting') out+='<button class="btn btn-sm btn-primary" onclick="finishCut(\''+b.booking_id+'\')"><i data-lucide="check-check" class="w-3.5 h-3.5"></i><span>จบการตัด</span></button>';
+    else if(b.cut_transport_status==='awaiting_dispatch') out+='<button class="btn btn-sm btn-primary" onclick="startDispatch(\''+b.booking_id+'\')"><i data-lucide="truck" class="w-3.5 h-3.5"></i><span>เริ่มจัดส่ง</span></button>';
+    // ย้อนสถานะ (void) — ทุกสถานะก่อน completed
+    out+='<button class="btn btn-sm btn-secondary" onclick="openReasonModal(\'void\',\''+b.booking_id+'\')"><i data-lucide="undo-2" class="w-3.5 h-3.5"></i><span>ย้อนสถานะ</span></button>';
+  }
+  return out;
+}
+
+function renderViewDrawer(){
+  if(!state.view)return; var b=findBooking(state.view.id); if(!b)return;
+  var actions=detailActions(b);
+  function cell(l,v){ return '<div class="dv-cell"><div class="dv-lbl">'+l+'</div><div class="dv-val">'+v+'</div></div>'; }
+
+  // Section 1 — ข้อมูลจอง
+  var sec1='<div class="dv-section"><div class="dv-section-title"><i data-lucide="calendar-clock" class="w-4 h-4"></i>ข้อมูลจอง</div><div class="dv-grid">'
+    +cell('เกษตรกร',esc(b.farmer_name+' '+b.farmer_lastname))
+    +cell('โทรศัพท์','<span class="num">'+esc(b.farmer_phone)+'</span>')
+    +cell('โควตา','<span class="mono text-primary">'+esc(b.quota_id)+'</span>')
+    +cell('รอบปลูก',b.crop_id?('<span class="mono">'+esc(b.crop_id)+'</span>'):'—')
+    +cell('ฤดูกาล','<span class="num">'+esc(b.season)+'</span>')
+    +cell('สถานที่',esc(locLabel(b.location)))
+    +cell('วันเวลา',fmtDateTime(b.booking_datetime))
+    +cell('รอบ / เลน',esc(b.slot)+' · เลน '+esc(b.lane))
+    +cell('ประเภทรถ',esc(vehLabel(b.vehicle_type)))
+    +cell('ทะเบียน / คนขับ','<span class="mono">'+esc(b.vehicle_plate)+'</span> · '+esc(b.driver))
+    +cell('ปริมาณคาดส่ง (ตัน)','<span class="num">'+fmtTons(b.estimated_tons)+'</span>')
+    +'</div></div>';
+
+  // Section 2 — รายละเอียดการตัด + พิมพ์ใบสั่งตัด
+  var sec2='<div class="dv-section"><div class="dv-section-title"><i data-lucide="scissors" class="w-4 h-4"></i>รายละเอียดการตัด</div><div class="dv-grid">'
+    +cell('วิธีการตัด',b.cutting_method==='machine'?'เครื่องจักร (รถตัดอ้อย)':'แรงงานคน')
+    +cell('สรุปการตัด',b.cutting_summary?esc(b.cutting_summary):'—')
+    +'</div><div style="margin-top:12px;"><button class="btn btn-sm btn-secondary'+(canPrintCut(b)?'':' is-disabled')+'" onclick="printCut(\''+b.booking_id+'\')" '+(canPrintCut(b)?'':'title="ต้องอนุมัติตัดก่อน จึงจะพิมพ์ใบสั่งตัดได้"')+'><i data-lucide="printer" class="w-3.5 h-3.5"></i><span>พิมพ์ใบสั่งตัด</span></button>'
+    +(canPrintCut(b)?'':'<span style="font-size:11.5px;color:var(--c-mute-2);margin-left:10px;">พิมพ์ได้ตั้งแต่สถานะ “รอตัด” ขึ้นไป</span>')+'</div></div>';
+
+  // Section 3 — รายละเอียดการจัดส่ง + พิมพ์ใบส่งอ้อย
+  var sec3='<div class="dv-section"><div class="dv-section-title"><i data-lucide="truck" class="w-4 h-4"></i>รายละเอียดการจัดส่ง</div><div class="dv-grid">'
+    +cell('รถ / ทะเบียน',esc(vehLabel(b.vehicle_type))+' · <span class="mono">'+esc(b.vehicle_plate)+'</span>')
+    +cell('เลน / รอบ','เลน '+esc(b.lane)+' · '+esc(b.slot))
+    +cell('เริ่มจัดส่งเมื่อ',b.dispatch_started_at?fmtDateTime(b.dispatch_started_at):'—')
+    +cell('เช็คอินโรงงาน',b.checkin_at?fmtDateTime(b.checkin_at):'—')
+    +'</div><div style="margin-top:12px;"><button class="btn btn-sm btn-secondary'+(canPrintDlv(b)?'':' is-disabled')+'" onclick="printDlv(\''+b.booking_id+'\')" '+(canPrintDlv(b)?'':'title="ต้องอยู่สถานะรอจัดส่งขึ้นไป จึงจะพิมพ์ใบนำส่งได้"')+'><i data-lucide="printer" class="w-3.5 h-3.5"></i><span>พิมพ์ใบส่งอ้อย</span></button>'
+    +(canPrintDlv(b)?'':'<span style="font-size:11.5px;color:var(--c-mute-2);margin-left:10px;">พิมพ์ได้ตั้งแต่สถานะ “รอจัดส่ง” ขึ้นไป</span>')+'</div></div>';
+
+  // Section 4 — การชำระเงิน & หักหนี้ (แสดงเมื่อแกน C เริ่ม)
+  var sec4;
+  if(b.cut_transport_closed_at!=null){
+    var os=fmtBaht(b.debtor_outstanding);
+    sec4='<div class="dv-section"><div class="dv-section-title"><i data-lucide="wallet" class="w-4 h-4"></i>การชำระเงิน &amp; หักหนี้</div><div class="dv-grid">'
+      +cell('ประเภทบิล',esc(payLabel(b.payment_type)))
+      +cell('หักหนี้ (%)','<span class="num">'+esc(b.debt_deduction_percent)+'</span>%')
+      +cell('ยอดหนี้คงค้าง (snapshot)',os?('<span class="num">'+esc(os)+'</span>'):'ไม่มีแฟ้มลูกหนี้')
+      +cell('สถานะชำระเงิน',b.payment_status==='completed'?'เสร็จสิ้น':'รอทำจ่าย')
+      +'</div><div class="dv-note">การหักหนี้จริงคำนวณที่ขั้นตอน Payment (ยอดจ่ายได้ × %/100) · ค่าที่แสดงเป็น snapshot จาก Debt Mgt</div></div>';
+  } else {
+    sec4='<div class="dv-section"><div class="dv-section-title"><i data-lucide="wallet" class="w-4 h-4"></i>การชำระเงิน &amp; หักหนี้</div><div style="padding:12px 14px;background:var(--c-bg-off);border:1px solid var(--c-line-2);border-radius:8px;font-size:12.5px;color:var(--c-mute-2);">ยังไม่ถึงขั้นชำระเงิน (แกนตัด&amp;ขนส่งยังไม่ปิดงาน)</div></div>';
+  }
+
+  // Section — จำลองเหตุการณ์ระบบภายนอก (system-controlled · non-manual)
+  var simPanel='';
+  if(b.approval_status==='verified' && !isCompleted(b)){
+    simPanel='<div class="dv-section"><div class="dv-section-title"><i data-lucide="satellite-dish" class="w-4 h-4"></i>จำลองเหตุการณ์ระบบภายนอก <span class="pill pill-outline" style="margin-left:4px;">ระบบกำหนด <i data-lucide="lock" class="w-2.5 h-2.5"></i></span></div>'
+      +'<div class="note is-info mb-3"><i data-lucide="info" class="w-4 h-4"></i><span>ขั้น “รอผลการเท / รอทำจ่าย / เสร็จสิ้น” ระบบภายนอกเป็นผู้อัปเดต ตั้งค่าเองไม่ได้ — ปุ่มด้านล่างจำลอง event เข้ามา</span></div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:8px;">'
+      +'<button class="btn btn-sm btn-secondary" onclick="simCheckin(\''+b.booking_id+'\')"><i data-lucide="log-in" class="w-3.5 h-3.5"></i><span>จำลอง: เช็คอินโรงงาน</span></button>'
+      +'<button class="btn btn-sm btn-secondary" onclick="simReceiving(\''+b.booking_id+'\')"><i data-lucide="package-check" class="w-3.5 h-3.5"></i><span>จำลอง: รับอ้อยเสร็จ</span></button>'
+      +'<button class="btn btn-sm btn-secondary" onclick="simPayment(\''+b.booking_id+'\')"><i data-lucide="banknote" class="w-3.5 h-3.5"></i><span>จำลอง: จ่ายเงินเสร็จ</span></button>'
+      +'</div></div>';
+  }
+
+  // Section 5 — ประวัติ & เหตุการณ์
+  var evMap={create:{t:'สร้างการจอง'},approve:{t:'อนุมัติรอบจอง'},reject:{t:'ปฏิเสธการจอง'},cancel:{t:'ยกเลิกการจอง'},cut_send:{t:'ขออนุมัติตัด'},cut_approve:{t:'อนุมัติตัด'},cut_finish:{t:'จบการตัด'},dispatch_start:{t:'เริ่มจัดส่ง'},checkin:{t:'เช็คอินโรงงาน (ระบบ)'},receiving:{t:'รับอ้อยเสร็จ (ระบบ)'},payment:{t:'จ่ายเงินเสร็จ (ระบบ)'},reverse:{t:'ย้อนสถานะ'}};
+  var items=b.history.slice().reverse().map(function(h){ var ev=evMap[h.event]||{t:h.event}; return '<div class="tl-item"><div class="tl-dot '+(h.dot||'')+'"></div><div class="flex justify-between items-center"><div class="tl-title">'+esc(ev.t)+'</div><div class="tl-meta">'+fmtDateTime(h.at)+'</div></div><div class="tl-meta">โดย '+esc(h.actor)+'</div>'+(h.note?'<div class="tl-note">'+esc(h.note)+'</div>':'')+'</div>'; }).join('');
+  var sec5='<div class="dv-section"><div class="dv-section-title"><i data-lucide="history" class="w-4 h-4"></i>ประวัติ &amp; เหตุการณ์</div><div class="timeline">'+items+'</div></div>';
+
+  // 3-axis badge row + closed note
+  var axisRow='<div style="display:flex;flex-wrap:wrap;gap:16px;padding:14px 16px;background:var(--c-bg-off);border:1px solid var(--c-line-2);border-radius:10px;margin-bottom:4px;">'
+    +'<div><div style="font-size:11px;color:var(--c-mute-3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:5px;">การอนุมัติ</div>'+displayApproval(b)+'</div>'
+    +'<div><div style="font-size:11px;color:var(--c-mute-3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:5px;">ตัด&amp;ขนส่ง</div>'+displayCut(b)+(b.cut_transport_closed_at!=null?'<div style="font-size:11px;color:var(--c-success);margin-top:3px;">ปิดงานขนส่งแล้ว</div>':'')+'</div>'
+    +'<div><div style="font-size:11px;color:var(--c-mute-3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:5px;">การชำระเงิน</div>'+displayPayment(b)+'</div>'
+    +'</div>';
+
+  var completedNote=isCompleted(b)?'<div class="note is-info mb-3"><i data-lucide="lock" class="w-4 h-4"></i><span>การจองนี้ชำระเงินเสร็จสิ้นแล้ว — อยู่ในสถานะอ่านอย่างเดียว (read-only)</span></div>':'';
+  var terminalNote=isTerminal(b)?'<div class="note is-warn mb-3"><i data-lucide="alert-triangle" class="w-4 h-4"></i><span><b>'+(b.approval_status==='rejected'?'เหตุผลที่ปฏิเสธ: ':'เหตุผลที่ยกเลิก: ')+'</b>'+esc(b.reject_reason||b.cancel_reason||'—')+'</span></div>':'';
+
+  document.getElementById('view-content').innerHTML=
+    '<div class="dw-head"><div class="dw-head-row"><div>'
+    +'<div class="dw-eyebrow"><i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> การจองรอบส่งอ้อย · <span class="mono">'+esc(b.quota_id)+'</span></div>'
+    +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><h2 class="dw-title mono">'+esc(b.booking_id)+'</h2>'+combinedPill(b)+'</div></div>'
+    +'<div class="dw-actions">'+actions+(actions?'<span class="drawer-header-divider"></span>':'')+'<button class="top-icon-btn" onclick="closeView()"><i data-lucide="x" class="w-5 h-5"></i></button></div></div></div>'
+    +'<div class="dw-body">'
+    +completedNote+terminalNote
+    +'<div class="dv-section"><div class="dv-section-title"><i data-lucide="git-commit-horizontal" class="w-4 h-4"></i>ความคืบหน้ารวม (10 ขั้น)</div>'+stepperHTML(b)+'</div>'
+    +axisRow
+    +'<div style="height:14px;"></div>'
+    +sec1+sec2+sec3+sec4+simPanel+sec5
+    +'</div>'
+    +'<div class="dw-footer"><div class="dw-footer-meta">อัปเดตล่าสุด '+fmtDateTime(b.updated_at)+' · เวอร์ชัน '+b.row_version+'</div><div class="dw-footer-right"><button class="btn btn-secondary" onclick="closeView()">ปิด</button></div></div>';
+  renderIcons();
+}
+
+// ============================================
+// ACTIONS (manual) — no-skip guards + optimistic version++ + history + toast
+// BACKEND: API-A* approve · API-B* cut/dispatch · reverse
+// ============================================
+function applyAction(b, ev, actor, note, dot){ b.row_version++; b.updated_at=new Date().toISOString(); b.history.push({event:ev,actor:actor||CURRENT_USER.name,at:b.updated_at,note:note||null,dot:dot||null}); render(); if(state.view&&state.view.id===b.booking_id)renderViewDrawer(); }
+
+function approveBooking(id){ var b=findBooking(id); if(!b)return; if(b.approval_status!=='waiting_for_verify'){ showToast('ไม่สามารถข้ามขั้นตอนได้','error'); return; } b.approval_status='verified'; applyAction(b,'approve',CURRENT_USER.name,'อนุมัติรอบจอง','is-success'); showToast('อนุมัติแล้ว','success'); }
+function sendCutApproval(id){ var b=findBooking(id); if(!b)return; if(!(b.approval_status==='verified'&&b.cut_transport_status==null)){ showToast('ไม่สามารถข้ามขั้นตอนได้','error'); return; } b.cut_transport_status='awaiting_cut_approval'; applyAction(b,'cut_send',CURRENT_USER.name,'ส่งขออนุมัติตัด'); showToast('ส่งขออนุมัติตัดแล้ว','success'); }
+function approveCut(id){ var b=findBooking(id); if(!b)return; if(b.cut_transport_status!=='awaiting_cut_approval'){ showToast('ไม่สามารถข้ามขั้นตอนได้','error'); return; } b.cut_transport_status='awaiting_cutting'; applyAction(b,'cut_approve',CURRENT_USER.name,'อนุมัติตัด'); showToast('ดำเนินการแล้ว','success'); }
+function finishCut(id){ var b=findBooking(id); if(!b)return; if(b.cut_transport_status!=='awaiting_cutting'){ showToast('ไม่สามารถข้ามขั้นตอนได้','error'); return; } b.cut_transport_status='awaiting_dispatch'; applyAction(b,'cut_finish',CURRENT_USER.name,'จบการตัด'); showToast('ดำเนินการแล้ว','success'); }
+function startDispatch(id){ var b=findBooking(id); if(!b)return; if(b.cut_transport_status!=='awaiting_dispatch'){ showToast('ไม่สามารถข้ามขั้นตอนได้','error'); return; } b.cut_transport_status='dispatching'; b.dispatch_started_at=new Date().toISOString(); applyAction(b,'dispatch_start',CURRENT_USER.name,'เริ่มจัดส่ง'); showToast('เริ่มจัดส่งแล้ว','success'); }
+
+// ---- Reverse (void) — revert 1 step + clear the just-set field (BR-04, reason required) ----
+function doReverse(b){
+  if(b.payment_status==='awaiting_payment'){ b.cut_transport_closed_at=null; b.payment_status='not_due'; b.dump_result_confirmed=false; return; }
+  if(b.checkin_at){ b.checkin_at=null; return; }
+  if(b.cut_transport_status==='dispatching'){ b.cut_transport_status='awaiting_dispatch'; b.dispatch_started_at=null; return; }
+  if(b.cut_transport_status==='awaiting_dispatch'){ b.cut_transport_status='awaiting_cutting'; return; }
+  if(b.cut_transport_status==='awaiting_cutting'){ b.cut_transport_status='awaiting_cut_approval'; return; }
+  if(b.cut_transport_status==='awaiting_cut_approval'){ b.cut_transport_status=null; return; }
+  if(b.approval_status==='verified'){ b.approval_status='waiting_for_verify'; return; }
+}
+
+// ============================================
+// SIMULATED SYSTEM EVENTS (non-manual) — event-ingest
+// BACKEND: API-E1 check-in · API-E2 receiving-completed · API-E3 payment-completed
+// ============================================
+function simCheckin(id){ var b=findBooking(id); if(!b)return; if(!(b.cut_transport_status==='dispatching'&&!b.checkin_at)){ showToast('สถานะนี้ระบบจะอัปเดตให้อัตโนมัติ เมื่อข้อมูลจากระบบอื่นเสร็จสิ้น','warning'); return; } b.checkin_at=new Date().toISOString(); applyAction(b,'checkin',SYS_ACTOR,'เช็คอินโรงงาน (ระบบ)','is-success'); showToast('รับเหตุการณ์เช็คอินโรงงานแล้ว — รอผลการเท','info'); }
+function simReceiving(id){ var b=findBooking(id); if(!b)return; if(!b.checkin_at||b.cut_transport_closed_at!=null){ showToast('สถานะนี้ระบบจะอัปเดตให้อัตโนมัติ เมื่อข้อมูลจากระบบอื่นเสร็จสิ้น','warning'); return; } b.cut_transport_closed_at=new Date().toISOString(); b.payment_status='awaiting_payment'; b.dump_result_confirmed=true; applyAction(b,'receiving',SYS_ACTOR,'รับอ้อยเสร็จ — ปิดงานขนส่ง + ตั้งรอทำจ่าย (ระบบ)','is-success'); showToast('รับอ้อยเสร็จ — ปิดงานขนส่ง + ตั้งรอทำจ่าย','info'); }
+function simPayment(id){ var b=findBooking(id); if(!b)return; if(b.payment_status!=='awaiting_payment'){ showToast('สถานะนี้ระบบจะอัปเดตให้อัตโนมัติ เมื่อข้อมูลจากระบบอื่นเสร็จสิ้น','warning'); return; } b.payment_status='completed'; applyAction(b,'payment',SYS_ACTOR,'จ่ายเงินเสร็จ (ระบบ)','is-success'); showToast('จ่ายเงินเสร็จ — การจองเสร็จสิ้น','success'); }
+
+// ============================================
+// PRINT (simulated) — idempotent doc numbers + QR (BR-07)
+// BACKEND: /print/cutting-order · /print/delivery-note
+// ============================================
+function printCut(id){ var b=findBooking(id); if(!b)return; if(!canPrintCut(b)){ showToast('ต้องอนุมัติตัดก่อน จึงจะพิมพ์ใบสั่งตัดได้','warning'); return; } var doc='CBM-CUT-2568-'+String(b.seq).padStart(7,'0'); showToast('จำลองสร้างเอกสาร ใบสั่งตัด '+doc+' + QR','info',4200); }
+function printDlv(id){ var b=findBooking(id); if(!b)return; if(!canPrintDlv(b)){ showToast('ต้องอยู่สถานะรอจัดส่งขึ้นไป จึงจะพิมพ์ใบนำส่งได้','warning'); return; } var doc='CBM-DLV-2568-'+String(b.seq).padStart(7,'0'); showToast('จำลองสร้างเอกสาร ใบส่งอ้อย '+doc+' + QR','info',4200); }
+
+// ============================================
+// BULK APPROVE — BACKEND: API-A1 approve (batch)
+// ============================================
+function bulkApprove(){
+  var ids=Array.from(state.selectedIds).filter(function(id){ var b=findBooking(id); return b&&b.approval_status==='waiting_for_verify'; });
+  if(ids.length===0){ showToast('เลือกได้เฉพาะรายการที่รออนุมัติ','warning'); return; }
+  ids.forEach(function(id){ var b=findBooking(id); b.approval_status='verified'; b.row_version++; b.updated_at=new Date().toISOString(); b.history.push({event:'approve',actor:CURRENT_USER.name,at:b.updated_at,note:'อนุมัติรอบจอง (กลุ่ม '+ids.length+' รายการ)',dot:'is-success'}); });
+  state.selectedIds.clear(); render(); if(state.view)renderViewDrawer(); showToast('อนุมัติแล้ว '+ids.length+' รายการ','success');
+}
+
+// ============================================
+// CREATE DRAWER (OV-01) — BACKEND: API-02 create · API-13 quota-search
+// ============================================
+function blankForm(){ return { quota_id:'', crop_id:'', season:SEASONS[0], location:'', booking_datetime:'', slot:'', lane:'', vehicle_type:'', vehicle_plate:'', driver:'', estimated_tons:'', payment_type:'', debt_deduction_percent:'0' }; }
+function openForm(mode){ state.form={ mode:mode, data:blankForm(), submitting:false, quota:null }; if(state.view){ state.view=null; if(getRoute()!=='bookings')navigate('bookings'); } mountPanel('form-content'); renderFormDrawer(); }
+function closeForm(){ if(state.form&&state.form.submitting)return; state.form=null; closePanel(); }
+function captureForm(){ if(!state.form)return; var d=state.form.data;
+  [['f-crop','crop_id'],['f-season','season'],['f-location','location'],['f-datetime','booking_datetime'],['f-slot','slot'],['f-lane','lane'],['f-vtype','vehicle_type'],['f-plate','vehicle_plate'],['f-driver','driver'],['f-tons','estimated_tons'],['f-ptype','payment_type'],['f-debt','debt_deduction_percent']].forEach(function(pr){ var el=document.getElementById(pr[0]); if(el)d[pr[1]]=el.value; });
+}
+function field(label,id,type,val,ph,req,extra,cls){ return '<div class="field"><label class="field-label">'+label+(req?' <span class="req">*</span>':'')+'</label><input class="input field-input '+(cls||'')+'" id="'+id+'" type="'+type+'" placeholder="'+(ph||'')+'" value="'+esc(val)+'" '+(extra||'')+'><div class="field-error"></div></div>'; }
+function selectField(label,id,val,opts,req,help){ var o='<option value="">— เลือก —</option>'+opts.map(function(x){ var v=(typeof x==='object')?x.v:x; var l=(typeof x==='object')?x.l:x; return '<option value="'+esc(v)+'"'+(String(val)===String(v)?' selected':'')+'>'+esc(l)+'</option>'; }).join(''); return '<div class="field"><label class="field-label">'+label+(req?' <span class="req">*</span>':'')+'</label><select class="select field-input" id="'+id+'">'+o+'</select>'+(help?'<div class="field-help">'+help+'</div>':'')+'<div class="field-error"></div></div>'; }
+
+function renderFormDrawer(){
+  var f=state.form; if(!f)return; var d=f.data; var q=f.quota;
+  var cropList=q?cropsForQuota(q.quota_id):[];
+  // Section 1 — ข้อมูลจอง (quota search → farmer snapshot card teal)
+  var s1;
+  if(q){
+    var os=fmtBaht(q.outstanding);
+    s1='<div style="padding:12px 14px;background:rgba(255,154,31,0.08);border:1px solid var(--c-line-2);border-radius:8px;display:flex;align-items:flex-start;gap:12px;">'
+      +'<i data-lucide="user-check" class="w-4 h-4" style="color:var(--c-teal);margin-top:2px;"></i><div style="flex:1;"><div style="font-size:12px;color:var(--c-mute-2);">เจ้าของโควตา</div>'
+      +'<div style="font-weight:600;"><span class="mono text-primary">'+esc(q.quota_id)+'</span> · '+esc(q.farmer_name+' '+q.lastname)+' · <span class="num">'+esc(q.phone)+'</span></div>'
+      +'<div style="font-size:11.5px;color:var(--c-mute-2);margin-top:2px;">ยอดหนี้คงค้าง: '+(os?('<span class="num">'+esc(os)+'</span>'):'ไม่มีแฟ้มลูกหนี้')+'</div></div>'
+      +'<button class="btn btn-sm btn-secondary" onclick="clearBookingQuota()"><i data-lucide="repeat" class="w-3.5 h-3.5"></i><span>เปลี่ยนโควตา</span></button></div>';
+  } else {
+    s1='<div class="field"><label class="field-label">ค้นหาโควตา <span class="req">*</span></label>'+searchSelectHTML('quota',{placeholder:'พิมพ์เลขโควตา หรือ ชื่อเกษตรกร'})+'<div class="field-help">ระบบจะดึงข้อมูลเจ้าของโควตา + ยอดหนี้คงค้างให้อัตโนมัติ</div></div>';
+  }
+  var s1extra=q?('<div class="form-grp" style="margin-top:12px;">'
+    +selectField('รอบปลูก (ไม่บังคับ)','f-crop',d.crop_id,cropList.map(c=>({v:c.crop_id,l:c.crop_id+' · '+c.label})),false,cropList.length?'':'ไม่พบรอบปลูกของโควตานี้ (เว้นว่างได้)')
+    +selectField('ฤดูกาล','f-season',d.season,SEASONS,true,'')
+    +selectField('สถานที่','f-location',d.location,LOCATIONS,true,'')
+    +'</div>'):'';
+
+  document.getElementById('form-content').innerHTML=
+    '<div class="dw-head"><div class="dw-head-row"><div>'
+    +'<div class="dw-eyebrow"><i data-lucide="plus" class="w-3.5 h-3.5"></i> สร้างการจอง</div>'
+    +'<h2 class="dw-title">สร้างการจองรอบส่งอ้อย</h2>'
+    +'<div class="dw-sub">การจองใหม่จะเริ่มที่สถานะ “รออนุมัติ”</div>'
+    +'</div><button class="top-icon-btn" onclick="closeForm()"><i data-lucide="x" class="w-5 h-5"></i></button></div></div>'
+    +'<div class="dw-body">'
+    +'<div class="form-section"><div class="form-section-title">ข้อมูลจอง</div>'+s1+s1extra+'</div>'
+    +'<div class="form-section"><div class="form-section-title">รอบเวลา / เลน</div><div class="form-grp">'
+    +field('วันเวลา','f-datetime','datetime-local',d.booking_datetime,'',true,'','')
+    +selectField('รอบ (slot)','f-slot',d.slot,SLOTS,true,'')
+    +selectField('เลน (lane)','f-lane',d.lane,LANES,true,'')
+    +'</div></div>'
+    +'<div class="form-section"><div class="form-section-title">รถ / น้ำหนัก</div><div class="form-grp">'
+    +selectField('ประเภทรถ','f-vtype',d.vehicle_type,VEHICLE_TYPES,true,'')
+    +field('ทะเบียนรถ','f-plate','text',d.vehicle_plate,'เช่น 70-1234 กจ',true,'','mono')
+    +field('คนขับ','f-driver','text',d.driver,'ชื่อ-นามสกุลคนขับ',true,'','')
+    +field('ปริมาณคาดส่ง (ตัน)','f-tons','number',d.estimated_tons,'มากกว่า 0',true,'inputmode="decimal" step="0.01" min="0"','num')
+    +'</div></div>'
+    +'<div class="form-section"><div class="form-section-title">การชำระ / หักหนี้</div><div class="form-grp">'
+    +selectField('ประเภทบิล','f-ptype',d.payment_type,PAYMENT_TYPES,true,'')
+    +field('หักหนี้ (%)','f-debt','number',d.debt_deduction_percent,'0 - 100',false,'inputmode="numeric" min="0" max="100" step="1"','num')
+    +'</div>'
+    +'<div class="field-help" style="margin-top:6px;">การหักหนี้จริงจะคำนวณตอน Payment (ยอดจ่ายได้ × %/100) · ยอดหนี้คงค้างดึงจาก Debt Mgt</div>'
+    +'</div>'
+    +'</div>'
+    +'<div class="dw-footer"><div></div><div class="dw-footer-right">'
+    +'<button class="btn btn-ghost" onclick="closeForm()">ยกเลิก</button>'
+    +'<button class="btn btn-primary" id="f-submit" onclick="submitForm()"><i data-lucide="check" class="w-4 h-4"></i><span>ยืนยันสร้าง</span></button>'
+    +'</div></div>';
+  renderIcons();
+  if(!q) initQuotaSearch();
+}
+function initQuotaSearch(){
+  initSearchSelect('quota',{
+    options: QUOTAS.map(q=>({value:q.quota_id,label:q.quota_id+' · '+q.farmer_name+' '+q.lastname,sub:q.phone,icon:'scale'})),
+    value: state.form.data.quota_id||null, emptyText:'ไม่พบโควตา',
+    onSelect:function(val){ selectBookingQuota(val); }
+  });
+}
+function selectBookingQuota(id){ captureForm(); var f=state.form; if(!id){ f.quota=null; f.data.quota_id=''; f.data.crop_id=''; renderFormDrawer(); return; } var q=findQuota(id); if(!q)return; if(f.data.quota_id!==id)f.data.crop_id=''; f.quota=q; f.data.quota_id=id; renderFormDrawer(); }
+function clearBookingQuota(){ captureForm(); var f=state.form; f.quota=null; f.data.quota_id=''; f.data.crop_id=''; renderFormDrawer(); }
+
+function vReq(msg){ return function(v){ return String(v).trim()?'':msg; }; }
+function validateField(el,val){ var f=el.closest('.field'); if(!f)return true; var msg=''; try{msg=val?val(el.value,el):'';}catch(e){msg='';} var e=f.querySelector('.field-error'); if(msg){f.classList.add('is-invalid'); if(e)e.textContent=msg; return false;} f.classList.remove('is-invalid'); return true; }
+function validateFormAll(){
+  captureForm(); var d=state.form.data; var ok=true;
+  function vf(id,fn){ var el=document.getElementById(id); if(el&&!validateField(el,fn))ok=false; }
+  if(!d.quota_id){ showToast('กรุณากรอกข้อมูลให้ครบถ้วน','warning'); return false; }
+  vf('f-season',vReq('กรุณาเลือกฤดูกาล'));
+  vf('f-location',vReq('กรุณาเลือกสถานที่'));
+  vf('f-datetime',vReq('กรุณาระบุวันเวลา'));
+  vf('f-slot',vReq('กรุณาเลือกรอบ'));
+  vf('f-lane',vReq('กรุณาเลือกเลน'));
+  vf('f-vtype',vReq('กรุณาเลือกประเภทรถ'));
+  vf('f-plate',vReq('กรุณาระบุทะเบียนรถ'));
+  vf('f-driver',vReq('กรุณาระบุคนขับ'));
+  vf('f-tons',function(v){ if(!String(v).trim())return 'กรุณากรอกปริมาณคาดส่ง'; var n=parseFloat(v); if(isNaN(n)||n<=0)return 'กรุณาใส่ค่าที่ถูกต้อง'; return ''; });
+  vf('f-ptype',vReq('กรุณาเลือกประเภทบิล'));
+  vf('f-debt',function(v){ if(!String(v).trim())return ''; var n=parseFloat(v); if(isNaN(n)||n<0||n>100)return 'หักหนี้ต้องอยู่ระหว่าง 0-100'; return ''; });
+  return ok;
+}
+async function submitForm(){
+  var f=state.form; if(!f||f.submitting)return;
+  if(!validateFormAll()){ showToast('กรุณากรอกข้อมูลให้ครบถ้วน','warning'); return; }
+  f.submitting=true; var btn=document.getElementById('f-submit'); btn.disabled=true; btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังบันทึก…</span>'; renderIcons();
+  // BACKEND: API-02 create (validate + save) · idempotency + double-submit guard (BR-03)
+  await new Promise(r=>setTimeout(r,600));
+  var d=f.data, q=f.quota; var now=new Date().toISOString();
+  var mx=0; state.records.forEach(function(b){ if(b.seq>mx)mx=b.seq; }); var seq=mx+1;
+  var code='CBM-2568-'+String(seq).padStart(7,'0');
+  var nb={ booking_id:code, seq:seq, quota_id:d.quota_id, crop_id:d.crop_id||null,
+    farmer_name:q?q.farmer_name:'', farmer_lastname:q?q.lastname:'', farmer_phone:q?q.phone:'',
+    season:d.season, location:d.location, booking_datetime:new Date(d.booking_datetime).toISOString(), slot:d.slot, lane:d.lane,
+    vehicle_type:d.vehicle_type, vehicle_plate:d.vehicle_plate, driver:d.driver, estimated_tons:parseFloat(d.estimated_tons),
+    payment_type:d.payment_type, debt_deduction_percent:parseFloat(d.debt_deduction_percent||'0'), debtor_outstanding:q?q.outstanding:null,
+    cutting_method:'person', cutting_summary:'',
+    approval_status:'waiting_for_verify', cut_transport_status:null, cut_transport_closed_at:null,
+    payment_status:'not_due', dispatch_started_at:null, checkin_at:null, dump_result_confirmed:false,
+    reject_reason:null, cancel_reason:null,
+    row_version:1, created_at:now, updated_at:now, created_by:CURRENT_USER.name,
+    history:[{event:'create',actor:CURRENT_USER.name,at:now,note:'สร้างการจอง · โควตา '+d.quota_id}] };
+  state.records.unshift(nb);
+  state.form=null; closePanel(); render(); showToast('สร้างการจองสำเร็จ — '+code,'success',4200);
+}
+
+// ============================================
+// SEARCH-SELECT helper (Iron Rule #34)
+// ============================================
+window.__ss=window.__ss||{};
+function ssGet(k){return window.__ss[k];}
+function ssEsc(s){return String(s).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function searchSelectHTML(key,opt){ opt=opt||{}; var ph=opt.placeholder||'ค้นหา...'; return '<div class="search-select" id="ss-'+key+'"><i data-lucide="search" class="ss-lead w-4 h-4"></i><input type="text" class="input ss-input" id="ss-input-'+key+'" autocomplete="off" placeholder="'+ph+'" oninput="ssOnInput(\''+key+'\',this.value)" onfocus="ssOpen(\''+key+'\')" onkeydown="ssOnKey(\''+key+'\',event)"><button type="button" class="ss-clear hidden" id="ss-clear-'+key+'" tabindex="-1" onclick="ssClear(\''+key+'\')"><i data-lucide="x" class="w-4 h-4"></i></button><i data-lucide="chevron-down" class="ss-caret w-4 h-4" id="ss-caret-'+key+'"></i><div class="ss-list hidden" id="ss-list-'+key+'"></div></div>'; }
+function initSearchSelect(key,cfg){ cfg=cfg||{}; window.__ss[key]={options:cfg.options||[],value:cfg.value!=null?cfg.value:null,onSelect:cfg.onSelect||function(){},emptyText:cfg.emptyText||'ไม่พบรายการ',query:'',open:false,hi:0}; ssSetText(key); ssSyncChrome(key); renderIcons(); }
+function ssFiltered(key){ var s=ssGet(key); if(!s)return []; var q=(s.query||'').toLowerCase().trim(); if(!q)return s.options; return s.options.filter(o=>String(o.label).toLowerCase().includes(q)||String(o.value).toLowerCase().includes(q)||String(o.sub||'').toLowerCase().includes(q)); }
+function ssSyncChrome(key){ var s=ssGet(key); if(!s)return; var sel=s.options.find(o=>o.value===s.value); var c=document.getElementById('ss-clear-'+key); if(c)c.classList.toggle('hidden',!sel); var k=document.getElementById('ss-caret-'+key); if(k)k.classList.toggle('hidden',!!sel); }
+function ssSetText(key){ var s=ssGet(key); if(!s)return; var inp=document.getElementById('ss-input-'+key); if(!inp)return; var sel=s.options.find(o=>o.value===s.value); inp.value=s.open?s.query:(sel?sel.label:''); }
+function ssRenderList(key){ var s=ssGet(key); if(!s)return; var list=document.getElementById('ss-list-'+key); if(!list)return; var items=ssFiltered(key); if(items.length===0){ list.innerHTML='<div class="ss-empty">'+s.emptyText+'</div>'; } else { var q=(s.query||'').toLowerCase().trim(); var hl=function(t){return q?String(t).replace(new RegExp('('+ssEsc(q)+')','gi'),'<mark>$1</mark>'):String(t);}; list.innerHTML=items.map(function(o,i){return '<button type="button" class="ss-opt '+(i===s.hi?'is-active':'')+'" onmousedown="event.preventDefault()" onclick="ssPick(\''+key+'\','+i+')">'+(o.icon?'<i data-lucide="'+o.icon+'" class="ss-opt-ic w-4 h-4"></i>':'')+'<span class="ss-opt-main"><span class="ss-opt-label">'+hl(o.label)+'</span>'+(o.sub?'<span class="ss-opt-sub">'+hl(o.sub)+'</span>':'')+'</span>'+(o.right?'<span class="ss-opt-right">'+o.right+'</span>':'')+'</button>';}).join(''); } list.classList.toggle('hidden',!s.open); renderIcons(); }
+function ssOpen(key){ var s=ssGet(key); if(!s)return; var inp=document.getElementById('ss-input-'+key); if(inp&&inp.disabled)return; s.open=true; s.query=''; s.hi=0; ssSetText(key); ssSyncChrome(key); ssRenderList(key); }
+function ssOnInput(key,val){ var s=ssGet(key); if(!s)return; s.query=val; s.open=true; s.hi=0; s.value=null; ssSyncChrome(key); ssRenderList(key); }
+function ssPick(key,i){ var s=ssGet(key); if(!s)return; var o=ssFiltered(key)[i]; if(!o)return; s.value=o.value; s.query=''; s.open=false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); s.onSelect(o.value,o); }
+function ssClear(key){ var s=ssGet(key); if(!s)return; s.value=null; s.query=''; s.open=true; ssSetText(key); ssSyncChrome(key); ssRenderList(key); var inp=document.getElementById('ss-input-'+key); if(inp)inp.focus(); s.onSelect(null,null); }
+function ssOnKey(key,e){ var s=ssGet(key); if(!s)return; var items=ssFiltered(key); if(e.key==='ArrowDown'){e.preventDefault(); s.open=true; s.hi=Math.min(items.length-1,s.hi+1); ssRenderList(key);} else if(e.key==='ArrowUp'){e.preventDefault(); s.hi=Math.max(0,s.hi-1); ssRenderList(key);} else if(e.key==='Enter'){e.preventDefault(); if(items[s.hi])ssPick(key,s.hi);} else if(e.key==='Escape'){s.open=false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); e.stopPropagation();} }
+document.addEventListener('click',function(e){ Object.keys(window.__ss||{}).forEach(function(key){ var w=document.getElementById('ss-'+key); var s=ssGet(key); if(w&&s&&s.open&&!w.contains(e.target)){ s.open=false; ssSetText(key); ssSyncChrome(key); ssRenderList(key); } }); });
+
+// ============================================
+// MODAL (reason — reject / cancel / void) OV-03/04
+// ============================================
+function openModalBox(type,data,isLg){ state.modal={open:true,type:type,data:data||{}}; var box=document.getElementById('modalBox'); box.className='modal'+(isLg?' is-lg':''); renderModal(); requestAnimationFrame(()=>document.getElementById('modalBackdrop').classList.add('is-open')); }
+function closeModal(){ if(state.modal.data&&state.modal.data.busy)return; document.getElementById('modalBackdrop').classList.remove('is-open'); setTimeout(()=>state.modal={open:false,type:null,data:null},200); }
+function renderModal(){ if(state.modal.type==='reason')renderReasonModal(); }
+
+var REASON_META={
+  reject:{ title:'ปฏิเสธการจอง', icon:'x-circle', ic:'is-danger', sub:'ระบุเหตุผลในการปฏิเสธ · จะบันทึกลงประวัติ', btn:'ยืนยันปฏิเสธ', bcls:'btn-danger is-solid' },
+  cancel:{ title:'ยกเลิกการจอง', icon:'ban', ic:'is-warning', sub:'ระบุเหตุผลในการยกเลิก · จะบันทึกลงประวัติ', btn:'ยืนยันยกเลิก', bcls:'btn-danger is-solid' },
+  void:{ title:'ย้อนสถานะ', icon:'undo-2', ic:'is-warning', sub:'ย้อนสถานะกลับ 1 ขั้น · ต้องระบุเหตุผล', btn:'ยืนยันย้อนสถานะ', bcls:'btn-primary' }
+};
+function openReasonModal(kind,id){ var b=findBooking(id); if(!b)return; openModalBox('reason',{kind:kind,id:id,reason:'',busy:false}); }
+function renderReasonModal(){
+  var d=state.modal.data; var b=findBooking(d.id); if(!b)return; var m=REASON_META[d.kind];
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon '+m.ic+'"><i data-lucide="'+m.icon+'" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">'+m.title+'</h3><p class="modal-subtitle">'+m.sub+'</p></div>'
+    +'<button class="icon-btn" onclick="closeModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>'
+    +'<div class="modal-body">'
+    +'<div style="font-size:13px;color:var(--c-mute);margin-bottom:12px;">การจอง <span class="mono" style="color:var(--c-ink);font-weight:600;">'+esc(b.booking_id)+'</span> · '+esc(b.farmer_name+' '+b.farmer_lastname)+(d.kind==='void'?(' · สถานะปัจจุบัน: '+esc(combinedProgress(b))):'')+'</div>'
+    +'<div class="field" style="margin-bottom:0;"><label class="field-label">เหตุผล <span class="req">*</span></label><textarea class="input" id="r-reason" placeholder="กรุณาระบุเหตุผล...">'+esc(d.reason||'')+'</textarea><div class="field-error" id="err-reason"></div></div>'
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button><button class="btn '+m.bcls+'" id="r-submit" onclick="submitReason()"><i data-lucide="check" class="w-4 h-4"></i><span>'+m.btn+'</span></button></div>';
+  renderIcons();
+  var rn=document.getElementById('r-reason'); if(rn)rn.value=d.reason||'';
+}
+async function submitReason(){
+  var d=state.modal.data; if(d.busy)return; var rn=document.getElementById('r-reason'); if(rn)d.reason=rn.value;
+  if(!(d.reason||'').trim()){ var er=document.getElementById('err-reason'); if(er){er.textContent='กรุณาระบุเหตุผล'; er.style.visibility='visible';} showToast('กรุณาระบุเหตุผล','warning'); return; }
+  d.busy=true; var btn=document.getElementById('r-submit'); btn.disabled=true; btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 spin"></i><span>กำลังดำเนินการ…</span>'; renderIcons();
+  await new Promise(r=>setTimeout(r,500));
+  var b=findBooking(d.id); var reason=(d.reason||'').trim(); var msg='';
+  if(d.kind==='reject'){ b.approval_status='rejected'; b.reject_reason=reason; b.history.push({event:'reject',actor:CURRENT_USER.name,at:new Date().toISOString(),note:reason,dot:'is-danger'}); msg='ปฏิเสธแล้ว'; }
+  else if(d.kind==='cancel'){ b.approval_status='cancelled'; b.cancel_reason=reason; b.history.push({event:'cancel',actor:CURRENT_USER.name,at:new Date().toISOString(),note:reason,dot:'is-warning'}); msg='ยกเลิกแล้ว'; }
+  else { doReverse(b); b.history.push({event:'reverse',actor:CURRENT_USER.name,at:new Date().toISOString(),note:'ย้อนสถานะ · '+reason,dot:'is-warning'}); msg='ย้อนสถานะแล้ว'; }
+  b.row_version++; b.updated_at=new Date().toISOString();
+  d.busy=false; closeModal(); render(); if(state.view&&state.view.id===b.booking_id)renderViewDrawer(); showToast(msg,'success');
+}
+
+// ESC chain
+window.addEventListener('keydown',function(e){ if(e.key!=='Escape')return; if(state.modal.open)closeModal(); else if(state.form)closeForm(); else if(state.view)closeView(); });
+
+// INIT
+window.addEventListener('hashchange',function(){ render(); });
+var domReady=false,lucideReady=false;
+function bootIfReady(){ if(domReady&&lucideReady){ render(); renderIcons(); } }
+if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',function(){domReady=true;bootIfReady();}); else domReady=true;
+window.addEventListener('lucide:ready',function(){lucideReady=true;bootIfReady();});
+if(window.lucide&&typeof window.lucide.createIcons==='function')lucideReady=true;
+bootIfReady();
+setTimeout(function(){ if(!lucideReady){lucideReady=true;bootIfReady();} },5000);
+</script>
+</body>
+</html>

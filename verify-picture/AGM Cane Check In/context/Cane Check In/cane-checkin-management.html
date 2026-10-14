@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เช็คอินรับอ้อย (Check-In) · CUBE NATIVE</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+
+<style>
+/* ============== CSS VARIABLES (CUBE CI — Warm Light) ============== */
+:root {
+  --c-navy: #111111;
+  --c-navy-2: #111111;
+  --c-primary: #FF3B30;
+  --c-primary-hover: #E62E24;
+  --c-teal: #FF9A1F;
+  --c-teal-light: #FFB763;
+  --c-ink: #111111;
+  --c-mute: #54565C;
+  --c-mute-2: #73757B;
+  --c-mute-3: #9A9CA2;
+  --c-line: #DEDAD4;
+  --c-line-2: #E9E5E0;
+  --c-line-3: #F1EEEA;
+  --c-bg-off: #FAF8F5;
+  --c-success: #1F9D55;
+  --c-warning: #E8870F;
+  --c-danger: #E62E24;
+  --sidebar-w: 232px;
+  --shell-h: 52px;
+  --fs-h1: 22px; --fs-h2: 17px; --fs-h3: 15px; --fs-body: 14px;
+  --fs-sub: 13px; --fs-meta: 12px; --fs-cap: 11px; --fs-kpi: 28px;
+  --sp-xs: 4px; --sp-sm: 8px; --sp-md: 12px; --sp-lg: 20px; --sp-xl: 28px;
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-full: 999px;
+}
+
+/* ============== RESET ============== */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { scrollbar-gutter: stable; }
+
+/* ============== SCROLLBAR (Iron Rule #49) ============== */
+* { scrollbar-width: thin; scrollbar-color: rgba(17,17,17,.16) transparent; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(17,17,17,.14); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(17,17,17,.26); }
+.sidebar, .slide { scrollbar-color: rgba(255,255,255,.28) transparent; }
+.sidebar ::-webkit-scrollbar-thumb, .slide ::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb, .slide::-webkit-scrollbar-thumb { background: rgba(255,255,255,.28); }
+.sidebar ::-webkit-scrollbar-thumb:hover, .slide ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.42); }
+body {
+  font-family: 'Satoshi', 'Noto Sans Thai', system-ui, sans-serif;
+  background: var(--c-bg-off);
+  color: #2A2B2F;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-width: 1180px;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+[data-lucide] { flex-shrink: 0; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ============== SIDEBAR ============== */
+.sidebar {
+  position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w);
+  background: #111111; color: #E9E5E0; z-index: 20;
+  display: flex; flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.sb-brand { padding: 18px; display: flex; align-items: center; gap: 11px; border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
+.sb-logo {
+  width: 34px; height: 34px; background: linear-gradient(135deg, #FF3B30, #FF9A1F);
+  border-radius: 9px; display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; flex-shrink: 0; box-shadow: 0 4px 12px rgba(255,59,48,0.3);
+}
+.sb-name { font-weight: 700; font-size: 14px; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+.sb-sub { font-size: 10px; color: #9A9CA2; letter-spacing: 0.06em; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+.sb-nav { flex: 1; padding: 12px 8px; overflow-y: auto; }
+.sb-module { margin-bottom: 4px; }
+.sb-module-header {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 8px 10px; border-radius: 6px; background: transparent; border: 0;
+  color: #9A9CA2; font-family: inherit; font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 120ms; text-align: left;
+}
+.sb-module-header:hover { background: rgba(255,255,255,0.04); color: #DEDAD4; }
+.sb-module-header .mod-icon { flex-shrink: 0; opacity: 0.7; }
+.sb-module-header .mod-label { flex: 1; }
+.sb-module-header .mod-chevron { flex-shrink: 0; transition: transform 200ms; opacity: 0.7; }
+.sb-module[data-expanded="false"] .mod-chevron { transform: rotate(-90deg); }
+.sb-module[data-expanded="false"] .sb-features { display: none; }
+.sb-features { padding: 2px 0 6px 0; }
+.sb-item {
+  display: flex; align-items: center; gap: 10px; padding: 7px 12px 7px 14px;
+  border-radius: 6px; color: #DEDAD4; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 120ms; margin-bottom: 1px; position: relative; user-select: none;
+}
+.sb-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sb-item.is-active { background: #FF3B30; color: #fff; font-weight: 600; }
+.sb-item.is-active::before {
+  content: ''; position: absolute; left: -10px; top: 7px; bottom: 7px;
+  width: 3px; background: #fff; border-radius: 0 2px 2px 0;
+}
+.sb-item [data-lucide] { width: 16px; height: 16px; opacity: 0.85; }
+.sb-item.is-active [data-lucide] { opacity: 1; }
+.sb-item.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.sb-item.is-disabled:hover { background: transparent; color: #DEDAD4; }
+.sb-footer {
+  padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: #9A9CA2;
+}
+.pulse-dot { width: 7px; height: 7px; background: var(--c-teal); border-radius: 50%; box-shadow: 0 0 0 3px rgba(255,154,31,0.20); animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+/* ============== MAIN + SHELL BAR ============== */
+.main { margin-left: var(--sidebar-w); min-height: 100vh; background: var(--c-bg-off); }
+.shell-bar {
+  position: sticky; top: 0; background: #fff; border-bottom: 1px solid var(--c-line-2);
+  height: var(--shell-h); display: flex; align-items: center; padding: 0 22px; z-index: 19; gap: 12px;
+}
+.breadcrumb { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--c-mute); }
+.breadcrumb a { cursor: pointer; transition: color 120ms; }
+.breadcrumb a:hover { color: var(--c-primary); }
+.breadcrumb .sep { color: var(--c-mute-3); font-size: 10px; }
+.breadcrumb-current { color: var(--c-ink); font-weight: 500; }
+.icon-btn {
+  width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute); border-radius: 7px; position: relative; transition: all 120ms;
+}
+.icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.icon-btn [data-lucide] { width: 17px; height: 17px; }
+.notif-dot { position: absolute; top: 7px; right: 8px; width: 7px; height: 7px; background: var(--c-danger); border-radius: 50%; border: 2px solid #fff; }
+.user-chip { display: flex; align-items: center; gap: 9px; padding: 5px 10px 5px 12px; border-radius: 8px; cursor: pointer; transition: background 120ms; }
+.user-chip:hover { background: var(--c-line-3); }
+.user-text { line-height: 1.2; text-align: right; }
+.user-name { font-size: 12.5px; font-weight: 500; color: var(--c-ink); white-space: nowrap; }
+.user-role { font-size: 10.5px; color: var(--c-mute-2); white-space: nowrap; margin-top: 1px; }
+.avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; flex-shrink: 0;
+}
+.user-menu {
+  position: absolute; top: calc(var(--shell-h) - 4px); right: 22px; background: #fff;
+  border: 1px solid var(--c-line-2); border-radius: 10px; box-shadow: 0 12px 32px rgba(17,17,17,0.12);
+  width: 240px; z-index: 30; padding: 6px; display: none;
+}
+.user-menu.is-open { display: block; }
+.user-menu-item { display: flex; align-items: center; gap: 10px; padding: 8px 11px; border-radius: 6px; font-size: 13px; color: var(--c-ink); cursor: pointer; transition: background 120ms; }
+.user-menu-item:hover { background: var(--c-bg-off); }
+.user-menu-item [data-lucide] { width: 15px; height: 15px; color: var(--c-mute-2); }
+.user-menu-item.is-danger { color: var(--c-danger); }
+.user-menu-item.is-danger [data-lucide] { color: var(--c-danger); }
+.user-menu-divider { height: 1px; background: var(--c-line-2); margin: 5px 0; }
+
+/* ============== CONTENT (fluid — Iron Rule #30) ============== */
+.content { padding: 22px; }
+
+/* ============== PAGE HEADER ============== */
+.ph { margin-bottom: 18px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.ph > div:first-child { flex: 1 1 auto; min-width: 280px; }
+.ph-title-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px; }
+.ph-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 22px; font-weight: 700; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.ph-count { font-size: 12.5px; font-weight: 600; color: var(--c-mute-2); background: var(--c-line-3); padding: 3px 9px; border-radius: 999px; }
+.ph-sub { font-size: 13px; color: var(--c-mute); margin: 0; }
+.ph-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ============== BUTTONS (Iron Rule #36 — Thai optical center) ============== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px; padding: 2px 14px 0; border-radius: 8px; font-size: 13px; font-weight: 500;
+  border: 1px solid transparent; background: transparent; white-space: nowrap;
+  transition: all 120ms; user-select: none; cursor: pointer;
+}
+.btn [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; }
+.btn:disabled, .btn.is-disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+.btn-eq { min-width: 104px; }
+.btn-primary { background: var(--c-primary); color: #fff; }
+.btn-primary:hover { background: var(--c-primary-hover); box-shadow: 0 2px 8px rgba(255,59,48,0.30); }
+.btn-secondary { background: #fff; border-color: var(--c-line); color: var(--c-ink); }
+.btn-secondary:hover { background: var(--c-line-3); border-color: var(--c-mute-2); }
+.btn-ghost { color: var(--c-mute); }
+.btn-ghost:hover { background: var(--c-line-3); color: var(--c-ink); }
+.btn-danger { background: #fff; border-color: var(--c-line); color: var(--c-danger); }
+.btn-danger:hover { background: #FFE9E7; border-color: var(--c-danger); }
+.btn-danger.is-solid { background: var(--c-danger); border-color: var(--c-danger); color: #fff; }
+.btn-danger.is-solid:hover { background: #C81E15; }
+.btn-link { background: transparent; border: 0; padding: 0 4px; height: auto; color: var(--c-primary); font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn-sm { height: 30px; padding: 2px 11px 0; font-size: 12px; }
+
+/* ============== STATS ============== */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.stat { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; padding: 14px 16px; transition: all 150ms; }
+.stat:hover { border-color: var(--c-line); box-shadow: 0 2px 8px rgba(17,17,17,0.05); }
+.stat-label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--c-mute); }
+.stat-label [data-lucide] { width: 13px; height: 13px; color: var(--c-primary); }
+.stat-value { font-family: 'Noto Sans Thai', sans-serif; font-size: 26px; font-weight: 700; color: var(--c-navy); margin-top: 6px; letter-spacing: -0.01em; }
+.stat-meta { font-size: 11.5px; color: var(--c-mute-2); margin-top: 5px; display: flex; align-items: center; gap: 4px; }
+.stat-meta.is-warn { color: var(--c-warning); }
+.stat-meta [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== CARD / FILTER ============== */
+.card { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; overflow: hidden; }
+.filter-bar { padding: 14px 18px; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid var(--c-line-2); background: #fff; flex-wrap: wrap; }
+
+/* ============== INPUTS ============== */
+.input, .select {
+  height: 36px; padding: 0 12px; border: 1px solid var(--c-line); border-radius: 8px;
+  font-size: 13px; background: #fff; color: var(--c-ink); font-family: inherit; transition: all 120ms; width: 100%;
+}
+.input:focus, .select:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(255,59,48,0.10); }
+.input:disabled, .input[readonly] { background: var(--c-line-3); color: var(--c-mute-2); cursor: not-allowed; border-color: var(--c-line-2); }
+.select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat; background-position: right 10px center; padding-right: 32px; appearance: none;
+}
+.input-search { position: relative; flex: 1; max-width: 340px; }
+.input-search input { padding-left: 36px; }
+.input-search .lead-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--c-mute-2); pointer-events: none; }
+
+/* ===== SEARCH-SELECT (Iron Rule #34) ===== */
+.search-select { position: relative; width: 100%; }
+.search-select .ss-input { padding-left: 34px; padding-right: 34px; }
+.search-select .ss-lead { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--c-mute-3); pointer-events: none; }
+.search-select .ss-caret { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--c-mute-3); pointer-events: none; }
+.search-select .ss-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); display: inline-flex; padding: 3px; border: 0; background: transparent; color: var(--c-mute-2); cursor: pointer; border-radius: 6px; }
+.search-select .ss-clear:hover { background: var(--c-line-3); color: var(--c-ink); }
+.search-select.is-disabled .ss-input { background: var(--c-line-3); color: var(--c-mute-2); cursor: not-allowed; }
+.ss-list {
+  position: absolute; z-index: 70; left: 0; right: 0; margin-top: 4px; max-height: 280px; overflow-y: auto;
+  background: #fff; border: 1px solid var(--c-line); border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(17,17,17,0.10), 0 4px 10px rgba(17,17,17,0.05);
+}
+.ss-opt { width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 0; border-bottom: 1px solid var(--c-line-3); background: transparent; cursor: pointer; text-align: left; font-family: inherit; }
+.ss-opt:last-child { border-bottom: 0; }
+.ss-opt:hover, .ss-opt.is-active { background: rgba(255,59,48,0.06); }
+.ss-opt-ic { width: 16px; height: 16px; color: var(--c-primary); flex-shrink: 0; }
+.ss-opt-main { flex: 1; min-width: 0; }
+.ss-opt-label { display: block; font-size: 13px; color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-sub { display: block; font-size: 11.5px; color: var(--c-mute-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-right { flex-shrink: 0; font-size: 12px; color: var(--c-mute); }
+.ss-opt mark { background: rgba(255,59,48,0.16); color: inherit; padding: 0 1px; border-radius: 2px; }
+.ss-empty { padding: 20px 14px; text-align: center; font-size: 13px; color: var(--c-mute-2); }
+
+/* ============== TABLE ============== */
+.table-scroll { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table thead { background: var(--c-bg-off); }
+.table th {
+  padding: 11px 14px; text-align: left; font-weight: 600; color: var(--c-mute);
+  font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--c-line-2); white-space: nowrap;
+}
+.table th.col-check { width: 40px; padding-right: 0; }
+.table td { padding: 13px 14px 11px; border-bottom: 1px solid var(--c-line-2); color: var(--c-ink); vertical-align: middle; }
+.table tbody tr { transition: background 120ms; }
+.table tbody tr:hover { background: var(--c-bg-off); }
+.table tbody tr.is-selected { background: rgba(255,59,48,0.04); }
+.table tbody tr.is-selected:hover { background: rgba(255,59,48,0.07); }
+.table tbody tr:last-child td { border-bottom: 0; }
+.table tbody tr.is-clickable { cursor: pointer; }
+.table-scroll.is-sticky { max-height: 560px; overflow-y: auto; scrollbar-gutter: stable; }
+.table-scroll.is-sticky thead th { position: sticky; top: 0; z-index: 3; background: var(--c-bg-off); box-shadow: inset 0 -1px 0 var(--c-line-2); }
+.cell-truncate { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+th.col-num, td.col-num { text-align: right; }
+.mono { font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+
+/* ============== CHECKBOX ============== */
+.cb {
+  width: 16px; height: 16px; border: 1.5px solid var(--c-line); border-radius: 4px; background: #fff;
+  cursor: pointer; display: inline-block; position: relative; transition: all 120ms; flex-shrink: 0;
+}
+.cb.is-checked, .cb.is-partial { background: var(--c-primary); border-color: var(--c-primary); }
+.cb.is-checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.cb.is-partial::after { content: ''; position: absolute; left: 3px; top: 6px; width: 8px; height: 2px; background: #fff; }
+.cb:hover { border-color: var(--c-primary); }
+.cb.is-disabled { opacity: 0.35; cursor: not-allowed; }
+.cb.is-disabled:hover { border-color: var(--c-line); }
+
+/* ============== PILLS ============== */
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px 3px; border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.pill [data-lucide] { width: 11px; height: 11px; }
+.pill-info    { background: #E6F0FF; color: #1A5FCC; }
+.pill-success { background: #E4F4EB; color: #157A41; }
+.pill-warning { background: #FFF1DD; color: #B8690B; }
+.pill-danger  { background: #FFE9E7; color: #E62E24; }
+.pill-muted   { background: var(--c-line-3); color: var(--c-mute-2); }
+.pill-outline { background: #fff; border: 1px solid var(--c-line); color: var(--c-mute); }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.8s linear infinite; }
+
+/* ============== FORM SECTION (Iron Rule #45) ============== */
+.form-section { margin-top: var(--sp-xl); }
+.form-section:first-child { margin-top: 0; }
+.form-section-title {
+  font-size: var(--fs-cap); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--c-mute);
+  padding-bottom: var(--sp-sm); border-bottom: 1px solid var(--c-line-2); margin-bottom: var(--sp-md);
+}
+.form-grp { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 16px; }
+
+/* ============== ROW ACTIONS ============== */
+.row-actions { display: inline-flex; gap: 2px; }
+.ra-btn {
+  width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute-2); border-radius: 6px; transition: all 120ms;
+}
+.ra-btn:hover { background: var(--c-line-3); color: var(--c-primary); }
+.ra-btn.is-danger:hover { background: #FFE9E7; color: var(--c-danger); }
+.ra-btn [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== TABLE FOOTER / BULK BAR ============== */
+.table-footer {
+  padding: 12px 18px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2);
+  display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: var(--c-mute); flex-wrap: wrap; gap: 10px;
+}
+.pagination { display: inline-flex; gap: 4px; align-items: center; }
+.pg-btn {
+  min-width: 30px; height: 30px; padding: 0 8px; display: inline-flex; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid var(--c-line-2); border-radius: 6px; color: var(--c-mute);
+  font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 120ms;
+}
+.pg-btn:hover { border-color: var(--c-line); background: var(--c-bg-off); }
+.pg-btn.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.pg-btn.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn [data-lucide] { width: 13px; height: 13px; }
+.bulk-bar {
+  background: var(--c-navy); color: #fff; padding: 11px 18px; border-radius: 8px 8px 0 0;
+  display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--c-line-2); margin: -1px -1px 0; font-size: 13px;
+}
+.bulk-bar .btn { height: 30px; padding: 2px 11px 0; font-size: 12px; }
+.bulk-bar .btn-secondary { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.18); color: #fff; }
+.bulk-bar .btn-secondary:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.30); }
+
+/* ============== DRAWER v2 SHELL (Patterns B/C — locked) ============== */
+.overlay-wrap { position: fixed; inset: 0; z-index: 50; }
+.backdrop { position: absolute; inset: 0; background: rgba(17,17,17,0.40); }
+.drawer-panel {
+  position: absolute; top: 0; right: 0; bottom: 0; width: 920px; max-width: 96vw;
+  background: #fff; display: flex; flex-direction: column;
+  box-shadow: -16px 0 40px rgba(17,17,17,0.18);
+}
+.drawer-panel.standard { width: 680px; }
+.drawer-enter { transform: translateX(100%); }
+.drawer-active { transform: translateX(0); transition: transform 250ms ease-out; }
+.top-icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;
+  border: 0; background: transparent; border-radius: var(--r-sm); color: var(--c-mute-2);
+  cursor: pointer; transition: all 120ms; flex-shrink: 0;
+}
+.top-icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.dw-head { padding: 18px 24px 16px; border-bottom: 1px solid var(--c-line-2); flex-shrink: 0; }
+.dw-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.dw-eyebrow { display: flex; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-mute-2); margin-bottom: 4px; font-weight: 600; }
+.dw-title { font-size: 20px; font-weight: 700; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.dw-sub { font-size: var(--fs-meta); color: var(--c-mute-2); margin-top: 4px; }
+.dw-body { flex: 1; overflow-y: auto; padding: 22px 24px; scrollbar-gutter: stable; }
+.dw-footer {
+  padding: 14px 24px; border-top: 1px solid var(--c-line-2); background: var(--c-bg-off); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.dw-footer-right { display: flex; align-items: center; gap: 8px; }
+.dw-footer-meta { font-size: 12px; color: var(--c-mute-2); }
+.drawer-header-divider { width: 1px; height: 22px; background: var(--c-line-2); margin: 0 4px; flex-shrink: 0; }
+.dw-actions { display: flex; gap: 6px; align-items: center; }
+
+/* Tabs (view drawer) */
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--c-line-2); margin-top: 14px; }
+.tab {
+  display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px 7px;
+  font-size: 13px; font-weight: 500; color: var(--c-mute); background: transparent; border: 0;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; transition: all 120ms;
+}
+.tab [data-lucide] { width: 14px; height: 14px; }
+.tab:hover { color: var(--c-ink); }
+.tab.on { color: var(--c-primary); border-bottom-color: var(--c-primary); font-weight: 600; }
+
+/* View drawer detail grid */
+.dv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
+.dv-cell .dv-lbl { font-size: 11px; color: var(--c-mute-3); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-bottom: 3px; }
+.dv-cell .dv-val { font-size: 13.5px; font-weight: 600; color: var(--c-ink); word-break: break-word; }
+.dv-section { margin-bottom: 24px; }
+.dv-section-title { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; color: var(--c-navy); margin-bottom: 12px; }
+.dv-section-title [data-lucide] { width: 15px; height: 15px; color: var(--c-primary); }
+.dv-note { margin-top: 10px; padding: 10px 12px; background: #FFF1DD; border-radius: 8px; font-size: 12.5px; color: #B8690B; }
+
+/* Info banner (edit rejected — re-submit notice; warning ของ action จริง) */
+.note { padding: 11px 14px; border-radius: 8px; font-size: 12.5px; display: flex; gap: 9px; align-items: flex-start; }
+.note [data-lucide] { width: 15px; height: 15px; margin-top: 1px; }
+.note.is-info { background: #E6F0FF; color: #1A5FCC; }
+.note.is-warn { background: #FFF1DD; color: #B8690B; }
+
+/* ============== TIMELINE ============== */
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 4px; bottom: 4px; width: 2px; background: var(--c-line-2); }
+.tl-item { position: relative; margin-bottom: 16px; }
+.tl-item:last-child { margin-bottom: 0; }
+.tl-dot { position: absolute; left: -20px; top: 3px; width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 2px solid var(--c-primary); }
+.tl-dot.is-success { border-color: var(--c-success); }
+.tl-dot.is-warning { border-color: var(--c-warning); }
+.tl-dot.is-danger { border-color: var(--c-danger); }
+.tl-title { font-size: 13px; font-weight: 600; color: var(--c-ink); }
+.tl-meta { font-size: 11.5px; color: var(--c-mute-2); margin-top: 2px; }
+.tl-note { font-size: 12.5px; color: var(--c-mute); background: var(--c-bg-off); border: 1px solid var(--c-line-2); border-radius: 6px; padding: 7px 10px; margin-top: 6px; }
+
+/* ============== EMPTY STATE ============== */
+.empty { padding: 56px 24px; text-align: center; color: var(--c-mute); }
+.empty-icon { width: 52px; height: 52px; margin: 0 auto 14px; border-radius: 50%; background: var(--c-line-3); color: var(--c-mute-2); display: inline-flex; align-items: center; justify-content: center; }
+.empty-icon [data-lucide] { width: 22px; height: 22px; }
+.empty-title { font-size: 15.5px; font-weight: 600; color: var(--c-ink); margin-bottom: 5px; font-family: 'Noto Sans Thai', sans-serif; }
+.empty-desc { font-size: 13px; color: var(--c-mute); max-width: 320px; margin: 0 auto; }
+.empty .btn { margin-top: 16px; }
+.empty-actions { display: flex; gap: 8px; justify-content: center; }
+.empty-actions .btn { margin-top: 16px; }
+
+/* ============== MODAL ============== */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(17,17,17,0.50); z-index: 60; opacity: 0; pointer-events: none;
+  transition: opacity 200ms; display: flex; align-items: center; justify-content: center;
+}
+.modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: #fff; border-radius: 12px; width: 440px; max-width: 92vw; max-height: 90vh;
+  display: flex; flex-direction: column; transform: scale(0.96);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 24px 64px rgba(17,17,17,0.28); overflow: hidden;
+}
+.modal.is-lg { width: 680px; }
+.modal-backdrop.is-open .modal { transform: scale(1); }
+.modal-header { padding: 18px 22px 12px; display: flex; align-items: flex-start; gap: 12px; }
+.modal-header-icon {
+  width: 36px; height: 36px; border-radius: 8px; background: rgba(255,59,48,0.10); color: var(--c-primary);
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.modal-header-icon.is-danger { background: #FFE9E7; color: var(--c-danger); }
+.modal-header-icon.is-warning { background: #FFF1DD; color: var(--c-warning); }
+.modal-header-icon [data-lucide] { width: 18px; height: 18px; }
+.modal-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 16px; font-weight: 600; color: var(--c-navy); margin: 0 0 4px; }
+.modal-subtitle { font-size: 13px; color: var(--c-mute); margin: 0; line-height: 1.5; }
+.modal-body { padding: 6px 22px 18px; font-size: 13px; color: var(--c-ink); overflow-y: auto; scrollbar-gutter: stable; }
+.modal-footer { padding: 12px 22px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2); display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Import summary chips */
+.imp-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.imp-chip { border-radius: 8px; padding: 12px; text-align: center; border: 1px solid var(--c-line-2); }
+.imp-chip .v { font-size: 22px; font-weight: 700; font-family: 'Noto Sans Thai', sans-serif; }
+.imp-chip .l { font-size: 11.5px; margin-top: 2px; font-weight: 600; }
+.imp-chip.is-total { background: var(--c-bg-off); color: var(--c-mute); }
+.imp-chip.is-ok { background: #E4F4EB; color: #157A41; border-color: #CBE9D8; }
+.imp-chip.is-bad { background: #FFE9E7; color: #E62E24; border-color: #F6D0CC; }
+.imp-errors { border: 1px solid var(--c-line-2); border-radius: 8px; max-height: 220px; overflow-y: auto; }
+.imp-err-row { display: flex; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--c-line-3); font-size: 12.5px; align-items: baseline; }
+.imp-err-row:last-child { border-bottom: 0; }
+.imp-err-row .r { flex-shrink: 0; font-weight: 700; color: var(--c-danger); min-width: 52px; }
+.imp-err-row .f { flex-shrink: 0; color: var(--c-mute); min-width: 90px; }
+.imp-err-row .m { color: var(--c-ink); }
+.imp-err-row .d { color: var(--c-mute-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+
+/* ============== FIELDS ============== */
+.field { margin-bottom: 14px; }
+.field-label { display: block; font-size: 12.5px; font-weight: 500; color: var(--c-mute); margin-bottom: 6px; }
+.field-label .req { color: var(--c-danger); margin-left: 2px; }
+.field-input { width: 100%; }
+.field-help { font-size: 11.5px; color: var(--c-mute-2); margin-top: 4px; }
+.field-error { font-size: 11.5px; color: var(--c-danger); margin-top: 4px; min-height: 15px; visibility: hidden; }
+.field.is-invalid .input, .field.is-invalid .select { border-color: var(--c-danger); }
+.field.is-invalid .field-error { visibility: visible; }
+textarea.input { height: auto; min-height: 74px; padding: 9px 12px; resize: vertical; line-height: 1.55; }
+
+/* ============== TOAST ============== */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; background: var(--c-navy); color: #fff;
+  padding: 13px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; z-index: 80;
+  display: flex; align-items: center; gap: 10px; box-shadow: 0 12px 32px rgba(17,17,17,0.30);
+  transform: translateY(100px); opacity: 0; transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1); max-width: 380px;
+}
+.toast.is-visible { transform: translateY(0); opacity: 1; }
+.toast.is-success { background: var(--c-success); }
+.toast.is-info { background: var(--c-primary); }
+.toast.is-warning { background: var(--c-warning); }
+.toast.is-error { background: var(--c-danger); }
+.toast [data-lucide] { width: 17px; height: 17px; }
+
+/* ============== UTILITIES ============== */
+.hidden { display: none !important; }
+.text-mute { color: var(--c-mute); }
+.text-mute-2 { color: var(--c-mute-2); }
+.text-primary { color: var(--c-primary); }
+.text-danger { color: var(--c-danger); }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.w-2\.5 { width: 10px; }   .h-2\.5 { height: 10px; }
+.w-3   { width: 12px; }    .h-3   { height: 12px; }
+.w-3\.5 { width: 14px; }   .h-3\.5 { height: 14px; }
+.w-4   { width: 16px; }    .h-4   { height: 16px; }
+.w-5   { width: 20px; }    .h-5   { height: 20px; }
+svg.lucide { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; flex-shrink: 0; }
+svg.lucide.w-2\.5 { width: 10px; }   svg.lucide.h-2\.5 { height: 10px; }
+svg.lucide.w-3    { width: 12px; }   svg.lucide.h-3    { height: 12px; }
+svg.lucide.w-3\.5 { width: 14px; }   svg.lucide.h-3\.5 { height: 14px; }
+svg.lucide.w-4    { width: 16px; }   svg.lucide.h-4    { height: 16px; }
+svg.lucide.w-5    { width: 20px; }   svg.lucide.h-5    { height: 20px; }
+</style>
+</head><body>
+
+<!-- ===== SIDEBAR (Pattern N) ===== -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i data-lucide="box" class="w-4 h-4"></i></div>
+    <div><div class="sb-name">CUBE NATIVE</div><div class="sb-sub">AGM · WKN</div></div>
+  </div>
+  <nav class="sb-nav" id="sb-nav">
+    <div class="sb-module" data-module="agm" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sprout" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">เกษตรกรรม</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item is-disabled" data-feature="farmer-members"><i data-lucide="users" class="w-4 h-4"></i><span>จัดการสมาชิกเกษตรกร</span></a>
+        <a class="sb-item is-disabled" data-feature="quota"><i data-lucide="scale" class="w-4 h-4"></i><span>จัดการโควตา</span></a>
+        <a class="sb-item is-disabled" data-feature="plots"><i data-lucide="map" class="w-4 h-4"></i><span>จัดการแปลงที่ดิน</span></a>
+        <a class="sb-item is-disabled" data-feature="crops"><i data-lucide="wheat" class="w-4 h-4"></i><span>จัดการรอบปลูก</span></a>
+        <a class="sb-item is-disabled" data-feature="cane-contract"><i data-lucide="file-signature" class="w-4 h-4"></i><span>จัดการสัญญาส่งอ้อย</span></a>
+        <a class="sb-item is-disabled" data-feature="surveys"><i data-lucide="clipboard-list" class="w-4 h-4"></i><span>จัดการแบบสำรวจ</span></a>
+        <a class="sb-item is-disabled" data-feature="cane-bookings"><i data-lucide="calendar-clock" class="w-4 h-4"></i><span>จัดการจองรอบส่งอ้อย</span></a>
+        <a class="sb-item is-disabled" data-feature="debtors"><i data-lucide="wallet" class="w-4 h-4"></i><span>จัดการหนี้ลูกหนี้</span></a>
+        <a class="sb-item is-disabled" data-feature="areas"><i data-lucide="shield-check" class="w-4 h-4"></i><span>พื้นที่และการกำหนดสิทธิ์</span></a>
+        <a class="sb-item is-active" data-feature="checkin"><i data-lucide="scale" class="w-4 h-4"></i><span>เช็คอินรับอ้อย</span></a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="system" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sliders-horizontal" class="mod-icon w-3.5 h-3.5"></i><span class="mod-label">System</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features"><a class="sb-item is-disabled" data-feature="settings"><i data-lucide="settings" class="w-4 h-4"></i><span>Settings</span></a></div>
+    </div>
+  </nav>
+  <div class="sb-footer"><div class="pulse-dot"></div><span>WKN Prototype · v1.0.0</span></div>
+</aside>
+
+<main class="main">
+  <header class="shell-bar">
+    <nav class="breadcrumb">
+      <a data-breadcrumb-module="agm">เกษตรกรรม</a>
+      <i data-lucide="chevron-right" class="w-3 h-3 sep"></i>
+      <a>หน้างานโรงงาน</a>
+      <i data-lucide="chevron-right" class="w-3 h-3 sep"></i>
+      <span class="breadcrumb-current">เช็คอินรับอ้อย</span>
+    </nav>
+    <div style="display:flex; align-items:center; gap:6px; margin-left:auto;">
+      <div style="position:relative;"><button class="icon-btn" id="notifBtn"><i data-lucide="bell" class="w-4 h-4"></i><span class="notif-dot"></span></button></div>
+      <div style="position:relative;">
+        <div class="user-chip" onclick="toggleUserMenu()">
+          <div class="user-text"><div class="user-name">สมพร วงศ์ทะเบียน</div><div class="user-role">เจ้าหน้าที่ชั่ง · WKN</div></div>
+          <div class="avatar">สว</div>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-item"><i data-lucide="user" class="w-3.5 h-3.5"></i><span>My Profile</span></div>
+          <div class="user-menu-item"><i data-lucide="settings" class="w-3.5 h-3.5"></i><span>Preferences</span></div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-item is-danger"><i data-lucide="log-out" class="w-3.5 h-3.5"></i><span>Sign out</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="content" id="page-content"></div>
+</main>
+
+<div id="overlay-root"></div>
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"><div class="modal" id="modalBox" onclick="event.stopPropagation()"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function loadLucide(){var v='0.469.0';var cdns=['https://unpkg.com/lucide@'+v+'/dist/umd/lucide.min.js','https://cdn.jsdelivr.net/npm/lucide@'+v+'/dist/umd/lucide.min.js','https://cdnjs.cloudflare.com/ajax/libs/lucide/'+v+'/lucide.min.js'];var i=0;function n(){if(i>=cdns.length){window.lucide=window.lucide||{createIcons:function(){}};window.dispatchEvent(new Event('lucide:ready'));return;}var s=document.createElement('script');s.src=cdns[i++];s.onload=function(){window.dispatchEvent(new Event('lucide:ready'));};s.onerror=n;document.head.appendChild(s);}n();})();
+</script>
+
+<script>
+// ============================================
+// USER (F-AGM-010 · Cane Check-In · WKN)
+// ============================================
+var CURRENT_ROLE = 'เจ้าหน้าที่ชั่ง';
+var canWrite = true;
+const CURRENT_USER = { id:'u-wkn-01', name:'สมพร วงศ์ทะเบียน', role:CURRENT_ROLE };
+
+// ---- Thai label maps + badge tones (verbatim) ----
+const ENTRY_TONE = { 'โควต้าจองคิว':'pill-info', 'โควต้าไม่ได้จองคิว':'pill-muted', 'โควต้ากลาง':'pill-warning' };
+const STATUS_TONE = { 'จัดส่ง':'pill-muted', 'รอทำจ่าย':'pill-warning', 'เสร็จสิ้น':'pill-success' };
+const TAB_TITLE = { 'pending':'ต้องส่ง', 'checked-in':'เช็คอินแล้ว' };
+const VTYPES = ['อีแต๋น','6 ล้อ','10 ล้อ','16 ล้อ'];
+
+// ---- Member quota master (for สมาชิก lookup) ----
+const MEMBER_QUOTAS = {
+  'Q12345': { farmer:'บุญมา รักไร่', phone:'085-234-5678' },
+  'Q10006': { farmer:'สายชล ทุ่งกว้าง', phone:'086-345-6789' },
+  'Q22222': { farmer:'ประยูร นางาม', phone:'087-456-7890' }
+};
+
+// ============================================
+// SEED — CheckInItem (consistent with Cane Booking / AGM chain)
+// ============================================
+var _seq = 0;
+const state = {
+  items: [
+    // ---- Pending (ต้องส่ง) : status 'จัดส่ง', entryType 'โควต้าจองคิว', CBM booked ----
+    { id:'ci-1', documentId:'CBM-2568-0000001', checkInTime:null, quota:'Q10001', farmer:'สมชาย ใจดี', phone:'081-111-1111', vehiclePlate:'80-1234', vehicleType:'10 ล้อ', driver:'สมชาย ใจดี', weighToken:'', entryType:'โควต้าจองคิว', phaseA:'อนุมัติรอบจองแล้ว', status:'จัดส่ง', bookingStatus:'อยู่ระหว่างจัดส่ง', syncPending:false, bookingVersion:1, syncError:'' },
+    { id:'ci-2', documentId:'CBM-2568-0000002', checkInTime:null, quota:'Q10002', farmer:'สมหญิง แสงดี', phone:'081-222-2222', vehiclePlate:'81-2345', vehicleType:'6 ล้อ', driver:'สมหญิง แสงดี', weighToken:'', entryType:'โควต้าจองคิว', phaseA:'อนุมัติรอบจองแล้ว', status:'จัดส่ง', bookingStatus:'อยู่ระหว่างจัดส่ง', syncPending:false, bookingVersion:1, syncError:'' },
+    { id:'ci-3', documentId:'CBM-2568-0000003', checkInTime:null, quota:'Q10003', farmer:'สมศักดิ์ มั่นคง', phone:'081-333-3333', vehiclePlate:'82-3456', vehicleType:'16 ล้อ', driver:'มานพ ขับดี', weighToken:'', entryType:'โควต้าจองคิว', phaseA:'อนุมัติรอบจองแล้ว', status:'จัดส่ง', bookingStatus:'อยู่ระหว่างจัดส่ง', syncPending:false, bookingVersion:1, syncError:'' },
+    // ---- Checked-in (เช็คอินแล้ว) ----
+    // NBM central (โควต้ากลาง, Walk-in)
+    { id:'ci-4', documentId:'NBM-2568-0000101', checkInTime:'08:15 21/07/26', quota:'โควต้ากลาง', farmer:'Walk-in', phone:'-', vehiclePlate:'70-5501', vehicleType:'อีแต๋น', driver:'ชูชาติ พาเข้า', weighToken:'10501', entryType:'โควต้ากลาง', phaseA:'-', status:'รอทำจ่าย', bookingStatus:'', syncPending:false, bookingVersion:0, syncError:'' },
+    // CBM booked, synced OK
+    { id:'ci-5', documentId:'CBM-2568-0000004', checkInTime:'08:40 21/07/26', quota:'Q10004', farmer:'ประสิทธิ์ ทองมา', phone:'083-444-4444', vehiclePlate:'83-4567', vehicleType:'10 ล้อ', driver:'ประสิทธิ์ ทองมา', weighToken:'10502', entryType:'โควต้าจองคิว', phaseA:'อนุมัติรอบจองแล้ว', status:'รอทำจ่าย', bookingStatus:'รอผลการเท', syncPending:false, bookingVersion:2, syncError:'' },
+    // NBM member (โควต้าไม่ได้จองคิว)
+    { id:'ci-6', documentId:'NBM-2568-0000102', checkInTime:'09:05 21/07/26', quota:'Q10006', farmer:'สายชล ทุ่งกว้าง', phone:'086-345-6789', vehiclePlate:'84-5678', vehicleType:'6 ล้อ', driver:'สายชล ทุ่งกว้าง', weighToken:'10503', entryType:'โควต้าไม่ได้จองคิว', phaseA:'-', status:'รอทำจ่าย', bookingStatus:'', syncPending:false, bookingVersion:0, syncError:'' },
+    // CBM booked, done
+    { id:'ci-7', documentId:'CBM-2568-0000005', checkInTime:'09:30 21/07/26', quota:'Q10005', farmer:'วิรัตน์ สีทอง', phone:'086-555-5555', vehiclePlate:'85-6789', vehicleType:'16 ล้อ', driver:'วิรัตน์ สีทอง', weighToken:'10504', entryType:'โควต้าจองคิว', phaseA:'อนุมัติรอบจองแล้ว', status:'เสร็จสิ้น', bookingStatus:'รอผลการเท', syncPending:false, bookingVersion:2, syncError:'' },
+    // CBM booked, sync FAILED (retry demo)
+    { id:'ci-8', documentId:'CBM-2568-0000006', checkInTime:'09:50 21/07/26', quota:'Q10007', farmer:'ทดสอบ ซิงก์ล้มเหลว', phone:'087-777-7777', vehiclePlate:'86-7890', vehicleType:'10 ล้อ', driver:'ทดสอบ ขับรถ', weighToken:'10505', entryType:'โควต้าจองคิว', phaseA:'อนุมัติรอบจองแล้ว', status:'รอทำจ่าย', bookingStatus:'อยู่ระหว่างจัดส่ง', syncPending:true, bookingVersion:1, syncError:'Network timeout' }
+  ],
+  tab:'pending',
+  filters:{ search:'', status:'all', dept:'all' },
+  pagination:{ page:1, pageSize:25 },
+  selectedIds: new Set(),
+  modal:{ open:false, type:null, data:null },
+  view:null
+};
+_seq = state.items.length;
+
+// ============================================
+// HELPERS
+// ============================================
+function renderIcons(){ if(window.lucide&&typeof window.lucide.createIcons==='function') window.lucide.createIcons(); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showToast(msg,variant,ms,desc){ variant=variant||'info'; ms=ms||3200; var el=document.getElementById('toast'); var im={success:'check-circle-2',info:'info',warning:'alert-triangle',error:'x-circle'}; el.className='toast is-'+variant; el.innerHTML='<i data-lucide="'+(im[variant]||'info')+'" class="w-4 h-4"></i><span>'+esc(msg)+(desc?'<br><span style="opacity:.85;font-weight:400;font-size:12px;">'+esc(desc)+'</span>':'')+'</span>'; renderIcons(); requestAnimationFrame(()=>el.classList.add('is-visible')); clearTimeout(showToast._t); showToast._t=setTimeout(()=>el.classList.remove('is-visible'),ms); }
+function toggleModule(h){ var m=h.closest('.sb-module'); if(!m)return; var e=m.getAttribute('data-expanded')!=='false'; m.setAttribute('data-expanded',e?'false':'true'); }
+function toggleUserMenu(){ document.getElementById('userMenu').classList.toggle('is-open'); }
+document.addEventListener('click',function(e){ if(!e.target.closest('.user-chip')&&!e.target.closest('.user-menu')){ var um=document.getElementById('userMenu'); if(um)um.classList.remove('is-open'); } });
+
+function nowStamp(){ var d=new Date(); var p=function(n){return String(n).padStart(2,'0');}; return p(d.getHours())+':'+p(d.getMinutes())+' '+p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+p(d.getFullYear()%100); }
+function nextNbmId(){ var mx=100; state.items.forEach(function(it){ if(String(it.documentId).indexOf('NBM-')===0){ var n=parseInt(String(it.documentId).slice(-7),10); if(n>mx)mx=n; } }); return 'NBM-2568-'+String(mx+1).padStart(7,'0'); }
+function findItem(id){ return state.items.find(function(x){ return x.id===id; }); }
+function findPendingCbm(code){ var c=String(code||'').trim(); return state.items.find(function(x){ return x.documentId===c && !x.checkInTime && x.entryType==='โควต้าจองคิว'; }); }
+
+// ---- pill / badge builders ----
+function statusPill(s){ return '<span class="pill '+(STATUS_TONE[s]||'pill-muted')+'">'+esc(s)+'</span>'; }
+function entryTypeBadge(t){ return '<span class="pill '+(ENTRY_TONE[t]||'pill-muted')+'">'+esc(t)+'</span>'; }
+function quotaCell(it){ if(it.entryType==='โควต้ากลาง') return '<span class="pill pill-warning">โควต้ากลาง</span>'; return '<span class="mono">'+esc(it.quota||'-')+'</span>'; }
+function bookingCell(it){
+  if(it.entryType!=='โควต้าจองคิว') return '<span class="text-mute-2">-</span>';
+  if(it.syncPending){
+    var icon='<i data-lucide="refresh-cw" class="w-4 h-4'+(it.syncBusy?' spin':'')+'"></i>';
+    return '<div style="display:inline-flex;align-items:center;gap:6px;">'
+      +'<span class="pill pill-danger"><i data-lucide="alert-circle" class="w-3 h-3"></i>ซิงก์ล้มเหลว</span>'
+      +'<button class="ra-btn" onclick="event.stopPropagation();retrySync(\''+it.id+'\')" title="ลองซิงก์ใหม่"'+(it.syncBusy?' disabled':'')+'>'+icon+'</button></div>';
+  }
+  return '<span class="pill pill-muted">'+esc(it.bookingStatus||'-')+'</span>';
+}
+
+// ============================================
+// ROUTER
+// ============================================
+function getRoute(){ var h=location.hash; if(!h||h==='#'||h==='#/')return 'checkins'; return h.replace(/^#\//,''); }
+function navigate(r){ location.hash='#/'+r; }
+function gotoTab(tab){ state.tab=tab; var target=tab==='checked-in'?'checkins/checked-in':'checkins'; if(location.hash!=='#/'+target){ location.hash='#/'+target; } render(); }
+
+// ============================================
+// FILTER / PAGE
+// ============================================
+function tabItems(tab){ return state.items.filter(function(i){ return tab==='checked-in' ? !!i.checkInTime : !i.checkInTime; }); }
+function getFiltered(){
+  var arr=tabItems(state.tab);
+  if(state.filters.status!=='all') arr=arr.filter(i=>i.status===state.filters.status);
+  if(state.filters.dept!=='all') arr=arr.filter(i=>i.entryType===state.filters.dept);
+  if(state.filters.search){
+    var q=state.filters.search.toLowerCase().trim();
+    arr=arr.filter(function(i){ return [i.documentId,i.vehiclePlate,i.weighToken,i.quota,i.driver,i.farmer].some(function(v){ return String(v||'').toLowerCase().includes(q); }); });
+  }
+  return arr;
+}
+function getPaged(){ var all=getFiltered(); var pg=state.pagination.page,ps=state.pagination.pageSize; var s=(pg-1)*ps; return {records:all.slice(s,s+ps),total:all.length,page:pg,totalPages:Math.max(1,Math.ceil(all.length/ps)),start:all.length===0?0:s+1,end:Math.min(s+ps,all.length)}; }
+function toggleSelect(id){ if(state.selectedIds.has(id))state.selectedIds.delete(id); else state.selectedIds.add(id); render(); }
+function toggleSelectAll(){ var sel=getPaged().records; var all=sel.length>0&&sel.every(d=>state.selectedIds.has(d.id)); if(all)sel.forEach(d=>state.selectedIds.delete(d.id)); else sel.forEach(d=>state.selectedIds.add(d.id)); render(); }
+function goToPage(n){ var tp=getPaged().totalPages; if(n<1||n>tp)return; state.pagination.page=n; render(); }
+function resetFilters(){ state.filters={search:'',status:'all',dept:'all'}; state.pagination.page=1; state.selectedIds.clear(); render(); }
+var _st=null; function onSearchInput(v){ clearTimeout(_st); _st=setTimeout(function(){ state.filters.search=v; state.pagination.page=1; render(); },300); }
+function setFilter(k,v){ state.filters[k]=v; state.pagination.page=1; render(); }
+
+// RENDER PRESERVATION
+function preserveState(){ var a=document.activeElement; var isI=a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'); return { pageScroll:window.scrollY, focusKey:isI?{id:a.id||'',placeholder:a.placeholder||'',selStart:a.selectionStart,selEnd:a.selectionEnd}:null }; }
+function restoreState(s){ if(!s)return; requestAnimationFrame(function(){ if(s.pageScroll>0)window.scrollTo(0,s.pageScroll); if(s.focusKey){ var c=s.focusKey.id?document.getElementById(s.focusKey.id):null; if(!c){var cs=document.querySelectorAll('input,textarea'); for(var i=0;i<cs.length;i++){ if((cs[i].placeholder||'')===s.focusKey.placeholder){c=cs[i];break;} }} if(c){ c.focus(); if(s.focusKey.selStart!=null&&c.setSelectionRange){ try{c.setSelectionRange(s.focusKey.selStart,s.focusKey.selEnd);}catch(e){} } } } }); }
+
+function emptyStateHTML(cfg){ cfg=cfg||{}; var acts=''; if(cfg.actions){ acts='<div class="empty-actions">'+cfg.actions.map(function(a){ return '<button class="btn '+(a.cls||'btn-primary')+'" onclick="'+a.onAction+'">'+(a.icon?'<i data-lucide="'+a.icon+'" class="w-4 h-4"></i>':'')+'<span>'+a.label+'</span></button>'; }).join('')+'</div>'; } return '<div class="empty"><div class="empty-icon"><i data-lucide="'+(cfg.icon||'inbox')+'" class="w-5 h-5"></i></div><div class="empty-title">'+(cfg.title||'ยังไม่มีข้อมูล')+'</div><div class="empty-desc">'+(cfg.desc||'')+'</div>'+acts+'</div>'; }
+
+// ============================================
+// TOP TAB BAR (page-level: ต้องส่ง | เช็คอินแล้ว)
+// ============================================
+function topTabBar(){
+  var t=state.tab;
+  var pc=tabItems('pending').length;
+  var cc=tabItems('checked-in').length;
+  return '<div class="tabs" style="margin-top:0;margin-bottom:20px;">'
+    +'<button class="tab '+(t==='pending'?'on':'')+'" onclick="gotoTab(\'pending\')"><i data-lucide="clock" class="w-3.5 h-3.5"></i><span>ต้องส่ง</span> <span class="ph-count" style="padding:1px 7px;">'+pc+'</span></button>'
+    +'<button class="tab '+(t==='checked-in'?'on':'')+'" onclick="gotoTab(\'checked-in\')"><i data-lucide="check-check" class="w-3.5 h-3.5"></i><span>เช็คอินแล้ว</span> <span class="ph-count" style="padding:1px 7px;">'+cc+'</span></button>'
+    +'</div>';
+}
+
+// ============================================
+// PAGE RENDER (dispatch)
+// ============================================
+function render(){
+  var snap=preserveState();
+  var route=getRoute(); var parts=route.split('/');
+  if(parts[0]!=='checkins'){ navigate('checkins'); return; }
+  var seg=parts[1]; var detailId=null;
+  if(seg==='checked-in'){ state.tab='checked-in'; }
+  else if(seg){ detailId=seg; }
+  else { state.tab='pending'; }
+  renderListPage();
+  renderIcons(); restoreState(snap);
+
+  if(detailId){
+    var it=findItem(detailId);
+    if(it){ if(!state.view||state.view.id!==it.id){ state.view={id:it.id}; mountViewDrawer(); } }
+    else { showToast('ไม่พบรายการเช็คอิน','error'); state.view=null; unmountOverlay(); navigate(state.tab==='checked-in'?'checkins/checked-in':'checkins'); }
+  } else if(state.view){ state.view=null; unmountOverlay(); }
+}
+
+// ============================================
+// LIST — BACKEND: API-01 checkin-list
+// ============================================
+function renderListPage(){
+  var isChecked=state.tab==='checked-in';
+  var pg=getPaged();
+  var pendingCount=state.items.filter(i=>!i.checkInTime).length;
+  var checkedCount=state.items.filter(i=>i.checkInTime).length;
+  var syncCount=state.items.filter(i=>i.syncPending).length;
+  var doneCount=state.items.filter(i=>i.status==='เสร็จสิ้น').length;
+
+  var rows=pg.records.map(function(it){
+    var docCell='<td><span class="mono text-primary" style="font-weight:600;cursor:pointer;" onclick="event.stopPropagation();openView(\''+it.id+'\')">'+esc(it.documentId)+'</span></td>';
+    var actions;
+    if(isChecked){
+      actions='<td onclick="event.stopPropagation()" style="text-align:right;width:110px;"><div class="row-actions">'
+        +'<button class="ra-btn" onclick="openView(\''+it.id+'\')" title="รายละเอียด"><i data-lucide="eye" class="w-4 h-4"></i></button>'
+        +'<button class="ra-btn is-danger" onclick="openModalBox(\'void\',{id:\''+it.id+'\'},460)" title="ยกเลิก"><i data-lucide="x-circle" class="w-4 h-4"></i></button>'
+        +'</div></td>';
+    } else {
+      actions='<td onclick="event.stopPropagation()" style="text-align:right;width:150px;"><div style="display:inline-flex;gap:4px;align-items:center;justify-content:flex-end;">'
+        +'<button class="btn btn-sm btn-primary" onclick="openModalBox(\'cbm\',{documentId:\''+it.documentId+'\'},560)"><i data-lucide="log-in" class="w-3.5 h-3.5"></i><span>เช็คอิน</span></button>'
+        +'<button class="ra-btn" onclick="openView(\''+it.id+'\')" title="รายละเอียด"><i data-lucide="eye" class="w-4 h-4"></i></button>'
+        +'</div></td>';
+    }
+    return '<tr class="is-clickable" onclick="openView(\''+it.id+'\')">'
+      +docCell
+      +'<td class="mono">'+esc(it.checkInTime||'-')+'</td>'
+      +'<td>'+quotaCell(it)+'</td>'
+      +'<td><div style="font-weight:600;">'+esc(it.farmer)+'</div><div style="font-size:11px;color:var(--c-mute-2);">'+esc(it.phone||'-')+'</div></td>'
+      +'<td class="mono">'+esc(it.vehiclePlate)+'</td>'
+      +'<td>'+esc(it.vehicleType)+'</td>'
+      +'<td>'+esc(it.driver)+'</td>'
+      +'<td class="mono">'+esc(it.weighToken||'-')+'</td>'
+      +'<td>'+entryTypeBadge(it.entryType)+'</td>'
+      +'<td>'+statusPill(it.status)+'</td>'
+      +(isChecked?('<td>'+bookingCell(it)+'</td>'):'')
+      +actions+'</tr>';
+  }).join('');
+
+  var noData=tabItems(state.tab).length===0; var emptyBlock='';
+  if(pg.records.length===0){
+    emptyBlock=noData
+      ? emptyStateHTML({icon:'inbox',title:'ยังไม่มีรายการเช็คอิน',desc:isChecked?'ยังไม่มีรถเข้าเช็คอินในวันนี้':'ยังไม่มีรถที่รอเข้าเช็คอิน'})
+      : emptyStateHTML({icon:'search-x',title:'ไม่พบรายการที่ค้นหา',desc:'ลองปรับคำค้นหรือล้างตัวกรอง',actions:[{label:'ล้างตัวกรอง',icon:'rotate-ccw',cls:'btn-ghost',onAction:'resetFilters()'}]});
+  }
+  var pageNums=[]; for(var n=1;n<=pg.totalPages;n++)pageNums.push(n);
+
+  document.getElementById('page-content').innerHTML=
+    topTabBar()
+    +'<div class="ph"><div><div class="ph-title-row"><h1 class="ph-title">'+esc(TAB_TITLE[state.tab])+'</h1><span class="ph-count">'+pg.total+' รายการ</span></div>'
+    +'<p class="ph-sub">เช็คอินรับอ้อยหน้าโรงงาน · จุดชั่งน้ำหนัก (WKN)</p></div>'
+    +'<div class="ph-actions">'
+    +'<button class="btn btn-secondary" onclick="openModalBox(\'qr\',{},460)"><i data-lucide="qr-code" class="w-4 h-4"></i><span>Scan QR</span></button>'
+    +'<button class="btn btn-secondary" onclick="exportCSV()"><i data-lucide="download" class="w-4 h-4"></i><span>Export CSV</span></button>'
+    +'<button class="btn btn-primary" onclick="openModalBox(\'method\',{},460)"><i data-lucide="log-in" class="w-4 h-4"></i><span>เช็คอิน</span></button>'
+    +'</div></div>'
+    +'<div class="stats">'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="clock" class="w-3 h-3"></i>รอเช็คอิน</div><div class="stat-value num">'+pendingCount+'</div><div class="stat-meta">รถที่รอเข้าเช็คอิน</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="check-check" class="w-3 h-3"></i>เช็คอินวันนี้</div><div class="stat-value num">'+checkedCount+'</div><div class="stat-meta">รถที่เช็คอินแล้ว</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="alert-circle" class="w-3 h-3"></i>ซิงก์ล้มเหลว</div><div class="stat-value num">'+syncCount+'</div><div class="stat-meta'+(syncCount>0?' is-warn':'')+'">รอซิงก์สถานะ Booking</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="check-circle-2" class="w-3 h-3"></i>เสร็จสิ้น</div><div class="stat-value num">'+doneCount+'</div><div class="stat-meta">ปิดรายการแล้ว</div></div>'
+    +'</div>'
+    +'<div class="card">'
+    +'<div class="filter-bar"><div class="input-search"><i data-lucide="search" class="lead-icon w-4 h-4"></i>'
+    +'<input class="input" type="text" id="q-search" placeholder="ค้นหา CBM/NBM/ทะเบียน/เหรียญ/โควต้า/คนขับ" value="'+esc(state.filters.search)+'" oninput="onSearchInput(this.value)"></div>'
+    +'<select class="select" style="max-width:170px;" onchange="setFilter(\'status\',this.value)">'
+    +'<option value="all"'+(state.filters.status==='all'?' selected':'')+'>ทุกสถานะ</option>'
+    +'<option value="จัดส่ง"'+(state.filters.status==='จัดส่ง'?' selected':'')+'>จัดส่ง</option>'
+    +'<option value="รอทำจ่าย"'+(state.filters.status==='รอทำจ่าย'?' selected':'')+'>รอทำจ่าย</option>'
+    +'<option value="เสร็จสิ้น"'+(state.filters.status==='เสร็จสิ้น'?' selected':'')+'>เสร็จสิ้น</option></select>'
+    +'<select class="select" style="max-width:200px;" onchange="setFilter(\'dept\',this.value)">'
+    +'<option value="all"'+(state.filters.dept==='all'?' selected':'')+'>ทุกแผนก</option>'
+    +'<option value="โควต้าจองคิว"'+(state.filters.dept==='โควต้าจองคิว'?' selected':'')+'>โควต้าจองคิว</option>'
+    +'<option value="โควต้าไม่ได้จองคิว"'+(state.filters.dept==='โควต้าไม่ได้จองคิว'?' selected':'')+'>โควต้าไม่ได้จองคิว</option>'
+    +'<option value="โควต้ากลาง"'+(state.filters.dept==='โควต้ากลาง'?' selected':'')+'>โควต้ากลาง</option></select>'
+    +'<div style="flex:1;"></div><button class="btn btn-ghost btn-sm" onclick="resetFilters()"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i><span>ล้าง</span></button></div>'
+    +'<div class="table-scroll is-sticky"><table class="table"><thead><tr>'
+    +'<th>รหัสเอกสาร</th><th>วันที่/เวลาเข้า</th><th>โควต้า</th><th>เกษตรกร/ผู้ส่ง</th><th>ทะเบียนรถ</th><th>ประเภทรถ</th><th>ชื่อคนขับ</th><th>เลขเหรียญชั่ง</th><th>ประเภทการเข้าโรงงาน</th><th>สถานะ</th>'
+    +(isChecked?'<th>สถานะ Booking</th>':'')
+    +'<th style="text-align:right;">การกระทำ</th></tr></thead><tbody>'+(pg.records.length?rows:'')+'</tbody></table>'+emptyBlock+'</div>'
+    +'<div class="table-footer"><span>แสดง '+pg.start+'-'+pg.end+' จาก '+pg.total+' รายการ</span><div class="pagination">'
+    +'<button class="pg-btn '+(pg.page===1?'is-disabled':'')+'" onclick="goToPage('+(pg.page-1)+')"><i data-lucide="chevron-left" class="w-3 h-3"></i></button>'
+    +pageNums.map(n=>'<button class="pg-btn '+(n===pg.page?'is-active':'')+'" onclick="goToPage('+n+')">'+n+'</button>').join('')
+    +'<button class="pg-btn '+(pg.page===pg.totalPages?'is-disabled':'')+'" onclick="goToPage('+(pg.page+1)+')"><i data-lucide="chevron-right" class="w-3 h-3"></i></button></div></div></div>';
+}
+
+function exportCSV(){ showToast('กำลังดาวน์โหลดไฟล์ CSV','info',3200); }
+
+// ---- Booking-sync RETRY (first retry succeeds; then random) ----
+function retrySync(id){
+  var it=findItem(id); if(!it||!it.syncPending||it.syncBusy)return;
+  it.syncBusy=true; render();
+  setTimeout(function(){
+    it.syncBusy=false;
+    it.retryCount=(it.retryCount||0)+1;
+    var ok = it.retryCount===1 ? true : (Math.random()<0.5);
+    if(ok){
+      it.syncPending=false; it.syncError=''; it.bookingStatus='รอผลการเท'; it.bookingVersion=(it.bookingVersion||0)+1;
+      render(); showToast('ซิงก์สถานะ Booking สำเร็จ','success');
+    } else {
+      render(); showToast('ซิงก์ล้มเหลว กรุณาลองใหม่','error');
+    }
+  },700);
+}
+
+// ============================================
+// OVERLAY SHELL (Drawer v2)
+// ============================================
+function unmountOverlay(){ document.getElementById('overlay-root').innerHTML=''; }
+function mountPanel(cid,standard){ document.getElementById('overlay-root').innerHTML='<div class="overlay-wrap"><div class="backdrop" onclick="closeTopDrawer()"></div><div id="drawer-panel" class="drawer-panel'+(standard?' standard':'')+' drawer-enter"><div id="'+cid+'" style="display:flex;flex-direction:column;height:100%;"></div></div></div>'; var p=document.getElementById('drawer-panel'); requestAnimationFrame(()=>p.classList.add('drawer-active')); }
+function closePanel(after){ var p=document.getElementById('drawer-panel'); if(p){p.classList.remove('drawer-active');p.classList.add('drawer-enter');} setTimeout(function(){ unmountOverlay(); if(after)after(); },200); }
+function closeTopDrawer(){ if(state.view)closeView(); }
+
+// ============================================
+// DETAIL DRAWER (view) — 680px, refresh-safe
+// BACKEND: API-02 checkin-detail
+// ============================================
+function openView(id){ navigate('checkins/'+id); }
+function mountViewDrawer(){ mountPanel('view-content',true); renderViewDrawer(); }
+function closeView(){ state.view=null; closePanel(function(){ navigate(state.tab==='checked-in'?'checkins/checked-in':'checkins'); }); }
+
+function renderViewDrawer(){
+  if(!state.view)return; var it=findItem(state.view.id); if(!it)return;
+  var isCBM=it.entryType==='โควต้าจองคิว';
+  var isChecked=!!it.checkInTime;
+  function cell(l,v){ return '<div class="dv-cell"><div class="dv-lbl">'+l+'</div><div class="dv-val">'+v+'</div></div>'; }
+
+  var bookingVal;
+  if(it.syncPending) bookingVal='<span class="pill pill-danger"><i data-lucide="alert-circle" class="w-3 h-3"></i>ซิงก์ล้มเหลว</span>';
+  else bookingVal='<span class="pill pill-muted">'+esc(it.bookingStatus||'-')+'</span>';
+
+  var grid='<div class="dv-section"><div class="dv-section-title"><i data-lucide="truck" class="w-4 h-4"></i>ข้อมูลการเช็คอิน</div><div class="dv-grid">'
+    +cell('เวลาเข้า','<span class="mono">'+esc(it.checkInTime||'-')+'</span>')
+    +cell('โควต้า',quotaCell(it))
+    +cell('เกษตรกร/ผู้ส่ง',esc(it.farmer)+' · <span style="color:var(--c-mute-2);">'+esc(it.phone||'-')+'</span>')
+    +cell('ทะเบียนรถ','<span class="mono">'+esc(it.vehiclePlate)+'</span>')
+    +cell('ประเภทรถ',esc(it.vehicleType))
+    +cell('ชื่อคนขับ',esc(it.driver))
+    +cell('เลขเหรียญชั่ง','<span class="mono">'+esc(it.weighToken||'-')+'</span>')
+    +cell('ประเภทการเข้าโรงงาน',entryTypeBadge(it.entryType))
+    +cell('สถานะ',statusPill(it.status))
+    +(isCBM?cell('สถานะ Booking',bookingVal):'')
+    +'</div>'
+    +(it.syncPending&&it.syncError?'<div class="note is-warn" style="margin-top:12px;"><i data-lucide="alert-triangle" class="w-4 h-4"></i><span>ซิงก์สถานะ Booking ล้มเหลว: '+esc(it.syncError)+'</span></div>':'')
+    +'</div>';
+
+  document.getElementById('view-content').innerHTML=
+    '<div class="dw-head"><div class="dw-head-row"><div>'
+    +'<div class="dw-eyebrow"><i data-lucide="scale" class="w-3.5 h-3.5"></i> เช็คอินรับอ้อย · <span class="mono">'+esc(it.documentId)+'</span></div>'
+    +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><h2 class="dw-title">'+esc(it.farmer)+'</h2>'+statusPill(it.status)+'</div>'
+    +'<div class="dw-sub">'+esc(it.vehiclePlate)+' · '+esc(it.vehicleType)+' · '+(it.checkInTime?('เข้าเมื่อ '+esc(it.checkInTime)):'ยังไม่เช็คอิน')+'</div>'
+    +'</div>'
+    +'<div class="dw-actions"><span class="drawer-header-divider"></span><button class="top-icon-btn" onclick="closeView()"><i data-lucide="x" class="w-5 h-5"></i></button></div></div></div>'
+    +'<div class="dw-body">'+grid+'</div>'
+    +'<div class="dw-footer"><div class="dw-footer-meta">'+esc(it.documentId)+'</div><div class="dw-footer-right">'
+    +(isChecked
+        ? '<button class="btn btn-danger" onclick="openModalBox(\'void\',{id:\''+it.id+'\'},460)"><i data-lucide="x-circle" class="w-4 h-4"></i><span>ยกเลิก</span></button>'
+        : '<button class="btn btn-primary" onclick="openModalBox(\'cbm\',{documentId:\''+it.documentId+'\'},560)"><i data-lucide="log-in" class="w-4 h-4"></i><span>เช็คอิน</span></button>')
+    +'<button class="btn btn-secondary" onclick="closeView()">ปิด</button></div></div>';
+  renderIcons();
+}
+
+// ============================================
+// MODALS (OV) — method / cbm / member / central / qr / void
+// ============================================
+function openModalBox(type,data,widthPx){ state.modal={open:true,type:type,data:data||{}}; var box=document.getElementById('modalBox'); box.className='modal'; if(widthPx)box.style.width=widthPx+'px'; else box.style.width=''; renderModal(); requestAnimationFrame(()=>document.getElementById('modalBackdrop').classList.add('is-open')); }
+function closeModal(){ if(state.modal.data&&state.modal.data.busy)return; document.getElementById('modalBackdrop').classList.remove('is-open'); setTimeout(()=>state.modal={open:false,type:null,data:null},200); }
+function renderModal(){
+  var t=state.modal.type;
+  if(t==='method')renderMethodModal();
+  else if(t==='cbm')renderCbmModal();
+  else if(t==='member')renderMemberModal();
+  else if(t==='central')renderCentralModal();
+  else if(t==='qr')renderQrModal();
+  else if(t==='void')renderVoidModal();
+}
+function modalCloseBtn(){ return '<button class="icon-btn" onclick="closeModal()"><i data-lucide="x" class="w-4 h-4"></i></button>'; }
+function vtypeOptions(sel){ return VTYPES.map(function(v){ return '<option value="'+esc(v)+'"'+(sel===v?' selected':'')+'>'+esc(v)+'</option>'; }).join(''); }
+function billRadios(name,current){ return ['บิลเขียว','บิลขาว'].map(function(v){ return '<label style="display:inline-flex;align-items:center;gap:6px;margin-right:18px;font-size:13px;cursor:pointer;"><input type="radio" name="'+name+'" value="'+esc(v)+'"'+(current===v?' checked':'')+'>'+esc(v)+'</label>'; }).join(''); }
+
+// ---- Method chooser ----
+function optBtn(onclick,icon,title,sub){
+  return '<button class="btn btn-secondary" style="width:100%;height:auto;padding:14px 16px;justify-content:flex-start;text-align:left;margin-bottom:10px;" onclick="'+onclick+'">'
+    +'<span style="display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:8px;background:rgba(255,59,48,0.10);color:var(--c-primary);flex-shrink:0;"><i data-lucide="'+icon+'" class="w-5 h-5"></i></span>'
+    +'<span style="margin-left:12px;"><span style="display:block;font-weight:600;font-size:14px;color:var(--c-ink);">'+esc(title)+'</span><span style="display:block;font-size:12px;color:var(--c-mute-2);margin-top:2px;font-weight:400;">'+esc(sub)+'</span></span></button>';
+}
+function renderMethodModal(){
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="log-in" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">เช็คอิน</h3><p class="modal-subtitle">เลือกวิธีการเช็คอิน</p></div>'+modalCloseBtn()+'</div>'
+    +'<div class="modal-body">'
+    +optBtn("openModalBox('cbm',{},560)",'qr-code','เช็คอินจาก CBM','ป้อนรหัส CBM หรือสแกน QR')
+    +optBtn("openModalBox('member',{},680)",'user-check','เช็คอินแบบไม่มีคิว — สมาชิก','ค้นหาโควต้าของสมาชิก')
+    +optBtn("openModalBox('central',{},680)",'globe','เช็คอินแบบไม่มีคิว — โควต้ากลาง','ไม่มีโควต้า')
+    +'</div>';
+  renderIcons();
+}
+
+// ---- CBM check-in ----
+function cbmCapture(){ var d=state.modal.data; var g=function(id){var e=document.getElementById(id);return e?e.value:undefined;}; var v; v=g('cbm-code'); if(v!==undefined)d.code=v; v=g('cbm-token'); if(v!==undefined)d.token=v; v=g('cbm-note'); if(v!==undefined)d.note=v; }
+function cbmLookup(){ cbmCapture(); var d=state.modal.data; var f=findPendingCbm(d.code); if(!f){ d.foundId=null; showToast('ไม่พบรหัส CBM นี้','warning'); } else { d.foundId=f.id; } renderModal(); }
+function cbmConfirm(){ var d=state.modal.data; cbmCapture(); if(!d.foundId){ showToast('ไม่พบรหัส CBM นี้','warning'); return; } if(!String(d.token||'').trim()){ showToast('กรุณาใส่เลขเหรียญชั่ง','warning'); return; } var it=findItem(d.foundId); if(!it)return; it.checkInTime=nowStamp(); it.weighToken=String(d.token).trim(); it.status='รอทำจ่าย'; it.bookingStatus='รอผลการเท'; it.syncPending=false; it.syncError=''; it.bookingVersion=(it.bookingVersion||0)+1; it.note=String(d.note||'').trim(); closeModal(); gotoTab('checked-in'); showToast('เช็คอินสำเร็จ','success',3600,'ส่งสถานะ Booking ไป "รอผลการเท" แล้ว'); }
+function renderCbmModal(){
+  var d=state.modal.data;
+  if(d.code===undefined){ d.code=d.documentId||''; if(d.code){ var f0=findPendingCbm(d.code); if(f0)d.foundId=f0.id; } }
+  var found=d.foundId?findItem(d.foundId):null;
+  function cell(l,v){ return '<div class="dv-cell"><div class="dv-lbl">'+l+'</div><div class="dv-val">'+v+'</div></div>'; }
+  var card=found
+    ? '<div style="border:1px solid var(--c-line-2);background:var(--c-bg-off);border-radius:8px;padding:12px 14px;margin-bottom:14px;"><div style="display:flex;align-items:center;gap:6px;color:var(--c-success);font-weight:600;font-size:12.5px;margin-bottom:10px;"><i data-lucide="check-circle-2" class="w-4 h-4"></i>พบรายการจอง</div><div class="dv-grid">'
+        +cell('เกษตรกร',esc(found.farmer))+cell('โควต้า','<span class="mono">'+esc(found.quota)+'</span>')+cell('ทะเบียนรถ','<span class="mono">'+esc(found.vehiclePlate)+'</span>')+cell('ประเภทรถ',esc(found.vehicleType))+'</div></div>'
+    : '';
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="qr-code" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">เช็คอินจาก CBM</h3><p class="modal-subtitle">ป้อนรหัส CBM แล้วค้นหา เพื่อดึงข้อมูลการจอง</p></div>'+modalCloseBtn()+'</div>'
+    +'<div class="modal-body">'
+    +'<div class="field"><label class="field-label">รหัส CBM <span class="req">*</span></label><div style="display:flex;gap:8px;"><input class="input mono" id="cbm-code" type="text" placeholder="CBM-2568-0000001" value="'+esc(d.code||'')+'"><button class="btn btn-secondary" onclick="cbmLookup()"><i data-lucide="search" class="w-4 h-4"></i><span>ค้นหา</span></button></div></div>'
+    +card
+    +'<div class="field"><label class="field-label">เลขเหรียญชั่ง <span class="req">*</span></label><input class="input mono" id="cbm-token" type="text" placeholder="ใส่เลขเหรียญชั่ง" value="'+esc(d.token||'')+'"></div>'
+    +'<div class="field" style="margin-bottom:0;"><label class="field-label">หมายเหตุ</label><textarea class="input" id="cbm-note" placeholder="หมายเหตุเพิ่มเติม (ถ้ามี)">'+esc(d.note||'')+'</textarea></div>'
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>'
+    +'<button class="btn btn-primary" onclick="cbmConfirm()"><i data-lucide="check" class="w-4 h-4"></i><span>ยืนยันเช็คอิน</span></button></div>';
+  renderIcons();
+}
+
+// ---- Member check-in (สมาชิก) ----
+function mbCapture(){ var d=state.modal.data; var g=function(id){var e=document.getElementById(id);return e?e.value:undefined;}; var v;
+  v=g('mb-quota'); if(v!==undefined)d.quota=v;
+  v=g('mb-token'); if(v!==undefined)d.token=v;
+  v=g('mb-plate'); if(v!==undefined)d.plate=v;
+  v=g('mb-driver'); if(v!==undefined)d.driver=v;
+  v=g('mb-phone'); if(v!==undefined)d.phone=v;
+  v=g('mb-vtype'); if(v!==undefined)d.vtype=v;
+  var b1=document.querySelector('input[name="mb-bill1"]:checked'); if(b1)d.bill1=b1.value;
+  var b2=document.querySelector('input[name="mb-bill2"]:checked'); if(b2)d.bill2=b2.value;
+}
+function mbLookup(){ mbCapture(); var d=state.modal.data; var q=String(d.quota||'').trim(); var m=MEMBER_QUOTAS[q]; if(!m){ d.foundMember=null; showToast('ไม่พบโควต้านี้','warning'); } else { d.foundMember=m; if(!d.driver)d.driver=m.farmer; if(!d.phone)d.phone=m.phone; } renderModal(); }
+function mbConfirm(){ var d=state.modal.data; mbCapture();
+  if(!d.foundMember||!String(d.token||'').trim()||!String(d.plate||'').trim()||!String(d.driver||'').trim()){ showToast('กรุณากรอกข้อมูลให้ครบถ้วน','warning'); return; }
+  if(!d.bill1||!d.bill2){ showToast('กรุณาเลือกประเภทการชำระเงินให้ครบถ้วน','warning'); return; }
+  createNbm({ entryType:'โควต้าไม่ได้จองคิว', quota:String(d.quota).trim(), farmer:d.foundMember.farmer, phone:d.phone, plate:String(d.plate).trim(), driver:String(d.driver).trim(), vtype:d.vtype, token:String(d.token).trim() });
+  closeModal(); gotoTab('checked-in'); showToast('เช็คอินสำเร็จ','success',3600);
+}
+function renderMemberModal(){
+  var d=state.modal.data;
+  var foundCard=d.foundMember
+    ? '<div style="border:1px solid var(--c-line-2);background:var(--c-bg-off);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:8px;"><span style="color:var(--c-success);display:inline-flex;"><i data-lucide="check-circle-2" class="w-4 h-4"></i></span><span style="font-size:13px;">พบข้อมูลสมาชิก · <b>'+esc(d.foundMember.farmer)+'</b> · <span class="mono">'+esc(d.foundMember.phone)+'</span></span></div>'
+    : '';
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="user-check" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">เช็คอินแบบไม่มีคิว — สมาชิก</h3><p class="modal-subtitle">ค้นหาโควต้าของสมาชิก แล้วกรอกข้อมูลรถและการชำระเงิน</p></div>'+modalCloseBtn()+'</div>'
+    +'<div class="modal-body">'
+    +'<div class="field"><label class="field-label">ค้นหาโควต้า <span class="req">*</span></label><div style="display:flex;gap:8px;"><input class="input mono" id="mb-quota" type="text" placeholder="Q12345" value="'+esc(d.quota||'')+'"><button class="btn btn-secondary" onclick="mbLookup()"><i data-lucide="search" class="w-4 h-4"></i><span>ค้นหา</span></button></div></div>'
+    +foundCard
+    +'<div class="form-grp">'
+    +'<div class="field"><label class="field-label">เลขเหรียญชั่ง <span class="req">*</span></label><input class="input mono" id="mb-token" type="text" placeholder="ใส่เลขเหรียญชั่ง" value="'+esc(d.token||'')+'"></div>'
+    +'<div class="field"><label class="field-label">ทะเบียนรถ <span class="req">*</span></label><input class="input mono" id="mb-plate" type="text" placeholder="1กก-1234" value="'+esc(d.plate||'')+'"></div>'
+    +'<div class="field"><label class="field-label">ชื่อคนขับ <span class="req">*</span></label><input class="input" id="mb-driver" type="text" placeholder="ชื่อคนขับ" value="'+esc(d.driver||'')+'"></div>'
+    +'<div class="field"><label class="field-label">เบอร์โทร</label><input class="input mono" id="mb-phone" type="text" placeholder="08x-xxx-xxxx" value="'+esc(d.phone||'')+'"></div>'
+    +'<div class="field"><label class="field-label">ประเภทรถ</label><select class="select" id="mb-vtype">'+vtypeOptions(d.vtype)+'</select></div>'
+    +'</div>'
+    +'<div class="form-section"><div class="form-section-title">ประเภทการชำระเงิน</div>'
+    +'<div class="field"><label class="field-label">งวดที่ 1 <span class="req">*</span></label><div>'+billRadios('mb-bill1',d.bill1)+'</div></div>'
+    +'<div class="field" style="margin-bottom:0;"><label class="field-label">งวดที่ 2 <span class="req">*</span></label><div>'+billRadios('mb-bill2',d.bill2)+'</div></div>'
+    +'</div>'
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>'
+    +'<button class="btn btn-primary" onclick="mbConfirm()"><i data-lucide="check" class="w-4 h-4"></i><span>ยืนยันเช็คอิน</span></button></div>';
+  renderIcons();
+}
+
+// ---- Central check-in (โควต้ากลาง) ----
+function ctCapture(){ var d=state.modal.data; var g=function(id){var e=document.getElementById(id);return e?e.value:undefined;}; var v;
+  v=g('ct-token'); if(v!==undefined)d.token=v;
+  v=g('ct-plate'); if(v!==undefined)d.plate=v;
+  v=g('ct-driver'); if(v!==undefined)d.driver=v;
+  v=g('ct-phone'); if(v!==undefined)d.phone=v;
+  v=g('ct-vtype'); if(v!==undefined)d.vtype=v;
+  var b1=document.querySelector('input[name="ct-bill1"]:checked'); if(b1)d.bill1=b1.value;
+  var b2=document.querySelector('input[name="ct-bill2"]:checked'); if(b2)d.bill2=b2.value;
+}
+function ctConfirm(){ var d=state.modal.data; ctCapture();
+  if(!String(d.token||'').trim()||!String(d.plate||'').trim()||!String(d.driver||'').trim()){ showToast('กรุณากรอกข้อมูลให้ครบถ้วน','warning'); return; }
+  if(!d.bill1||!d.bill2){ showToast('กรุณาเลือกประเภทการชำระเงินให้ครบถ้วน','warning'); return; }
+  createNbm({ entryType:'โควต้ากลาง', quota:'โควต้ากลาง', farmer:String(d.driver).trim(), phone:d.phone||'-', plate:String(d.plate).trim(), driver:String(d.driver).trim(), vtype:d.vtype, token:String(d.token).trim() });
+  closeModal(); gotoTab('checked-in'); showToast('เช็คอินสำเร็จ','success',3600);
+}
+function renderCentralModal(){
+  var d=state.modal.data;
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="globe" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">เช็คอินแบบไม่มีคิว — โควต้ากลาง</h3><p class="modal-subtitle">ไม่มีโควต้า · กรอกข้อมูลรถและการชำระเงิน</p></div>'+modalCloseBtn()+'</div>'
+    +'<div class="modal-body">'
+    +'<div class="form-grp">'
+    +'<div class="field"><label class="field-label">เลขเหรียญชั่ง <span class="req">*</span></label><input class="input mono" id="ct-token" type="text" placeholder="ใส่เลขเหรียญชั่ง" value="'+esc(d.token||'')+'"></div>'
+    +'<div class="field"><label class="field-label">ทะเบียนรถ <span class="req">*</span></label><input class="input mono" id="ct-plate" type="text" placeholder="1กก-1234" value="'+esc(d.plate||'')+'"></div>'
+    +'<div class="field"><label class="field-label">ชื่อคนขับ <span class="req">*</span></label><input class="input" id="ct-driver" type="text" placeholder="ชื่อคนขับ" value="'+esc(d.driver||'')+'"></div>'
+    +'<div class="field"><label class="field-label">เบอร์โทร</label><input class="input mono" id="ct-phone" type="text" placeholder="08x-xxx-xxxx" value="'+esc(d.phone||'')+'"></div>'
+    +'<div class="field"><label class="field-label">ประเภทรถ</label><select class="select" id="ct-vtype">'+vtypeOptions(d.vtype)+'</select></div>'
+    +'</div>'
+    +'<div class="form-section"><div class="form-section-title">ประเภทการชำระเงิน</div>'
+    +'<div class="field"><label class="field-label">งวดที่ 1 <span class="req">*</span></label><div>'+billRadios('ct-bill1',d.bill1)+'</div></div>'
+    +'<div class="field" style="margin-bottom:0;"><label class="field-label">งวดที่ 2 <span class="req">*</span></label><div>'+billRadios('ct-bill2',d.bill2)+'</div></div>'
+    +'</div>'
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>'
+    +'<button class="btn btn-primary" onclick="ctConfirm()"><i data-lucide="check" class="w-4 h-4"></i><span>ยืนยันเช็คอิน</span></button></div>';
+  renderIcons();
+}
+
+function createNbm(o){
+  state.items.unshift({ id:'ci-'+(++_seq), documentId:nextNbmId(), checkInTime:nowStamp(), quota:o.quota, farmer:o.farmer, phone:o.phone||'-', vehiclePlate:o.plate, vehicleType:o.vtype||'อีแต๋น', driver:o.driver, weighToken:o.token, entryType:o.entryType, phaseA:'-', status:'รอทำจ่าย', bookingStatus:'', syncPending:false, bookingVersion:0, syncError:'' });
+}
+
+// ---- QR scan ----
+function qrGo(){ var e=document.getElementById('qr-code'); var code=e?String(e.value||'').trim():''; openModalBox('cbm',{documentId:code},560); }
+function renderQrModal(){
+  var d=state.modal.data;
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="qr-code" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">สแกน QR — CBM</h3><p class="modal-subtitle">สแกน QR Code หรือป้อนรหัส CBM</p></div>'+modalCloseBtn()+'</div>'
+    +'<div class="modal-body">'
+    +'<div style="border:2px dashed var(--c-line);border-radius:12px;padding:28px;text-align:center;margin-bottom:14px;background:var(--c-bg-off);">'
+    +'<div style="color:var(--c-mute-2);display:inline-flex;"><i data-lucide="scan-line" class="w-5 h-5"></i></div>'
+    +'<div style="font-size:12.5px;color:var(--c-mute-2);margin-top:8px;">เล็งกล้องไปที่ QR Code บนใบจอง</div></div>'
+    +'<div class="field" style="margin-bottom:0;"><label class="field-label">หรือป้อนรหัส CBM</label><div style="display:flex;gap:8px;"><input class="input mono" id="qr-code" type="text" placeholder="CBM-............." value="'+esc(d.code||'')+'"><button class="btn btn-primary" onclick="qrGo()"><i data-lucide="arrow-right" class="w-4 h-4"></i><span>ไป</span></button></div></div>'
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ปิด</button></div>';
+  renderIcons();
+}
+
+// ---- Void ----
+function voidConfirm(){ var d=state.modal.data; var it=findItem(d.id); if(it){ state.items=state.items.filter(function(x){ return x.id!==it.id; }); } closeModal(); state.view=null; unmountOverlay(); gotoTab('checked-in'); showToast('ยกเลิกเช็คอินสำเร็จ','success'); }
+function renderVoidModal(){
+  var d=state.modal.data; var it=findItem(d.id);
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon is-danger"><i data-lucide="x-circle" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">ยกเลิกเช็คอิน (Void)</h3><p class="modal-subtitle">ต้องการยกเลิกเช็คอินรายการนี้หรือไม่?'+(it?' · '+esc(it.documentId):'')+'</p></div>'+modalCloseBtn()+'</div>'
+    +'<div class="modal-body">'
+    +'<div class="field" style="margin-bottom:0;"><label class="field-label">เหตุผล (ไม่บังคับ)</label><textarea class="input" id="void-reason" placeholder="ระบุเหตุผลในการยกเลิก..."></textarea></div>'
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>'
+    +'<button class="btn btn-danger is-solid" onclick="voidConfirm()"><i data-lucide="check" class="w-4 h-4"></i><span>ยืนยัน</span></button></div>';
+  renderIcons();
+}
+
+// ESC chain
+window.addEventListener('keydown',function(e){ if(e.key!=='Escape')return; if(state.modal.open)closeModal(); else if(state.view)closeView(); });
+
+// INIT
+window.addEventListener('hashchange',function(){ render(); });
+var domReady=false,lucideReady=false;
+function bootIfReady(){ if(domReady&&lucideReady){ render(); renderIcons(); } }
+if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',function(){domReady=true;bootIfReady();}); else domReady=true;
+window.addEventListener('lucide:ready',function(){lucideReady=true;bootIfReady();});
+if(window.lucide&&typeof window.lucide.createIcons==='function')lucideReady=true;
+bootIfReady();
+setTimeout(function(){ if(!lucideReady){lucideReady=true;bootIfReady();} },5000);
+</script>
+</body></html>

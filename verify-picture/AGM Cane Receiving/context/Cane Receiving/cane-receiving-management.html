@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>การรับอ้อย (Receiving) · CUBE NATIVE</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+
+<style>
+/* ============== CSS VARIABLES (CUBE CI — Warm Light) ============== */
+:root {
+  --c-navy: #111111;
+  --c-navy-2: #111111;
+  --c-primary: #FF3B30;
+  --c-primary-hover: #E62E24;
+  --c-teal: #FF9A1F;
+  --c-teal-light: #FFB763;
+  --c-ink: #111111;
+  --c-mute: #54565C;
+  --c-mute-2: #73757B;
+  --c-mute-3: #9A9CA2;
+  --c-line: #DEDAD4;
+  --c-line-2: #E9E5E0;
+  --c-line-3: #F1EEEA;
+  --c-bg-off: #FAF8F5;
+  --c-success: #1F9D55;
+  --c-warning: #E8870F;
+  --c-danger: #E62E24;
+  --sidebar-w: 232px;
+  --shell-h: 52px;
+  --fs-h1: 22px; --fs-h2: 17px; --fs-h3: 15px; --fs-body: 14px;
+  --fs-sub: 13px; --fs-meta: 12px; --fs-cap: 11px; --fs-kpi: 28px;
+  --sp-xs: 4px; --sp-sm: 8px; --sp-md: 12px; --sp-lg: 20px; --sp-xl: 28px;
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-full: 999px;
+}
+
+/* ============== RESET ============== */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { scrollbar-gutter: stable; }
+
+/* ============== SCROLLBAR (Iron Rule #49) ============== */
+* { scrollbar-width: thin; scrollbar-color: rgba(17,17,17,.16) transparent; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(17,17,17,.14); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(17,17,17,.26); }
+.sidebar, .slide { scrollbar-color: rgba(255,255,255,.28) transparent; }
+.sidebar ::-webkit-scrollbar-thumb, .slide ::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb, .slide::-webkit-scrollbar-thumb { background: rgba(255,255,255,.28); }
+.sidebar ::-webkit-scrollbar-thumb:hover, .slide ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.42); }
+body {
+  font-family: 'Satoshi', 'Noto Sans Thai', system-ui, sans-serif;
+  background: var(--c-bg-off);
+  color: #2A2B2F;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-width: 1180px;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+[data-lucide] { flex-shrink: 0; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ============== SIDEBAR ============== */
+.sidebar {
+  position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w);
+  background: #111111; color: #E9E5E0; z-index: 20;
+  display: flex; flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.sb-brand { padding: 18px; display: flex; align-items: center; gap: 11px; border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
+.sb-logo {
+  width: 34px; height: 34px; background: linear-gradient(135deg, #FF3B30, #FF9A1F);
+  border-radius: 9px; display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; flex-shrink: 0; box-shadow: 0 4px 12px rgba(255,59,48,0.3);
+}
+.sb-name { font-weight: 700; font-size: 14px; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+.sb-sub { font-size: 10px; color: #9A9CA2; letter-spacing: 0.06em; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+.sb-nav { flex: 1; padding: 12px 8px; overflow-y: auto; }
+.sb-module { margin-bottom: 4px; }
+.sb-module-header {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 8px 10px; border-radius: 6px; background: transparent; border: 0;
+  color: #9A9CA2; font-family: inherit; font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 120ms; text-align: left;
+}
+.sb-module-header:hover { background: rgba(255,255,255,0.04); color: #DEDAD4; }
+.sb-module-header .mod-icon { flex-shrink: 0; opacity: 0.7; }
+.sb-module-header .mod-label { flex: 1; }
+.sb-module-header .mod-chevron { flex-shrink: 0; transition: transform 200ms; opacity: 0.7; }
+.sb-module[data-expanded="false"] .mod-chevron { transform: rotate(-90deg); }
+.sb-module[data-expanded="false"] .sb-features { display: none; }
+.sb-features { padding: 2px 0 6px 0; }
+.sb-item {
+  display: flex; align-items: center; gap: 10px; padding: 7px 12px 7px 14px;
+  border-radius: 6px; color: #DEDAD4; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 120ms; margin-bottom: 1px; position: relative; user-select: none;
+}
+.sb-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sb-item.is-active { background: #FF3B30; color: #fff; font-weight: 600; }
+.sb-item.is-active::before {
+  content: ''; position: absolute; left: -10px; top: 7px; bottom: 7px;
+  width: 3px; background: #fff; border-radius: 0 2px 2px 0;
+}
+.sb-item [data-lucide] { width: 16px; height: 16px; opacity: 0.85; }
+.sb-item.is-active [data-lucide] { opacity: 1; }
+.sb-item.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.sb-item.is-disabled:hover { background: transparent; color: #DEDAD4; }
+.sb-footer {
+  padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: #9A9CA2;
+}
+.pulse-dot { width: 7px; height: 7px; background: var(--c-teal); border-radius: 50%; box-shadow: 0 0 0 3px rgba(255,154,31,0.20); animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+/* ============== MAIN + SHELL BAR ============== */
+.main { margin-left: var(--sidebar-w); min-height: 100vh; background: var(--c-bg-off); }
+.shell-bar {
+  position: sticky; top: 0; background: #fff; border-bottom: 1px solid var(--c-line-2);
+  height: var(--shell-h); display: flex; align-items: center; padding: 0 22px; z-index: 19; gap: 12px;
+}
+.breadcrumb { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--c-mute); }
+.breadcrumb a { cursor: pointer; transition: color 120ms; }
+.breadcrumb a:hover { color: var(--c-primary); }
+.breadcrumb .sep { color: var(--c-mute-3); font-size: 10px; }
+.breadcrumb-current { color: var(--c-ink); font-weight: 500; }
+.icon-btn {
+  width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute); border-radius: 7px; position: relative; transition: all 120ms;
+}
+.icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.icon-btn [data-lucide] { width: 17px; height: 17px; }
+.notif-dot { position: absolute; top: 7px; right: 8px; width: 7px; height: 7px; background: var(--c-danger); border-radius: 50%; border: 2px solid #fff; }
+.user-chip { display: flex; align-items: center; gap: 9px; padding: 5px 10px 5px 12px; border-radius: 8px; cursor: pointer; transition: background 120ms; }
+.user-chip:hover { background: var(--c-line-3); }
+.user-text { line-height: 1.2; text-align: right; }
+.user-name { font-size: 12.5px; font-weight: 500; color: var(--c-ink); white-space: nowrap; }
+.user-role { font-size: 10.5px; color: var(--c-mute-2); white-space: nowrap; margin-top: 1px; }
+.avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-teal));
+  color: #fff; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; flex-shrink: 0;
+}
+.user-menu {
+  position: absolute; top: calc(var(--shell-h) - 4px); right: 22px; background: #fff;
+  border: 1px solid var(--c-line-2); border-radius: 10px; box-shadow: 0 12px 32px rgba(17,17,17,0.12);
+  width: 240px; z-index: 30; padding: 6px; display: none;
+}
+.user-menu.is-open { display: block; }
+.user-menu-item { display: flex; align-items: center; gap: 10px; padding: 8px 11px; border-radius: 6px; font-size: 13px; color: var(--c-ink); cursor: pointer; transition: background 120ms; }
+.user-menu-item:hover { background: var(--c-bg-off); }
+.user-menu-item [data-lucide] { width: 15px; height: 15px; color: var(--c-mute-2); }
+.user-menu-item.is-danger { color: var(--c-danger); }
+.user-menu-item.is-danger [data-lucide] { color: var(--c-danger); }
+.user-menu-divider { height: 1px; background: var(--c-line-2); margin: 5px 0; }
+
+/* ============== CONTENT (fluid — Iron Rule #30) ============== */
+.content { padding: 22px; }
+
+/* ============== PAGE HEADER ============== */
+.ph { margin-bottom: 18px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.ph > div:first-child { flex: 1 1 auto; min-width: 280px; }
+.ph-title-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px; }
+.ph-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 22px; font-weight: 700; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.ph-count { font-size: 12.5px; font-weight: 600; color: var(--c-mute-2); background: var(--c-line-3); padding: 3px 9px; border-radius: 999px; }
+.ph-sub { font-size: 13px; color: var(--c-mute); margin: 0; }
+.ph-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ============== BUTTONS (Iron Rule #36 — Thai optical center) ============== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px; padding: 2px 14px 0; border-radius: 8px; font-size: 13px; font-weight: 500;
+  border: 1px solid transparent; background: transparent; white-space: nowrap;
+  transition: all 120ms; user-select: none; cursor: pointer;
+}
+.btn [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; }
+.btn:disabled, .btn.is-disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+.btn-eq { min-width: 104px; }
+.btn-primary { background: var(--c-primary); color: #fff; }
+.btn-primary:hover { background: var(--c-primary-hover); box-shadow: 0 2px 8px rgba(255,59,48,0.30); }
+.btn-secondary { background: #fff; border-color: var(--c-line); color: var(--c-ink); }
+.btn-secondary:hover { background: var(--c-line-3); border-color: var(--c-mute-2); }
+.btn-ghost { color: var(--c-mute); }
+.btn-ghost:hover { background: var(--c-line-3); color: var(--c-ink); }
+.btn-danger { background: #fff; border-color: var(--c-line); color: var(--c-danger); }
+.btn-danger:hover { background: #FFE9E7; border-color: var(--c-danger); }
+.btn-danger.is-solid { background: var(--c-danger); border-color: var(--c-danger); color: #fff; }
+.btn-danger.is-solid:hover { background: #C81E15; }
+.btn-link { background: transparent; border: 0; padding: 0 4px; height: auto; color: var(--c-primary); font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn-sm { height: 30px; padding: 2px 11px 0; font-size: 12px; }
+
+/* ============== STATS ============== */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.stat { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; padding: 14px 16px; transition: all 150ms; }
+.stat:hover { border-color: var(--c-line); box-shadow: 0 2px 8px rgba(17,17,17,0.05); }
+.stat-label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--c-mute); }
+.stat-label [data-lucide] { width: 13px; height: 13px; color: var(--c-primary); }
+.stat-value { font-family: 'Noto Sans Thai', sans-serif; font-size: 26px; font-weight: 700; color: var(--c-navy); margin-top: 6px; letter-spacing: -0.01em; }
+.stat-meta { font-size: 11.5px; color: var(--c-mute-2); margin-top: 5px; display: flex; align-items: center; gap: 4px; }
+.stat-meta.is-warn { color: var(--c-warning); }
+.stat-meta [data-lucide] { width: 12px; height: 12px; }
+
+/* ============== CARD / FILTER ============== */
+.card { background: #fff; border: 1px solid var(--c-line-2); border-radius: 10px; overflow: hidden; }
+.filter-bar { padding: 14px 18px; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid var(--c-line-2); background: #fff; flex-wrap: wrap; }
+
+/* ============== INPUTS ============== */
+.input, .select {
+  height: 36px; padding: 0 12px; border: 1px solid var(--c-line); border-radius: 8px;
+  font-size: 13px; background: #fff; color: var(--c-ink); font-family: inherit; transition: all 120ms; width: 100%;
+}
+.input:focus, .select:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(255,59,48,0.10); }
+.input:disabled, .input[readonly] { background: var(--c-line-3); color: var(--c-mute-2); cursor: not-allowed; border-color: var(--c-line-2); }
+.select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat; background-position: right 10px center; padding-right: 32px; appearance: none;
+}
+.input-search { position: relative; flex: 1; max-width: 340px; }
+.input-search input { padding-left: 36px; }
+.input-search .lead-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--c-mute-2); pointer-events: none; }
+
+/* ===== SEARCH-SELECT (Iron Rule #34) ===== */
+.search-select { position: relative; width: 100%; }
+.search-select .ss-input { padding-left: 34px; padding-right: 34px; }
+.search-select .ss-lead { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--c-mute-3); pointer-events: none; }
+.search-select .ss-caret { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--c-mute-3); pointer-events: none; }
+.search-select .ss-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); display: inline-flex; padding: 3px; border: 0; background: transparent; color: var(--c-mute-2); cursor: pointer; border-radius: 6px; }
+.search-select .ss-clear:hover { background: var(--c-line-3); color: var(--c-ink); }
+.search-select.is-disabled .ss-input { background: var(--c-line-3); color: var(--c-mute-2); cursor: not-allowed; }
+.ss-list {
+  position: absolute; z-index: 70; left: 0; right: 0; margin-top: 4px; max-height: 280px; overflow-y: auto;
+  background: #fff; border: 1px solid var(--c-line); border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(17,17,17,0.10), 0 4px 10px rgba(17,17,17,0.05);
+}
+.ss-opt { width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 0; border-bottom: 1px solid var(--c-line-3); background: transparent; cursor: pointer; text-align: left; font-family: inherit; }
+.ss-opt:last-child { border-bottom: 0; }
+.ss-opt:hover, .ss-opt.is-active { background: rgba(255,59,48,0.06); }
+.ss-opt-ic { width: 16px; height: 16px; color: var(--c-primary); flex-shrink: 0; }
+.ss-opt-main { flex: 1; min-width: 0; }
+.ss-opt-label { display: block; font-size: 13px; color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-sub { display: block; font-size: 11.5px; color: var(--c-mute-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-opt-right { flex-shrink: 0; font-size: 12px; color: var(--c-mute); }
+.ss-opt mark { background: rgba(255,59,48,0.16); color: inherit; padding: 0 1px; border-radius: 2px; }
+.ss-empty { padding: 20px 14px; text-align: center; font-size: 13px; color: var(--c-mute-2); }
+
+/* ============== TABLE ============== */
+.table-scroll { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table thead { background: var(--c-bg-off); }
+.table th {
+  padding: 11px 14px; text-align: left; font-weight: 600; color: var(--c-mute);
+  font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--c-line-2); white-space: nowrap;
+}
+.table th.col-check { width: 40px; padding-right: 0; }
+.table td { padding: 13px 14px 11px; border-bottom: 1px solid var(--c-line-2); color: var(--c-ink); vertical-align: middle; }
+.table tbody tr { transition: background 120ms; }
+.table tbody tr:hover { background: var(--c-bg-off); }
+.table tbody tr.is-selected { background: rgba(255,59,48,0.04); }
+.table tbody tr.is-selected:hover { background: rgba(255,59,48,0.07); }
+.table tbody tr:last-child td { border-bottom: 0; }
+.table tbody tr.is-clickable { cursor: pointer; }
+.table-scroll.is-sticky { max-height: 560px; overflow-y: auto; scrollbar-gutter: stable; }
+.table-scroll.is-sticky thead th { position: sticky; top: 0; z-index: 3; background: var(--c-bg-off); box-shadow: inset 0 -1px 0 var(--c-line-2); }
+.cell-truncate { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+th.col-num, td.col-num { text-align: right; }
+.mono { font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+
+/* ============== CHECKBOX ============== */
+.cb {
+  width: 16px; height: 16px; border: 1.5px solid var(--c-line); border-radius: 4px; background: #fff;
+  cursor: pointer; display: inline-block; position: relative; transition: all 120ms; flex-shrink: 0;
+}
+.cb.is-checked, .cb.is-partial { background: var(--c-primary); border-color: var(--c-primary); }
+.cb.is-checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.cb.is-partial::after { content: ''; position: absolute; left: 3px; top: 6px; width: 8px; height: 2px; background: #fff; }
+.cb:hover { border-color: var(--c-primary); }
+.cb.is-disabled { opacity: 0.35; cursor: not-allowed; }
+.cb.is-disabled:hover { border-color: var(--c-line); }
+
+/* ============== PILLS ============== */
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px 3px; border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.pill [data-lucide] { width: 11px; height: 11px; }
+.pill-info    { background: #E6F0FF; color: #1A5FCC; }
+.pill-success { background: #E4F4EB; color: #157A41; }
+.pill-warning { background: #FFF1DD; color: #B8690B; }
+.pill-danger  { background: #FFE9E7; color: #E62E24; }
+.pill-muted   { background: var(--c-line-3); color: var(--c-mute-2); }
+.pill-outline { background: #fff; border: 1px solid var(--c-line); color: var(--c-mute); }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.8s linear infinite; }
+
+/* ============== FORM SECTION (Iron Rule #45) ============== */
+.form-section { margin-top: var(--sp-xl); }
+.form-section:first-child { margin-top: 0; }
+.form-section-title {
+  font-size: var(--fs-cap); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--c-mute);
+  padding-bottom: var(--sp-sm); border-bottom: 1px solid var(--c-line-2); margin-bottom: var(--sp-md);
+}
+.form-grp { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 16px; }
+
+/* ============== ROW ACTIONS ============== */
+.row-actions { display: inline-flex; gap: 2px; }
+.ra-btn {
+  width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; color: var(--c-mute-2); border-radius: 6px; transition: all 120ms;
+}
+.ra-btn:hover { background: var(--c-line-3); color: var(--c-primary); }
+.ra-btn.is-danger:hover { background: #FFE9E7; color: var(--c-danger); }
+.ra-btn [data-lucide] { width: 15px; height: 15px; }
+
+/* ============== TABLE FOOTER / BULK BAR ============== */
+.table-footer {
+  padding: 12px 18px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2);
+  display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: var(--c-mute); flex-wrap: wrap; gap: 10px;
+}
+.pagination { display: inline-flex; gap: 4px; align-items: center; }
+.pg-btn {
+  min-width: 30px; height: 30px; padding: 0 8px; display: inline-flex; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid var(--c-line-2); border-radius: 6px; color: var(--c-mute);
+  font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 120ms;
+}
+.pg-btn:hover { border-color: var(--c-line); background: var(--c-bg-off); }
+.pg-btn.is-active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.pg-btn.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn [data-lucide] { width: 13px; height: 13px; }
+.bulk-bar {
+  background: var(--c-navy); color: #fff; padding: 11px 18px; border-radius: 8px 8px 0 0;
+  display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--c-line-2); margin: -1px -1px 0; font-size: 13px;
+}
+.bulk-bar .btn { height: 30px; padding: 2px 11px 0; font-size: 12px; }
+.bulk-bar .btn-secondary { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.18); color: #fff; }
+.bulk-bar .btn-secondary:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.30); }
+
+/* ============== DRAWER v2 SHELL (Patterns B/C — locked) ============== */
+.overlay-wrap { position: fixed; inset: 0; z-index: 50; }
+.backdrop { position: absolute; inset: 0; background: rgba(17,17,17,0.40); }
+.drawer-panel {
+  position: absolute; top: 0; right: 0; bottom: 0; width: 920px; max-width: 96vw;
+  background: #fff; display: flex; flex-direction: column;
+  box-shadow: -16px 0 40px rgba(17,17,17,0.18);
+}
+.drawer-panel.standard { width: 680px; }
+.drawer-enter { transform: translateX(100%); }
+.drawer-active { transform: translateX(0); transition: transform 250ms ease-out; }
+.top-icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;
+  border: 0; background: transparent; border-radius: var(--r-sm); color: var(--c-mute-2);
+  cursor: pointer; transition: all 120ms; flex-shrink: 0;
+}
+.top-icon-btn:hover { background: var(--c-line-3); color: var(--c-ink); }
+.dw-head { padding: 18px 24px 16px; border-bottom: 1px solid var(--c-line-2); flex-shrink: 0; }
+.dw-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.dw-eyebrow { display: flex; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-mute-2); margin-bottom: 4px; font-weight: 600; }
+.dw-title { font-size: 20px; font-weight: 700; color: var(--c-navy); margin: 0; letter-spacing: -0.01em; }
+.dw-sub { font-size: var(--fs-meta); color: var(--c-mute-2); margin-top: 4px; }
+.dw-body { flex: 1; overflow-y: auto; padding: 22px 24px; scrollbar-gutter: stable; }
+.dw-footer {
+  padding: 14px 24px; border-top: 1px solid var(--c-line-2); background: var(--c-bg-off); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.dw-footer-right { display: flex; align-items: center; gap: 8px; }
+.dw-footer-meta { font-size: 12px; color: var(--c-mute-2); }
+.drawer-header-divider { width: 1px; height: 22px; background: var(--c-line-2); margin: 0 4px; flex-shrink: 0; }
+.dw-actions { display: flex; gap: 6px; align-items: center; }
+
+/* Tabs (view drawer) */
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--c-line-2); margin-top: 14px; }
+.tab {
+  display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px 7px;
+  font-size: 13px; font-weight: 500; color: var(--c-mute); background: transparent; border: 0;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; transition: all 120ms;
+}
+.tab [data-lucide] { width: 14px; height: 14px; }
+.tab:hover { color: var(--c-ink); }
+.tab.on { color: var(--c-primary); border-bottom-color: var(--c-primary); font-weight: 600; }
+
+/* View drawer detail grid */
+.dv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
+.dv-cell .dv-lbl { font-size: 11px; color: var(--c-mute-3); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-bottom: 3px; }
+.dv-cell .dv-val { font-size: 13.5px; font-weight: 600; color: var(--c-ink); word-break: break-word; }
+.dv-section { margin-bottom: 24px; }
+.dv-section-title { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; color: var(--c-navy); margin-bottom: 12px; }
+.dv-section-title [data-lucide] { width: 15px; height: 15px; color: var(--c-primary); }
+.dv-note { margin-top: 10px; padding: 10px 12px; background: #FFF1DD; border-radius: 8px; font-size: 12.5px; color: #B8690B; }
+
+/* Info banner (edit rejected — re-submit notice; warning ของ action จริง) */
+.note { padding: 11px 14px; border-radius: 8px; font-size: 12.5px; display: flex; gap: 9px; align-items: flex-start; }
+.note [data-lucide] { width: 15px; height: 15px; margin-top: 1px; }
+.note.is-info { background: #E6F0FF; color: #1A5FCC; }
+.note.is-warn { background: #FFF1DD; color: #B8690B; }
+
+/* ============== TIMELINE ============== */
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 4px; bottom: 4px; width: 2px; background: var(--c-line-2); }
+.tl-item { position: relative; margin-bottom: 16px; }
+.tl-item:last-child { margin-bottom: 0; }
+.tl-dot { position: absolute; left: -20px; top: 3px; width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 2px solid var(--c-primary); }
+.tl-dot.is-success { border-color: var(--c-success); }
+.tl-dot.is-warning { border-color: var(--c-warning); }
+.tl-dot.is-danger { border-color: var(--c-danger); }
+.tl-title { font-size: 13px; font-weight: 600; color: var(--c-ink); }
+.tl-meta { font-size: 11.5px; color: var(--c-mute-2); margin-top: 2px; }
+.tl-note { font-size: 12.5px; color: var(--c-mute); background: var(--c-bg-off); border: 1px solid var(--c-line-2); border-radius: 6px; padding: 7px 10px; margin-top: 6px; }
+
+/* ============== EMPTY STATE ============== */
+.empty { padding: 56px 24px; text-align: center; color: var(--c-mute); }
+.empty-icon { width: 52px; height: 52px; margin: 0 auto 14px; border-radius: 50%; background: var(--c-line-3); color: var(--c-mute-2); display: inline-flex; align-items: center; justify-content: center; }
+.empty-icon [data-lucide] { width: 22px; height: 22px; }
+.empty-title { font-size: 15.5px; font-weight: 600; color: var(--c-ink); margin-bottom: 5px; font-family: 'Noto Sans Thai', sans-serif; }
+.empty-desc { font-size: 13px; color: var(--c-mute); max-width: 320px; margin: 0 auto; }
+.empty .btn { margin-top: 16px; }
+.empty-actions { display: flex; gap: 8px; justify-content: center; }
+.empty-actions .btn { margin-top: 16px; }
+
+/* ============== MODAL ============== */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(17,17,17,0.50); z-index: 60; opacity: 0; pointer-events: none;
+  transition: opacity 200ms; display: flex; align-items: center; justify-content: center;
+}
+.modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: #fff; border-radius: 12px; width: 440px; max-width: 92vw; max-height: 90vh;
+  display: flex; flex-direction: column; transform: scale(0.96);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 24px 64px rgba(17,17,17,0.28); overflow: hidden;
+}
+.modal.is-lg { width: 680px; }
+.modal-backdrop.is-open .modal { transform: scale(1); }
+.modal-header { padding: 18px 22px 12px; display: flex; align-items: flex-start; gap: 12px; }
+.modal-header-icon {
+  width: 36px; height: 36px; border-radius: 8px; background: rgba(255,59,48,0.10); color: var(--c-primary);
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.modal-header-icon.is-danger { background: #FFE9E7; color: var(--c-danger); }
+.modal-header-icon.is-warning { background: #FFF1DD; color: var(--c-warning); }
+.modal-header-icon [data-lucide] { width: 18px; height: 18px; }
+.modal-title { font-family: 'Noto Sans Thai', sans-serif; font-size: 16px; font-weight: 600; color: var(--c-navy); margin: 0 0 4px; }
+.modal-subtitle { font-size: 13px; color: var(--c-mute); margin: 0; line-height: 1.5; }
+.modal-body { padding: 6px 22px 18px; font-size: 13px; color: var(--c-ink); overflow-y: auto; scrollbar-gutter: stable; }
+.modal-footer { padding: 12px 22px; background: var(--c-bg-off); border-top: 1px solid var(--c-line-2); display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Import summary chips */
+.imp-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.imp-chip { border-radius: 8px; padding: 12px; text-align: center; border: 1px solid var(--c-line-2); }
+.imp-chip .v { font-size: 22px; font-weight: 700; font-family: 'Noto Sans Thai', sans-serif; }
+.imp-chip .l { font-size: 11.5px; margin-top: 2px; font-weight: 600; }
+.imp-chip.is-total { background: var(--c-bg-off); color: var(--c-mute); }
+.imp-chip.is-ok { background: #E4F4EB; color: #157A41; border-color: #CBE9D8; }
+.imp-chip.is-bad { background: #FFE9E7; color: #E62E24; border-color: #F6D0CC; }
+.imp-errors { border: 1px solid var(--c-line-2); border-radius: 8px; max-height: 220px; overflow-y: auto; }
+.imp-err-row { display: flex; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--c-line-3); font-size: 12.5px; align-items: baseline; }
+.imp-err-row:last-child { border-bottom: 0; }
+.imp-err-row .r { flex-shrink: 0; font-weight: 700; color: var(--c-danger); min-width: 52px; }
+.imp-err-row .f { flex-shrink: 0; color: var(--c-mute); min-width: 90px; }
+.imp-err-row .m { color: var(--c-ink); }
+.imp-err-row .d { color: var(--c-mute-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+
+/* ============== FIELDS ============== */
+.field { margin-bottom: 14px; }
+.field-label { display: block; font-size: 12.5px; font-weight: 500; color: var(--c-mute); margin-bottom: 6px; }
+.field-label .req { color: var(--c-danger); margin-left: 2px; }
+.field-input { width: 100%; }
+.field-help { font-size: 11.5px; color: var(--c-mute-2); margin-top: 4px; }
+.field-error { font-size: 11.5px; color: var(--c-danger); margin-top: 4px; min-height: 15px; visibility: hidden; }
+.field.is-invalid .input, .field.is-invalid .select { border-color: var(--c-danger); }
+.field.is-invalid .field-error { visibility: visible; }
+textarea.input { height: auto; min-height: 74px; padding: 9px 12px; resize: vertical; line-height: 1.55; }
+
+/* ============== TOAST ============== */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; background: var(--c-navy); color: #fff;
+  padding: 13px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; z-index: 80;
+  display: flex; align-items: center; gap: 10px; box-shadow: 0 12px 32px rgba(17,17,17,0.30);
+  transform: translateY(100px); opacity: 0; transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1); max-width: 380px;
+}
+.toast.is-visible { transform: translateY(0); opacity: 1; }
+.toast.is-success { background: var(--c-success); }
+.toast.is-info { background: var(--c-primary); }
+.toast.is-warning { background: var(--c-warning); }
+.toast.is-error { background: var(--c-danger); }
+.toast [data-lucide] { width: 17px; height: 17px; }
+
+/* ============== UTILITIES ============== */
+.hidden { display: none !important; }
+.text-mute { color: var(--c-mute); }
+.text-mute-2 { color: var(--c-mute-2); }
+.text-primary { color: var(--c-primary); }
+.text-danger { color: var(--c-danger); }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.w-2\.5 { width: 10px; }   .h-2\.5 { height: 10px; }
+.w-3   { width: 12px; }    .h-3   { height: 12px; }
+.w-3\.5 { width: 14px; }   .h-3\.5 { height: 14px; }
+.w-4   { width: 16px; }    .h-4   { height: 16px; }
+.w-5   { width: 20px; }    .h-5   { height: 20px; }
+svg.lucide { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; flex-shrink: 0; }
+svg.lucide.w-2\.5 { width: 10px; }   svg.lucide.h-2\.5 { height: 10px; }
+svg.lucide.w-3    { width: 12px; }   svg.lucide.h-3    { height: 12px; }
+svg.lucide.w-3\.5 { width: 14px; }   svg.lucide.h-3\.5 { height: 14px; }
+svg.lucide.w-4    { width: 16px; }   svg.lucide.h-4    { height: 16px; }
+svg.lucide.w-5    { width: 20px; }   svg.lucide.h-5    { height: 20px; }
+</style>
+</head><body>
+
+<!-- ===== SIDEBAR (Pattern N) ===== -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i data-lucide="box" class="w-4 h-4"></i></div>
+    <div><div class="sb-name">CUBE NATIVE</div><div class="sb-sub">AGM · WKN</div></div>
+  </div>
+  <nav class="sb-nav" id="sb-nav">
+    <div class="sb-module" data-module="agm" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sprout" class="mod-icon w-3.5 h-3.5"></i>
+        <span class="mod-label">เกษตรกรรม</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features">
+        <a class="sb-item is-disabled" data-feature="farmer-members"><i data-lucide="users" class="w-4 h-4"></i><span>จัดการสมาชิกเกษตรกร</span></a>
+        <a class="sb-item is-disabled" data-feature="quota"><i data-lucide="scale" class="w-4 h-4"></i><span>จัดการโควตา</span></a>
+        <a class="sb-item is-disabled" data-feature="plots"><i data-lucide="map" class="w-4 h-4"></i><span>จัดการแปลงที่ดิน</span></a>
+        <a class="sb-item is-disabled" data-feature="crops"><i data-lucide="wheat" class="w-4 h-4"></i><span>จัดการรอบปลูก</span></a>
+        <a class="sb-item is-disabled" data-feature="cane-contract"><i data-lucide="file-signature" class="w-4 h-4"></i><span>จัดการสัญญาส่งอ้อย</span></a>
+        <a class="sb-item is-disabled" data-feature="surveys"><i data-lucide="clipboard-list" class="w-4 h-4"></i><span>จัดการแบบสำรวจ</span></a>
+        <a class="sb-item is-disabled" data-feature="cane-bookings"><i data-lucide="calendar-clock" class="w-4 h-4"></i><span>จัดการจองรอบส่งอ้อย</span></a>
+        <a class="sb-item is-disabled" data-feature="debtors"><i data-lucide="wallet" class="w-4 h-4"></i><span>จัดการหนี้ลูกหนี้</span></a>
+        <a class="sb-item is-disabled" data-feature="areas"><i data-lucide="shield-check" class="w-4 h-4"></i><span>พื้นที่และการกำหนดสิทธิ์</span></a>
+        <a class="sb-item is-disabled" data-feature="checkin"><i data-lucide="log-in" class="w-4 h-4"></i><span>เช็คอินรับอ้อย</span></a>
+        <a class="sb-item is-active" data-feature="receiving"><i data-lucide="scale" class="w-4 h-4"></i><span>การรับอ้อย</span></a>
+      </div>
+    </div>
+    <div class="sb-module" data-module="system" data-expanded="true">
+      <button class="sb-module-header" type="button" onclick="toggleModule(this)">
+        <i data-lucide="sliders-horizontal" class="mod-icon w-3.5 h-3.5"></i><span class="mod-label">System</span>
+        <i data-lucide="chevron-down" class="mod-chevron w-3 h-3"></i>
+      </button>
+      <div class="sb-features"><a class="sb-item is-disabled" data-feature="settings"><i data-lucide="settings" class="w-4 h-4"></i><span>Settings</span></a></div>
+    </div>
+  </nav>
+  <div class="sb-footer"><div class="pulse-dot"></div><span>WKN Prototype · v1.0.0</span></div>
+</aside>
+
+<main class="main">
+  <header class="shell-bar">
+    <nav class="breadcrumb">
+      <a data-breadcrumb-module="agm">เกษตรกรรม</a>
+      <i data-lucide="chevron-right" class="w-3 h-3 sep"></i>
+      <a>หน้างานโรงงาน</a>
+      <i data-lucide="chevron-right" class="w-3 h-3 sep"></i>
+      <span class="breadcrumb-current">การรับอ้อย</span>
+    </nav>
+    <div style="display:flex; align-items:center; gap:6px; margin-left:auto;">
+      <div style="position:relative;"><button class="icon-btn" id="notifBtn"><i data-lucide="bell" class="w-4 h-4"></i><span class="notif-dot"></span></button></div>
+      <div style="position:relative;">
+        <div class="user-chip" onclick="toggleUserMenu()">
+          <div class="user-text"><div class="user-name">สมพร วงศ์ทะเบียน</div><div class="user-role">เจ้าหน้าที่รับอ้อย · WKN</div></div>
+          <div class="avatar">สว</div>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-item"><i data-lucide="user" class="w-3.5 h-3.5"></i><span>My Profile</span></div>
+          <div class="user-menu-item"><i data-lucide="settings" class="w-3.5 h-3.5"></i><span>Preferences</span></div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-item is-danger"><i data-lucide="log-out" class="w-3.5 h-3.5"></i><span>Sign out</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="content" id="page-content"></div>
+</main>
+
+<div id="overlay-root"></div>
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"><div class="modal" id="modalBox" onclick="event.stopPropagation()"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function loadLucide(){var v='0.469.0';var cdns=['https://unpkg.com/lucide@'+v+'/dist/umd/lucide.min.js','https://cdn.jsdelivr.net/npm/lucide@'+v+'/dist/umd/lucide.min.js','https://cdnjs.cloudflare.com/ajax/libs/lucide/'+v+'/lucide.min.js'];var i=0;function n(){if(i>=cdns.length){window.lucide=window.lucide||{createIcons:function(){}};window.dispatchEvent(new Event('lucide:ready'));return;}var s=document.createElement('script');s.src=cdns[i++];s.onload=function(){window.dispatchEvent(new Event('lucide:ready'));};s.onerror=n;document.head.appendChild(s);}n();})();
+</script>
+
+<script>
+// ============================================
+// USER (F-AGM-011 · Cane Receiving · WKN)
+// ============================================
+var CURRENT_ROLE = 'เจ้าหน้าที่รับอ้อย';
+var canWrite = true;
+const CURRENT_USER = { id:'u-wkn-01', name:'สมพร วงศ์ทะเบียน', role:CURRENT_ROLE };
+
+// ---- Thai label maps + badge tones ----
+const STATUS_LABEL = { 'Draft':'รอผลเท', 'Issued':'เทแล้ว', 'Void':'ยกเลิก' };
+const STATUS_TONE  = { 'Draft':'pill-muted', 'Issued':'pill-success', 'Void':'pill-danger' };
+const ENTRY_TONE   = { 'จองคิว':'pill-info', 'ไม่จองคิว':'pill-muted', 'โควต้ากลาง':'pill-warning' };
+const TAB_TITLE    = { 'draft':'รอผลเท', 'issued':'เทแล้ว', 'void':'ยกเลิก' };
+const TAB_STATUS   = { 'draft':'Draft', 'issued':'Issued', 'void':'Void' };
+
+// ---- Cane type master (subset, for display) ----
+const CANE_TYPES = { '01':'อ้อยโรงงาน', '03':'อ้อยไฟไหม้', '05':'อ้อยสด (Fresh Cane)' };
+
+// ============================================
+// SEED — ReceivingItem
+// ============================================
+var _seq = 0;
+const state = {
+  items: [
+    // ---- รอผลเท (Draft) : checked-in, not-yet-received ----
+    { id:'CHK-0001', receiving_id:null, checkInTime:'08:15 21/07/26', dateKey:'2026-07-21', cbmNbmCode:'CBM-2568-0101', sourceType:'CBM', entryType:'จองคิว', coinNumber:'10501', licensePlate:'80-1234', driverName:'สมชาย ใจดี', driverPhone:'081-111-1111', farmerName:'นายสมชาย ใจดี', quotaId:'Q10001', dumpResultSource:'-', status:'Draft', caneTypeCode:'-', caneTypeName:'-', timeIn:'-', timeOut:'-', grossWeightKg:null, tareWeightKg:null, netWeightKg:null, manualReason:'', paymentStatus:'-', coinReturned:false, pdfUrl:'', issuedAt:'', issuedBy:'', voidedAt:'', voidedBy:'', voidReason:'' },
+    { id:'CHK-0002', receiving_id:null, checkInTime:'08:40 21/07/26', dateKey:'2026-07-21', cbmNbmCode:'NBM-2568-0102', sourceType:'NBM', entryType:'ไม่จองคิว', coinNumber:'10502', licensePlate:'81-2345', driverName:'เอก มั่นคง', driverPhone:'082-222-2222', farmerName:'นายเอก มั่นคง', quotaId:'Q10002', dumpResultSource:'-', status:'Draft', caneTypeCode:'-', caneTypeName:'-', timeIn:'-', timeOut:'-', grossWeightKg:null, tareWeightKg:null, netWeightKg:null, manualReason:'', paymentStatus:'-', coinReturned:false, pdfUrl:'', issuedAt:'', issuedBy:'', voidedAt:'', voidedBy:'', voidReason:'' },
+    { id:'CHK-0003', receiving_id:null, checkInTime:'09:05 21/07/26', dateKey:'2026-07-21', cbmNbmCode:'NBM-2568-0103', sourceType:'CENTRAL', entryType:'โควต้ากลาง', coinNumber:'10503', licensePlate:'82-3456', driverName:'มานะ ขยัน', driverPhone:'083-333-3333', farmerName:'นายมานะ ขยัน', quotaId:'-', dumpResultSource:'-', status:'Draft', caneTypeCode:'-', caneTypeName:'-', timeIn:'-', timeOut:'-', grossWeightKg:null, tareWeightKg:null, netWeightKg:null, manualReason:'', paymentStatus:'-', coinReturned:false, pdfUrl:'', issuedAt:'', issuedBy:'', voidedAt:'', voidedBy:'', voidReason:'' },
+    { id:'CHK-0004', receiving_id:null, checkInTime:'09:30 21/07/26', dateKey:'2026-07-21', cbmNbmCode:'CBM-2568-0104', sourceType:'CBM', entryType:'จองคิว', coinNumber:'10504', licensePlate:'83-4567', driverName:'สมหญิง รักดี', driverPhone:'084-444-4444', farmerName:'นางสมหญิง รักดี', quotaId:'Q10004', dumpResultSource:'-', status:'Draft', caneTypeCode:'-', caneTypeName:'-', timeIn:'-', timeOut:'-', grossWeightKg:null, tareWeightKg:null, netWeightKg:null, manualReason:'', paymentStatus:'-', coinReturned:false, pdfUrl:'', issuedAt:'', issuedBy:'', voidedAt:'', voidedBy:'', voidReason:'' },
+    // ---- เทแล้ว (Issued) : full dump v2, auto ----
+    { id:'CHK-0005', receiving_id:'CRN-2568-00001', checkInTime:'07:20 21/07/26', dateKey:'2026-07-21', cbmNbmCode:'CBM-2568-0090', sourceType:'CBM', entryType:'จองคิว', coinNumber:'10490', licensePlate:'86-1111', driverName:'ประสิทธิ์ ทองมา', driverPhone:'085-555-5555', farmerName:'นายประสิทธิ์ ทองมา', quotaId:'Q10010', dumpResultSource:'auto', status:'Issued', caneTypeCode:'05', caneTypeName:CANE_TYPES['05'], timeIn:'07:30', timeOut:'07:48', grossWeightKg:30000, tareWeightKg:10000, netWeightKg:20000, manualReason:'', paymentStatus:'รอทำจ่าย', coinReturned:true, pdfUrl:'/pdf/CRN-2568-00001.pdf', issuedAt:'07:50 21/07/26', issuedBy:'สมพร วงศ์ทะเบียน', voidedAt:'', voidedBy:'', voidReason:'' },
+    { id:'CHK-0006', receiving_id:'CRN-2568-00002', checkInTime:'07:45 21/07/26', dateKey:'2026-07-21', cbmNbmCode:'CBM-2568-0091', sourceType:'CBM', entryType:'จองคิว', coinNumber:'10491', licensePlate:'87-2222', driverName:'วิรัตน์ สีทอง', driverPhone:'086-666-6666', farmerName:'นายวิรัตน์ สีทอง', quotaId:'Q10011', dumpResultSource:'auto', status:'Issued', caneTypeCode:'01', caneTypeName:CANE_TYPES['01'], timeIn:'07:55', timeOut:'08:12', grossWeightKg:42000, tareWeightKg:14000, netWeightKg:28000, manualReason:'', paymentStatus:'ชำระเงินแล้ว', coinReturned:true, pdfUrl:'/pdf/CRN-2568-00002.pdf', issuedAt:'08:15 21/07/26', issuedBy:'สมพร วงศ์ทะเบียน', voidedAt:'', voidedBy:'', voidReason:'' },
+    { id:'CHK-0007', receiving_id:'CRN-2568-00003', checkInTime:'08:10 21/07/26', dateKey:'2026-07-21', cbmNbmCode:'NBM-2568-0092', sourceType:'NBM', entryType:'ไม่จองคิว', coinNumber:'10492', licensePlate:'88-3333', driverName:'สายชล ทุ่งกว้าง', driverPhone:'086-345-6789', farmerName:'นายสายชล ทุ่งกว้าง', quotaId:'Q10012', dumpResultSource:'auto', status:'Issued', caneTypeCode:'03', caneTypeName:CANE_TYPES['03'], timeIn:'08:20', timeOut:'08:35', grossWeightKg:25000, tareWeightKg:8000, netWeightKg:17000, manualReason:'', paymentStatus:'รอทำจ่าย', coinReturned:true, pdfUrl:'/pdf/CRN-2568-00003.pdf', issuedAt:'08:38 21/07/26', issuedBy:'สมพร วงศ์ทะเบียน', voidedAt:'', voidedBy:'', voidReason:'' },
+    // ---- ยกเลิก (Void) ----
+    { id:'CHK-0008', receiving_id:null, checkInTime:'06:50 21/07/26', dateKey:'2026-07-21', cbmNbmCode:'CBM-2568-0080', sourceType:'CBM', entryType:'จองคิว', coinNumber:'10480', licensePlate:'89-9999', driverName:'ทดสอบ ยกเลิก', driverPhone:'087-777-7777', farmerName:'นายทดสอบ ยกเลิก', quotaId:'Q10020', dumpResultSource:'-', status:'Void', caneTypeCode:'-', caneTypeName:'-', timeIn:'-', timeOut:'-', grossWeightKg:null, tareWeightKg:null, netWeightKg:null, manualReason:'', paymentStatus:'-', coinReturned:false, pdfUrl:'', issuedAt:'', issuedBy:'', voidedAt:'07:05 21/07/26', voidedBy:'สมพร วงศ์ทะเบียน', voidReason:'ข้อมูลน้ำหนักไม่ถูกต้อง ต้องชั่งใหม่' }
+  ],
+  tab:'draft',
+  filters:{ search:'', status:'all', entry:'all', date:'' },
+  pagination:{ page:1, pageSize:25 },
+  selectedIds: new Set(),
+  modal:{ open:false, type:null, data:null },
+  form:null,
+  view:null,
+  syncResult:null
+};
+_seq = state.items.length;
+
+// ============================================
+// HELPERS
+// ============================================
+function renderIcons(){ if(window.lucide&&typeof window.lucide.createIcons==='function') window.lucide.createIcons(); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showToast(msg,variant,ms,desc){ variant=variant||'info'; ms=ms||3200; var el=document.getElementById('toast'); var im={success:'check-circle-2',info:'info',warning:'alert-triangle',error:'x-circle'}; el.className='toast is-'+variant; el.innerHTML='<i data-lucide="'+(im[variant]||'info')+'" class="w-4 h-4"></i><span>'+esc(msg)+(desc?'<br><span style="opacity:.85;font-weight:400;font-size:12px;">'+esc(desc)+'</span>':'')+'</span>'; renderIcons(); requestAnimationFrame(()=>el.classList.add('is-visible')); clearTimeout(showToast._t); showToast._t=setTimeout(()=>el.classList.remove('is-visible'),ms); }
+function toggleModule(h){ var m=h.closest('.sb-module'); if(!m)return; var e=m.getAttribute('data-expanded')!=='false'; m.setAttribute('data-expanded',e?'false':'true'); }
+function toggleUserMenu(){ document.getElementById('userMenu').classList.toggle('is-open'); }
+document.addEventListener('click',function(e){ if(!e.target.closest('.user-chip')&&!e.target.closest('.user-menu')){ var um=document.getElementById('userMenu'); if(um)um.classList.remove('is-open'); } });
+
+function nowStamp(){ var d=new Date(); var p=function(n){return String(n).padStart(2,'0');}; return p(d.getHours())+':'+p(d.getMinutes())+' '+p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+p(d.getFullYear()%100); }
+function findItem(id){ return state.items.find(function(x){ return x.id===id; }); }
+function nextCrn(){ var mx=0; state.items.forEach(function(it){ if(it.receiving_id){ var n=parseInt(String(it.receiving_id).slice(-5),10); if(!isNaN(n)&&n>mx)mx=n; } }); return 'CRN-2568-'+String(mx+1).padStart(5,'0'); }
+function fmtNum(n){ if(n==null||n==='') return '-'; return Number(n).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtKg(n){ if(n==null||n==='') return '-'; return fmtNum(n)+' กก.'; }
+
+// ---- pill / badge builders ----
+function statusPill(s){ return '<span class="pill '+(STATUS_TONE[s]||'pill-muted')+'">'+esc(STATUS_LABEL[s]||s)+'</span>'; }
+function entryBadge(t){ return '<span class="pill '+(ENTRY_TONE[t]||'pill-muted')+'">'+esc(t)+'</span>'; }
+function dvCell(l,v){ return '<div class="dv-cell"><div class="dv-lbl">'+esc(l)+'</div><div class="dv-val">'+v+'</div></div>'; }
+
+// ============================================
+// ROUTER
+// ============================================
+function getRoute(){ var h=location.hash; if(!h||h==='#'||h==='#/')return 'receivings'; return h.replace(/^#\//,''); }
+function navigate(r){ location.hash='#/'+r; }
+function tabRoute(tab){ return tab==='issued'?'receivings/issued':tab==='void'?'receivings/void':'receivings'; }
+function gotoTab(tab){ state.tab=tab; state.pagination.page=1; state.selectedIds.clear(); if(location.hash!=='#/'+tabRoute(tab)){ location.hash='#/'+tabRoute(tab); } render(); }
+
+// ============================================
+// FILTER / PAGE
+// ============================================
+function tabItems(tab){ var s=TAB_STATUS[tab]; return state.items.filter(function(i){ return i.status===s; }); }
+function getFiltered(){
+  var arr=tabItems(state.tab);
+  if(state.filters.status!=='all') arr=arr.filter(i=>i.status===state.filters.status);
+  if(state.filters.entry!=='all') arr=arr.filter(i=>i.entryType===state.filters.entry);
+  if(state.filters.date) arr=arr.filter(i=>i.dateKey===state.filters.date);
+  if(state.filters.search){
+    var q=state.filters.search.toLowerCase().trim();
+    arr=arr.filter(function(i){ return [i.coinNumber,i.id,i.receiving_id,i.cbmNbmCode,i.licensePlate,i.farmerName,i.driverName,i.quotaId].some(function(v){ return String(v||'').toLowerCase().includes(q); }); });
+  }
+  return arr;
+}
+function getPaged(){ var all=getFiltered(); var pg=state.pagination.page,ps=state.pagination.pageSize; var s=(pg-1)*ps; return {records:all.slice(s,s+ps),total:all.length,page:pg,totalPages:Math.max(1,Math.ceil(all.length/ps)),start:all.length===0?0:s+1,end:Math.min(s+ps,all.length)}; }
+function toggleSelect(id){ if(state.selectedIds.has(id))state.selectedIds.delete(id); else state.selectedIds.add(id); render(); }
+function toggleSelectAll(){ var sel=getPaged().records; var all=sel.length>0&&sel.every(d=>state.selectedIds.has(d.id)); if(all)sel.forEach(d=>state.selectedIds.delete(d.id)); else sel.forEach(d=>state.selectedIds.add(d.id)); render(); }
+function goToPage(n){ var tp=getPaged().totalPages; if(n<1||n>tp)return; state.pagination.page=n; render(); }
+function resetFilters(){ state.filters={search:'',status:'all',entry:'all',date:''}; state.pagination.page=1; state.selectedIds.clear(); render(); }
+var _st=null; function onSearchInput(v){ clearTimeout(_st); _st=setTimeout(function(){ state.filters.search=v; state.pagination.page=1; render(); },300); }
+function setFilter(k,v){ state.filters[k]=v; state.pagination.page=1; render(); }
+
+// RENDER PRESERVATION
+function preserveState(){ var a=document.activeElement; var isI=a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'); return { pageScroll:window.scrollY, focusKey:isI?{id:a.id||'',placeholder:a.placeholder||'',selStart:a.selectionStart,selEnd:a.selectionEnd}:null }; }
+function restoreState(s){ if(!s)return; requestAnimationFrame(function(){ if(s.pageScroll>0)window.scrollTo(0,s.pageScroll); if(s.focusKey){ var c=s.focusKey.id?document.getElementById(s.focusKey.id):null; if(!c){var cs=document.querySelectorAll('input,textarea'); for(var i=0;i<cs.length;i++){ if((cs[i].placeholder||'')===s.focusKey.placeholder){c=cs[i];break;} }} if(c){ c.focus(); if(s.focusKey.selStart!=null&&c.setSelectionRange){ try{c.setSelectionRange(s.focusKey.selStart,s.focusKey.selEnd);}catch(e){} } } } }); }
+
+function emptyStateHTML(cfg){ cfg=cfg||{}; var acts=''; if(cfg.actions){ acts='<div class="empty-actions">'+cfg.actions.map(function(a){ return '<button class="btn '+(a.cls||'btn-primary')+'" onclick="'+a.onAction+'">'+(a.icon?'<i data-lucide="'+a.icon+'" class="w-4 h-4"></i>':'')+'<span>'+a.label+'</span></button>'; }).join('')+'</div>'; } return '<div class="empty"><div class="empty-icon"><i data-lucide="'+(cfg.icon||'inbox')+'" class="w-5 h-5"></i></div><div class="empty-title">'+(cfg.title||'ยังไม่มีข้อมูล')+'</div><div class="empty-desc">'+(cfg.desc||'')+'</div>'+acts+'</div>'; }
+
+// ============================================
+// TOP TAB BAR (page-level: รอผลเท | เทแล้ว | ยกเลิก)
+// ============================================
+function topTabBar(){
+  var t=state.tab;
+  var dc=tabItems('draft').length, ic=tabItems('issued').length, vc=tabItems('void').length;
+  return '<div class="tabs" style="margin-top:0;margin-bottom:20px;">'
+    +'<button class="tab '+(t==='draft'?'on':'')+'" onclick="gotoTab(\'draft\')"><i data-lucide="clock" class="w-3.5 h-3.5"></i><span>รอผลเท</span> <span class="ph-count" style="padding:1px 7px;">'+dc+'</span></button>'
+    +'<button class="tab '+(t==='issued'?'on':'')+'" onclick="gotoTab(\'issued\')"><i data-lucide="check-check" class="w-3.5 h-3.5"></i><span>เทแล้ว</span> <span class="ph-count" style="padding:1px 7px;">'+ic+'</span></button>'
+    +'<button class="tab '+(t==='void'?'on':'')+'" onclick="gotoTab(\'void\')"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i><span>ยกเลิก</span> <span class="ph-count" style="padding:1px 7px;">'+vc+'</span></button>'
+    +'</div>';
+}
+
+// ============================================
+// PAGE RENDER (dispatch)
+// ============================================
+function render(){
+  if(state.form) return;
+  var snap=preserveState();
+  var route=getRoute(); var parts=route.split('/');
+  if(parts[0]!=='receivings'){ navigate('receivings'); return; }
+  var seg=parts[1]; var detailId=null;
+  if(seg==='issued'){ state.tab='issued'; }
+  else if(seg==='void'){ state.tab='void'; }
+  else if(seg){ detailId=seg; }
+  else { state.tab='draft'; }
+  renderListPage();
+  renderIcons(); restoreState(snap);
+
+  if(detailId){
+    var it=findItem(detailId);
+    if(it){ if(!state.view||state.view.id!==it.id){ state.view={id:it.id}; mountViewDrawer(); } }
+    else { showToast('ไม่พบรายการ','error'); state.view=null; unmountOverlay(); navigate(tabRoute(state.tab)); }
+  } else if(state.view){ state.view=null; unmountOverlay(); }
+}
+
+// ============================================
+// LIST — BACKEND: API-01 receiving-list
+// ============================================
+function renderListPage(){
+  var isDraft=state.tab==='draft';
+  var isIssued=state.tab==='issued';
+  var pg=getPaged();
+  var draftCount=state.items.filter(i=>i.status==='Draft').length;
+  var issuedCount=state.items.filter(i=>i.status==='Issued').length;
+  var voidCount=state.items.filter(i=>i.status==='Void').length;
+  var netToday=state.items.filter(i=>i.status==='Issued').reduce(function(a,i){ return a+(i.netWeightKg||0); },0);
+
+  var rows=pg.records.map(function(it){
+    if(isDraft){
+      var codeCell='<td><span class="mono text-primary" style="font-weight:600;cursor:pointer;" onclick="event.stopPropagation();openView(\''+it.id+'\')">'+esc(it.quotaId)+'</span><div style="font-size:11px;color:var(--c-mute-2);">'+esc(it.cbmNbmCode)+'</div></td>';
+      var draftActions='<td onclick="event.stopPropagation()" style="text-align:right;width:190px;"><div style="display:inline-flex;gap:4px;align-items:center;justify-content:flex-end;">'
+        +'<button class="btn btn-sm btn-primary" onclick="openForm(\'issue\',{id:\''+it.id+'\'})"><i data-lucide="file-check-2" class="w-3.5 h-3.5"></i><span>ออกใบรับอ้อย</span></button>'
+        +'<button class="ra-btn" onclick="openView(\''+it.id+'\')" title="รายละเอียด"><i data-lucide="eye" class="w-4 h-4"></i></button>'
+        +'</div></td>';
+      return '<tr class="is-clickable" onclick="openView(\''+it.id+'\')">'
+        +codeCell
+        +'<td class="mono">'+esc(it.coinNumber||'-')+'</td>'
+        +'<td class="mono">'+esc(it.checkInTime||'-')+'</td>'
+        +'<td><div style="font-weight:600;">'+esc(it.farmerName)+'</div></td>'
+        +'<td class="mono">'+esc(it.driverPhone||'-')+'</td>'
+        +'<td class="mono">'+esc(it.licensePlate)+'</td>'
+        +'<td>'+esc(it.driverName)+'</td>'
+        +'<td>'+entryBadge(it.entryType)+'</td>'
+        +draftActions+'</tr>';
+    }
+    var idCode=it.receiving_id||it.id;
+    var idCell='<td><span class="mono text-primary" style="font-weight:600;cursor:pointer;" onclick="event.stopPropagation();openView(\''+it.id+'\')">'+esc(idCode)+'</span><div style="font-size:11px;color:var(--c-mute-2);">'+esc(it.quotaId)+'</div></td>';
+    var actions='<td onclick="event.stopPropagation()" style="text-align:right;width:130px;"><div class="row-actions">'
+      +'<button class="ra-btn" onclick="openView(\''+it.id+'\')" title="รายละเอียด"><i data-lucide="eye" class="w-4 h-4"></i></button>'
+      +'<button class="ra-btn" onclick="openPdf(\''+it.id+'\')" title="พิมพ์"><i data-lucide="printer" class="w-4 h-4"></i></button>'
+      +(isIssued?'<button class="ra-btn is-danger" onclick="openModalBox(\'void\',{id:\''+it.id+'\'},460)" title="Void"><i data-lucide="x-circle" class="w-4 h-4"></i></button>':'')
+      +'</div></td>';
+    return '<tr class="is-clickable" onclick="openView(\''+it.id+'\')">'
+      +idCell
+      +'<td class="mono">'+esc(it.coinNumber||'-')+'</td>'
+      +'<td class="mono">'+esc(it.checkInTime||'-')+'</td>'
+      +'<td><div style="font-weight:600;">'+esc(it.farmerName)+'</div></td>'
+      +'<td class="mono">'+esc(it.licensePlate)+'</td>'
+      +'<td class="mono">'+fmtKg(it.netWeightKg)+'</td>'
+      +'<td>'+esc(it.caneTypeName||'-')+'</td>'
+      +'<td>'+statusPill(it.status)+'</td>'
+      +actions+'</tr>';
+  }).join('');
+
+  var noData=tabItems(state.tab).length===0; var emptyBlock='';
+  if(pg.records.length===0){
+    emptyBlock=noData
+      ? emptyStateHTML({icon:'inbox',title:'ไม่มีรายการ',desc:'ยังไม่มีรายการในแท็บ '+esc(TAB_TITLE[state.tab])})
+      : emptyStateHTML({icon:'search-x',title:'ไม่พบรายการที่ค้นหา',desc:'ลองปรับคำค้นหรือล้างตัวกรอง',actions:[{label:'ล้าง',icon:'rotate-ccw',cls:'btn-ghost',onAction:'resetFilters()'}]});
+  }
+  var pageNums=[]; for(var n=1;n<=pg.totalPages;n++)pageNums.push(n);
+
+  var headCells=isDraft
+    ? '<th>รหัสเกษตรกร</th><th>เลขเหรียญชั่ง</th><th>วัน/เวลาเข้า</th><th>ผู้ขนส่ง</th><th>เบอร์โทร</th><th>ทะเบียนรถ</th><th>ชื่อคนขับ</th><th>ประเภทเข้า</th><th style="text-align:right;">การกระทำ</th>'
+    : '<th>เลขที่ใบรับ</th><th>เลขเหรียญชั่ง</th><th>วัน/เวลาเข้า</th><th>ผู้ขนส่ง</th><th>ทะเบียนรถ</th><th>น้ำหนักสุทธิ</th><th>ประเภทการเทอ้อย</th><th>สถานะ</th><th style="text-align:right;">การกระทำ</th>';
+
+  var syncBtn=isDraft
+    ? '<button class="btn btn-secondary" onclick="syncAll()"><i data-lucide="refresh-cw" class="w-4 h-4"></i><span>Sync All & ออกใบรับอ้อยอัตโนมัติ</span></button>'
+    : '';
+
+  document.getElementById('page-content').innerHTML=
+    topTabBar()
+    +'<div class="ph"><div><div class="ph-title-row"><h1 class="ph-title">'+esc(TAB_TITLE[state.tab])+'</h1><span class="ph-count">'+pg.total+' รายการ</span></div>'
+    +'<p class="ph-sub">การรับอ้อย · ออกใบรับอ้อยหน้าโรงงาน (WKN)</p></div>'
+    +'<div class="ph-actions">'
+    +'<button class="btn btn-secondary" onclick="openModalBox(\'qr\',{},460)"><i data-lucide="qr-code" class="w-4 h-4"></i><span>Scan QR</span></button>'
+    +'<button class="btn btn-secondary" onclick="openModalBox(\'search\',{},460)"><i data-lucide="search" class="w-4 h-4"></i><span>ค้นหาเลขเหรียญ</span></button>'
+    +'<button class="btn btn-secondary" onclick="exportCSV()"><i data-lucide="download" class="w-4 h-4"></i><span>Export CSV</span></button>'
+    +syncBtn
+    +'<button class="btn btn-primary" onclick="openModalBox(\'search\',{},460)"><i data-lucide="file-check-2" class="w-4 h-4"></i><span>ออกใบรับอ้อย</span></button>'
+    +'</div></div>'
+    +'<div class="stats">'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="clock" class="w-3 h-3"></i>รอผลเท</div><div class="stat-value num">'+draftCount+'</div><div class="stat-meta">เช็คอินแล้ว รอออกใบ</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="file-check-2" class="w-3 h-3"></i>ออกใบวันนี้</div><div class="stat-value num">'+issuedCount+'</div><div class="stat-meta">ใบรับอ้อยที่ออกแล้ว</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="x-circle" class="w-3 h-3"></i>ยกเลิก</div><div class="stat-value num">'+voidCount+'</div><div class="stat-meta">รายการที่ถูกยกเลิก</div></div>'
+    +'<div class="stat"><div class="stat-label"><i data-lucide="scale" class="w-3 h-3"></i>น้ำหนักอ้อยรวมวันนี้</div><div class="stat-value num">'+fmtNum(netToday)+'</div><div class="stat-meta">'+esc(fmtKg(netToday))+' (Issued)</div></div>'
+    +'</div>'
+    +'<div class="card">'
+    +'<div class="filter-bar"><div class="input-search"><i data-lucide="search" class="lead-icon w-4 h-4"></i>'
+    +'<input class="input" type="text" id="q-search" placeholder="ค้นหาเลขเหรียญ/รหัส/ทะเบียน" value="'+esc(state.filters.search)+'" oninput="onSearchInput(this.value)"></div>'
+    +'<select class="select" style="max-width:160px;" onchange="setFilter(\'status\',this.value)">'
+    +'<option value="all"'+(state.filters.status==='all'?' selected':'')+'>ทุกสถานะ</option>'
+    +'<option value="Draft"'+(state.filters.status==='Draft'?' selected':'')+'>รอผลเท</option>'
+    +'<option value="Issued"'+(state.filters.status==='Issued'?' selected':'')+'>เทแล้ว</option>'
+    +'<option value="Void"'+(state.filters.status==='Void'?' selected':'')+'>ยกเลิก</option></select>'
+    +'<select class="select" style="max-width:180px;" onchange="setFilter(\'entry\',this.value)">'
+    +'<option value="all"'+(state.filters.entry==='all'?' selected':'')+'>ทุกประเภท</option>'
+    +'<option value="จองคิว"'+(state.filters.entry==='จองคิว'?' selected':'')+'>จองคิว</option>'
+    +'<option value="ไม่จองคิว"'+(state.filters.entry==='ไม่จองคิว'?' selected':'')+'>ไม่จองคิว</option>'
+    +'<option value="โควต้ากลาง"'+(state.filters.entry==='โควต้ากลาง'?' selected':'')+'>โควต้ากลาง</option></select>'
+    +'<input class="input" type="date" style="max-width:160px;" value="'+esc(state.filters.date)+'" onchange="setFilter(\'date\',this.value)">'
+    +'<div style="flex:1;"></div><button class="btn btn-ghost btn-sm" onclick="resetFilters()"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i><span>ล้าง</span></button></div>'
+    +'<div class="table-scroll is-sticky"><table class="table"><thead><tr>'+headCells+'</tr></thead><tbody>'+(pg.records.length?rows:'')+'</tbody></table>'+emptyBlock+'</div>'
+    +'<div class="table-footer"><span>แสดง '+pg.start+'-'+pg.end+' จาก '+pg.total+' รายการ</span><div class="pagination">'
+    +'<button class="pg-btn '+(pg.page===1?'is-disabled':'')+'" onclick="goToPage('+(pg.page-1)+')"><i data-lucide="chevron-left" class="w-3 h-3"></i></button>'
+    +pageNums.map(n=>'<button class="pg-btn '+(n===pg.page?'is-active':'')+'" onclick="goToPage('+n+')">'+n+'</button>').join('')
+    +'<button class="pg-btn '+(pg.page===pg.totalPages?'is-disabled':'')+'" onclick="goToPage('+(pg.page+1)+')"><i data-lucide="chevron-right" class="w-3 h-3"></i></button></div></div></div>';
+}
+
+function exportCSV(){ showToast('กำลังส่งออกข้อมูล...','info',2000); setTimeout(function(){ showToast('ส่งออกข้อมูลสำเร็จ','success'); },900); }
+function openPdf(id){ var it=findItem(id); if(!it||!it.pdfUrl){ showToast('ไม่พบ PDF','warning'); return; } openModalBox('pdf',{id:id},720); }
+
+// ============================================
+// OVERLAY SHELL (Drawer v2)
+// ============================================
+function unmountOverlay(){ document.getElementById('overlay-root').innerHTML=''; }
+function mountPanel(cid,standard){ document.getElementById('overlay-root').innerHTML='<div class="overlay-wrap"><div class="backdrop" onclick="closeTopDrawer()"></div><div id="drawer-panel" class="drawer-panel'+(standard?' standard':'')+' drawer-enter"><div id="'+cid+'" style="display:flex;flex-direction:column;height:100%;"></div></div></div>'; var p=document.getElementById('drawer-panel'); requestAnimationFrame(()=>p.classList.add('drawer-active')); }
+function closePanel(after){ var p=document.getElementById('drawer-panel'); if(p){p.classList.remove('drawer-active');p.classList.add('drawer-enter');} setTimeout(function(){ unmountOverlay(); if(after)after(); },200); }
+function closeTopDrawer(){ if(state.form)closeForm(); else if(state.view)closeView(); }
+
+// ============================================
+// ISSUE RECEIVING DRAWER (openForm) — 920px · Dump Result v2
+// BACKEND: API-03 dump-result-fetch + API-04 receiving-issue
+// ============================================
+function openForm(type,data){
+  state.view=null;
+  state.form={ type:type, id:(data&&data.id)||null, mode:'auto', fetching:false, fetched:false, failed:false, dump:null, manualNet:'', manualReason:'' };
+  mountPanel('form-content',false); renderFormDrawer();
+}
+function closeForm(){ state.form=null; closePanel(function(){ render(); }); }
+
+function formCanIssue(){ var f=state.form; if(!f)return false; if(f.mode==='auto')return !!f.fetched; return String(f.manualNet||'').trim()!=='' && String(f.manualReason||'').trim()!==''; }
+function formManualInput(){ var f=state.form; if(!f)return; var n=document.getElementById('f-net'); if(n)f.manualNet=n.value; var r=document.getElementById('f-reason'); if(r)f.manualReason=r.value; var b=document.getElementById('f-issue-btn'); if(b){ var ok=formCanIssue(); b.disabled=!ok; if(ok)b.classList.remove('is-disabled'); else b.classList.add('is-disabled'); } }
+function setFormMode(m){ var f=state.form; if(!f)return; f.mode=m; if(m==='auto'){ f.failed=false; } renderFormDrawer(); }
+function resetToAuto(){ var f=state.form; if(!f)return; f.mode='auto'; f.fetched=false; f.failed=false; f.dump=null; f.manualNet=''; f.manualReason=''; renderFormDrawer(); }
+
+function handleAutoFetch(){
+  var f=state.form; if(!f||f.fetching)return;
+  f.fetching=true; f.failed=false; renderFormDrawer();
+  setTimeout(function(){
+    f.fetching=false;
+    var it=findItem(f.id);
+    f.dump={ caneTypeCode:'05', caneTypeName:CANE_TYPES['05'], coinNumber:(it?it.coinNumber:''), timeIn:'08:15', timeOut:'08:32', grossWeightKg:32000, tareWeightKg:12000, netWeightKg:20000 };
+    f.fetched=true; renderFormDrawer(); showToast('ดึงผลการเทสำเร็จ','success');
+  },1000);
+}
+function handleForceFail(){ var f=state.form; if(!f||f.fetching)return; f.fetching=false; f.fetched=false; f.dump=null; f.failed=true; f.mode='manual'; renderFormDrawer(); showToast('ไม่พบผลการเทจากโรงงาน','error'); }
+
+function issueSubmit(){
+  var f=state.form; if(!f)return; var it=findItem(f.id); if(!it)return;
+  var src, net, caneCode, caneName, tin, tout, gross, tare, reason='';
+  if(f.mode==='manual'){
+    formManualInput();
+    var netStr=String(f.manualNet||'').trim();
+    if(netStr===''){ showToast('กรุณากรอกน้ำหนักสุทธิ','warning'); return; }
+    if(!/^\d+(\.\d{1,2})?$/.test(netStr)){ showToast('กรุณากรอกน้ำหนักสุทธิเป็นจำนวนไม่ลบและ 2 ตำแหน่ง','warning'); return; }
+    if(String(f.manualReason||'').trim()===''){ showToast('กรุณากรอกเหตุผลการกรอกด้วยตนเอง','warning'); return; }
+    src='manual'; net=parseFloat(netStr); caneCode='-'; caneName='-'; tin='-'; tout='-'; gross=null; tare=null; reason=String(f.manualReason).trim();
+  } else {
+    if(!f.fetched||!f.dump){ showToast('กรุณาดึงผลการเทก่อน','warning'); return; }
+    var d=f.dump; src='auto'; net=d.netWeightKg; caneCode=d.caneTypeCode; caneName=d.caneTypeName; tin=d.timeIn; tout=d.timeOut; gross=d.grossWeightKg; tare=d.tareWeightKg;
+  }
+  it.status='Issued'; it.receiving_id=nextCrn(); it.dumpResultSource=src;
+  it.caneTypeCode=caneCode; it.caneTypeName=caneName; it.timeIn=tin; it.timeOut=tout;
+  it.grossWeightKg=gross; it.tareWeightKg=tare; it.netWeightKg=net; it.manualReason=reason;
+  it.paymentStatus='รอทำจ่าย'; it.coinReturned=true; it.pdfUrl='/pdf/'+it.receiving_id+'.pdf';
+  it.issuedAt=nowStamp(); it.issuedBy=CURRENT_USER.name;
+  state.form=null; state.tab='issued';
+  closePanel(function(){ navigate('receivings/issued'); showToast('ออกใบรับอ้อยสำเร็จ','success',4200,'CBM → awaiting_payment · ปลดเหรียญชั่ง · สร้าง PDF'); });
+}
+
+function renderFormDrawer(){
+  var f=state.form; if(!f)return; var it=findItem(f.id); if(!it)return;
+  var checkin='<div class="dv-section"><div class="dv-section-title"><i data-lucide="log-in" class="w-4 h-4"></i>ข้อมูล Check-in</div><div class="dv-grid">'
+    +dvCell('รหัส Check-in','<span class="mono">'+esc(it.id)+'</span>')
+    +dvCell('ประเภทการจอง',entryBadge(it.entryType))
+    +dvCell('รหัส Booking','<span class="mono">'+esc(it.cbmNbmCode)+'</span>')
+    +dvCell('เลขเหรียญชั่ง','<span class="mono">'+esc(it.coinNumber||'-')+'</span>')
+    +dvCell('เวลา Check-in','<span class="mono">'+esc(it.checkInTime||'-')+'</span>')
+    +dvCell('ประเภทเข้าโรงงาน',esc(it.sourceType))
+    +dvCell('ชื่อเกษตรกร',esc(it.farmerName))
+    +dvCell('ชื่อคนขับ',esc(it.driverName))
+    +dvCell('เบอร์โทร','<span class="mono">'+esc(it.driverPhone||'-')+'</span>')
+    +dvCell('ทะเบียนรถ','<span class="mono">'+esc(it.licensePlate)+'</span>')
+    +dvCell('Quota ID','<span class="mono">'+esc(it.quotaId)+'</span>')
+    +'</div></div>';
+
+  var modeBadge=f.mode==='auto'?'<span class="pill pill-info">Auto</span>':'<span class="pill pill-warning">Manual</span>';
+
+  var dumpBody;
+  if(f.mode==='auto'){
+    if(f.fetched&&f.dump){
+      var d=f.dump;
+      dumpBody='<div style="border:1px solid var(--c-line-2);background:var(--c-bg-off);border-radius:8px;padding:14px 16px;">'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">'
+        +'<div style="display:flex;align-items:center;gap:6px;color:var(--c-success);font-weight:600;font-size:12.5px;"><i data-lucide="check-circle-2" class="w-4 h-4"></i>ดึงผลการเทสำเร็จ (ล็อกค่า)</div>'
+        +'<span class="pill pill-info">Auto</span></div>'
+        +'<div class="dv-grid">'
+        +dvCell('ประเภทอ้อย',esc(d.caneTypeCode)+' - '+esc(d.caneTypeName))
+        +dvCell('เลขเหรียญชั่ง','<span class="mono">'+esc(d.coinNumber)+'</span>')
+        +dvCell('เวลาเข้า (Time In)','<span class="mono">'+esc(d.timeIn)+'</span>')
+        +dvCell('เวลาออก (Time Out)','<span class="mono">'+esc(d.timeOut)+'</span>')
+        +dvCell('น.น. รวม (กก.)','<span class="mono">'+fmtNum(d.grossWeightKg)+'</span>')
+        +dvCell('น.น. รถเบา (กก.)','<span class="mono">'+fmtNum(d.tareWeightKg)+'</span>')
+        +dvCell('น.น. อ้อยสุทธิ (กก.)','<span class="mono" style="color:var(--c-primary);">'+fmtNum(d.netWeightKg)+'</span>')
+        +'</div></div>';
+    } else {
+      dumpBody='<div class="note is-info"><i data-lucide="info" class="w-4 h-4"></i><span>กดปุ่ม "ดึงผลการเท (Auto)" เพื่อดึงผลการเทจากระบบโรงงาน — ระบบจะล็อกค่าน้ำหนักและประเภทอ้อยอัตโนมัติ</span></div>';
+    }
+  } else {
+    var errNote=f.failed?'<div class="note is-warn" style="margin-bottom:14px;"><i data-lucide="alert-triangle" class="w-4 h-4"></i><span>ไม่พบผลการเทจากโรงงาน — กรุณาเปลี่ยนเป็นโหมด Manual</span></div>':'';
+    dumpBody=errNote
+      +'<div class="field"><label class="field-label">น.น. อ้อยสุทธิ (กก.) <span class="req">*</span></label><input class="input mono" id="f-net" type="text" placeholder="เช่น 20000.00" value="'+esc(f.manualNet||'')+'" oninput="formManualInput()"></div>'
+      +'<div class="field" style="margin-bottom:0;"><label class="field-label">เหตุผล <span class="req">*</span></label><textarea class="input" id="f-reason" placeholder="เหตุผลที่ต้องกรอกด้วยตนเอง..." oninput="formManualInput()">'+esc(f.manualReason||'')+'</textarea></div>';
+  }
+
+  var toggleBtn=f.mode==='auto'
+    ? '<button class="btn btn-secondary btn-sm" onclick="setFormMode(\'manual\')"><i data-lucide="pencil" class="w-3.5 h-3.5"></i><span>สลับเป็นโหมดกรอกมือ</span></button>'
+    : '<button class="btn btn-secondary btn-sm" onclick="resetToAuto()"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i><span>รีเซ็ต / กลับไป Auto</span></button>';
+  var fetchBtn=f.mode==='auto'
+    ? '<button class="btn btn-primary btn-sm'+(f.fetching?' is-disabled':'')+'"'+(f.fetching?' disabled':'')+' onclick="handleAutoFetch()"><i data-lucide="'+(f.fetching?'loader-2':'download-cloud')+'" class="w-3.5 h-3.5'+(f.fetching?' spin':'')+'"></i><span>ดึงผลการเท (Auto)</span></button>'
+      +'<button class="btn btn-ghost btn-sm" onclick="handleForceFail()"><i data-lucide="wifi-off" class="w-3.5 h-3.5"></i><span>จำลองไม่พบผล</span></button>'
+    : '';
+
+  var dump='<div class="dv-section" style="margin-bottom:0;"><div class="dv-section-title" style="justify-content:space-between;"><span style="display:inline-flex;align-items:center;gap:7px;"><i data-lucide="package-check" class="w-4 h-4"></i>ผลการเทจากโรงงาน (Dump Result)</span>'+modeBadge+'</div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">'+fetchBtn+toggleBtn+'</div>'
+    +dumpBody+'</div>';
+
+  var canIssue=formCanIssue();
+  document.getElementById('form-content').innerHTML=
+    '<div class="dw-head"><div class="dw-head-row"><div>'
+    +'<div class="dw-eyebrow"><i data-lucide="file-check-2" class="w-3.5 h-3.5"></i> ออกใบรับอ้อย · <span class="mono">'+esc(it.id)+'</span></div>'
+    +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><h2 class="dw-title">'+esc(it.farmerName)+'</h2>'+entryBadge(it.entryType)+'</div>'
+    +'<div class="dw-sub">'+esc(it.licensePlate)+' · เหรียญ '+esc(it.coinNumber||'-')+' · เข้าเมื่อ '+esc(it.checkInTime||'-')+'</div>'
+    +'</div>'
+    +'<div class="dw-actions"><span class="drawer-header-divider"></span><button class="top-icon-btn" onclick="closeForm()"><i data-lucide="x" class="w-5 h-5"></i></button></div></div></div>'
+    +'<div class="dw-body">'+checkin+dump+'</div>'
+    +'<div class="dw-footer"><div class="dw-footer-meta">'+esc(it.cbmNbmCode)+'</div><div class="dw-footer-right">'
+    +'<button class="btn btn-secondary" onclick="closeForm()">ปิด</button>'
+    +'<button class="btn btn-primary'+(canIssue?'':' is-disabled')+'" id="f-issue-btn"'+(canIssue?'':' disabled')+' onclick="issueSubmit()"><i data-lucide="file-check-2" class="w-4 h-4"></i><span>ออกใบรับอ้อย</span></button>'
+    +'</div></div>';
+  renderIcons();
+}
+
+// ============================================
+// DETAIL DRAWER (view) — 680px, refresh-safe
+// BACKEND: API-02 receiving-detail
+// ============================================
+function openView(id){ navigate('receivings/'+id); }
+function mountViewDrawer(){ mountPanel('view-content',true); renderViewDrawer(); }
+function closeView(){ state.view=null; closePanel(function(){ navigate(tabRoute(state.tab)); }); }
+
+function renderViewDrawer(){
+  if(!state.view)return; var it=findItem(state.view.id); if(!it)return;
+  var isIssued=it.status==='Issued';
+  var isVoid=it.status==='Void';
+
+  var checkin='<div class="dv-section"><div class="dv-section-title"><i data-lucide="log-in" class="w-4 h-4"></i>ข้อมูล Check-in</div><div class="dv-grid">'
+    +dvCell('รหัส Check-in','<span class="mono">'+esc(it.id)+'</span>')
+    +dvCell('รหัส Booking','<span class="mono">'+esc(it.cbmNbmCode)+'</span>')
+    +dvCell('ประเภทเข้าโรงงาน',esc(it.sourceType)+' · '+entryBadge(it.entryType))
+    +dvCell('เลขเหรียญชั่ง','<span class="mono">'+esc(it.coinNumber||'-')+'</span>')
+    +dvCell('เวลา Check-in','<span class="mono">'+esc(it.checkInTime||'-')+'</span>')
+    +dvCell('เกษตรกร/ผู้ขนส่ง',esc(it.farmerName))
+    +dvCell('ชื่อคนขับ',esc(it.driverName)+' · <span style="color:var(--c-mute-2);">'+esc(it.driverPhone||'-')+'</span>')
+    +dvCell('ทะเบียนรถ','<span class="mono">'+esc(it.licensePlate)+'</span>')
+    +dvCell('Quota ID','<span class="mono">'+esc(it.quotaId)+'</span>')
+    +'</div></div>';
+
+  var dumpBadge=it.dumpResultSource==='auto'?'<span class="pill pill-info">Auto</span>':it.dumpResultSource==='manual'?'<span class="pill pill-warning">Manual</span>':'<span class="pill pill-muted">-</span>';
+  var dump='<div class="dv-section"><div class="dv-section-title" style="justify-content:space-between;"><span style="display:inline-flex;align-items:center;gap:7px;"><i data-lucide="package-check" class="w-4 h-4"></i>ผลการเทจากโรงงาน</span>'+dumpBadge+'</div><div class="dv-grid">'
+    +dvCell('ประเภทอ้อย',(it.caneTypeCode&&it.caneTypeCode!=='-')?(esc(it.caneTypeCode)+' - '+esc(it.caneTypeName)):'-')
+    +dvCell('เวลาเข้า (Time In)','<span class="mono">'+esc(it.timeIn||'-')+'</span>')
+    +dvCell('เวลาออก (Time Out)','<span class="mono">'+esc(it.timeOut||'-')+'</span>')
+    +dvCell('น.น. รวม (กก.)','<span class="mono">'+fmtNum(it.grossWeightKg)+'</span>')
+    +dvCell('น.น. รถเบา (กก.)','<span class="mono">'+fmtNum(it.tareWeightKg)+'</span>')
+    +dvCell('น.น. อ้อยสุทธิ (กก.)','<span class="mono" style="color:var(--c-primary);">'+fmtNum(it.netWeightKg)+'</span>')
+    +'</div>'
+    +(it.manualReason?'<div class="note is-warn" style="margin-top:12px;"><i data-lucide="pencil" class="w-4 h-4"></i><span>กรอกด้วยตนเอง: '+esc(it.manualReason)+'</span></div>':'')
+    +'</div>';
+
+  var docRows=dvCell('เลขที่ใบรับอ้อย','<span class="mono">'+esc(it.receiving_id||'-')+'</span>')
+    +dvCell('สถานะ',statusPill(it.status))
+    +dvCell('สถานะการชำระเงิน',esc(it.paymentStatus||'-'))
+    +dvCell('คืนเหรียญชั่ง',it.coinReturned?'<span class="pill pill-success">คืนแล้ว</span>':'<span class="pill pill-muted">-</span>');
+  if(isIssued||isVoid){ docRows+=dvCell('ออกใบเมื่อ','<span class="mono">'+esc(it.issuedAt||'-')+'</span>')+dvCell('ออกใบโดย',esc(it.issuedBy||'-')); }
+  var doc='<div class="dv-section" style="margin-bottom:0;"><div class="dv-section-title"><i data-lucide="file-text" class="w-4 h-4"></i>ข้อมูลเอกสาร</div><div class="dv-grid">'+docRows+'</div>'
+    +(isVoid?'<div class="note is-warn" style="margin-top:12px;"><i data-lucide="x-circle" class="w-4 h-4"></i><span>ยกเลิกเมื่อ '+esc(it.voidedAt||'-')+' โดย '+esc(it.voidedBy||'-')+' · เหตุผล: '+esc(it.voidReason||'-')+'</span></div>':'')
+    +'</div>';
+
+  var footRight=(isIssued?'<button class="btn btn-danger" onclick="openModalBox(\'void\',{id:\''+it.id+'\'},460)"><i data-lucide="x-circle" class="w-4 h-4"></i><span>Void</span></button>':'')
+    +((isIssued||isVoid)&&it.pdfUrl?'<button class="btn btn-secondary" onclick="openPdf(\''+it.id+'\')"><i data-lucide="printer" class="w-4 h-4"></i><span>พิมพ์</span></button>':'')
+    +(it.status==='Draft'?'<button class="btn btn-primary" onclick="closeView();setTimeout(function(){openForm(\'issue\',{id:\''+it.id+'\'});},220)"><i data-lucide="file-check-2" class="w-4 h-4"></i><span>ออกใบรับอ้อย</span></button>':'')
+    +'<button class="btn btn-secondary" onclick="closeView()">ปิด</button>';
+
+  document.getElementById('view-content').innerHTML=
+    '<div class="dw-head"><div class="dw-head-row"><div>'
+    +'<div class="dw-eyebrow"><i data-lucide="scale" class="w-3.5 h-3.5"></i> การรับอ้อย · <span class="mono">'+esc(it.receiving_id||it.id)+'</span></div>'
+    +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><h2 class="dw-title">'+esc(it.farmerName)+'</h2>'+statusPill(it.status)+'</div>'
+    +'<div class="dw-sub">'+esc(it.licensePlate)+' · เหรียญ '+esc(it.coinNumber||'-')+' · '+esc(it.checkInTime||'-')+'</div>'
+    +'</div>'
+    +'<div class="dw-actions"><span class="drawer-header-divider"></span><button class="top-icon-btn" onclick="closeView()"><i data-lucide="x" class="w-5 h-5"></i></button></div></div></div>'
+    +'<div class="dw-body">'+checkin+dump+doc+'</div>'
+    +'<div class="dw-footer"><div class="dw-footer-meta">'+esc(it.cbmNbmCode)+'</div><div class="dw-footer-right">'+footRight+'</div></div>';
+  renderIcons();
+}
+
+// ============================================
+// MODALS (OV) — syncresult / void / pdf / qr / search
+// ============================================
+function openModalBox(type,data,widthPx){ state.modal={open:true,type:type,data:data||{}}; var box=document.getElementById('modalBox'); box.className='modal'; if(widthPx)box.style.width=widthPx+'px'; else box.style.width=''; renderModal(); requestAnimationFrame(()=>document.getElementById('modalBackdrop').classList.add('is-open')); }
+function closeModal(){ if(state.modal.data&&state.modal.data.busy)return; document.getElementById('modalBackdrop').classList.remove('is-open'); setTimeout(()=>state.modal={open:false,type:null,data:null},200); }
+function renderModal(){
+  var t=state.modal.type;
+  if(t==='syncresult')renderSyncResultModal();
+  else if(t==='void')renderVoidModal();
+  else if(t==='pdf')renderPdfModal();
+  else if(t==='qr')renderQrModal();
+  else if(t==='search')renderSearchModal();
+}
+function modalCloseBtn(){ return '<button class="icon-btn" onclick="closeModal()"><i data-lucide="x" class="w-4 h-4"></i></button>'; }
+
+// ---- Sync All (bulk auto-issue) ----
+function syncAll(){
+  if(!state.filters.date){ showToast('กรุณาเลือกช่วงวันที่ก่อนทำ Sync All','warning'); return; }
+  showToast('กำลังดึงผลการเท...','info',2000);
+  setTimeout(function(){
+    var drafts=state.items.filter(function(i){ return i.status==='Draft' && i.dateKey===state.filters.date; });
+    var success=[], failed=[];
+    drafts.forEach(function(it,idx){
+      var ok=(idx%3!==2);
+      if(ok){
+        it.status='Issued'; it.receiving_id=nextCrn(); it.dumpResultSource='auto';
+        it.caneTypeCode='05'; it.caneTypeName=CANE_TYPES['05']; it.timeIn='08:15'; it.timeOut='08:32';
+        it.grossWeightKg=32000; it.tareWeightKg=12000; it.netWeightKg=20000;
+        it.paymentStatus='รอทำจ่าย'; it.coinReturned=true; it.pdfUrl='/pdf/'+it.receiving_id+'.pdf';
+        it.issuedAt=nowStamp(); it.issuedBy=CURRENT_USER.name;
+        success.push(it.id);
+      } else {
+        failed.push({ checkInTime:it.checkInTime, coinNumber:it.coinNumber, cbmNbmCode:it.cbmNbmCode, farmerName:it.farmerName, error:'ไม่พบข้อมูลผลการเทในระบบโรงงาน' });
+      }
+    });
+    state.syncResult={ total:drafts.length, success:success.length, failed:failed };
+    openModalBox('syncresult',{},640);
+    showToast('ดึงผลการเทเสร็จสิ้น','info',4200,'สำเร็จ '+success.length+' รายการ, ล้มเหลว '+failed.length+' รายการ');
+  },1200);
+}
+function syncViewFailed(){ closeModal(); state.tab='draft'; navigate('receivings'); }
+function renderSyncResultModal(){
+  var r=state.syncResult||{total:0,success:0,failed:[]};
+  var failBlock;
+  if(r.failed.length===0){
+    failBlock='<div class="note is-info"><i data-lucide="check-circle-2" class="w-4 h-4"></i><span>ทุกรายการดึงผลการเทสำเร็จ และออกใบรับอ้อยอัตโนมัติแล้ว</span></div>';
+  } else {
+    var rows=r.failed.map(function(x){ return '<div class="imp-err-row"><span class="r mono">'+esc(x.checkInTime)+'</span><span class="f mono">'+esc(x.coinNumber)+'</span><span class="f mono">'+esc(x.cbmNbmCode)+'</span><span class="m">'+esc(x.farmerName)+'</span><span class="d">'+esc(x.error)+'</span></div>'; }).join('');
+    failBlock='<div style="font-size:12px;font-weight:600;color:var(--c-mute);margin-bottom:6px;">รายการที่ล้มเหลว</div><div class="imp-errors">'+rows+'</div>';
+  }
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="refresh-cw" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">ผลการ Sync All</h3><p class="modal-subtitle">ดึงผลการเท + ออกใบรับอ้อยอัตโนมัติ</p></div>'+modalCloseBtn()+'</div>'
+    +'<div class="modal-body">'
+    +'<div class="imp-summary"><div class="imp-chip is-total"><div class="v">'+r.total+'</div><div class="l">ทั้งหมด</div></div>'
+    +'<div class="imp-chip is-ok"><div class="v">'+r.success+'</div><div class="l">สำเร็จ</div></div>'
+    +'<div class="imp-chip is-bad"><div class="v">'+r.failed.length+'</div><div class="l">ล้มเหลว</div></div></div>'
+    +failBlock
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-secondary" onclick="syncViewFailed()"><i data-lucide="list" class="w-4 h-4"></i><span>ดูรายการที่ล้มเหลว</span></button>'
+    +'<button class="btn btn-primary" onclick="closeModal()">ปิด</button></div>';
+  renderIcons();
+}
+
+// ---- Void ----
+function voidConfirm(){
+  var d=state.modal.data; var it=findItem(d.id); if(!it)return;
+  if(it.paymentStatus==='ชำระเงินแล้ว'){ showToast('ไม่สามารถยกเลิกรายการที่ชำระเงินแล้ว','error'); return; }
+  var e=document.getElementById('void-reason'); var reason=e?String(e.value||'').trim():'';
+  if(reason.length<5){ showToast('เหตุผลต้องมีความยาวอย่างน้อย 5 ตัวอักษร','warning'); return; }
+  it.status='Void'; it.voidReason=reason; it.voidedAt=nowStamp(); it.voidedBy=CURRENT_USER.name; it.paymentStatus='-';
+  closeModal(); state.view=null; unmountOverlay(); state.tab='void'; navigate('receivings/void'); showToast('Void ใบรับอ้อยสำเร็จ','success');
+}
+function renderVoidModal(){
+  var d=state.modal.data; var it=findItem(d.id);
+  var paid=it&&it.paymentStatus==='ชำระเงินแล้ว';
+  var body=paid
+    ? '<div class="note is-warn" style="margin-bottom:14px;"><i data-lucide="lock" class="w-4 h-4"></i><span>รายการนี้ชำระเงินแล้ว จึงไม่สามารถยกเลิก (Void) ได้</span></div>'
+    : '<div class="note is-warn" style="margin-bottom:14px;"><i data-lucide="alert-triangle" class="w-4 h-4"></i><span>การยกเลิกจะย้อนสถานะ CBM เป็น awaiting_dump_result และไม่สามารถชำระเงินต่อ</span></div>'
+      +'<div class="field" style="margin-bottom:0;"><label class="field-label">เหตุผลการยกเลิก <span class="req">*</span></label><textarea class="input" id="void-reason" placeholder="กรุณากรอกเหตุผลการยกเลิก (อย่างน้อย 5 ตัวอักษร)"></textarea></div>';
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon is-danger"><i data-lucide="x-circle" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">ยกเลิกใบรับอ้อย</h3><p class="modal-subtitle">'+(it?esc(it.receiving_id||it.id):'')+'</p></div>'+modalCloseBtn()+'</div>'
+    +'<div class="modal-body">'+body+'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>'
+    +'<button class="btn btn-danger is-solid'+(paid?' is-disabled':'')+'"'+(paid?' disabled':'')+' onclick="voidConfirm()"><i data-lucide="check" class="w-4 h-4"></i><span>ยืนยัน Void</span></button></div>';
+  renderIcons();
+}
+
+// ---- PDF viewer ----
+function renderPdfModal(){
+  var d=state.modal.data; var it=findItem(d.id);
+  if(!it||!it.pdfUrl){ closeModal(); showToast('ไม่พบ PDF','warning'); return; }
+  var a4='<div style="background:#fff;border:1px solid var(--c-line);border-radius:6px;box-shadow:0 4px 14px rgba(17,17,17,0.08);padding:20px;font-size:12.5px;">'
+    +'<div style="text-align:center;border-bottom:1px dashed var(--c-line);padding-bottom:10px;margin-bottom:12px;"><div style="font-weight:700;font-size:15px;color:var(--c-navy);">ใบรับอ้อย (Cane Receiving)</div><div class="mono" style="color:var(--c-mute-2);margin-top:2px;">'+esc(it.receiving_id||'-')+'</div></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;">'
+    +'<div><span style="color:var(--c-mute-2);">เกษตรกร:</span> '+esc(it.farmerName)+'</div>'
+    +'<div><span style="color:var(--c-mute-2);">ทะเบียนรถ:</span> <span class="mono">'+esc(it.licensePlate)+'</span></div>'
+    +'<div><span style="color:var(--c-mute-2);">ประเภทอ้อย:</span> '+((it.caneTypeCode&&it.caneTypeCode!=='-')?(esc(it.caneTypeCode)+' - '+esc(it.caneTypeName)):'-')+'</div>'
+    +'<div><span style="color:var(--c-mute-2);">เลขเหรียญชั่ง:</span> <span class="mono">'+esc(it.coinNumber||'-')+'</span></div>'
+    +'<div><span style="color:var(--c-mute-2);">น.น. รวม:</span> <span class="mono">'+fmtKg(it.grossWeightKg)+'</span></div>'
+    +'<div><span style="color:var(--c-mute-2);">น.น. รถเบา:</span> <span class="mono">'+fmtKg(it.tareWeightKg)+'</span></div>'
+    +'<div style="grid-column:1 / -1;font-weight:700;color:var(--c-primary);">น.น. อ้อยสุทธิ: <span class="mono">'+fmtKg(it.netWeightKg)+'</span></div>'
+    +'</div>'
+    +'<div style="display:flex;justify-content:flex-end;margin-top:14px;"><div style="width:88px;height:88px;border:1px solid var(--c-line);border-radius:6px;display:flex;align-items:center;justify-content:center;background:var(--c-bg-off);color:var(--c-mute-3);"><i data-lucide="qr-code" class="w-5 h-5"></i></div></div>'
+    +'</div>';
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="file-text" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">ใบรับอ้อย (PDF)</h3><p class="modal-subtitle">'+esc(it.receiving_id||'-')+' · ตัวอย่างเอกสาร</p></div>'+modalCloseBtn()+'</div>'
+    +'<div class="modal-body">'+a4+'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ปิด</button>'
+    +'<button class="btn btn-primary" onclick="showToast(\'กำลังส่งไปยังเครื่องพิมพ์...\',\'info\')"><i data-lucide="printer" class="w-4 h-4"></i><span>พิมพ์</span></button></div>';
+  renderIcons();
+}
+
+// ---- Scan QR (pick a draft -> issue) ----
+function qrGo(){
+  var e=document.getElementById('qr-input'); var v=e?String(e.value||'').trim():'';
+  var it=state.items.find(function(x){ return x.status==='Draft' && (x.cbmNbmCode===v||x.coinNumber===v||x.id===v); });
+  if(!it) it=state.items.find(function(x){ return x.status==='Draft'; });
+  if(!it){ showToast('ไม่พบรายการ','warning'); return; }
+  closeModal(); openForm('issue',{id:it.id});
+}
+function renderQrModal(){
+  var d=state.modal.data;
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="qr-code" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">สแกน QR</h3><p class="modal-subtitle">สแกน QR หรือป้อนรหัส Booking เพื่อเปิดใบรับอ้อย</p></div>'+modalCloseBtn()+'</div>'
+    +'<div class="modal-body">'
+    +'<div style="border:2px dashed var(--c-line);border-radius:12px;padding:28px;text-align:center;margin-bottom:14px;background:var(--c-bg-off);">'
+    +'<div style="color:var(--c-mute-2);display:inline-flex;"><i data-lucide="scan-line" class="w-5 h-5"></i></div>'
+    +'<div style="font-size:12.5px;color:var(--c-mute-2);margin-top:8px;">เล็งกล้องไปที่ QR Code บนใบเช็คอิน</div></div>'
+    +'<div class="field" style="margin-bottom:0;"><label class="field-label">หรือป้อนรหัส Booking</label><div style="display:flex;gap:8px;"><input class="input mono" id="qr-input" type="text" placeholder="CBM-2568-...." value="'+esc(d.code||'')+'"><button class="btn btn-primary" onclick="qrGo()"><i data-lucide="arrow-right" class="w-4 h-4"></i><span>ไป</span></button></div></div>'
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ปิด</button></div>';
+  renderIcons();
+}
+
+// ---- Search by coin (pick a draft -> issue) ----
+function searchGo(){
+  var e=document.getElementById('search-input'); var v=e?String(e.value||'').trim():'';
+  var it=state.items.find(function(x){ return x.status==='Draft' && (x.coinNumber===v||x.id===v||x.cbmNbmCode===v||x.licensePlate===v); });
+  if(!it) it=state.items.find(function(x){ return x.status==='Draft'; });
+  if(!it){ showToast('ไม่พบรายการ','warning'); return; }
+  closeModal(); openForm('issue',{id:it.id});
+}
+function renderSearchModal(){
+  var d=state.modal.data;
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-header"><div class="modal-header-icon"><i data-lucide="search" class="w-5 h-5"></i></div>'
+    +'<div style="flex:1;"><h3 class="modal-title">ค้นหาเลขเหรียญชั่ง</h3><p class="modal-subtitle">ป้อนเลขเหรียญชั่งเพื่อเปิดใบรับอ้อย</p></div>'+modalCloseBtn()+'</div>'
+    +'<div class="modal-body">'
+    +'<div class="field" style="margin-bottom:0;"><label class="field-label">เลขเหรียญชั่ง / รหัส</label><div style="display:flex;gap:8px;"><input class="input mono" id="search-input" type="text" placeholder="เช่น 10501" value="'+esc(d.code||'')+'"><button class="btn btn-primary" onclick="searchGo()"><i data-lucide="arrow-right" class="w-4 h-4"></i><span>ไป</span></button></div></div>'
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">ปิด</button></div>';
+  renderIcons();
+}
+
+// ESC chain
+window.addEventListener('keydown',function(e){ if(e.key!=='Escape')return; if(state.modal.open)closeModal(); else if(state.form)closeForm(); else if(state.view)closeView(); });
+
+// INIT
+window.addEventListener('hashchange',function(){ render(); });
+var domReady=false,lucideReady=false;
+function bootIfReady(){ if(domReady&&lucideReady){ render(); renderIcons(); } }
+if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',function(){domReady=true;bootIfReady();}); else domReady=true;
+window.addEventListener('lucide:ready',function(){lucideReady=true;bootIfReady();});
+if(window.lucide&&typeof window.lucide.createIcons==='function')lucideReady=true;
+bootIfReady();
+setTimeout(function(){ if(!lucideReady){lucideReady=true;bootIfReady();} },5000);
+</script>
+</body></html>
