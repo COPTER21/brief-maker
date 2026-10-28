@@ -1,0 +1,47 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# ที่มาของค่า: 4_knowledge/governance/unattended-policy.md + FORM_SPEC.check.json (signals)
+
+# G1 ผลต่อระบบ (ต้องตอบ) — ใบเดินทางและสถานที่ปฏิบัติงานเป็นบันทึกการเดินทาง + ขอเบิกค่าใช้จ่ายของพนักงานขาย
+# ไม่แก้ค่าตั้งต้นในระบบ และไม่ยิงต่อระบบอื่นรอบนี้ (การตั้งหนี้/จ่ายเงินทำนอกเอกสารใบนี้ รอลูกค้ายืนยัน)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — กระดาษมีช่องลงชื่อ 2 ช่อง (ซ้าย = ผู้จัดทำ · ขวา = ผู้อนุมัติ) → ค่าเริ่ม 1 ขั้น
+doa:
+  required: true
+  mode: dynamic
+  default_steps: ["role-line-manager"]
+  amount: none
+
+# G3 สูตร / ค่าคงที่ — ไม่มีค่าคงที่พิมพ์บนกระดาษ · มีสูตรรวมยอด 14 ช่อง
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "ยอดรวมทุกคอลัมน์รวมทุกแถวของตารางเสมอ (เติมสูตรคอลัมน์ค่าที่พักที่ต้นฉบับไม่มี) ระบบคำนวณให้ ผู้ใช้แก้ไม่ได้"
+    - "รวมค่าใช้จ่ายที่เบิกรายแถว = ค่าใช้จ่ายที่พัก (ที่พัก + ค่าโรงแรม) + ค่าใช้จ่ายในการทำงานทุกช่อง (ต้นฉบับไม่มีสูตรรายแถว)"
+    - "รวมค่าใช้จ่ายทั้งสิ้นเป็นเงิน = รวมค่าใช้จ่ายในการเดินทาง + ค่าโทรศัพท์ (แก้สูตรต้นฉบับที่ไม่บวกค่าโทรศัพท์)"
+    - "คงเหลือ (เบิกเพิ่มบริษัทฯ) = รวมค่าใช้จ่ายทั้งสิ้น - เบิกเงินสำรองของบริษัทฯ · ค่าลบหมายถึงต้องคืนบริษัท เตือนไม่บล็อก"
+    - "เลขไมล์สิ้นสุดน้อยกว่าเลขไมล์เริ่มต้นในแถวเดียวกัน เตือน ไม่บล็อก"
+
+# G4 รายการซ้ำ — กระดาษมีตารางวันทำงาน 27 แถว และเอกสารแนบ 3 บรรทัด
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ / ยกเลิก — unattended-policy: กลับเป็นร่างเลขเดิม
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 เลขที่ — ไม่ใช่เอกสารการเงินที่ต้อง no-gap → ออกตอนบันทึกครั้งแรก · รหัสย่อจากชื่อเอกสาร (Travel & Work Place)
+numbering: { issue_on: first_save, code: "TWP" }
+
+# G10 ของเสริม — กระดาษมีช่อง "เอกสารที่แนบ" 3 บรรทัด
+extras: { attachments: true, copy: false, export_csv: true, announce: false }

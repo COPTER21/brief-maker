@@ -1,0 +1,44 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# ที่มาของค่า: 4_knowledge/governance/unattended-policy.md + FORM_SPEC.check.json (signals)
+
+# G1 ผลต่อระบบ (ต้องตอบ) — ใบเดินทางเป็นแผน/ผลการเดินทางของพนักงานขาย ไม่แก้ค่าตั้งต้นในระบบ ไม่ยิงต่อระบบอื่นรอบนี้
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — กระดาษมีช่อง "ผู้อนุมัติ" 2 ช่อง (นอกเหนือจาก "ผู้นำเสนอ") → ค่าเริ่ม 2 ขั้น
+doa:
+  required: true
+  mode: dynamic
+  default_steps: ["role-line-manager", "role-mgr-sales"]
+  amount: none
+
+# G3 สูตร / ค่าคงที่ — ไม่มีค่าคงที่พิมพ์บนกระดาษ · มีสูตรรวมยอด 13 ช่อง
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "ยอดรวมทุกคอลัมน์รวมทุกแถวของตารางเสมอ (แก้สูตรที่ครอบช่วงไม่ครบในต้นฉบับ) ระบบคำนวณให้ ผู้ใช้แก้ไม่ได้"
+    - "ช่อง \"จังหวัดที่ปฎิบัติงาน\" เป็นข้อความที่ผู้ใช้กรอกเอง ไม่ผูกสูตรกับช่องอื่น (ตัดสูตรค้าง =D39 ของต้นฉบับ)"
+    - "ช่อง Accual (ผลจริง) เตือนเมื่อมากกว่าช่องแผนของกลุ่มเดียวกัน ไม่บล็อก"
+
+# G4 รายการซ้ำ — กระดาษมี 31 แถว (1 เดือน)
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ / ยกเลิก — unattended-policy: กลับเป็นร่างเลขเดิม
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 เลขที่ — ไม่ใช่เอกสารการเงินที่ต้อง no-gap → ออกตอนบันทึกครั้งแรก · รหัสย่อจากชื่อเอกสาร (ใบเดินทาง / Travel)
+numbering: { issue_on: first_save, code: "TRV" }
+
+# G10 ของเสริม
+extras: { attachments: true, copy: false, export_csv: true, announce: false }

@@ -1,0 +1,26 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# G1 ผลต่อระบบ — บันทึกการขออนุญาตเข้าพื้นที่ ไม่เปลี่ยนค่าในระบบ ไม่ส่งต่อ (ไม่ต่อระบบบัตรผ่าน/ประตูรอบนี้)
+config_changes: []
+post_to: []
+# G2 — กระดาษมีช่องผู้อนุมัติ 1 จุด (ผู้บังคับบัญชาต้นสังกัด) → dynamic 1 ขั้น role-line-manager · ไม่มีวงเงิน
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager"], amount: none }
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "ชื่อบริษัทบนกระดาษ (2 จุด) อ่านจาก Organization Company.name_th ค่าเดียว — ห้าม hardcode"
+    - "ชื่อผู้รับการติดต่อ = พนักงานที่ผู้มาติดต่อระบุ (host) อัตโนมัติ · สังกัดฝ่าย/ผู้บังคับบัญชาต้นสังกัดดึงจากผังองค์กรของ host (อ่านอย่างเดียว)"
+    - "ไม่อนุมัติ → ต้องกรอกความเห็นผู้บังคับบัญชา (บล็อก)"
+    - "วันที่ลงนามผู้มาติดต่อก่อนวันที่เข้าพื้นที่ → เตือน"
+    - "ผู้ขอ (เจ้าของใบ) = พนักงานผู้รับการติดต่อ บันทึกข้อมูลผู้มาติดต่อแทน · ผู้มาติดต่อลงนามด้วยมือบนแบบพิมพ์"
+# G4 — ไม่มีรายการซ้ำบนกระดาษ (ไม่ถาม)
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+reject_cancel: { on_reject: draft, cancel_by: [owner, admin_role], cancel_states: [draft, submitted], reason_required: true }
+# G8 — เจ้าของ · ผู้อนุมัติหลังส่ง · HR (หน่วยงานเจ้าของฟอร์ม FM-HRM) เห็นทั้งหมด
+visibility: { owner: true, approver: after_submit, admin_role: all, admin_role_id: role-mgr-hr }
+numbering: { issue_on: first_save, code: "VAR" }
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+extend: {}
+fit: {}

@@ -1,0 +1,20 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock แล้วปรับ (ตัด var_over_limit_approved: ไม่มีเกณฑ์ตัวเลข · เพิ่มยกเลิกระหว่างรอ)
+feature_id: F-TMP-003
+name: แบบฟอร์มขออนุญาตเข้าพื้นที่สำนักงาน
+code: VAR
+events:
+- id: var_cancelled
+  trigger: submitted → cancelled (เจ้าของหรือ HR ยกเลิกระหว่างรอพิจารณา พร้อมเหตุผล)
+  recipients:
+  - ผู้อนุมัติขั้นปัจจุบัน
+  - ผู้สร้างเอกสาร
+  template: 'คำขอเข้าพื้นที่สำนักงาน **{doc_no}** ถูกยกเลิก — เหตุผล: {reason}'
+  channel: in-app
+  optional: true
+  frd_ref: 03_LOGIC F-TMP-003-FN-06, F-TMP-003-FN-08
+  why: ยกเลิกระหว่างรอพิจารณา ผู้บังคับบัญชาต้องรู้ว่าไม่ต้องพิจารณาแล้ว (DEC-08) · ผลอนุมัติ/ไม่อนุมัติมาจาก doa_result
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+- var_over_limit_approved

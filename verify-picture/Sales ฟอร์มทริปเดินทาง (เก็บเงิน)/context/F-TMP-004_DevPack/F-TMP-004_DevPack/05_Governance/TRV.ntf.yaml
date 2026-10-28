@@ -1,0 +1,23 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock · ตัดสิน review แล้ว (unattended · AI-DEFAULT)
+feature_id: F-TMP-004
+name: 'ใบเดินทาง : เขตการขาย General Trade'
+code: TRV
+events:
+- id: trv_cancelled
+  trigger: pending_approval → cancelled (DEC-08 · G7)
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  frd_ref: 03_LOGIC FN-09
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+note: 'ตัด trv_over_limit_approved ที่ suggest ไว้ (review: true) — กฎ G3 ของเอกสารนี้
+  คือเตือนในหน้าจอตอนกรอก (Accual > แผน) ไม่ใช่เหตุการณ์หลังอนุมัติที่ต้องแจ้งใคร
+  และยังไม่มี role ผู้รับที่ยืนยันได้ (จะได้ TODO-role ค้าง) · ถ้าลูกค้ายืนยันว่าต้องการ
+  ให้เปิดเพิ่มในรอบหลังใบเซ็น'

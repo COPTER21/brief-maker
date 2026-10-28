@@ -1,0 +1,22 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock · ตัดสิน review แล้ว (โหมดไม่เฝ้า · AI-DEFAULT)
+feature_id: F-TMP-005
+name: แบบฟอร์มสำรวจสมรรถนะ
+code: CMP
+events:
+- id: cmp_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  frd_ref: 03_LOGIC FN-06
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+note: 'ตัด cmp_over_limit_approved ออก — ฟอร์มนี้ไม่มีสูตร/เกณฑ์ตัวเลขบนกระดาษ (FORM_SPEC.formulas = 0)
+  มติ G3 over_limit=warn เป็นค่า default ที่ไม่มีเกณฑ์จริงให้เตือน → ไม่ประกาศ event ลอย
+  · ไม่มี event ส่งต่อระบบอื่น ตาม DEC-02 (post_to = [])'

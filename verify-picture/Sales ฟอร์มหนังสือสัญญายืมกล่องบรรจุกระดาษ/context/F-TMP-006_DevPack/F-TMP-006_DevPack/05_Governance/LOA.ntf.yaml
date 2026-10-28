@@ -1,0 +1,34 @@
+# ntf-declaration v1.2 — ฉบับจริง (ยืนยันกับ FRD · frd_ref ครบ)
+feature_id: F-TMP-006
+name: หนังสือสัญญายืม
+code: LOA
+events:
+- id: loa_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC FN-09
+- id: loa_signed_copy_attached
+  trigger: approved → แนบไฟล์หนังสือที่คู่สัญญาลงนามแล้วเข้าเอกสาร (G10 แนบไฟล์)
+  recipients:
+  - document_owner
+  - role-mgr-sales
+  template: '**{doc_no}** ได้รับหนังสือสัญญายืมที่ลงนามครบสองฝ่ายแล้ว — {attachment_name}'
+  channel: in-app
+  optional: true
+  why: หลักฐานผูกพันของสัญญาคือฉบับที่ลงนามครบสองฝ่าย ผู้ดูแลเขตการขายต้องรู้ว่าได้คืนมาแล้ว
+    เป็น event ของเอกสารเอง ไม่ใช่ผลการอนุมัติในระบบ
+  frd_ref: 03_LOGIC FN-12
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+- loa_over_limit_approved
+note: ตัด loa_over_limit_approved ออก — เอกสารนี้ไม่มีช่องคำนวณและไม่มีเกณฑ์วงเงินในระบบ
+  (เพดานร้อยละ 10 ต่อปีเป็นถ้อยคำในสัญญา ไม่ใช่ค่าที่ระบบตรวจรายใบ · DEC-04) จึงไม่มี
+  event เกินเกณฑ์

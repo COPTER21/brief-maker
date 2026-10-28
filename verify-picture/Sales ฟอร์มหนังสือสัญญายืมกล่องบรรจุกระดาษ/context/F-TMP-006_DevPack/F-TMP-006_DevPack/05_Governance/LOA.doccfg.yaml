@@ -1,0 +1,53 @@
+# doccfg-declaration v2.1 — ฉบับจริง (ยืนยันกับ FRD · frd_ref ครบ)
+feature_id: F-TMP-006
+doc_types:
+- code: LOA
+  name_th: หนังสือสัญญายืม
+  module: SALES
+  feature_id: F-TMP-006
+  numbering:
+    preset: '{PREFIX}-{YYYY}-{run:4}'
+    reset: yearly
+    scope: global
+    no_gap: false
+    issue_on: first_save
+    frd_ref: 03_LOGIC FN-04
+  snapshot:
+    sent_external: true
+    approved_final: true
+  snapshot_points:
+  - event: sent_external
+    frd_ref: 03_LOGIC FN-07, FN-11
+  - event: approved_final
+    frd_ref: 03_LOGIC FN-07, FN-11
+  print_config:
+    form_code: FM-SAL-14
+    revision: 'Rev.00 : 01/07/2569'
+    paper: A4-portrait
+    min_rows: 1
+    dense_when_rows_over: 6
+    header_source: organization_snapshot_at_numbering
+    sign_boxes:
+    - box: requester
+      label: ผู้รับมอบ
+      show_date: true
+    - box: doa_step:*
+      label: from_doa_role
+      show_decision: true
+      show_date: true
+    decision_words:
+      default:
+        approve: ลงนาม
+        reject: ไม่ลงนาม
+      by_role:
+        role-mgr-sales:
+          approve: ลงนาม
+          reject: ไม่ลงนาม
+    sign_layout:
+      source: approval_chain snapshot (ผู้รับมอบ (คู่สัญญา) + จำนวนขั้นตามที่ตั้งใน
+        DOA)
+      max_per_row: 4
+      split: even
+      dense_when_steps_over: 4
+      keep_together: true
+    ref: print/print_config.json

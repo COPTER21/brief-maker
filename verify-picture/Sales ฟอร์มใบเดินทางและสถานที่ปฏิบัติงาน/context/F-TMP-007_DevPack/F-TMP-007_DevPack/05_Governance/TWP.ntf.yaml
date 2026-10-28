@@ -1,0 +1,24 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock · ตัดสิน review แล้ว (unattended · AI-DEFAULT)
+feature_id: F-TMP-007
+name: ใบเดินทางและสถานที่ปฎิบัติงาน  สำหรับ General Trade
+code: TWP
+events:
+- id: twp_cancelled
+  trigger: pending_approval → cancelled (DEC-09 · G7)
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  frd_ref: 03_LOGIC FN-11
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+note: 'ตัด twp_over_limit_approved ที่ suggest ไว้ (review: true) — กฎ G3 ของเอกสารนี้
+  (คงเหลือติดลบ = ต้องคืนบริษัท · เลขไมล์สิ้นสุดน้อยกว่าเลขไมล์เริ่มต้น) เป็นคำเตือนบนหน้าจอ
+  ตอนกรอก ไม่ใช่เหตุการณ์หลังอนุมัติที่ต้องแจ้งใคร และยังไม่มี role ผู้รับที่ยืนยันได้
+  (จะได้ TODO-role ค้าง ซึ่งผิดกฎ N4) · ถ้าลูกค้ายืนยันว่าต้องการให้แจ้งฝ่ายการเงินเมื่อมีเงินคืน
+  ให้เปิดเพิ่มในรอบหลังใบเซ็น'

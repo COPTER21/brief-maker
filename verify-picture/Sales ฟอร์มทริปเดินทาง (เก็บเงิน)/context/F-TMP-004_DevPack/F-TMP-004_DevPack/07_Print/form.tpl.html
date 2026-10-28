@@ -1,0 +1,64 @@
+<style>
+/* ============================================================
+   TRV DOC-LEVEL OVERRIDES — ใบเดินทาง เขตการขาย General Trade (เก็บเงิน)
+   เคาะ 2026-10-10 (Strike): ต้นฉบับลูกค้าเป็น A4 "แนวนอน" + คอลัมน์ 21 ช่อง
+   กว้างตามสัดส่วนกระดาษ (วัดจาก column width ใน xlsx ต้นฉบับ)
+   engine thai-doc-pdf-generator v2.2 ยังไม่มี token: page_orientation /
+   grid col widths → ใส่เป็น override ระดับเอกสาร (ดู print-spec §7)
+   TODO: ย้ายเข้า profile token เมื่อสกิลออก v2.3
+   ============================================================ */
+@page{ size:A4 landscape; margin:6mm; }
+:root{ --page-w:297mm; --page-h:210mm; --page-margin:6mm; --content-h:198mm; }
+/* หัวกระดาษ: โลโก้ซ้าย + ชื่อเอกสารกึ่งกลางบรรทัดเดียวกัน (ตามกระดาษ) */
+.trv-head{ display:flex; align-items:flex-start; gap:4mm; }
+.trv-head .form-brand{ flex:0 0 46mm; justify-content:flex-start; }
+.trv-head .form-title{ flex:1 1 auto; margin-top:0; }
+.trv-head::after{ content:""; flex:0 0 46mm; }
+/* กล่อง TO/CC — กระดาษเป็นกล่องเส้นบาง มีช่องเติมขีดเส้น ไม่ใช่ตาราง */
+.trv-meta{ border:1px solid var(--form-grid-line); padding:0 2mm 1mm; margin-top:1.5mm; }
+.trv-meta .form-row{ margin-top:1px; gap:4px; }
+.trv-meta .lbl{ white-space:nowrap; }
+/* ตารางหลัก 21 คอลัมน์ ตามสัดส่วนต้นฉบับ (คอลัมน์ B และ E คือช่องว่างบนกระดาษ) */
+.form-grid.trv-grid{ margin-top:1.5mm; }
+.trv-grid col.cw-a{width:2.5%}  .trv-grid col.cw-b{width:3.5%}  .trv-grid col.cw-c{width:5.1%}
+.trv-grid col.cw-d{width:9.0%}  .trv-grid col.cw-e{width:1.9%}  .trv-grid col.cw-f{width:8.2%}
+.trv-grid col.cw-g{width:3.2%}  .trv-grid col.cw-h{width:2.2%}  .trv-grid col.cw-i{width:6.6%}
+.trv-grid col.cw-j{width:2.3%}  .trv-grid col.cw-k{width:6.5%}  .trv-grid col.cw-l{width:2.2%}
+.trv-grid col.cw-m{width:7.7%}  .trv-grid col.cw-n{width:2.9%}  .trv-grid col.cw-o{width:7.3%}
+.trv-grid col.cw-p{width:3.2%}  .trv-grid col.cw-q{width:5.7%}  .trv-grid col.cw-r{width:2.5%}
+.trv-grid col.cw-s{width:5.6%}  .trv-grid col.cw-t{width:6.6%}  .trv-grid col.cw-u{width:5.3%}
+.trv-grid th{ line-height:1.15; }
+.trv-grid td, .trv-grid th{ padding-top:0; padding-bottom:0; }
+/* บล็อกลงชื่อ — กระดาษเป็นเส้นลอย ไม่มีกรอบตาราง */
+.form-grid--signs, .form-grid--signs td{ border:0; }
+.trv-meta .fill{ min-height:1.2em; }
+.doc-bottom .sign__line{ height:12px; }
+.doc-bottom.is-dense .sign__line{ height:10px; }
+</style>
+<div class="doc-page"><div class="doc-content form{{#layout.dense}} form--dense{{/layout.dense}}">
+  <div class="trv-head">
+    <div class="form-brand"><img class="form-logo" src="{{{company.logo}}}" alt="{{company.name}}"></div>
+    <div class="form-title">{{company.name}}<br>{{doc.title}}</div>
+  </div>
+  <div class="trv-meta">
+    <div class="form-row"><span class="lbl">TO  :</span><span class="fill fill--left">{{header.to}}</span><span class="lbl">ผู้รับผิดชอบเขต  :</span><span class="fill fill--left">{{header.owner_name}}</span><span class="lbl">เขต  :</span><span class="fill fill--left">{{header.territory}}</span></div>
+    <div class="form-row"><span class="lbl">CC  :</span><span class="fill fill--left">{{header.cc}}</span><span class="lbl">ตำแหน่ง  :</span><span class="fill fill--left">{{header.owner_position}}</span><span class="lbl">รอบการขาย  :</span><span class="fill fill--left">{{header.sales_period}}</span></div>
+  </div>
+  <table class="form-grid trv-grid">
+    <colgroup><col class="cw-a"><col class="cw-b"><col class="cw-c"><col class="cw-d"><col class="cw-e"><col class="cw-f"><col class="cw-g"><col class="cw-h"><col class="cw-i"><col class="cw-j"><col class="cw-k"><col class="cw-l"><col class="cw-m"><col class="cw-n"><col class="cw-o"><col class="cw-p"><col class="cw-q"><col class="cw-r"><col class="cw-s"><col class="cw-t"><col class="cw-u"></colgroup>
+    <tr><th colspan="2" rowspan="2">วัน<br>ทำงาน</th><th rowspan="2">วันที่</th><th rowspan="2">เริ่มต้นตลาด</th><th rowspan="2"></th><th rowspan="2">สิ้นสุดตลาด</th><th rowspan="2">จำนวน</th><th colspan="2">วางบิล</th><th colspan="2">Accual</th><th colspan="2">รับเช็ค</th><th colspan="2">Accual</th><th colspan="2">เป้าหมายการขาย</th><th colspan="2">Accual</th><th rowspan="2">จังหวัดที่<br>ปฎิบัติงาน</th><th rowspan="2">ที่พัก<br>(จังหวัด)</th></tr>
+    <tr><th>บิล</th><th>บาท</th><th>บิล</th><th>บาท</th><th>บิล</th><th>บาท</th><th>บิล</th><th>บาท</th><th>ร้าน</th><th>บาท</th><th>ร้าน</th><th>บาท</th></tr>
+    {{#lines}}<tr><td class="g-c g-v">{{no}}</td><td></td><td class="g-c g-v">{{work_date}}</td><td class="g-v">{{market_from}}</td><td></td><td class="g-v">{{market_to}}</td><td class="g-num">{{qty}}</td><td class="g-num">{{bill_plan_c}}</td><td class="g-num">{{bill_plan_a}}</td><td class="g-num">{{bill_act_c}}</td><td class="g-num">{{bill_act_a}}</td><td class="g-num">{{chq_plan_c}}</td><td class="g-num">{{chq_plan_a}}</td><td class="g-num">{{chq_act_c}}</td><td class="g-num">{{chq_act_a}}</td><td class="g-num">{{tgt_shop}}</td><td class="g-num">{{tgt_amt}}</td><td class="g-num">{{act_shop}}</td><td class="g-num">{{act_amt}}</td><td class="g-v">{{work_province}}</td><td class="g-v">{{stay_province}}</td></tr>
+    {{/lines}}<tr><td></td><td></td><td></td><td class="g-c g-b">รวมยอด</td><td></td><td></td><td class="g-num g-b">{{totals.qty}}</td><td class="g-num g-b">{{totals.bill_plan_c}}</td><td class="g-num g-b">{{totals.bill_plan_a}}</td><td class="g-num g-b">{{totals.bill_act_c}}</td><td class="g-num g-b">{{totals.bill_act_a}}</td><td class="g-num g-b">{{totals.chq_plan_c}}</td><td class="g-num g-b">{{totals.chq_plan_a}}</td><td class="g-num g-b">{{totals.chq_act_c}}</td><td class="g-num g-b">{{totals.chq_act_a}}</td><td class="g-num g-b">{{totals.tgt_shop}}</td><td class="g-num g-b">{{totals.tgt_amt}}</td><td class="g-num g-b">{{totals.act_shop}}</td><td class="g-num g-b">{{totals.act_amt}}</td><td></td><td></td></tr>
+  </table>
+</div><div class="doc-bottom{{#layout.dense}} is-dense{{/layout.dense}}">
+  <div class="signs-block">{{#sign_rows}}<table class="form-grid form-grid--signs"><tr>{{#signs}}<td>
+    <div class="g-b">{{role}}</div>
+    <div class="sign__name">{{#decision}}{{approve_box}} {{approve_word}} &nbsp;&nbsp; {{reject_box}} {{reject_word}}{{/decision}}{{^decision}}&nbsp;{{/decision}}</div>
+    <div class="sign__line"></div>
+    <div class="sign__paren">({{name}})</div>
+    <div class="sign__date">{{date}}</div>
+  </td>{{/signs}}</tr></table>
+  {{/sign_rows}}</div>
+  <div class="doc-footer"><span>เลขที่ {{doc.no}}{{#doc.is_draft}} · ร่าง{{/doc.is_draft}} · เอกสารนี้จัดทำโดยระบบ CUBE NATIVE</span><span>{{doc.footer_right}}</span></div>
+</div></div>

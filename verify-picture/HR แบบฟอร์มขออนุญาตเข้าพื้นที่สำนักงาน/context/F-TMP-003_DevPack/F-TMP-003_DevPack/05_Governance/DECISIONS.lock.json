@@ -1,0 +1,333 @@
+{
+ "req": "REQ-TMP-003",
+ "status": "พร้อมเริ่มทำ",
+ "ready": true,
+ "decisions": [
+  {
+   "id": "DEC-01",
+   "cat": "G1",
+   "text": "อนุมัติแล้วไม่เปลี่ยนค่าในระบบ",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-02",
+   "cat": "G1",
+   "text": "ไม่ส่งต่อระบบอื่นรอบนี้ (ประกาศ event ไว้ใน FRD แต่ไม่ยิง)",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-03",
+   "cat": "G2",
+   "text": "สายอนุมัติตั้งที่ DOA กลาง (dynamic) · ค่าเริ่ม 1 ขั้น: role-line-manager · วงเงิน: ไม่มี",
+   "value": {
+    "required": true,
+    "mode": "dynamic",
+    "default_steps": [
+     "role-line-manager"
+    ],
+    "amount": "none"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "doa-declaration",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-04",
+   "cat": "G3",
+   "text": "ค่าคงที่อ่านจาก config: \"บริษัท ครีเดนซ์ จำกัด (มหาชน) / บริษัท ครีเดนซ์ จำกัด\" → Organization.Company.name_th · คำนวณให้อัตโนมัติ ผู้ใช้ปรับได้ · เกินเกณฑ์ = เตือน · ชื่อบริษัทบนกระดาษ (2 จุด) อ่านจาก Organization Company.name_th ค่าเดียว — ห้าม hardcode · ชื่อผู้รับการติดต่อ = พนักงานที่ผู้มาติดต่อระบุ (host) อัตโนมัติ · สังกัดฝ่าย/ผู้บังคับบัญชาต้นสังกัดดึงจากผังองค์กรของ host (อ่านอย่างเดียว) · ไม่อนุมัติ → ต้องกรอกความเห็นผู้บังคับบัญชา (บล็อก) · วันที่ลงนามผู้มาติดต่อก่อนวันที่เข้าพื้นที่ → เตือน · ผู้ขอ (เจ้าของใบ) = พนักงานผู้รับการติดต่อ บันทึกข้อมูลผู้มาติดต่อแทน · ผู้มาติดต่อลงนามด้วยมือบนแบบพิมพ์",
+   "value": {
+    "constants_from_config": true,
+    "auto_compute": true,
+    "over_limit": "warn",
+    "rules": [
+     "ชื่อบริษัทบนกระดาษ (2 จุด) อ่านจาก Organization Company.name_th ค่าเดียว — ห้าม hardcode",
+     "ชื่อผู้รับการติดต่อ = พนักงานที่ผู้มาติดต่อระบุ (host) อัตโนมัติ · สังกัดฝ่าย/ผู้บังคับบัญชาต้นสังกัดดึงจากผังองค์กรของ host (อ่านอย่างเดียว)",
+     "ไม่อนุมัติ → ต้องกรอกความเห็นผู้บังคับบัญชา (บล็อก)",
+     "วันที่ลงนามผู้มาติดต่อก่อนวันที่เข้าพื้นที่ → เตือน",
+     "ผู้ขอ (เจ้าของใบ) = พนักงานผู้รับการติดต่อ บันทึกข้อมูลผู้มาติดต่อแทน · ผู้มาติดต่อลงนามด้วยมือบนแบบพิมพ์"
+    ]
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-05",
+   "cat": "G4",
+   "text": "รายการซ้ำ: ไม่จำกัดจำนวนแถว · PDF อย่างน้อย None แถวตามกระดาษ",
+   "value": {
+    "max_rows": null,
+    "min_rows": null
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-06",
+   "cat": "G5",
+   "text": "ช่องตรงกระดาษ 1:1 · ไม่เพิ่มช่อง (เช่น หมายเหตุ)",
+   "value": {
+    "one_to_one": true,
+    "add_fields": [],
+    "merge_split": []
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-07",
+   "cat": "G6",
+   "text": "ลายเซ็นแถวล่าง 1 ช่องต่อขั้น DOA · ไม่ใช้ภาพลายมือชื่อ (ข้อความส่งในระบบ/พิจารณาในระบบ)",
+   "value": {
+    "layout": "row-bottom",
+    "per_doa_step": true,
+    "handwriting_image": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "thai-doc",
+    "html",
+    "doccfg-declaration",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-08",
+   "cat": "G7",
+   "text": "ไม่อนุมัติ = กลับเป็นร่าง แก้แล้วส่งใหม่ · ยกเลิกได้โดย owner, admin_role สถานะ draft, submitted · ต้องมีเหตุผล",
+   "value": {
+    "on_reject": "draft",
+    "cancel_by": [
+     "owner",
+     "admin_role"
+    ],
+    "cancel_states": [
+     "draft",
+     "submitted"
+    ],
+    "reason_required": true
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests",
+    "doa-declaration"
+   ]
+  },
+  {
+   "id": "DEC-09",
+   "cat": "G8",
+   "text": "มองเห็น: เจ้าของ · ผู้อนุมัติเห็นหลังส่ง · admin role เห็นทั้งหมด",
+   "value": {
+    "owner": true,
+    "approver": "after_submit",
+    "admin_role": "all",
+    "admin_role_id": "role-mgr-hr"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-10",
+   "cat": "G9",
+   "text": "ออกเลขเมื่อบันทึกครั้งแรก · รหัส VAR",
+   "value": {
+    "issue_on": "first_save",
+    "code": "VAR"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "doccfg-declaration",
+    "html",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-11",
+   "cat": "G10",
+   "text": "ของเสริม (กระดาษไม่มี): แนบไฟล์, ส่งออก CSV",
+   "value": {
+    "attachments": true,
+    "copy": false,
+    "export_csv": true,
+    "announce": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "brd",
+    "frd",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-12",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: F09 = F06 อัตโนมัติ (อ่านอย่างเดียว) — ห้ามต่างกัน (พบ: ชื่อพนักงานที่ติดต่อ (F06) กับ ชื่อผู้รับการติดต่อ (F09) เป็นคนเดียวกันแต่กรอก 2 ที่)",
+   "value": {
+    "where": "ส่วนผู้มาติดต่อ vs ส่วนเจ้าหน้าที่",
+    "detail": "ชื่อพนักงานที่ติดต่อ (F06) กับ ชื่อผู้รับการติดต่อ (F09) เป็นคนเดียวกันแต่กรอก 2 ที่",
+    "rule": "F09 = F06 อัตโนมัติ (อ่านอย่างเดียว) — ห้ามต่างกัน"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-13",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ทั้งสองจุดแสดง Company.name_th จาก Organization ค่าเดียว (พบ: ส่วนบนเขียน \"บริษัท ครีเดนซ์ จำกัด (มหาชน)\" ส่วนล่างเขียน \"บริษัท ครีเดนซ์ จำกัด\" ไม่ตรงกัน)",
+   "value": {
+    "where": "ชื่อบริษัท",
+    "detail": "ส่วนบนเขียน \"บริษัท ครีเดนซ์ จำกัด (มหาชน)\" ส่วนล่างเขียน \"บริษัท ครีเดนซ์ จำกัด\" ไม่ตรงกัน",
+    "rule": "ทั้งสองจุดแสดง Company.name_th จาก Organization ค่าเดียว"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-14",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ไม่อนุมัติ → ต้องกรอกเหตุผล (ช่อง ผู้บังคับบัญชาพิจารณา) — บล็อก (พบ: ตัวเลือก อนุมัติ/ไม่อนุมัติ ไม่ระบุว่าต้องมีเหตุผล)",
+   "value": {
+    "where": "ผู้บังคับบัญชาพิจารณา",
+    "detail": "ตัวเลือก อนุมัติ/ไม่อนุมัติ ไม่ระบุว่าต้องมีเหตุผล",
+    "rule": "ไม่อนุมัติ → ต้องกรอกเหตุผล (ช่อง ผู้บังคับบัญชาพิจารณา) — บล็อก"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-15",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: visitor.sign_date ≥ visit.request_date (เตือน) (พบ: วันที่ลงนามผู้มาติดต่อไม่ควรก่อนวันที่ขอเข้าพื้นที่)",
+   "value": {
+    "where": "วันที่",
+    "detail": "วันที่ลงนามผู้มาติดต่อไม่ควรก่อนวันที่ขอเข้าพื้นที่",
+    "rule": "visitor.sign_date ≥ visit.request_date (เตือน)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  }
+ ],
+ "raw": {
+  "config_changes": [],
+  "post_to": [],
+  "doa": {
+   "required": true,
+   "mode": "dynamic",
+   "default_steps": [
+    "role-line-manager"
+   ],
+   "amount": "none"
+  },
+  "calc": {
+   "constants_from_config": true,
+   "auto_compute": true,
+   "over_limit": "warn",
+   "rules": [
+    "ชื่อบริษัทบนกระดาษ (2 จุด) อ่านจาก Organization Company.name_th ค่าเดียว — ห้าม hardcode",
+    "ชื่อผู้รับการติดต่อ = พนักงานที่ผู้มาติดต่อระบุ (host) อัตโนมัติ · สังกัดฝ่าย/ผู้บังคับบัญชาต้นสังกัดดึงจากผังองค์กรของ host (อ่านอย่างเดียว)",
+    "ไม่อนุมัติ → ต้องกรอกความเห็นผู้บังคับบัญชา (บล็อก)",
+    "วันที่ลงนามผู้มาติดต่อก่อนวันที่เข้าพื้นที่ → เตือน",
+    "ผู้ขอ (เจ้าของใบ) = พนักงานผู้รับการติดต่อ บันทึกข้อมูลผู้มาติดต่อแทน · ผู้มาติดต่อลงนามด้วยมือบนแบบพิมพ์"
+   ]
+  },
+  "repeat": {
+   "max_rows": null
+  },
+  "fidelity": {
+   "one_to_one": true,
+   "add_fields": [],
+   "merge_split": []
+  },
+  "signature": {
+   "layout": "row-bottom",
+   "per_doa_step": true,
+   "handwriting_image": false
+  },
+  "reject_cancel": {
+   "on_reject": "draft",
+   "cancel_by": [
+    "owner",
+    "admin_role"
+   ],
+   "cancel_states": [
+    "draft",
+    "submitted"
+   ],
+   "reason_required": true
+  },
+  "visibility": {
+   "owner": true,
+   "approver": "after_submit",
+   "admin_role": "all",
+   "admin_role_id": "role-mgr-hr"
+  },
+  "numbering": {
+   "issue_on": "first_save",
+   "code": "VAR"
+  },
+  "extras": {
+   "attachments": true,
+   "copy": false,
+   "export_csv": true,
+   "announce": false
+  },
+  "extend": {},
+  "fit": {}
+ },
+ "unattended": true
+}

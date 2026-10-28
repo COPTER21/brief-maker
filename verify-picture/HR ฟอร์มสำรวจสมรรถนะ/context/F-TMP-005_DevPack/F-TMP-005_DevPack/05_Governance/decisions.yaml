@@ -1,0 +1,41 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# REQ-TMP-005 · F-TMP-005 · แบบฟอร์มสำรวจสมรรถนะ (FM-HRM-40) · module HR
+# ตอบตาม 4_knowledge/governance/unattended-policy.md (อนุรักษ์นิยม · ERP standard)
+
+# G1 ผลต่อระบบ — แบบฟอร์มสำรวจสมรรถนะเป็นเอกสารบันทึกผลประเมิน ไม่เปลี่ยนค่าใด ๆ ในระบบ ไม่ส่งต่อ module อื่นรอบนี้
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — บนกระดาษมีช่องลงชื่อผู้อนุมัติ 1 จุด (ผู้ประเมิน = ผู้บังคับบัญชาของผู้รับประเมิน)
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager"], amount: none }
+
+# G3 ค่าคงที่ — ตารางระดับการประเมิน 1–4 บนกระดาษต้องอ่านจาก config ห้าม hardcode · ไม่มีสูตรคำนวณบนกระดาษ
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules: []
+
+# G4 รายการซ้ำ — core 5 แถว · func 6 แถว บนกระดาษ = ขั้นต่ำ · เพิ่มได้ไม่จำกัด
+repeat: { max_rows: null }
+
+# G5 ความตรงกระดาษ — 1:1 ไม่เพิ่มช่อง
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น — แถวล่าง 1 ช่องต่อขั้น DOA + ช่องผู้รับประเมิน · ข้อความ "พิจารณาในระบบ" ไม่ใช้ภาพลายมือชื่อ
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ / ยกเลิก — กลับเป็นร่างเลขเดิม · ยกเลิกได้ที่สถานะร่าง/รออนุมัติ · ต้องมีเหตุผล
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น — เจ้าของ · ผู้อนุมัติหลังส่ง · admin role ของ HR เห็นทั้งหมด
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 เลขที่ — ไม่ใช่เอกสารการเงิน no-gap → ออกเลขตอนบันทึกครั้งแรก · รหัส CMP (ย่อจาก Competency · ไม่ชนทะเบียน)
+numbering: { issue_on: first_save, code: "CMP" }
+
+# G10 ของเสริม — แนบไฟล์ ✓ · ส่งออก CSV ✓ · ทำซ้ำ ✗ · ประกาศ ✗
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}
