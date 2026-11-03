@@ -1,0 +1,277 @@
+{
+ "req": "REQ-TMP-001",
+ "status": "พร้อมเริ่มทำ",
+ "ready": true,
+ "decisions": [
+  {
+   "id": "DEC-01",
+   "cat": "G1",
+   "text": "อนุมัติแล้วไม่เปลี่ยนค่าในระบบ",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-02",
+   "cat": "G1",
+   "text": "ไม่ส่งต่อระบบอื่นรอบนี้ (ประกาศ event ไว้ใน FRD แต่ไม่ยิง)",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-03",
+   "cat": "G2",
+   "text": "ไม่มีการอนุมัติ",
+   "value": {
+    "required": false,
+    "mode": "dynamic",
+    "default_steps": [],
+    "amount": "none"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-04",
+   "cat": "G3",
+   "text": "คำนวณให้อัตโนมัติ ผู้ใช้ปรับได้ · เกินเกณฑ์ = เตือน · ชื่อบริษัทในหัวเรื่องและข้อ 2 ดึงจาก Organization.legal_name ค่าเดียวกัน (ไม่พิมพ์ตายตัว)",
+   "value": {
+    "constants_from_config": true,
+    "auto_compute": true,
+    "over_limit": "warn",
+    "rules": [
+     "ชื่อบริษัทในหัวเรื่องและข้อ 2 ดึงจาก Organization.legal_name ค่าเดียวกัน (ไม่พิมพ์ตายตัว)"
+    ]
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-05",
+   "cat": "G4",
+   "text": "รายการซ้ำ: ไม่จำกัดจำนวนแถว · PDF อย่างน้อย None แถวตามกระดาษ",
+   "value": {
+    "max_rows": null,
+    "min_rows": null
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-06",
+   "cat": "G5",
+   "text": "ช่องตรงกระดาษ 1:1 · ไม่เพิ่มช่อง (เช่น หมายเหตุ)",
+   "value": {
+    "one_to_one": true,
+    "add_fields": [],
+    "merge_split": []
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-07",
+   "cat": "G6",
+   "text": "ลายเซ็นแถวล่าง 1 ช่องต่อขั้น DOA · ไม่ใช้ภาพลายมือชื่อ (ข้อความส่งในระบบ/พิจารณาในระบบ)",
+   "value": {
+    "layout": "row-bottom",
+    "per_doa_step": true,
+    "handwriting_image": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "thai-doc",
+    "html",
+    "doccfg-declaration",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-08",
+   "cat": "G8",
+   "text": "มองเห็น: เจ้าของ · ผู้อนุมัติเห็นหลังส่ง · admin role เห็นทั้งหมด",
+   "value": {
+    "owner": true,
+    "approver": "after_submit",
+    "admin_role": "all"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-09",
+   "cat": "G9",
+   "text": "ออกเลขเมื่อบันทึกครั้งแรก · รหัส CSE",
+   "value": {
+    "issue_on": "first_save",
+    "code": "CSE"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "doccfg-declaration",
+    "html",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-10",
+   "cat": "G10",
+   "text": "ของเสริม (กระดาษไม่มี): แนบไฟล์, ส่งออก CSV",
+   "value": {
+    "attachments": true,
+    "copy": false,
+    "export_csv": true,
+    "announce": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "brd",
+    "frd",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-11",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ทั้งสองจุดดึงชื่อนิติบุคคลเดียวกันจาก Organization.legal_name — ไม่พิมพ์ตายตัว (พบ: หัวเรื่องเขียน 'บริษัทครีเดนซ์ จำกัด (มหาชน)' แต่ข้อ 2 พิมพ์ 'บริษัท ครีเดนซ์ จำกัด' (ไม่มี มหาชน))",
+   "value": {
+    "where": "หัวกระดาษ vs ข้อ 2",
+    "detail": "หัวเรื่องเขียน 'บริษัทครีเดนซ์ จำกัด (มหาชน)' แต่ข้อ 2 พิมพ์ 'บริษัท ครีเดนซ์ จำกัด' (ไม่มี มหาชน)",
+    "rule": "ทั้งสองจุดดึงชื่อนิติบุคคลเดียวกันจาก Organization.legal_name — ไม่พิมพ์ตายตัว"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-12",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ตีความเป็น 1–<3 ปี / 3–5 ปี / มากกว่า 5 ปี · เลือกได้ 1 ตัว (คำบนกระดาษคงเดิม) (พบ: ช่วง '1-3 ปี' กับ '3-5 ปี' ทับกันที่ 3 ปี)",
+   "value": {
+    "where": "ตัวเลือกข้อ 4",
+    "detail": "ช่วง '1-3 ปี' กับ '3-5 ปี' ทับกันที่ 3 ปี",
+    "rule": "ตีความเป็น 1–<3 ปี / 3–5 ปี / มากกว่า 5 ปี · เลือกได้ 1 ตัว (คำบนกระดาษคงเดิม)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-13",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: คะแนนต้องเป็นจำนวนเต็ม 1–5 เท่านั้น · ครบ 9 ข้อก่อนส่ง (พบ: กระดาษให้เขียนตัวเลขเอง ไม่มีกรอบตัวเลือก)",
+   "value": {
+    "where": "หัวตาราง 'คะแนน (1-5)'",
+    "detail": "กระดาษให้เขียนตัวเลขเอง ไม่มีกรอบตัวเลือก",
+    "rule": "คะแนนต้องเป็นจำนวนเต็ม 1–5 เท่านั้น · ครบ 9 ข้อก่อนส่ง"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  }
+ ],
+ "raw": {
+  "config_changes": [],
+  "post_to": [],
+  "doa": {
+   "required": false,
+   "mode": "dynamic",
+   "default_steps": [],
+   "amount": "none"
+  },
+  "calc": {
+   "constants_from_config": true,
+   "auto_compute": true,
+   "over_limit": "warn",
+   "rules": [
+    "ชื่อบริษัทในหัวเรื่องและข้อ 2 ดึงจาก Organization.legal_name ค่าเดียวกัน (ไม่พิมพ์ตายตัว)"
+   ]
+  },
+  "repeat": {
+   "max_rows": null
+  },
+  "fidelity": {
+   "one_to_one": true,
+   "add_fields": [],
+   "merge_split": []
+  },
+  "signature": {
+   "layout": "row-bottom",
+   "per_doa_step": true,
+   "handwriting_image": false
+  },
+  "reject_cancel": {
+   "on_reject": "draft",
+   "cancel_by": [
+    "owner",
+    "admin_role"
+   ],
+   "cancel_states": [
+    "draft",
+    "submitted"
+   ],
+   "reason_required": true
+  },
+  "visibility": {
+   "owner": true,
+   "approver": "after_submit",
+   "admin_role": "all"
+  },
+  "numbering": {
+   "issue_on": "first_save",
+   "code": "CSE"
+  },
+  "extras": {
+   "attachments": true,
+   "copy": false,
+   "export_csv": true,
+   "announce": false
+  },
+  "extend": {},
+  "fit": {}
+ },
+ "unattended": true
+}

@@ -1,0 +1,37 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# J001 แบบประเมินความพึงพอใจลูกค้า (FM-SAL-06) · ตอบตาม 4_knowledge/governance/unattended-policy.md
+
+# G1 ผลต่อระบบ — ไม่เปลี่ยนค่า ไม่ส่งต่อ (แบบสอบถามเก็บผลในเอกสารนี้)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — กระดาษมีช่องลงชื่อผู้อนุมัติ 0 ช่อง (มีแค่ "ผู้ประเมิน") → ไม่มีการอนุมัติ
+doa: { required: false, mode: dynamic, default_steps: [], amount: none }
+
+# G3 ไม่มีสูตร/ค่าคงที่บนกระดาษ · ชื่อบริษัทคู่ค้าดึงจาก Organization (แก้ความไม่ตรง จำกัด/มหาชน)
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules: ["ชื่อบริษัทในหัวเรื่องและข้อ 2 ดึงจาก Organization.legal_name ค่าเดียวกัน (ไม่พิมพ์ตายตัว)"]
+
+# G4 ไม่มีรายการซ้ำ (ตาราง 9 หัวข้อคงที่)
+repeat: { max_rows: null }
+
+# G5 1:1 ไม่เพิ่มช่อง
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ช่องลงชื่อ "ผู้ประเมิน" 1 ช่อง · ข้อความ "ส่งในระบบ" ไม่ใช้ภาพ
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 (ไม่มีอนุมัติ) ยกเลิกได้: เจ้าของ + admin role · สถานะ ร่าง/ส่งแล้ว · เหตุผลบังคับ
+reject_cancel: { on_reject: draft, cancel_by: [owner, admin_role], cancel_states: [draft, submitted], reason_required: true }
+
+# G8 เจ้าของ · admin role ของหน่วยงานเจ้าของเอกสาร (ผู้จัดการฝ่ายขาย role-mgr-sales) เห็นทั้งหมด
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 ออกเลขตอนบันทึกครั้งแรก · รหัสย่อ 3 ตัว: CSE (Customer Satisfaction Evaluation)
+numbering: { issue_on: first_save, code: CSE }
+
+# G10 แนบไฟล์ ✓ · CSV ✓ · ทำซ้ำ ✗ · ประกาศ ✗
+extras: { attachments: true, copy: false, export_csv: true, announce: false }

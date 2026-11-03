@@ -1,0 +1,22 @@
+feature_id: F-TMP-002
+name: บันทึกภายใน
+code: MEM
+events:
+- id: mem_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC MEM-FN-06
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+note: 'ตัด mem_over_limit_approved (suggest เสนอมา review: true) ออก — ฟอร์ม FM-HRM-54
+  ไม่มีสูตรและไม่มีค่าคงที่/เกณฑ์ใด ๆ (FORM_SPEC.formulas = 0 · constants = 0 · DECISIONS
+  calc.rules = []) จึงไม่มีเงื่อนไข "เกินเกณฑ์" ให้ยิง · ไม่ประกาศ event แจ้งผู้รับตามช่อง
+  "เรียน" เพราะเป็นข้อความอิสระ ไม่ผูกผู้ใช้ในระบบ และ G10 announce = ✗ · เพิ่มภายหลังได้เมื่อลูกค้ายืนยัน'

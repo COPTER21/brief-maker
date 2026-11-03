@@ -1,0 +1,41 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# ที่มา: 4_knowledge/governance/unattended-policy.md + FORM_SPEC.check.json (signals.gate) · ฟอร์ม FM-HRM-54 บันทึกภายใน
+
+# G1 ผลต่อระบบ (ต้องตอบ) — ฟอร์มไม่ได้เขียนว่าอนุมัติแล้วไปเปลี่ยนค่าหรือส่งต่อระบบใด
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — กระดาษมีช่องลงชื่อผู้พิจารณา 1 จุด (ฝ่ายกฎหมาย) → ค่าเริ่ม 1 ขั้น · ไม่มีช่วงวงเงินบนกระดาษ
+doa: { required: true, mode: dynamic, default_steps: ["role-compliance"], amount: none }
+
+# G3 สูตร / ค่าคงที่ — กระดาษไม่มีสูตรและไม่มีตัวเลขพิมพ์ตายตัว
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules: []
+
+# G4 รายการซ้ำ — ไม่มี repeat group บนกระดาษ
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ — 1:1 ไม่เพิ่มช่อง
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น — แถวล่าง 1 ช่องต่อขั้น DOA · ไม่ใช้ภาพลายมือชื่อ
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ / ยกเลิก — กลับเป็นร่างเลขเดิม · ยกเลิกได้เฉพาะร่าง/รออนุมัติ · ต้องมีเหตุผล
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 เลขที่ — เอกสารภายใน ไม่ใช่เอกสารการเงินที่ต้อง no-gap → ออกเลขตอนบันทึกครั้งแรก
+#     ชื่อไฟล์ไม่มี [CODE] → ย่อ 3 ตัวจากชื่อเอกสาร "บันทึกภายใน" (Internal Memo) = MEM (ไม่ชนใน doccfg_registry_codes.txt)
+numbering: { issue_on: first_save, code: "MEM" }
+
+# G10 ของเสริม — แนบไฟล์ ✓ · CSV ✓ · ทำซ้ำ ✗ · ประกาศ ✗
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

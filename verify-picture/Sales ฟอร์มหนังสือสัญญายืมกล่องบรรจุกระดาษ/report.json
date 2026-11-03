@@ -1,0 +1,117 @@
+{
+  "feature": { "code": "F-TMP-006", "name": "หนังสือสัญญายืมกล่องบรรจุกระดาษ (LOA)", "module": "Sales" },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-10-28",
+  "round": 1,
+  "env": "Production · core.2bsimple.com/sales/loan-agreements",
+  "refs": "FRD v6 Pack F-TMP-006 (06_TESTS 56 เคส) · ดีไซน์ต้นแบบ feature.html",
+
+  "scope": {
+    "checked": [
+      "สร้าง / แก้ไขร่าง / ยกเลิกเอกสาร (happy path ใช้งานได้)",
+      "ค้นหา+เลือกลูกค้าผู้ยืม (create drawer) และเลือกผู้พิจารณา (modal ส่งลงนาม)",
+      "แนบไฟล์ — ทั้ง UI และตำแหน่งที่ช่องแนบปรากฏ",
+      "view drawer และแท็บ PDF Preview (ความเรียบร้อยหน้าจอ)",
+      "modal ยกเลิกเอกสาร และ modal ส่งให้ผู้ส่งมอบลงนาม (UI)"
+    ],
+    "not_checked": [
+      { "item": "สิทธิ์และการมองเห็น — ร่างคนอื่นรั่วถึง approver, 404 ไม่ใช่ 403 ของร่างคนอื่น, ผู้จัดทำลงนามใบตัวเองไม่ได้ (T-30…T-38)", "reason": "รอบนี้ตรวจเฉพาะ flow+UI ยังไม่ได้ทดสอบข้ามสิทธิ์" },
+      { "item": "เลขที่เอกสารคงเดิมตลอดชีพ แม้ถูกส่งกลับแก้ไขแล้วส่งใหม่ (T-04/T-23/T-25)", "reason": "ยังไม่ได้เดินเคสส่งกลับแก้ไข" },
+      { "item": "ค่านโยบาย box_free_replace_pct ถูก snapshot — เปลี่ยน config แล้วไม่ย้อนแก้ฉบับที่ออกเลขไปแล้ว (T-45)", "reason": "ต้องแก้ค่า config กลาง ยังไม่ได้ทดสอบ" },
+      { "item": "ลงนามครบแล้วไม่แตะระบบอื่น — ไม่ตัดสต๊อก ไม่ลงบัญชี (T-53, DEC-01/02)", "reason": "ยังไม่ได้ตรวจระบบปลายทาง" },
+      { "item": "สายอนุมัติ dynamic หลายขั้น + ช่องลงชื่อบนแบบพิมพ์แบ่งแถว (T-26/T-27)", "reason": "ต้องตั้ง DOA กลางหลายขั้น ยังไม่ได้ทดสอบ" },
+      { "item": "ตรวจชนิด/ขนาดไฟล์แนบที่ server (T-50/T-51) · แก้ชน 409 (T-54) · ประวัติ append-only (T-55)", "reason": "ยังไม่ได้ทดสอบเคส edge/negative" },
+      { "item": "ความถูกต้องแบบพิมพ์ 2 ชุด (ต้นฉบับ/สำเนา เลขข้อ 1./2. ตรงกัน) และ parity กับต้นแบบ (T-40…T-47)", "reason": "ตรวจไม่ได้เพราะแท็บ PDF Preview แสดงหน้าขาว (BUG-05)" }
+    ]
+  },
+
+  "logic": [
+    { "item": "สร้างหนังสือสัญญา (create)", "status": "pass", "ref": "FN-01" },
+    { "item": "แก้ไขร่าง (update)", "status": "pass", "ref": "FN-02" },
+    { "item": "ยกเลิกเอกสาร (delete / cancel)", "status": "pass", "ref": "FN-09" },
+    { "item": "เลือกลูกค้าผู้ยืม / ผู้พิจารณา ผ่าน search dropdown",
+      "expected": "พิมพ์คำค้น → รายชื่อปรากฏใน dropdown ให้เลือกได้",
+      "actual": "พิมพ์แล้ว option ไม่แสดง ต้องพิมพ์ให้ตรงแล้วกด Enter จึงเลือกได้",
+      "status": "note", "bug": "BUG-01", "ref": "FN-01/FN-05 · VR-01/VR-07" },
+    { "item": "แนบไฟล์เอกสาร (upload + ตำแหน่งช่องแนบ)",
+      "expected": "อัปโหลดสำเร็จ (PDF/Word/Excel/รูป ≤20MB) · ช่องแนบอยู่ถูกที่/ถูกสถานะตาม FN-12",
+      "actual": "อัปโหลดไม่สำเร็จ API ตอบ LOA_FILE_INVALID 'อ่านไฟล์ไม่สำเร็จ' · และช่องแนบ (Choose File) โผล่ใน view drawer ตั้งแต่ร่าง/รอลงนาม",
+      "status": "fail", "bug": "BUG-03", "ref": "FN-12" },
+    { "item": "ดูตัวอย่างเอกสารก่อนพิมพ์ (แท็บ PDF Preview)",
+      "expected": "แท็บ PDF Preview เรนเดอร์หนังสือสัญญาตามต้นแบบ",
+      "actual": "แสดงหน้าขาว ไม่เรนเดอร์เอกสาร",
+      "status": "fail", "bug": "BUG-05", "ref": "FN-11 · T-40…T-47" }
+  ],
+
+  "ui_checked": true,
+  "ui": [
+    { "id": "U-02", "status": "note",
+      "note": "layout ช่องแนบไฟล์ (create/edit) เป็นกล่องเทาเปล่า ไม่มี dropzone/ปุ่ม + view drawer โดยรวมหลุดจากดีไซน์มาก — ดู BUG-02, BUG-06",
+      "evidence": ["tk02/upload.png", "tk03/Screenshot 2026-10-28 123740.png"] },
+    { "id": "U-06", "status": "note",
+      "note": "dropdown ลูกค้าผู้ยืม: icon ค้นหาทับ placeholder และ option ไม่แสดงเมื่อพิมพ์ — ดู BUG-01",
+      "evidence": ["tk01/Screenshot 2026-10-28 120351.png", "tk01/Screenshot 2026-10-28 123209.png"] },
+    { "item": "modal ยกเลิกเอกสาร หลุดจากดีไซน์ต้นแบบ", "status": "note",
+      "note": "ของจริงเหลือ chip เหตุผลสำเร็จรูป 1 อัน (ต้นแบบมี 3), ไม่มี icon+เลขที่เอกสาร, textarea ไม่มี placeholder, ปุ่มเพี้ยน — ดู BUG-04",
+      "evidence": ["tk02/modal_cancle.png", "tk02/example_cancel_modal.png"] }
+  ],
+  "ux_checked": true,
+  "ux": [
+    { "id": "X-01", "status": "note",
+      "note": "เลือกลูกค้า/ผู้พิจารณาไม่ได้ด้วยวิธีปกติ ต้องเดาว่าให้กด Enter — ดู BUG-01" },
+    { "id": "X-05", "status": "note",
+      "note": "แท็บ PDF Preview แสดงหน้าขาว ไม่มีข้อความบอกสถานะหรือทางไปต่อ — ดู BUG-05" }
+  ],
+
+  "bugs": [
+    { "id": "BUG-05", "title": "แท็บ PDF Preview: ช่องแสดง PDF เป็นพื้นที่ว่าง ไม่เรนเดอร์เอกสาร", "severity": "high",
+      "steps": ["เปิดเอกสารใด ๆ ใน view drawer", "กดแท็บ PDF Preview", "ดูช่องพื้นที่ตัวอย่างเอกสาร"],
+      "expected": "ช่องตัวอย่างเอกสารเรนเดอร์หนังสือสัญญาเต็มพื้นที่ (COMPANY LOGO, หัวเรื่อง, เงื่อนไขข้อ 1./2., ช่องลงนาม) สลับต้นฉบับ/สำเนาได้",
+      "actual": "ช่องที่ต้องแสดง PDF เป็นพื้นที่ว่าง เอกสารไม่เรนเดอร์ลงในพื้นที่ preview — ตรวจความถูกต้องแบบพิมพ์ (T-40…T-47) ต่อไม่ได้",
+      "evidence": ["tk04/example_pdf_preview.png"],
+      "status": "open" },
+
+    { "id": "BUG-01", "title": "Search dropdown ไม่แสดง option + icon ทับ placeholder (ลูกค้าผู้ยืม / ผู้พิจารณา)", "severity": "medium",
+      "steps": [
+        "เปิด create drawer → ช่อง 'ลูกค้าผู้ยืม' (icon ค้นหาทับ placeholder อยู่แล้ว)",
+        "พิมพ์คำค้น → ไม่มีรายการใด ๆ โผล่ใน dropdown",
+        "พิมพ์ชื่อจาก response API ให้ตรงแล้วกด Enter → ระบบเลือก option นั้นให้ (แปลว่ามีข้อมูล แต่ list ไม่ render)",
+        "modal 'ส่งให้ผู้ส่งมอบลงนาม' → ช่องเลือกผู้พิจารณา อาการเดียวกัน (พิมพ์ 'qa' แล้ว option ไม่แสดง)"
+      ],
+      "expected": "พิมพ์คำค้น → รายการตรงเงื่อนไขปรากฏใน dropdown ให้คลิกเลือกได้ · icon ไม่ทับ placeholder",
+      "actual": "option ไม่แสดง (คาดว่า index option น้อยกว่ารายการจริงใน drawer) · ต้องพึ่งการกด Enter · icon ทับ placeholder",
+      "evidence": ["tk01/Screenshot 2026-10-28 120351.png", "tk01/Screenshot 2026-10-28 123209.png"],
+      "status": "open" },
+
+    { "id": "BUG-03", "title": "แนบไฟล์: อัปโหลดไม่สำเร็จ (API LOA_FILE_INVALID) + ช่องแนบโผล่ใน view drawer ตั้งแต่ร่าง/รอลงนาม", "severity": "high",
+      "steps": [
+        "A) เปิดจุดแนบไฟล์ (create/edit drawer ขั้นที่ 2 'เอกสารแนบ') → เลือกไฟล์เพื่ออัปโหลด → ระบบเรียก API แนบไฟล์",
+        "B) เปิด view drawer ของเอกสารสถานะ 'ร่าง' หรือ 'รอลงนาม' → เลื่อนลงท้ายแท็บรายละเอียด"
+      ],
+      "expected": "A) อัปโหลดสำเร็จ แนบไฟล์ได้ (PDF/Word/Excel/รูป ≤20MB ตาม FN-12) · B) ช่องแนบอยู่ในขั้น create/edit หรือแนบสำเนาที่ลงนามครบเมื่อสถานะ approved ผ่าน Document Center (FN-12)",
+      "actual": "A) อัปโหลดไม่สำเร็จ — API ตอบ {\"code\":\"LOA_FILE_INVALID\",\"message\":\"อ่านไฟล์ไม่สำเร็จ\"} · B) ช่องแนบแบบ native 'Choose File' ปรากฏใน view drawer ตั้งแต่สถานะร่าง/รอลงนาม ไม่ผ่าน Document Center",
+      "evidence": ["tk03/Screenshot 2026-10-28 123740.png"],
+      "status": "open" },
+
+    { "id": "BUG-06", "title": "view drawer UI/layout หลุดจากดีไซน์ต้นแบบไปมาก", "severity": "medium",
+      "steps": ["เปิด view drawer ของเอกสารใด ๆ", "เทียบกับดีไซน์ต้นแบบ feature.html"],
+      "expected": "จัดวาง/ระยะ/องค์ประกอบตรงดีไซน์ต้นแบบ",
+      "actual": "layout โดยรวมของ view drawer คลาดจากดีไซน์มาก (แท็บ PDF Preview หนักสุด = หน้าขาว ดู BUG-05)",
+      "evidence": ["tk03/Screenshot 2026-10-28 123740.png"],
+      "status": "open" },
+
+    { "id": "BUG-02", "title": "layout ช่องแนบไฟล์ (เอกสารแนบ) ใน create/edit หลุดจากดีไซน์", "severity": "low",
+      "steps": ["เปิด create หรือ edit drawer → ขั้นที่ 2 'เอกสารแนบ'"],
+      "expected": "dropzone เส้นประ + ไอคอนอัปโหลด + ปุ่ม 'เลือกไฟล์' (ตามต้นแบบ example.png)",
+      "actual": "เป็นกล่องเทาเปล่าขนาดใหญ่ มีแค่ไอคอนคลิปหนีบ + ข้อความ ไม่มีกรอบ dropzone และไม่มีปุ่มเลือกไฟล์",
+      "evidence": ["tk02/upload.png", "tk02/example.png", "tk03/Screenshot 2026-10-28 123958.png"],
+      "status": "open" },
+
+    { "id": "BUG-04", "title": "modal ยกเลิกเอกสาร หลุดจากดีไซน์ (เหตุผลสำเร็จรูปหาย 2 จาก 3)", "severity": "low",
+      "steps": ["เปิดเอกสาร → กด 'ยกเลิกเอกสาร'", "เทียบกับต้นแบบ example_cancel_modal.png"],
+      "expected": "หัว 'ยกเลิกเอกสาร?' + icon + เลขที่เอกสาร · chip เหตุผล 3 อัน (ลูกค้ายกเลิกการขอยืม · ทำเอกสารซ้ำ · บันทึกผิดฉบับ) · textarea มี placeholder · ปุ่ม 'ไม่ยกเลิก'/'ยกเลิกเอกสาร'",
+      "actual": "เหลือ chip เดียว 'ลูกค้ายกเลิกการขอยืม' · ไม่มี icon/เลขที่เอกสาร · textarea ไม่มี placeholder · ปุ่มเป็น 'ยกเลิก'/'ยืนยัน'",
+      "evidence": ["tk02/modal_cancle.png", "tk02/example_cancel_modal.png"],
+      "status": "open" }
+  ]
+}

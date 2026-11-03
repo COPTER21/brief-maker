@@ -1,0 +1,64 @@
+{
+  "feature": {"code": "F-TMP-003", "name": "แบบฟอร์มขออนุญาตเข้าพื้นที่สำนักงาน (Visitor Access Request)", "module": "HR"},
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-02",
+  "round": 2,
+  "env": "Production", "build": "—",
+  "dev": "—", "reviewer": "—",
+  "refs": "FRD F-TMP-003 Pack · FN-03/04/05 · BR-06/10 · §5.3 · LD-03/04",
+  "summary_note": "ผ่านเฉพาะขอบเขตที่ตรวจรอบนี้ (สร้าง/แก้ไข/ลบ + UI/UX ผ่าน เหลือ BUG-02 layout) — logic ความเสี่ยงสูง (สายอนุมัติ DOA · สิทธิ์เห็นใบ+404 · PII/CSV · เลข VAR · แบบพิมพ์ · snapshot) ยังไม่ได้ตรวจ ดูหัวข้อ 'สิ่งที่ยังไม่ได้ตรวจ'",
+  "scope": {
+    "checked": [
+      "สร้างคำขอ / แก้ไข / ลบ (create / update / delete)",
+      "เปิด modal ส่งขออนุมัติ — ตรวจ layout"
+    ],
+    "not_checked": [
+      {"item": "สายอนุมัติ DOA เต็มสาย: ส่งขออนุมัติ → ขั้น 1 = หัวหน้าของ host (ไม่ใช่ผู้บันทึก) · อนุมัติ/ไม่อนุมัติ · ห้ามอนุมัติใบตัวเอง · ลำดับขั้น sequential · ไม่อนุมัติ→กลับร่างเลขเดิม (FN-04/05 · BR-06 · BR-DOA · LD-03)", "reason": "รอบนี้ตรวจแค่ CRUD + layout · จุดเปราะสูงสุด ยังไม่ได้ทดสอบ"},
+      {"item": "เลข VAR ออกตอนบันทึกครั้งแรก + รูปแบบ VAR-YYYY-NNNN (BR-10 · FN-03 · DEC-10)", "reason": "create ผ่าน แต่ยังไม่ได้ยืนยันเจาะจงเรื่องเลขเอกสาร"},
+      {"item": "สิทธิ์เห็นใบ + คนไม่เกี่ยวข้องได้ 404 (ไม่ใช่ 403) + PII: CSV ไม่มีเบอร์โทร (§5.3 · FN-09 · LD-04)", "reason": "ต้องใช้หลายบัญชีต่าง role + ดู response code — ยังไม่ได้ตรวจ"},
+      {"item": "ยกเลิกจาก pending + แจ้งเตือน var_cancelled (FN-06/08 · BR-11 · EC-08)", "reason": "ยังไม่ได้ตรวจ ('delete' ที่ตรวจรอบนี้คนละเคสกับ cancel-from-pending)"},
+      {"item": "snapshot host/ฝ่าย/ผู้บังคับบัญชา นิ่งเมื่อผังองค์กรเปลี่ยน (FN-01 · DEC-01)", "reason": "ยังไม่ได้ตรวจ"},
+      {"item": "แบบพิมพ์ FM-HRM-05 / print parity / ช่องลงชื่อตามขั้น DOA ทุกสถานะ (FN-07 · DEC-07 · AC-08)", "reason": "ยังไม่ได้ตรวจ"},
+      {"item": "Validation VR-01..08: เบอร์ 9–10 หลัก=บล็อก · วันที่ลงนามก่อน=เตือนไม่บล็อก (EC-02/03)", "reason": "ยังไม่ได้ตรวจ"},
+      {"item": "แนบไฟล์ ≤20MB (BR-12)", "reason": "ยังไม่ได้ตรวจ"}
+    ]
+  },
+  "logic": [
+    {"item": "สร้างคำขอ (create)", "status": "pass"},
+    {"item": "แก้ไข/อัปเดตคำขอ (update)", "status": "pass"},
+    {"item": "ลบคำขอ (delete)", "status": "pass"}
+  ],
+  "ui_checked": true,
+  "ui": [
+    {"id": "U-02", "status": "note", "note": "modal 'ส่งขออนุมัติ': footer (แถบปุ่มล่าง) ไม่ stick ที่ก้น modal — layout ไม่เรียบร้อย (ดู BUG-02) · UI ส่วนที่เหลือลองแล้วโอเค"}
+  ],
+  "ux_checked": true,
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "doc_type VAR ยังไม่เปิดใช้ที่ Document Configuration (F-DOCCFG) — กดสร้างคำขอไม่ได้ (พบรอบ R1)",
+      "severity": "critical",
+      "steps": ["เข้าเมนู 'ขอเข้าพื้นที่สำนักงาน'", "กดปุ่มสร้างคำขอใหม่"],
+      "expected": "เปิดฟอร์ม wizard สร้างคำขอได้",
+      "actual": "R1: ขึ้น 'แบบเอกสารนี้ยังไม่เปิดใช้งาน — สร้างคำขอใหม่ไม่ได้' (ตัวกันถูกตาม EC-09/BR-10 · รากคือยังไม่เปิด doc_type) · แก้แล้ว 2026-11-02: เปิด doc_type VAR ที่ F-DOCCFG → สร้างได้",
+      "status": "fixed"
+    },
+    {
+      "id": "BUG-02",
+      "title": "modal 'ส่งขออนุมัติ' — footer ไม่ stick ที่ก้น modal (layout ไม่เรียบร้อย)",
+      "severity": "low",
+      "steps": [
+        "เปิดใบคำขอสถานะร่าง",
+        "กดปุ่ม 'ส่งขออนุมัติ' เพื่อเปิด modal",
+        "สังเกต footer (แถบปุ่มล่าง) ของ modal"
+      ],
+      "expected": "footer (แถบปุ่ม) ติดก้น modal เสมอ (sticky) · เนื้อหาเลื่อนภายในพื้นที่ body",
+      "actual": "footer ไม่ stick ที่ก้น modal — layout หลุด ไม่เรียบร้อย",
+      "status": "open"
+    }
+  ],
+  "suggestions": [
+    {"item": "รอบถัดไปตรวจ logic ความเสี่ยงสูงตามลำดับ: สายอนุมัติ DOA (resolve หัวหน้าของ host · ห้ามอนุมัติใบตัวเอง · sequential · ไม่อนุมัติ→กลับร่างเลขเดิม) → สิทธิ์+404+PII/CSV → เลข VAR → แบบพิมพ์ทุกสถานะ → validation → snapshot", "reason": "รอบนี้ครอบแค่ CRUD + layout · ส่วนที่เสียหายสูงสุดถ้าพลาดยังไม่ถูกตรวจ"},
+    {"item": "ทวน BA: DEC ทั้ง 11 ข้อยังเป็น [AI-DEFAULT] ยังไม่ยืนยัน (OQ-01) · OQ-04 อนุมัติแล้วยกเลิกได้ไหม · OQ-02 host ไม่มีหัวหน้า · OQ-DOA-1 role-line-manager ตรง DOA master ไหม", "reason": "expected ของหลายเคสอิง default ถ้าลูกค้าเคาะต่างผลเปลี่ยน แม้ขึ้น prod แล้ว"}
+  ]
+}

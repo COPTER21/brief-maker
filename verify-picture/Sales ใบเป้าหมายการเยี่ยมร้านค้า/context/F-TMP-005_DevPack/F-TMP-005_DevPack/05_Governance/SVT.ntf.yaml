@@ -1,0 +1,46 @@
+feature_id: F-TMP-005
+name: ใบเป้าหมายการเยี่ยมร้านค้า
+code: SVT
+events:
+- id: svt_cancelled
+  trigger: pending_approval → cancelled (เจ้าของหรือผู้จัดการฝ่ายขายยกเลิกระหว่างรออนุมัติ
+    พร้อมเหตุผล)
+  recipients:
+  - current_step_approver
+  - ผู้สร้างเอกสาร
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้) · DEC-08
+  frd_ref: 03_LOGIC F-TMP-005-FN-07, F-TMP-005-FN-09
+- id: svt_plan_published
+  trigger: pending_approval → approved (อนุมัติขั้นสุดท้าย) แจ้งผู้รับตามช่อง TO /
+    CC
+  recipients:
+  - TO (to_recipient)
+  - CC (cc_recipients)
+  template: ใบเป้าหมายการเยี่ยมร้านค้า **{doc_no}** เขต {territory} รอบ {sales_cycle}
+    อนุมัติแล้ว — {work_days} วัน · {total_customers} ร้าน
+  channel: in-app+email
+  optional: false
+  why: กระดาษมีช่อง TO / CC = ผู้รับแผนเยี่ยม · DOA engine แจ้งเฉพาะผู้ขอ (doa_result)
+    ไม่แจ้งผู้รับสำเนา · DEC-04 · DEC-09
+  frd_ref: 03_LOGIC F-TMP-005-FN-09
+- id: svt_superseded
+  trigger: ใบใหม่ของเขต + รอบการขายเดียวกันอนุมัติ → ใบเดิม approved → superseded
+  recipients:
+  - ผู้สร้างเอกสาร
+  - TO (to_recipient)
+  template: '**{doc_no}** เขต {territory} รอบ {sales_cycle} ถูกแทนที่ด้วยใบ **{new_doc_no}**'
+  channel: in-app
+  optional: true
+  why: เขต + รอบเดียวกันมีแผนที่ใช้ได้ใบเดียว (DEC-04) — ผู้ถือใบเดิมต้องรู้ว่าเปลี่ยนแล้ว
+  frd_ref: 03_LOGIC F-TMP-005-FN-09
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+- svt_over_limit_approved
+note: ตัด svt_over_limit_approved — เกณฑ์เตือนเดียวคือร้าน >7 ต่อวัน (แจ้งในฟอร์มตอนกรอก
+  ไม่ต้องแจ้งหลังอนุมัติ) · ส่งอนุมัติ/ผลอนุมัติ = DOA engine ยิงเอง

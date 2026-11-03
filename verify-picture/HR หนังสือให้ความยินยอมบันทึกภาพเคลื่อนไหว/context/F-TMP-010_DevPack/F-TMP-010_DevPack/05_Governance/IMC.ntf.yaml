@@ -1,0 +1,52 @@
+# ntf-declaration v1.2 — ร่าง (ยืนยันกับ FRD ในขั้น 7)
+feature_id: F-TMP-010
+name: หนังสือให้ความยินยอมในการบันทึกและเผยแพร่ภาพถ่าย หรือภาพเคลื่อนไหว
+code: IMC
+events:
+- id: imc_consent_recorded
+  trigger: 'S: draft → confirmed (ผู้ให้ความยินยอมยืนยันในระบบ · ระบบบันทึกวันที่ให้ความยินยอมและฉบับของหนังสือ)'
+  recipients:
+  - role-mgr-hr
+  template: '**{doc_no}** {subject_name} ให้ความยินยอมบันทึกและเผยแพร่ภาพแล้ว (บูธ
+    {booth_location} ฉบับ {form_revision}) — บันทึกเป็นหลักฐานความยินยอมเรียบร้อย'
+  channel: in-app
+  optional: true
+  why: ผู้ดูแลงานบุคคลต้องรู้ว่าหลักฐานความยินยอมของผู้ร่วมกิจกรรมรายนี้ครบแล้วก่อนนำภาพไปเผยแพร่
+  frd_ref: 03_LOGIC F-TMP-010-FN-06
+- id: imc_consent_withdrawn
+  trigger: 'S: confirmed → withdrawn (ถอนความยินยอมรายข้อหรือทั้งฉบับ · DEC-15)'
+  recipients:
+  - role-mgr-hr
+  - role-compliance
+  template: '**{doc_no}** {subject_name} ถอนความยินยอม {withdrawn_scope} เมื่อ {withdrawn_at}
+    — ต้องหยุดเผยแพร่ภาพส่วนที่ถอนทันที'
+  channel: in-app+email
+  optional: false
+  why: การถอนความยินยอมมีผลทางกฎหมายทันที ผู้ดูแลและผู้กำกับดูแลต้องรู้โดยไม่ขึ้นกับการตั้งค่าส่วนตัว
+    — ปิดไม่ได้
+  frd_ref: 03_LOGIC F-TMP-010-FN-08
+- id: imc_minor_consent_recorded
+  trigger: ตอนยืนยัน พบว่าอายุผู้ให้ความยินยอมต่ำกว่าเกณฑ์ผู้เยาว์ใน config และมีผู้ปกครองรับรอง
+    (DEC-04)
+  recipients:
+  - role-mgr-hr
+  template: '**{doc_no}** {subject_name} เป็นผู้เยาว์ ({subject_age} ปี) — รับรองโดยผู้ปกครอง
+    {guardian_name} ตรวจเอกสารยืนยันตัวตนผู้ปกครองก่อนใช้ภาพ'
+  channel: in-app
+  optional: true
+  why: ความยินยอมของผู้เยาว์ต้องมีผู้ปกครองรับรอง ผู้ดูแลต้องเห็นเพื่อตรวจหลักฐานก่อนนำภาพไปใช้
+  frd_ref: 03_LOGIC F-TMP-010-FN-06
+- id: imc_cancelled
+  trigger: 'S: draft / pending → cancelled (ยกเลิกใบก่อนยืนยัน · DEC-07)'
+  recipients:
+  - role-mgr-hr
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ใบที่ยกเลิกก่อนยืนยันไม่เป็นหลักฐานความยินยอม ผู้ดูแลต้องรู้ว่าไม่มีความยินยอมของรายนี้
+  frd_ref: 03_LOGIC F-TMP-010-FN-09
+excluded:
+- doa_pending / doa_result / doa_escalate — เอกสารนี้ไม่มีสายอนุมัติ (DEC-03) จึงไม่มี
+  event จาก DOA engine
+- imc_over_limit_approved (จาก suggest) — ตัดออก เอกสารไม่มีวงเงินและไม่มีการอนุมัติ
+note: ฉบับจริง — frd_ref ครบทุก event (frd_lint.py Section N)

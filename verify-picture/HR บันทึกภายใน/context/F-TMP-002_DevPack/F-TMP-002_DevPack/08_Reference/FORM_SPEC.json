@@ -1,0 +1,69 @@
+{
+  "form": {
+    "title": "บันทึกภายใน",
+    "form_code": "FM-HRM-54",
+    "revision": "Rev.00 : 01/07/2569",
+    "source_file": "บันทึกภายใน.doc",
+    "sha256": "",
+    "pages": 1,
+    "paper": "A4-portrait"
+  },
+  "blocks": [
+    { "id": "B01", "kind": "logo" },
+    { "id": "B02", "kind": "title", "text": "บันทึกภายใน" },
+    { "id": "B03", "kind": "row", "fields": ["F01"] },
+    { "id": "B04", "kind": "row", "fields": ["F02"] },
+    { "id": "B05", "kind": "row", "fields": ["F03"] },
+    { "id": "B06", "kind": "row", "fields": ["F04"] },
+    { "id": "B07", "kind": "row", "fields": ["F05"] },
+    { "id": "B08", "kind": "row", "fields": ["F06"] },
+    { "id": "B09", "kind": "row", "fields": ["F07"] },
+    { "id": "B10", "kind": "sign", "signature": "S1", "fields": ["F08"] },
+    { "id": "B11", "kind": "control" }
+  ],
+  "fields": [
+    { "id": "F01", "label": "วันที่", "key": "memo.doc_date", "type": "date",
+      "source": "auto", "required": true, "repeat_group": null, "sample": "", "pdpa": false,
+      "note": "วันที่ของบันทึก — ระบบใส่ให้ตอนบันทึกครั้งแรก แก้ไขได้ก่อนส่ง" },
+    { "id": "F02", "label": "เรียน", "key": "memo.to", "type": "text",
+      "source": "user", "required": true, "repeat_group": null, "sample": "", "pdpa": false,
+      "note": "ผู้รับบันทึก (ชื่อบุคคล/ตำแหน่ง/หน่วยงาน) — กระดาษเป็นบรรทัดเปิด ไม่บังคับรูปแบบ" },
+    { "id": "F03", "label": "จาก", "key": "memo.from", "type": "text",
+      "source": "system", "system_path": "Employee.full_name · Employee.department_name",
+      "owner": "HR · Employee (FEATURE_REGISTRY ยังไม่กำหนดรหัส feature)",
+      "required": true, "repeat_group": null, "sample": "", "pdpa": false,
+      "note": "ผู้จัดทำบันทึก — ค่าเริ่มจากผู้ใช้ที่สร้างเอกสาร แก้เป็นหน่วยงานได้" },
+    { "id": "F04", "label": "เรื่อง", "key": "memo.subject", "type": "text",
+      "source": "user", "required": true, "repeat_group": null, "sample": "", "pdpa": false, "note": "" },
+    { "id": "F05", "label": "เลขที่", "key": "memo.doc_no", "type": "text",
+      "source": "auto", "required": true, "repeat_group": null, "sample": "", "pdpa": false,
+      "note": "เลขที่บันทึก — ระบบออกให้ตอนบันทึกครั้งแรก (G9)" },
+    { "id": "F06", "label": "(พื้นที่เนื้อหาบันทึก)", "key": "memo.body", "type": "longtext",
+      "source": "user", "required": true, "repeat_group": null, "sample": "", "pdpa": false,
+      "note": "กระดาษเป็นพื้นที่ว่างกลางหน้า ไม่มีคำกำกับพิมพ์ไว้ — เนื้อความของบันทึก" },
+    { "id": "F07", "label": "ข้อคิดเห็นฝ่ายกฎหมาย", "key": "memo.legal_opinion", "type": "longtext",
+      "source": "user", "required": false, "repeat_group": null, "sample": "", "pdpa": false,
+      "note": "กรอกโดยผู้พิจารณาฝ่ายกฎหมายเท่านั้น — กระดาษมีเส้นประ 2 บรรทัด" },
+    { "id": "F08", "label": "วันที่", "key": "memo.legal_opinion_date", "type": "date",
+      "source": "auto", "required": false, "repeat_group": null, "sample": "", "pdpa": false,
+      "note": "วันที่ในบล็อกลงชื่อฝ่ายกฎหมาย — ระบบใส่ตอนบันทึกความเห็น (คนละช่องกับ F01)" }
+  ],
+  "repeat_groups": [],
+  "choices": [],
+  "formulas": [],
+  "constants": [],
+  "signatures": [
+    { "id": "S1", "role_on_paper": "ฝ่ายกฎหมาย", "who": "approver", "decision": [] }
+  ],
+  "control": {
+    "doc_no_on_paper": "FM-HRM-54",
+    "revision": "Rev.00 : 01/07/2569",
+    "running_no_on_paper": true
+  },
+  "anomalies": [
+    { "where": "บล็อกข้อคิดเห็นฝ่ายกฎหมาย", "detail": "มีเส้นประเปล่าเพิ่มอีก 1 เส้นมุมขวาล่าง ไม่มีคำกำกับว่าใช้ทำอะไร", "rule": "ไม่ทำเป็นช่องกรอก — คงเป็นเส้นว่างบนแบบพิมพ์เท่านั้น (1:1 ตาม G5)" },
+    { "where": "คำว่า \"วันที่\" ปรากฏ 2 จุด", "detail": "หัวบันทึก (F01) และในบล็อกลงชื่อฝ่ายกฎหมาย (F08) ใช้คำเดียวกันแต่คนละความหมาย", "rule": "แยก key คนละตัว ห้าม bind ค่าเดียวกัน" },
+    { "where": "ทั้งใบ", "detail": "ไม่มีช่องลงชื่อผู้จัดทำ/ผู้บังคับบัญชาบนกระดาษ มีเฉพาะฝ่ายกฎหมาย", "rule": "ผู้จัดทำยึดจากช่อง \"จาก\" (F03) + ผู้สร้างเอกสารในระบบ ไม่เพิ่มช่องลงชื่อใหม่" },
+    { "where": "ไฟล์ตัวอย่าง", "detail": "เป็นแบบฟอร์มเปล่า ไม่มีข้อมูลตัวอย่างที่กรอกไว้", "rule": "ไม่มีข้อมูลส่วนบุคคลให้ระวัง — prototype ใช้ข้อมูลสมมติทั้งหมด" }
+  ]
+}

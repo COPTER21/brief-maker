@@ -1,0 +1,63 @@
+{
+  "feature": {"code": "F-TMP-003", "name": "แบบฟอร์มขออนุญาตเข้าพื้นที่สำนักงาน (Visitor Access Request)", "module": "HR"},
+  "env": "Production", "build": "—",
+  "tester": "กานต์ สายบัวทอง", "date": "2026-10-28", "round": 1,
+  "dev": "—", "reviewer": "—",
+  "last_updated": "2026-11-02",
+  "update_log": [
+    {
+      "date": "2026-11-02",
+      "by": "reviewer",
+      "note": "BUG-01 (critical blocker) แก้แล้ว — dev เปิดใช้ doc_type VAR ที่ Document Configuration (F-DOCCFG) · ผู้ใช้ยืนยันว่ากดสร้างคำขอได้แล้ว · ยังไม่ได้ re-verify การออกเลข VAR ในรายงานนี้ (เป็นจุดแรกที่ต้องยืนยันตอนเริ่ม R2 logic review) · blocker เคลียร์ → รายการที่เคยติดบล็อกทั้งหมดพร้อมตรวจในรอบ R2"
+    }
+  ],
+  "refs": "FRD F-TMP-003 Pack · EC-09 / BR-10 / FN-03 / AC-14",
+  "scope": {
+    "checked": ["เข้าเมนูขออนุญาตเข้าพื้นที่สำนักงาน แล้วกดปุ่มสร้างคำขอใหม่"],
+    "not_checked": [
+      {"item": "สร้าง / บันทึกร่าง + การออกเลข VAR (BR-10 / FN-03)", "reason": "blocker เคลียร์แล้ว (2026-11-02) — ยังไม่ตรวจ รอรอบ R2 · การออกเลข VAR = จุดแรกที่ต้องยืนยัน"},
+      {"item": "Validation ช่องบังคับ / เบอร์โทร / วันที่ลงนาม (VR-01..08)", "reason": "blocker เคลียร์แล้ว (2026-11-02) — ยังไม่ตรวจ รอรอบ R2"},
+      {"item": "สายอนุมัติ DOA — ส่งขออนุมัติ / อนุมัติ / ไม่อนุมัติ กลับร่าง / ลำดับขั้น / ห้ามอนุมัติใบตัวเอง (FN-04/05 · BR-06 · BR-DOA)", "reason": "blocker เคลียร์แล้ว (2026-11-02) — ยังไม่ตรวจ รอรอบ R2 · จุดเปราะสูงสุด (role-line-manager resolve หัวหน้าของ host · self-approval · sequential)"},
+      {"item": "สิทธิ์การเห็นใบ + 404 ของคนไม่เกี่ยวข้อง + PII/CSV ไม่หลุดเบอร์ (§5.3 · FN-09 · LD-04)", "reason": "blocker เคลียร์แล้ว (2026-11-02) — ยังไม่ตรวจ รอรอบ R2 · ต้องใช้หลายบัญชีต่าง role + ดู response code จริง (404 ไม่ใช่ 403)"},
+      {"item": "ยกเลิก + แจ้งเตือน var_cancelled (FN-06/08 · BR-11)", "reason": "blocker เคลียร์แล้ว (2026-11-02) — ยังไม่ตรวจ รอรอบ R2"},
+      {"item": "snapshot host/ฝ่าย/ผู้บังคับบัญชา นิ่งเมื่อผังองค์กรเปลี่ยน (FN-01 · DEC-01)", "reason": "blocker เคลียร์แล้ว (2026-11-02) — ยังไม่ตรวจ รอรอบ R2"},
+      {"item": "แบบพิมพ์ FM-HRM-05 / print parity / ช่องลงชื่อตามขั้น DOA (FN-07 · DEC-07)", "reason": "blocker เคลียร์แล้ว (2026-11-02) — ยังไม่ตรวจ รอรอบ R2 · ตรวจครบทุกสถานะ (AC-08)"},
+      {"item": "แนบไฟล์ ≤20MB (BR-12)", "reason": "blocker เคลียร์แล้ว (2026-11-02) — ยังไม่ตรวจ รอรอบ R2"},
+      {"item": "UI / UX", "reason": "ผู้ใช้แจ้งว่า UI/layout ปรับเรียบร้อยแล้ว — รอบ R2 โฟกัส logic/การทำงานตาม FRD เป็นหลัก"}
+    ]
+  },
+  "logic": [
+    {
+      "item": "ตัวกันการสร้างเมื่อ doc_type VAR ยังไม่เปิดใช้ที่ Document Configuration (F-DOCCFG)",
+      "expected": "ถ้า F-DOCCFG เปิดใช้ doc_type VAR → กดสร้างคำขอได้ และออกเลข VAR ตอนบันทึกครั้งแรก",
+      "actual": "R1 (2026-10-28): ระบบบล็อกด้วยข้อความ 'แบบเอกสารนี้ยังไม่เปิดใช้งาน — สร้างคำขอใหม่ไม่ได้' → ตัวกันทำงานตรงตาม EC-09/BR-10 แต่ environment ยังไม่เปิด doc_type VAR · อัปเดต 2026-11-02: dev เปิด doc_type VAR ที่ F-DOCCFG แล้ว ผู้ใช้ยืนยันว่ากดสร้างคำขอได้ → ตัวกันผ่านเงื่อนไขเปิดใช้งานถูกต้อง (ยังไม่ re-verify การออกเลข VAR — ตรวจในรอบ R2)",
+      "status": "resolved",
+      "bug": "BUG-01",
+      "ref": "EC-09 / BR-10 / AC-14"
+    }
+  ],
+  "ui_checked": false,
+  "ux_checked": false,
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "doc_type VAR ยังไม่เปิดใช้งานที่ Document Configuration (F-DOCCFG) — กดสร้างคำขอไม่ได้ ตรวจ logic อื่นต่อไม่ได้ทั้งหมด",
+      "severity": "critical",
+      "steps": [
+        "เข้าเมนู 'ขอเข้าพื้นที่สำนักงาน'",
+        "กดปุ่มสร้างคำขอใหม่"
+      ],
+      "expected": "เปิดฟอร์ม wizard สร้างคำขอได้ (เมื่อ doc_type VAR เปิดใช้งานที่ F-DOCCFG)",
+      "actual": "R1: ขึ้นข้อความ 'แบบเอกสารนี้ยังไม่เปิดใช้งาน — สร้างคำขอใหม่ไม่ได้' กดสร้างไม่ได้ · พฤติกรรมตรงตามกฎ EC-09/BR-10 (ตัวกันถูกต้อง) รากของปัญหาคือยังไม่ได้เปิดใช้ doc_type VAR ที่ Document Configuration — เป็นขั้นตั้งค่าก่อนใช้งาน ไม่ใช่ตัวกันพัง",
+      "status": "fixed",
+      "resolved_date": "2026-11-02",
+      "resolved_by": "dev (config)",
+      "verified_by": "reported-fixed (ผู้ใช้ยืนยันกดสร้างได้ · ยังไม่ re-verify การออกเลข VAR — ยืนยันตอนเริ่ม R2)",
+      "resolution": "เปิดใช้ doc_type VAR ที่ Document Configuration (F-DOCCFG) → กดสร้างคำขอได้แล้ว · เมื่อสร้างได้ ให้ยืนยันต่อว่าออกเลข VAR-YYYY-NNNN ตอนบันทึกครั้งแรกจริง (BR-10 / FN-03 / DEC-10) เป็นด่านแรกของ R2"
+    }
+  ],
+  "suggestions": [
+    {"item": "เริ่ม R2 logic review ตามลำดับ smoke → happy path → DOA (ชั้นเปราะสุด) → reject loop/เลข/snapshot → สิทธิ์+PII → validation → ยกเลิก+พิมพ์ → edge/OQ · ด่านแรก: ยืนยันสร้างใบได้ + ออกเลข VAR จริง", "reason": "blocker เคลียร์แล้ว แต่ logic ทั้งตัวยังไม่ถูกตรวจสักข้อ — รายการ not_checked ทั้งหมดคือ scope ของ R2"},
+    {"item": "ทวน BA ก่อน/ระหว่าง R2: DEC ทั้ง 11 ข้อยังเป็น [AI-DEFAULT] ยังไม่ยืนยัน (OQ-01) · OQ-04 อนุมัติแล้วยกเลิกได้ไหม · OQ-02 host ไม่มีหัวหน้า · OQ-DOA-1 role-line-manager ตรง DOA master ไหม", "reason": "expected ของหลายเคสอิง AI-DEFAULT ถ้าลูกค้าเคาะต่างผลเปลี่ยน แม้ขึ้น prod แล้ว"}
+  ]
+}

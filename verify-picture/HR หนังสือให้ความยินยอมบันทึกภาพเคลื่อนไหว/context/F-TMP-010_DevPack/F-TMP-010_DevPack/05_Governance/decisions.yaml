@@ -1,0 +1,45 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# F-TMP-010 · FM-HRM-51 หนังสือให้ความยินยอมในการบันทึกและเผยแพร่ภาพถ่าย หรือภาพเคลื่อนไหว
+
+# G1 ผลต่อระบบ
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — กระดาษไม่มีช่องผู้อนุมัติ (มีแต่ลายเซ็นผู้ให้ความยินยอม + ผู้ปกครอง)
+doa: { required: false, mode: dynamic, default_steps: [], amount: none }
+
+# G3 สูตร / ค่าคงที่
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "เกณฑ์ผู้เยาว์อ่านจาก config (PdpaPolicy.minor_age_threshold) — อายุผู้ให้ความยินยอมต่ำกว่าเกณฑ์ ต้องกรอกส่วนผู้ปกครองครบ"
+    - "ชื่อตัวบรรจงใต้ลายเซ็นคัดจากชื่อที่กรอก ห้ามพิมพ์ซ้ำ"
+    - "วันสิ้นสุดกิจกรรมต้องไม่ก่อนวันเริ่มกิจกรรม"
+    - "ทุกข้อ 1-3 ต้องเลือกอย่างใดอย่างหนึ่ง ห้ามเว้นว่าง"
+    - "ใบที่ยืนยันแล้วแก้ไม่ได้ (immutable) — เปลี่ยนเจตนาใช้คำสั่งถอนความยินยอมผูกใบเดิม"
+
+# G4 รายการซ้ำ
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ / ยกเลิก
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 เลขที่
+numbering: { issue_on: first_save, code: "IMC" }
+
+# G10 ของเสริม
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

@@ -1,0 +1,26 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# G1 ผลต่อระบบ — ใบเป้าหมายเป็นแผนเยี่ยมร้านของพนักงานขายต่อรอบการขาย เก็บในเอกสารนี้ · ไม่แก้ Customer / Sales Territory · ไม่สร้าง Visit อัตโนมัติ (Visit Operation อ้างอิงเองภายหลัง)
+config_changes: []
+post_to: []
+# G2 — กระดาษมีช่องผู้อนุมัติ 2 ช่อง ไม่ระบุตำแหน่ง → dynamic 2 ขั้น: ผู้บังคับบัญชาตรงของผู้นำเสนอ → ผู้จัดการฝ่ายขาย · ไม่มีวงเงิน
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager", "role-mgr-sales"], amount: none }
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "ผู้รับผิดชอบเขต = ผู้สร้างใบ (ค่าเริ่ม) · ตำแหน่ง ดึงจาก Employee/Position · เลือกเขตจาก Sales Territory ที่ตนรับผิดชอบ"
+    - "TO ค่าเริ่ม = ผู้อนุมัติขั้นแรก (แก้ได้) · CC เลือกได้หลายคน ไม่บังคับ"
+    - "รอบการขาย (เดือน/ปี) บังคับ · วันที่ในตารางต้องอยู่ในรอบการขาย และไม่ซ้ำกัน (บล็อก)"
+    - "แผนรายวันอย่างน้อย 1 วัน (บล็อก) · วันที่มีแผนต้องมี เริ่มต้นตลาด · สิ้นสุดตลาด · ร้านค้า ≥ 1 (บล็อก) · ที่พัก (จังหวัด) ไม่บังคับ"
+    - "จำนวนลูกค้า = นับรายชื่อร้านค้าของวันนั้น (ไม่ให้กรอกเอง) · แถวรวมท้ายตาราง = จำนวนวันทำงาน + จำนวนลูกค้ารวม"
+    - "รายชื่อร้านค้าเลือกจาก Customer master (customerId) · ร้านเกิน 7 ร้านต่อวัน = เตือน ไม่บล็อก (กระดาษมี 7 ช่อง) · ร้านเดียวกันซ้ำในวันเดียวกัน = บล็อก"
+    - "เขต + รอบการขาย เดียวกันมีใบที่อนุมัติแล้วได้ใบเดียว — อนุมัติใบใหม่ = ใบเดิมเปลี่ยนเป็น \"ถูกแทนที่\" อัตโนมัติ (ข้อมูลในเอกสารนี้เท่านั้น)"
+repeat: { max_rows: 31 }
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+reject_cancel: { on_reject: draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+# G8 — เจ้าของ · ผู้อนุมัติหลังส่ง · ผู้จัดการฝ่ายขาย (role-mgr-sales) เห็นทั้งหมด · TO/CC เห็นใบที่อนุมัติแล้วที่ตนถูกระบุ
+visibility: { owner: true, approver: after_submit, admin_role: all, admin_role_id: role-mgr-sales, recipients: approved_only }
+numbering: { issue_on: first_save, code: "SVT" }
+extras: { attachments: true, copy: false, export_csv: true, announce: false }

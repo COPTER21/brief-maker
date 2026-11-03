@@ -1,0 +1,64 @@
+# doccfg-declaration v2.1 — init จาก DECISIONS.lock + print_config · แก้ได้ก่อน brief
+feature_id: F-TMP-010
+doc_types:
+- code: IMC
+  name_th: หนังสือให้ความยินยอมในการบันทึกและเผยแพร่ภาพถ่าย หรือภาพเคลื่อนไหว
+  module: HR
+  feature_id: F-TMP-010
+  numbering:
+    preset: '{PREFIX}-{YYYY}-{run:4}'
+    reset: yearly
+    scope: global
+    no_gap: false
+    issue_on: first_save
+    frd_ref: 03_LOGIC F-TMP-010-FN-03
+  snapshot:
+    sent_external: false
+    approved_final: true
+  snapshot_points:
+  - event: approved_final
+    when: 'S: draft → confirmed (ผู้ให้ความยินยอมยืนยันในระบบ)'
+    frd_ref: 03_LOGIC F-TMP-010-FN-06
+    note: เก็บสำเนา PDF เป็นหลักฐานความยินยอมแบบแก้ไม่ได้ พร้อม revision ของหนังสือ
+      — บังคับตาม PDPA
+  print_config:
+    form_code: FM-HRM-51
+    revision: 'Rev. 00 : 01/07/2569'
+    paper: A4-portrait
+    min_rows: 3
+    dense_when_rows_over: 3
+    header_source: organization_snapshot_at_numbering
+    sign_boxes:
+    - box: requester
+      label: ผู้ให้ความยินยอม
+      show_date: true
+    - box: guardian
+      label: ผู้ปกครองของผู้เยาว์
+      show_date: true
+      note: ช่องคงที่ตามกระดาษ FM-HRM-51 — เว้นว่างเมื่อผู้ให้ความยินยอมบรรลุนิติภาวะ
+    - box: doa_step:*
+      label: from_doa_step
+      show_decision: true
+      show_date: true
+    decision_words:
+      default:
+        approve: อนุมัติ
+        reject: ไม่อนุมัติ
+      by_role:
+        role-mgr-hr:
+          approve: รับหนังสือยินยอม
+          reject: ไม่รับหนังสือยินยอม
+        role-compliance:
+          approve: ตรวจแล้ว
+          reject: ตีกลับ
+        role-mgr-sales:
+          approve: รับทราบ
+          reject: ไม่รับทราบ
+    sign_layout:
+      source: ผู้ให้ความยินยอม + ผู้ปกครอง (ตามกระดาษ) + 1 ช่องต่อขั้นใน approval_chain
+        snapshot (รอบนี้ DOA = 0 ขั้น)
+      max_per_row: 4
+      split: even
+      dense_when_steps_over: 4
+      keep_together: true
+    ref: print/print_config.json
