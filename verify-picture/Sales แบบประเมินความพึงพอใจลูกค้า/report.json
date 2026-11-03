@@ -1,0 +1,208 @@
+{
+  "feature": {
+    "code": "F-TMP-001",
+    "name": "แบบประเมินความพึงพอใจลูกค้า",
+    "module": "Sales"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-03",
+  "round": 1,
+  "refs": "FRD F-TMP-001 v1.0 · AI Test Cases F-TMP-001 (52 เคส)",
+  "summary_note": "เคส Create/Edit/Cancel ที่ตรวจไม่พบ Logic Fail · ยังมีรายการที่ไม่ได้ตรวจตามขอบเขตด้านล่าง",
+  "scope": {
+    "checked": [
+      "สร้างแบบประเมินและบันทึกแบบร่าง",
+      "แก้ไขข้อมูลแบบประเมิน",
+      "ยกเลิกเอกสาร",
+      "ตรวจ UI/UX ของ drawer รวมแท็บ PDF และประวัติ"
+    ],
+    "not_checked": [
+      {
+        "item": "สิทธิ์ Owner / ผู้ใช้อื่น / role-mgr-sales และการเข้าถึงด้วย URL ตรง",
+        "reason": "ไม่มีผลตรวจแนบมาในรอบนี้"
+      },
+      {
+        "item": "การส่งแบบประเมิน คะแนน 9 หัวข้อ และสถานะ submitted",
+        "reason": "ไม่มีผลตรวจแนบมาในรอบนี้"
+      },
+      {
+        "item": "ความถูกต้องของข้อมูลใน PDF, CSV, ไฟล์แนบ, notification, audit และ concurrency",
+        "reason": "ไม่มีผลตรวจแนบมาในรอบนี้"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างแบบประเมินและบันทึกแบบร่าง",
+      "expected": "บันทึกสำเร็จ แสดงผลสำเร็จ และ drawer สร้างปิดเมื่อจบรายการ",
+      "actual": "รายการถูกสร้างขึ้นจริง แต่ drawer ไม่ปิดและขึ้น toast ‘ทำรายการไม่สำเร็จ กรุณาลองใหม่’",
+      "status": "note",
+      "bug": "BUG-01",
+      "ref": "FRD 06_TESTS AC-06"
+    },
+    {
+      "item": "แก้ไขชื่อห้าง/ร้านค้าในเอกสารร่าง",
+      "expected": "เมื่อบันทึกร่างแล้ว ชื่อห้าง/ร้านค้าเปลี่ยนเป็นค่าใหม่",
+      "status": "pass",
+      "ref": "FRD 02_API API-04 · 03_LOGIC FN-01"
+    },
+    {
+      "item": "เริ่มยกเลิกเอกสารจาก view drawer",
+      "expected": "กดปุ่มยกเลิกก่อน แล้วระบบเปิด modal ให้กรอกเหตุผลและยืนยันยกเลิก",
+      "actual": "ต้องกรอกเหตุผลในแท็บรายละเอียดก่อน มิฉะนั้นปุ่มยืนยันยกเลิกถูก disable",
+      "status": "note",
+      "bug": "BUG-03",
+      "ref": "FRD 01_UI M-02 · 06_TESTS AC-08"
+    },
+    {
+      "item": "ยกเลิกเอกสารหลังระบุเหตุผล",
+      "expected": "ยกเลิกเอกสารได้เมื่อมีเหตุผล",
+      "status": "pass",
+      "ref": "FRD 05_RULES BR-07 · VR-05"
+    },
+    {
+      "item": "สร้าง แก้ไข และยกเลิกเอกสารในขอบเขตที่ตรวจ",
+      "expected": "ผู้ใช้เข้าถึง flow ทั้งสามรายการได้",
+      "status": "pass",
+      "ref": "ผลตรวจจากผู้ตรวจ"
+    },
+    {
+      "item": "ตรวจข้อมูลบังคับก่อนส่งและคะแนน 9 หัวข้อ",
+      "expected": "ต้องครบและเป็นจำนวนเต็ม 1–5",
+      "status": "na",
+      "ref": "FRD 05_RULES BR-03 · VR-02..04"
+    },
+    {
+      "item": "ส่งแบบประเมิน draft → submitted โดยไม่มีสายอนุมัติ",
+      "expected": "ส่งแล้วเสร็จทันทีและแก้ไม่ได้",
+      "status": "na",
+      "ref": "FRD 05_RULES BR-04"
+    },
+    {
+      "item": "สิทธิ์การมองเห็นและดำเนินการตาม role",
+      "expected": "owner เห็นของตน · manager เห็นทั้งหมดแต่แก้แทนไม่ได้ · ผู้อื่นไม่เห็น",
+      "status": "na",
+      "ref": "FRD 05_RULES §5.3"
+    },
+    {
+      "item": "ออกเลขเอกสารเมื่อบันทึกครั้งแรกและไม่สร้างเลขซ้ำ",
+      "expected": "เลข CSE ออกครั้งเดียวจาก ENG-DOC-NUM",
+      "status": "na",
+      "ref": "FRD 03_LOGIC FN-02"
+    },
+    {
+      "item": "PDF และ CSV ตรงกับข้อมูลและสิทธิ์",
+      "expected": "ข้อมูลครบ ถูกต้อง และไม่แสดงข้อมูลที่ไม่มีสิทธิ์",
+      "status": "na",
+      "ref": "FRD 03_LOGIC FN-06..08"
+    },
+    {
+      "item": "ไฟล์แนบ pdf/jpg/png ไม่เกิน 10 MB เฉพาะร่างของ owner",
+      "expected": "รับเฉพาะชนิด ขนาด สถานะ และสิทธิ์ที่กำหนด",
+      "status": "na",
+      "ref": "FRD 03_LOGIC FN-09"
+    },
+    {
+      "item": "notification cse_submitted และ audit append-only",
+      "expected": "แจ้ง role-mgr-sales เมื่อส่ง และบันทึกประวัติทุก write",
+      "status": "na",
+      "ref": "FRD 03_LOGIC FN-05 · 02_API §2.3"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-04",
+      "status": "note",
+      "note": "ชุดปุ่มใน drawer create/edit หลุดจาก pattern ของ design กลาง"
+    },
+    {
+      "item": "รูปแบบแท็บ PDF ใน view drawer",
+      "status": "note",
+      "note": "รูปแบบหน้าตาหลุดจาก design pattern ของระบบ"
+    },
+    {
+      "item": "รูปแบบแท็บประวัติใน view drawer",
+      "status": "note",
+      "note": "รูปแบบหน้าตาหลุดจาก design pattern ของระบบ"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-02",
+      "status": "note",
+      "note": "บันทึกร่างสำเร็จจริง แต่ระบบแจ้งว่าทำรายการไม่สำเร็จและ drawer ไม่ปิด"
+    },
+    {
+      "id": "X-01",
+      "status": "note",
+      "note": "ขั้นตอนยกเลิกบังคับให้กรอกเหตุผลในแท็บรายละเอียดก่อน แทนการกดปุ่มแล้วกรอกใน modal"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "บันทึกร่างสำเร็จแต่ drawer ไม่ปิดและแจ้งว่าทำรายการไม่สำเร็จ",
+      "severity": "medium",
+      "steps": [
+        "เปิด drawer สร้างแบบประเมิน",
+        "กรอกข้อมูลสำหรับบันทึกร่าง",
+        "กด ‘บันทึกแบบร่าง’",
+        "ตรวจ toast, drawer และรายการเอกสาร"
+      ],
+      "expected": "แสดงผลบันทึกสำเร็จ ปิด drawer และมีรายการที่สร้างหนึ่งรายการ",
+      "actual": "drawer ไม่ปิดและขึ้น toast ‘ทำรายการไม่สำเร็จ กรุณาลองใหม่’ แต่มีรายการถูกสร้างขึ้นจริง",
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "ขั้นตอนยกเลิกไม่เปิด modal ให้กรอกเหตุผลหลังจากกดปุ่ม",
+      "severity": "medium",
+      "steps": [
+        "เปิด view drawer ของเอกสารที่ยกเลิกได้",
+        "อยู่ที่แท็บรายละเอียดโดยยังไม่กรอกเหตุผล",
+        "ตรวจและลองกดปุ่มยืนยันยกเลิก"
+      ],
+      "expected": "ปุ่มยกเลิกกดได้และเปิด modal ให้กรอกเหตุผลก่อนยืนยัน",
+      "actual": "ต้องกรอกเหตุผลในแท็บรายละเอียดก่อน มิฉะนั้นปุ่มยืนยันยกเลิกถูก disable",
+      "status": "open"
+    },
+    {
+      "id": "BUG-04",
+      "title": "ชุดปุ่มใน drawer create/edit ไม่ตรง design pattern",
+      "severity": "low",
+      "steps": [
+        "เปิด drawer create หรือ edit",
+        "ตรวจชุดปุ่ม action ของ drawer"
+      ],
+      "expected": "ชุดปุ่มตรง pattern กลางของระบบ",
+      "actual": "layout และรูปแบบปุ่มหลุดจาก design pattern",
+      "status": "open"
+    },
+    {
+      "id": "BUG-05",
+      "title": "แท็บ PDF ใน view drawer ไม่ตรง design pattern",
+      "severity": "low",
+      "steps": [
+        "เปิด view drawer",
+        "เลือกแท็บ PDF"
+      ],
+      "expected": "แท็บ PDF ใช้ design pattern กลางของระบบ",
+      "actual": "หน้าตาแท็บ PDF หลุดจาก design pattern",
+      "status": "open"
+    },
+    {
+      "id": "BUG-06",
+      "title": "แท็บประวัติใน view drawer ไม่ตรง design pattern",
+      "severity": "low",
+      "steps": [
+        "เปิด view drawer",
+        "เลือกแท็บประวัติ"
+      ],
+      "expected": "แท็บประวัติใช้ design pattern กลางของระบบ",
+      "actual": "หน้าตาแท็บประวัติหลุดจาก design pattern",
+      "status": "open"
+    }
+  ]
+}

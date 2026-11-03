@@ -1,0 +1,158 @@
+{
+  "feature": {
+    "code": "F-TMP-002",
+    "name": "HR บันทึกภายใน",
+    "module": "HR"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-03",
+  "round": 1,
+  "refs": "FRD F-TMP-002 Pack v1.0 · BR-MEM-09 · UI Brief F-TMP-002",
+  "scope": {
+    "checked": [
+      "Create, Update และ Delete",
+      "Create/Edit drawer และ stepper",
+      "การบันทึกจาก drawer ขั้นที่ 3 พร้อมเอกสารแนบ",
+      "รูปแบบปุ่มของ drawer",
+      "แท็บ PDF Preview",
+      "UI/UX ส่วนที่เหลือ"
+    ],
+    "not_checked": [
+      {
+        "item": "DOA และ flow อนุมัติ/ไม่อนุมัติ",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลในรอบนี้"
+      },
+      {
+        "item": "สิทธิ์การมองเห็น, CSV, notification และ race/error cases",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลในรอบนี้"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างบันทึกภายใน (Create)",
+      "expected": "สร้างข้อมูลได้สำเร็จ",
+      "status": "pass"
+    },
+    {
+      "item": "แก้ไขบันทึกภายใน (Update)",
+      "expected": "แก้ไขข้อมูลได้สำเร็จ",
+      "status": "pass"
+    },
+    {
+      "item": "ลบ/ยกเลิกบันทึกภายใน (Delete)",
+      "expected": "ทำรายการได้สำเร็จตาม flow ที่ระบบกำหนด",
+      "status": "pass"
+    },
+    {
+      "item": "บันทึกจาก drawer ขั้นที่ 3 เมื่อไฟล์แนบแต่ละไฟล์ไม่เกิน 20 MB",
+      "expected": "ระบบยอมรับไฟล์ PDF, Word, Excel และรูปภาพที่มีขนาดไม่เกิน 20 MB ต่อไฟล์ และบันทึกได้",
+      "actual": "ระบบตอบ 422 และแสดง toast ‘ไฟล์มีขนาดใหญ่เกินกำหนด’ แม้ไฟล์ที่แนบมีขนาด 0.01 MB, 0.17 MB และ 0.06 MB",
+      "status": "fail",
+      "bug": "BUG-01",
+      "ref": "BR-MEM-09"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "Create/Edit drawer: stepper และการจัดพื้นที่ด้านบนหลุดจาก pattern ของ design อ้างอิง",
+      "evidence": "tk01/Screenshot 2026-11-03 155731.png"
+    },
+    {
+      "id": "U-04",
+      "status": "note",
+      "note": "ชุดปุ่ม action ของ drawer หลุดจาก pattern ของ design อ้างอิง",
+      "evidence": "tk03/Screenshot 2026-11-03 160346.png"
+    },
+    {
+      "item": "รูปแบบแท็บ PDF Preview",
+      "status": "note",
+      "note": "แท็บและพื้นที่ PDF Preview หลุดจาก pattern ของ design อ้างอิง",
+      "evidence": "tk04/Screenshot 2026-11-03 160609.png"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "note",
+      "note": "ผู้ใช้ไม่สามารถจบ flow บันทึกในขั้นที่ 3 ได้เมื่อมีไฟล์แนบที่ถูกชนิดและมีขนาดต่ำกว่า 20 MB"
+    },
+    {
+      "id": "X-03",
+      "status": "note",
+      "note": "ข้อความผิดพลาดแจ้งว่าไฟล์ใหญ่เกินกำหนด ทั้งที่ไฟล์ทุกไฟล์มีขนาดต่ำกว่าเกณฑ์ จึงไม่บอกสาเหตุจริงหรือวิธีแก้"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "ไฟล์แนบต่ำกว่า 20 MB ถูกปฏิเสธว่าไฟล์ใหญ่เกินกำหนด",
+      "severity": "medium",
+      "steps": [
+        "เปิด Create หรือ Edit drawer ของบันทึกภายใน",
+        "ไปขั้นที่ 2 และแนบไฟล์ XLS 0.01 MB, PDF 0.17 MB และ PNG 0.06 MB",
+        "ไปขั้นที่ 3 แล้วกดบันทึก"
+      ],
+      "expected": "ไฟล์ทุกไฟล์ผ่านเงื่อนไขไม่เกิน 20 MB ต่อไฟล์และระบบบันทึกได้",
+      "actual": "คำขอเอกสารแนบตอบ 422 และขึ้น toast ‘ไฟล์มีขนาดใหญ่เกินกำหนด’",
+      "evidence": [
+        "tk02/Screenshot 2026-11-03 160102.png",
+        "tk02/Screenshot 2026-11-03 160023.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "Stepper ของ Create/Edit drawer หลุดจาก design pattern",
+      "severity": "low",
+      "steps": [
+        "เปิด Create หรือ Edit drawer",
+        "ตรวจตำแหน่ง ระยะห่าง และความกว้างของ stepper เทียบ design อ้างอิง"
+      ],
+      "expected": "Stepper ใช้โครงสร้างและระยะห่างตาม pattern อ้างอิง",
+      "actual": "Stepper และพื้นที่ด้านบนจัดวางต่างจาก pattern อ้างอิง",
+      "evidence": [
+        "tk01/Screenshot 2026-11-03 155731.png",
+        "tk01/example_stepper.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "ชุดปุ่ม action ของ drawer หลุดจาก design pattern",
+      "severity": "low",
+      "steps": [
+        "เปิด drawer รายละเอียดบันทึกภายใน",
+        "ตรวจตำแหน่งและรูปแบบปุ่ม แก้ไข, ส่งอนุมัติ และยกเลิกเอกสาร เทียบ design อ้างอิง"
+      ],
+      "expected": "ปุ่ม action อยู่ในตำแหน่งและใช้รูปแบบเดียวกับ drawer pattern อ้างอิง",
+      "actual": "ตำแหน่งและการจัดกลุ่มปุ่มแตกต่างจาก pattern อ้างอิง",
+      "evidence": [
+        "tk03/Screenshot 2026-11-03 160346.png",
+        "tk03/example_button_layout.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-04",
+      "title": "แท็บ PDF Preview หลุดจาก design pattern",
+      "severity": "low",
+      "steps": [
+        "เปิด drawer รายละเอียดบันทึกภายใน",
+        "เลือกแท็บ PDF Preview",
+        "ตรวจรูปแบบแท็บและพื้นที่ preview เทียบ design อ้างอิง"
+      ],
+      "expected": "แท็บและ PDF viewer ใช้ layout ตาม pattern อ้างอิง",
+      "actual": "ตำแหน่งแท็บและพื้นที่แสดง PDF แตกต่างจาก pattern อ้างอิง",
+      "evidence": [
+        "tk04/Screenshot 2026-11-03 160609.png",
+        "tk04/example_pdf_tab.png"
+      ],
+      "status": "open"
+    }
+  ]
+}

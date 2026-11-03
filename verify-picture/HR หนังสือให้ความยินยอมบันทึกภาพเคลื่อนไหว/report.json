@@ -1,0 +1,298 @@
+{
+  "feature": {
+    "code": "F-TMP-010",
+    "name": "HR หนังสือให้ความยินยอมบันทึกภาพเคลื่อนไหว",
+    "module": "HR"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-03",
+  "round": 1,
+  "env": "sandbox-core",
+  "build": "v0.2.0",
+  "refs": "FRD F-TMP-010 Pack · หลักฐานภาพ tk01–tk05",
+  "scope": {
+    "checked": [
+      "สร้างหนังสือให้ความยินยอม",
+      "แก้ไขหนังสือให้ความยินยอม",
+      "ยกเลิกเอกสาร (ผู้ตรวจเรียกว่า delete)",
+      "แนบเอกสารใน drawer ตอนสร้างและเปิดแก้ไข",
+      "บันทึกและยืนยันหนังสือยินยอม",
+      "UI / UX ของ drawer, แท็บ PDF และ badge สถานะ"
+    ],
+    "not_checked": [
+      {
+        "item": "ค้นหา ตัวกรอง และส่งออก CSV",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลในรอบนี้"
+      },
+      {
+        "item": "กฎผู้เยาว์และข้อมูลผู้ปกครอง",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลในรอบนี้"
+      },
+      {
+        "item": "ถอนความยินยอมรายข้อ/ทั้งฉบับ",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลในรอบนี้"
+      },
+      {
+        "item": "สิทธิ์การมองเห็นและการปิดบังข้อมูล Restricted",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลในรอบนี้"
+      },
+      {
+        "item": "เนื้อหา PDF เทียบต้นฉบับและการเก็บ snapshot",
+        "reason": "ตรวจพบเฉพาะ layout ของแท็บ PDF แต่ไม่ได้ระบุผลความถูกต้องของเอกสาร"
+      },
+      {
+        "item": "Notification, audit trail, concurrency และ API negative cases",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลในรอบนี้"
+      },
+      {
+        "item": "DOA dynamic",
+        "reason": "Scope รอบนี้กำหนด 0 ขั้นอนุมัติ (DEC-03)"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "id": "L-01",
+      "item": "สร้างหนังสือให้ความยินยอม",
+      "expected": "สร้างและบันทึกร่างได้ตาม FN-02",
+      "status": "pass",
+      "ref": "FN-02 · T-01"
+    },
+    {
+      "id": "L-02",
+      "item": "แก้ไขหนังสือให้ความยินยอม",
+      "expected": "แก้ไขข้อมูลร่างและบันทึกได้",
+      "status": "pass",
+      "ref": "FN-02"
+    },
+    {
+      "id": "L-03",
+      "item": "ยกเลิกเอกสาร",
+      "expected": "ยกเลิกเอกสารได้ตาม flow ที่ระบบกำหนด",
+      "status": "pass",
+      "ref": "FN-09"
+    },
+    {
+      "id": "L-04",
+      "item": "เอกสารแนบระหว่างสร้างและแก้ไข",
+      "expected": "เอกสารแนบที่บันทึกแล้วต้องแสดงเมื่อเปิดแก้ไข และจัดการผ่าน Document Center ได้",
+      "actual": "หน้าสร้างแนบได้เพียง 1 ไฟล์ และเมื่อเปิดแก้ไขไม่แสดงไฟล์ที่เคยแนบ แม้หน้ารายละเอียดจะแสดงว่ามีไฟล์อยู่",
+      "status": "fail",
+      "bug": "BUG-01",
+      "ref": "FN-12 · TC-C03"
+    },
+    {
+      "id": "L-05",
+      "item": "บันทึกและยืนยันความยินยอม",
+      "expected": "ยืนยันสำเร็จและเปลี่ยนสถานะเป็น confirmed ทันที เนื่องจากรอบนี้ไม่มี DOA",
+      "actual": "ยืนยันไม่ได้ API ตอบ ERR_FEATURE_NOT_FOUND_IN_CUBIC: Feature not registered in Cubic: F-TMP-010",
+      "status": "fail",
+      "bug": "BUG-04",
+      "ref": "FN-06 · T-02 · DEC-03"
+    },
+    {
+      "id": "L-06",
+      "item": "รายการ ค้นหา ตัวกรอง และส่งออก CSV",
+      "expected": "ทำงานตาม FN-01 และ CSV ไม่มีเลขบัตรประชาชน",
+      "status": "na",
+      "ref": "FN-01 · T-04"
+    },
+    {
+      "id": "L-07",
+      "item": "เลขที่เอกสารและ snapshot",
+      "expected": "ออกเลขครั้งแรกครั้งเดียวและเก็บ form/header snapshot",
+      "status": "na",
+      "ref": "FN-03 · BR-05"
+    },
+    {
+      "id": "L-08",
+      "item": "กฎผู้เยาว์และผู้ปกครอง",
+      "expected": "ต่ำกว่าเกณฑ์ต้องมีผู้ปกครอง; เท่ากับเกณฑ์ไม่ถือเป็นผู้เยาว์",
+      "status": "na",
+      "ref": "FN-04 · T-06–T-10"
+    },
+    {
+      "id": "L-09",
+      "item": "ความยินยอมแยกรายข้อ",
+      "expected": "ทุกข้อต้องเลือก consent หรือ withdraw และเก็บแยกรายข้อ",
+      "status": "na",
+      "ref": "FN-05 · T-14"
+    },
+    {
+      "id": "L-10",
+      "item": "ถอนความยินยอม",
+      "expected": "ถอนรายข้อ/ทั้งฉบับผูกใบเดิม พร้อมเหตุผลและประวัติ",
+      "status": "na",
+      "ref": "FN-08 · T-27–T-30"
+    },
+    {
+      "id": "L-11",
+      "item": "แบบพิมพ์ PDF Replica",
+      "expected": "ข้อมูลและถ้อยคำตรงต้นฉบับ พร้อมสถานะและ checkbox ถูกต้อง",
+      "status": "na",
+      "ref": "FN-10 · T-36–T-40"
+    },
+    {
+      "id": "L-12",
+      "item": "สิทธิ์การมองเห็นและข้อมูล Restricted",
+      "expected": "เจ้าของ/role ที่กำหนดเห็นตามสิทธิ์ และเลขบัตรไม่รั่ว",
+      "status": "na",
+      "ref": "FN-11 · T-20–T-26"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "layout ของ drawer และพื้นที่แท็บ PDF Preview ไม่เป็น pattern เดียวกับหน้ามาตรฐานที่ใช้อ้างอิง",
+      "evidence": [
+        "tk02/Screenshot 2026-11-03 165321.png",
+        "tk03/Screenshot 2026-11-03 165454.png"
+      ]
+    },
+    {
+      "id": "U-04",
+      "status": "note",
+      "note": "ตำแหน่งและรูปแบบปุ่ม action ใน drawer หลุดจาก design pattern ของระบบ",
+      "evidence": [
+        "tk02/Screenshot 2026-11-03 165321.png",
+        "tk02/example_button_layout.png"
+      ]
+    },
+    {
+      "id": "U-05",
+      "status": "note",
+      "note": "badge สถานะยกเลิกแสดงเส้นขีดฆ่าทับตัวหนังสือ ทำให้อ่านสถานะยาก",
+      "evidence": [
+        "tk05/Screenshot 2026-11-03 170518.png",
+        "tk05/Screenshot 2026-11-03 170609.png"
+      ]
+    },
+    {
+      "item": "รูปแบบแท็บ PDF Preview",
+      "status": "note",
+      "note": "องค์ประกอบ toolbar และกรอบ preview ไม่สอดคล้องกับ design pattern ที่ใช้อ้างอิง",
+      "evidence": [
+        "tk03/Screenshot 2026-11-03 165454.png",
+        "tk03/example_pdf_Tab.png"
+      ]
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "fail",
+      "note": "งานหลักจบไม่ได้ เพราะกดบันทึกและยืนยันแล้ว API ปฏิเสธว่า F-TMP-010 ยังไม่ถูก register",
+      "evidence": "tk04/Screenshot 2026-11-03 165938.png"
+    },
+    {
+      "id": "X-03",
+      "status": "note",
+      "note": "ข้อความ Feature not registered in Cubic เป็นข้อความเทคนิคและไม่มีคำแนะนำที่ผู้ใช้แก้ไขหรือดำเนินการต่อได้",
+      "evidence": "tk04/Screenshot 2026-11-03 165938.png"
+    },
+    {
+      "id": "X-05",
+      "status": "note",
+      "note": "เมื่อเปิดแก้ไขไม่แสดงไฟล์เดิม ทำให้ผู้ใช้ไม่ทราบว่าเอกสารแนบถูกบันทึกไว้แล้วหรือไม่",
+      "evidence": [
+        "tk01/Screenshot 2026-11-03 164859.png",
+        "tk01/Screenshot 2026-11-03 165128.png"
+      ]
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-04",
+      "title": "บันทึกและยืนยันไม่ได้ เพราะ F-TMP-010 ไม่ถูก register ใน Cubic",
+      "severity": "high",
+      "steps": [
+        "เปิดสร้างหรือแก้ไขหนังสือให้ความยินยอม",
+        "กรอกข้อมูลและเลือกความยินยอมจนถึงขั้นตรวจสอบและยืนยัน",
+        "กด บันทึกและยืนยัน",
+        "ตรวจ API response และข้อความใน modal"
+      ],
+      "expected": "ยืนยันสำเร็จและเปลี่ยนสถานะเป็น confirmed โดยไม่ต้องผ่าน DOA ตาม DEC-03",
+      "actual": "API ตอบ code ERR_FEATURE_NOT_FOUND_IN_CUBIC และ message Feature not registered in Cubic: F-TMP-010 ทำให้ยืนยันไม่ได้",
+      "evidence": "tk04/Screenshot 2026-11-03 165938.png",
+      "status": "open"
+    },
+    {
+      "id": "BUG-01",
+      "title": "เปิดแก้ไขแล้วไม่แสดงเอกสารแนบเดิม",
+      "severity": "medium",
+      "steps": [
+        "สร้างหนังสือและแนบไฟล์ CMP-2569-0001.pdf",
+        "บันทึกเอกสาร",
+        "ตรวจหน้ารายละเอียดว่ามีเอกสารแนบ 1 ไฟล์",
+        "กดแก้ไขและไปขั้นเอกสารและวัตถุประสงค์"
+      ],
+      "expected": "drawer แก้ไขแสดงไฟล์ที่เคยแนบและให้ผู้ใช้จัดการไฟล์เดิมได้",
+      "actual": "หน้ารายละเอียดแสดงไฟล์ แต่ drawer แก้ไขแสดงข้อความ ยังไม่มีไฟล์แนบ; control รองรับไฟล์ที่เห็นบนจอเพียง 1 ไฟล์",
+      "evidence": [
+        "tk01/Screenshot 2026-11-03 164859.png",
+        "tk01/Screenshot 2026-11-03 165128.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "ปุ่ม action ใน drawer ไม่ตรง design pattern ของระบบ",
+      "severity": "low",
+      "steps": [
+        "เปิดรายละเอียดหนังสือให้ความยินยอม",
+        "สังเกตตำแหน่งปุ่ม ยกเลิกเอกสาร และ แก้ไข ที่ footer",
+        "เทียบกับ drawer มาตรฐานที่วาง action หลักไว้บริเวณ header"
+      ],
+      "expected": "ตำแหน่ง ขนาด และลำดับความสำคัญของปุ่มสอดคล้องกับ drawer pattern กลาง",
+      "actual": "ปุ่ม action อยู่ที่ footer และรูปแบบ/ตำแหน่งต่างจาก drawer มาตรฐาน",
+      "evidence": [
+        "tk02/Screenshot 2026-11-03 165321.png",
+        "tk02/example_button_layout.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "layout ของแท็บ PDF Preview ไม่ตรง design pattern",
+      "severity": "low",
+      "steps": [
+        "เปิดรายละเอียดหนังสือให้ความยินยอม",
+        "กดแท็บ PDF Preview",
+        "เทียบ toolbar, spacing และกรอบ preview กับหน้ามาตรฐาน"
+      ],
+      "expected": "แท็บ PDF ใช้โครง toolbar และพื้นที่ preview ตาม pattern กลางของระบบ",
+      "actual": "toolbar, spacing และกรอบเอกสารมีรูปแบบต่างจาก pattern ที่ใช้อ้างอิง",
+      "evidence": [
+        "tk03/Screenshot 2026-11-03 165454.png",
+        "tk03/example_pdf_Tab.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-05",
+      "title": "badge สถานะยกเลิกมีเส้นขีดฆ่าทับข้อความ",
+      "severity": "low",
+      "steps": [
+        "ยกเลิกเอกสาร",
+        "เปิดรายการหรือรายละเอียดเอกสาร",
+        "สังเกต badge สถานะ ยกเลิก"
+      ],
+      "expected": "ข้อความสถานะยกเลิกอ่านได้ชัดเจนโดยไม่มีเส้นทับตัวอักษร",
+      "actual": "badge แสดงเส้นขีดฆ่าพาดทับคำว่า ยกเลิก",
+      "evidence": [
+        "tk05/Screenshot 2026-11-03 170518.png",
+        "tk05/Screenshot 2026-11-03 170609.png"
+      ],
+      "status": "open"
+    }
+  ],
+  "suggestions": [
+    {
+      "item": "ให้ PM/BA ยืนยันจำนวนเอกสารแนบสูงสุด",
+      "reason": "ผู้ตรวจพบว่า UI รับได้เพียง 1 ไฟล์ แต่ FRD ระบุเพียงให้แนบผ่าน Document Center โดยไม่ได้ล็อกจำนวนไฟล์ จึงยังตัดสินส่วนจำนวนไฟล์เป็น Bug ไม่ได้"
+    }
+  ]
+}
