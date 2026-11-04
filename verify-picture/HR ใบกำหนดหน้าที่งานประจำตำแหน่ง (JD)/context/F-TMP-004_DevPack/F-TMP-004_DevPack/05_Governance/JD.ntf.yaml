@@ -1,0 +1,51 @@
+feature_id: F-TMP-004
+name: ใบกำหนดหน้าที่งานประจำตำแหน่ง (JD)
+code: JD
+events:
+- id: jd_cancelled
+  trigger: pending_approval → cancelled (เจ้าของหรือ HR ยกเลิกระหว่างรออนุมัติ พร้อมเหตุผล)
+  recipients:
+  - current_step_approver
+  - ผู้สร้างเอกสาร
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้) · DEC-09
+  frd_ref: 03_LOGIC F-TMP-004-FN-07, F-TMP-004-FN-09
+- id: jd_ack_requested
+  trigger: approved และ HR ระบุผู้ดำรงตำแหน่ง (acknowledged_by ถูกกำหนด)
+  recipients:
+  - ผู้ดำรงตำแหน่งที่ระบุ
+  template: ใบกำหนดหน้าที่งาน **{doc_no}** ตำแหน่ง {position_name} อนุมัติแล้ว — กรุณาอ่านและกดรับทราบ
+  channel: in-app+email
+  optional: false
+  why: ผู้ดำรงตำแหน่งต้องลงนามรับทราบ (Acknowledged By) หลังอนุมัติ — DEC-04 · DEC-16
+  frd_ref: 03_LOGIC F-TMP-004-FN-09, F-TMP-004-FN-10
+- id: jd_acknowledged
+  trigger: approved → acknowledged (ผู้ดำรงตำแหน่งกดรับทราบ)
+  recipients:
+  - ผู้สร้างเอกสาร
+  - role-mgr-hr
+  template: '**{doc_no}** ตำแหน่ง {position_name} — ผู้ดำรงตำแหน่งรับทราบแล้ว'
+  channel: in-app
+  optional: true
+  why: ปิดวงจร JD — ผู้จัดทำและ HR รู้ว่าลงนามครบ 3 ช่องแล้ว
+  frd_ref: 03_LOGIC F-TMP-004-FN-09, F-TMP-004-FN-11
+- id: jd_superseded
+  trigger: ฉบับใหม่ของตำแหน่งเดียวกันอนุมัติ → ฉบับเดิม approved/acknowledged → superseded
+  recipients:
+  - ผู้สร้างเอกสาร
+  - ผู้ดำรงตำแหน่งที่ระบุ
+  template: '**{doc_no}** ตำแหน่ง {position_name} ถูกแทนที่ด้วยฉบับ **{new_doc_no}**'
+  channel: in-app
+  optional: true
+  why: ตำแหน่งเดียวกันมี JD ที่ใช้ได้ฉบับเดียว (DEC-04) — คนที่ถือฉบับเดิมต้องรู้ว่าเปลี่ยนแล้ว
+  frd_ref: 03_LOGIC F-TMP-004-FN-09
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+- jd_over_limit_approved
+note: ตัด jd_over_limit_approved — JD ไม่มีวงเงิน/เกณฑ์ตัวเลข (DEC-03, DEC-04) · ส่งอนุมัติ/ผลอนุมัติ
+  = DOA engine ยิงเอง

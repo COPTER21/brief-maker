@@ -1,0 +1,37 @@
+# doa-declaration v1.2 — เขียนมือตาม SKILL §Interview (doa_tool.py init ไม่สร้างให้เพราะ DECISIONS G2 = ไม่มีผู้อนุมัติ)
+# เข้าเกณฑ์ Trigger Rule ของสกิล: เป็นเอกสารที่ออก PDF และมีช่องลายเซ็น + schema มี approval_chain
+# ประกาศตรงตามมติ: รอบนี้ "0 ขั้น" (กระดาษมีช่องลงชื่อเฉพาะเจ้าของข้อมูล · DEC-03) แต่จำนวนขั้นตั้งเพิ่มที่ DOA กลางได้โดยไม่แก้ feature
+feature_id: F-TMP-008
+name: หนังสือยินยอมในการเก็บรวบรวม ใช้ และเปิดเผยข้อมูลส่วนบุคคล
+module: hr
+platform: hr_platform
+doa_type: pdc
+approval_scope: document_sign
+approval_required: false
+mode: dynamic
+amount: none
+dept_mode: merged
+on_reject: back_to_draft
+cancel_by:
+- owner
+- role-mgr-hr
+cancel_states:
+- draft
+- pending
+actions:
+- id: confirm_pdc
+  label: ยืนยันความยินยอม (เจ้าของข้อมูลลงนามในระบบ)
+  from_state: draft
+matrix:
+- amount_from: 0
+  amount_to: null
+  departments: merged
+  chainMode: sequential
+  steps: []
+defaults_unconfirmed: true
+wire_status: pending
+source_decisions:
+- DEC-03
+- DEC-07
+- DEC-08
+note: "ค่าเริ่มต้น 0 ขั้น = ลงชื่อเฉพาะเจ้าของข้อมูลตามแบบฟอร์มกระดาษ FM-HRM-31 · เพิ่มขั้นผู้รับหนังสือ/ผู้กำกับดูแลได้ที่ DOA กลาง (ช่องลายเซ็นใน PDF วนจาก approval_chain ไม่ fix จำนวน)"

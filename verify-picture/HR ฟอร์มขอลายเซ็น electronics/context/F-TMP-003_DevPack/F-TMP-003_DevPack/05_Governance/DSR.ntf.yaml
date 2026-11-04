@@ -1,0 +1,34 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock แล้วตัดสิน event ที่ review: true (โหมดไม่เฝ้า)
+feature_id: F-TMP-003
+name: คำขอมีและใช้ลายเซ็นดิจิทัล (Digital Signature)
+code: DSR
+events:
+- id: dsr_cancelled
+  trigger: pending_approval → cancelled (ยกเลิกโดยเจ้าของหรือ admin role · DEC-08)
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  frd_ref: '03_LOGIC FN-09'
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว (DOA engine ไม่ยิงกรณีนี้)
+- id: dsr_name_change_requested
+  trigger: draft → pending_approval เมื่อ case = change (กรณีที่ 3 ขอเปลี่ยนลายเซ็นดิจิทัลเพราะเปลี่ยนชื่อ/นามสกุล · DEC-13/DEC-14)
+  recipients:
+  - role-mgr-hr
+  template: '**{doc_no}** {requester} ขอเปลี่ยนลายเซ็นดิจิทัลจากการเปลี่ยนชื่อ-นามสกุล — โปรดตรวจสอบทะเบียนพนักงานให้ตรงกัน'
+  channel: in-app
+  optional: true
+  frd_ref: '03_LOGIC FN-13'
+  why: >
+    G1 มติว่าใบนี้ไม่เปลี่ยนค่าในระบบและไม่ส่งต่อระบบอื่น (DEC-01/DEC-02) ชื่อ-นามสกุลในทะเบียนพนักงานเป็นของ F-EMP-001
+    จึงต้องมีการแจ้งให้ผู้ดูแลทะเบียนไปแก้เอง ไม่ใช่ระบบแก้ให้อัตโนมัติ · ไม่ซ้ำกับ doa_pending เพราะผู้รับและเจตนาต่างกัน
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+decided:
+- id: dsr_over_limit_approved
+  decision: ตัดออก
+  why: เอกสารนี้ไม่มีค่าคงที่/สูตร/วงเงินบนกระดาษ (FORM_SPEC.constants = [] · formulas = [] · DOA amount = none) จึงไม่มี "เกินเกณฑ์" ให้เตือน
+note: เอกสารนี้ไม่มีไฟล์แนบบังคับและไม่มีประกาศเมื่ออนุมัติ (DEC-11 ประกาศ ✗) จึงไม่ประกาศ event เพิ่มนอกจาก 2 รายการข้างบน

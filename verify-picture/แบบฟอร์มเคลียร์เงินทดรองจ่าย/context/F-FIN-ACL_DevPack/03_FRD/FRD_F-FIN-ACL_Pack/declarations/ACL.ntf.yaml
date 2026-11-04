@@ -1,0 +1,7 @@
+# FINAL — ยืนยันกับ FRD v1.0 (frd_lint N7 PASS)
+feature_id: F-FIN-ACL
+events:
+  - { id: acl_cancelled, trigger: "pending_approval → cancelled", recipients: [current_step_approver], template: "**{doc_no}** ใบเคลียร์เงินทดรองจ่ายถูกยกเลิกโดย {actor} — {reason}", channel: in-app, optional: true, frd_ref: "03_LOGIC F-FIN-ACL-FN-07, FN-09" }
+  - { id: acl_overspent_approved, trigger: "→ approved และ refund_amount < 0", recipients: [role-finance-officer], template: "**{doc_no}** เคลียร์แล้ว ใช้เกินเงินที่เบิก {over_amount} บาท — ต้องจ่ายคืนพนักงาน {requester}", channel: in-app+email, optional: false, frd_ref: "03_LOGIC F-FIN-ACL-FN-09" }
+  - { id: acl_refund_due, trigger: "→ approved และ refund_amount > 0", recipients: [role-finance-officer], template: "**{doc_no}** เคลียร์แล้ว มีเงินคืนบริษัท {refund_amount} บาท — ตรวจรับเงินโอน", channel: in-app, optional: true, frd_ref: "03_LOGIC F-FIN-ACL-FN-09" }
+excluded: [doa_pending, doa_result, doa_escalate]

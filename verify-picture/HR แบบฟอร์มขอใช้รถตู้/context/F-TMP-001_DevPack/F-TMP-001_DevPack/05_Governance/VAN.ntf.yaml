@@ -1,0 +1,25 @@
+# ntf-declaration v1.2 — ร่าง (ก่อน FRD) · ตัดสินแล้วทุก event (โหมดไม่เฝ้า)
+feature_id: F-TMP-001
+name: แบบฟอร์มขอใช้รถตู้
+code: VAN
+events:
+- id: van_cancelled
+  trigger: pending_approval → cancelled (ผู้ขอหรือ admin role ยกเลิกระหว่างรออนุมัติ · DEC-08)
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  frd_ref: 03_LOGIC FN-09
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+decided:
+- 'van_over_limit_approved — ตัดออก: แบบฟอร์มนี้ไม่มีวงเงิน/เกณฑ์ตัวเลขบนกระดาษ (FORM_SPEC.constants = 0)
+  กฎใน DEC-04 เป็นกฎตรรกะวันที่/เวลา ซึ่งบล็อกตั้งแต่ตอนกรอก ไม่มีเคส "อนุมัติแล้วแต่เกินเกณฑ์"'
+- 'ไม่ประกาศ event ตอนอนุมัติให้ผู้เดินทางในรายชื่อ — ขัด DEC-11 (G10 ประกาศ ✗) · ถ้าลูกค้ายืนยันว่าต้องการ
+  ให้เพิ่ม event van_travelers_notified ในรอบถัดไป'
+note: 'event ธุรกิจของเอกสารนี้มีตัวเดียว (ยกเลิกระหว่างรอ) · การแจ้งผลอนุมัติเป็นของ DOA engine (doa_result)'

@@ -1,0 +1,53 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# ค่าทุกหมวดมาจาก 4_knowledge/governance/unattended-policy.md (อนุรักษ์นิยม · ERP standard)
+# แบบฟอร์มขอใช้รถตู้ (FM-HRM-22 Rev.00) · F-TMP-001 · REQ-TMP-001
+
+# G1 ผลต่อระบบ (ต้องตอบ)
+config_changes: []          # ไม่เปลี่ยนค่าตั้งค่าใด ๆ — เป็นเอกสารบันทึกคำขอ + อนุมัติอย่างเดียว
+post_to: []                 # ไม่ส่งต่อระบบอื่นรอบนี้ (ยังไม่มี feature ทะเบียนรถ/ตารางใช้รถในระบบ)
+
+# G2 สายอนุมัติ — ค่าเริ่ม = จำนวนช่องลงชื่อผู้อนุมัติบนกระดาษ (2 ช่อง)
+doa:
+  required: true
+  mode: dynamic
+  default_steps: ["role-line-manager", "role-mgr-hr"]
+  amount: none              # กระดาษไม่มีช่วงวงเงิน
+
+# G3 สูตร / ค่าคงที่
+calc:
+  constants_from_config: true
+  auto_compute: true        # "รวมเป็นจำนวน ... วัน" คำนวณจากช่วงวันที่ให้อัตโนมัติ (ต้นฉบับให้กรอกเอง → แก้สูตรที่ผิด)
+  over_limit: warn
+  rules:
+    - "จำนวนวัน = (ถึงวันที่ − วันที่เริ่ม) + 1 นับรวมวันเริ่มและวันสิ้นสุด"
+    - "ถึงวันที่ ต้องไม่ก่อน วันที่เริ่ม — ขัดแย้งทางตรรกะ = บล็อก"
+    - "ติ๊กเดินทางเฉพาะขาไป = กรอกเฉพาะบล็อกการเดินทางขาไป · เฉพาะขากลับ = เฉพาะบล็อกขากลับ · ไป-กลับ = ครบทั้งสองบล็อก"
+    - "เวลาส่ง (ปลายทาง) ต้องไม่ก่อน เวลารับ (ต้นทาง) ในขาเดียวกัน = เตือน"
+
+# G4 รายการซ้ำ
+repeat: { max_rows: null }  # รายชื่อผู้เดินทางไม่จำกัดจำนวนแถว · PDF อย่างน้อย 5 แถวตามกระดาษ
+
+# G5 ช่องตามกระดาษ
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ / ยกเลิก
+reject_cancel:
+  on_reject: back_to_draft  # กลับเป็นร่างเลขเดิม แก้แล้วส่งใหม่
+  cancel_by: [owner, admin_role]
+  cancel_states: [draft, pending]
+  reason_required: true
+
+# G8 การมองเห็น
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 เลขที่
+numbering: { issue_on: first_save, code: "VAN" }   # เอกสารภายใน ไม่ต้อง no-gap · รหัสย่อ 3 ตัวจาก "ขอใช้รถตู้" (Van)
+
+# G10 ของเสริม
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

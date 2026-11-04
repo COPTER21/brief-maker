@@ -1,0 +1,25 @@
+feature_id: F-TMP-002
+name: แบบสอบถามบุคลากรที่พ้นจากงาน (Exit Interview)
+code: EXI
+events:
+- id: exi_submitted
+  trigger: draft → submitted (ผู้ให้ข้อมูลหรือ HR กดส่งแบบสอบถาม)
+  recipients:
+  - role-mgr-hr
+  template: แบบสอบถามพ้นจากงาน **{doc_no}** ส่งแล้ว — รอ HR รับทราบ
+  channel: in-app
+  optional: false
+  why: ไม่มีสายอนุมัติ (DEC-03) — HR ต้องรู้ว่ามีใบใหม่เข้ามาเพื่อรับทราบ/ปิดใบ ·
+    ข้อความไม่ใส่ชื่อ/คำตอบ (ความลับ DEC-17)
+  frd_ref: 03_LOGIC F-TMP-002-FN-04, F-TMP-002-FN-09
+- id: exi_cancelled
+  trigger: submitted → cancelled (เจ้าของหรือ HR ยกเลิก พร้อมเหตุผล)
+  recipients:
+  - role-mgr-hr
+  - ผู้สร้างเอกสาร
+  template: 'แบบสอบถามพ้นจากงาน **{doc_no}** ถูกยกเลิก — เหตุผล: {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกหลังส่งต้องให้ HR และเจ้าของรู้ (มีเหตุผลบังคับ)
+  frd_ref: 03_LOGIC F-TMP-002-FN-07, F-TMP-002-FN-09
+excluded: []

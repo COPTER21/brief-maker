@@ -1,0 +1,26 @@
+# คำตอบ gate — user มอบให้ AI ประเมินตาม ERP standard (แชท 6 ต.ค. 2569: "ประเมินตาม standard แล้วทำต่อได้เลย")
+# G1 ผลต่อระบบ — AI ประเมิน: ไม่มีการเปลี่ยน config · ใบเบิก FM-FIN-01 ยังไม่อยู่ในระบบ → ไม่ส่งต่อ/ไม่ลงบัญชีรอบนี้
+config_changes: []
+post_to: []
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager", "role-finance-officer", "role-finance-manager"], amount: none }
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "รวมค่าใช้จ่าย = ผลรวมจำนวนเงินทุกรายการ (ต้อง > 0)"
+    - "จำนวนเงินที่เหลือส่งคืน = ยอดเบิก − รวมค่าใช้จ่าย"
+    - "TOTAL = จำนวนเงินที่เหลือส่งคืน · ตัวอักษร (BAHTTEXT) ตรงตัวเลขเสมอ"
+    - "ยอดติดลบ (ใช้เกินเงินเบิก) = แสดงยอดติดลบ + เตือน 'ใช้เกินเงินที่เบิก — บริษัทต้องจ่ายเพิ่ม' ไม่บล็อก"
+    - "หมายเหตุเส้นตายบนเอกสารแสดงจาก ExpensePolicy.advance_clear_due_day · ยังไม่เตือนเลยกำหนดรอบนี้ (ต้องมีวันที่เบิกจาก FM-FIN-01)"
+    - "เหลือส่งคืน > 0 ต้องแนบสลิปโอนคืนก่อนขั้นการเงินรับเคลียร์"
+    - "จำนวนเงินรายการ > 0 · ทศนิยม 2 ตำแหน่ง"
+repeat: { max_rows: null }
+fidelity: { one_to_one: true, add_fields: [], merge_split: [], label_fix: ["ผ่าย/แผนก → ฝ่าย/แผนก"] }
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, role-finance-officer], cancel_states: [draft, pending], reason_required: true }
+visibility: { owner: true, approver: after_submit, admin_role: all, admin_role_name: role-finance-officer }
+numbering: { issue_on: first_save, code: ACL }
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+extend: {}
+fit: {}

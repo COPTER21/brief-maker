@@ -1,0 +1,44 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# คำขอมีและใช้ลายเซ็นดิจิทัล (Digital Signature) · FM-HRM-23 · F-TMP-003 · REQ-TMP-003
+# ตอบตาม 4_knowledge/governance/unattended-policy.md (ERP standard · อนุรักษ์นิยม)
+
+# G1 ผลต่อระบบ — ไม่เปลี่ยนค่าในระบบ ไม่ส่งต่อระบบอื่นรอบนี้
+# (ฟอร์มเป็นคำขอ "มี/ใหม่/เปลี่ยน" ใบรับรอง CA — การออก/เพิกถอนใบรับรองทำนอกระบบโดยเจ้าหน้าที่
+#  และการเปลี่ยนชื่อ-นามสกุลในทะเบียนพนักงานเป็นงานของ F-EMP-001 ไม่ใช่ผลอัตโนมัติของใบนี้)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — ช่องลงชื่อผู้อนุมัติบนกระดาษ 1 จุด ("เจ้าหน้าที่") → ค่าเริ่ม 1 ขั้น
+doa: { required: true, mode: dynamic, default_steps: ["role-mgr-hr"], amount: none }
+
+# G3 สูตร / ค่าคงที่ — ฟอร์มไม่มีสูตรและไม่มีค่าคงที่ (ใช้ค่ามาตรฐาน)
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules: []
+
+# G4 รายการซ้ำ — ฟอร์มไม่มีแถวซ้ำ
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ — 19 ช่อง 1:1 ไม่เพิ่ม ไม่รวม ไม่แยก
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น — แถวล่าง 1 ช่องต่อขั้น DOA · ไม่ใช้ภาพลายมือชื่อแทนการอนุมัติ
+# (ช่อง "ตัวอย่างลายมือชื่อ/ลายมือเขียนชื่อ" เป็นข้อมูลของคำขอ ไม่ใช่ลายเซ็นอนุมัติ — เว้นกรอบว่างบนแบบพิมพ์ + แนบไฟล์ได้ตาม G10)
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ / ยกเลิก — กลับเป็นร่างเลขเดิม แก้แล้วส่งใหม่
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 เลขที่ — ออกตอนบันทึกครั้งแรก (เอกสารภายใน ไม่ใช่เอกสารการเงิน no-gap) · รหัส DSR
+numbering: { issue_on: first_save, code: "DSR" }
+
+# G10 ของเสริม — แนบไฟล์ ✓ · CSV ✓ · ทำซ้ำ ✗ · ประกาศ ✗
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

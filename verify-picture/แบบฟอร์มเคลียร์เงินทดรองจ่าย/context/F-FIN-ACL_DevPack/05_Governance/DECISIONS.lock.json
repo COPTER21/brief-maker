@@ -1,0 +1,346 @@
+{
+ "req": "REQ-2569-0000",
+ "status": "พร้อมเริ่มทำ",
+ "ready": true,
+ "decisions": [
+  {
+   "id": "DEC-01",
+   "cat": "G1",
+   "text": "อนุมัติแล้วไม่เปลี่ยนค่าในระบบ",
+   "value": [],
+   "source": "ตอบแล้ว",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-02",
+   "cat": "G1",
+   "text": "ไม่ส่งต่อระบบอื่นรอบนี้ (ประกาศ event ไว้ใน FRD แต่ไม่ยิง)",
+   "value": [],
+   "source": "ตอบแล้ว",
+   "consumers": [
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-03",
+   "cat": "G2",
+   "text": "สายอนุมัติตั้งที่ DOA กลาง (dynamic) · ค่าเริ่ม 3 ขั้น: role-line-manager, role-finance-officer, role-finance-manager · วงเงิน: ไม่มี",
+   "value": {
+    "required": true,
+    "mode": "dynamic",
+    "default_steps": [
+     "role-line-manager",
+     "role-finance-officer",
+     "role-finance-manager"
+    ],
+    "amount": "none"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "doa-declaration",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-04",
+   "cat": "G3",
+   "text": "ค่าคงที่อ่านจาก config: \"ภายในวันที่ 5 ของเดือนถัดไป\" → ExpensePolicy.advance_clear_due_day, \"บริษัท ครีเดนซ์ จำกัด (มหาชน) · ธนาคารยูโอบี สาขาสำนักสาทร · 601-119725-3\" → Company.bank_accounts[purpose=advance_refund] · คำนวณให้อัตโนมัติ ผู้ใช้ปรับได้ · เกินเกณฑ์ = เตือน · รวมค่าใช้จ่าย = ผลรวมจำนวนเงินทุกรายการ (ต้อง > 0) · จำนวนเงินที่เหลือส่งคืน = ยอดเบิก − รวมค่าใช้จ่าย · TOTAL = จำนวนเงินที่เหลือส่งคืน · ตัวอักษร (BAHTTEXT) ตรงตัวเลขเสมอ · ยอดติดลบ (ใช้เกินเงินเบิก) = แสดงยอดติดลบ + เตือน 'ใช้เกินเงินที่เบิก — บริษัทต้องจ่ายเพิ่ม' ไม่บล็อก · หมายเหตุเส้นตายบนเอกสารแสดงจาก ExpensePolicy.advance_clear_due_day · ยังไม่เตือนเลยกำหนดรอบนี้ (ต้องมีวันที่เบิกจาก FM-FIN-01) · เหลือส่งคืน > 0 ต้องแนบสลิปโอนคืนก่อนขั้นการเงินรับเคลียร์ · จำนวนเงินรายการ > 0 · ทศนิยม 2 ตำแหน่ง",
+   "value": {
+    "constants_from_config": true,
+    "auto_compute": true,
+    "over_limit": "warn",
+    "rules": [
+     "รวมค่าใช้จ่าย = ผลรวมจำนวนเงินทุกรายการ (ต้อง > 0)",
+     "จำนวนเงินที่เหลือส่งคืน = ยอดเบิก − รวมค่าใช้จ่าย",
+     "TOTAL = จำนวนเงินที่เหลือส่งคืน · ตัวอักษร (BAHTTEXT) ตรงตัวเลขเสมอ",
+     "ยอดติดลบ (ใช้เกินเงินเบิก) = แสดงยอดติดลบ + เตือน 'ใช้เกินเงินที่เบิก — บริษัทต้องจ่ายเพิ่ม' ไม่บล็อก",
+     "หมายเหตุเส้นตายบนเอกสารแสดงจาก ExpensePolicy.advance_clear_due_day · ยังไม่เตือนเลยกำหนดรอบนี้ (ต้องมีวันที่เบิกจาก FM-FIN-01)",
+     "เหลือส่งคืน > 0 ต้องแนบสลิปโอนคืนก่อนขั้นการเงินรับเคลียร์",
+     "จำนวนเงินรายการ > 0 · ทศนิยม 2 ตำแหน่ง"
+    ]
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-05",
+   "cat": "G4",
+   "text": "รายละเอียดค่าใช้จ่าย: ไม่จำกัดจำนวนแถว · PDF อย่างน้อย 10 แถวตามกระดาษ",
+   "value": {
+    "max_rows": null,
+    "min_rows": 10
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-06",
+   "cat": "G5",
+   "text": "ช่องตรงกระดาษ 1:1 · ไม่เพิ่มช่อง (เช่น หมายเหตุ) · แก้ป้าย 'ผ่าย/แผนก' → 'ฝ่าย/แผนก'",
+   "value": {
+    "one_to_one": true,
+    "add_fields": [],
+    "merge_split": [],
+    "label_fix": [
+     "ผ่าย/แผนก → ฝ่าย/แผนก"
+    ]
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-07",
+   "cat": "G6",
+   "text": "ลายเซ็นแถวล่าง 1 ช่องต่อขั้น DOA · ไม่ใช้ภาพลายมือชื่อ (ข้อความส่งในระบบ/พิจารณาในระบบ)",
+   "value": {
+    "layout": "row-bottom",
+    "per_doa_step": true,
+    "handwriting_image": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "thai-doc",
+    "html",
+    "doccfg-declaration",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-08",
+   "cat": "G7",
+   "text": "ไม่อนุมัติ = กลับเป็นร่าง แก้แล้วส่งใหม่ · ยกเลิกได้โดย owner, role-finance-officer สถานะ draft, pending · ต้องมีเหตุผล",
+   "value": {
+    "on_reject": "back_to_draft",
+    "cancel_by": [
+     "owner",
+     "role-finance-officer"
+    ],
+    "cancel_states": [
+     "draft",
+     "pending"
+    ],
+    "reason_required": true
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests",
+    "doa-declaration"
+   ]
+  },
+  {
+   "id": "DEC-09",
+   "cat": "G8",
+   "text": "มองเห็น: เจ้าของ · ผู้อนุมัติเห็นหลังส่ง · admin role เห็นทั้งหมด",
+   "value": {
+    "owner": true,
+    "approver": "after_submit",
+    "admin_role": "all",
+    "admin_role_name": "role-finance-officer"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-10",
+   "cat": "G9",
+   "text": "ออกเลขเมื่อบันทึกครั้งแรก · รหัส ACL",
+   "value": {
+    "issue_on": "first_save",
+    "code": "ACL"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "doccfg-declaration",
+    "html",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-11",
+   "cat": "G10",
+   "text": "ของเสริม (กระดาษไม่มี): แนบไฟล์, ส่งออก CSV",
+   "value": {
+    "attachments": true,
+    "copy": false,
+    "export_csv": true,
+    "announce": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "brd",
+    "frd",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-12",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: TOTAL = จำนวนเงินที่เหลือส่งคืน · ตัวอักษร (BAHTTEXT) ตรงกับตัวเลขเสมอ (พบ: ช่อง TOTAL ว่าง ไม่มีสูตร แต่ตัวอักษรใช้ =BAHTTEXT(D27) → พิมพ์ 'ศูนย์บาทถ้วน' เสมอ)",
+   "value": {
+    "where": "แถว TOTAL",
+    "detail": "ช่อง TOTAL ว่าง ไม่มีสูตร แต่ตัวอักษรใช้ =BAHTTEXT(D27) → พิมพ์ 'ศูนย์บาทถ้วน' เสมอ",
+    "rule": "TOTAL = จำนวนเงินที่เหลือส่งคืน · ตัวอักษร (BAHTTEXT) ตรงกับตัวเลขเสมอ"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-13",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: เหลือส่งคืน = เบิก − รวมค่าใช้จ่าย · ติดลบ = แสดงยอดติดลบ + เตือน 'ใช้เกินเงินที่เบิก — บริษัทต้องจ่ายเพิ่ม' (ไม่บล็อก) (พบ: ไม่มีสูตร และกระดาษรองรับแค่กรณีเหลือคืน ไม่มีกรณีใช้เกินเงินที่เบิก)",
+   "value": {
+    "where": "รวมค่าใช้จ่าย / เหลือส่งคืน",
+    "detail": "ไม่มีสูตร และกระดาษรองรับแค่กรณีเหลือคืน ไม่มีกรณีใช้เกินเงินที่เบิก",
+    "rule": "เหลือส่งคืน = เบิก − รวมค่าใช้จ่าย · ติดลบ = แสดงยอดติดลบ + เตือน 'ใช้เกินเงินที่เบิก — บริษัทต้องจ่ายเพิ่ม' (ไม่บล็อก)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-14",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ป้ายแสดงเป็น 'ฝ่าย/แผนก :' (แก้คำสะกด — ยืนยันกับลูกค้าในใบเซ็น) (พบ: สะกดผิดจาก 'ฝ่าย')",
+   "value": {
+    "where": "ป้าย 'ผ่าย/แผนก'",
+    "detail": "สะกดผิดจาก 'ฝ่าย'",
+    "rule": "ป้ายแสดงเป็น 'ฝ่าย/แผนก :' (แก้คำสะกด — ยืนยันกับลูกค้าในใบเซ็น)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-15",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: แนบไฟล์ระดับใบ (ใบเสร็จ/หลักฐาน + สลิปโอนคืน) · ไม่ผูกหมวดบัญชีรอบนี้ (รอ COA/AP) (พบ: ไม่มีช่องแนบใบเสร็จ/หลักฐาน และไม่มีหมวดค่าใช้จ่าย แม้หัวข้อเป็น 'ส่วนของบัญชี')",
+   "value": {
+    "where": "ตารางรายการ",
+    "detail": "ไม่มีช่องแนบใบเสร็จ/หลักฐาน และไม่มีหมวดค่าใช้จ่าย แม้หัวข้อเป็น 'ส่วนของบัญชี'",
+    "rule": "แนบไฟล์ระดับใบ (ใบเสร็จ/หลักฐาน + สลิปโอนคืน) · ไม่ผูกหมวดบัญชีรอบนี้ (รอ COA/AP)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  }
+ ],
+ "raw": {
+  "config_changes": [],
+  "post_to": [],
+  "doa": {
+   "required": true,
+   "mode": "dynamic",
+   "default_steps": [
+    "role-line-manager",
+    "role-finance-officer",
+    "role-finance-manager"
+   ],
+   "amount": "none"
+  },
+  "calc": {
+   "constants_from_config": true,
+   "auto_compute": true,
+   "over_limit": "warn",
+   "rules": [
+    "รวมค่าใช้จ่าย = ผลรวมจำนวนเงินทุกรายการ (ต้อง > 0)",
+    "จำนวนเงินที่เหลือส่งคืน = ยอดเบิก − รวมค่าใช้จ่าย",
+    "TOTAL = จำนวนเงินที่เหลือส่งคืน · ตัวอักษร (BAHTTEXT) ตรงตัวเลขเสมอ",
+    "ยอดติดลบ (ใช้เกินเงินเบิก) = แสดงยอดติดลบ + เตือน 'ใช้เกินเงินที่เบิก — บริษัทต้องจ่ายเพิ่ม' ไม่บล็อก",
+    "หมายเหตุเส้นตายบนเอกสารแสดงจาก ExpensePolicy.advance_clear_due_day · ยังไม่เตือนเลยกำหนดรอบนี้ (ต้องมีวันที่เบิกจาก FM-FIN-01)",
+    "เหลือส่งคืน > 0 ต้องแนบสลิปโอนคืนก่อนขั้นการเงินรับเคลียร์",
+    "จำนวนเงินรายการ > 0 · ทศนิยม 2 ตำแหน่ง"
+   ]
+  },
+  "repeat": {
+   "max_rows": null
+  },
+  "fidelity": {
+   "one_to_one": true,
+   "add_fields": [],
+   "merge_split": [],
+   "label_fix": [
+    "ผ่าย/แผนก → ฝ่าย/แผนก"
+   ]
+  },
+  "signature": {
+   "layout": "row-bottom",
+   "per_doa_step": true,
+   "handwriting_image": false
+  },
+  "reject_cancel": {
+   "on_reject": "back_to_draft",
+   "cancel_by": [
+    "owner",
+    "role-finance-officer"
+   ],
+   "cancel_states": [
+    "draft",
+    "pending"
+   ],
+   "reason_required": true
+  },
+  "visibility": {
+   "owner": true,
+   "approver": "after_submit",
+   "admin_role": "all",
+   "admin_role_name": "role-finance-officer"
+  },
+  "numbering": {
+   "issue_on": "first_save",
+   "code": "ACL"
+  },
+  "extras": {
+   "attachments": true,
+   "copy": false,
+   "export_csv": true,
+   "announce": false
+  },
+  "extend": {},
+  "fit": {}
+ }
+}

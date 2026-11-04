@@ -1,0 +1,26 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# G1 ผลต่อระบบ — JD เป็นเอกสารกำหนดหน้าที่ของตำแหน่ง เก็บในเอกสารนี้ · ไม่แก้ Position master · ไม่ส่งต่อ (Performance/Recruit อ้างอิงเองภายหลัง)
+config_changes: []
+post_to: []
+# G2 — กระดาษมีช่องผู้อนุมัติ 1 ช่อง (Approved By) ไม่ระบุตำแหน่ง → dynamic 1 ขั้น ผู้บังคับบัญชาตรงของผู้จัดทำ · ไม่มีวงเงิน
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager"], amount: none }
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "ชื่อตำแหน่ง (ไทย) / แผนก / ฝ่าย / รายงานต่อ ดึงจาก Position master เมื่อเลือกตำแหน่ง · ชื่อตำแหน่งอังกฤษไม่มีใน master → กรอกเอง · รายงานต่อแก้ได้"
+    - "ผู้ใต้บังคับบัญชา (ส่วนที่ 1) คำนวณจากตารางผู้ใต้บังคับบัญชาโดยตรง = \"N ตำแหน่ง · M คน\" · ไม่มีแถว = \"ไม่มี\" (ไม่ให้กรอกซ้ำ)"
+    - "ตารางผู้บังคับบัญชาโดยตรง(หัวหน้า) อย่างน้อย 1 แถว (บล็อก) · ตำแหน่งแถวแรกไม่ตรง \"รายงานต่อ\" = เตือน ไม่บล็อก"
+    - "จำนวน (คน) จำนวนเต็ม ≥ 1 เมื่อกรอกตำแหน่ง (บล็อก) · ตำแหน่งว่างแต่มีจำนวน = บล็อก"
+    - "วัตถุประสงค์ · ขอบเขตความรับผิดชอบหลัก · คุณสมบัติประจำตำแหน่ง · KPI บังคับกรอกก่อนส่ง (บล็อก) · คุณสมบัติอื่น ๆ ไม่บังคับ"
+    - "ตำแหน่งเดียวกันมี JD ที่อนุมัติแล้วได้ฉบับเดียว — อนุมัติฉบับใหม่ = ฉบับเดิมเปลี่ยนเป็น \"ถูกแทนที่\" อัตโนมัติ (ข้อมูลในเอกสารนี้เท่านั้น)"
+    - "ผู้ดำรงตำแหน่งลงนามรับทราบ (Acknowledged By) หลังอนุมัติเท่านั้น · ไม่บังคับ (ตำแหน่งว่าง) · HR ระบุผู้ดำรงตำแหน่ง แล้วพนักงานคนนั้นกดรับทราบในระบบ"
+repeat: { max_rows: null }
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+reject_cancel: { on_reject: draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+# G8 — เจ้าของ · ผู้อนุมัติหลังส่ง · HR (role-mgr-hr) เห็นทั้งหมด · ผู้ดำรงตำแหน่งเห็น JD ที่อนุมัติแล้วของตำแหน่งตัวเอง
+visibility: { owner: true, approver: after_submit, admin_role: all, admin_role_id: role-mgr-hr, incumbent: approved_only }
+numbering: { issue_on: first_save, code: "JD" }
+extras: { attachments: true, copy: false, export_csv: true, announce: false }

@@ -1,0 +1,23 @@
+# ร่าง — ยืนยันหลัง FRD (doa-declaration v1.0 ทำแบบมือ: ไม่มี doa_tool.py)
+feature_id: F-FIN-ACL
+name: ใบเคลียร์เงินทดรองจ่าย
+module: Finance
+platform: core
+approval_scope: document_sign
+dept_mode: merged
+actions:
+  - id: submit_clearing
+    label: ส่งเคลียร์เงินทดรองจ่าย
+    from_state: draft
+matrix:
+  - amount_from: 0
+    amount_to: null
+    departments: all
+    chainMode: sequential
+    steps:
+      - { roles: [role-line-manager],   label_on_paper: "ผู้อนุมัติ/ตรวจสอบ", decision: [อนุมัติ, ไม่อนุมัติ] }
+      - { roles: [role-finance-officer], label_on_paper: "ผู้รับเคลียร์เงิน",   decision: [รับเคลียร์, ไม่รับเคลียร์] }
+      - { roles: [role-finance-manager], label_on_paper: "ผู้จัดการฝ่ายการเงิน", decision: [อนุมัติ, ไม่อนุมัติ] }
+status: "[DEFAULT — รอยืนยัน]"
+wire_status: pending
+on_reject: back_to_draft

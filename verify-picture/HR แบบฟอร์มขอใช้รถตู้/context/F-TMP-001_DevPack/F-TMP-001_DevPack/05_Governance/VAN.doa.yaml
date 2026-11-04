@@ -1,0 +1,43 @@
+# doa-declaration v1.2 — สร้างจาก DECISIONS.lock.json · แก้ได้ก่อนรัน brief
+feature_id: F-TMP-001
+name: แบบฟอร์มขอใช้รถตู้
+module: hr
+platform: core
+doa_type: van
+approval_scope: document_sign
+approval_required: true
+mode: dynamic
+amount: none
+dept_mode: merged
+on_reject: back_to_draft
+cancel_by:
+- owner
+- admin_role
+cancel_states:
+- draft
+- pending
+actions:
+- id: submit_van
+  label: ส่งอนุมัติแบบฟอร์มขอใช้รถตู้
+  from_state: draft
+matrix:
+- amount_from: 0
+  amount_to: null
+  departments: merged
+  chainMode: sequential
+  steps:
+  - roles:
+    - role-line-manager
+    label: ผู้บังคับบัญชา
+  - roles:
+    - role-mgr-hr
+    label: ผู้จัดการฝ่ายทรัพยากรบุคคล
+    decision:
+      approve: เห็นควร
+      reject: ไม่เห็นควร
+defaults_unconfirmed: true
+wire_status: pending
+source_decisions:
+- DEC-03
+- DEC-07
+- DEC-08

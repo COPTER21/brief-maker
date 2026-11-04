@@ -1,0 +1,315 @@
+{
+ "req": "REQ-TMP-001",
+ "status": "พร้อมเริ่มทำ",
+ "ready": true,
+ "decisions": [
+  {
+   "id": "DEC-01",
+   "cat": "G1",
+   "text": "อนุมัติแล้วไม่เปลี่ยนค่าในระบบ",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-02",
+   "cat": "G1",
+   "text": "ไม่ส่งต่อระบบอื่นรอบนี้ (ประกาศ event ไว้ใน FRD แต่ไม่ยิง)",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-03",
+   "cat": "G2",
+   "text": "สายอนุมัติตั้งที่ DOA กลาง (dynamic) · ค่าเริ่ม 2 ขั้น: role-line-manager, role-mgr-hr · วงเงิน: ไม่มี",
+   "value": {
+    "required": true,
+    "mode": "dynamic",
+    "default_steps": [
+     "role-line-manager",
+     "role-mgr-hr"
+    ],
+    "amount": "none"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "doa-declaration",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-04",
+   "cat": "G3",
+   "text": "คำนวณให้อัตโนมัติ ผู้ใช้ปรับได้ · เกินเกณฑ์ = เตือน · จำนวนวัน = (ถึงวันที่ − วันที่เริ่ม) + 1 นับรวมวันเริ่มและวันสิ้นสุด · ถึงวันที่ ต้องไม่ก่อน วันที่เริ่ม — ขัดแย้งทางตรรกะ = บล็อก · ติ๊กเดินทางเฉพาะขาไป = กรอกเฉพาะบล็อกการเดินทางขาไป · เฉพาะขากลับ = เฉพาะบล็อกขากลับ · ไป-กลับ = ครบทั้งสองบล็อก · เวลาส่ง (ปลายทาง) ต้องไม่ก่อน เวลารับ (ต้นทาง) ในขาเดียวกัน = เตือน",
+   "value": {
+    "constants_from_config": true,
+    "auto_compute": true,
+    "over_limit": "warn",
+    "rules": [
+     "จำนวนวัน = (ถึงวันที่ − วันที่เริ่ม) + 1 นับรวมวันเริ่มและวันสิ้นสุด",
+     "ถึงวันที่ ต้องไม่ก่อน วันที่เริ่ม — ขัดแย้งทางตรรกะ = บล็อก",
+     "ติ๊กเดินทางเฉพาะขาไป = กรอกเฉพาะบล็อกการเดินทางขาไป · เฉพาะขากลับ = เฉพาะบล็อกขากลับ · ไป-กลับ = ครบทั้งสองบล็อก",
+     "เวลาส่ง (ปลายทาง) ต้องไม่ก่อน เวลารับ (ต้นทาง) ในขาเดียวกัน = เตือน"
+    ]
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-05",
+   "cat": "G4",
+   "text": "รายชื่อผู้เดินทาง: ไม่จำกัดจำนวนแถว · PDF อย่างน้อย 5 แถวตามกระดาษ",
+   "value": {
+    "max_rows": null,
+    "min_rows": 5
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-06",
+   "cat": "G5",
+   "text": "ช่องตรงกระดาษ 1:1 · ไม่เพิ่มช่อง (เช่น หมายเหตุ)",
+   "value": {
+    "one_to_one": true,
+    "add_fields": [],
+    "merge_split": []
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-07",
+   "cat": "G6",
+   "text": "ลายเซ็นแถวล่าง 1 ช่องต่อขั้น DOA · ไม่ใช้ภาพลายมือชื่อ (ข้อความส่งในระบบ/พิจารณาในระบบ)",
+   "value": {
+    "layout": "row-bottom",
+    "per_doa_step": true,
+    "handwriting_image": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "thai-doc",
+    "html",
+    "doccfg-declaration",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-08",
+   "cat": "G7",
+   "text": "ไม่อนุมัติ = กลับเป็นร่าง แก้แล้วส่งใหม่ · ยกเลิกได้โดย owner, admin_role สถานะ draft, pending · ต้องมีเหตุผล",
+   "value": {
+    "on_reject": "back_to_draft",
+    "cancel_by": [
+     "owner",
+     "admin_role"
+    ],
+    "cancel_states": [
+     "draft",
+     "pending"
+    ],
+    "reason_required": true
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests",
+    "doa-declaration"
+   ]
+  },
+  {
+   "id": "DEC-09",
+   "cat": "G8",
+   "text": "มองเห็น: เจ้าของ · ผู้อนุมัติเห็นหลังส่ง · admin role เห็นทั้งหมด",
+   "value": {
+    "owner": true,
+    "approver": "after_submit",
+    "admin_role": "all"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-10",
+   "cat": "G9",
+   "text": "ออกเลขเมื่อบันทึกครั้งแรก · รหัส VAN",
+   "value": {
+    "issue_on": "first_save",
+    "code": "VAN"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "doccfg-declaration",
+    "html",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-11",
+   "cat": "G10",
+   "text": "ของเสริม (กระดาษไม่มี): แนบไฟล์, ส่งออก CSV",
+   "value": {
+    "attachments": true,
+    "copy": false,
+    "export_csv": true,
+    "announce": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "brd",
+    "frd",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-12",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ชื่อผู้พิจารณาต้องมาจาก DOA resolve ตอนส่ง ห้าม hardcode ชื่อบุคคล และเป็นข้อมูลส่วนบุคคล (ห้ามใช้เป็นข้อมูลตัวอย่าง) (พบ: ต้นฉบับพิมพ์ชื่อบุคคลจริงไว้ตายตัวใต้ช่องลงชื่อ)",
+   "value": {
+    "where": "ช่องลงชื่อผู้จัดการฝ่ายทรัพยากรบุคคล",
+    "detail": "ต้นฉบับพิมพ์ชื่อบุคคลจริงไว้ตายตัวใต้ช่องลงชื่อ",
+    "rule": "ชื่อผู้พิจารณาต้องมาจาก DOA resolve ตอนส่ง ห้าม hardcode ชื่อบุคคล และเป็นข้อมูลส่วนบุคคล (ห้ามใช้เป็นข้อมูลตัวอย่าง)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-13",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ระบบคำนวณจำนวนวันจากช่วงวันที่ และบล็อกเมื่อถึงวันที่ ก่อน วันที่เริ่ม (พบ: ต้นฉบับให้ผู้ขอกรอกจำนวนวันเอง ซึ่งอาจไม่ตรงกับช่วงวันที่ที่กรอก)",
+   "value": {
+    "where": "ช่วงวันที่ขอใช้รถตู้",
+    "detail": "ต้นฉบับให้ผู้ขอกรอกจำนวนวันเอง ซึ่งอาจไม่ตรงกับช่วงวันที่ที่กรอก",
+    "rule": "ระบบคำนวณจำนวนวันจากช่วงวันที่ และบล็อกเมื่อถึงวันที่ ก่อน วันที่เริ่ม"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-14",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ติ๊กเฉพาะขาไป → ต้องกรอกเฉพาะบล็อกขาไป · เฉพาะขากลับ → เฉพาะบล็อกขากลับ · ไป-กลับ → ครบทั้งสองบล็อก (พบ: ต้นฉบับมีช่องขาไปและขากลับครบเสมอ แม้ติ๊กเดินทางเฉพาะขาเดียว)",
+   "value": {
+    "where": "ลักษณะการเดินทาง vs ช่องสถานที่/เวลา",
+    "detail": "ต้นฉบับมีช่องขาไปและขากลับครบเสมอ แม้ติ๊กเดินทางเฉพาะขาเดียว",
+    "rule": "ติ๊กเฉพาะขาไป → ต้องกรอกเฉพาะบล็อกขาไป · เฉพาะขากลับ → เฉพาะบล็อกขากลับ · ไป-กลับ → ครบทั้งสองบล็อก"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  }
+ ],
+ "raw": {
+  "config_changes": [],
+  "post_to": [],
+  "doa": {
+   "required": true,
+   "mode": "dynamic",
+   "default_steps": [
+    "role-line-manager",
+    "role-mgr-hr"
+   ],
+   "amount": "none"
+  },
+  "calc": {
+   "constants_from_config": true,
+   "auto_compute": true,
+   "over_limit": "warn",
+   "rules": [
+    "จำนวนวัน = (ถึงวันที่ − วันที่เริ่ม) + 1 นับรวมวันเริ่มและวันสิ้นสุด",
+    "ถึงวันที่ ต้องไม่ก่อน วันที่เริ่ม — ขัดแย้งทางตรรกะ = บล็อก",
+    "ติ๊กเดินทางเฉพาะขาไป = กรอกเฉพาะบล็อกการเดินทางขาไป · เฉพาะขากลับ = เฉพาะบล็อกขากลับ · ไป-กลับ = ครบทั้งสองบล็อก",
+    "เวลาส่ง (ปลายทาง) ต้องไม่ก่อน เวลารับ (ต้นทาง) ในขาเดียวกัน = เตือน"
+   ]
+  },
+  "repeat": {
+   "max_rows": null
+  },
+  "fidelity": {
+   "one_to_one": true,
+   "add_fields": [],
+   "merge_split": []
+  },
+  "signature": {
+   "layout": "row-bottom",
+   "per_doa_step": true,
+   "handwriting_image": false
+  },
+  "reject_cancel": {
+   "on_reject": "back_to_draft",
+   "cancel_by": [
+    "owner",
+    "admin_role"
+   ],
+   "cancel_states": [
+    "draft",
+    "pending"
+   ],
+   "reason_required": true
+  },
+  "visibility": {
+   "owner": true,
+   "approver": "after_submit",
+   "admin_role": "all"
+  },
+  "numbering": {
+   "issue_on": "first_save",
+   "code": "VAN"
+  },
+  "extras": {
+   "attachments": true,
+   "copy": false,
+   "export_csv": true,
+   "announce": false
+  },
+  "extend": {},
+  "fit": {}
+ },
+ "unattended": true
+}

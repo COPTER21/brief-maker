@@ -1,0 +1,57 @@
+# doccfg-declaration v2.1 — ฉบับจริง (ยืนยันกับ FRD)
+feature_id: F-TMP-008
+doc_types:
+- code: PDC
+  name_th: หนังสือยินยอมในการเก็บรวบรวม ใช้ และเปิดเผยข้อมูลส่วนบุคคล
+  module: HR
+  feature_id: F-TMP-008
+  numbering:
+    preset: '{PREFIX}-{YYYY}-{run:4}'
+    reset: yearly
+    scope: global
+    no_gap: false
+    issue_on: first_save
+    frd_ref: 03_LOGIC F-TMP-008-FN-03
+  snapshot:
+    sent_external: false
+    approved_final: true
+  snapshot_points:
+  - event: approved_final
+    when: 'S: draft → confirmed (เจ้าของข้อมูลยืนยันความยินยอม)'
+    frd_ref: 03_LOGIC F-TMP-008-FN-08
+    note: เก็บสำเนา PDF เป็นหลักฐานความยินยอมแบบแก้ไม่ได้ พร้อม revision ของหนังสือ
+      — บังคับตาม PDPA
+  print_config:
+    form_code: FM-HRM-31
+    revision: 'Rev. 00 : 01/07/2569'
+    paper: A4-portrait
+    min_rows: 8
+    dense_when_rows_over: 8
+    header_source: organization_snapshot_at_numbering
+    sign_boxes:
+    - box: requester
+      label: เจ้าของข้อมูลส่วนบุคคล
+      show_date: true
+    - box: doa_step:*
+      label: from_doa_step
+      show_decision: true
+      show_date: true
+    decision_words:
+      default:
+        approve: อนุมัติ
+        reject: ไม่อนุมัติ
+      by_role:
+        role-mgr-hr:
+          approve: รับหนังสือยินยอม
+          reject: ไม่รับหนังสือยินยอม
+        role-compliance:
+          approve: ตรวจแล้ว
+          reject: ตีกลับ
+    sign_layout:
+      source: approval_chain snapshot (เจ้าของข้อมูล + จำนวนขั้นตามที่ตั้งใน DOA ·
+        รอบนี้ DOA = 0 ขั้น)
+      max_per_row: 4
+      split: even
+      dense_when_steps_over: 4
+      keep_together: true
+    ref: print/print_config.json
