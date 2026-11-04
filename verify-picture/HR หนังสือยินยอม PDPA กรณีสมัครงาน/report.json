@@ -1,0 +1,258 @@
+{
+  "feature": {
+    "code": "F-TMP-008",
+    "name": "HR หนังสือยินยอม PDPA กรณีสมัครงาน",
+    "module": "HR"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-04",
+  "round": 1,
+  "refs": "FRD_F-TMP-008_Pack · UI_BRIEF_F-TMP-008 · Test Cases F-TMP-008",
+  "scope": {
+    "checked": [
+      "Create / Update / Delete บนระบบจริง",
+      "Create และ Edit drawer: stepper, ข้อมูลเจ้าของข้อมูล และเอกสารแนบ",
+      "ตำแหน่งปุ่ม action และระยะห่างของ tab ภายใน drawer",
+      "แท็บรายละเอียด, PDF Preview, ลายเซ็น / อนุมัติ และประวัติ",
+      "UI/UX ส่วนที่เหลือตามเส้นทางที่ทดลองใช้งาน"
+    ],
+    "not_checked": [
+      {
+        "item": "Business rules อื่นนอกเหนือจาก Create / Update / Delete และประเด็นที่ระบุ",
+        "reason": "ผู้ตรวจไม่ได้รายงานผลในรอบนี้"
+      },
+      {
+        "item": "สิทธิ์ข้ามผู้ใช้/ข้ามบริษัท, Notification, DOA และ Audit log เชิงระบบ",
+        "reason": "ไม่มีผลตรวจหรือหลักฐานในข้อมูลที่ส่งมา"
+      },
+      {
+        "item": "ความถูกต้องของข้อมูลภายใน PDF",
+        "reason": "รอบนี้ตรวจรูปแบบแท็บ PDF Preview ไม่ได้ยืนยันเนื้อหาเอกสาร"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างหนังสือยินยอม",
+      "expected": "สร้างรายการใหม่สำเร็จตาม flow",
+      "status": "pass",
+      "ref": "Create"
+    },
+    {
+      "item": "แก้ไขข้อมูลทั่วไปของหนังสือยินยอม",
+      "expected": "เปิดและบันทึกการแก้ไขรายการได้",
+      "status": "pass",
+      "ref": "Update"
+    },
+    {
+      "item": "ลบรายการตาม flow ที่ระบบเปิดให้ใช้งาน",
+      "expected": "ลบรายการสำเร็จและรายการไม่คงอยู่ในหน้ารายการ",
+      "status": "pass",
+      "ref": "Delete"
+    },
+    {
+      "item": "แก้ไขข้อมูลเจ้าของข้อมูลขณะเอกสารเป็นร่าง",
+      "expected": "ร่างของตนเองแก้ไขประเภท ชื่อเจ้าของข้อมูล ตำแหน่ง และฝ่ายได้ก่อนยืนยัน",
+      "actual": "ฟิลด์ทั้ง 4 เป็น read-only และแก้ไขไม่ได้",
+      "status": "fail",
+      "bug": "BUG-06",
+      "ref": "FRD 01_UI P-02 · 05_RULES §5.3"
+    },
+    {
+      "item": "จัดการไฟล์แนบขณะเอกสารเป็นร่าง",
+      "expected": "ร่างของตนเองเพิ่ม ลบ หรือเปลี่ยนไฟล์แนบได้ก่อนยืนยัน",
+      "actual": "หน้า Edit ปิดช่อง Upload และแจ้งให้แก้ผ่าน Document Center",
+      "status": "fail",
+      "bug": "BUG-07",
+      "ref": "FRD 01_UI P-02"
+    },
+    {
+      "item": "ยืนยันความยินยอมและทำให้ใบ immutable",
+      "expected": "เลือกครบแล้วสถานะถูกต้องและใบที่ยืนยันแล้วแก้ไขไม่ได้",
+      "status": "na",
+      "ref": "AC-03 · AC-04"
+    },
+    {
+      "item": "ถอนความยินยอมและเก็บประวัติ",
+      "expected": "ถอนตามขอบเขตพร้อมเหตุผลและเก็บหลักฐานเดิม",
+      "status": "na",
+      "ref": "AC-06..AC-08"
+    },
+    {
+      "item": "สิทธิ์การมองเห็นและการปฏิเสธผู้ไม่มีสิทธิ์",
+      "expected": "เห็นและทำรายการได้ตาม Permission Matrix",
+      "status": "na",
+      "ref": "TC-D01..TC-D08"
+    },
+    {
+      "item": "PDF, Snapshot และ Revision",
+      "expected": "PDF และข้อมูล snapshot ถูกต้องตามสถานะและไม่เปลี่ยนย้อนหลัง",
+      "status": "na",
+      "ref": "AC-10..AC-14"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "Stepper ของ Create/Edit, พื้นที่ Upload, ตำแหน่ง action และระยะห่างของแท็บไม่ตรงรูปแบบอ้างอิง",
+      "evidence": [
+        "tk01/Screenshot 2026-11-04 162036.png",
+        "tk02/Screenshot 2026-11-04 162329.png",
+        "tk03/Screenshot 2026-11-04 163157.png"
+      ]
+    },
+    {
+      "id": "U-04",
+      "status": "note",
+      "note": "ปุ่ม action ของ drawer และรูปแบบแท็บ PDF Preview, ลายเซ็น / อนุมัติ และประวัติไม่สม่ำเสมอกับ design reference",
+      "evidence": [
+        "tk03/Screenshot 2026-11-04 163157.png",
+        "tk06/Screenshot 2026-11-04 165343.png",
+        "tk06/Screenshot 2026-11-04 165403.png",
+        "tk06/Screenshot 2026-11-04 165422.png"
+      ]
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "note",
+      "note": "หน้า Edit ของร่างไม่ให้แก้ข้อมูลเจ้าของข้อมูลและไฟล์แนบ ทำให้แก้ข้อมูลที่กรอกผิดใน flow เดิมไม่ได้",
+      "evidence": [
+        "tk04/Screenshot 2026-11-04 164429.png",
+        "tk05/Screenshot 2026-11-04 164802.png"
+      ]
+    },
+    {
+      "item": "การแนบไฟล์หลายรายการ",
+      "status": "note",
+      "note": "หน้า Create แนบไฟล์ได้เพียง 1 ไฟล์ต่อครั้ง/รายการตามผลตรวจ",
+      "evidence": "tk02/Screenshot 2026-11-04 162627.png"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "Stepper ของ Create/Edit drawer หลุดจากรูปแบบ design",
+      "severity": "low",
+      "steps": [
+        "เปิดหน้ารายการหนังสือยินยอม",
+        "กดสร้างหนังสือยินยอม หรือเปิดร่างแล้วกดแก้ไข",
+        "ตรวจตำแหน่งและรูปแบบ stepper ด้านบน drawer"
+      ],
+      "expected": "Stepper จัดวางและใช้รูปแบบเดียวกับ design reference ของ drawer",
+      "actual": "Stepper มีรูปแบบและการจัดวางไม่ตรง design reference",
+      "evidence": [
+        "tk01/Screenshot 2026-11-04 162036.png",
+        "tk01/example_stepper.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "พื้นที่ Upload ของ Create/Edit drawer หลุดจากรูปแบบ design",
+      "severity": "low",
+      "steps": [
+        "เปิด Create หรือ Edit drawer",
+        "ไปขั้นเอกสารแนบ",
+        "ตรวจ layout และพื้นที่ว่างของ Upload zone"
+      ],
+      "expected": "Upload zone จัดวางตาม design reference และใช้พื้นที่อย่างสมดุล",
+      "actual": "Upload zone และพื้นที่รอบข้างหลุดจาก design และมีพื้นที่ว่างมากผิดปกติ",
+      "evidence": [
+        "tk02/Screenshot 2026-11-04 162329.png",
+        "tk02/example_upload.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "หน้า Create รองรับไฟล์แนบได้เพียง 1 ไฟล์",
+      "severity": "medium",
+      "steps": [
+        "เปิด Create drawer",
+        "ไปขั้นเอกสารแนบ",
+        "เลือกไฟล์แรก",
+        "พยายามเพิ่มไฟล์ที่สอง"
+      ],
+      "expected": "สามารถแนบเอกสารได้มากกว่า 1 ไฟล์และแสดงรายการไฟล์ทั้งหมด",
+      "actual": "ระบบรองรับไฟล์แนบได้เพียง 1 ไฟล์",
+      "evidence": "tk02/Screenshot 2026-11-04 162627.png",
+      "status": "open"
+    },
+    {
+      "id": "BUG-04",
+      "title": "ตำแหน่งปุ่ม Action และระยะห่างของ Tab ภายใน drawer หลุดจาก design",
+      "severity": "low",
+      "steps": [
+        "เปิด View drawer ของหนังสือยินยอม",
+        "ตรวจแถบ tab และปุ่ม action บริเวณส่วนล่าง/ขอบ drawer"
+      ],
+      "expected": "แท็บมีระยะห่างจากขอบ drawer และปุ่ม action อยู่ในตำแหน่งตาม design reference",
+      "actual": "แท็บชิด drawer มากเกินไปและตำแหน่งปุ่ม action ไม่ตรง design",
+      "evidence": [
+        "tk03/Screenshot 2026-11-04 163157.png",
+        "tk03/example_ux_ui_layout.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-05",
+      "title": "แท็บ PDF Preview, ลายเซ็น / อนุมัติ และประวัติหลุดจาก design",
+      "severity": "low",
+      "steps": [
+        "เปิด View drawer ของเอกสาร",
+        "เปิดแท็บ PDF Preview",
+        "เปิดแท็บลายเซ็น / อนุมัติ",
+        "เปิดแท็บประวัติและตรวจ layout ของแต่ละแท็บ"
+      ],
+      "expected": "เนื้อหาและระยะห่างของทั้ง 3 แท็บเป็นรูปแบบเดียวกับ design reference",
+      "actual": "รูปแบบ การจัดวาง และพื้นที่ของทั้ง 3 แท็บไม่ตรง design reference",
+      "evidence": [
+        "tk06/Screenshot 2026-11-04 165343.png",
+        "tk06/example_tab_pdf_preview.png",
+        "tk06/Screenshot 2026-11-04 165403.png",
+        "tk06/example_tab_doa.png",
+        "tk06/Screenshot 2026-11-04 165422.png",
+        "tk06/example_tab_history.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-06",
+      "title": "ร่างไม่สามารถแก้ไขข้อมูลเจ้าของข้อมูลได้",
+      "severity": "medium",
+      "steps": [
+        "สร้างหนังสือยินยอมและบันทึกเป็นสถานะร่าง",
+        "เปิดเอกสารร่างแล้วกดแก้ไข",
+        "ตรวจส่วนเจ้าของข้อมูล",
+        "ลองแก้ประเภท ชื่อเจ้าของข้อมูล ตำแหน่ง และฝ่าย"
+      ],
+      "expected": "ร่างของตนเองแก้ไขข้อมูลเจ้าของข้อมูลได้ก่อนยืนยัน หรือมีกฎ FRD ระบุฟิลด์ที่ล็อกอย่างชัดเจน",
+      "actual": "ประเภท ชื่อเจ้าของข้อมูล ตำแหน่ง และฝ่ายเป็น read-only ทั้งหมด",
+      "evidence": [
+        "tk04/Screenshot 2026-11-04 164332.png",
+        "tk04/Screenshot 2026-11-04 164429.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-07",
+      "title": "ร่างไม่สามารถจัดการไฟล์แนบจากหน้า Edit ได้",
+      "severity": "medium",
+      "steps": [
+        "สร้างหนังสือยินยอมและบันทึกเป็นสถานะร่าง",
+        "เปิดเอกสารร่างแล้วกดแก้ไข",
+        "ไปขั้นเอกสารแนบ",
+        "ลองเพิ่ม ลบ หรือเปลี่ยนไฟล์แนบ"
+      ],
+      "expected": "เจ้าของร่างสามารถจัดการไฟล์แนบได้ก่อนยืนยัน หรือมีลิงก์ตรงที่ใช้งานได้ไปยังไฟล์ของเอกสารใน Document Center",
+      "actual": "ช่อง Upload ใช้งานไม่ได้และแสดงข้อความ “ไฟล์แนบของร่างเดิมแก้ไขผ่าน Document Center”",
+      "evidence": "tk05/Screenshot 2026-11-04 164802.png",
+      "status": "open"
+    }
+  ]
+}
