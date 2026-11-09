@@ -1,0 +1,39 @@
+# ntf-declaration v1.2 — ฉบับจริง (frd_ref จาก frd_lint)
+feature_id: F-TMP-002
+name: แบบฟอร์มตรวจเช็คความเรียบร้อยห้อง Server
+code: SRC
+events:
+- id: src_abnormal_found
+  trigger: 'บันทึกแถวตรวจเช็คที่เข้าเกณฑ์เตือน (DEC-04): อุณหภูมินอก 18-27°C · ความชื้นนอก
+    40-55 %RH · ทะเบียนคุมเข้าออก = ไม่มี · อุปกรณ์ใด = ไม่ปกติ'
+  recipients:
+  - admin_role
+  template: '**{doc_no}** ห้อง Server พบรายการผิดปกติวันที่ {check_date}: {detail}'
+  channel: in-app+email
+  optional: false
+  why: G3 เกินเกณฑ์ = เตือนไม่บล็อก — ผู้ดูแลห้อง Server (admin role ฝ่าย IT) ต้องรู้ทันทีเพื่อแก้ไข
+    · ไม่เปิด Ticket อัตโนมัติ (DEC-02)
+  frd_ref: 03_LOGIC F-TMP-002-FN-02, F-TMP-002-FN-08
+- id: src_submitted
+  trigger: draft → submitted (ปิดรอบการตรวจเช็ค)
+  recipients:
+  - admin_role
+  template: '**{doc_no}** ปิดรอบตรวจเช็คห้อง Server แล้ว ({row_count} รายการ · ผิดปกติ
+    {abnormal_count})'
+  channel: in-app
+  optional: true
+  why: ไม่มีการอนุมัติ (DEC-03) — แจ้งผู้ดูแลว่ามีใบปิดรอบแล้วเพื่อเก็บเข้าแฟ้ม
+  frd_ref: 03_LOGIC F-TMP-002-FN-04, F-TMP-002-FN-08
+- id: src_cancelled
+  trigger: draft/submitted → cancelled (เจ้าของ หรือ admin role · ต้องมีเหตุผล)
+  recipients:
+  - owner
+  - admin_role
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: G7 ยกเลิกได้ทั้งร่างและที่ปิดรอบแล้ว — อีกฝ่ายต้องรู้
+  frd_ref: 03_LOGIC F-TMP-002-FN-06, F-TMP-002-FN-08
+excluded: []
+note: ไม่มี DOA (DEC-03) จึงไม่มี doa_pending/doa_result · admin_role = ผู้ดูแลของหน่วยงานเจ้าของเอกสาร
+  (ฝ่าย IT)

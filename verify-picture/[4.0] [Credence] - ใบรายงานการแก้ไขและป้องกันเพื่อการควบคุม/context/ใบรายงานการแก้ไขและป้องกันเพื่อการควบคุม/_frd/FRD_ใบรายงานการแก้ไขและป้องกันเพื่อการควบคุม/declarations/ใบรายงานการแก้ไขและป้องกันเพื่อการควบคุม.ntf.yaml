@@ -1,0 +1,36 @@
+# FINAL — ยืนยันกับ FRD v1.0 (frd_lint N7 PASS) · ตัด car_over_limit_approved (เกณฑ์เป็นคำเตือนตอนกรอก)
+feature_id: F-TMP-008
+name: ใบรายงานการแก้ไขและป้องกันเพื่อการควบคุม
+code: CAR
+events:
+- id: car_cancelled
+  trigger: in_review / pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรอตรวจสอบ/รออนุมัติ — ผู้ตรวจสอบหรือผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว (DOA engine ไม่ยิงกรณีนี้ · ขั้นรอตรวจสอบไม่อยู่ใน DOA)
+  frd_ref: 03_LOGIC F-TMP-008-FN-11, F-TMP-008-FN-13
+- id: car_submitted_for_review
+  trigger: draft → in_review (ผู้จัดทำกดส่งตรวจสอบ)
+  recipients:
+  - role-ic-officer
+  template: '**{doc_no}** รอตรวจสอบ — {subject} · กรอกช่วง "การตรวจสอบ" และลงนามตรวจสอบ'
+  channel: in-app
+  optional: false
+  why: ขั้นรอตรวจสอบ (IC กรอกช่วงการตรวจสอบ + ลงนามตรวจสอบ 7 จุด) อยู่ก่อนส่งอนุมัติ DOA — DOA engine ไม่แจ้ง (DEC-31 · G7)
+  frd_ref: 03_LOGIC F-TMP-008-FN-04, F-TMP-008-FN-13
+- id: car_review_returned
+  trigger: in_review → draft (ผู้ตรวจสอบส่งกลับแก้ไข · ล้างจุดลงนามตรวจสอบ)
+  recipients:
+  - owner
+  template: '**{doc_no}** ถูกส่งกลับแก้ไขโดย {actor} — {reason}'
+  channel: in-app
+  optional: false
+  why: ส่งกลับจากขั้นตรวจสอบไม่ผ่าน DOA → doa_result ไม่ยิง ผู้จัดทำต้องรู้เพื่อแก้แล้วส่งใหม่ (DEC-25)
+  frd_ref: 03_LOGIC F-TMP-008-FN-07, F-TMP-008-FN-13
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

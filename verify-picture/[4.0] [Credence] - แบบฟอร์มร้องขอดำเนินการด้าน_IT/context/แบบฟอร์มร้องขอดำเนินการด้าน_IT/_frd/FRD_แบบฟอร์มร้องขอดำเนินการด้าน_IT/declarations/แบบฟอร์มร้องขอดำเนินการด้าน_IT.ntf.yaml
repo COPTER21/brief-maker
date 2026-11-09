@@ -1,0 +1,37 @@
+# FINAL — ยืนยันกับ FRD v1.0 (frd_lint N7 PASS)
+feature_id: F-TMP-001
+name: แบบฟอร์มร้องขอดำเนินการด้าน IT
+code: ITRS
+events:
+- id: itrs_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-001-FN-06
+- id: itrs_ready_for_it
+  trigger: pending_approval → approved (DOA ครบทุกขั้น) — เข้าคิวงานฝ่าย IT
+  recipients:
+  - role-it-officer
+  template: '**{doc_no}** {subject} อนุมัติแล้ว — ต้องการส่งมอบ {due_date} ที่ {delivery_location}'
+  channel: in-app
+  optional: false
+  why: ฝ่าย IT ผู้ "ดำเนินการโดย" ต้องรู้ว่ามีคำขอที่อนุมัติแล้วรอดำเนินการ (DOA แจ้งเฉพาะผู้ขอ)
+  frd_ref: 03_LOGIC F-TMP-001-FN-04
+- id: itrs_completed
+  trigger: approved → completed (เจ้าหน้าที่ IT กด ดำเนินการแล้ว · บันทึก performed_by/performed_at)
+  recipients:
+  - owner
+  template: '**{doc_no}** {subject} ดำเนินการเสร็จแล้ว โดย {actor}'
+  channel: in-app
+  optional: true
+  why: ผู้ร้องขอต้องรู้ว่างานเสร็จ (ช่อง ดำเนินการโดย บนกระดาษ)
+  frd_ref: 03_LOGIC F-TMP-001-FN-07
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

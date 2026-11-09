@@ -1,0 +1,40 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# J004 · FM-ITS-06 แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์ · ตอบตาม 4_knowledge/governance/unattended-policy.md
+
+# G1 ผลต่อระบบ — ฟอร์มไม่ได้เขียนว่าเปลี่ยนค่า/ส่งต่อ → ไม่เปลี่ยน ไม่ส่งต่อ (ทะเบียนทรัพย์สิน/ใบขอซื้อ ไม่ผูก — ผู้ใช้กรอกรหัสทรัพย์สินเอง)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — ช่องผู้อนุมัติบนกระดาษ 1 ช่อง (อนุมัติโดย · ส่วนที่ 2) → dynamic 1 ขั้น ผู้บังคับบัญชาตรงของผู้ส่งอนุมัติ (เจ้าหน้าที่ IT) · ไม่มีวงเงิน
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager"], amount: none }
+
+# G3 สูตร / ค่าคงที่ — ไม่มีสูตร/ค่าคงที่บนกระดาษ · กติกาตรวจเป็นเตือน
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules: ["วันที่ต้องการส่งมอบ ต้องไม่ก่อนวันที่แจ้ง (เตือน)", "ติ๊กประเภท อื่นๆ ต้องระบุข้อความ", "เลือกประเภทได้ 1 ข้อ (1 ใบ = 1 อุปกรณ์)", "ผลตรวจเช็คแบบส่งบริษัท/สั่งซื้อ ต้องกรอก ระยะเวลา-ถึง · ร้านค้า · วันที่ส่งเคลม · ถึง ≥ ระยะเวลา (เตือน)", "ผลการซ่อม ไม่สามารถแก้ไขได้ ต้องระบุรายละเอียด"]
+
+# G4 รายการซ้ำ — ไม่มีบนกระดาษ
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ — 1:1 · แก้คำสะกด ตําแหน่ง→ตำแหน่ง · ส่งเครม→ส่งเคลม · สั้งซื้อ→สั่งซื้อ
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น — แถวล่างของแต่ละส่วนตามกระดาษ · ช่อง อนุมัติโดย = 1 ช่องต่อขั้น DOA · ผู้แจ้งซ่อม/ผู้รับแจ้ง/ผู้ดำเนินการ = ชื่อจากระบบตามผู้กดในขั้นนั้น · ข้อความ "พิจารณาในระบบ" ไม่ใช้ภาพ
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ → กลับเป็นร่างเลขเดิม (ร่างผลตรวจเช็คของ IT) · ยกเลิกได้ เจ้าของ + admin role · ร่าง/รออนุมัติ · เหตุผลบังคับ
+reject_cancel: { on_reject: draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น — เจ้าของ · ผู้อนุมัติหลังส่ง · admin role ของหน่วยงานเจ้าของเอกสาร (ฝ่าย IT) เห็นทั้งหมด
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 เลขที่ — ออกตอนบันทึกครั้งแรก (เอกสารภายใน ไม่ใช่การเงิน) · รหัส CRR (Computer Repair Request — ITRS/SRC ใช้แล้ว)
+numbering: { issue_on: first_save, code: CRR }
+
+# G10 ของเสริม — แนบ ✓ (รูปอาการเสีย/ใบเคลม) CSV ✓ ทำซ้ำ ✗ ประกาศ ✗
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

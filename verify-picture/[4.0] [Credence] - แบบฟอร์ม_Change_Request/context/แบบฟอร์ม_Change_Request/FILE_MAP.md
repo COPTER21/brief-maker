@@ -1,0 +1,61 @@
+# FILE_MAP — แบบฟอร์ม_Change_Request
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_แบบฟอร์ม_Change_Request.md` |
+| `01_Prototype/feature.html` | `_ui/UI_แบบฟอร์ม_Change_Request.html` |
+| `02_BRD/BRD_F-TMP-005.docx` | `_brd/BRD_แบบฟอร์ม_Change_Request.docx` |
+| `02_BRD/BRD_F-TMP-005.md` | `_brd/BRD_แบบฟอร์ม_Change_Request.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/00_OVERVIEW.md` | `_frd/FRD_แบบฟอร์ม_Change_Request/00_OVERVIEW_แบบฟอร์ม_Change_Request.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/01_UI.md` | `_frd/FRD_แบบฟอร์ม_Change_Request/01_UI_แบบฟอร์ม_Change_Request.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/02_API.md` | `_frd/FRD_แบบฟอร์ม_Change_Request/02_API_แบบฟอร์ม_Change_Request.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/03_LOGIC.md` | `_frd/FRD_แบบฟอร์ม_Change_Request/03_LOGIC_แบบฟอร์ม_Change_Request.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/04_DB.md` | `_frd/FRD_แบบฟอร์ม_Change_Request/04_DB_แบบฟอร์ม_Change_Request.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/05_RULES.md` | `_frd/FRD_แบบฟอร์ม_Change_Request/05_RULES_แบบฟอร์ม_Change_Request.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/06_TESTS.md` | `_frd/FRD_แบบฟอร์ม_Change_Request/06_TESTS_แบบฟอร์ม_Change_Request.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_แบบฟอร์ม_Change_Request/07_LOCKED_DECISIONS_แบบฟอร์ม_Change_Request.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/INDEX.md` | `_frd/FRD_แบบฟอร์ม_Change_Request/INDEX_แบบฟอร์ม_Change_Request.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/declarations/DOA_BRIEF_F-TMP-005.md` | `_frd/FRD_แบบฟอร์ม_Change_Request/declarations/DOA_BRIEF_แบบฟอร์ม_Change_Request.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/declarations/DOCCFG_BRIEF_F-TMP-005.md` | `_frd/FRD_แบบฟอร์ม_Change_Request/declarations/DOCCFG_BRIEF_แบบฟอร์ม_Change_Request.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/declarations/ITCR.doa.yaml` | `_frd/FRD_แบบฟอร์ม_Change_Request/declarations/แบบฟอร์ม_Change_Request.doa.yaml` |
+| `03_FRD/FRD_F-TMP-005_Pack/declarations/ITCR.doccfg.yaml` | `_frd/FRD_แบบฟอร์ม_Change_Request/declarations/แบบฟอร์ม_Change_Request.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-005_Pack/declarations/ITCR.mdoc.yaml` | `_frd/FRD_แบบฟอร์ม_Change_Request/declarations/แบบฟอร์ม_Change_Request.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-005_Pack/declarations/ITCR.ntf.yaml` | `_frd/FRD_แบบฟอร์ม_Change_Request/declarations/แบบฟอร์ม_Change_Request.ntf.yaml` |
+| `03_FRD/FRD_F-TMP-005_Pack/declarations/MDOC_BRIEF_ITCR.md` | `_frd/FRD_แบบฟอร์ม_Change_Request/declarations/MDOC_BRIEF_แบบฟอร์ม_Change_Request.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/declarations/NTF_BRIEF_F-TMP-005.md` | `_frd/FRD_แบบฟอร์ม_Change_Request/declarations/NTF_BRIEF_แบบฟอร์ม_Change_Request.md` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-005.md` | `_uibrief/UIBRIEF_แบบฟอร์ม_Change_Request.md` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_แบบฟอร์ม_Change_Request.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_แบบฟอร์ม_Change_Request.md` |
+| `05_Governance/DOA_BRIEF_F-TMP-005.md` | `_governance/DOA_BRIEF_แบบฟอร์ม_Change_Request.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-005.md` | `_governance/DOCCFG_BRIEF_แบบฟอร์ม_Change_Request.md` |
+| `05_Governance/ITCR.doa.yaml` | `_governance/แบบฟอร์ม_Change_Request.doa.yaml` |
+| `05_Governance/ITCR.doccfg.yaml` | `_governance/แบบฟอร์ม_Change_Request.doccfg.yaml` |
+| `05_Governance/ITCR.mdoc.yaml` | `_governance/แบบฟอร์ม_Change_Request.mdoc.yaml` |
+| `05_Governance/ITCR.ntf.yaml` | `_governance/แบบฟอร์ม_Change_Request.ntf.yaml` |
+| `05_Governance/MDOC_BRIEF_ITCR.md` | `_governance/MDOC_BRIEF_แบบฟอร์ม_Change_Request.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-005.md` | `_governance/NTF_BRIEF_แบบฟอร์ม_Change_Request.md` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_แบบฟอร์ม_Change_Request.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-005.md` | `_tc/QA_AUDIT_แบบฟอร์ม_Change_Request.md` |
+| `06_Test/cases.json` | `_tc/แบบฟอร์ม_Change_Request_cases.json` |
+| `06_Test/testcase-F-TMP-005.html` | `_tc/UAT_แบบฟอร์ม_Change_Request.html` |
+| `06_Test/testcases-F-TMP-005.md` | `_tc/TC_แบบฟอร์ม_Change_Request.md` |
+| `07_Print/ITCR_print-spec.md` | `_document/แบบฟอร์ม_Change_Request_print-spec.md` |
+| `07_Print/ITCR_template.html` | `_document/แบบฟอร์ม_Change_Request_template.html` |
+| `07_Print/approved-doa6steps.data.json` | `_document/แบบฟอร์ม_Change_Request_approved-doa6steps.data.json` |
+| `07_Print/approved.data.json` | `_document/แบบฟอร์ม_Change_Request_approved.data.json` |
+| `07_Print/draft.data.json` | `_document/แบบฟอร์ม_Change_Request_draft.data.json` |
+| `07_Print/form.tpl.html` | `_document/แบบฟอร์ม_Change_Request_template.html` |
+| `07_Print/long-text.data.json` | `_document/แบบฟอร์ม_Change_Request_long-text.data.json` |
+| `07_Print/print_config.json` | `_document/แบบฟอร์ม_Change_Request_print_config.json` |
+| `07_Print/profile.json` | `_document/แบบฟอร์ม_Change_Request_profile.json` |
+| `07_Print/rejected.data.json` | `_document/แบบฟอร์ม_Change_Request_rejected.data.json` |
+| `08_Reference/7. FM-ITS-07 แบบฟอร์ม Change Request Form.xlsx` | `_reference/7. FM-ITS-07 แบบฟอร์ม Change Request Form_แบบฟอร์ม_Change_Request.xlsx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_แบบฟอร์ม_Change_Request.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_แบบฟอร์ม_Change_Request.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_แบบฟอร์ม_Change_Request.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-005.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-005_แบบฟอร์ม_Change_Request.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-005_v2.md` | `_reference/PREBRIEF_REQ-TMP-005_v2_แบบฟอร์ม_Change_Request.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_แบบฟอร์ม_Change_Request.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_แบบฟอร์ม_Change_Request.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_แบบฟอร์ม_Change_Request.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_แบบฟอร์ม_Change_Request.md` |

@@ -1,0 +1,40 @@
+# doa-declaration v1.2 — สร้างจาก DECISIONS.lock.json · แก้ได้ก่อนรัน brief
+feature_id: F-TMP-004
+name: แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์
+module: it
+platform: core
+doa_type: crr
+approval_scope: document_sign
+approval_required: true
+mode: dynamic
+amount: none
+dept_mode: merged
+on_reject: back_to_draft
+cancel_by:
+- owner
+- admin_role
+cancel_states:
+- draft
+- reported
+- inspecting
+- pending
+actions:
+- id: submit_crr
+  label: ส่งอนุมัติผลตรวจเช็ค (ส่วนที่ 2 แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์)
+  from_state: inspecting
+  note: เจ้าหน้าที่ IT กดส่งจาก inspecting (ร่างผลตรวจเช็คส่วนที่ 2 = draft ของขั้นอนุมัติ) · ไม่อนุมัติ → กลับ inspecting เลขเดิม แก้แล้วส่งใหม่ · role-line-manager resolve จากผู้ส่ง (เจ้าหน้าที่ IT)
+matrix:
+- amount_from: 0
+  amount_to: null
+  departments: merged
+  chainMode: sequential
+  steps:
+  - roles:
+    - role-line-manager
+    label: อนุมัติโดย
+defaults_unconfirmed: true
+wire_status: pending
+source_decisions:
+- DEC-03
+- DEC-07
+- DEC-08

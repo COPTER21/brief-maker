@@ -1,0 +1,61 @@
+# FILE_MAP — แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `01_Prototype/feature.html` | `_ui/UI_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.html` |
+| `02_BRD/BRD_F-TMP-004.docx` | `_brd/BRD_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.docx` |
+| `02_BRD/BRD_F-TMP-004.md` | `_brd/BRD_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/00_OVERVIEW.md` | `_frd/FRD_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์/00_OVERVIEW_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/01_UI.md` | `_frd/FRD_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์/01_UI_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/02_API.md` | `_frd/FRD_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์/02_API_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/03_LOGIC.md` | `_frd/FRD_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์/03_LOGIC_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/04_DB.md` | `_frd/FRD_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์/04_DB_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/05_RULES.md` | `_frd/FRD_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์/05_RULES_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/06_TESTS.md` | `_frd/FRD_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์/06_TESTS_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์/07_LOCKED_DECISIONS_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/INDEX.md` | `_frd/FRD_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์/INDEX_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/CRR.doa.yaml` | `_frd/FRD_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์/declarations/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.doa.yaml` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/CRR.doccfg.yaml` | `_frd/FRD_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์/declarations/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/CRR.mdoc.yaml` | `_frd/FRD_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์/declarations/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/CRR.ntf.yaml` | `_frd/FRD_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์/declarations/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.ntf.yaml` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/DOA_BRIEF_F-TMP-004.md` | `_frd/FRD_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์/declarations/DOA_BRIEF_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/DOCCFG_BRIEF_F-TMP-004.md` | `_frd/FRD_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์/declarations/DOCCFG_BRIEF_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/MDOC_BRIEF_CRR.md` | `_frd/FRD_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์/declarations/MDOC_BRIEF_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/NTF_BRIEF_F-TMP-004.md` | `_frd/FRD_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์/declarations/NTF_BRIEF_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-004.md` | `_uibrief/UIBRIEF_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `05_Governance/CRR.doa.yaml` | `_governance/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.doa.yaml` |
+| `05_Governance/CRR.doccfg.yaml` | `_governance/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.doccfg.yaml` |
+| `05_Governance/CRR.mdoc.yaml` | `_governance/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.mdoc.yaml` |
+| `05_Governance/CRR.ntf.yaml` | `_governance/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.ntf.yaml` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `05_Governance/DOA_BRIEF_F-TMP-004.md` | `_governance/DOA_BRIEF_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-004.md` | `_governance/DOCCFG_BRIEF_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `05_Governance/MDOC_BRIEF_CRR.md` | `_governance/MDOC_BRIEF_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-004.md` | `_governance/NTF_BRIEF_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-004.md` | `_tc/QA_AUDIT_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `06_Test/cases.json` | `_tc/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์_cases.json` |
+| `06_Test/testcase-F-TMP-004.html` | `_tc/UAT_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.html` |
+| `06_Test/testcases-F-TMP-004.md` | `_tc/TC_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `07_Print/CRR_print-spec.md` | `_document/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์_print-spec.md` |
+| `07_Print/approved-doa6steps.data.json` | `_document/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์_approved-doa6steps.data.json` |
+| `07_Print/approved.data.json` | `_document/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์_approved.data.json` |
+| `07_Print/draft.data.json` | `_document/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์_draft.data.json` |
+| `07_Print/form.tpl.html` | `_document/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์_template.html` |
+| `07_Print/long-text.data.json` | `_document/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์_long-text.data.json` |
+| `07_Print/print_config.json` | `_document/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์_print_config.json` |
+| `07_Print/profile.json` | `_document/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์_profile.json` |
+| `07_Print/rejected.data.json` | `_document/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์_rejected.data.json` |
+| `07_Print/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์_template.html` | `_document/แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์_template.html` |
+| `08_Reference/6. FM-ITS-06 แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.xlsx` | `_reference/6. FM-ITS-06 แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.xlsx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-004.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-004_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-004_v2.md` | `_reference/PREBRIEF_REQ-TMP-004_v2_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์.md` |

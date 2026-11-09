@@ -1,0 +1,40 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# J001 · FM-ITS-01 แบบฟอร์มร้องขอดำเนินการด้าน IT · ตอบตาม 4_knowledge/governance/unattended-policy.md
+
+# G1 ผลต่อระบบ — ฟอร์มไม่ได้เขียนว่าเปลี่ยนค่า/ส่งต่อ → ไม่เปลี่ยน ไม่ส่งต่อ (IT Ticket ยังไม่มีในระบบ)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — ช่องผู้อนุมัติบนกระดาษ 1 ช่อง (ตรวจสอบโดย) → 1 ขั้น ผู้บังคับบัญชาตรง · ไม่มีวงเงิน
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager"], amount: none }
+
+# G3 สูตร / ค่าคงที่ — ไม่มีสูตร/ค่าคงที่บนกระดาษ · กติกาตรวจเป็นเตือน
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules: ["วันที่ต้องการส่งมอบ ต้องไม่ก่อนวันที่ขอ (เตือน)", "ติ๊กประเภทงาน อื่นๆ ต้องระบุข้อความ", "ประเภทงานต้องเลือกอย่างน้อย 1 ข้อ (เลือกได้หลายข้อ ตาม ☐ บนกระดาษ)"]
+
+# G4 รายการซ้ำ — ไม่มีบนกระดาษ
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ — 1:1 · แก้คำสะกด ตําแหน่ง → ตำแหน่ง
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น — แถวล่าง 1 ช่องต่อขั้น DOA + ผู้ร้องขอ + ดำเนินการโดย (เจ้าหน้าที่ IT ผู้ปิดงาน) · ข้อความ "พิจารณาในระบบ" ไม่ใช้ภาพ
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ → กลับเป็นร่างเลขเดิม · ยกเลิกได้ เจ้าของ + admin role · ร่าง/รออนุมัติ · เหตุผลบังคับ
+reject_cancel: { on_reject: draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น — เจ้าของ · ผู้อนุมัติหลังส่ง · admin role ของหน่วยงานเจ้าของเอกสาร (ฝ่าย IT) เห็นทั้งหมด
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 เลขที่ — ออกตอนบันทึกครั้งแรก · รหัส ITRS (prefix "ITRS." พิมพ์บนกระดาษ)
+numbering: { issue_on: first_save, code: ITRS }
+
+# G10 ของเสริม — แนบ ✓ CSV ✓ ทำซ้ำ ✗ ประกาศ ✗
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

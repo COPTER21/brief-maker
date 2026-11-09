@@ -1,0 +1,46 @@
+# ntf-declaration v1.2 — ฉบับจริง (frd_ref จาก frd_lint)
+feature_id: F-TMP-006
+name: รายงานการเข้า-ออก ห้อง server
+code: SRAL
+events:
+- id: sral_certify_pending
+  trigger: บันทึกแถวการเข้าห้องใหม่ (สถานะแถว = รอรับรอง)
+  recipients:
+  - admin_role
+  template: '**{doc_no}** มีการเข้าห้อง server รอรับรอง: {visitor_name} ({in_date} {in_time}) — {purpose}'
+  channel: in-app
+  optional: false
+  why: ลายเซ็นผู้รับรองต่อแถว (G6/DEC-13) — เจ้าหน้าที่ IT ผู้ดูแลห้องต้องรู้ทันทีเพื่อรับรอง
+  frd_ref: 03_LOGIC F-TMP-006-FN-02, F-TMP-006-FN-08
+- id: sral_overstay
+  trigger: แถวที่ยังไม่บันทึกเวลาออก และอยู่ในห้องนานเกิน ServerRoomAccessConfig.max_stay_hours (ค่าเริ่ม 12 ชม.) — DEC-04
+    เตือนไม่บล็อก
+  recipients:
+  - admin_role
+  template: '**{doc_no}** {visitor_name} อยู่ในห้อง server เกิน {max_stay_hours} ชม. ยังไม่บันทึกเวลาออก'
+  channel: in-app+email
+  optional: false
+  why: G3 เกินเกณฑ์ = เตือน — ผู้ดูแลห้องต้องตรวจสอบว่าลืมบันทึกออกหรือยังอยู่จริง
+  frd_ref: 03_LOGIC F-TMP-006-FN-02, F-TMP-006-FN-08
+- id: sral_submitted
+  trigger: draft → submitted (ปิดรอบรายงาน)
+  recipients:
+  - admin_role
+  template: '**{doc_no}** ปิดรอบรายงานการเข้า-ออกห้อง server แล้ว ({row_count} รายการ)'
+  channel: in-app
+  optional: true
+  why: ไม่มีการอนุมัติ (DEC-03) — แจ้งผู้ดูแลว่ามีรายงานปิดรอบแล้วเพื่อเก็บเข้าแฟ้ม
+  frd_ref: 03_LOGIC F-TMP-006-FN-04, F-TMP-006-FN-08
+- id: sral_cancelled
+  trigger: draft/submitted → cancelled (เจ้าของ หรือ admin role · ต้องมีเหตุผล)
+  recipients:
+  - owner
+  - admin_role
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: G7 ยกเลิกได้ทั้งร่างและที่ปิดรอบแล้ว — อีกฝ่ายต้องรู้
+  frd_ref: 03_LOGIC F-TMP-006-FN-06, F-TMP-006-FN-08
+excluded: []
+note: ตัด sral_over_limit_approved (suggest) เพราะไม่มีการอนุมัติ — แทนด้วย sral_overstay · ไม่มี DOA (DEC-03) จึงไม่มี doa_pending/doa_result
+  · admin_role = เจ้าหน้าที่/ผู้ดูแลของหน่วยงานเจ้าของเอกสาร (ฝ่าย IT)

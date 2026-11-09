@@ -1,0 +1,40 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# G1 ผลต่อระบบ — บันทึกการเข้า-ออกห้อง server อย่างเดียว ไม่เปลี่ยนค่า ไม่ส่งต่อ (ไม่เชื่อมระบบประตู/บัตรผ่าน)
+config_changes: []
+post_to: []
+
+# G2 — กระดาษไม่มีช่องลงชื่อผู้อนุมัติท้ายใบ (มีแค่ ลายเซ็นผู้เข้า / ผู้รับรอง ต่อแถว) → ไม่มีการอนุมัติเอกสาร · ผู้รับรองรายแถว = เจ้าหน้าที่ IT ผู้ดูแลห้อง (สิทธิ์ ไม่ใช่ DOA)
+doa: { required: false, mode: dynamic, default_steps: [], amount: none }
+
+# G3 — ไม่มีสูตร/ค่าคงที่บนกระดาษ · ตรวจตรรกะเวลา
+calc:
+  constants_from_config: true
+  auto_compute: false
+  over_limit: warn
+  rules:
+    - "วันเวลาออก ก่อนวันเวลาเข้า → บล็อก (ขัดแย้งทางตรรกะ)"
+    - "อยู่ในห้องนานเกินเกณฑ์ (ค่าเริ่ม 12 ชม. อ่านจาก config ServerRoomAccessConfig.max_stay_hours) → เตือน ไม่บล็อก"
+    - "ผู้เข้าคนเดียวกันมีแถวที่ยังไม่ออกซ้อนกัน → เตือน ไม่บล็อก"
+    - "ส่งปิดรอบ: ทุกแถวต้องมี วันที่ออก/เวลาที่ออก และผู้รับรองแล้ว → บล็อกถ้าไม่ครบ"
+    - "ผู้รับรองต้องไม่ใช่ผู้เข้าคนเดียวกัน (SoD) → บล็อก"
+
+# G4
+repeat: { max_rows: null }
+
+# G5
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 — ไม่มีช่องลงชื่อท้ายใบ · ลายเซ็นผู้เข้า/ผู้รับรองเป็นคอลัมน์ต่อแถว (ข้อความ "ลงชื่อในระบบ"/"รับรองในระบบ" + ชื่อ + วันเวลา ไม่ใช้ภาพ)
+signature: { layout: per-row, per_doa_step: false, handwriting_image: false }
+
+# G7 — ไม่มีอนุมัติ · ยกเลิกได้โดยเจ้าของ + admin role · ต้องมีเหตุผล
+reject_cancel: { on_reject: draft, cancel_by: [owner, admin_role], cancel_states: [draft, submitted], reason_required: true }
+
+# G8
+visibility: { owner: true, approver: none, admin_role: all }
+
+# G9
+numbering: { issue_on: first_save, code: "SRAL" }
+
+# G10
+extras: { attachments: true, copy: false, export_csv: true, announce: false }

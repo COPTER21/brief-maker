@@ -1,0 +1,40 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# J003 · FM-ITS-02 แบบฟอร์มการขอทำลายข้อมูล · ตอบตาม 4_knowledge/governance/unattended-policy.md
+
+# G1 ผลต่อระบบ — ฟอร์มไม่ได้เขียนว่าเปลี่ยนค่า/ส่งต่อ → ไม่เปลี่ยน ไม่ส่งต่อ (การทำลายข้อมูลจริงทำนอกระบบโดยเจ้าหน้าที่ IT แล้วบันทึกผล)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — ช่องผู้อนุมัติบนกระดาษ 2 ช่อง (ตรวจสอบ · อนุมัติ) → 2 ขั้น: ผู้บังคับบัญชาตรง + ผู้จัดการฝ่าย IT (role ตามหน้าที่ ฟอร์มของฝ่าย IT) · ไม่มีวงเงิน
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager", "role-mgr-it"], amount: none }
+
+# G3 สูตร / ค่าคงที่ — ไม่มีสูตร/ค่าคงที่บนกระดาษ · กติกาตรวจ
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules: ["ช่วงเวลาของข้อมูล ถึง ต้องไม่ก่อน จาก (บังคับ)", "ช่วงเวลาของข้อมูล ถึง ไม่ควรเกินวันที่ขอ (เตือน)", "ติ๊ก อื่นๆ(โปรดระบุ) ในเหตุผล/วิธีการ ต้องระบุข้อความ", "ประเภทข้อมูล · เหตุผล · วิธีการ ต้องเลือกอย่างน้อย 1 ข้อต่อกลุ่ม (เลือกได้หลายข้อ ตาม ☐ บนกระดาษ)"]
+
+# G4 รายการซ้ำ — ไม่มีบนกระดาษ
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ — 1:1 · แก้คำสะกด ตําแหน่ง → ตำแหน่ง · อนุมัมติ → อนุมัติ · แสดง ☐ ครบหน้าตัวเลือก เข้ารหัสฯ
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น — แถวล่าง: ผู้ร้องขอ + 1 ช่องต่อขั้น DOA + เจ้าหน้าที่ IT (ผู้ดำเนินการทำลาย ลงเมื่อทำลายเสร็จ — ไม่ใช่ขั้น DOA) · ข้อความ "พิจารณาในระบบ" ไม่ใช้ภาพ
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ → กลับเป็นร่างเลขเดิม · ยกเลิกได้ เจ้าของ + admin role · ร่าง/รออนุมัติ · เหตุผลบังคับ
+reject_cancel: { on_reject: draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น — เจ้าของ · ผู้อนุมัติหลังส่ง · admin role ของหน่วยงานเจ้าของเอกสาร (ฝ่าย IT) เห็นทั้งหมด
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 เลขที่ — ออกตอนบันทึกครั้งแรก · รหัส DRITS (prefix "DRITS." พิมพ์บนกระดาษ)
+numbering: { issue_on: first_save, code: DRITS }
+
+# G10 ของเสริม — แนบ ✓ CSV ✓ ทำซ้ำ ✗ ประกาศ ✗
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

@@ -1,0 +1,47 @@
+# FINAL — ยืนยันกับ FRD v1.0 (frd_lint N7 PASS)
+feature_id: F-TMP-004
+name: แบบฟอร์มใบแจ้งซ่อมอุปกรณ์คอมพิวเตอร์
+code: CRR
+events:
+- id: crr_reported
+  trigger: draft → reported (ผู้แจ้งซ่อมกด ส่งแจ้งซ่อม)
+  recipients:
+  - role-it-officer
+  template: '**{doc_no}** แจ้งซ่อม {item_name} ({device_type}) — {problem}'
+  channel: in-app
+  optional: false
+  why: ฝ่าย IT (ผู้รับแจ้ง) ต้องรู้ว่ามีใบแจ้งซ่อมใหม่เข้าคิว — ไม่ผ่าน DOA จึงไม่มี doa_pending
+  frd_ref: 03_LOGIC F-TMP-004-FN-03
+- id: crr_received
+  trigger: reported → inspecting (เจ้าหน้าที่ IT กด รับแจ้ง · บันทึก received_by/received_at)
+  recipients:
+  - owner
+  template: '**{doc_no}** เจ้าหน้าที่ IT {actor} รับแจ้งซ่อมแล้ว'
+  channel: in-app
+  optional: true
+  why: ผู้แจ้งซ่อมต้องรู้ว่ามีคนรับเรื่องแล้ว (ช่อง ผู้รับแจ้ง บนกระดาษ)
+  frd_ref: 03_LOGIC F-TMP-004-FN-04
+- id: crr_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-004-FN-11
+- id: crr_repaired
+  trigger: approved → repaired (เจ้าหน้าที่ IT บันทึกผลการซ่อม)
+  recipients:
+  - owner
+  template: '**{doc_no}** บันทึกผลการซ่อมแล้ว: {repair_result} — กรุณารับทราบ'
+  channel: in-app
+  optional: false
+  why: ผู้แจ้งซ่อมต้องเข้ามารับทราบผล (ช่อง ผู้แจ้งซ่อม แถวสุดท้ายบนกระดาษ)
+  frd_ref: 03_LOGIC F-TMP-004-FN-09
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+- crr_over_limit_approved
+note: 'ตัด crr_over_limit_approved — ไม่มีวงเงิน/เกณฑ์ตัวเลข (กติกา G3 เป็นเตือนวันที่เท่านั้น)'

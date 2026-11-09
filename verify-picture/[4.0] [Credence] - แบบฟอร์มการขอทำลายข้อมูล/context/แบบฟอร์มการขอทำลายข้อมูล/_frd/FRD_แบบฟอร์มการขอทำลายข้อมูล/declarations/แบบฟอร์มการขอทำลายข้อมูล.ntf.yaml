@@ -1,0 +1,39 @@
+# FINAL — ยืนยันกับ FRD v1.0 (frd_lint N7 PASS)
+feature_id: F-TMP-003
+name: แบบฟอร์มการขอทำลายข้อมูล
+code: DRITS
+events:
+- id: drits_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-003-FN-06
+- id: drits_ready_for_it
+  trigger: pending_approval → approved (DOA ครบทุกขั้น) — เข้าคิวงานทำลายข้อมูลของฝ่าย
+    IT
+  recipients:
+  - role-it-officer
+  template: '**{doc_no}** อนุมัติให้ทำลายข้อมูลแล้ว — โปรแกรม {program} ช่วง {period_from}–{period_to}'
+  channel: in-app
+  optional: false
+  why: เจ้าหน้าที่ IT (ช่องลงชื่อ เจ้าหน้าที่ IT บนกระดาษ) ต้องรู้ว่ามีคำขอที่อนุมัติแล้วรอทำลาย
+    (DOA แจ้งเฉพาะผู้ขอ)
+  frd_ref: 03_LOGIC F-TMP-003-FN-04
+- id: drits_destroyed
+  trigger: approved → destroyed (เจ้าหน้าที่ IT กด บันทึกการทำลายแล้ว · บันทึก performed_by/performed_at)
+  recipients:
+  - owner
+  template: '**{doc_no}** ทำลายข้อมูลเรียบร้อยแล้ว โดย {actor}'
+  channel: in-app
+  optional: true
+  why: ผู้ร้องขอต้องรู้ว่าทำลายข้อมูลเสร็จแล้ว (ช่อง เจ้าหน้าที่ IT บนกระดาษ)
+  frd_ref: 03_LOGIC F-TMP-003-FN-07
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

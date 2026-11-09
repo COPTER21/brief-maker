@@ -1,0 +1,30 @@
+# FINAL — ยืนยันกับ FRD v1.0 (frd_lint N7 PASS)
+feature_id: F-TMP-005
+name: แบบฟอร์ม Change Request
+code: ITCR
+events:
+- id: itcr_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-005-FN-06
+- id: itcr_approved_for_it
+  trigger: pending_approval → approved (DOA ครบทุกขั้น) — เข้าคิวงานเปลี่ยนแปลงของฝ่าย
+    IT
+  recipients:
+  - role-it-officer
+  template: '**{doc_no}** อนุมัติการเปลี่ยนแปลงแล้ว — {subject} · ส่งมอบ {due_date}'
+  channel: in-app
+  optional: false
+  why: เจ้าหน้าที่ IT ผู้ดำเนินการเปลี่ยนแปลงต้องรู้ว่ามีคำขอที่อนุมัติแล้ว พร้อมวันที่ต้องการส่งมอบ
+    (DOA แจ้งเฉพาะผู้ขอ)
+  frd_ref: 03_LOGIC F-TMP-005-FN-04
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

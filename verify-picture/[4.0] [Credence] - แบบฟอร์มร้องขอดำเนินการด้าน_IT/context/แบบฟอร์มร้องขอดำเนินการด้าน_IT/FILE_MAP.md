@@ -1,0 +1,62 @@
+# FILE_MAP — แบบฟอร์มร้องขอดำเนินการด้าน_IT
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `01_Prototype/feature.html` | `_ui/UI_แบบฟอร์มร้องขอดำเนินการด้าน_IT.html` |
+| `02_BRD/BRD_F-TMP-001.docx` | `_brd/BRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT.docx` |
+| `02_BRD/BRD_F-TMP-001.md` | `_brd/BRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/00_OVERVIEW.md` | `_frd/FRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT/00_OVERVIEW_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/01_UI.md` | `_frd/FRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT/01_UI_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/02_API.md` | `_frd/FRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT/02_API_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/03_LOGIC.md` | `_frd/FRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT/03_LOGIC_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/04_DB.md` | `_frd/FRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT/04_DB_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/05_RULES.md` | `_frd/FRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT/05_RULES_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/06_TESTS.md` | `_frd/FRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT/06_TESTS_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT/07_LOCKED_DECISIONS_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/INDEX.md` | `_frd/FRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT/INDEX_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/_SECTION_N.md` | `_frd/FRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT/_SECTION_N_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/DOA_BRIEF_F-TMP-001.md` | `_frd/FRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT/declarations/DOA_BRIEF_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/DOCCFG_BRIEF_F-TMP-001.md` | `_frd/FRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT/declarations/DOCCFG_BRIEF_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/ITRS.doa.yaml` | `_frd/FRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT/declarations/แบบฟอร์มร้องขอดำเนินการด้าน_IT.doa.yaml` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/ITRS.doccfg.yaml` | `_frd/FRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT/declarations/แบบฟอร์มร้องขอดำเนินการด้าน_IT.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/ITRS.mdoc.yaml` | `_frd/FRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT/declarations/แบบฟอร์มร้องขอดำเนินการด้าน_IT.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/ITRS.ntf.yaml` | `_frd/FRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT/declarations/แบบฟอร์มร้องขอดำเนินการด้าน_IT.ntf.yaml` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/MDOC_BRIEF_ITRS.md` | `_frd/FRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT/declarations/MDOC_BRIEF_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/NTF_BRIEF_F-TMP-001.md` | `_frd/FRD_แบบฟอร์มร้องขอดำเนินการด้าน_IT/declarations/NTF_BRIEF_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-001.md` | `_uibrief/UIBRIEF_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_แบบฟอร์มร้องขอดำเนินการด้าน_IT.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `05_Governance/DOA_BRIEF_F-TMP-001.md` | `_governance/DOA_BRIEF_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-001.md` | `_governance/DOCCFG_BRIEF_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `05_Governance/ITRS.doa.yaml` | `_governance/แบบฟอร์มร้องขอดำเนินการด้าน_IT.doa.yaml` |
+| `05_Governance/ITRS.doccfg.yaml` | `_governance/แบบฟอร์มร้องขอดำเนินการด้าน_IT.doccfg.yaml` |
+| `05_Governance/ITRS.mdoc.yaml` | `_governance/แบบฟอร์มร้องขอดำเนินการด้าน_IT.mdoc.yaml` |
+| `05_Governance/ITRS.ntf.yaml` | `_governance/แบบฟอร์มร้องขอดำเนินการด้าน_IT.ntf.yaml` |
+| `05_Governance/MDOC_BRIEF_ITRS.md` | `_governance/MDOC_BRIEF_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-001.md` | `_governance/NTF_BRIEF_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_แบบฟอร์มร้องขอดำเนินการด้าน_IT.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-001.md` | `_tc/QA_AUDIT_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `06_Test/cases.json` | `_tc/แบบฟอร์มร้องขอดำเนินการด้าน_IT_cases.json` |
+| `06_Test/testcase-F-TMP-001.html` | `_tc/UAT_แบบฟอร์มร้องขอดำเนินการด้าน_IT.html` |
+| `06_Test/testcases-F-TMP-001.md` | `_tc/TC_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `07_Print/ITRS_print-spec.md` | `_document/แบบฟอร์มร้องขอดำเนินการด้าน_IT_print-spec.md` |
+| `07_Print/ITRS_template.html` | `_document/แบบฟอร์มร้องขอดำเนินการด้าน_IT_template.html` |
+| `07_Print/approved-doa6steps.data.json` | `_document/แบบฟอร์มร้องขอดำเนินการด้าน_IT_approved-doa6steps.data.json` |
+| `07_Print/approved.data.json` | `_document/แบบฟอร์มร้องขอดำเนินการด้าน_IT_approved.data.json` |
+| `07_Print/draft.data.json` | `_document/แบบฟอร์มร้องขอดำเนินการด้าน_IT_draft.data.json` |
+| `07_Print/form.tpl.html` | `_document/แบบฟอร์มร้องขอดำเนินการด้าน_IT_template.html` |
+| `07_Print/long-text.data.json` | `_document/แบบฟอร์มร้องขอดำเนินการด้าน_IT_long-text.data.json` |
+| `07_Print/print_config.json` | `_document/แบบฟอร์มร้องขอดำเนินการด้าน_IT_print_config.json` |
+| `07_Print/profile.json` | `_document/แบบฟอร์มร้องขอดำเนินการด้าน_IT_profile.json` |
+| `07_Print/rejected.data.json` | `_document/แบบฟอร์มร้องขอดำเนินการด้าน_IT_rejected.data.json` |
+| `08_Reference/1. FM-ITS-01 แบบฟอร์มขอรับบริการด้านเทคโนโลยีสารสนเทศ.xlsx` | `_reference/1. FM-ITS-01 แบบฟอร์มขอรับบริการด้านเทคโนโลยีสารสนเทศ_แบบฟอร์มร้องขอดำเนินการด้าน_IT.xlsx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_แบบฟอร์มร้องขอดำเนินการด้าน_IT.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_แบบฟอร์มร้องขอดำเนินการด้าน_IT.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-001.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-001_แบบฟอร์มร้องขอดำเนินการด้าน_IT.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-001_v2.md` | `_reference/PREBRIEF_REQ-TMP-001_v2_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_แบบฟอร์มร้องขอดำเนินการด้าน_IT.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_แบบฟอร์มร้องขอดำเนินการด้าน_IT.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_แบบฟอร์มร้องขอดำเนินการด้าน_IT.md` |

@@ -1,0 +1,46 @@
+{
+  "form": { "title": "แบบฟอร์มตรวจเช็คความเรียบร้อยห้อง Server", "form_code": "FM-ITS-10", "revision": "Rev.00 : 01/07/2569",
+            "source_file": "10. FM-ITS-10 แบบฟอร์มตรวจเช็คความเรียบร้อยห้อง Server.xlsx", "sha256": "c5126b3640f9b64a", "pages": 1, "paper": "A4-landscape",
+            "note": "ไฟล์ Excel 1 ชีต (FM-ITS-10) · ตารางเส้นทึบ 11 คอลัมน์ · หัวตาราง 2 แถว (ชื่อหัวข้อ + เกณฑ์/รูปแบบในวงเล็บ) · แถวว่าง 30 แถว (แถว 4–33) · โลโก้อยู่ใน header กลางหน้า · Doc No./Rev. อยู่ footer ขวา · พิมพ์ A4 แนวนอน scale 92% · ไม่มีช่องลงชื่อผู้อนุมัติบนกระดาษ (มีแค่คอลัมน์ ผู้ตรวจสอบ ต่อแถว)" },
+  "blocks": [
+    { "id": "B01", "kind": "logo", "note": "รูปโลโก้ใน page header กึ่งกลาง → ระบบใช้โลโก้ของ Organization" },
+    { "id": "B02", "kind": "title", "text": "แบบฟอร์มตรวจเช็คความเรียบร้อยห้อง Server" },
+    { "id": "B03", "kind": "repeat", "group": "checks", "note": "ตารางกรอบเส้นทึบ (thai-doc R9) · หัวตาราง 2 แถว: แถวบน = ชื่อหัวข้อ · แถวล่าง = เกณฑ์/รูปแบบในวงเล็บ · หมายเหตุ + ผู้ตรวจสอบ merge 2 แถว" },
+    { "id": "B04", "kind": "control" }
+  ],
+  "fields": [
+    { "id": "F01", "label": "วันที่", "key": "checks[].check_date", "type": "date", "source": "user", "repeat_group": "checks", "required": true, "sample": "", "hint_on_paper": "(DD/MM/YYYY)", "note": "ค่าเริ่ม = วันนี้" },
+    { "id": "F02", "label": "ทะเบียนคุมเข้าออก", "key": "checks[].access_log", "type": "enum", "choice": "access_log", "source": "user", "repeat_group": "checks", "required": true, "sample": "", "hint_on_paper": "(มี / ไม่มี)" },
+    { "id": "F03", "label": "ถังดับเพลิง", "key": "checks[].extinguisher_pressure", "type": "text", "source": "user", "repeat_group": "checks", "required": true, "sample": "", "hint_on_paper": "(ความดัน)", "note": "กระดาษไม่ระบุหน่วย/เกณฑ์ความดัน → เก็บเป็นข้อความสั้นตามที่อ่านจากเกจ (รอยืนยัน: ตัวเลข+หน่วย หรือ ปกติ/ไม่ปกติ)" },
+    { "id": "F04", "label": "อุณหภูมิ", "key": "checks[].temperature_c", "type": "number", "source": "user", "repeat_group": "checks", "required": true, "sample": "", "hint_on_paper": "(18-27°C)", "note": "ทศนิยม 1 ตำแหน่ง · นอกช่วงเกณฑ์ = เตือน" },
+    { "id": "F05", "label": "ความชื้นสัมพัทธ์", "key": "checks[].humidity_rh", "type": "number", "source": "user", "repeat_group": "checks", "required": true, "sample": "", "hint_on_paper": "(40-55 %RH)", "note": "ทศนิยม 1 ตำแหน่ง · นอกช่วงเกณฑ์ = เตือน" },
+    { "id": "F06", "label": "เครื่องปรับอากาศ", "key": "checks[].aircon", "type": "enum", "choice": "status_aircon", "source": "user", "repeat_group": "checks", "required": true, "sample": "", "hint_on_paper": "(ปกติ / ไม่ปกติ)" },
+    { "id": "F07", "label": "กล้องวงจรปิด", "key": "checks[].cctv", "type": "enum", "choice": "status_cctv", "source": "user", "repeat_group": "checks", "required": true, "sample": "", "hint_on_paper": "(ปกติ / ไม่ปกติ)" },
+    { "id": "F08", "label": "MDB", "key": "checks[].mdb", "type": "enum", "choice": "status_mdb", "source": "user", "repeat_group": "checks", "required": true, "sample": "", "hint_on_paper": "(ปกติ / ไม่ปกติ)", "note": "MDB = ตู้เมนไฟฟ้า (Main Distribution Board)" },
+    { "id": "F09", "label": "PDU", "key": "checks[].pdu", "type": "enum", "choice": "status_pdu", "source": "user", "repeat_group": "checks", "required": true, "sample": "", "hint_on_paper": "(ปกติ / ไม่ปกติ)", "note": "PDU = รางปลั๊กจ่ายไฟในตู้ Rack (Power Distribution Unit)" },
+    { "id": "F10", "label": "หมายเหตุ", "key": "checks[].remark", "type": "text", "source": "user", "repeat_group": "checks", "required": false, "sample": "" },
+    { "id": "F11", "label": "ผู้ตรวจสอบ", "key": "checks[].checked_by", "type": "text", "source": "system", "system_path": "Employee.full_name (ผู้บันทึกแถวนั้น · current user)", "owner": "F-EMP-001", "repeat_group": "checks", "required": true, "sample": "", "pdpa": true, "note": "ระบบใส่ชื่อผู้บันทึกแถวให้อัตโนมัติ" }
+  ],
+  "repeat_groups": [ { "id": "checks", "label": "รายการตรวจเช็คประจำวัน", "min_rows": 30, "max_rows": null, "note": "กระดาษ 30 แถว ≈ 1 เดือน (ตรวจวันละ 1 แถว)" } ],
+  "choices": [
+    { "id": "access_log", "label": "ทะเบียนคุมเข้าออก", "multi": false, "options": [ { "value": "yes", "label": "มี", "enables": [] }, { "value": "no", "label": "ไม่มี", "enables": [] } ] },
+    { "id": "status_aircon", "label": "เครื่องปรับอากาศ", "multi": false, "options": [ { "value": "normal", "label": "ปกติ", "enables": [] }, { "value": "abnormal", "label": "ไม่ปกติ", "enables": [] } ] },
+    { "id": "status_cctv", "label": "กล้องวงจรปิด", "multi": false, "options": [ { "value": "normal", "label": "ปกติ", "enables": [] }, { "value": "abnormal", "label": "ไม่ปกติ", "enables": [] } ] },
+    { "id": "status_mdb", "label": "MDB", "multi": false, "options": [ { "value": "normal", "label": "ปกติ", "enables": [] }, { "value": "abnormal", "label": "ไม่ปกติ", "enables": [] } ] },
+    { "id": "status_pdu", "label": "PDU", "multi": false, "options": [ { "value": "normal", "label": "ปกติ", "enables": [] }, { "value": "abnormal", "label": "ไม่ปกติ", "enables": [] } ] }
+  ],
+  "formulas": [],
+  "constants": [
+    { "text": "18-27°C", "meaning": "ช่วงอุณหภูมิห้อง Server ที่ยอมรับได้", "should_be": "ServerRoomCheckConfig.temp_min_c / temp_max_c" },
+    { "text": "40-55 %RH", "meaning": "ช่วงความชื้นสัมพัทธ์ห้อง Server ที่ยอมรับได้", "should_be": "ServerRoomCheckConfig.rh_min / rh_max" }
+  ],
+  "signatures": [
+    { "id": "S1", "role_on_paper": "ผู้ตรวจสอบ (คอลัมน์ต่อแถว)", "who": "requester", "decision": [], "note": "บนกระดาษเป็นคอลัมน์ชื่อผู้ตรวจสอบต่อแถว ไม่มีช่องลงชื่อท้ายใบ · ไม่มีช่องผู้อนุมัติ" }
+  ],
+  "control": { "doc_no_on_paper": "FM-ITS-10", "revision": "Rev.00 : 01/07/2569", "running_no_on_paper": false },
+  "anomalies": [
+    { "where": "ช่องลงชื่อ", "detail": "กระดาษไม่มีช่องลงชื่อผู้ตรวจทาน/ผู้อนุมัติ — มีเฉพาะชื่อผู้ตรวจสอบต่อแถว", "rule": "G2 ต้องให้ลูกค้ายืนยันว่าต้องมีผู้ตรวจทานประจำเดือนหรือไม่" },
+    { "where": "ถังดับเพลิง (ความดัน)", "detail": "ไม่ระบุหน่วยหรือเกณฑ์ความดันที่ถือว่าผ่าน", "rule": "เก็บเป็นข้อความ · ลูกค้ายืนยันรูปแบบ" },
+    { "where": "อุณหภูมิ / ความชื้น", "detail": "ค่านอกช่วงเกณฑ์บนหัวตาราง (18-27°C · 40-55 %RH)", "rule": "ค่านอกช่วง = เตือน + ระบุหมายเหตุ (ไม่บล็อก)" }
+  ]
+}
