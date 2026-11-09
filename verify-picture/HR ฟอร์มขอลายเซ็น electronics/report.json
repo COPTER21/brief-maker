@@ -1,0 +1,159 @@
+{
+  "feature": {
+    "code": "F-TMP-003",
+    "name": "HR ฟอร์มขอลายเซ็น electronics",
+    "module": "HR"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-05",
+  "round": 1,
+  "refs": "FRD F-TMP-003 Pack · 06_TESTS.md จำนวน 46 เคส",
+  "scope": {
+    "checked": [
+      "Create, Update และยกเลิกเอกสารผ่านทั้งหมด",
+      "Dropdown ขั้นที่ 1 ของ Create และ Edit drawer",
+      "Upload เอกสารแนบใน Create และ Edit drawer",
+      "Drawer tabs: PDF Preview, ลายเซ็น/อนุมัติ และประวัติ",
+      "ชุด action บน drawer",
+      "UI/UX ส่วนอื่นที่ผู้ตรวจทดลองใช้งาน"
+    ],
+    "not_checked": [
+      {"item": "กฎ FRD และ Test Case ที่มีสถานะ ไม่ได้ตรวจ ในตาราง Logic", "reason": "ผู้ตรวจไม่ได้ระบุผลในรอบนี้"},
+      {"item": "ผลทดสอบระดับ API อื่นนอกเหนือจาก upload attachment", "reason": "ไม่มีผลหรือหลักฐานระบุ"}
+    ]
+  },
+  "logic": [
+    {"item": "Create คำขอ", "expected": "สร้างคำขอได้และบันทึกข้อมูลสำเร็จ", "status": "pass", "ref": "TC-01"},
+    {"item": "Update คำขอ", "expected": "แก้ไขและบันทึกข้อมูลคำขอได้", "status": "pass", "ref": "TC-11"},
+    {"item": "ยกเลิกคำขอ", "expected": "ยกเลิกเอกสารได้สำเร็จ", "status": "pass", "ref": "FN-09"},
+    {"item": "กรณีต่ออายุ — เลือกเหตุผลการต่ออายุ", "expected": "Dropdown แสดงตัวเลือกเหตุผลการต่ออายุให้เลือก", "actual": "กด Dropdown แล้วไม่แสดง option ทั้ง Create และ Edit drawer", "status": "fail", "bug": "BUG-01", "ref": "TC-03 · FN-02"},
+    {"item": "กรณีเปลี่ยนชื่อ/นามสกุล — เลือกประเภทการเปลี่ยน", "expected": "Dropdown แสดงตัวเลือกประเภทการเปลี่ยนให้เลือก", "actual": "กด Dropdown แล้วไม่แสดง option ทั้ง Create และ Edit drawer", "status": "fail", "bug": "BUG-01", "ref": "TC-04 · FN-02/FN-03"},
+    {"item": "แนบไฟล์ใน Create/Edit drawer", "expected": "ไฟล์ที่เลือกถูกส่งไปยัง API และแนบกับคำขอได้", "actual": "API ตอบ 422 ATTACHMENT_INVALID พร้อมข้อความไฟล์มีขนาดใหญ่เกินกำหนด และ request payload เป็น {\"file\":{}}", "status": "fail", "bug": "BUG-02", "ref": "DEC-11 · FN-12"},
+    {"item": "กรณีเปลี่ยนชื่อ — บังคับชื่อเดิมและชื่อใหม่ครบ", "expected": "บล็อกเมื่อกรอกไม่ครบ", "status": "na", "ref": "TC-05"},
+    {"item": "กรณีเปลี่ยนนามสกุล — ช่องที่ไม่เกี่ยวต้องว่าง", "expected": "ผ่านเมื่อกรอกนามสกุลครบและช่องชื่อว่าง", "status": "na", "ref": "TC-06"},
+    {"item": "กรณีเปลี่ยนทั้งชื่อและนามสกุล", "expected": "ผ่านเมื่อครบทั้ง 6 ช่อง", "status": "na", "ref": "TC-07"},
+    {"item": "ชื่อใหม่ต้องไม่เท่าชื่อเดิม", "expected": "ระบบบล็อก", "status": "na", "ref": "TC-08"},
+    {"item": "เปลี่ยนจากกรณีที่ 3 กลับกรณีที่ 1", "expected": "ช่องชื่อถูกล้างทั้งหมด", "status": "na", "ref": "TC-09"},
+    {"item": "คำรับรองของผู้ขอ", "expected": "ไม่ติ๊กแล้วต้องถูกบล็อก", "status": "na", "ref": "TC-10"},
+    {"item": "แก้ร่างของผู้อื่น", "expected": "403 NOT_OWNER", "status": "na", "ref": "TC-12"},
+    {"item": "แก้เอกสาร approved", "expected": "ไม่มีปุ่มแก้ไขและ API ปฏิเสธ", "status": "na", "ref": "TC-13"},
+    {"item": "สร้างเมื่อ doc_type DSR ไม่ active", "expected": "ปุ่มถูกปิดและ API ตอบ 409", "status": "na", "ref": "TC-14"},
+    {"item": "ส่งอนุมัติพร้อมผู้พิจารณาครบ", "expected": "draft เป็น pending และ freeze approval chain", "status": "na", "ref": "TC-15"},
+    {"item": "ส่งอนุมัติโดยไม่เลือกผู้พิจารณา", "expected": "แสดง error รายช่องและส่งไม่ได้", "status": "na", "ref": "TC-16"},
+    {"item": "DOA แบบ 3 ขั้น", "expected": "ได้ 3 ขั้นโดยไม่แก้โค้ด", "status": "na", "ref": "TC-17"},
+    {"item": "ผู้พิจารณาปัจจุบันกดดำเนินการได้", "expected": "ขั้นผ่านและสถานะเดินหน้าถูกต้อง", "status": "na", "ref": "TC-18"},
+    {"item": "ผู้ที่ไม่ใช่ผู้พิจารณาปัจจุบันอนุมัติ", "expected": "403 NOT_CURRENT_APPROVER", "status": "na", "ref": "TC-19"},
+    {"item": "ผู้ขออนุมัติใบตนเอง", "expected": "403 SELF_APPROVE", "status": "na", "ref": "TC-20"},
+    {"item": "ไม่สามารถดำเนินการได้โดยไม่ใส่เหตุผล", "expected": "ระบบบล็อก", "status": "na", "ref": "TC-21"},
+    {"item": "ไม่สามารถดำเนินการได้พร้อมเหตุผล", "expected": "กลับเป็น draft เลขเดิม", "status": "na", "ref": "TC-22"},
+    {"item": "แก้และส่งใหม่หลังกลับเป็นร่าง", "expected": "resolve chain ใหม่และเลขเดิม", "status": "na", "ref": "TC-23"},
+    {"item": "ยกเลิกเอกสาร pending พร้อมเหตุผล", "expected": "cancelled ขั้นค้าง skipped และส่ง event", "status": "na", "ref": "TC-24"},
+    {"item": "ยกเลิกใบผู้อื่นโดยไม่ใช่ admin", "expected": "ไม่มีสิทธิ์", "status": "na", "ref": "TC-25"},
+    {"item": "ยกเลิกเอกสาร approved", "expected": "ทำไม่ได้", "status": "na", "ref": "TC-26"},
+    {"item": "ส่งใบเปลี่ยนชื่อ", "expected": "ส่ง event dsr_name_change_requested", "status": "na", "ref": "TC-27"},
+    {"item": "เจ้าของเห็นใบตนเองทุกสถานะ", "expected": "เห็นทั้งหมด", "status": "na", "ref": "TC-28"},
+    {"item": "ผู้พิจารณาไม่เห็น draft ของผู้อื่น", "expected": "ไม่พบใน list และเปิด URL ไม่ได้", "status": "na", "ref": "TC-29"},
+    {"item": "ผู้พิจารณาเห็นใบที่ส่งแล้ว", "expected": "เห็นและทำรายการได้เมื่อเป็นขั้นปัจจุบัน", "status": "na", "ref": "TC-30"},
+    {"item": "HR admin เห็นทุกใบ", "expected": "เห็นรวมร่างของทุกคน", "status": "na", "ref": "TC-31"},
+    {"item": "ผู้ใช้ไม่เกี่ยวข้องเปิด URL โดยตรง", "expected": "403 NOT_ALLOWED", "status": "na", "ref": "TC-32"},
+    {"item": "API list ไม่รั่วใบของผู้อื่น", "expected": "response ไม่มีรายการที่ไม่มีสิทธิ์", "status": "na", "ref": "TC-33"},
+    {"item": "PDF Preview สถานะ draft", "expected": "มีคำว่าร่างและช่องเจ้าหน้าที่ไม่ถูกเลือก", "status": "na", "ref": "TC-34"},
+    {"item": "PDF สถานะ approved", "expected": "แสดงผลดำเนินการได้", "status": "na", "ref": "TC-35"},
+    {"item": "PDF หลังไม่สามารถดำเนินการได้", "expected": "แสดงผลและเหตุผลตรงข้อมูล", "status": "na", "ref": "TC-36"},
+    {"item": "PDF กรณีที่ 1/2", "expected": "ช่องชื่อเดิมและชื่อใหม่ว่าง", "status": "na", "ref": "TC-37"},
+    {"item": "PDF กรณีเปลี่ยนนามสกุล", "expected": "ติ๊กและแสดงเฉพาะนามสกุล", "status": "na", "ref": "TC-38"},
+    {"item": "Header snapshot บน PDF", "expected": "ใช้ชื่อบริษัทและโลโก้ ณ ตอนออกเลข", "status": "na", "ref": "TC-39"},
+    {"item": "PDF เมื่อ DOA 6 ขั้น", "expected": "แสดง 7 ช่องลงชื่อ 2 แถวและยังอ่านได้", "status": "na", "ref": "TC-40"},
+    {"item": "ส่งออก CSV", "expected": "ได้เฉพาะแถวตามตัวกรองและสิทธิ์", "status": "na", "ref": "TC-41"},
+    {"item": "คำตัดสินบน PDF หลังสลับลำดับ DOA", "expected": "คำตัดสินยังผูก role ถูกคน", "status": "na", "ref": "TC-42"},
+    {"item": "ช่องหน้าจอตรง FORM_SPEC", "expected": "ครบ 19 ช่องและไม่มีช่องเกิน", "status": "na", "ref": "TC-43"},
+    {"item": "หัวกระดาษ PDF", "expected": "มีเฉพาะโลโก้และข้อความเจ้าหน้าที่ไม่ซ้ำ", "status": "na", "ref": "TC-44"},
+    {"item": "ข้อมูลตัวอย่างไม่มีข้อมูลส่วนบุคคลจริง", "expected": "ใช้ชื่อสมมติทั้งหมด", "status": "na", "ref": "TC-45"},
+    {"item": "Audit trail หลังพิจารณา", "expected": "มีผู้ดำเนินการและวันเวลาครบ", "status": "na", "ref": "TC-46"}
+  ],
+  "ui_checked": true,
+  "ui": [
+    {"id": "U-02", "status": "note", "note": "Layout ของแท็บ PDF Preview, ลายเซ็น/อนุมัติ และประวัติไม่ตรงกับ design ต้นแบบ", "evidence": "tk03/Screenshot 2026-11-05 140951.png"},
+    {"id": "U-04", "status": "note", "note": "ตำแหน่งและรูปแบบชุด action บน drawer ไม่ตรงกับ design ต้นแบบ", "evidence": "tk04/Screenshot 2026-11-05 142016.png"}
+  ],
+  "ux_checked": true,
+  "ux": [
+    {"id": "X-01", "status": "note", "note": "Dropdown ขั้นที่ 1 กดแล้วไม่มี option ทำให้ flow ต่ออายุและเปลี่ยนชื่อไปต่อไม่ได้", "evidence": "tk01/Screenshot 2026-11-05 134514.png"},
+    {"id": "X-03", "status": "note", "note": "Upload ส่ง payload file เป็น object ว่าง แต่ข้อความแจ้งผู้ใช้ว่าไฟล์ใหญ่เกินกำหนด จึงไม่บอกสาเหตุที่แท้จริง", "evidence": "tk02/Screenshot 2026-11-05 135908.png"}
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "Dropdown เหตุผลต่ออายุและประเภทการเปลี่ยนไม่แสดง option",
+      "severity": "high",
+      "steps": [
+        "เปิด Create หรือ Edit drawer",
+        "ที่ขั้น 1 เลือก ต่ออายุ หรือ เปลี่ยนชื่อ/นามสกุล",
+        "กด Dropdown ที่ปรากฏใต้ตัวเลือก"
+      ],
+      "expected": "Dropdown แสดงตัวเลือกเหตุผลต่ออายุหรือประเภทการเปลี่ยนให้เลือก",
+      "actual": "Dropdown ไม่แสดง option ทำให้ไม่สามารถเลือกค่าบังคับได้",
+      "evidence": [
+        "tk01/Screenshot 2026-11-05 134514.png",
+        "tk01/Screenshot 2026-11-05 135119.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "Upload เอกสารแนบส่ง payload file ว่างและ API ตอบ 422",
+      "severity": "medium",
+      "steps": [
+        "เปิด Create หรือ Edit drawer",
+        "ไปขั้นเอกสารแนบและเลือกไฟล์",
+        "บันทึกคำขอและตรวจ request attachments ใน Network"
+      ],
+      "expected": "Request ส่งข้อมูลไฟล์ที่เลือกและ API บันทึกเอกสารแนบสำเร็จ",
+      "actual": "Request payload เป็น {\"file\":{}} และ API ตอบ 422 {\"code\":\"ATTACHMENT_INVALID\",\"message\":\"ไฟล์มีขนาดใหญ่เกินกำหนด\"}",
+      "evidence": [
+        "tk02/Screenshot 2026-11-05 135252.png",
+        "tk02/Screenshot 2026-11-05 135645.png",
+        "tk02/Screenshot 2026-11-05 135908.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "Layout ของแท็บ PDF Preview การอนุมัติ และประวัติไม่ตรง design",
+      "severity": "low",
+      "steps": [
+        "เปิด drawer รายละเอียดเอกสาร",
+        "เปิดแท็บ PDF Preview, ลายเซ็น/อนุมัติ และประวัติ",
+        "เทียบโครงสร้างและการจัดวางกับ prototype"
+      ],
+      "expected": "โครงสร้าง การจัดวาง และองค์ประกอบในแต่ละแท็บตรงกับ prototype",
+      "actual": "ทั้งสามแท็บใช้โครงสร้างและการจัดวางต่างจาก prototype",
+      "evidence": [
+        "tk03/Screenshot 2026-11-05 140951.png",
+        "tk03/example_tab_pdf_preview.png",
+        "tk03/Screenshot 2026-11-05 141507.png",
+        "tk03/example_tab_doa.png",
+        "tk03/Screenshot 2026-11-05 141547.png",
+        "tk03/example_tab_history.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-04",
+      "title": "ชุด action บน drawer ไม่ตรง design ต้นแบบ",
+      "severity": "low",
+      "steps": [
+        "เปิด drawer รายละเอียดเอกสารสถานะร่าง",
+        "ดูชุดปุ่ม action บริเวณหัว drawer และปุ่มปิด",
+        "เทียบกับ prototype"
+      ],
+      "expected": "ชนิดปุ่ม ลำดับ ตำแหน่ง และรูปแบบ action ตรงกับ prototype",
+      "actual": "ชุดปุ่ม PDF, แก้ไข, ส่งอนุมัติ, ยกเลิกเอกสาร และปุ่มปิดจัดวาง/ใช้รูปแบบต่างจาก prototype",
+      "evidence": [
+        "tk04/Screenshot 2026-11-05 142016.png",
+        "tk04/example_of_design.png"
+      ],
+      "status": "open"
+    }
+  ]
+}

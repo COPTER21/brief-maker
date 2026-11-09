@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>F-MB-STOCKTAKE Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFFFF;--card:#F5F5F5;--muted:#EBEBEB;--fg:#111111;--mfg:#666666;--border:#E5E5E5;
+  --primary:#FF3B30;--primary-bg:#FFEFEE;--cta:#E0281D;--accent-text:#C52620;
+  --orange:#FF9A1F;--orange-bg:#FFF0D9;--green:#167446;--green-bg:#E7F1E9;
+  --danger:#C52620;--danger-bg:#FFF0ED;--progress:#3B6FB5;--progress-bg:#E8EFF8;
+  --page:#EFEFEF;--panel:#FFFFFF;--skel:#E6E6E6;--fn:#3B6FB5;
+}
+:root[data-theme="dark"]{
+  --bg:#0E0E0F;--card:#171719;--muted:#222225;--fg:#F8F7F4;--mfg:#B3B0A9;--border:#343438;
+  --primary-bg:#361C1A;--accent-text:#FF776D;--green:#77D7A0;--green-bg:#152B20;--orange-bg:#382818;
+  --danger:#FF776D;--danger-bg:#342020;--progress:#8DB2E8;--progress-bg:#1C2636;
+  --page:#1A1A1C;--panel:#232326;--skel:#2A2A2D;--fn:#8DB2E8;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--fg);font-family:"Plus Jakarta Sans","Noto Sans Thai",system-ui,sans-serif;line-height:1.5}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{display:flex;gap:24px;justify-content:center;align-items:flex-start;padding:24px 16px;flex-wrap:wrap}
+
+/* control panel (outside phone) */
+.panel{width:280px;background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:16px;position:sticky;top:24px}
+.panel h1{font-size:15px;margin:0 0 2px}
+.panel p{font-size:12px;color:var(--mfg);margin:0 0 12px}
+.panel h2{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mfg);margin:14px 0 6px}
+.seg{display:flex;flex-direction:column;gap:4px}
+.seg button{text-align:left;border:1px solid var(--border);background:var(--bg);border-radius:10px;padding:7px 10px;font-size:13px}
+.seg button[aria-pressed="true"]{border-color:var(--cta);background:var(--primary-bg);color:var(--accent-text);font-weight:600}
+.toggle{display:flex;align-items:center;justify-content:space-between;font-size:13px;padding:4px 0}
+.toggle input{width:18px;height:18px;accent-color:var(--cta)}
+.demo-btn{width:100%;border:1px dashed var(--border);background:transparent;border-radius:10px;padding:7px 10px;font-size:12px;text-align:left;margin-top:4px}
+
+/* phone */
+.phone{width:390px;max-width:100%;height:844px;background:var(--bg);border:10px solid #000;border-radius:48px;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.status{height:44px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 28px;font-size:14px;font-weight:600}
+.scroll{flex:1;overflow-y:auto;padding:0 20px 32px}
+.hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0}
+.co{display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;min-height:44px;text-align:left;min-width:0}
+.av{border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.av.brand{width:40px;height:40px;background:var(--primary-bg);color:var(--accent-text)}
+.av.me{width:36px;height:36px;background:var(--muted);color:var(--fg);font-size:14px}
+.co-name{font-weight:600;font-size:15px;display:flex;align-items:center;gap:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cap{font-size:12px;color:var(--mfg)}
+.icon-btn{width:44px;height:44px;border-radius:999px;border:0;background:none;display:flex;align-items:center;justify-content:center;position:relative}
+.badge{position:absolute;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--cta);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1}
+.icon-btn .badge{top:4px;right:2px}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.14em;color:var(--mfg);text-transform:uppercase}
+.title1{font-size:24px;font-weight:700;line-height:1.35}
+.card{border-radius:16px;padding:16px;background:var(--card);border:1px solid var(--border)}
+.card.hl{background:var(--primary-bg);border-color:transparent}
+.card.ok{background:var(--green-bg);border-color:transparent;display:flex;align-items:center;gap:12px;font-weight:600}
+.card.err{display:flex;flex-direction:column;gap:10px}
+.display{font-size:44px;font-weight:800;color:var(--accent-text);line-height:1}
+.row{display:flex;gap:8px}
+.btn{flex:1;min-height:44px;border-radius:12px;border:0;font-weight:600;font-size:14px;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn.pri{background:var(--cta);color:#fff}
+.btn.sec{background:var(--bg);border:1px solid var(--border)}
+.btn.sm{flex:none;min-height:40px;padding:0 14px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kpi{text-align:left;border:1px solid var(--border);background:var(--card);border-radius:16px;padding:12px 14px;min-height:96px;display:flex;flex-direction:column;gap:2px}
+.kpi.bad{background:var(--danger-bg);border-color:transparent}
+.kpi .lb{display:flex;justify-content:space-between;font-size:13px;font-weight:500}
+.kpi .v{font-size:24px;font-weight:700;line-height:1.3}
+.kpi.bad .v{color:var(--danger)}
+.kpi .cmp{font-size:12px;color:var(--mfg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sec-line{display:flex;justify-content:space-between;align-items:baseline;margin:24px 0 10px}
+.sec-line h3{font-size:13px;font-weight:700;margin:0;letter-spacing:.02em}
+.link{background:none;border:0;color:var(--accent-text);font-weight:600;font-size:13px;padding:4px 0}
+.shortcuts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.sc{border:1px solid var(--border);background:var(--card);border-radius:16px;min-height:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:500}
+.sc .ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;position:relative}
+.sc .badge{top:-8px;right:-8px}
+.t-green{background:var(--green-bg);color:var(--green)}.t-neutral{background:var(--muted);color:var(--fg)}
+.t-orange{background:var(--orange-bg);color:var(--orange)}.t-brand{background:var(--primary-bg);color:var(--accent-text)}
+.list{border:1px solid var(--border);border-radius:16px}
+.task{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--card)}
+.task:first-of-type{border-radius:15px 15px 0 0}.task:last-of-type{border-radius:0 0 15px 15px}
+.task:only-of-type{border-radius:15px}
+.task+.task{border-top:1px solid var(--border)}
+.task-open{flex:1;display:flex;gap:12px;background:none;border:0;padding:0;text-align:left;min-width:0}
+.dot{width:8px;height:8px;border-radius:999px;margin-top:8px;flex:none;background:var(--mfg)}
+.dot.over{background:var(--danger)}.dot.prog{background:var(--progress)}
+.t-title{font-weight:600;font-size:15px}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:4px}
+.pill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--muted)}
+.pill.prog{background:var(--progress-bg);color:var(--progress)}
+.due{font-size:12px;color:var(--mfg)}.due.over{color:var(--danger);font-weight:700}.due.today{color:var(--fg);font-weight:700}
+.reason{font-size:12px;color:var(--mfg);margin-top:4px}
+.banner{display:flex;gap:8px;align-items:center;background:var(--orange-bg);color:var(--fg);font-size:13px;padding:10px 14px;border-radius:12px;margin:4px 0 8px}
+.foot{font-size:11px;color:var(--mfg);text-align:center;margin-top:24px}
+.skel{background:var(--skel);border-radius:12px;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.5}}
+@media (prefers-reduced-motion:reduce){.skel{animation:none}}
+.toast{position:absolute;left:20px;right:20px;bottom:28px;background:#111;color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none}
+:root[data-theme="dark"] .toast{background:#F2F2F2;color:#111}
+.toast.show{opacity:1;transform:none}
+.sheet-bg{position:absolute;inset:0;background:rgba(0,0,0,.4);display:none;align-items:flex-end}
+.sheet-bg.open{display:flex}
+.sheet{background:var(--bg);width:100%;border-radius:20px 20px 0 0;padding:16px 20px 28px}
+.sheet h4{margin:0 0 8px;font-size:17px}
+.co-opt{width:100%;display:flex;align-items:center;gap:12px;background:none;border:0;border-top:1px solid var(--border);padding:12px 0;text-align:left}
+.signin{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;height:100%;text-align:center;padding:24px}
+
+/* FN tags for coverage */
+[data-fn]{position:relative}
+.fn-tag{display:none;position:absolute;top:-8px;left:-6px;z-index:5;background:var(--fn);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;letter-spacing:.02em;pointer-events:none}
+body.show-fn .fn-tag{display:inline-block}
+body.show-fn [data-fn="FN-02"] .fn-tag{left:auto;right:0}
+body.show-fn [data-fn]{outline:1px dashed var(--fn);outline-offset:3px;border-radius:12px}
+:focus-visible{outline:2px solid var(--cta);outline-offset:2px}
+
+.stocktake .card{margin:12px 0}.stocktake .task-open{align-items:flex-start;min-height:44px}.stocktake .chevron{margin-left:auto}.stocktake .back{min-height:44px}.stocktake label{display:block;font-size:13px}.stocktake input,.stocktake select,.stocktake textarea,.panel select{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--border);border-radius:10px;min-height:44px;width:100%;padding:8px;margin:4px 0 10px}.stocktake .count-row{display:grid;grid-template-columns:1fr 94px;gap:8px;align-items:center}.stocktake .count-row input{margin-bottom:0}.actions{display:flex;gap:8px;padding:12px 20px max(16px,env(safe-area-inset-bottom));border-top:1px solid var(--border)}.actions:empty{display:none}.stocktake dialog{position:absolute;inset:auto 0 0;width:100%;max-width:none;margin:0;background:var(--bg);color:var(--fg);border:0;border-radius:20px 20px 0 0;padding:20px}.stocktake dialog::backdrop{background:#0006}.stocktake dialog{font-family:inherit}.stocktake dialog h2{margin:0;font-size:18px}.stocktake dialog p{font-size:14px}.stocktake .task-open span.cap{display:block;margin-top:4px}.stocktake ol{padding-left:20px}.stocktake li{margin-bottom:8px}
+@media(max-width:720px){.wrap{padding:0;gap:12px}.panel{position:static;width:min(390px,100%);order:2}.phone{height: min(844px,100dvh);border-radius:0;border:0;width:min(480px,100%)}}
+.stocktake .btn{border-radius:999px}.stocktake .btn.pri{min-height:48px}.stock-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px}.stock-tabs button{flex:1;min-height:44px;background:none;border:0;border-bottom:2px solid transparent;font-size:13px;padding:4px;color:var(--mfg)}.stock-tabs button[aria-current]{border-color:var(--cta);color:var(--accent-text);font-weight:600}.facts{display:grid;grid-template-columns:1fr auto;gap:4px 12px;font-size:13px}.facts dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}.stock-header{padding:12px 0}.stock-header .co-name{font-size:17px;line-height:24px}.stock-header .cap{display:block;font-size:13px}.stock-back{background:var(--card);border:1px solid var(--border);border-radius:50%;width:44px;height:44px;font-size:24px;flex:none}.stock-stats{margin:8px 0 16px}.stock-stats .kpi{min-height:76px;justify-content:center}.stocktake input.stock-search{border:0;background:var(--card);min-height:48px;padding:0 16px}.stock-chips{display:flex;gap:8px;overflow-x:auto;padding:4px 2px}.stock-chips button{white-space:nowrap;border:1px solid var(--border);border-radius:999px;background:var(--card);padding:0 14px;min-height:44px;font-size:13px}.stock-chips button[aria-pressed=true]{background:var(--primary-bg);color:var(--accent-text);border-color:var(--accent-text)}.round-card{border:0;background:none;text-align:left;display:grid;gap:4px;width:100%;padding:0}.round-card strong{font-size:17px;line-height:24px}.round-meta{display:flex;justify-content:space-between;align-items:center;gap:8px}.round-due{justify-self:start;background:var(--danger-bg);color:var(--danger)}.clear-filter{min-height:44px}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}</style></head>
+<body><div class="wrap">
+<aside class="panel" aria-label="ตัวควบคุม prototype">
+<h1>F-MB-STOCKTAKE · ตรวจนับสต๊อก</h1><p>BA prototype · ข้อมูลจำลองสำหรับทบทวน flow</p>
+<h2>บทบาทตัวอย่าง</h2><select id="role" aria-label="บทบาทตัวอย่าง"><option value="counter">กิตติพงษ์ ใจดี · ผู้นับ</option><option value="recount">พิมพ์ดาว ศรีสุข · ผู้นับซ้ำ</option><option value="supervisor">นลิน วัฒนา · หัวหน้าคลัง</option><option value="approver">อรทัย ตั้งมั่น · ผู้อนุมัติ</option></select>
+<h2>สถานะหน้าจอ</h2><div class="seg" role="group" aria-label="สถานะหน้าจอ">
+<button data-state="normal">ปกติ</button><button data-state="empty">ไม่มีงาน</button><button data-state="loading">กำลังโหลด</button><button data-state="error">โหลดไม่สำเร็จ</button><button data-state="offline">ออฟไลน์</button><button data-state="session">เซสชันหมดอายุ</button></div>
+<h2>มุมมอง</h2><label class="toggle">โหมดมืด <input type="checkbox" id="dark"></label><label class="toggle">แสดง FN <input type="checkbox" id="showfn"></label>
+<button class="demo-btn" id="reset">รีเซ็ตข้อมูลตัวอย่าง</button>
+</aside>
+<div class="phone stocktake" aria-label="หน้าจอโทรศัพท์"><div class="status"><span>09:18</span><span id="net">5G</span></div>
+<main class="scroll" id="screen"></main><div class="actions" id="actions"></div>
+<dialog id="dialog" aria-labelledby="dialog-title"><h2 id="dialog-title"></h2><form method="dialog"><div id="dialog-body"></div><div class="row"><button class="btn sec" value="no" formnovalidate>ยกเลิก</button><button class="btn pri" value="yes">ยืนยัน</button></div></form></dialog></div>
+</div><script>(function () {
+  const $ = id => document.getElementById(id);
+  const products = [['ITM-001','ปั๊มน้ำ','เครื่อง',12,25000],['ITM-002','วาล์ว','ชิ้น',20,1200]];
+  const threshold=2;
+  const money=value=>value.toLocaleString('th-TH');
+  const people = { counter:'กิตติพงษ์ ใจดี', recount:'พิมพ์ดาว ศรีสุข', supervisor:'นลิน วัฒนา', approver:'อรทัย ตั้งมั่น' };
+  const labels = { draft:'รอล็อกพื้นที่', frozen:'รอมอบหมาย', counting:'กำลังตรวจนับ', recount:'รอมอบหมายนับซ้ำ', recounting:'กำลังนับซ้ำ', review:'รอตรวจผลต่าง', pending:'รออนุมัติ', approved:'อนุมัติแล้ว', closed:'ปิดรอบแล้ว', rejected:'ไม่อนุมัติ' };
+  const defaults = () => ({step:'counting',name:'ตรวจนับคลังหลัก กันยายน',scope:'คลังหลัก / โซน A',freezeAt:'14/09/2026 · 09:00 น.',ack:null,form:{name:'',scope:''},qty:products.map(()=> ''),first:null,second:null,history:['ล็อกพื้นที่และเก็บยอดตั้งต้น','มอบหมายใบนับให้กิตติพงษ์ ใจดี']});
+  let round=defaults(), screen='list', role='counter', scenario='normal', notice='', confirmAction=null, filter='all', query='';
+  const escape = value => String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const fn = id => `<span class="fn-tag">${id}</span>`;
+  const box = (id, body, style='') => `<section class="card ${style}" data-fn="${id}">${fn(id)}${body}</section>`;
+  const btn = (label, action, style='pri') => `<button class="btn ${style}" data-action="${action}">${label}</button>`;
+  const go = view => {screen=view; notice=''; render(); $('screen').scrollTop=0;};
+  const own = () => (role==='counter' && round.step==='counting') || (role==='recount' && round.step==='recounting');
+  const canReview = () => (role==='supervisor' && ['review','pending','approved','closed','rejected'].includes(round.step)) || (role==='approver' && round.step==='pending');
+  const record = (step,event) => {round.step=step;round.history.push(event);go('detail');};
+  function render() {
+    const boss=role==='supervisor';
+    $('net').textContent=scenario==='offline'?'ออฟไลน์':'▮▮▮  5G';
+    document.querySelectorAll('[data-state]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===scenario)));
+    $('actions').innerHTML='';
+    let body='';
+    if(scenario==='loading') body=box('FN-01','<div role="status" class="cap">กำลังโหลดข้อมูล</div><div class="skel" style="height:96px;margin-top:10px"></div>');
+    else if(scenario==='error') body=box('FN-01',`<strong>โหลดข้อมูลไม่สำเร็จ</strong><p class="cap">ตรวจสอบการเชื่อมต่อแล้วลองใหม่</p>${btn('ลองใหม่','retry','sec')}`);
+    else if(scenario==='session') body=box('FN-06',`<strong>เซสชันหมดอายุ</strong><p class="cap">เข้าสู่ระบบอีกครั้งเพื่อเปิดงานของคุณ</p>${btn('เข้าสู่ระบบ','retry')}`);
+    else if(screen==='list') {
+      body=`<div class="kpis stock-stats">${[['รอบทั้งหมด',scenario==='empty'?0:1,'all'],['รอบเปิดอยู่',Number(scenario!=='empty'&&!['closed','rejected'].includes(round.step)),'open'],['ใบนับรอส่ง',Number(scenario!=='empty'&&['counting','recounting'].includes(round.step)),'counting'],['รอตรวจผลต่าง',Number(scenario!=='empty'&&round.step==='review'),'review']].map(([label,n,key])=>`<button class="kpi" data-filter="${key}"><span class="v">${n}</span><span class="lb">${label}</span></button>`).join('')}</div>`;
+      if(scenario!=='empty') {
+        body+=`<label class="sr-only" for="search">ค้นหารอบนับ</label><input id="search" class="stock-search" value="${escape(query)}" placeholder="ค้นหาชื่อรอบหรือรหัส"><div class="stock-chips" aria-label="กรองสถานะ">${Object.entries({all:'ทั้งหมด',open:'รอบเปิดอยู่',counting:'กำลังตรวจนับ',review:'รอตรวจผลต่าง',closed:'ปิดรอบแล้ว'}).map(([key,label])=>`<button data-filter="${key}" aria-pressed="${filter===key}">${label}</button>`).join('')}</div>${filter!=='all'||query?'<button class="link clear-filter" data-action="clear">ล้างตัวกรอง</button>':''}<div class="sec-line"><h3>${own()?'รอคุณ':'รอบนับ'}</h3><span class="cap" id="result-count"></span></div><div id="results">${box('FN-01',`<button class="round-card" data-action="detail"><span class="round-meta"><span class="cap">ST-2026-001</span><span class="pill prog">${labels[round.step]}</span></span><strong>${escape(round.name)}</strong><span class="cap">${escape(round.scope)}</span>${own()?'<span class="pill round-due">รอคุณส่งผลนับ</span>':''}</button>`)}</div><div id="no-results" hidden>${box('FN-01','ไม่พบรอบที่ตรงกับตัวกรอง')}</div>`;
+      } else body+=box('FN-01','<strong>ยังไม่มีรอบนับ</strong><div class="cap">รายการจะแสดงเมื่อมีรอบตรวจนับ</div>');
+      if(boss) $('actions').innerHTML=btn('สร้างรอบนับ','create');
+    } else if(screen==='create') {
+      body=`<div class="title1">สร้างรอบนับ</div>${box('FN-01',`<label for="name">ชื่อรอบนับ</label><input id="name" value="${escape(round.form.name)}"><label for="scope">พื้นที่นับ</label><select id="scope"><option value="">เลือกพื้นที่</option>${['คลังหลัก / ทุกโซน','คลังหลัก / โซน A','คลังสาขาเหนือ / ทุกโซน'].map(s=>`<option ${s===round.form.scope?'selected':''}>${s}</option>`).join('')}</select>`)}`;
+      $('actions').innerHTML=btn('สร้างรอบ','create-save');
+    } else if(screen==='detail') {
+      body=`<div class="eyebrow">ST-2026-001</div><div class="title1">${escape(round.name)}</div>${box('FN-03',`<span class="pill prog">${labels[round.step]}</span><p>${escape(round.scope)}</p><div class="cap">${['draft','closed','rejected'].includes(round.step)?'พื้นที่ไม่ได้ล็อก':'พื้นที่ถูกล็อกสำหรับรอบนี้'}</div>`,'hl')}`;
+      body+=box('FN-12','<strong>ประวัติรอบนับ</strong><div class="cap">ติดตามการเปลี่ยนสถานะของรอบ</div><button class="link" data-action="history">ดูประวัติ ›</button>');
+      if(own()) $('actions').innerHTML=btn(role==='recount'?'เปิดใบนับซ้ำ':'เปิดใบนับ','count');
+      if(boss && round.step==='draft') $('actions').innerHTML=btn('ล็อกพื้นที่','freeze');
+      if(boss && ['frozen','recount'].includes(round.step)) $('actions').innerHTML=btn('มอบหมายผู้ตรวจนับ','assign');
+      if(canReview()) $('actions').innerHTML=btn('ดูผลต่างและการอนุมัติ','variance');
+    } else if(screen==='assign') {
+      body=`<div class="title1">${round.step==='recount'?'มอบหมายนับซ้ำ':'มอบหมายใบนับ'}</div>${box('FN-05',`<label for="person">ผู้รับงาน</label><select id="person"><option value="">เลือกผู้รับงาน</option>${round.step==='recount'?'<option value="recount">พิมพ์ดาว ศรีสุข</option>':'<option value="counter">กิตติพงษ์ ใจดี</option>'}</select><p class="cap">${round.step==='recount'?'ผู้ตรวจนับซ้ำต้องเป็นคนละคนกับผู้ตรวจนับครั้งแรก':''}</p>`)}`;
+      $('actions').innerHTML=btn('ยืนยันมอบหมาย','assign-save');
+    } else if(screen==='count' && own()) {
+      body=`<div class="title1">${role==='recount'?'ใบนับซ้ำ':'ใบนับของฉัน'}</div><p class="cap">${escape(round.scope)}</p>${box('FN-06','<strong>กรอกจำนวนที่นับได้จริง</strong><div class="cap" id="progress"></div>','hl')}`;
+      body+=products.map(([sku,name,loc],i)=>box('FN-07',`<div class="count-row"><div><strong>${name}</strong><div class="cap">${sku} · ${loc}</div></div><div><label class="cap" for="q${i}">จำนวน (${loc})</label><input id="q${i}" data-qty="${i}" type="number" min="0" step="1" inputmode="numeric" value="${escape(round.qty[i])}"></div></div>`)).join('');
+      $('actions').innerHTML=btn('ตรวจสอบและส่งผล','count-send');
+    } else if(screen==='variance' && canReview()) {
+      const values=round.second||round.first||products.map(p=>p[3]);
+      const total=products.reduce((sum,p,i)=>sum+Math.abs(values[i]-p[3])*p[4],0);
+      body=`<div class="title1">ตรวจผลต่าง</div><p class="cap">ST-2026-001 · ${labels[round.step]}</p>`+box('FN-08',`<div class="eyebrow">APPROVAL BASIS</div><strong>฿${money(total)}</strong><div class="cap">มูลค่าส่วนต่างสัมบูรณ์รวม · เกณฑ์นับซ้ำเกิน ${threshold} หน่วย</div>`,'hl')+products.map(([sku,name,unit,expected,cost],i)=>box('FN-08',`<strong>${name}</strong><div class="cap">${sku} · ${unit}</div><dl class="facts"><dt>ยอดตั้งต้น</dt><dd>${expected}</dd><dt>นับครั้งที่ 1</dt><dd>${round.first?.[i]??'—'}</dd><dt>นับซ้ำ</dt><dd>${round.second?.[i]??'—'}</dd><dt>ผลต่างสุดท้าย</dt><dd>${values[i]-expected}</dd><dt>มูลค่าส่วนต่าง</dt><dd>฿${money((values[i]-expected)*cost)}</dd></dl>`)).join('');
+      if(boss && round.step==='review') $('actions').innerHTML=btn('ส่งอนุมัติ','submit-approval');
+      if(role==='approver') $('actions').innerHTML=btn('ไม่อนุมัติ','reject','sec')+btn('อนุมัติ','approve');
+      if(boss && round.step==='approved') $('actions').innerHTML=btn('สร้างร่างใบปรับยอด','handoff');
+    } else if(screen==='history') {
+      body='<div class="title1">ประวัติรอบนับ</div>'+box('FN-12',`<ol>${round.history.map(e=>`<li>${escape(e)}</li>`).join('')}</ol>`)+(round.ack?box('FN-11',`<strong>ส่งต่อใบปรับยอด</strong><div class="cap">ตอบรับจำลองจาก F082 · ${round.ack} · ร่าง</div>`):'');
+    } else { screen='detail'; return render(); }
+    const back=['count','assign','variance','history'].includes(screen)?'detail':'list';
+    const views=[['detail','ใบนับ'],...(canReview()?[['variance','ผลต่าง']]:[]),['history','ประวัติ']];
+    const tabs=['detail','variance','history'].includes(screen)&&!['loading','error','session','empty'].includes(scenario)?`<nav class="stock-tabs" aria-label="มุมมองตรวจนับ">${views.map(([id,label])=>`<button data-action="${id}" ${screen===id?'aria-current="page"':''}>${label}</button>`).join('')}</nav>`:'';
+
+    $('screen').innerHTML=`<header class="hdr stock-header"><div class="co">${screen!=='list'?'<button class="stock-back" aria-label="กลับ" data-action="'+back+'">‹</button>':''}<span><span class="co-name">${screen==='list'?'ตรวจนับใหญ่':'ST-2026-001'}</span><span class="cap">${screen==='list'?'คลังสินค้า · Stocktake':'ใน ตรวจนับใหญ่ · '+labels[round.step]}</span></span></div></header>${scenario==='offline'?'<div class="banner">ออฟไลน์ · เชื่อมต่อเพื่อส่งข้อมูล</div>':''}${notice?`<div class="banner" role="alert">${escape(notice)}</div>`:''}${tabs}${body}<p class="foot">ข้อมูลตัวอย่างจาก F-WH-STOCKTAKE · จำลองบนเครื่อง</p>`;
+    if(scenario==='offline') $('actions').querySelectorAll('button').forEach(b=>{if(b.dataset.action!=='count'&&b.dataset.action!=='variance') b.disabled=true;});
+    if($('search')){
+      const update=()=>{const matches={all:true,open:!['closed','rejected'].includes(round.step),counting:['counting','recounting'].includes(round.step),review:round.step==='review',closed:round.step==='closed'};const found=matches[filter]&&`${round.name} ST-2026-001 ${round.scope}`.toLowerCase().includes(query.toLowerCase());$('results').hidden=!found;$('no-results').hidden=found;$('result-count').textContent=found?'1 รอบ':'0 รอบ';};
+      $('search').oninput=e=>{query=e.target.value;update();};
+      update();
+    }
+    if($('name')) $('name').oninput=e=>round.form.name=e.target.value;
+    if($('scope')) $('scope').onchange=e=>round.form.scope=e.target.value;
+    $('screen').querySelectorAll('[data-qty]').forEach(input=>input.oninput=()=>{round.qty[input.dataset.qty]=input.value;progress();});
+    progress();
+  }
+  function progress(){if($('progress')) $('progress').textContent=`กรอกแล้ว ${round.qty.filter(x=>x!=='').length} / ${products.length} รายการ`;}
+  function ask(title,body,action){
+    $('dialog-title').textContent=title; $('dialog-body').innerHTML=body;confirmAction=action;const dialog=$('dialog');dialog.returnValue='';const phone=document.querySelector('.phone').getBoundingClientRect();Object.assign(dialog.style,{position:'fixed',left:phone.left+'px',right:'auto',width:phone.width+'px',bottom:Math.max(0,window.innerHeight-phone.bottom)+'px'});dialog.showModal();
+  }
+  function report(message){notice=message;render();}
+  $('dialog').addEventListener('close',()=>{const action=confirmAction;confirmAction=null;if($('dialog').returnValue==='yes'&&action) action();});
+  document.addEventListener('click',e=>{
+    const state=e.target.closest('[data-state]')?.dataset.state;
+    if(state){scenario=state;return render();}
+    const selected=e.target.closest('[data-filter]')?.dataset.filter; if(selected){filter=selected;return render();}
+    const action=e.target.closest('[data-action]')?.dataset.action;
+    if(!action)return;
+    if(action==='clear'){filter='all';query='';return render();}
+    if(['list','detail','create','assign','count','variance','history'].includes(action))return go(action);
+    if(action==='retry'){scenario='normal';return render();}
+    if(scenario==='offline')return report('กรุณาเชื่อมต่อก่อนส่งข้อมูล');
+    if(action==='create-save'){
+      if(!round.form.name.trim()||!round.form.scope)return report('ระบุชื่อรอบและพื้นที่นับ');
+      const {name,scope}=round.form;round={...defaults(),name:name.trim(),scope,history:[]};return record('draft','สร้างรอบนับ');
+    }
+    if(action==='freeze' && round.scope==='คลังสาขาเหนือ / ทุกโซน')return report('ไม่พบสินค้าในพื้นที่นับ');
+    if(action==='freeze')return ask('ล็อกพื้นที่นับ','<p>ยืนยันหยุด movement ในพื้นที่ของรอบและเก็บยอดตั้งต้น</p>',()=>{round.freezeAt=new Intl.DateTimeFormat('th-TH',{dateStyle:'short',timeStyle:'short'}).format(new Date());record('frozen','ล็อกพื้นที่และเก็บยอดตั้งต้น');});
+    if(action==='assign-save'){
+      if(!$('person').value)return report('เลือกผู้รับงานก่อนยืนยัน');
+      const person=$('person').value;
+      return record(person==='recount'?'recounting':'counting',`มอบหมายให้${people[person]}`);
+    }
+    if(action==='count-send'){
+      const invalid=round.qty.findIndex(x=>x===''||!Number.isInteger(Number(x))||Number(x)<0);
+      if(invalid>=0){report('กรอกจำนวนเต็มตั้งแต่ 0 ให้ครบทุกบรรทัด');return $('q'+invalid).focus();}
+      return ask('ยืนยันส่งผลนับ','<p>ส่งจำนวนที่กรอกครบทั้ง 2 รายการแล้วจะแก้ไขไม่ได้</p>',()=>{
+        const values=round.qty.map(Number);round.qty=products.map(()=> '');
+        if(role==='recount'){round.second=values;return record('review','รับผลนับซ้ำ');}
+        round.first=values;return record(values.some((v,i)=>Math.abs(v-products[i][3])>threshold)?'recount':'review','รับผลนับครั้งแรก');
+      });
+    }
+    if(action==='submit-approval')return ask('ส่งอนุมัติ','<p>ผู้อนุมัติตามสายตัวอย่าง: อรทัย ตั้งมั่น</p>',()=>record('pending','ส่งอนุมัติให้อรทัย ตั้งมั่น'));
+    if(action==='approve')return ask('อนุมัติผลนับ','<p>ยืนยันผลต่างของรอบนี้</p>',()=>record('approved','อรทัย ตั้งมั่นอนุมัติ'));
+    if(action==='reject')return ask('ไม่อนุมัติ','<label for="reason">เหตุผล</label><textarea id="reason" required></textarea>',()=>{const reason=$('reason').value.trim();if(!reason)return report('กรุณาระบุเหตุผลที่ไม่อนุมัติ');record('rejected','อรทัย ตั้งมั่นไม่อนุมัติ: '+reason);});
+    if(action==='handoff')return ask('สร้างร่างใบปรับยอด','<p>ปิดรอบเมื่อ F082 ยืนยันว่าได้รับรายการ</p>',()=>{round.ack='ADJ-DEMO-001';record('closed','จำลองการตอบรับร่างใบปรับยอดจาก F082');});
+  });
+  $('role').onchange=e=>{role=e.target.value;go('list');};
+  $('dark').onchange=e=>document.documentElement.dataset.theme=e.target.checked?'dark':'light';
+  $('showfn').onchange=e=>document.body.classList.toggle('show-fn',e.target.checked);
+  $('reset').onclick=()=>{round=defaults();filter='all';query='';scenario='normal';role=$('role').value='counter';go('list');};
+  render();
+})();</script></body></html>

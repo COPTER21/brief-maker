@@ -1,0 +1,162 @@
+{
+  "feature": {
+    "code": "F-TMP-001",
+    "name": "HR แบบฟอร์มขอใช้รถตู้",
+    "module": "HR"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-05",
+  "round": 1,
+  "refs": "FRD F-TMP-001 · 03_LOGIC FN-09 · 05_RULES BR-VIS-05 · 06_TESTS TC-26",
+  "scope": {
+    "checked": [
+      "สร้างคำขอ (create)",
+      "แก้ไขคำขอ (update)",
+      "ลบ/ยกเลิกรายการ (delete/cancel)",
+      "Create/Edit drawer ขั้นที่ 1",
+      "View drawer: รายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ และประวัติ",
+      "Modal ยกเลิกเอกสาร",
+      "UI/UX ส่วนที่เหลือ"
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างคำขอ",
+      "expected": "สร้างคำขอได้สำเร็จ",
+      "status": "pass",
+      "ref": "Create flow"
+    },
+    {
+      "item": "แก้ไขคำขอ",
+      "expected": "แก้ไขคำขอได้สำเร็จ",
+      "status": "pass",
+      "ref": "Update flow"
+    },
+    {
+      "item": "ลบ/ยกเลิกรายการใน flow ที่ทดสอบทั่วไป",
+      "expected": "ดำเนินการลบ/ยกเลิกได้สำเร็จ",
+      "status": "pass",
+      "ref": "Delete/cancel flow"
+    },
+    {
+      "item": "เจ้าของยกเลิกคำขอสถานะรออนุมัติพร้อมระบุเหตุผล",
+      "expected": "ยกเลิกได้และสถานะเปลี่ยนเป็น cancelled ตาม FN-09 / BR-VIS-05",
+      "actual": "POST /van-requests/66f51adb-03b6-4f34-81c0-1be7baa64909/cancel ตอบ error {\"code\":\"VALIDATION_FAILED\",\"message\":\"ประเภทไม่ถูกต้อง\"} เมื่อส่ง payload {\"version\":2,\"reason\":\"ทดสิอบ\"}",
+      "status": "fail",
+      "bug": "BUG-01",
+      "ref": "FN-09 · BR-VIS-05 · TC-26"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "Create/Edit drawer ขั้นที่ 1 ส่วน 'ใช้รถตู้เมื่อไหร่ เพื่ออะไร' ช่องแสดงจำนวนวันไม่ align กับช่องเลือกวันที่ ทำให้ layout ไม่เรียบร้อย",
+      "evidence": "tk01/Screenshot 2026-11-05 154530.png"
+    },
+    {
+      "item": "View drawer ทั้ง 4 แท็บ",
+      "status": "note",
+      "note": "Layout ของแท็บรายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ และประวัติหลุดจาก design ที่กำหนด",
+      "evidence": "tk02/Screenshot 2026-11-05 155727.png"
+    },
+    {
+      "item": "Modal ยกเลิกเอกสาร",
+      "status": "note",
+      "note": "องค์ประกอบและ layout ของ modal ยกเลิกเอกสารหลุดจาก design ตัวอย่าง",
+      "evidence": "tk03/Screenshot 2026-11-05 160636.png"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "item": "ความสม่ำเสมอของ View drawer",
+      "status": "note",
+      "note": "การจัดวางเนื้อหาในแท็บรายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ และประวัติไม่เป็นไปตาม design ทำให้ประสบการณ์ใช้งานไม่สม่ำเสมอ"
+    },
+    {
+      "id": "X-02",
+      "status": "note",
+      "note": "กดยืนยันยกเลิกเอกสารสถานะรออนุมัติแล้วระบบแจ้ง 'ประเภทไม่ถูกต้อง' และไม่ยกเลิกเอกสาร"
+    },
+    {
+      "item": "ประสบการณ์ใช้งาน Modal ยกเลิกเอกสาร",
+      "status": "note",
+      "note": "Modal ที่ใช้งานจริงไม่มีชิปเหตุผลและลำดับองค์ประกอบตาม design ตัวอย่าง"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "ยกเลิกเอกสารสถานะรออนุมัติไม่ได้ API ตอบ VALIDATION_FAILED",
+      "severity": "high",
+      "steps": [
+        "เปิดคำขอสถานะ 'รออนุมัติ' เลขที่ VAN-2569-0002",
+        "กด 'ยกเลิกเอกสาร'",
+        "กรอกเหตุผล 'ทดสิอบ'",
+        "กด 'ยืนยัน'"
+      ],
+      "expected": "ระบบยกเลิกเอกสารได้ เปลี่ยนสถานะเป็น cancelled และบันทึกเหตุผล ตาม FN-09 / BR-VIS-05 / TC-26",
+      "actual": "API POST /van-requests/66f51adb-03b6-4f34-81c0-1be7baa64909/cancel ตอบ HTTP 400: {\"code\":\"VALIDATION_FAILED\",\"message\":\"ประเภทไม่ถูกต้อง\"}; payload คือ {\"version\":2,\"reason\":\"ทดสิอบ\"} และเอกสารไม่ถูกยกเลิก",
+      "evidence": "tk03/Screenshot 2026-11-05 160636.png",
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "ช่องจำนวนวันไม่ align กับช่องวันที่ใน Create/Edit drawer",
+      "severity": "low",
+      "steps": [
+        "เปิด Create หรือ Edit drawer",
+        "อยู่ขั้นที่ 1 'ข้อมูลหลักคำขอ'",
+        "ดูส่วน 'ใช้รถตู้เมื่อไหร่ เพื่ออะไร'"
+      ],
+      "expected": "ช่องแสดงจำนวนวันจัดแนวและมีความสูงสัมพันธ์กับช่องเลือกวันที่",
+      "actual": "ช่องจำนวนวันมีแนวและรูปแบบไม่เท่ากับช่องวันที่ ทำให้ layout ดูไม่เรียบร้อย",
+      "evidence": "tk01/Screenshot 2026-11-05 154530.png",
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "Layout ของ View drawer ทั้ง 4 แท็บหลุดจาก design",
+      "severity": "low",
+      "steps": [
+        "เปิด View drawer ของคำขอ",
+        "เปิดแท็บรายละเอียด",
+        "เปิดแท็บ PDF Preview",
+        "เปิดแท็บลายเซ็น/อนุมัติ",
+        "เปิดแท็บประวัติ"
+      ],
+      "expected": "แต่ละแท็บจัดกลุ่มข้อมูล ใช้ spacing และองค์ประกอบตาม design ตัวอย่าง",
+      "actual": "ทั้ง 4 แท็บจัดวางเนื้อหาและพื้นที่ว่างหลุดจาก design; PDF แสดงเป็น viewer ดิบและแท็บอนุมัติ/ประวัติมีพื้นที่ว่างมากผิดปกติ",
+      "evidence": [
+        "tk02/Screenshot 2026-11-05 155727.png",
+        "tk02/Screenshot 2026-11-05 155811.png",
+        "tk02/Screenshot 2026-11-05 155850.png",
+        "tk02/Screenshot 2026-11-05 160006.png",
+        "tk02/example_tab_detail.png",
+        "tk02/example_tab_pdf_preview.png",
+        "tk02/example_tab_doa.png",
+        "tk02/example_tab_history.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-04",
+      "title": "Modal ยกเลิกเอกสารหลุดจาก design",
+      "severity": "low",
+      "steps": [
+        "เปิดคำขอที่ยกเลิกได้",
+        "กด 'ยกเลิกเอกสาร'",
+        "เปรียบเทียบ modal ที่แสดงกับ design ตัวอย่าง"
+      ],
+      "expected": "Modal มีไอคอน หัวข้อ ข้อมูลเอกสาร ชิปเหตุผล ช่องเหตุผล และปุ่มตาม design ตัวอย่าง",
+      "actual": "Modal ที่ใช้งานจริงมีเพียงหัวข้อ ช่องเหตุผล และปุ่มพื้นฐาน รูปแบบและลำดับองค์ประกอบไม่ตรง design",
+      "evidence": [
+        "tk03/Screenshot 2026-11-05 160636.png",
+        "tk03/example_cancle_modal.png"
+      ],
+      "status": "open"
+    }
+  ]
+}
