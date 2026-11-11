@@ -1,0 +1,192 @@
+{
+  "feature": {
+    "code": "F-TMP-002",
+    "name": "[4.0] [Credence] - แบบฟอร์มตรวจเช็คความเรียบร้อยห้อง Server",
+    "module": "IT Support"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-10",
+  "round": 1,
+  "env": "Production",
+  "refs": "FRD-F-TMP-002 v1.0 · AI Test Cases 50 เคส · FRD 01_UI / 02_API / 05_RULES / 06_TESTS",
+  "scope": {
+    "checked": [
+      "สร้างเอกสาร (Create)",
+      "แก้ไขเอกสาร (Update)",
+      "ลบ/ยกเลิกเอกสาร (Delete ตามผลที่ผู้ตรวจรายงาน)",
+      "Create/Edit Drawer ขั้นตอนเอกสารแนบ",
+      "View Drawer: รายละเอียด · PDF Preview · ลายเซ็น/อนุมัติ · ประวัติ",
+      "UI/UX ส่วนที่เหลือ"
+    ],
+    "not_checked": [
+      {
+        "item": "กฎธุรกิจและ integration อื่นใน FRD",
+        "reason": "ผู้ตรวจไม่ได้รายงานผลในรอบนี้"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างเอกสาร (Create)",
+      "expected": "สร้างเอกสารได้สำเร็จ",
+      "status": "pass",
+      "ref": "AC-01 / API-03"
+    },
+    {
+      "item": "แก้ไขเอกสาร (Update)",
+      "expected": "แก้ไขข้อมูลเอกสารได้สำเร็จ",
+      "status": "pass",
+      "ref": "API-04"
+    },
+    {
+      "item": "ลบ/ยกเลิกเอกสาร",
+      "expected": "ดำเนินการลบ/ยกเลิกตาม flow ได้สำเร็จ",
+      "status": "pass",
+      "ref": "AC-10 / API-07"
+    },
+    {
+      "item": "แนบเอกสารใน Create/Edit Drawer ขั้นตอนที่ 2",
+      "expected": "ขั้นตอนที่ 2 มี Upload Zone ให้แนบเอกสาร และขั้นตอนที่ 3 แสดงไฟล์ที่แนบ",
+      "actual": "ระบบแสดงข้อความให้บันทึกร่างก่อน แล้วจึงแนบภาพเกจหรือหลักฐานจากหน้ารายละเอียด",
+      "status": "fail",
+      "bug": "BUG-01",
+      "ref": "FRD 01_UI §1.2 P-02 · API-03/04 attachment_ids[] · TC-F01/F02"
+    },
+    {
+      "item": "อัปโหลดไฟล์แนบจากหน้ารายละเอียด",
+      "expected": "อัปโหลดไฟล์ได้สำเร็จ หรือระบบแจ้งข้อจำกัดขนาดไฟล์ที่ตรวจสอบได้ก่อนส่ง",
+      "actual": "อัปโหลดไม่สำเร็จ และ API ตอบ {\"code\":\"FILE_TOO_LARGE\",\"message\":\"ไฟล์มีขนาดเกินกำหนด\"}",
+      "status": "fail",
+      "bug": "BUG-03",
+      "ref": "API-10 / TC-F02"
+    },
+    {
+      "item": "ประเมินอุณหภูมิ/ความชื้นจาก Config และ snapshot เกณฑ์",
+      "expected": "ใบเดิมใช้เกณฑ์ snapshot และใบใหม่ใช้ Config ปัจจุบัน",
+      "status": "na",
+      "ref": "BR-01 / AC-04"
+    },
+    {
+      "item": "ตรวจจับและแจ้งเตือนรายการผิดปกติ",
+      "expected": "เตือนและไฮไลต์โดยไม่บล็อก พร้อมแจ้งผู้ดูแลเมื่อพบความผิดปกติใหม่",
+      "status": "na",
+      "ref": "BR-02/03 / AC-03"
+    },
+    {
+      "item": "ผู้ตรวจสอบของแถวเติมจากผู้บันทึกล่าสุด",
+      "expected": "ระบบเติมผู้ตรวจสอบและผู้ใช้แก้เองไม่ได้",
+      "status": "na",
+      "ref": "BR-04 / AC-06"
+    },
+    {
+      "item": "ไฟล์แนบ · CSV · ไม่มีคำสั่งทำซ้ำ",
+      "expected": "รองรับไฟล์แนบและ CSV และไม่มีคำสั่งทำซ้ำ",
+      "status": "na",
+      "ref": "BR-08"
+    },
+    {
+      "item": "ออกเลข SRC เมื่อบันทึกครั้งแรก",
+      "expected": "ออกเลขผ่าน ENG-DOC-NUM เพียงครั้งเดียว",
+      "status": "na",
+      "ref": "BR-09 / AC-01"
+    },
+    {
+      "item": "ส่งปิดรอบและล็อกการแก้ไข",
+      "expected": "ส่งแล้วเป็น submitted ทันทีและแก้ไขไม่ได้",
+      "status": "na",
+      "ref": "BR-10/13 / AC-07/08"
+    },
+    {
+      "item": "สิทธิ์การมองเห็น Owner/Admin/บุคคลอื่น",
+      "expected": "Owner เห็นของตน Admin เห็นทั้งหมด และร่างไม่รั่วให้บุคคลอื่น",
+      "status": "na",
+      "ref": "BR-12 / TC-D01..D06"
+    },
+    {
+      "item": "PDF อย่างน้อย 30 แถวและแบ่งหน้า",
+      "expected": "PDF ใช้ snapshot แบ่งหน้าและแสดงหัวตารางซ้ำตาม FRD",
+      "status": "na",
+      "ref": "BR-07 / AC-09"
+    },
+    {
+      "item": "Notification และไม่เปิด IT Ticket/DOA",
+      "expected": "ยิง notification ตาม event แต่ไม่เปิด Ticket และไม่มี doa_pending",
+      "status": "na",
+      "ref": "XT-01..03"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "View Drawer แท็บรายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ และประวัติ มี layout/spacing และการจัดวางเนื้อหาต่างจากหน้าต้นแบบ",
+      "evidence": "tk02/Screenshot 2026-11-10 144724.png"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "note",
+      "note": "Create/Edit ไม่สามารถแนบเอกสารให้จบใน Wizard เดียว ต้องบันทึกร่างแล้วไปแนบจากหน้ารายละเอียด"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "Create/Edit Drawer ขั้นตอนที่ 2 ไม่สามารถแนบเอกสารได้",
+      "severity": "medium",
+      "steps": [
+        "เปิด Create Drawer หรือ Edit Drawer",
+        "กรอกข้อมูลและไปขั้นตอนที่ 2 เอกสารแนบ",
+        "ตรวจพื้นที่เอกสารแนบ"
+      ],
+      "expected": "มี Upload Zone ให้แนบเอกสารในขั้นตอนที่ 2 และแสดงรายการไฟล์ในขั้นตอนที่ 3",
+      "actual": "แสดงข้อความ “บันทึกร่างก่อน แล้วแนบภาพเกจหรือหลักฐานได้จากหน้ารายละเอียด” และแนบได้เฉพาะ View Drawer",
+      "evidence": [
+        "tk01/Screenshot 2026-11-10 140012.png",
+        "tk01/Screenshot 2026-11-10 140126.png",
+        "tk01/Screenshot 2026-11-10 140316.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "View Drawer ทั้ง 4 แท็บแสดง UI/UX ไม่ตรงกับหน้าต้นแบบ",
+      "severity": "low",
+      "steps": [
+        "เปิดเอกสารจากหน้ารายการ",
+        "เปิดแท็บรายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ และประวัติ",
+        "เปรียบเทียบ layout และการจัดวางข้อมูลกับหน้าต้นแบบ"
+      ],
+      "expected": "โครงหน้า การจัดกลุ่มข้อมูล spacing และรูปแบบเนื้อหาตรงกับหน้าต้นแบบของแต่ละแท็บ",
+      "actual": "ทั้ง 4 แท็บมีโครงหน้าและการจัดวางเนื้อหาหลุดจากหน้าต้นแบบ",
+      "evidence": [
+        "tk02/Screenshot 2026-11-10 144724.png",
+        "tk02/Screenshot 2026-11-10 144925.png",
+        "tk02/Screenshot 2026-11-10 144946.png",
+        "tk02/Screenshot 2026-11-10 145006.png",
+        "tk02/example_tab_detail_1.png",
+        "tk02/example_tab_detail_2.png",
+        "tk02/example_tab_pdf_preview.png",
+        "tk02/example_tab_doa.png",
+        "tk02/example_tab_history.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "อัปโหลดไฟล์แนบไม่สำเร็จและ API ตอบ FILE_TOO_LARGE",
+      "severity": "medium",
+      "steps": [
+        "เปิด View Drawer และไปส่วนเอกสารแนบ",
+        "เลือกไฟล์เพื่ออัปโหลด",
+        "ตรวจผลตอบกลับจาก API"
+      ],
+      "expected": "อัปโหลดไฟล์ได้สำเร็จ หรือหน้า UI แจ้งขนาดไฟล์สูงสุดที่รองรับอย่างชัดเจนก่อนส่ง",
+      "actual": "อัปโหลดไม่สำเร็จ โดย API ตอบ {\"code\":\"FILE_TOO_LARGE\",\"message\":\"ไฟล์มีขนาดเกินกำหนด\"}",
+      "status": "open"
+    }
+  ]
+}
