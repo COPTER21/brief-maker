@@ -1,0 +1,239 @@
+{
+  "feature": {
+    "code": "F-TMP-008",
+    "name": "[4.0] [Credence] - ใบรายงานการแก้ไขและป้องกันเพื่อการควบคุม",
+    "module": "Governance / Policy"
+  },
+  "env": "Sandbox",
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-12",
+  "round": 1,
+  "refs": "FRD-F-TMP-008 v1.0 · AI Test Cases 60 เคส",
+  "scope": {
+    "checked": [
+      "Create / Edit / View drawer",
+      "สร้าง แก้ไข และยกเลิกรายการ",
+      "Step 2 เอกสารแนบและการ Upload ไฟล์",
+      "การกรอกอาการของปัญหา: เกิดใหม่ / เกิดซ้ำครั้งที่",
+      "ปุ่มบันทึกและส่งตรวจสอบ รวมถึง modal เลือกผู้ตรวจสอบ IC",
+      "View drawer: รายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ และประวัติ",
+      "UI/UX ส่วนที่เหลือ"
+    ],
+    "not_checked": [
+      {
+        "item": "Workflow หลังส่งตรวจสอบ: บันทึกการตรวจสอบ ลงนาม 7 จุด และ DOA",
+        "reason": "Sandbox ยังไม่ได้กำหนดเจ้าหน้าที่ IC สำหรับบริษัท จึงไม่มีผู้ตรวจสอบให้เลือก"
+      },
+      {
+        "item": "อนุมัติครบ, PDF final และ Notification หลังส่งตรวจสอบ",
+        "reason": "ยังไม่สามารถผ่านขั้นส่งตรวจสอบได้"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างรายการ CAR",
+      "expected": "สร้างรายการสถานะร่างได้",
+      "status": "pass",
+      "ref": "03_LOGIC FN-01/FN-02"
+    },
+    {
+      "item": "แก้ไขรายการ CAR",
+      "expected": "แก้ไขและบันทึกรายการได้",
+      "status": "pass",
+      "ref": "02_API API-04"
+    },
+    {
+      "item": "ยกเลิก/ลบรายการตาม action ที่ทดสอบ",
+      "expected": "ดำเนินการสำเร็จ",
+      "status": "pass",
+      "ref": "03_LOGIC FN-11"
+    },
+    {
+      "item": "Upload และผูกไฟล์กับรายการ CAR",
+      "expected": "ไฟล์ที่เลือกถูก Upload และแสดงในรายการไฟล์ของ CAR",
+      "actual": "ระบบสร้างรายการร่างสำเร็จ แต่ Attachment API ตอบ 422 พร้อมข้อความ “กรุณาเลือกไฟล์” และไฟล์ไม่แสดงในรายการ",
+      "status": "fail",
+      "bug": "BUG-02",
+      "ref": "02_API API-13"
+    },
+    {
+      "item": "ส่งตรวจสอบและเลือกเจ้าหน้าที่ IC",
+      "expected": "เลือกผู้ตรวจสอบ IC แล้วส่งตรวจสอบได้",
+      "actual": "ยังไม่ได้กำหนดเจ้าหน้าที่ IC สำหรับบริษัท จึงไม่มีผู้ตรวจสอบให้เลือก",
+      "status": "na",
+      "ref": "03_LOGIC FN-04 / AT-13"
+    },
+    {
+      "item": "ลงนาม 7 จุดและส่งอนุมัติตาม DOA",
+      "expected": "ทดสอบต่อหลังส่งตรวจสอบสำเร็จ",
+      "actual": "ยังไม่ได้ตรวจเพราะติด configuration เจ้าหน้าที่ IC",
+      "status": "na",
+      "ref": "03_LOGIC FN-06/FN-08/FN-09"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "Create/Edit drawer Step 2 เอกสารแนบ และ View drawer หลายแท็บมี layout/spacing ไม่ตรง design reference",
+      "evidence": "tk01/Screenshot 2026-11-12 120045.png"
+    },
+    {
+      "id": "U-04",
+      "status": "note",
+      "note": "View drawer วางปุ่มยกเลิกเอกสารแยกที่ footer ทั้งที่ action อื่นอยู่ส่วนหัว; footer ควรเหลือเฉพาะปุ่มปิด",
+      "evidence": "tk08/Screenshot 2026-11-12 131757.png"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "note",
+      "note": "Create/Edit ไม่มีปุ่ม “บันทึกและส่งตรวจสอบ” ตาม flow ที่กำหนด ผู้ใช้ต้องออกไปส่งจาก View drawer",
+      "evidence": "tk05/Screenshot 2026-11-12 123157.png"
+    },
+    {
+      "id": "X-02",
+      "status": "note",
+      "note": "เลือกไฟล์แล้วบันทึก ระบบสร้าง Draft แต่ไฟล์ไม่ถูกแนบ ทำให้ผลลัพธ์บางส่วนสำเร็จโดยไม่ชัดเจน",
+      "evidence": "tk02/Screenshot 2026-11-12 120355.png"
+    },
+    {
+      "id": "X-03",
+      "status": "note",
+      "note": "เมื่อเลือก “เกิดใหม่” ช่อง “เกิดซ้ำครั้งที่” ยังเปิดให้กรอก ควร disabled ให้เห็นเงื่อนไขชัดเจน",
+      "evidence": "tk04/Screenshot 2026-11-12 122620.png"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "Create/Edit drawer Step 2 เอกสารแนบมี UI/UX ไม่ตรง design",
+      "severity": "low",
+      "steps": [
+        "เปิด Create หรือ Edit CAR",
+        "ไป Step 2 เอกสารแนบ",
+        "เปรียบเทียบ layout กับ design reference"
+      ],
+      "expected": "Step 2 แสดง layout, spacing และ upload area ตาม design ที่กำหนด",
+      "actual": "โครงสร้างและระยะห่างของ Step 2 หลุดจาก design reference",
+      "evidence": [
+        "tk01/Screenshot 2026-11-12 120045.png",
+        "tk01/example_upload_ui.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "Upload ไฟล์ไม่สำเร็จ แต่ระบบยังสร้างรายการร่าง",
+      "severity": "medium",
+      "steps": [
+        "เปิด Create CAR และกรอกข้อมูล",
+        "ไป Step 2 แล้วเลือกไฟล์ 3 ไฟล์",
+        "ไป Step 3 และกดบันทึกแบบร่าง",
+        "ตรวจ Network และเปิดรายการร่างที่สร้าง"
+      ],
+      "expected": "ระบบสร้างรายการร่างและ Upload/ผูกไฟล์ที่เลือกกับ CAR สำเร็จ หรือแจ้งให้ชัดเจนว่าไฟล์ใด Upload ไม่สำเร็จ",
+      "actual": "รายการร่างถูกสร้าง แต่ Attachment API ตอบ 422, แสดง “กรุณาเลือกไฟล์” และไฟล์ที่เลือกไม่ปรากฏในรายการ",
+      "evidence": [
+        "tk02/Screenshot 2026-11-12 120317.png",
+        "tk02/Screenshot 2026-11-12 120355.png",
+        "tk02/Screenshot 2026-11-12 120437.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "View drawer แสดง Upload file ในแท็บรายละเอียด",
+      "severity": "low",
+      "steps": [
+        "เปิดรายการ CAR ใน View drawer",
+        "เปิดแท็บรายละเอียด",
+        "เลื่อนถึงส่วนเอกสารแนบ"
+      ],
+      "expected": "View drawer ใช้ดูไฟล์แนบ; การเพิ่มไฟล์อยู่ใน Create/Edit drawer",
+      "actual": "แท็บรายละเอียดใน View drawer แสดงพื้นที่ “แนบไฟล์เพิ่ม”",
+      "evidence": "tk03/Screenshot 2026-11-12 121551.png",
+      "status": "open"
+    },
+    {
+      "id": "BUG-04",
+      "title": "เลือกเกิดใหม่แล้วช่องเกิดซ้ำครั้งที่ยังกรอกได้",
+      "severity": "low",
+      "steps": [
+        "เปิด Create/Edit CAR",
+        "ไปส่วน 3. อาการของปัญหา",
+        "เลือก checkbox “เกิดใหม่”",
+        "ลองกรอกช่อง “เกิดซ้ำครั้งที่”"
+      ],
+      "expected": "เมื่อเลือกเกิดใหม่ ช่องเกิดซ้ำครั้งที่ถูก disabled และไม่รับค่า",
+      "actual": "ช่องเกิดซ้ำครั้งที่ยังเปิดให้กรอก ทำให้ผู้ใช้ไม่ทราบว่าเป็นเงื่อนไขที่กรอกไม่ได้",
+      "evidence": "tk04/Screenshot 2026-11-12 122620.png",
+      "status": "open"
+    },
+    {
+      "id": "BUG-05",
+      "title": "Create/Edit ไม่มีปุ่มบันทึกและส่งตรวจสอบ",
+      "severity": "medium",
+      "steps": [
+        "เปิด Create หรือ Edit CAR",
+        "กรอกข้อมูลและไป Step 3 ตรวจสอบและยืนยัน",
+        "ตรวจปุ่ม action ที่ footer"
+      ],
+      "expected": "มีปุ่ม “บันทึกและส่งตรวจสอบ” ตาม flow พร้อมกับปุ่มบันทึกแบบร่าง",
+      "actual": "มีเฉพาะปุ่ม “บันทึกแบบร่าง” ไม่มีปุ่มบันทึกและส่งตรวจสอบ",
+      "evidence": [
+        "tk05/Screenshot 2026-11-12 123157.png",
+        "tk05/Screenshot 2026-11-12 123236.png",
+        "tk05/example_save_and_sent_butt.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-06",
+      "title": "View drawer หลายแท็บมี UI/UX ไม่ตรง design",
+      "severity": "low",
+      "steps": [
+        "เปิด CAR ใน View drawer",
+        "ตรวจแท็บรายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ และประวัติ",
+        "เปรียบเทียบกับ design reference ของแต่ละแท็บ"
+      ],
+      "expected": "ทุกแท็บมี layout, component และ spacing ตรง design reference",
+      "actual": "รูปแบบการ์ด ข้อมูล และการจัดวางในหลายแท็บหลุดจาก design reference",
+      "evidence": [
+        "tk07/Screenshot 2026-11-12 130235.png",
+        "tk07/Screenshot 2026-11-12 130333.png",
+        "tk07/Screenshot 2026-11-12 130405.png",
+        "tk07/Screenshot 2026-11-12 130429.png",
+        "tk07/Screenshot 2026-11-12 130514.png",
+        "tk07/example_tab_detail_1.png",
+        "tk07/example_tab_pdf_preview.png",
+        "tk07/example_tab_doa.png",
+        "tk07/example_tab_history.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-07",
+      "title": "ปุ่มยกเลิกเอกสารอยู่ผิดกลุ่ม action",
+      "severity": "low",
+      "steps": [
+        "เปิด CAR ใน View drawer",
+        "ตรวจตำแหน่ง action ด้านบนและ footer"
+      ],
+      "expected": "ปุ่มยกเลิกเอกสารอยู่รวมกับ action อื่นด้านบน และ footer มีเฉพาะปุ่มปิด",
+      "actual": "ปุ่มยกเลิกเอกสารอยู่ที่ footer แยกจาก action อื่น",
+      "evidence": "tk08/Screenshot 2026-11-12 131757.png",
+      "status": "open"
+    }
+  ],
+  "suggestions": [
+    {
+      "item": "กำหนดเจ้าหน้าที่ IC สำหรับบริษัทใน Sandbox แล้วตรวจซ้ำ flow ส่งตรวจสอบ",
+      "reason": "ปัจจุบัน modal แจ้ง “ยังไม่ได้กำหนดเจ้าหน้าที่ IC สำหรับบริษัทนี้” และไม่มีผู้ตรวจสอบให้เลือก"
+    }
+  ]
+}

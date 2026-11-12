@@ -1,0 +1,252 @@
+{
+  "feature": {
+    "code": "[4.0]",
+    "name": "[Credence] - ใบคำร้องขอดำเนินการด้านเอกสาร",
+    "module": "Policy Center · Document Control"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-12",
+  "round": 1,
+  "refs": "FRD-F-TMP-007 v1.0 · AI Test Cases 69 เคส",
+  "scope": {
+    "checked": [
+      "สร้าง แก้ไข และลบรายการ",
+      "Create / Edit / View drawer",
+      "การแนบไฟล์ขณะสร้างและแก้ไข",
+      "ปุ่มบันทึกและส่งตรวจสอบ",
+      "Modal เลือกสายอนุมัติ",
+      "UI/UX ของแท็บรายละเอียด PDF Preview ลายเซ็น และประวัติ"
+    ],
+    "not_checked": [
+      {
+        "item": "อนุมัติตามสายจนจบและเปลี่ยนสถานะเป็นอนุมัติแล้ว",
+        "reason": "ไม่สามารถเลือกสายอนุมัติและส่งตรวจสอบได้"
+      },
+      {
+        "item": "ไม่อนุมัติแล้วกลับเป็นร่าง",
+        "reason": "ติด blocker ก่อนเข้าสู่ขั้นพิจารณา"
+      },
+      {
+        "item": "Notification หลังอนุมัติ ยกเลิก และลงนามรับ",
+        "reason": "ยังไม่มีผลตรวจจากผู้ตรวจในรอบนี้"
+      },
+      {
+        "item": "ลงนามรับเอกสารควบคุมและ PDF สถานะสุดท้าย",
+        "reason": "ติด blocker ก่อนเข้าสู่สถานะอนุมัติแล้ว"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างรายการ",
+      "expected": "ผู้ใช้สร้างรายการได้สำเร็จ",
+      "status": "pass",
+      "ref": "ผลตรวจของผู้ตรวจ"
+    },
+    {
+      "item": "แก้ไขรายการ",
+      "expected": "ผู้ใช้แก้ไขรายการได้สำเร็จ",
+      "status": "pass",
+      "ref": "ผลตรวจของผู้ตรวจ"
+    },
+    {
+      "item": "ลบรายการ",
+      "expected": "ผู้ใช้ลบรายการได้สำเร็จ",
+      "status": "pass",
+      "ref": "ผลตรวจของผู้ตรวจ"
+    },
+    {
+      "item": "แนบไฟล์ขณะสร้างหรือแก้ไขใบคำร้อง",
+      "expected": "ไฟล์แนบสำเร็จและสัมพันธ์กับรายการร่าง หรือระบบต้องหยุดและแจ้งความล้มเหลวอย่างชัดเจน",
+      "actual": "Upload ไฟล์ไม่สำเร็จ แต่ระบบยังสร้างรายการร่าง",
+      "status": "fail",
+      "bug": "BUG-01",
+      "ref": "FRD 02_API API-12 · 04_DB §4.5 · TC-F01"
+    },
+    {
+      "item": "บันทึกและส่งตรวจสอบจาก Create / Edit drawer",
+      "expected": "มีปุ่มบันทึกและส่งอนุมัติ/ส่งตรวจสอบเพื่อเข้าสู่สายอนุมัติ",
+      "actual": "ไม่พบปุ่มบันทึกและส่งตรวจสอบใน Create และ Edit drawer",
+      "status": "fail",
+      "bug": "BUG-02",
+      "ref": "FRD 01_UI §1.3 · AT-14 · TC-C02"
+    },
+    {
+      "item": "เลือกผู้พิจารณาตามสายอนุมัติ",
+      "expected": "Modal แสดงผู้พิจารณาครบตามจำนวนขั้น DOA และมี dropdown ให้เลือกทุกขั้น",
+      "actual": "Modal ระบุ 4 ขั้นตอน DOA แต่ไม่มีรายการหรือ dropdown ให้เลือกผู้พิจารณา",
+      "status": "fail",
+      "bug": "BUG-03",
+      "ref": "FRD FN-03 · BR-08 · VR-11 · AT-14"
+    },
+    {
+      "item": "อนุมัติตามลำดับขั้นจนจบ",
+      "expected": "ผู้พิจารณาปัจจุบันอนุมัติทีละขั้นจนเป็นสถานะอนุมัติแล้ว",
+      "status": "na",
+      "ref": "FRD FN-04 · AT-16/17"
+    },
+    {
+      "item": "ไม่อนุมัติแล้วกลับเป็นร่างเลขเดิม",
+      "expected": "เมื่อไม่อนุมัติ ใบคำร้องกลับเป็นร่างโดยใช้เลขเดิม",
+      "status": "na",
+      "ref": "FRD FN-05 · BR-09 · AT-18"
+    },
+    {
+      "item": "ยกเลิกใบรออนุมัติและแจ้งผู้พิจารณาปัจจุบัน",
+      "expected": "ยกเลิกพร้อมเหตุผลและส่ง dar_cancelled",
+      "status": "na",
+      "ref": "FRD FN-06 · AT-19"
+    },
+    {
+      "item": "ลงนามรับเอกสารควบคุม",
+      "expected": "Document Controller เลือกผู้รับและเปลี่ยนสถานะเป็นลงนามรับแล้ว",
+      "status": "na",
+      "ref": "FRD FN-08 · AT-20"
+    },
+    {
+      "item": "สร้างและจัดเก็บ PDF หลังอนุมัติ",
+      "expected": "สร้าง PDF สถานะสุดท้ายและจัดเก็บ approved_final",
+      "status": "na",
+      "ref": "FRD FN-04/FN-07 · AT-21"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "Create / Edit drawer และขั้นตอนใน drawer หลุดจาก layout/design ที่กำหนด",
+      "evidence": "tk07/Screenshot 2026-11-12 145414.png"
+    },
+    {
+      "id": "U-04",
+      "status": "note",
+      "note": "View drawer วางปุ่มยกเลิกเอกสารแยกจาก action อื่น; footer ควรเหลือเฉพาะปุ่มปิด",
+      "evidence": "tk07/Screenshot 2026-11-12 145414.png"
+    },
+    {
+      "item": "แท็บใน View drawer",
+      "status": "note",
+      "note": "แท็บรายละเอียด PDF Preview ลายเซ็น และประวัติหลุดจาก design",
+      "evidence": "tk07/Screenshot 2026-11-12 145414.png"
+    },
+    {
+      "item": "พื้นที่แนบไฟล์ใน View drawer",
+      "status": "note",
+      "note": "พบการแนบไฟล์ในแท็บรายละเอียดของ View drawer ทั้งที่ควรมีเฉพาะ Create / Edit drawer",
+      "evidence": "tk07/Screenshot 2026-11-12 145414.png"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "note",
+      "note": "ผู้ใช้ไม่สามารถจบงานส่งตรวจสอบได้ เพราะไม่มีปุ่มบันทึกและส่งตรวจสอบ และ Modal ไม่มีตัวเลือกสายอนุมัติ",
+      "evidence": "tk07/Screenshot 2026-11-12 145414.png"
+    },
+    {
+      "id": "X-02",
+      "status": "note",
+      "note": "Upload ไฟล์ไม่สำเร็จแต่ระบบยังสร้างรายการร่าง ทำให้ผลของคำสั่งไม่สอดคล้องกับสิ่งที่ผู้ใช้คาด",
+      "evidence": "tk07/Screenshot 2026-11-12 145414.png"
+    },
+    {
+      "id": "X-05",
+      "status": "note",
+      "note": "Modal เลือกสายอนุมัติไม่มีรายการหรือ dropdown ทำให้ไม่มีทางดำเนินการต่อ",
+      "evidence": "tk07/Screenshot 2026-11-12 145414.png"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "Upload ไฟล์ไม่สำเร็จ แต่ระบบยังสร้างรายการร่าง",
+      "severity": "high",
+      "steps": [
+        "เปิด Create หรือ Edit drawer",
+        "เลือกไฟล์เพื่อ Upload",
+        "บันทึกรายการร่าง"
+      ],
+      "expected": "ไฟล์ Upload สำเร็จและผูกกับรายการร่าง หรือระบบหยุดการบันทึกพร้อมแจ้งสาเหตุที่ชัดเจน",
+      "actual": "ไฟล์ Upload ไม่สำเร็จ แต่ระบบสร้างรายการร่างต่อ",
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "Create และ Edit drawer ไม่มีปุ่มบันทึกและส่งตรวจสอบ",
+      "severity": "critical",
+      "steps": [
+        "เปิด Create drawer หรือ Edit drawer",
+        "กรอกข้อมูลที่จำเป็นให้ครบ",
+        "ตรวจปุ่มดำเนินการเพื่อส่งเข้าสายอนุมัติ"
+      ],
+      "expected": "มีปุ่มบันทึกและส่งตรวจสอบ/ส่งอนุมัติ เพื่อเริ่มสายอนุมัติตาม FRD",
+      "actual": "ไม่พบปุ่มบันทึกและส่งตรวจสอบใน Create และ Edit drawer",
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "Modal เลือกสายอนุมัติไม่มีรายการหรือ dropdown ให้เลือก",
+      "severity": "critical",
+      "steps": [
+        "เปิดใบ DAR สถานะฉบับร่าง",
+        "กดปุ่มส่งอนุมัติ",
+        "ตรวจ Modal เลือกสายอนุมัติ"
+      ],
+      "expected": "Modal แสดง 4 ขั้นตอน พร้อมผู้พิจารณาหรือ dropdown ให้เลือกครบทุกขั้น",
+      "actual": "Modal แสดงข้อความว่ามี 4 ขั้นตอน DOA แต่พื้นที่รายการว่าง ไม่มีผู้พิจารณาและไม่มี dropdown",
+      "evidence": [
+        "tk07/Screenshot 2026-11-12 145414.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-04",
+      "title": "View drawer แสดงพื้นที่ Upload ไฟล์ในแท็บรายละเอียด",
+      "severity": "low",
+      "steps": [
+        "เปิด View drawer ของใบ DAR",
+        "อยู่ที่แท็บรายละเอียด",
+        "เลื่อนไปยังส่วนไฟล์แนบ"
+      ],
+      "expected": "View drawer แสดงไฟล์แนบแบบอ่านอย่างเดียว; การ Upload มีเฉพาะ Create และ Edit drawer",
+      "actual": "View drawer มีปุ่มแนบไฟล์ในแท็บรายละเอียด",
+      "evidence": [
+        "tk07/Screenshot 2026-11-12 145414.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-05",
+      "title": "ตำแหน่งปุ่มยกเลิกเอกสารใน View drawer ไม่รวมกับกลุ่ม action",
+      "severity": "low",
+      "steps": [
+        "เปิด View drawer ของใบ DAR",
+        "ตรวจกลุ่มปุ่ม action และ footer"
+      ],
+      "expected": "ปุ่มยกเลิกเอกสารอยู่ในกลุ่ม action เดียวกับปุ่มดำเนินการอื่น และ footer มีเฉพาะปุ่มปิด",
+      "actual": "ปุ่มยกเลิกเอกสารอยู่แยกจากกลุ่ม action ตามที่ผู้ตรวจพบ",
+      "evidence": [
+        "tk07/Screenshot 2026-11-12 145414.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-06",
+      "title": "Layout ของ drawer และแท็บหลักหลุดจาก design",
+      "severity": "low",
+      "steps": [
+        "เปิด Create และ Edit drawer แล้วตรวจลำดับขั้น",
+        "เปิด View drawer",
+        "สลับแท็บรายละเอียด PDF Preview ลายเซ็น และประวัติ"
+      ],
+      "expected": "Layout และขั้นตอนตรงตาม design ของฟีเจอร์ทุก drawer และทุกแท็บ",
+      "actual": "Create/Edit drawer, step และแท็บใน View drawer หลุดจาก design ตามที่ผู้ตรวจรายงาน",
+      "evidence": [
+        "tk07/Screenshot 2026-11-12 145414.png"
+      ],
+      "status": "open"
+    }
+  ]
+}
