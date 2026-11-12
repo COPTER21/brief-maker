@@ -1,0 +1,45 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# G1 ผลต่อระบบ — รายงานสอบทาน ไม่เปลี่ยนค่าในระบบ ไม่ส่งต่อ (ไม่ปิด/ยกเลิก PR-PO ให้ — PR F072 / PO F078 ยังไม่มีในระบบ → ผู้ใช้กรอกเลขอ้างอิงเอง)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — กระดาษมีช่อง "ผู้มีอำนาจอนุมัติ" 1 จุด (ไม่ระบุตำแหน่ง) → เอกสารจัดซื้อ ใช้ผู้จัดการ module purchase = role-mgr-pur (มีใน DOA master) · ไม่มีวงเงิน
+doa: { required: true, mode: dynamic, default_steps: ["role-mgr-pur"], amount: none }
+
+# G3 ค่าคงที่ — ไม่มีตัวเลข/ตัวเลือกพิมพ์ตายตัว · ไม่มีสูตร · เกณฑ์ "ค้างนาน" ไม่ระบุบนกระดาษ → ไม่แต่งตัวเลข (OQ)
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "แต่ละแถวต้องมี เลขที่ PR หรือ เลขที่ PO อย่างน้อย 1 (บล็อกตอนส่ง)"
+    - "แต่ละแถวต้องมี รายละเอียด · จำนวนสั่งซื้อ (> 0) · หน่วย · ฝ่าย/แผนกขอซื้อ · สาเหตุคงค้าง · สถานะปัจจุบัน · แนวทางการแก้ไข (บล็อกตอนส่ง)"
+    - "มีเลขที่ PO → วันที่สั่งซื้อ และ ผู้ผลิต/ผู้จัดจำหน่าย บังคับ (บล็อก)"
+    - "วันที่รับสินค้า/บริการ ต้องไม่ก่อนวันที่สั่งซื้อ · วันที่รายงานและวันที่สั่งซื้อห้ามเป็นวันในอนาคต · วันที่สั่งซื้อต้องไม่หลังวันที่รายงาน (บล็อก) · วันที่รับเป็นวันในอนาคตได้ (กำหนดรับ)"
+    - "เลขที่ PR หรือ PO ซ้ำในใบเดียวกัน → เตือน (ไม่บล็อก) อาจเป็นคนละรายการ"
+    - "หน่วยเลือกจาก UOM Master · ฝ่าย/แผนกขอซื้อ และ หน่วยงาน เลือกจากผังองค์กร · ผู้จัดทำรายงาน/ตำแหน่ง ดึงจากผู้ล็อกอิน"
+    - "ต้องมีอย่างน้อย 1 แถวก่อนส่ง"
+
+# G4 รายการซ้ำ — ไม่จำกัดแถว · PDF แสดงขั้นต่ำ 8 แถวตามกระดาษ (แถวว่างเติมให้ครบ)
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ 1:1 (ต้นแบบชีต 1 Rev.02) · ไม่เพิ่มคอลัมน์อายุค้าง/มูลค่า · ไม่มีคำสะกดผิดที่ต้องแก้
+fidelity: { one_to_one: true, add_fields: [], merge_split: [], spelling_fix: [] }
+
+# G6 ลายเซ็น
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ → กลับเป็นร่างเลขเดิม · ยกเลิกได้ เจ้าของ + admin · ร่าง/รออนุมัติ · เหตุผลบังคับ
+reject_cancel: { on_reject: draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น — admin = ผู้จัดการฝ่ายจัดซื้อ (role-mgr-pur)
+visibility: { owner: true, approver: after_submit, admin_role: all, admin_role_id: role-mgr-pur }
+
+# G9 เลขที่ — ออกตอนบันทึกครั้งแรก · รหัส PPO (PR/PO Outstanding)
+numbering: { issue_on: first_save, code: PPO }
+
+# G10 ของเสริม
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

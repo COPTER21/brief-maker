@@ -1,0 +1,27 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock + เติม event ธุรกิจจาก DEC-09/DEC-13/DEC-16 · AI-DEFAULT รอลูกค้ายืนยัน
+feature_id: F-TMP-006
+name: แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนประจำปี
+code: COI
+events:
+- id: coi_conflict_declared
+  trigger: draft → pending_approval โดยเลือก "มี" ผลประโยชน์ทับซ้อน — DEC-13/DEC-16 · ยิงครั้งเดียวต่อการส่ง
+  recipients:
+  - role-compliance
+  template: '**{doc_no}** มีการเปิดเผยผลประโยชน์ทับซ้อน ประจำปี {disclosure_year} จาก {declarant_name} — เปิดดูรายละเอียดในระบบ'
+  channel: in-app
+  optional: false
+  frd_ref: 03_LOGIC F-TMP-006-FN-05, F-TMP-006-FN-10 · 05 §5.6
+  why: "ฝ่ายกฎหมาย/กำกับดูแลเป็นผู้ดูแลทะเบียนผลประโยชน์ทับซ้อน (คำ 'ฝ่ายกฎหมาย' บนกระดาษ) ต้องรู้ทุกใบที่ตอบ มี · ข้อความไม่ใส่รายละเอียด (ข้อมูลลับ) · ช่องทาง in-app เท่านั้น ไม่ส่ง email เนื้อหาลับ"
+- id: coi_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  frd_ref: 03_LOGIC F-TMP-006-FN-08, F-TMP-006-FN-10 · 05 §5.6
+  why: ยกเลิกระหว่างรอพิจารณา — ผู้พิจารณาขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว (DOA engine ไม่ยิงกรณีนี้)
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

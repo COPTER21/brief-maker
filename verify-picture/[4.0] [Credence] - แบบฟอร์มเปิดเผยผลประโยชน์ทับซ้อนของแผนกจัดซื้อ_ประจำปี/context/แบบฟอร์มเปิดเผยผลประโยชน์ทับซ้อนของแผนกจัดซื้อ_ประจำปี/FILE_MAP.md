@@ -1,0 +1,62 @@
+# FILE_MAP — แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `01_Prototype/feature.html` | `_ui/UI_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.html` |
+| `02_BRD/BRD_F-TMP-006.docx` | `_brd/BRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.docx` |
+| `02_BRD/BRD_F-TMP-006.md` | `_brd/BRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/00_OVERVIEW.md` | `_frd/FRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี/00_OVERVIEW_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/01_UI.md` | `_frd/FRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี/01_UI_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/02_API.md` | `_frd/FRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี/02_API_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/03_LOGIC.md` | `_frd/FRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี/03_LOGIC_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/04_DB.md` | `_frd/FRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี/04_DB_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/05_RULES.md` | `_frd/FRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี/05_RULES_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/06_TESTS.md` | `_frd/FRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี/06_TESTS_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี/07_LOCKED_DECISIONS_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/INDEX.md` | `_frd/FRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี/INDEX_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/_SECTION_N.md` | `_frd/FRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี/_SECTION_N_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/declarations/COI.doa.yaml` | `_frd/FRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี/declarations/แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.doa.yaml` |
+| `03_FRD/FRD_F-TMP-006_Pack/declarations/COI.doccfg.yaml` | `_frd/FRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี/declarations/แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-006_Pack/declarations/COI.mdoc.yaml` | `_frd/FRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี/declarations/แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-006_Pack/declarations/COI.ntf.yaml` | `_frd/FRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี/declarations/แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.ntf.yaml` |
+| `03_FRD/FRD_F-TMP-006_Pack/declarations/DOA_BRIEF_F-TMP-006.md` | `_frd/FRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี/declarations/DOA_BRIEF_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/declarations/DOCCFG_BRIEF_F-TMP-006.md` | `_frd/FRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี/declarations/DOCCFG_BRIEF_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/declarations/MDOC_BRIEF_COI.md` | `_frd/FRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี/declarations/MDOC_BRIEF_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/declarations/NTF_BRIEF_F-TMP-006.md` | `_frd/FRD_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี/declarations/NTF_BRIEF_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-006.md` | `_uibrief/UIBRIEF_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `05_Governance/COI.doa.yaml` | `_governance/แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.doa.yaml` |
+| `05_Governance/COI.doccfg.yaml` | `_governance/แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.doccfg.yaml` |
+| `05_Governance/COI.mdoc.yaml` | `_governance/แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.mdoc.yaml` |
+| `05_Governance/COI.ntf.yaml` | `_governance/แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.ntf.yaml` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `05_Governance/DOA_BRIEF_F-TMP-006.md` | `_governance/DOA_BRIEF_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-006.md` | `_governance/DOCCFG_BRIEF_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `05_Governance/MDOC_BRIEF_COI.md` | `_governance/MDOC_BRIEF_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-006.md` | `_governance/NTF_BRIEF_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-006.md` | `_tc/QA_AUDIT_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `06_Test/cases.json` | `_tc/แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี_cases.json` |
+| `06_Test/testcase-F-TMP-006.html` | `_tc/UAT_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.html` |
+| `06_Test/testcases-F-TMP-006.md` | `_tc/TC_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `07_Print/COI_print-spec.md` | `_document/แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี_print-spec.md` |
+| `07_Print/FM-PUR-04_template.html` | `_document/แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี_template.html` |
+| `07_Print/approved-doa6steps.data.json` | `_document/แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี_approved-doa6steps.data.json` |
+| `07_Print/approved.data.json` | `_document/แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี_approved.data.json` |
+| `07_Print/draft.data.json` | `_document/แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี_draft.data.json` |
+| `07_Print/form.tpl.html` | `_document/แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี_template.html` |
+| `07_Print/long-12lines.data.json` | `_document/แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี_long-12lines.data.json` |
+| `07_Print/print_config.json` | `_document/แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี_print_config.json` |
+| `07_Print/profile.json` | `_document/แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี_profile.json` |
+| `07_Print/rejected.data.json` | `_document/แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี_rejected.data.json` |
+| `08_Reference/4. FM-PUR-04 แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนประจำปี 2569.docx` | `_reference/4. FM-PUR-04 แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนประจำปี 2569_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.docx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-006.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-006_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-006_v2.md` | `_reference/PREBRIEF_REQ-TMP-006_v2_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี.md` |

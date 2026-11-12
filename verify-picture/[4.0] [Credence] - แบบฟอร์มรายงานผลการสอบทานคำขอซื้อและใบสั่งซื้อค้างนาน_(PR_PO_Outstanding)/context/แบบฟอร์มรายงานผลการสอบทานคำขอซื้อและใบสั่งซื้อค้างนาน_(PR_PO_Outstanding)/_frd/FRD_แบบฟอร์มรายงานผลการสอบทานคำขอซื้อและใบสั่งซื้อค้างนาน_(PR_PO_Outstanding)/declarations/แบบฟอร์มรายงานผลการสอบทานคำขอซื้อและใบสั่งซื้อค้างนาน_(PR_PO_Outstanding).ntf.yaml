@@ -1,0 +1,20 @@
+# ntf-declaration v1.2 — final (frd_ref ครบ)
+feature_id: F-TMP-005
+name: แบบฟอร์มรายงานผลการสอบทานคำขอซื้อและใบสั่งซื้อค้างนาน (PR/PO Outstanding)
+code: PPO
+events:
+- id: ppo_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-005-FN-08, F-TMP-005-FN-10 · 05 §5.6
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+note: ตัด ppo_over_limit_approved (ไม่มีเกณฑ์ตัวเลข/วงเงินบนกระดาษ) · เก็บ ppo_cancelled

@@ -1,0 +1,44 @@
+# doa-declaration v1.2 — สร้างจาก DECISIONS.lock.json · แก้ได้ก่อนรัน brief
+feature_id: F-TMP-006
+name: แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ ประจำปี
+module: purchase
+platform: core
+doa_type: coi
+approval_scope: document_sign
+approval_required: true
+mode: dynamic
+amount: none
+dept_mode: merged
+on_reject: back_to_draft
+cancel_by:
+- owner
+- admin_role
+cancel_states:
+- draft
+- pending
+actions:
+- id: submit_coi
+  label: ส่งพิจารณาแบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนประจำปี
+  from_state: draft
+matrix:
+- amount_from: 0
+  amount_to: null
+  departments: merged
+  chainMode: sequential
+  steps:
+  - roles:
+    - role-line-manager
+    label: ผู้บังคับบัญชา
+    decision:
+      approve: รับทราบ
+      reject: ส่งกลับแก้ไข
+defaults_unconfirmed: true
+wire_status: pending
+source_decisions:
+- DEC-03
+- DEC-07
+- DEC-08
+notes:
+- "กระดาษพิมพ์ 'ฝ่ายกฎหมาย' ใต้ช่องลงชื่อในกรอบผู้บังคับบัญชา → ถ้าลูกค้ายืนยันว่าฝ่ายกฎหมายต้องลงนาม ให้เพิ่มขั้น role-compliance (label: ฝ่ายกฎหมาย) ที่ DOA กลาง — TODO: DOA engine (OQ)"
+- "เอกสารลับ (Confidential): ผู้พิจารณาเห็นใบหลังส่งเท่านั้น · admin = role-compliance (DEC-09/16)"
+frd_ref: 03_LOGIC F-TMP-006-FN-05, F-TMP-006-FN-06, F-TMP-006-FN-07 · 05 §5.1–§5.3

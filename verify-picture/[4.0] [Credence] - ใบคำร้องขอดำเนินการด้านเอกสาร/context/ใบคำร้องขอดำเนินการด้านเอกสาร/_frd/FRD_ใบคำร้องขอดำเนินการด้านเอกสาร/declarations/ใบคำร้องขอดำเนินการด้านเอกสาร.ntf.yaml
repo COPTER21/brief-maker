@@ -1,0 +1,42 @@
+# ntf-declaration v1.2 — ฉบับจริง (frd_ref จาก frd_lint)
+feature_id: F-TMP-007
+name: ใบคำร้องขอดำเนินการด้านเอกสาร
+code: DAR
+events:
+- id: dar_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-007-FN-06
+- id: dar_distributed
+  trigger: pending_approval → approved (DOA ครบทุกขั้น) — แจกจ่ายเอกสารควบคุมตามหน่วยงานที่เลือก
+  recipients:
+  - distribution_departments
+  - distribution_emails
+  template: '**{doc_no}** แจกจ่ายเอกสาร {target_doc_no} {target_doc_name} ({purpose})
+    มีผลบังคับใช้ {effective_date} — โปรดลงนามรับเอกสารควบคุม'
+  channel: in-app+email
+  optional: false
+  why: หน่วยงานที่ต้องได้รับการแจกจ่ายต้องรู้ว่ามีเอกสารควบคุมใหม่/แก้ไข/ยกเลิก และต้องลงนามรับ
+    (DOA แจ้งเฉพาะผู้ขอ)
+  frd_ref: 03_LOGIC F-TMP-007-FN-04
+- id: dar_received
+  trigger: approved → received (ลงนามรับเอกสารควบคุม)
+  recipients:
+  - owner
+  - role-doc-controller
+  template: '**{doc_no}** {receiver} ลงนามรับเอกสารควบคุมแล้ว'
+  channel: in-app
+  optional: true
+  why: ผู้จัดทำและผู้ควบคุมเอกสารต้องรู้ว่าปิดงานแจกจ่ายแล้ว
+  frd_ref: 03_LOGIC F-TMP-007-FN-08
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+# ตัด dar_over_limit_approved — ไม่มีเกณฑ์ตัวเลขบนกระดาษ

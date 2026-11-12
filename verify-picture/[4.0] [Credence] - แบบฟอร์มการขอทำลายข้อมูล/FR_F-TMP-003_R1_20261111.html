@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>รายงานผลตรวจ — F-TMP-003 [4.0] [Credence] - แบบฟอร์มการขอทำลายข้อมูล</title>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap">
+<style>:root{
+  --bg:#FAF8F5;--paper:#FFFFFF;--ink:#111;--ink2:#55524C;--ink3:#8A867E;
+  --line:#E7E2D9;--line2:#F1EDE6;--navy:#0B1D3A;--primary:#0B5CFF;
+  --pass:#00A88E;--pass-bg:#E6F6F3;--warn:#C96F00;--warn-bg:#FFF3E2;
+  --fail:#E0271D;--fail-bg:#FFECEA;--na:#8A867E;--na-bg:#F1EDE6;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:14px/1.6 'Satoshi','Noto Sans Thai',system-ui,-apple-system,'Segoe UI',sans-serif}
+.page{max-width:1040px;margin:0 auto;padding:32px 24px 64px}
+.sheet{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:32px 36px;position:relative}
+.toolbar{position:absolute;top:14px;right:16px}
+.toolbar button{font:inherit;font-size:12.5px;border:1px solid var(--line);background:var(--paper);color:var(--ink2);border-radius:6px;padding:4px 12px;cursor:pointer}
+.toolbar button:hover{border-color:var(--ink3);color:var(--ink)}
+.toolbar button:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+
+.head{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end;padding:16px 0 18px;border-bottom:2px solid var(--navy)}
+.head h1{margin:0;font-size:24px;line-height:1.3;color:var(--navy);font-weight:700}
+.head .feat{margin-top:2px;font-size:16px;font-weight:600}
+.docno{text-align:right;font-size:12px;color:var(--ink2)}
+.docno b{display:block;font-size:15px;color:var(--ink)}
+.meta{display:grid;grid-template-columns:repeat(3,1fr);margin-top:16px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.meta div{padding:8px 12px;border-right:1px solid var(--line2);border-bottom:1px solid var(--line2)}
+.meta div:nth-child(3n){border-right:0}
+.meta div:nth-last-child(-n+3){border-bottom:0}
+.meta small{display:block;font-size:11.5px;color:var(--ink3)}
+.meta span{font-weight:500}
+
+.verdict{display:grid;grid-template-columns:290px 1fr;margin-top:24px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.v-main{padding:18px 20px;border-right:1px solid var(--line)}
+.v-main small{font-size:12px;color:var(--ink2)}
+.v-main .v{font-size:22px;font-weight:700;margin:2px 0 6px}
+.v-main p{margin:0;font-size:13px;color:var(--ink2)}
+.v-main .next{margin-top:12px;padding-top:10px;border-top:1px solid rgba(0,0,0,.08);font-size:13px;font-weight:600;color:var(--ink)}
+.v-main .next small{display:block;font-weight:400}
+.v-pass .v-main{background:var(--pass-bg)}.v-pass .v{color:var(--pass)}
+.v-warn .v-main{background:var(--warn-bg)}.v-warn .v{color:var(--warn)}
+.v-fail .v-main{background:var(--fail-bg)}.v-fail .v{color:var(--fail)}
+.v-na .v-main{background:var(--na-bg)}.v-na .v{color:var(--na)}
+.v-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.v-cell{padding:16px 18px;border-right:1px solid var(--line2)}
+.v-cell:last-child{border-right:0}
+.v-cell small{display:block;font-size:12px;color:var(--ink3)}
+.v-cell .n{font-size:26px;font-weight:700;line-height:1.2;margin:4px 0;font-variant-numeric:tabular-nums}
+.v-cell .n span{font-size:15px;color:var(--ink3);font-weight:500}
+.v-cell .na-t{color:var(--ink3)}
+.v-cell .s{font-size:12.5px;color:var(--ink2)}
+.bars{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+
+h2{font-size:17px;color:var(--navy);margin:32px 0 4px;display:flex;align-items:baseline;gap:10px}
+h2 .no{font-size:13px;color:var(--ink3);font-weight:500}
+.lead{margin:0 0 12px;color:var(--ink2);font-size:13px}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#F6F3EE;text-align:left;font-weight:600;color:var(--ink2);padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--line2);vertical-align:top}
+tr:last-child td{border-bottom:0}
+tr.r-fail td{background:#FFF8F7}
+tr.r-note td{background:#FFFCF6}
+tr.r-na td{color:var(--ink3)}
+td.id{white-space:nowrap;color:var(--ink3);font-variant-numeric:tabular-nums}
+td.empty{text-align:center;color:var(--ink3);padding:16px}
+.ev a{color:var(--primary);text-decoration:none}
+.ev a:hover{text-decoration:underline}
+.file{display:inline-block;font-size:12px;color:var(--primary)}
+.shot{height:56px;max-width:120px;object-fit:cover;border:1px solid var(--line);border-radius:4px;cursor:zoom-in;vertical-align:top;margin:2px 4px 2px 0}
+.bug .shot{height:90px;max-width:200px;margin-top:6px}
+
+.chip{display:inline-block;padding:1px 9px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.pass{background:var(--pass-bg);color:var(--pass)}
+.warn{background:var(--warn-bg);color:var(--warn)}
+.fail{background:var(--fail-bg);color:var(--fail)}
+.na{background:var(--na-bg);color:var(--na)}
+.sev-c{background:#3A0B08;color:#fff}
+.sev-h{background:var(--fail-bg);color:var(--fail)}
+.sev-m{background:var(--warn-bg);color:var(--warn)}
+.sev-l{background:var(--na-bg);color:var(--ink2)}
+
+.scope{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.box{border:1px solid var(--line);border-radius:8px;padding:12px 16px}
+.box h3{margin:0 0 6px;font-size:13.5px}
+.box ul{margin:0;padding-left:18px;color:var(--ink2);font-size:13px}
+
+.bug{border:1px solid var(--line);border-radius:8px;margin-bottom:12px;overflow:hidden}
+.bug-h{display:flex;gap:10px;align-items:center;padding:10px 14px;background:#FBFAF7;border-bottom:1px solid var(--line2);flex-wrap:wrap}
+.bug-h b{font-size:13px;color:var(--ink3);font-weight:600}
+.bug-h .t{font-weight:600;flex:1;min-width:200px}
+.bug-b{display:grid;grid-template-columns:1fr 1fr 1fr}
+.bug-b>div{padding:10px 14px;border-right:1px solid var(--line2);font-size:13px}
+.bug-b>div:last-child{border-right:0}
+.bug-b small{display:block;color:var(--ink3);font-size:11.5px;margin-bottom:2px}
+.bug-b ol{margin:0;padding-left:18px}
+.none{margin:0;padding:14px 16px;border:1px dashed var(--line);border-radius:8px;color:var(--ink2);font-size:13px}
+
+.attest{margin-top:12px;padding:14px 16px;border-left:3px solid var(--navy);background:#F6F3EE;font-size:13.5px}
+.signs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+.sign{border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.sign small{color:var(--ink3);font-size:12px}
+.sign .line{height:40px;border-bottom:1px dashed var(--ink3);margin:8px 0}
+.sign .who{font-weight:600}
+.sign .d{font-size:12px;color:var(--ink2)}
+
+.rules{margin-top:28px;font-size:12.5px;color:var(--ink2);border-top:1px solid var(--line);padding-top:14px}
+.rules b{color:var(--ink)}
+.rules ul{margin:4px 0 8px;padding-left:18px}
+
+.lb{position:fixed;inset:0;background:rgba(17,17,17,.82);display:none;align-items:center;justify-content:center;z-index:900;padding:24px;cursor:zoom-out}
+.lb.on{display:flex}
+.lb img{max-width:100%;max-height:100%;border-radius:6px;background:#fff}
+
+@media (max-width:760px){
+  .page{padding:16px 12px 40px}
+  .sheet{padding:20px}
+  .toolbar{position:static;margin-bottom:8px}
+  .head{grid-template-columns:1fr}.docno{text-align:left}
+  .meta{grid-template-columns:1fr 1fr}
+  .meta div{border-right:1px solid var(--line2)!important;border-bottom:1px solid var(--line2)!important}
+  .verdict{grid-template-columns:1fr}.v-main{border-right:0;border-bottom:1px solid var(--line)}
+  .v-grid{grid-template-columns:1fr 1fr}
+  .v-cell{border-bottom:1px solid var(--line2)}
+  .scope,.signs,.bug-b{grid-template-columns:1fr}
+  .bug-b>div{border-right:0;border-bottom:1px solid var(--line2)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{
+  @page{size:A4;margin:12mm}
+  :root{padding:0}
+  body{background:#fff;font-size:12px}
+  .page{padding:0;max-width:none}
+  .sheet{border:0;padding:0}
+  .toolbar,.lb{display:none!important}
+  .bug,.sign,tr,.verdict,.scope{break-inside:avoid}
+  h2{break-after:avoid}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style></head>
+<body><div class="page"><div class="sheet">
+<div class="toolbar"><button type="button" onclick="window.print()">พิมพ์ / บันทึก PDF</button></div>
+<header class="head"><div><h1>รายงานผลตรวจฟีเจอร์</h1><div class="feat">F-TMP-003 [4.0] [Credence] - แบบฟอร์มการขอทำลายข้อมูล</div></div>
+<div class="docno">เลขที่รายงาน<b>FR-2026-F-TMP-003-R1</b>รอบตรวจที่ 1</div></header>
+<div class="meta"><div><small>Module</small><span>IT Support</span></div><div><small>Environment / Build</small><span>—</span></div><div><small>ผู้ตรวจ</small><span>กานต์ สายบัวทอง</span></div><div><small>วันที่ตรวจ</small><span>11 พ.ย. 2569</span></div><div><small>เอกสารอ้างอิง</small><span>FRD-F-TMP-003 v1.0 · ผลตรวจระบบจริงจากผู้ตรวจ</span></div><div><small>Dev ผู้รับผิดชอบ</small><span>—</span></div></div>
+
+<section class="verdict v-warn">
+<div class="v-main"><small>ผลการตรวจ</small><div class="v">ผ่านแบบมีเงื่อนไข</div><p>พบ Bug ระดับ High 1 รายการ และ Logic ไม่ผ่าน 2 ข้อ</p>
+<div class="next"><small>สิ่งที่ต้องทำต่อ</small>แก้ BUG-03, BUG-01 แล้วตรวจซ้ำเฉพาะจุดบนระบบที่ใช้งานจริง</div></div>
+<div class="v-grid">
+<div class="v-cell"><small>1 · Logic</small><div class="n">3<span>/6</span></div><div class="s">มีข้อสังเกต 1 · ไม่ผ่าน 2 · ไม่ได้ตรวจ 10</div></div>
+<div class="v-cell"><small>2 · UI ความเรียบร้อย</small><div class="n">6<span>/7</span></div><div class="s">มีข้อสังเกต 1</div></div>
+<div class="v-cell"><small>3 · UX ใช้งานง่าย</small><div class="n">4<span>/6</span></div><div class="s">มีข้อสังเกต 2</div></div>
+<div class="v-cell"><small>4 · Bug ที่พบ</small><div class="n">4</div><div class="bars"><span class="chip sev-h">High 1</span><span class="chip sev-m">Medium 2</span><span class="chip sev-l">Low 1</span></div></div>
+</div></section>
+
+<h2><span class="no">0</span>ขอบเขตการตรวจ</h2>
+<p class="lead">ส่วนที่ไม่ได้ตรวจ อยู่นอกความรับผิดชอบของรายงานฉบับนี้</p>
+<div class="scope"><div class="box"><h3>ตรวจแล้ว</h3><ul><li>สร้างคำขอ แก้ไขคำขอ และลบ/ยกเลิกคำขอ</li><li>Create/Edit Drawer รวมการบันทึกร่างและส่งอนุมัติ</li><li>การแนบเอกสารจากขั้นตอนที่ 2</li><li>View Drawer: รายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ และประวัติ</li><li>หน้ารายการและการแสดงประเภทข้อมูล</li><li>UI/UX ส่วนที่เหลือ</li></ul></div>
+<div class="box"><h3>ไม่ได้ตรวจ</h3><ul><li>สายอนุมัติครบทุกขั้น การไม่อนุมัติ และส่งใหม่ — ผู้ตรวจไม่ได้ระบุผลในรอบนี้</li><li>สิทธิ์รายบทบาท การเปิด URL/API ตรง และข้อมูลข้ามบริษัท — ผู้ตรวจไม่ได้ระบุผลในรอบนี้</li><li>Notification จริง, stale/concurrency และกรณี API ล้มเหลว — ผู้ตรวจไม่ได้ระบุผลในรอบนี้</li><li>ความถูกต้องของ PDF ที่ดาวน์โหลด, CSV และ audit log — ตรวจเฉพาะหน้าจอ/แท็บตามผลที่แจ้ง ยังไม่ได้ระบุผลด้านข้อมูล</li></ul></div></div>
+
+<h2><span class="no">1</span>Logic — ทำงานถูกตามกฎธุรกิจ</h2>
+<p class="lead">เทียบผลจริงกับ FRD / Test Case — ข้อที่ไม่ผ่านต้องผูกกับ Bug ในข้อ 4</p>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>กฎ / Scenario</th><th>ผลที่คาดหวัง</th><th>ผลจริง</th><th>ผล</th><th>อ้างอิง</th></tr></thead>
+<tbody><tr class="r-pass"><td class="id">L-01</td><td>สร้างคำขอและบันทึกแบบร่าง</td><td>สร้างคำขอและบันทึกร่างได้</td><td>ทำงานได้ครบตามที่ผู้ตรวจระบุ</td><td><span class="chip pass">ผ่าน</span></td><td class="ev">AT-01</td></tr><tr class="r-pass"><td class="id">L-02</td><td>แก้ไขข้อมูลคำขอ</td><td>แก้ไขและบันทึกข้อมูลคำขอได้</td><td>ทำงานได้ครบตามที่ผู้ตรวจระบุ</td><td><span class="chip pass">ผ่าน</span></td><td class="ev">API-04</td></tr><tr class="r-pass"><td class="id">L-03</td><td>ลบ/ยกเลิกคำขอ</td><td>ทำรายการลบ/ยกเลิกตามการทำงานที่ระบบเปิดให้ได้</td><td>ทำงานได้ครบตามที่ผู้ตรวจระบุ</td><td><span class="chip pass">ผ่าน</span></td><td class="ev">FN-06</td></tr><tr class="r-fail"><td class="id">L-04</td><td>แนบเอกสารใน Create/Edit Drawer ขั้นตอนที่ 2</td><td>แนบเอกสารได้จากขั้นตอนเอกสารแนบใน Drawer</td><td>แนบไม่ได้ ต้องบันทึกร่างก่อน แล้วไปแนบที่หน้ารายละเอียด</td><td><span class="chip fail">ไม่ผ่าน</span></td><td class="ev"><a href="#BUG-01">BUG-01</a></td></tr><tr class="r-note"><td class="id">L-05</td><td>Create Drawer — บันทึกและส่งอนุมัติ</td><td>เมื่อเลือกผู้พิจารณาและยืนยันสำเร็จ modal ปิดและแสดงผลรายการสำเร็จ</td><td>ทำรายการสำเร็จ แต่ modal เลือกผู้พิจารณายังค้างเปิดอยู่</td><td><span class="chip warn">มีข้อสังเกต</span></td><td class="ev"><a href="#BUG-02">BUG-02</a></td></tr><tr class="r-fail"><td class="id">L-06</td><td>Edit Drawer — บันทึกและส่งอนุมัติ</td><td>บันทึกข้อมูลแล้วส่งเข้าสายอนุมัติ</td><td>ระบบบันทึกเป็นร่างเท่านั้น ไม่ได้ส่งอนุมัติ</td><td><span class="chip fail">ไม่ผ่าน</span></td><td class="ev"><a href="#BUG-03">BUG-03</a></td></tr><tr class="r-na"><td class="id">L-07</td><td>Validation ช่องบังคับและช่วงวันที่</td><td>ตรวจ VR-01..09 และบล็อกช่วงวันที่ผิด</td><td>—</td><td><span class="chip na">ไม่ได้ตรวจ</span></td><td class="ev">AT-02..09</td></tr><tr class="r-na"><td class="id">L-08</td><td>ช่วงวันที่สิ้นสุดหลังวันที่ขอ</td><td>เตือนแต่ยังส่งได้</td><td>—</td><td><span class="chip na">ไม่ได้ตรวจ</span></td><td class="ev">AT-06</td></tr><tr class="r-na"><td class="id">L-09</td><td>สายอนุมัติ dynamic และจำนวนขั้นตาม DOA</td><td>ผู้พิจารณาและจำนวนขั้นตรง DOA</td><td>—</td><td><span class="chip na">ไม่ได้ตรวจ</span></td><td class="ev">AT-11..12</td></tr><tr class="r-na"><td class="id">L-10</td><td>อนุมัติตามลำดับทุกขั้น</td><td>ผ่านทีละขั้นจนครบแล้วเป็นรอทำลายข้อมูล</td><td>—</td><td><span class="chip na">ไม่ได้ตรวจ</span></td><td class="ev">AT-13..14</td></tr><tr class="r-na"><td class="id">L-11</td><td>ไม่อนุมัติและกลับเป็นร่างเลขเดิม</td><td>เหตุผลบังคับ กลับร่างเลขเดิม และส่งใหม่ได้</td><td>—</td><td><span class="chip na">ไม่ได้ตรวจ</span></td><td class="ev">AT-15..16</td></tr><tr class="r-na"><td class="id">L-12</td><td>เจ้าหน้าที่ IT บันทึกการทำลายแล้ว</td><td>ทำได้เฉพาะใบอนุมัติแล้ว พร้อมชื่อและเวลา</td><td>—</td><td><span class="chip na">ไม่ได้ตรวจ</span></td><td class="ev">AT-17</td></tr><tr class="r-na"><td class="id">L-13</td><td>ยกเลิกใบรออนุมัติและส่ง Notification</td><td>เหตุผลบังคับและแจ้งผู้พิจารณาปัจจุบัน</td><td>—</td><td><span class="chip na">ไม่ได้ตรวจ</span></td><td class="ev">AT-18</td></tr><tr class="r-na"><td class="id">L-14</td><td>สิทธิ์การมองเห็นและการทำรายการของแต่ละบทบาท</td><td>ผู้ไม่มีสิทธิ์ดูหรือทำรายการไม่ได้</td><td>—</td><td><span class="chip na">ไม่ได้ตรวจ</span></td><td class="ev">DN-01..08</td></tr><tr class="r-na"><td class="id">L-15</td><td>PDF ทุกสถานะและการส่งออก CSV</td><td>PDF 1 หน้า ข้อมูลครบ และ CSV UTF-8 BOM</td><td>—</td><td><span class="chip na">ไม่ได้ตรวจ</span></td><td class="ev">AT-19</td></tr><tr class="r-na"><td class="id">L-16</td><td>กรณี API ล้มเหลว, stale และ modal/drawer ซ้อนกัน</td><td>ไม่เปลี่ยนสถานะผิดและมีทางให้ผู้ใช้ดำเนินการต่อ</td><td>—</td><td><span class="chip na">ไม่ได้ตรวจ</span></td><td class="ev">ER-01..03</td></tr></tbody></table></div>
+
+<h2><span class="no">2</span>UI — ความเรียบร้อยของหน้าจอ</h2>
+<p class="lead">Checklist มาตรฐาน · "ผ่าน" = ผู้ตรวจดูแล้วไม่พบปัญหา</p>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>หัวข้อตรวจ</th><th>ผล</th><th>หมายเหตุ</th><th>หลักฐาน</th></tr></thead>
+<tbody><tr class="r-pass"><td class="id">U-01</td><td>สี / ฟอนต์ ตรง CI</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr><tr class="r-pass"><td class="id">U-02</td><td>ระยะห่าง / การจัดแนว ฟอร์มและตาราง</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr><tr class="r-pass"><td class="id">U-03</td><td>ตาราง 1 ช่อง = 1 บรรทัด ไม่ซ้อนข้อมูล</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr><tr class="r-pass"><td class="id">U-04</td><td>ปุ่ม / ไอคอน ขนาดและสไตล์สม่ำเสมอ</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr><tr class="r-pass"><td class="id">U-05</td><td>ข้อความไทยถูกต้อง ไม่พิมพ์ผิด ไม่ตกบรรทัดแปลก</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr><tr class="r-pass"><td class="id">U-06</td><td>Dropdown / popup ไม่จม ไม่ล้นจอ</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr><tr class="r-note"><td class="id">U-07</td><td>View Drawer — แท็บรายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ และประวัติ</td><td><span class="chip warn">มีข้อสังเกต</span></td><td>รูปแบบ UI หลุดจาก design ที่ใช้อ้างอิง</td><td class="ev">—</td></tr></tbody></table></div>
+
+<h2><span class="no">3</span>UX — ใช้งานลื่นไหล</h2>
+<p class="lead">มองจากผู้ใช้จริง · "ผ่าน" = ผู้ตรวจลองใช้แล้วไม่ติดขัด</p>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>หัวข้อตรวจ</th><th>ผล</th><th>หมายเหตุ</th><th>หลักฐาน</th></tr></thead>
+<tbody><tr class="r-note"><td class="id">X-01</td><td>ทำงานหลักจบได้เองโดยไม่ต้องเดา</td><td><span class="chip warn">มีข้อสังเกต</span></td><td>ขั้นตอนที่ 2 ระบุเป็นเอกสารแนบ แต่ผู้ใช้แนบไม่ได้และต้องอ้อมไปบันทึกร่างก่อน</td><td class="ev">—</td></tr><tr class="r-note"><td class="id">X-02</td><td>กดแล้วระบบบอกผลทุกครั้ง (แจ้งเตือน / สถานะเปลี่ยน)</td><td><span class="chip warn">มีข้อสังเกต</span></td><td>Create ส่งอนุมัติสำเร็จแต่ modal ไม่ปิด; Edit กดบันทึกและส่งอนุมัติแต่ผลจริงยังเป็นร่าง</td><td class="ev">—</td></tr><tr class="r-pass"><td class="id">X-03</td><td>ข้อความ error บอกว่าผิดที่ไหน แก้ยังไง</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr><tr class="r-pass"><td class="id">X-04</td><td>ถามยืนยันก่อนลบ / ยกเลิก / สิ่งที่ย้อนไม่ได้</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr><tr class="r-pass"><td class="id">X-05</td><td>หน้าว่าง / กำลังโหลด / โหลดไม่สำเร็จ มีทางไปต่อ</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr><tr class="r-pass"><td class="id">X-06</td><td>ความเร็วตอบสนองรับได้</td><td><span class="chip pass">ผ่าน</span></td><td>—</td><td class="ev">—</td></tr></tbody></table></div>
+
+<h2><span class="no">4</span>Bug ที่พบ</h2>
+<p class="lead">เรียงจากรุนแรงมากไปน้อย · ทำซ้ำได้ตามขั้นตอน</p>
+<div class="bug" id="BUG-03"><div class="bug-h"><b>BUG-03</b><span class="t">Edit Drawer กดบันทึกและส่งอนุมัติ แต่ระบบบันทึกเป็นร่างเท่านั้น</span><span class="chip sev-h">High</span><span class="chip na">รอแก้</span></div><div class="bug-b"><div><small>ขั้นตอนทำซ้ำ</small><ol><li>เปิด Edit Drawer ของคำขอสถานะร่าง</li><li>แก้ไขข้อมูล</li><li>กดบันทึกและส่งอนุมัติ</li></ol></div><div><small>ผลที่ควรเป็น</small>บันทึกข้อมูลและส่งคำขอเข้าสายอนุมัติ</div><div><small>ผลที่เกิดจริง</small>ระบบบันทึกร่าง แต่ไม่ได้ส่งอนุมัติ</div></div></div><div class="bug" id="BUG-01"><div class="bug-h"><b>BUG-01</b><span class="t">Create/Edit Drawer ขั้นตอนที่ 2 ไม่สามารถแนบเอกสารได้</span><span class="chip sev-m">Medium</span><span class="chip na">รอแก้</span></div><div class="bug-b"><div><small>ขั้นตอนทำซ้ำ</small><ol><li>เปิด Create Drawer หรือ Edit Drawer</li><li>ไปขั้นตอนที่ 2 เอกสารแนบ</li><li>ลองแนบเอกสาร</li></ol></div><div><small>ผลที่ควรเป็น</small>แนบเอกสารได้จากขั้นตอนที่ 2 ตาม flow ของ Drawer</div><div><small>ผลที่เกิดจริง</small>แนบไม่ได้ ระบบบังคับให้บันทึกร่าง แล้วไปแนบจากหน้ารายละเอียด</div></div></div><div class="bug" id="BUG-02"><div class="bug-h"><b>BUG-02</b><span class="t">Create Drawer ส่งอนุมัติสำเร็จแล้ว modal เลือกผู้พิจารณาไม่ปิด</span><span class="chip sev-m">Medium</span><span class="chip na">รอแก้</span></div><div class="bug-b"><div><small>ขั้นตอนทำซ้ำ</small><ol><li>เปิด Create Drawer และกรอกข้อมูล</li><li>กดบันทึกและส่งอนุมัติ</li><li>เลือกผู้พิจารณาแล้วกดยืนยัน</li></ol></div><div><small>ผลที่ควรเป็น</small>ทำรายการสำเร็จแล้ว modal ปิดและแสดงสถานะล่าสุด</div><div><small>ผลที่เกิดจริง</small>ทำรายการสำเร็จ แต่ modal ยังค้างเปิดอยู่</div></div></div><div class="bug" id="BUG-04"><div class="bug-h"><b>BUG-04</b><span class="t">UI ของ View Drawer ทั้ง 4 แท็บไม่สอดคล้องกับ design</span><span class="chip sev-l">Low</span><span class="chip na">รอแก้</span></div><div class="bug-b"><div><small>ขั้นตอนทำซ้ำ</small><ol><li>เปิด View Drawer</li><li>สลับดูแท็บรายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ และประวัติ</li><li>เปรียบเทียบกับ design ที่ใช้อ้างอิง</li></ol></div><div><small>ผลที่ควรเป็น</small>องค์ประกอบของทั้ง 4 แท็บสอดคล้องกับ design system</div><div><small>ผลที่เกิดจริง</small>ผู้ตรวจพบว่า UI/UX ของทั้ง 4 แท็บหลุดจาก design</div></div></div>
+<h2><span class="no">5</span>ข้อเสนอแนะ (ไม่ใช่ Bug)</h2><p class="lead">ทำงานถูกตาม spec แล้ว แต่ควรปรับให้ดีขึ้น — ส่งต่อเป็น Enhancement ถ้าทีมเห็นด้วย</p><div class="tbl-wrap"><table><thead><tr><th>#</th><th>ข้อเสนอ</th><th>เหตุผล</th></tr></thead><tbody><tr><td class="id">S-01</td><td>เพิ่ม tooltip/popover ที่ +จำนวน ในคอลัมน์ประเภทข้อมูล เพื่อแสดงชื่อประเภทที่เหลือทั้งหมดเมื่อ hover และ keyboard focus</td><td>FRD กำหนดให้ตารางแสดงประเภทแรก +n อยู่แล้ว จึงไม่ใช่ Bug; แต่ปัจจุบัน hover แล้วไม่มีรายละเอียด ทำให้ต้องเปิดเอกสารเพื่อดูรายการทั้งหมด</td></tr></tbody></table></div>
+
+<h2><span class="no">6</span>การรับรองผลตรวจ</h2>
+<div class="attest">ข้าพเจ้าได้ตรวจฟีเจอร์นี้ตามขอบเขตในข้อ 0 บน environment และ build ที่ระบุ ผลทั้งหมดมาจากการทดสอบจริง ข้อที่ระบุว่า "ผ่าน" คือได้ตรวจแล้วไม่พบปัญหา ส่วนที่ "ไม่ได้ตรวจ" อยู่นอกความรับผิดชอบของรายงานฉบับนี้</div>
+<div class="signs">
+<div class="sign"><small>ผู้ตรวจ</small><div class="line"></div><div class="who">กานต์ สายบัวทอง&nbsp;</div><div class="d">11 พ.ย. 2569</div></div>
+<div class="sign"><small>ผู้ทบทวนรายงาน</small><div class="line"></div><div class="who">&nbsp;</div><div class="d">____/____/____</div></div>
+<div class="sign"><small>Dev รับทราบ</small><div class="line"></div><div class="who">&nbsp;</div><div class="d">____/____/____</div></div>
+</div>
+
+<div class="rules"><b>เกณฑ์ตัดสินผล</b> (คำนวณอัตโนมัติ)
+<ul><li><b>ไม่ผ่าน</b> — มี Bug Critical ค้าง หรือ Logic ไม่ผ่านตั้งแต่ 3 ข้อ</li>
+<li><b>ผ่านแบบมีเงื่อนไข</b> — มี Bug High ค้าง หรือ Logic ไม่ผ่าน 1–2 ข้อ → แก้แล้วตรวจซ้ำเฉพาะจุด</li>
+<li><b>ผ่าน</b> — Logic ผ่านทุกข้อ ไม่มี Bug High ขึ้นไป (Medium / Low ตามแก้รอบถัดไป)</li></ul>
+<b>ระดับ Bug</b> · Critical ใช้งานไม่ได้ / ข้อมูลเสีย / ข้ามสิทธิ์หรือสายอนุมัติ · High ผลลัพธ์ผิด (เงิน สต๊อก สถานะ) · Medium ผิด spec แต่มีทางเลี่ยง · Low หน้าตา / ข้อความ</div>
+</div></div>
+<div class="lb" id="lb"><img alt=""></div>
+<script>
+(function(){
+  var lb=document.getElementById('lb');
+  document.querySelectorAll('.shot').forEach(function(i){
+    i.addEventListener('click',function(){lb.querySelector('img').src=i.src;lb.classList.add('on');});
+  });
+  lb.addEventListener('click',function(){lb.classList.remove('on');});
+  document.addEventListener('keydown',function(ev){if(ev.key==='Escape')lb.classList.remove('on');});
+})();
+</script>
+</body></html>
