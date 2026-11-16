@@ -1,0 +1,61 @@
+# FILE_MAP — แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `01_Prototype/feature.html` | `_ui/UI_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.html` |
+| `02_BRD/BRD_F-TMP-004.docx` | `_brd/BRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.docx` |
+| `02_BRD/BRD_F-TMP-004.md` | `_brd/BRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/00_OVERVIEW.md` | `_frd/FRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี/00_OVERVIEW_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/01_UI.md` | `_frd/FRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี/01_UI_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/02_API.md` | `_frd/FRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี/02_API_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/03_LOGIC.md` | `_frd/FRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี/03_LOGIC_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/04_DB.md` | `_frd/FRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี/04_DB_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/05_RULES.md` | `_frd/FRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี/05_RULES_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/06_TESTS.md` | `_frd/FRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี/06_TESTS_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี/07_LOCKED_DECISIONS_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/INDEX.md` | `_frd/FRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี/INDEX_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/_SECTION_N.md` | `_frd/FRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี/_SECTION_N_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/DOA_BRIEF_F-TMP-004.md` | `_frd/FRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี/declarations/DOA_BRIEF_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/DOCCFG_BRIEF_F-TMP-004.md` | `_frd/FRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี/declarations/DOCCFG_BRIEF_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/MDOC_BRIEF_VEV.md` | `_frd/FRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี/declarations/MDOC_BRIEF_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/NTF_BRIEF_F-TMP-004.md` | `_frd/FRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี/declarations/NTF_BRIEF_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/VEV.doa.yaml` | `_frd/FRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี/declarations/แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.doa.yaml` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/VEV.doccfg.yaml` | `_frd/FRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี/declarations/แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/VEV.mdoc.yaml` | `_frd/FRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี/declarations/แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/VEV.ntf.yaml` | `_frd/FRD_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี/declarations/แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.ntf.yaml` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-004.md` | `_uibrief/UIBRIEF_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `05_Governance/DOA_BRIEF_F-TMP-004.md` | `_governance/DOA_BRIEF_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-004.md` | `_governance/DOCCFG_BRIEF_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `05_Governance/MDOC_BRIEF_VEV.md` | `_governance/MDOC_BRIEF_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-004.md` | `_governance/NTF_BRIEF_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `05_Governance/VEV.doa.yaml` | `_governance/แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.doa.yaml` |
+| `05_Governance/VEV.doccfg.yaml` | `_governance/แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.doccfg.yaml` |
+| `05_Governance/VEV.mdoc.yaml` | `_governance/แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.mdoc.yaml` |
+| `05_Governance/VEV.ntf.yaml` | `_governance/แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.ntf.yaml` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-004.md` | `_tc/QA_AUDIT_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `06_Test/cases.json` | `_tc/แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี_cases.json` |
+| `06_Test/testcase-F-TMP-004.html` | `_tc/UAT_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.html` |
+| `06_Test/testcases-F-TMP-004.md` | `_tc/TC_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `07_Print/FM-PUR-01_template.html` | `_document/แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี_template.html` |
+| `07_Print/VEV_print-spec.md` | `_document/แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี_print-spec.md` |
+| `07_Print/approved-doa6steps.data.json` | `_document/แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี_approved-doa6steps.data.json` |
+| `07_Print/approved.data.json` | `_document/แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี_approved.data.json` |
+| `07_Print/draft.data.json` | `_document/แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี_draft.data.json` |
+| `07_Print/form.tpl.html` | `_document/แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี_template.html` |
+| `07_Print/long-12criteria.data.json` | `_document/แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี_long-12criteria.data.json` |
+| `07_Print/print_config.json` | `_document/แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี_print_config.json` |
+| `07_Print/profile.json` | `_document/แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี_profile.json` |
+| `07_Print/rejected.data.json` | `_document/แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี_rejected.data.json` |
+| `08_Reference/1. FM-PUR-01 แบบประเมินและคัดเลือกผู้ขายผู้ให้บริการ ประจำปี.xlsx` | `_reference/1. FM-PUR-01 แบบประเมินและคัดเลือกผู้ขายผู้ให้บริการ ประจำปี_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.xlsx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-004.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-004_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-004_v2.md` | `_reference/PREBRIEF_REQ-TMP-004_v2_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |
+| `08_Reference/page-1.png` | `_reference/page-1_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_แบบประเมินและคัดเลือกผู้ขาย_ผู้ให้บริการ_ประจำปี.md` |

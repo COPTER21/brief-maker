@@ -1,0 +1,19 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock · AI-DEFAULT รอลูกค้ายืนยัน
+feature_id: F-TMP-003
+name: สรุปผลการเคลียร์สินค้า Slow move
+code: SMC
+events:
+- id: smc_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  frd_ref: 03_LOGIC F-TMP-003-FN-08, F-TMP-003-FN-10 · 05 §5.6
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว (DOA engine ไม่ยิงกรณีนี้)
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+- smc_over_limit_approved   # ตัด — เอกสารนี้ไม่มีเกณฑ์ตัวเลข/วงเงิน · วันหมดอายุผ่านแล้วเป็นแค่คำเตือนบนจอ (DEC-14) ผู้อนุมัติเห็นในใบเองผ่าน doa_pending

@@ -1,0 +1,28 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock + เติม event ธุรกิจจาก DEC-13/DEC-14 · AI-DEFAULT รอลูกค้ายืนยัน
+feature_id: F-TMP-004
+name: แบบประเมินและคัดเลือกผู้ขาย/ผู้ให้บริการ ประจำปี
+code: VEV
+events:
+- id: vev_evaluation_failed
+  trigger: draft → pending_approval โดยผลประเมิน = ไม่ผ่าน (คะแนนรวม < เกณฑ์ผ่าน) — DEC-13/DEC-14 · ยิงครั้งเดียวต่อการส่ง
+  recipients:
+  - role-mgr-pur
+  - role-gm
+  template: '**{doc_no}** ผู้ขาย/ผู้ให้บริการ {vendor_name} ไม่ผ่านการประเมิน (คะแนนรวม {score_total}/{max_total}) — ผู้จัดการฝ่ายจัดซื้อและผู้บริหารต้องพิจารณาคัดเลือก'
+  channel: in-app+email
+  optional: false
+  frd_ref: 03_LOGIC F-TMP-004-FN-05, F-TMP-004-FN-10 · 05 §5.6
+  why: "หมายเหตุบนกระดาษ — กรณีประเมินได้ต่ำกว่า 6 คะแนน ผู้จัดการฝ่ายจัดซื้อ และผู้บริหาร จะต้องเป็นผู้พิจารณาคัดเลือก · ผู้บริหารต้องรู้แม้ DOA กลางยังไม่รองรับขั้นตามเงื่อนไข (TODO DOA engine)"
+- id: vev_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  frd_ref: 03_LOGIC F-TMP-004-FN-08, F-TMP-004-FN-10 · 05 §5.6
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว (DOA engine ไม่ยิงกรณีนี้)
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

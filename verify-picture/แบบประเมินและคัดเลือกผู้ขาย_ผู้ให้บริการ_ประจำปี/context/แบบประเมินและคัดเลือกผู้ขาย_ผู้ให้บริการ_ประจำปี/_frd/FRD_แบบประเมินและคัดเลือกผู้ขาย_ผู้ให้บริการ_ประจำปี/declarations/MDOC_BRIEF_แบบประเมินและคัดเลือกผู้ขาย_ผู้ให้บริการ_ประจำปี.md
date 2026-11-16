@@ -1,0 +1,60 @@
+# MDOC_BRIEF — VEV แบบประเมินและคัดเลือกผู้ขาย/ผู้ให้บริการ ประจำปี
+
+> ใบประกาศแบบเอกสารเข้าทะเบียน F185 · ระบบ register ตอน deploy · F185 เก็บแบบ ไม่เก็บฉบับ (LD-DM-01)
+> Verdict: **WARN** · source: `declaration` · สร้างโดย mdoc-declaration
+
+## แบบเอกสาร
+| หัวข้อ | ค่า |
+|---|---|
+| รหัส (จาก F-DOCCFG) | `VEV` |
+| ชื่อ | แบบประเมินและคัดเลือกผู้ขาย/ผู้ให้บริการ ประจำปี · Annual Vendor/Service Provider Evaluation and Selection |
+| หมวด / หน้าที่ | FRM แบบฟอร์ม · F01 |
+| Taxonomy definition | — (รออนุมัติ definition ใหม่) |
+| Module · Feature | Purchase · F-TMP-004 |
+| หน้าเอกสาร | `#/purchase/vendor-evaluation` |
+| เจ้าของแบบ | แผนกจัดซื้อ · role-mgr-pur |
+| เวอร์ชัน | v1 — เวอร์ชันแรก |
+| แบบพิมพ์ | FM-PUR-01 แบบประเมินและคัดเลือกผู้ขาย/ผู้ให้บริการ ประจำปี |
+| การอนุมัติ (DOA) | รอเชื่อม |
+| ประกาศ (ค่าเริ่ม) | ไม่ตั้ง (ลูกค้าตั้งเองที่ F185) |
+
+
+## ผลตรวจ
+| กฎ | ระดับ | รายละเอียด |
+|---|---|---|
+| G04 | WARN | ยังไม่มี taxonomy_def_id — จะเข้าคิว definition ใหม่รออนุมัติ |
+| G09 | WARN | doa = pending — ต้องมี DOA_BRIEF และตามปิดก่อนลูกค้าเปิดใช้ |
+
+## Events หลัง register
+| Event | ผล |
+|---|---|
+| `doctype.registered / doctype.version_ready` | F185: แบบใหม่ = `ready` (รอเปิดใช้งาน) · เวอร์ชันใหม่ของแบบเดิม = `update` (มีเวอร์ชันใหม่) |
+
+## Payload
+```yaml
+doc_type: VEV
+name_th: แบบประเมินและคัดเลือกผู้ขาย/ผู้ให้บริการ ประจำปี
+name_en: Annual Vendor/Service Provider Evaluation and Selection
+class_code: FRM
+function_code: F01
+taxonomy_def_id: null
+module: Purchase
+feature_id: F-TMP-004
+route_path: '#/purchase/vendor-evaluation'
+owner:
+  unit: แผนกจัดซื้อ
+  role: role-mgr-pur
+version: v1
+change_note: เวอร์ชันแรก
+prints:
+- FM-PUR-01 แบบประเมินและคัดเลือกผู้ขาย/ผู้ให้บริการ ประจำปี
+doa: pending
+request_no: null
+announcement_default: {}
+source: declaration
+```
+
+## Dev wiring note
+- register ผ่าน F185 register API ตอน deploy (pipeline) — feature ห้ามเขียนตาราง `doc_type` / `doc_type_version` เอง
+- เลขที่เอกสารของฉบับ = `ENG-DOC-NUM.next('VEV', ctx)` (doccfg) · สายอนุมัติ = DOA engine (doa) · แจ้งเตือน = ENG-NOTIFY (ntf) — ไม่อยู่ในใบนี้
+- เปลี่ยนแบบพิมพ์/หน้าเอกสาร = ประกาศเวอร์ชันใหม่ (v+1) พร้อม change_note — ห้ามแก้เวอร์ชันที่ register แล้ว

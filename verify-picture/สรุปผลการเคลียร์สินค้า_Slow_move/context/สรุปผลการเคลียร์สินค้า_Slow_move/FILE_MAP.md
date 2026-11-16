@@ -1,0 +1,62 @@
+# FILE_MAP — สรุปผลการเคลียร์สินค้า_Slow_move
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `01_Prototype/feature.html` | `_ui/UI_สรุปผลการเคลียร์สินค้า_Slow_move.html` |
+| `02_BRD/BRD_F-TMP-003.docx` | `_brd/BRD_สรุปผลการเคลียร์สินค้า_Slow_move.docx` |
+| `02_BRD/BRD_F-TMP-003.md` | `_brd/BRD_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/00_OVERVIEW.md` | `_frd/FRD_สรุปผลการเคลียร์สินค้า_Slow_move/00_OVERVIEW_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/01_UI.md` | `_frd/FRD_สรุปผลการเคลียร์สินค้า_Slow_move/01_UI_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/02_API.md` | `_frd/FRD_สรุปผลการเคลียร์สินค้า_Slow_move/02_API_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/03_LOGIC.md` | `_frd/FRD_สรุปผลการเคลียร์สินค้า_Slow_move/03_LOGIC_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/04_DB.md` | `_frd/FRD_สรุปผลการเคลียร์สินค้า_Slow_move/04_DB_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/05_RULES.md` | `_frd/FRD_สรุปผลการเคลียร์สินค้า_Slow_move/05_RULES_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/06_TESTS.md` | `_frd/FRD_สรุปผลการเคลียร์สินค้า_Slow_move/06_TESTS_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_สรุปผลการเคลียร์สินค้า_Slow_move/07_LOCKED_DECISIONS_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/INDEX.md` | `_frd/FRD_สรุปผลการเคลียร์สินค้า_Slow_move/INDEX_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/_SECTION_N.md` | `_frd/FRD_สรุปผลการเคลียร์สินค้า_Slow_move/_SECTION_N_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/DOA_BRIEF_F-TMP-003.md` | `_frd/FRD_สรุปผลการเคลียร์สินค้า_Slow_move/declarations/DOA_BRIEF_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/DOCCFG_BRIEF_F-TMP-003.md` | `_frd/FRD_สรุปผลการเคลียร์สินค้า_Slow_move/declarations/DOCCFG_BRIEF_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/MDOC_BRIEF_SMC.md` | `_frd/FRD_สรุปผลการเคลียร์สินค้า_Slow_move/declarations/MDOC_BRIEF_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/NTF_BRIEF_F-TMP-003.md` | `_frd/FRD_สรุปผลการเคลียร์สินค้า_Slow_move/declarations/NTF_BRIEF_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/SMC.doa.yaml` | `_frd/FRD_สรุปผลการเคลียร์สินค้า_Slow_move/declarations/สรุปผลการเคลียร์สินค้า_Slow_move.doa.yaml` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/SMC.doccfg.yaml` | `_frd/FRD_สรุปผลการเคลียร์สินค้า_Slow_move/declarations/สรุปผลการเคลียร์สินค้า_Slow_move.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/SMC.mdoc.yaml` | `_frd/FRD_สรุปผลการเคลียร์สินค้า_Slow_move/declarations/สรุปผลการเคลียร์สินค้า_Slow_move.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/SMC.ntf.yaml` | `_frd/FRD_สรุปผลการเคลียร์สินค้า_Slow_move/declarations/สรุปผลการเคลียร์สินค้า_Slow_move.ntf.yaml` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-003.md` | `_uibrief/UIBRIEF_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_สรุปผลการเคลียร์สินค้า_Slow_move.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `05_Governance/DOA_BRIEF_F-TMP-003.md` | `_governance/DOA_BRIEF_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-003.md` | `_governance/DOCCFG_BRIEF_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `05_Governance/MDOC_BRIEF_SMC.md` | `_governance/MDOC_BRIEF_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-003.md` | `_governance/NTF_BRIEF_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `05_Governance/SMC.doa.yaml` | `_governance/สรุปผลการเคลียร์สินค้า_Slow_move.doa.yaml` |
+| `05_Governance/SMC.doccfg.yaml` | `_governance/สรุปผลการเคลียร์สินค้า_Slow_move.doccfg.yaml` |
+| `05_Governance/SMC.mdoc.yaml` | `_governance/สรุปผลการเคลียร์สินค้า_Slow_move.mdoc.yaml` |
+| `05_Governance/SMC.ntf.yaml` | `_governance/สรุปผลการเคลียร์สินค้า_Slow_move.ntf.yaml` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_สรุปผลการเคลียร์สินค้า_Slow_move.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-003.md` | `_tc/QA_AUDIT_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `06_Test/cases.json` | `_tc/สรุปผลการเคลียร์สินค้า_Slow_move_cases.json` |
+| `06_Test/testcase-F-TMP-003.html` | `_tc/UAT_สรุปผลการเคลียร์สินค้า_Slow_move.html` |
+| `06_Test/testcases-F-TMP-003.md` | `_tc/TC_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `07_Print/FM-WHS-09_template.html` | `_document/สรุปผลการเคลียร์สินค้า_Slow_move_template.html` |
+| `07_Print/SMC_print-spec.md` | `_document/สรุปผลการเคลียร์สินค้า_Slow_move_print-spec.md` |
+| `07_Print/approved-doa6steps.data.json` | `_document/สรุปผลการเคลียร์สินค้า_Slow_move_approved-doa6steps.data.json` |
+| `07_Print/approved.data.json` | `_document/สรุปผลการเคลียร์สินค้า_Slow_move_approved.data.json` |
+| `07_Print/draft.data.json` | `_document/สรุปผลการเคลียร์สินค้า_Slow_move_draft.data.json` |
+| `07_Print/form.tpl.html` | `_document/สรุปผลการเคลียร์สินค้า_Slow_move_template.html` |
+| `07_Print/long-45items.data.json` | `_document/สรุปผลการเคลียร์สินค้า_Slow_move_long-45items.data.json` |
+| `07_Print/print_config.json` | `_document/สรุปผลการเคลียร์สินค้า_Slow_move_print_config.json` |
+| `07_Print/profile.json` | `_document/สรุปผลการเคลียร์สินค้า_Slow_move_profile.json` |
+| `07_Print/rejected.data.json` | `_document/สรุปผลการเคลียร์สินค้า_Slow_move_rejected.data.json` |
+| `08_Reference/9. FM-WHS-09 สรุปผลการเคลียร์สินค้า Slow Move.xlsx` | `_reference/9. FM-WHS-09 สรุปผลการเคลียร์สินค้า Slow Move_สรุปผลการเคลียร์สินค้า_Slow_move.xlsx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_สรุปผลการเคลียร์สินค้า_Slow_move.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_สรุปผลการเคลียร์สินค้า_Slow_move.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-003.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-003_สรุปผลการเคลียร์สินค้า_Slow_move.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-003_v2.md` | `_reference/PREBRIEF_REQ-TMP-003_v2_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_สรุปผลการเคลียร์สินค้า_Slow_move.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_สรุปผลการเคลียร์สินค้า_Slow_move.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_สรุปผลการเคลียร์สินค้า_Slow_move.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_สรุปผลการเคลียร์สินค้า_Slow_move.md` |

@@ -1,0 +1,60 @@
+# doa-declaration v1.2 — สร้างจาก DECISIONS.lock.json · แก้ได้ก่อนรัน brief
+feature_id: F-TMP-004
+name: แบบประเมินและคัดเลือกผู้ขาย/ผู้ให้บริการ ประจำปี
+module: purchase
+platform: core
+doa_type: vev
+approval_scope: document_sign
+approval_required: true
+mode: dynamic
+amount: none
+dept_mode: merged
+on_reject: back_to_draft
+cancel_by:
+- owner
+- admin_role
+cancel_states:
+- draft
+- pending
+actions:
+- id: submit_vev
+  label: ส่งอนุมัติแบบประเมินและคัดเลือกผู้ขาย/ผู้ให้บริการ ประจำปี
+  from_state: draft
+matrix:
+- amount_from: 0
+  amount_to: null
+  departments: merged
+  chainMode: sequential
+  steps:
+  - roles:
+    - role-pur-officer
+    label: ผู้จัดทำ (แผนกจัดซื้อ)
+    decision:
+      approve: เห็นด้วย (Agree / Acknowledge)
+      reject: ไม่เห็นด้วย (Not Agree)
+  - roles:
+    - role-mgr-pur
+    label: อนุมัติ (ผู้จัดการแผนกจัดซื้อ)
+    decision:
+      approve: อนุมัติ (Approve)
+      reject: ไม่อนุมัติ ( Not Approve)
+# DEC-14 · หมายเหตุบนกระดาษ: คะแนนรวม < 6 (ไม่ผ่าน) → ผู้จัดการฝ่ายจัดซื้อ และผู้บริหาร ต้องพิจารณา
+# TODO: DOA engine — เงื่อนไขตามผลประเมิน (eval_result=fail) ให้ DOA กลางเพิ่มขั้นผู้บริหาร · feature ไม่ hardcode
+conditional_steps:
+- when: eval_result == fail
+  add_after_last:
+    roles:
+    - role-gm
+    label: ผู้บริหาร (กรณีไม่ผ่านการประเมิน)
+    decision:
+      approve: อนุมัติ (Approve)
+      reject: ไม่อนุมัติ ( Not Approve)
+  status: proposed
+  note: "TODO: DOA engine — DOA กลางยังไม่รองรับเงื่อนไขที่ไม่ใช่วงเงิน · role-gm = ค่าเสนอของ 'ผู้บริหาร' (AI-DEFAULT รอลูกค้ายืนยัน)"
+defaults_unconfirmed: true
+wire_status: pending
+source_decisions:
+- DEC-03
+- DEC-07
+- DEC-08
+- DEC-14

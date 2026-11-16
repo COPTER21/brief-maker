@@ -1,0 +1,45 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# G1 ผลต่อระบบ — ใบสรุปผลประจำเดือน ไม่เปลี่ยนค่าในระบบ ไม่ส่งต่อ (ไม่ตัดสต็อก/ไม่สร้าง Stock Adjustment — Inventory/Stock Adjustment ยังไม่มีในระบบ)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — กระดาษมีช่อง "ผู้อนุมัติ" 1 จุด (ไม่ระบุตำแหน่ง) → เอกสารคลังสินค้า ใช้ผู้จัดการ module inventory = role-mgr-wh (มีใน DOA master) · ไม่มีวงเงิน
+doa: { required: true, mode: dynamic, default_steps: ["role-mgr-wh"], amount: none }
+
+# G3 ค่าคงที่ — แนวทางการเคลียร์อ่านจาก config (SlowMoveConfig.clearance_methods) + ระบุเพิ่มเติมได้ · ไม่มีสูตร
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "รหัสสินค้าเลือกจาก Product Master (สินค้าที่ใช้งานอยู่) → รายละเอียดดึงชื่อสินค้าให้อัตโนมัติ แก้ไม่ได้"
+    - "แต่ละแถวต้องมี รหัสสินค้า · วันที่ติดตาม · แนวทางการเคลียร์ (บล็อกตอนส่ง)"
+    - "วันที่ (ผลการเคลียร์) กับ จำนวน ต้องกรอกคู่กัน · จำนวน > 0 (บล็อก)"
+    - "วันที่เคลียร์ต้องไม่ก่อนวันที่ติดตาม · วันที่ติดตามและวันที่เคลียร์ห้ามเป็นวันในอนาคต (บล็อก) · วันหมดอายุเป็นวันในอนาคตได้"
+    - "วันหมดอายุผ่านไปแล้ว ณ วันที่ติดตาม → เตือน (ไม่บล็อก)"
+    - "รหัสสินค้าเดียวกันซ้ำในใบเดียวกัน → เตือน (ไม่บล็อก) อาจเป็นคนละ lot"
+    - "1 ใบ = 1 เดือน (ประจำเดือน) · ต้องมีอย่างน้อย 1 แถวก่อนส่ง"
+
+# G4 รายการซ้ำ — ไม่จำกัดแถว · PDF แสดงขั้นต่ำ 23 แถวตามกระดาษ (แถวว่างเติมให้ครบ)
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ 1:1 · ไม่ใช้หัวตารางร่างแถว 4 ของไฟล์ · ไม่มีคำสะกดผิดที่ต้องแก้
+fidelity: { one_to_one: true, add_fields: [], merge_split: [], spelling_fix: [] }
+
+# G6 ลายเซ็น
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ → กลับเป็นร่างเลขเดิม · ยกเลิกได้ เจ้าของ + admin · ร่าง/รออนุมัติ · เหตุผลบังคับ
+reject_cancel: { on_reject: draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น — admin = ผู้จัดการคลังสินค้า (role-mgr-wh)
+visibility: { owner: true, approver: after_submit, admin_role: all, admin_role_id: role-mgr-wh }
+
+# G9 เลขที่ — ออกตอนบันทึกครั้งแรก · รหัส SMC (Slow Move Clearance)
+numbering: { issue_on: first_save, code: SMC }
+
+# G10 ของเสริม
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}
