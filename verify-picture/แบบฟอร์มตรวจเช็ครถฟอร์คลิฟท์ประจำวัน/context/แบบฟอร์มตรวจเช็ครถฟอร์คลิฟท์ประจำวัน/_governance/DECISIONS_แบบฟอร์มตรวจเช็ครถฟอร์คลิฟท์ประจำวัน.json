@@ -1,0 +1,369 @@
+{
+ "req": "REQ-TMP-002",
+ "status": "พร้อมเริ่มทำ",
+ "ready": true,
+ "decisions": [
+  {
+   "id": "DEC-01",
+   "cat": "G1",
+   "text": "อนุมัติแล้วไม่เปลี่ยนค่าในระบบ",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-02",
+   "cat": "G1",
+   "text": "ไม่ส่งต่อระบบอื่นรอบนี้ (ประกาศ event ไว้ใน FRD แต่ไม่ยิง)",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-03",
+   "cat": "G2",
+   "text": "สายอนุมัติตั้งที่ DOA กลาง (dynamic) · ค่าเริ่ม 1 ขั้น: role-supervisor · วงเงิน: ไม่มี",
+   "value": {
+    "required": true,
+    "mode": "dynamic",
+    "default_steps": [
+     "role-supervisor"
+    ],
+    "amount": "none"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "doa-declaration",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-04",
+   "cat": "G3",
+   "text": "ค่าคงที่อ่านจาก config: \"รายการตรวจสอบทั่วไป 15 รายการ (สภาพตัวรถโดยรวม … ตรวจสอบการรั่วซึม)\" → ForkliftChecklistConfig.items[section=general], \"รายการตรวจสอบเฉพาะรถฟอร์คลิฟท์น้ำมัน 8 รายการ\" → ForkliftChecklistConfig.items[section=fuel], \"รายการตรวจสอบเฉพาะรถฟอร์คลิฟท์ไฟฟ้า 6 รายการ\" → ForkliftChecklistConfig.items[section=electric], \"คอลัมน์วันที่ 1–31\" → Calendar(inspection_month).days — ปิดวันที่เกินจำนวนวันของเดือน · คำนวณให้อัตโนมัติ ผู้ใช้ปรับได้ · เกินเกณฑ์ = เตือน · เลือกประเภทรถ (น้ำมัน/ไฟฟ้า) ได้ 1 แบบ → กรอกได้เฉพาะรายการทั่วไป + รายการเฉพาะประเภทที่เลือก · ช่องผลตรวจรายวันรับค่า ✓ (ปกติ/พร้อมใช้งาน) หรือ ✗ (ผิดปกติ/ต้องแก้ไข) หรือว่าง · ห้ามกรอกวันที่เกินจำนวนวันของเดือนที่เลือก และห้ามกรอกวันในอนาคต (บล็อก) · มีช่องใดเป็น ✗ → เตือนให้แจ้งหัวหน้างานตรวจสอบทันที (เตือน ไม่บล็อก) · 1 ใบ = 1 เดือน · ส่งให้หัวหน้างานตรวจสอบเมื่อสิ้นเดือน (ส่งก่อนสิ้นเดือนได้)",
+   "value": {
+    "constants_from_config": true,
+    "auto_compute": true,
+    "over_limit": "warn",
+    "rules": [
+     "เลือกประเภทรถ (น้ำมัน/ไฟฟ้า) ได้ 1 แบบ → กรอกได้เฉพาะรายการทั่วไป + รายการเฉพาะประเภทที่เลือก",
+     "ช่องผลตรวจรายวันรับค่า ✓ (ปกติ/พร้อมใช้งาน) หรือ ✗ (ผิดปกติ/ต้องแก้ไข) หรือว่าง",
+     "ห้ามกรอกวันที่เกินจำนวนวันของเดือนที่เลือก และห้ามกรอกวันในอนาคต (บล็อก)",
+     "มีช่องใดเป็น ✗ → เตือนให้แจ้งหัวหน้างานตรวจสอบทันที (เตือน ไม่บล็อก)",
+     "1 ใบ = 1 เดือน · ส่งให้หัวหน้างานตรวจสอบเมื่อสิ้นเดือน (ส่งก่อนสิ้นเดือนได้)"
+    ]
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-05",
+   "cat": "G4",
+   "text": "รายการตรวจสอบทั่วไป: ไม่จำกัดจำนวนแถว · PDF อย่างน้อย 15 แถวตามกระดาษ",
+   "value": {
+    "max_rows": null,
+    "min_rows": 15
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-06",
+   "cat": "G4",
+   "text": "รายการตรวจสอบเฉพาะรถฟอร์คลิฟท์น้ำมัน: ไม่จำกัดจำนวนแถว · PDF อย่างน้อย 8 แถวตามกระดาษ",
+   "value": {
+    "max_rows": null,
+    "min_rows": 8
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-07",
+   "cat": "G4",
+   "text": "รายการตรวจสอบเฉพาะรถฟอร์คลิฟท์ไฟฟ้า: ไม่จำกัดจำนวนแถว · PDF อย่างน้อย 6 แถวตามกระดาษ",
+   "value": {
+    "max_rows": null,
+    "min_rows": 6
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-08",
+   "cat": "G5",
+   "text": "ช่องตรงกระดาษ 1:1 · ไม่เพิ่มช่อง (เช่น หมายเหตุ)",
+   "value": {
+    "one_to_one": true,
+    "add_fields": [],
+    "merge_split": [],
+    "spelling_fix": [
+     "ปฎิบัติ → ปฏิบัติ"
+    ]
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-09",
+   "cat": "G6",
+   "text": "ลายเซ็นแถวล่าง 1 ช่องต่อขั้น DOA · ไม่ใช้ภาพลายมือชื่อ (ข้อความส่งในระบบ/พิจารณาในระบบ)",
+   "value": {
+    "layout": "row-bottom",
+    "per_doa_step": true,
+    "handwriting_image": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "thai-doc",
+    "html",
+    "doccfg-declaration",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-10",
+   "cat": "G7",
+   "text": "ไม่อนุมัติ = กลับเป็นร่าง แก้แล้วส่งใหม่ · ยกเลิกได้โดย owner, admin_role สถานะ draft, pending · ต้องมีเหตุผล",
+   "value": {
+    "on_reject": "draft",
+    "cancel_by": [
+     "owner",
+     "admin_role"
+    ],
+    "cancel_states": [
+     "draft",
+     "pending"
+    ],
+    "reason_required": true
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests",
+    "doa-declaration"
+   ]
+  },
+  {
+   "id": "DEC-11",
+   "cat": "G8",
+   "text": "มองเห็น: เจ้าของ · ผู้อนุมัติเห็นหลังส่ง · admin role เห็นทั้งหมด",
+   "value": {
+    "owner": true,
+    "approver": "after_submit",
+    "admin_role": "all",
+    "admin_role_id": "role-mgr-wh"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-12",
+   "cat": "G9",
+   "text": "ออกเลขเมื่อบันทึกครั้งแรก · รหัส FLI",
+   "value": {
+    "issue_on": "first_save",
+    "code": "FLI"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "doccfg-declaration",
+    "html",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-13",
+   "cat": "G10",
+   "text": "ของเสริม (กระดาษไม่มี): แนบไฟล์, ส่งออก CSV",
+   "value": {
+    "attachments": true,
+    "copy": false,
+    "export_csv": true,
+    "announce": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "brd",
+    "frd",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-14",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: แสดง/บังคับกรอกเฉพาะส่วนตามประเภทรถที่เลือก · ส่วนอีกประเภทซ่อนในจอ แต่แบบพิมพ์คงตารางว่างไว้ตามกระดาษ (พบ: ฟอร์มมีส่วนน้ำมัน + ไฟฟ้า ในใบเดียว แต่ติ๊กประเภทรถได้ทีละแบบ)",
+   "value": {
+    "where": "หัวตาราง",
+    "detail": "ฟอร์มมีส่วนน้ำมัน + ไฟฟ้า ในใบเดียว แต่ติ๊กประเภทรถได้ทีละแบบ",
+    "rule": "แสดง/บังคับกรอกเฉพาะส่วนตามประเภทรถที่เลือก · ส่วนอีกประเภทซ่อนในจอ แต่แบบพิมพ์คงตารางว่างไว้ตามกระดาษ"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-15",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ห้ามกรอกวันที่เกินจำนวนวันของเดือนที่เลือก และห้ามกรอกวันในอนาคต (บล็อก) (พบ: กระดาษมี 31 คอลัมน์ทุกเดือน)",
+   "value": {
+    "where": "คอลัมน์วันที่ 29–31",
+    "detail": "กระดาษมี 31 คอลัมน์ทุกเดือน",
+    "rule": "ห้ามกรอกวันที่เกินจำนวนวันของเดือนที่เลือก และห้ามกรอกวันในอนาคต (บล็อก)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-16",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: มีช่องใดเป็น ✗ → เตือนให้แจ้งหัวหน้างานตรวจสอบ (เตือน ไม่บล็อก) (พบ: \"ปฎิบัติ\" สะกดผิด (ที่ถูก ปฏิบัติ) · ระบุให้แจ้งผู้ควบคุมทันทีเมื่อพบจุดเสียหาย)",
+   "value": {
+    "where": "หมายเหตุท้ายฟอร์ม",
+    "detail": "\"ปฎิบัติ\" สะกดผิด (ที่ถูก ปฏิบัติ) · ระบุให้แจ้งผู้ควบคุมทันทีเมื่อพบจุดเสียหาย",
+    "rule": "มีช่องใดเป็น ✗ → เตือนให้แจ้งหัวหน้างานตรวจสอบ (เตือน ไม่บล็อก)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-17",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: คง 1:1 ตาม G5 · เสนอให้ลูกค้ายืนยันว่าจะเพิ่มช่องหมายเลขรถหรือไม่ (ใน _BATCH_REPORT) (พบ: กระดาษไม่มีช่องระบุทะเบียน/หมายเลขรถฟอร์คลิฟท์ ทั้งที่ใช้ 1 ใบต่อรถ 1 คันต่อเดือน)",
+   "value": {
+    "where": "ทั้งใบ",
+    "detail": "กระดาษไม่มีช่องระบุทะเบียน/หมายเลขรถฟอร์คลิฟท์ ทั้งที่ใช้ 1 ใบต่อรถ 1 คันต่อเดือน",
+    "rule": "คง 1:1 ตาม G5 · เสนอให้ลูกค้ายืนยันว่าจะเพิ่มช่องหมายเลขรถหรือไม่ (ใน _BATCH_REPORT)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  }
+ ],
+ "raw": {
+  "config_changes": [],
+  "post_to": [],
+  "doa": {
+   "required": true,
+   "mode": "dynamic",
+   "default_steps": [
+    "role-supervisor"
+   ],
+   "amount": "none"
+  },
+  "calc": {
+   "constants_from_config": true,
+   "auto_compute": true,
+   "over_limit": "warn",
+   "rules": [
+    "เลือกประเภทรถ (น้ำมัน/ไฟฟ้า) ได้ 1 แบบ → กรอกได้เฉพาะรายการทั่วไป + รายการเฉพาะประเภทที่เลือก",
+    "ช่องผลตรวจรายวันรับค่า ✓ (ปกติ/พร้อมใช้งาน) หรือ ✗ (ผิดปกติ/ต้องแก้ไข) หรือว่าง",
+    "ห้ามกรอกวันที่เกินจำนวนวันของเดือนที่เลือก และห้ามกรอกวันในอนาคต (บล็อก)",
+    "มีช่องใดเป็น ✗ → เตือนให้แจ้งหัวหน้างานตรวจสอบทันที (เตือน ไม่บล็อก)",
+    "1 ใบ = 1 เดือน · ส่งให้หัวหน้างานตรวจสอบเมื่อสิ้นเดือน (ส่งก่อนสิ้นเดือนได้)"
+   ]
+  },
+  "repeat": {
+   "max_rows": null
+  },
+  "fidelity": {
+   "one_to_one": true,
+   "add_fields": [],
+   "merge_split": [],
+   "spelling_fix": [
+    "ปฎิบัติ → ปฏิบัติ"
+   ]
+  },
+  "signature": {
+   "layout": "row-bottom",
+   "per_doa_step": true,
+   "handwriting_image": false
+  },
+  "reject_cancel": {
+   "on_reject": "draft",
+   "cancel_by": [
+    "owner",
+    "admin_role"
+   ],
+   "cancel_states": [
+    "draft",
+    "pending"
+   ],
+   "reason_required": true
+  },
+  "visibility": {
+   "owner": true,
+   "approver": "after_submit",
+   "admin_role": "all",
+   "admin_role_id": "role-mgr-wh"
+  },
+  "numbering": {
+   "issue_on": "first_save",
+   "code": "FLI"
+  },
+  "extras": {
+   "attachments": true,
+   "copy": false,
+   "export_csv": true,
+   "announce": false
+  },
+  "extend": {},
+  "fit": {}
+ },
+ "unattended": true
+}

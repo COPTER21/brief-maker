@@ -1,0 +1,424 @@
+{
+ "req": "REQ-TMP-002",
+ "status": "พร้อมเริ่มทำ",
+ "ready": true,
+ "decisions": [
+  {
+   "id": "DEC-01",
+   "cat": "G1",
+   "text": "อนุมัติแล้วไม่เปลี่ยนค่าในระบบ",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-02",
+   "cat": "G1",
+   "text": "ไม่ส่งต่อระบบอื่นรอบนี้ (ประกาศ event ไว้ใน FRD แต่ไม่ยิง)",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-03",
+   "cat": "G2",
+   "text": "สายอนุมัติตั้งที่ DOA กลาง (dynamic) · ค่าเริ่ม 1 ขั้น: role-mgr-bu · วงเงิน: ไม่มี",
+   "value": {
+    "required": true,
+    "mode": "dynamic",
+    "default_steps": [
+     "role-mgr-bu"
+    ],
+    "amount": "none",
+    "step_labels": [
+     "ผู้อำนวยการสายงานการขาย"
+    ],
+    "requester_role": "role-mgr-sales"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "doa-declaration",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-04",
+   "cat": "G3",
+   "text": "ค่าคงที่อ่านจาก config: \"ตั้งแต่ 3 ครั้งขึ้นไป / เดือน\" → SalesConfig.csat_min_orders_per_month (=3), \"80% – 100%: ลูกค้ามีความพึงพอใจสูง\" → SalesConfig.csat_bands[high].min (=80), \"60% – 79%: ลูกค้าพึงพอใจในระดับปานกลาง\" → SalesConfig.csat_bands[mid].min (=60), \"ต่ำกว่า 60%: ลูกค้าอาจมีความไม่พึงพอใจ\" → SalesConfig.csat_bands[low], \"มากที่สุด / มาก / ปานกลาง / น้อย / ต้องปรับปรุง\" → SalesConfig.csat_scale[] (label + weight), \"หัวข้อการประเมิน 3 ด้าน 16 ข้อ\" → SalesConfig.csat_topics[] (ตามกระดาษ Rev.00) · คำนวณให้อัตโนมัติ ผู้ใช้ปรับได้ · เกินเกณฑ์ = เตือน · จำนวนในช่องคะแนน (มากที่สุด…ต้องปรับปรุง) เป็นจำนวนเต็ม ≥ 0 — ติดลบ/ทศนิยม = บล็อก · รวมต่อแถว = ผลรวม 5 ระดับ · แถว รวม ท้ายตารางรวมครบทั้ง 5 คอลัมน์ (ต้นฉบับขาดบางคอลัมน์) · % ต่อด้าน = (5×มากที่สุด+4×มาก+3×ปานกลาง+2×น้อย+1×ต้องปรับปรุง) ÷ (5×รวม) × 100 · ทศนิยม 2 ตำแหน่ง · รวม=0 แสดง — · % โดยรวม = คะแนนถ่วงน้ำหนักรวม 3 ด้าน ÷ (5×จำนวนคำตอบรวม 3 ด้าน) × 100 — แทนตัวเลข 85.83 ที่พิมพ์ตายตัว · ข้อความแปลผล: ≥80 สูง · 60–79.99 ปานกลาง · <60 อาจไม่พึงพอใจ (ช่วงอ่านจาก SalesConfig.csat_bands) · จำนวนการสั่งซื้อของลูกค้าในรายชื่อ < SalesConfig.csat_min_orders_per_month (3) → เตือน ไม่บล็อก · หัวข้อประเมิน 16 ข้อ และน้ำหนัก 5–1 อ่านจาก config (ผู้ใช้ไม่แก้ข้อความหัวข้อ) · จำนวนแถวตาราง 3 ด้าน = จำนวนหัวข้อใน config (ผู้ใช้ไม่เพิ่ม/ลบแถว · ไม่จำกัดที่ระดับ config) · ส่งได้เมื่อมีจำนวนคำตอบรวม > 0 อย่างน้อย 1 ด้าน และรายชื่อลูกค้า ≥ 1 แถว",
+   "value": {
+    "constants_from_config": true,
+    "auto_compute": true,
+    "over_limit": "warn",
+    "rules": [
+     "จำนวนในช่องคะแนน (มากที่สุด…ต้องปรับปรุง) เป็นจำนวนเต็ม ≥ 0 — ติดลบ/ทศนิยม = บล็อก",
+     "รวมต่อแถว = ผลรวม 5 ระดับ · แถว รวม ท้ายตารางรวมครบทั้ง 5 คอลัมน์ (ต้นฉบับขาดบางคอลัมน์)",
+     "% ต่อด้าน = (5×มากที่สุด+4×มาก+3×ปานกลาง+2×น้อย+1×ต้องปรับปรุง) ÷ (5×รวม) × 100 · ทศนิยม 2 ตำแหน่ง · รวม=0 แสดง —",
+     "% โดยรวม = คะแนนถ่วงน้ำหนักรวม 3 ด้าน ÷ (5×จำนวนคำตอบรวม 3 ด้าน) × 100 — แทนตัวเลข 85.83 ที่พิมพ์ตายตัว",
+     "ข้อความแปลผล: ≥80 สูง · 60–79.99 ปานกลาง · <60 อาจไม่พึงพอใจ (ช่วงอ่านจาก SalesConfig.csat_bands)",
+     "จำนวนการสั่งซื้อของลูกค้าในรายชื่อ < SalesConfig.csat_min_orders_per_month (3) → เตือน ไม่บล็อก",
+     "หัวข้อประเมิน 16 ข้อ และน้ำหนัก 5–1 อ่านจาก config (ผู้ใช้ไม่แก้ข้อความหัวข้อ) · จำนวนแถวตาราง 3 ด้าน = จำนวนหัวข้อใน config (ผู้ใช้ไม่เพิ่ม/ลบแถว · ไม่จำกัดที่ระดับ config)",
+     "ส่งได้เมื่อมีจำนวนคำตอบรวม > 0 อย่างน้อย 1 ด้าน และรายชื่อลูกค้า ≥ 1 แถว"
+    ]
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-05",
+   "cat": "G4",
+   "text": "ด้านคุณภาพสินค้า/บริการ: ไม่จำกัดจำนวนแถว · PDF อย่างน้อย 4 แถวตามกระดาษ",
+   "value": {
+    "max_rows": null,
+    "min_rows": 4
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-06",
+   "cat": "G4",
+   "text": "ด้านการส่งมอบสินค้า: ไม่จำกัดจำนวนแถว · PDF อย่างน้อย 4 แถวตามกระดาษ",
+   "value": {
+    "max_rows": null,
+    "min_rows": 4
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-07",
+   "cat": "G4",
+   "text": "ด้านเจ้าหน้าที่ผู้ให้บริการ/พนักงานขาย: ไม่จำกัดจำนวนแถว · PDF อย่างน้อย 8 แถวตามกระดาษ",
+   "value": {
+    "max_rows": null,
+    "min_rows": 8
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-08",
+   "cat": "G4",
+   "text": "โดยมีรายชื่อดังนี้: ไม่จำกัดจำนวนแถว · PDF อย่างน้อย 14 แถวตามกระดาษ",
+   "value": {
+    "max_rows": null,
+    "min_rows": 14
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-09",
+   "cat": "G5",
+   "text": "ช่องตรงกระดาษ 1:1 · ไม่เพิ่มช่อง (เช่น หมายเหตุ)",
+   "value": {
+    "one_to_one": true,
+    "add_fields": [],
+    "merge_split": []
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-10",
+   "cat": "G6",
+   "text": "ลายเซ็นแถวล่าง 1 ช่องต่อขั้น DOA · ไม่ใช้ภาพลายมือชื่อ (ข้อความส่งในระบบ/พิจารณาในระบบ)",
+   "value": {
+    "layout": "row-bottom",
+    "per_doa_step": true,
+    "handwriting_image": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "thai-doc",
+    "html",
+    "doccfg-declaration",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-11",
+   "cat": "G7",
+   "text": "ไม่อนุมัติ = กลับเป็นร่าง แก้แล้วส่งใหม่ · ยกเลิกได้โดย owner, admin_role สถานะ draft, pending · ต้องมีเหตุผล",
+   "value": {
+    "on_reject": "back_to_draft",
+    "cancel_by": [
+     "owner",
+     "admin_role"
+    ],
+    "cancel_states": [
+     "draft",
+     "pending"
+    ],
+    "reason_required": true
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests",
+    "doa-declaration"
+   ]
+  },
+  {
+   "id": "DEC-12",
+   "cat": "G8",
+   "text": "มองเห็น: เจ้าของ · ผู้อนุมัติเห็นหลังส่ง · admin role เห็นทั้งหมด",
+   "value": {
+    "owner": true,
+    "approver": "after_submit",
+    "admin_role": "all",
+    "admin_role_name": "ผู้ดูแลเอกสารฝ่ายขาย (Sales admin)"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-13",
+   "cat": "G9",
+   "text": "ออกเลขเมื่อบันทึกครั้งแรก · รหัส CSM",
+   "value": {
+    "issue_on": "first_save",
+    "code": "CSM"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "doccfg-declaration",
+    "html",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-14",
+   "cat": "G10",
+   "text": "ของเสริม (กระดาษไม่มี): แนบไฟล์, ส่งออก CSV",
+   "value": {
+    "attachments": true,
+    "copy": false,
+    "export_csv": true,
+    "announce": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "brd",
+    "frd",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-15",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ใช้รหัสฟอร์ม FM-SAL-11 ตาม footer (ชีตคัดลอกมาจาก FM-SAL-10) (พบ: ชีตชื่อ \"FM-SAL-10\" แต่ footer Doc.No.FM-SAL-11 และชื่อไฟล์ FM-SAL-11)",
+   "value": {
+    "where": "ชื่อชีต",
+    "detail": "ชีตชื่อ \"FM-SAL-10\" แต่ footer Doc.No.FM-SAL-11 และชื่อไฟล์ FM-SAL-11",
+    "rule": "ใช้รหัสฟอร์ม FM-SAL-11 ตาม footer (ชีตคัดลอกมาจาก FM-SAL-10)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-16",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: รวมครบทั้ง 5 คอลัมน์ทุกด้าน (พบ: มีสูตรรวมแค่คอลัมน์ มากที่สุด/มาก/ปานกลาง — น้อย/ต้องปรับปรุง ไม่มีสูตร)",
+   "value": {
+    "where": "แถว \"รวม\" ท้ายตาราง ด้าน 1 และ 3",
+    "detail": "มีสูตรรวมแค่คอลัมน์ มากที่สุด/มาก/ปานกลาง — น้อย/ต้องปรับปรุง ไม่มีสูตร",
+    "rule": "รวมครบทั้ง 5 คอลัมน์ทุกด้าน"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-17",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: รวมครบทั้ง 5 คอลัมน์ (พบ: มีสูตรรวม 4 คอลัมน์ ขาด ต้องปรับปรุง)",
+   "value": {
+    "where": "แถว \"รวม\" ท้ายตาราง ด้าน 2",
+    "detail": "มีสูตรรวม 4 คอลัมน์ ขาด ต้องปรับปรุง",
+    "rule": "รวมครบทั้ง 5 คอลัมน์"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-18",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: % = คะแนนถ่วงน้ำหนัก ÷ (5 × รวม) × 100 · ตรวจ: รวมทั้งหมด = 0 → ไม่คำนวณ (พบ: ทั้ง 3 ตารางไม่มีสูตร % (เซลล์ว่าง))",
+   "value": {
+    "where": "คอลัมน์ %",
+    "detail": "ทั้ง 3 ตารางไม่มีสูตร % (เซลล์ว่าง)",
+    "rule": "% = คะแนนถ่วงน้ำหนัก ÷ (5 × รวม) × 100 · ตรวจ: รวมทั้งหมด = 0 → ไม่คำนวณ"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-19",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: คำนวณ % โดยรวม และข้อความแปลผลจากช่วง CSAT อัตโนมัติ (พบ: ข้อความพิมพ์ตายตัว \"โดยรวม 85.83 % ลูกค้ามีความพึงพอใจสูง\" ไม่ผูกกับตาราง (ตารางเป็น 0 ทั้งหมด))",
+   "value": {
+    "where": "สรุปผลการประเมิน",
+    "detail": "ข้อความพิมพ์ตายตัว \"โดยรวม 85.83 % ลูกค้ามีความพึงพอใจสูง\" ไม่ผูกกับตาราง (ตารางเป็น 0 ทั้งหมด)",
+    "rule": "คำนวณ % โดยรวม และข้อความแปลผลจากช่วง CSAT อัตโนมัติ"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-20",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: จำนวนการสั่งซื้อ < เกณฑ์ → เตือน (ไม่บล็อก) (พบ: เกณฑ์ ≥ 3 ครั้ง/เดือน แต่ไม่มีการตรวจ)",
+   "value": {
+    "where": "รายชื่อลูกค้า",
+    "detail": "เกณฑ์ ≥ 3 ครั้ง/เดือน แต่ไม่มีการตรวจ",
+    "rule": "จำนวนการสั่งซื้อ < เกณฑ์ → เตือน (ไม่บล็อก)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  }
+ ],
+ "raw": {
+  "config_changes": [],
+  "post_to": [],
+  "doa": {
+   "required": true,
+   "mode": "dynamic",
+   "default_steps": [
+    "role-mgr-bu"
+   ],
+   "amount": "none",
+   "step_labels": [
+    "ผู้อำนวยการสายงานการขาย"
+   ],
+   "requester_role": "role-mgr-sales"
+  },
+  "calc": {
+   "constants_from_config": true,
+   "auto_compute": true,
+   "over_limit": "warn",
+   "rules": [
+    "จำนวนในช่องคะแนน (มากที่สุด…ต้องปรับปรุง) เป็นจำนวนเต็ม ≥ 0 — ติดลบ/ทศนิยม = บล็อก",
+    "รวมต่อแถว = ผลรวม 5 ระดับ · แถว รวม ท้ายตารางรวมครบทั้ง 5 คอลัมน์ (ต้นฉบับขาดบางคอลัมน์)",
+    "% ต่อด้าน = (5×มากที่สุด+4×มาก+3×ปานกลาง+2×น้อย+1×ต้องปรับปรุง) ÷ (5×รวม) × 100 · ทศนิยม 2 ตำแหน่ง · รวม=0 แสดง —",
+    "% โดยรวม = คะแนนถ่วงน้ำหนักรวม 3 ด้าน ÷ (5×จำนวนคำตอบรวม 3 ด้าน) × 100 — แทนตัวเลข 85.83 ที่พิมพ์ตายตัว",
+    "ข้อความแปลผล: ≥80 สูง · 60–79.99 ปานกลาง · <60 อาจไม่พึงพอใจ (ช่วงอ่านจาก SalesConfig.csat_bands)",
+    "จำนวนการสั่งซื้อของลูกค้าในรายชื่อ < SalesConfig.csat_min_orders_per_month (3) → เตือน ไม่บล็อก",
+    "หัวข้อประเมิน 16 ข้อ และน้ำหนัก 5–1 อ่านจาก config (ผู้ใช้ไม่แก้ข้อความหัวข้อ) · จำนวนแถวตาราง 3 ด้าน = จำนวนหัวข้อใน config (ผู้ใช้ไม่เพิ่ม/ลบแถว · ไม่จำกัดที่ระดับ config)",
+    "ส่งได้เมื่อมีจำนวนคำตอบรวม > 0 อย่างน้อย 1 ด้าน และรายชื่อลูกค้า ≥ 1 แถว"
+   ]
+  },
+  "repeat": {
+   "max_rows": null
+  },
+  "fidelity": {
+   "one_to_one": true,
+   "add_fields": [],
+   "merge_split": []
+  },
+  "signature": {
+   "layout": "row-bottom",
+   "per_doa_step": true,
+   "handwriting_image": false
+  },
+  "reject_cancel": {
+   "on_reject": "back_to_draft",
+   "cancel_by": [
+    "owner",
+    "admin_role"
+   ],
+   "cancel_states": [
+    "draft",
+    "pending"
+   ],
+   "reason_required": true
+  },
+  "visibility": {
+   "owner": true,
+   "approver": "after_submit",
+   "admin_role": "all",
+   "admin_role_name": "ผู้ดูแลเอกสารฝ่ายขาย (Sales admin)"
+  },
+  "numbering": {
+   "issue_on": "first_save",
+   "code": "CSM"
+  },
+  "extras": {
+   "attachments": true,
+   "copy": false,
+   "export_csv": true,
+   "announce": false
+  },
+  "extend": {},
+  "fit": {}
+ },
+ "unattended": true
+}

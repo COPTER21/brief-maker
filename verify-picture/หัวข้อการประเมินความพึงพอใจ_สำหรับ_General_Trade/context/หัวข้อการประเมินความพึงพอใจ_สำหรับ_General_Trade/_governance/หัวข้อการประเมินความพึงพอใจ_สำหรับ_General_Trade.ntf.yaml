@@ -1,0 +1,31 @@
+# ntf-declaration v1.2 — FINAL ยืนยันกับ FRD v1.0 (frd_lint N7 PASS)
+feature_id: F-TMP-002
+name: หัวข้อการประเมินความพึงพอใจ สำหรับ General Trade
+code: CSM
+events:
+- id: csm_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-002-FN-07, F-TMP-002-FN-09
+- id: csm_low_csat
+  trigger: → approved และ overall_pct < SalesConfig.csat_bands[mid].min (60) — ผลแปลผล
+    "ลูกค้าอาจมีความไม่พึงพอใจ"
+  recipients:
+  - owner
+  - role-mgr-sales
+  template: '**{doc_no}** ผลประเมินความพึงพอใจ GT เดือน {period_month} โดยรวม {overall_pct}%
+    — ลูกค้าอาจมีความไม่พึงพอใจ'
+  channel: in-app+email
+  optional: false
+  why: G3 ช่วง CSAT ต่ำกว่า 60% — ฝ่ายขายต้องรู้เพื่อวางแผนแก้ไข (เตือน ไม่บล็อก)
+  frd_ref: 03_LOGIC F-TMP-002-FN-06, F-TMP-002-FN-09
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

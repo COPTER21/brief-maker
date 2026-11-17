@@ -1,0 +1,30 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# G1 ผลต่อระบบ — ใบตรวจเช็คไม่เปลี่ยนค่าในระบบ ไม่ส่งต่อ (ไม่ได้ผูกงานซ่อม/Asset Maintenance รอบนี้)
+config_changes: []
+post_to: []
+# G2 — กระดาษไม่มีช่องลงชื่อผู้อนุมัติ → ไม่มีอนุมัติ (บันทึกตรวจอย่างเดียว)
+doa: { required: false, mode: none, default_steps: [], amount: none }
+# G3 — ไม่มีสูตร/ค่าคงที่ · กติกาตรวจจากเครื่องหมาย
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "ทุกแถวต้องเลือกครบ 4 หัวข้อ (มาตรวัด · ซีล/สลัก · สายฉีด · สภาพถัง) เป็น / ปกติ หรือ x ผิดปกติ"
+    - "มีหัวข้อใดเป็น x = แถวนั้นผิดปกติ → แจ้งเตือนผู้จัดการคลังสินค้า (role-mgr-wh) ให้ติดต่อผู้จำหน่ายแก้ไข"
+    - "1 ใบ = 1 จุดติดตั้ง (สถานที่) · ผู้ตรวจ = ผู้บันทึกแถว (ระบบใส่) · วันที่ตรวจห้ามเป็นอนาคต"
+    - "แถวที่บันทึกแล้วแก้ได้เฉพาะผู้บันทึกภายในวันเดียวกัน หลังจากนั้นแก้ไม่ได้ (log)"
+# G4
+repeat: { max_rows: null }
+# G5
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+# G6 — ไม่มีช่องลงชื่อ · ผู้ตรวจต่อแถวแสดงชื่อเป็นข้อความ
+signature: { layout: per-row-text, per_doa_step: false, handwriting_image: false }
+# G7 — ไม่มีอนุมัติ · ยกเลิกใบได้โดยเจ้าของ + admin role ก่อนปิดใบ ต้องมีเหตุผล
+reject_cancel: { on_reject: draft, cancel_by: [owner, admin_role], cancel_states: [draft, active], reason_required: true }
+# G8 — admin role = ผู้จัดการคลังสินค้า (role-mgr-wh)
+visibility: { owner: true, approver: none, admin_role: all, admin_role_id: role-mgr-wh, warehouse_staff: all }
+# G9
+numbering: { issue_on: first_save, code: FEC }
+# G10
+extras: { attachments: true, copy: false, export_csv: true, announce: false }

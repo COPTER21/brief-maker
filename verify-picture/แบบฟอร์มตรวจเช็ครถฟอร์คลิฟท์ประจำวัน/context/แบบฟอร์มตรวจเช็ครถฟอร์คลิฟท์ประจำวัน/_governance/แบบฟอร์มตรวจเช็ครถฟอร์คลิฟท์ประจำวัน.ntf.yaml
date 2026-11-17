@@ -1,0 +1,28 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock + เติม event ธุรกิจจาก DEC-16 · AI-DEFAULT รอลูกค้ายืนยัน
+feature_id: F-TMP-002
+name: แบบฟอร์มตรวจเช็ครถฟอร์คลิฟท์ประจำวัน
+code: FLI
+events:
+- id: fli_defect_found
+  trigger: บันทึกผลตรวจรายวันที่มีอย่างน้อย 1 ช่องเป็น ✗ (ผิดปกติ/ต้องแก้ไข) — DEC-16 · ยิงครั้งเดียวต่อวันต่อใบ
+  recipients:
+  - role-supervisor
+  template: '**{doc_no}** พบรายการผิดปกติ {defect_count} รายการ ({items}) วันที่ {day} — {vehicle_type} · โปรดตรวจสอบก่อนใช้งานรถ'
+  channel: in-app+email
+  optional: false
+  frd_ref: 03_LOGIC F-TMP-002-FN-04, F-TMP-002-FN-10 · 05 §5.6
+  why: หมายเหตุท้ายฟอร์ม "หากพบจุดเสียหายที่ไม่สามารถปฏิบัติงานได้ แจ้งผู้ควบคุมทันที" — ต้องแจ้งทันที ไม่รอสิ้นเดือน
+- id: fli_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  frd_ref: 03_LOGIC F-TMP-002-FN-08, F-TMP-002-FN-10 · 05 §5.6
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว (DOA engine ไม่ยิงกรณีนี้)
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+- fli_over_limit_approved   # ตัด — เอกสารนี้ไม่มีเกณฑ์ตัวเลข (ไม่มีสูตร/วงเงิน)

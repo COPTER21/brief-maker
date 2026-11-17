@@ -1,0 +1,43 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# G1 ผลต่อระบบ — ใบตรวจเช็คประจำวัน ไม่เปลี่ยนค่าในระบบ ไม่ส่งต่อ (Asset/Maintenance ยังไม่มีในระบบ)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — กระดาษมีช่องผู้อนุมัติ 1 จุด "หัวหน้างานตรวจสอบ" → role-supervisor (มีใน DOA master)
+doa: { required: true, mode: dynamic, default_steps: ["role-supervisor"], amount: none }
+
+# G3 ค่าคงที่ — รายการตรวจ 3 กลุ่ม + คอลัมน์วัน อ่านจาก config · ไม่มีสูตร
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "เลือกประเภทรถ (น้ำมัน/ไฟฟ้า) ได้ 1 แบบ → กรอกได้เฉพาะรายการทั่วไป + รายการเฉพาะประเภทที่เลือก"
+    - "ช่องผลตรวจรายวันรับค่า ✓ (ปกติ/พร้อมใช้งาน) หรือ ✗ (ผิดปกติ/ต้องแก้ไข) หรือว่าง"
+    - "ห้ามกรอกวันที่เกินจำนวนวันของเดือนที่เลือก และห้ามกรอกวันในอนาคต (บล็อก)"
+    - "มีช่องใดเป็น ✗ → เตือนให้แจ้งหัวหน้างานตรวจสอบทันที (เตือน ไม่บล็อก)"
+    - "1 ใบ = 1 เดือน · ส่งให้หัวหน้างานตรวจสอบเมื่อสิ้นเดือน (ส่งก่อนสิ้นเดือนได้)"
+
+# G4 รายการซ้ำ — รายการตรวจมาจาก config ไม่ให้ผู้ใช้เพิ่มแถวเอง; PDF แสดงครบ 15/8/6 แถวตามกระดาษ
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ 1:1 · แก้คำสะกดผิด "ปฎิบัติ" → "ปฏิบัติ"
+fidelity: { one_to_one: true, add_fields: [], merge_split: [], spelling_fix: ["ปฎิบัติ → ปฏิบัติ"] }
+
+# G6 ลายเซ็น
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ → กลับเป็นร่างเลขเดิม · ยกเลิกได้ เจ้าของ + admin · ร่าง/รออนุมัติ · เหตุผลบังคับ
+reject_cancel: { on_reject: draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น — admin = ผู้จัดการคลังสินค้า (role-mgr-wh)
+visibility: { owner: true, approver: after_submit, admin_role: all, admin_role_id: role-mgr-wh }
+
+# G9 เลขที่ — ออกตอนบันทึกครั้งแรก · รหัส FLI (ForkLift Inspection)
+numbering: { issue_on: first_save, code: FLI }
+
+# G10 ของเสริม
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

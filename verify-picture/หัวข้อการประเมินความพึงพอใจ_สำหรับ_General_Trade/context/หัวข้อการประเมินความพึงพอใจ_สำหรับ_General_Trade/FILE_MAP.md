@@ -1,0 +1,62 @@
+# FILE_MAP — หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `01_Prototype/feature.html` | `_ui/UI_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.html` |
+| `02_BRD/BRD_F-TMP-002.docx` | `_brd/BRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.docx` |
+| `02_BRD/BRD_F-TMP-002.md` | `_brd/BRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-002_Pack/00_OVERVIEW.md` | `_frd/FRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade/00_OVERVIEW_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-002_Pack/01_UI.md` | `_frd/FRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade/01_UI_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-002_Pack/02_API.md` | `_frd/FRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade/02_API_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-002_Pack/03_LOGIC.md` | `_frd/FRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade/03_LOGIC_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-002_Pack/04_DB.md` | `_frd/FRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade/04_DB_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-002_Pack/05_RULES.md` | `_frd/FRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade/05_RULES_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-002_Pack/06_TESTS.md` | `_frd/FRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade/06_TESTS_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-002_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade/07_LOCKED_DECISIONS_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-002_Pack/INDEX.md` | `_frd/FRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade/INDEX_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-002_Pack/_SECTION_N.md` | `_frd/FRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade/_SECTION_N_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-002_Pack/declarations/CSM.doa.yaml` | `_frd/FRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade/declarations/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.doa.yaml` |
+| `03_FRD/FRD_F-TMP-002_Pack/declarations/CSM.doccfg.yaml` | `_frd/FRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade/declarations/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-002_Pack/declarations/CSM.mdoc.yaml` | `_frd/FRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade/declarations/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-002_Pack/declarations/CSM.ntf.yaml` | `_frd/FRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade/declarations/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.ntf.yaml` |
+| `03_FRD/FRD_F-TMP-002_Pack/declarations/DOA_BRIEF_F-TMP-002.md` | `_frd/FRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade/declarations/DOA_BRIEF_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-002_Pack/declarations/DOCCFG_BRIEF_F-TMP-002.md` | `_frd/FRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade/declarations/DOCCFG_BRIEF_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-002_Pack/declarations/MDOC_BRIEF_CSM.md` | `_frd/FRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade/declarations/MDOC_BRIEF_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-002_Pack/declarations/NTF_BRIEF_F-TMP-002.md` | `_frd/FRD_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade/declarations/NTF_BRIEF_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-002.md` | `_uibrief/UIBRIEF_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `05_Governance/CSM.doa.yaml` | `_governance/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.doa.yaml` |
+| `05_Governance/CSM.doccfg.yaml` | `_governance/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.doccfg.yaml` |
+| `05_Governance/CSM.mdoc.yaml` | `_governance/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.mdoc.yaml` |
+| `05_Governance/CSM.ntf.yaml` | `_governance/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.ntf.yaml` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `05_Governance/DOA_BRIEF_F-TMP-002.md` | `_governance/DOA_BRIEF_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-002.md` | `_governance/DOCCFG_BRIEF_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `05_Governance/MDOC_BRIEF_CSM.md` | `_governance/MDOC_BRIEF_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-002.md` | `_governance/NTF_BRIEF_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-002.md` | `_tc/QA_AUDIT_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `06_Test/cases.json` | `_tc/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade_cases.json` |
+| `06_Test/testcase-F-TMP-002.html` | `_tc/UAT_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.html` |
+| `06_Test/testcases-F-TMP-002.md` | `_tc/TC_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `07_Print/FM-SAL-11_print-spec.md` | `_document/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade_print-spec.md` |
+| `07_Print/FM-SAL-11_template.html` | `_document/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade_template.html` |
+| `07_Print/approved-doa6steps.data.json` | `_document/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade_approved-doa6steps.data.json` |
+| `07_Print/approved.data.json` | `_document/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade_approved.data.json` |
+| `07_Print/draft.data.json` | `_document/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade_draft.data.json` |
+| `07_Print/form.tpl.html` | `_document/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade_template.html` |
+| `07_Print/long-22customers.data.json` | `_document/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade_long-22customers.data.json` |
+| `07_Print/print_config.json` | `_document/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade_print_config.json` |
+| `07_Print/profile.json` | `_document/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade_profile.json` |
+| `07_Print/rejected.data.json` | `_document/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade_rejected.data.json` |
+| `07_Print/render_data.py` | `_document/หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade_render_data.py` |
+| `08_Reference/11. FM-SAL-11 แบบสรุปหัวข้อการประเมินความพึงพอใจ สำหรับ General Trade.xlsx` | `_reference/11. FM-SAL-11 แบบสรุปหัวข้อการประเมินความพึงพอใจ สำหรับ General Trade_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.xlsx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-002.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-002_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-002_v2.md` | `_reference/PREBRIEF_REQ-TMP-002_v2_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_หัวข้อการประเมินความพึงพอใจ_สำหรับ_General_Trade.png` |

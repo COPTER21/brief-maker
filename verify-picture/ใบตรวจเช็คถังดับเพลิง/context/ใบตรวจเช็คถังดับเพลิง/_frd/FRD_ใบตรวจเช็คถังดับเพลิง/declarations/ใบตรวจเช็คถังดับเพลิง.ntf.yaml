@@ -1,0 +1,27 @@
+# ntf-declaration v1.2 — ฉบับจริง (frd_ref จาก frd_lint)
+feature_id: F-TMP-001
+name: ใบตรวจเช็คถังดับเพลิง
+code: FEC
+events:
+- id: fec_abnormal_found
+  trigger: บันทึกแถวตรวจที่มีหัวข้อใดเป็น x = ผิดปกติ (DEC-04 · DEC-13)
+  recipients:
+  - role-mgr-wh
+  template: '**{doc_no}** พบถังดับเพลิงผิดปกติที่ {location} ({abnormal_items}) วันที่
+    {check_date} — ติดต่อผู้จำหน่ายเพื่อแก้ไข'
+  channel: in-app+email
+  optional: false
+  why: ข้อความท้ายฟอร์ม "หากพบเครื่องดับเพลิงผิดปกติ ติดต่อผู้จำหน่ายเพื่อแก้ไข" —
+    ผู้รับผิดชอบต้องรู้ทันที (ความปลอดภัย)
+  frd_ref: 03_LOGIC F-TMP-001-FN-07
+- id: fec_cancelled
+  trigger: active → cancelled
+  recipients:
+  - role-mgr-wh
+  template: '**{doc_no}** ใบตรวจเช็คถังดับเพลิง ({location}) ถูกยกเลิกโดย {actor}
+    — {reason}'
+  channel: in-app
+  optional: true
+  why: ผู้ดูแลคลังต้องรู้ว่าจุดติดตั้งนี้ไม่มีใบตรวจที่ใช้งานอยู่
+  frd_ref: 03_LOGIC F-TMP-001-FN-07
+excluded: []

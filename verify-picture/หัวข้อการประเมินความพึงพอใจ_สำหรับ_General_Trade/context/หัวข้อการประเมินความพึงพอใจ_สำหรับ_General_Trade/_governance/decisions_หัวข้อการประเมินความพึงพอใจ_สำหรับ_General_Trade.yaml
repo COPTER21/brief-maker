@@ -1,0 +1,48 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# J002 · FM-SAL-11 หัวข้อการประเมินความพึงพอใจ สำหรับ General Trade (แบบสรุปผล CSAT รายเดือน)
+
+# G1 ผลต่อระบบ — ไม่เปลี่ยนค่า ไม่ส่งต่อ · ข้อมูลผลประเมินจากแบบสำรวจ FM-SAL-10 ยังไม่ได้ผูก → ผู้ใช้กรอกจำนวนเอง
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — กระดาษมีผู้ลงชื่อรับรอง 1 จุด (ผู้อำนวยการสายงานการขาย) · role ใกล้สุดใน master = role-mgr-bu
+doa: { required: true, mode: dynamic, default_steps: ["role-mgr-bu"], step_labels: ["ผู้อำนวยการสายงานการขาย"], requester_role: "role-mgr-sales", amount: none }
+
+# G3 สูตร / ค่าคงที่
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "จำนวนในช่องคะแนน (มากที่สุด…ต้องปรับปรุง) เป็นจำนวนเต็ม ≥ 0 — ติดลบ/ทศนิยม = บล็อก"
+    - "รวมต่อแถว = ผลรวม 5 ระดับ · แถว รวม ท้ายตารางรวมครบทั้ง 5 คอลัมน์ (ต้นฉบับขาดบางคอลัมน์)"
+    - "% ต่อด้าน = (5×มากที่สุด+4×มาก+3×ปานกลาง+2×น้อย+1×ต้องปรับปรุง) ÷ (5×รวม) × 100 · ทศนิยม 2 ตำแหน่ง · รวม=0 แสดง —"
+    - "% โดยรวม = คะแนนถ่วงน้ำหนักรวม 3 ด้าน ÷ (5×จำนวนคำตอบรวม 3 ด้าน) × 100 — แทนตัวเลข 85.83 ที่พิมพ์ตายตัว"
+    - "ข้อความแปลผล: ≥80 สูง · 60–79.99 ปานกลาง · <60 อาจไม่พึงพอใจ (ช่วงอ่านจาก SalesConfig.csat_bands)"
+    - "จำนวนการสั่งซื้อของลูกค้าในรายชื่อ < SalesConfig.csat_min_orders_per_month (3) → เตือน ไม่บล็อก"
+    - "หัวข้อประเมิน 16 ข้อ และน้ำหนัก 5–1 อ่านจาก config (ผู้ใช้ไม่แก้ข้อความหัวข้อ) · จำนวนแถวตาราง 3 ด้าน = จำนวนหัวข้อใน config (ผู้ใช้ไม่เพิ่ม/ลบแถว · ไม่จำกัดที่ระดับ config)"
+    - "ส่งได้เมื่อมีจำนวนคำตอบรวม > 0 อย่างน้อย 1 ด้าน และรายชื่อลูกค้า ≥ 1 แถว"
+
+# G4 รายการซ้ำ — ตารางคะแนนแถวคงที่ตามหัวข้อ (4/4/8) · รายชื่อลูกค้าไม่จำกัด PDF ขั้นต่ำ 14 แถว
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ / ยกเลิก
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น
+visibility: { owner: true, approver: after_submit, admin_role: all, admin_role_name: "ผู้ดูแลเอกสารฝ่ายขาย (Sales admin)" }
+
+# G9 เลขที่ — เอกสารภายใน ออกตอนบันทึกครั้งแรก · รหัส CSM (CSAT Summary Monthly)
+numbering: { issue_on: first_save, code: CSM }
+
+# G10 ของเสริม
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

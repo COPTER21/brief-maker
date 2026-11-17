@@ -1,0 +1,316 @@
+{
+  "feature": {
+    "code": "F-TMP-004",
+    "name": "แบบประเมินและคัดเลือกผู้ขาย/ผู้ให้บริการ ประจำปี",
+    "module": "Purchase"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-16",
+  "round": 1,
+  "refs": "FRD-F-TMP-004 v1.0 · 06_TESTS AC-01..15 · TC-D01..07",
+  "scope": {
+    "checked": [
+      "Create / Update / Delete ตาม flow ที่ผู้ตรวจใช้งาน",
+      "Create และ Edit drawer รวมการแนบไฟล์และปุ่มดำเนินการ",
+      "View drawer: รายละเอียด · PDF Preview · ลายเซ็น · ประวัติ",
+      "Modal เลือกสายอนุมัติ",
+      "UI/UX ส่วนที่เหลือ"
+    ],
+    "not_checked": [
+      {
+        "item": "การคำนวณคะแนนและผล Pass/Fail ทุก boundary",
+        "reason": "ผู้ตรวจไม่ได้ระบุผล"
+      },
+      {
+        "item": "อนุมัติครบสาย · ส่งกลับ · ส่งใหม่ · notification",
+        "reason": "ติดข้อความไม่พบสายอนุมัติ จึงไปต่อไม่ได้"
+      },
+      {
+        "item": "Permission/deny cases และ multi-tenant RLS",
+        "reason": "ผู้ตรวจไม่ได้ระบุผล"
+      },
+      {
+        "item": "PDF 2 หน้า · Document Store · config/DOA snapshot · concurrency/idempotency",
+        "reason": "ผู้ตรวจไม่ได้ระบุผล"
+      },
+      {
+        "item": "รายการ · ตัวกรอง · CSV · การเตือนผู้ขายซ้ำในปี",
+        "reason": "ผู้ตรวจไม่ได้ระบุผล"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างรายการ (Create)",
+      "expected": "สร้างรายการได้ตาม flow",
+      "status": "pass",
+      "ref": "AC-01"
+    },
+    {
+      "item": "แก้ไขรายการ (Update)",
+      "expected": "แก้ไขรายการได้ตาม flow",
+      "status": "pass",
+      "ref": "BR-DOA-01 · Permission Matrix"
+    },
+    {
+      "item": "ลบ/ยกเลิกรายการ (Delete ตามคำผู้ตรวจ)",
+      "expected": "ดำเนินการได้ตาม flow ที่ระบบเปิดให้ใช้",
+      "status": "pass",
+      "ref": "AC-13"
+    },
+    {
+      "item": "Upload ไฟล์ระหว่าง Create/Edit",
+      "expected": "Upload สำเร็จก่อนจบขั้นตอน หรือเมื่อ Upload ไม่สำเร็จต้องไม่สร้างร่างโดยไม่มีไฟล์โดยที่ผู้ใช้ไม่ตั้งใจ",
+      "actual": "Upload ไม่สำเร็จ แต่ระบบยังสร้างรายการร่าง",
+      "status": "fail",
+      "bug": "BUG-02",
+      "ref": "BR-15 · API-11"
+    },
+    {
+      "item": "บันทึกและส่งตรวจสอบจาก Create/Edit drawer",
+      "expected": "มี action บันทึกและส่งตรวจสอบให้ผู้ใช้จบ flow ได้",
+      "actual": "ไม่มีปุ่มบันทึกและส่งตรวจสอบ",
+      "status": "fail",
+      "bug": "BUG-03",
+      "ref": "AC-07 · API-06"
+    },
+    {
+      "item": "Resolve สายอนุมัติเมื่อส่งตรวจสอบ",
+      "expected": "พบสายอนุมัติตามหน่วยงานของผู้จัดทำและเลือกผู้พิจารณาได้",
+      "actual": "Modal แสดงข้อความ “ไม่พบสายอนุมัติสำหรับหน่วยงานของผู้จัดทำ”",
+      "status": "fail",
+      "bug": "BUG-05",
+      "ref": "AC-07 · FN-05 · BR-DOA-02"
+    },
+    {
+      "item": "Validation ช่องบังคับก่อนส่ง",
+      "expected": "บล็อกและแจ้งช่องที่ผิด",
+      "status": "na",
+      "ref": "AC-02"
+    },
+    {
+      "item": "ประเภทสินค้า/บริการและการล้างรายละเอียด",
+      "expected": "เลือกอย่างน้อย 1 และล้างรายละเอียดเมื่อยกเลิกประเภท",
+      "status": "na",
+      "ref": "AC-03"
+    },
+    {
+      "item": "ตรวจคะแนนเกินเต็ม/รูปแบบทศนิยม",
+      "expected": "บล็อกคะแนนเกินเต็ม ทศนิยมเกิน 1 ตำแหน่ง และตัวอักษร",
+      "status": "na",
+      "ref": "AC-04"
+    },
+    {
+      "item": "คำนวณคะแนนรวมและ Pass/Fail",
+      "expected": "server คำนวณผลถูกต้อง รวมเท่ากับเกณฑ์เป็น Pass",
+      "status": "na",
+      "ref": "AC-05"
+    },
+    {
+      "item": "มาตรฐานอื่นๆ บังคับระบุชื่อ",
+      "expected": "เลือกอื่นๆ แล้วไม่ระบุชื่อต้องส่งไม่ได้",
+      "status": "na",
+      "ref": "AC-06"
+    },
+    {
+      "item": "แจ้งเตือนเมื่อผู้ขายไม่ผ่าน",
+      "expected": "แจ้ง role-mgr-pur และ role-gm ตามช่องทางที่กำหนด",
+      "status": "na",
+      "ref": "AC-08"
+    },
+    {
+      "item": "อนุมัติตามลำดับจน approved",
+      "expected": "เดินทีละขั้น ล็อกแก้ไข และเก็บ approved_final",
+      "status": "na",
+      "ref": "AC-09"
+    },
+    {
+      "item": "ไม่เห็นด้วย/ไม่อนุมัติแล้วส่งกลับ",
+      "expected": "เหตุผลบังคับ กลับ returned เลขเดิม แก้และส่งใหม่ได้",
+      "status": "na",
+      "ref": "AC-10"
+    },
+    {
+      "item": "PDF ทุกสถานะและข้อมูลลายเซ็น",
+      "expected": "PDF 2 หน้า คะแนนและช่องลงชื่อตรง chain",
+      "status": "na",
+      "ref": "AC-11"
+    },
+    {
+      "item": "DOA แบบ 2/3/6 ขั้น",
+      "expected": "จำนวน slot และลายเซ็นเปลี่ยนตาม DOA",
+      "status": "na",
+      "ref": "AC-12"
+    },
+    {
+      "item": "รายการ รอฉันพิจารณา ตัวกรอง และ CSV",
+      "expected": "แสดงตามสิทธิ์และส่งออกคะแนนรายหัวข้อ",
+      "status": "na",
+      "ref": "AC-14"
+    },
+    {
+      "item": "เตือนผู้ขายรหัสเดิมในปีเดียวกัน",
+      "expected": "เตือนแต่ไม่บล็อก",
+      "status": "na",
+      "ref": "AC-15"
+    },
+    {
+      "item": "ผู้อนุมัติไม่เห็นร่างของผู้อื่น",
+      "expected": "ไม่พบในรายการและเปิดตรงได้ 404",
+      "status": "na",
+      "ref": "TC-D01"
+    },
+    {
+      "item": "Owner ไม่เห็นใบของผู้ประเมินคนอื่น",
+      "expected": "ค้นหาไม่พบ",
+      "status": "na",
+      "ref": "TC-D02"
+    },
+    {
+      "item": "ผู้ที่ไม่ใช่ current approver ตัดสินไม่ได้",
+      "expected": "ไม่มีปุ่มและ API ปฏิเสธ NOT_CURRENT_APPROVER",
+      "status": "na",
+      "ref": "TC-D03"
+    },
+    {
+      "item": "คนนอกสิทธิ์ยกเลิกไม่ได้",
+      "expected": "API ปฏิเสธ NOT_OWNER",
+      "status": "na",
+      "ref": "TC-D04"
+    },
+    {
+      "item": "แก้ใบ pending/approved หรือใบผู้อื่นไม่ได้",
+      "expected": "ไม่มีปุ่มและ API ปฏิเสธ",
+      "status": "na",
+      "ref": "TC-D05"
+    },
+    {
+      "item": "ผู้ประเมินเลือกตนเองเป็นผู้พิจารณาไม่ได้",
+      "expected": "ไม่มีในรายชื่อและ API ปฏิเสธ SELF_APPROVAL",
+      "status": "na",
+      "ref": "TC-D06"
+    },
+    {
+      "item": "Client กำหนด score_total/eval_result เองไม่ได้",
+      "expected": "server คำนวณใหม่",
+      "status": "na",
+      "ref": "TC-D07"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "Create/Edit drawer และ step หลุด design; layout บางส่วนไม่เรียบร้อย"
+    },
+    {
+      "id": "U-04",
+      "status": "note",
+      "note": "Create/Edit ไม่มีปุ่มบันทึกและส่งตรวจสอบ และตำแหน่ง action ใน View drawer ไม่สม่ำเสมอ"
+    },
+    {
+      "item": "View drawer tabs",
+      "status": "note",
+      "note": "แท็บรายละเอียด, PDF Preview, ลายเซ็น และประวัติ มี UI หลุด design"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "note",
+      "note": "Flow ส่งตรวจสอบจบไม่ได้ เพราะไม่พบสายอนุมัติสำหรับหน่วยงานของผู้จัดทำ"
+    },
+    {
+      "id": "X-02",
+      "status": "note",
+      "note": "Upload ไฟล์ไม่สำเร็จ แต่ระบบยังสร้างรายการร่าง ทำให้ผลของ action ไม่สอดคล้องกับที่ผู้ใช้คาด"
+    },
+    {
+      "id": "X-05",
+      "status": "note",
+      "note": "ไม่มี action บันทึกและส่งตรวจสอบใน Create/Edit drawer ให้ไปต่อจากจุดเดิม"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "Create/Edit drawer และ step หลุด design",
+      "severity": "low",
+      "steps": [
+        "เปิด Create drawer",
+        "ไล่แต่ละ step และสังเกต layout",
+        "เปิด Edit drawer และตรวจซ้ำ"
+      ],
+      "expected": "Drawer, step และ layout เรียบร้อยและสอดคล้องกับ design system",
+      "actual": "Drawer และ step หลุด design; layout บางส่วนไม่เรียบร้อย",
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "Upload ไฟล์ไม่สำเร็จ แต่ระบบยังสร้างรายการร่าง",
+      "severity": "medium",
+      "steps": [
+        "เปิด Create หรือ Edit drawer",
+        "เลือก Upload ไฟล์",
+        "ดำเนินการต่อจนระบบแจ้งว่า Upload ไม่สำเร็จ",
+        "กลับไปตรวจรายการ"
+      ],
+      "expected": "ระบบแจ้งข้อผิดพลาดและไม่สร้าง/บันทึกร่างโดยไม่มีไฟล์โดยที่ผู้ใช้ไม่ตั้งใจ หรือให้ผู้ใช้ยืนยันว่าจะบันทึกต่อ",
+      "actual": "Upload ไม่สำเร็จ แต่มีรายการร่างถูกสร้างแล้ว",
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "Create/Edit drawer ไม่มีปุ่มบันทึกและส่งตรวจสอบ",
+      "severity": "medium",
+      "steps": [
+        "เปิด Create drawer และกรอกข้อมูล",
+        "ไปยังขั้นสุดท้าย",
+        "ตรวจ action ที่มีอยู่",
+        "เปิด Edit drawer และตรวจซ้ำ"
+      ],
+      "expected": "มีปุ่มบันทึกและส่งตรวจสอบเพื่อจบ flow จาก Create/Edit drawer",
+      "actual": "ไม่พบปุ่มบันทึกและส่งตรวจสอบ",
+      "status": "open"
+    },
+    {
+      "id": "BUG-04",
+      "title": "UI/UX ของแท็บใน View drawer หลุด design",
+      "severity": "low",
+      "steps": [
+        "เปิด View drawer",
+        "เปิดแท็บรายละเอียด",
+        "เปิด PDF Preview, ลายเซ็น และประวัติ",
+        "ตรวจ layout และรูปแบบของแต่ละแท็บ"
+      ],
+      "expected": "ทุกแท็บใช้ layout และ component ตาม design system เดียวกัน",
+      "actual": "แท็บรายละเอียด, PDF Preview, ลายเซ็น และประวัติ มี UI/UX หลุด design",
+      "status": "open"
+    },
+    {
+      "id": "BUG-05",
+      "title": "ไม่พบสายอนุมัติสำหรับหน่วยงานของผู้จัดทำ ทำให้ส่งตรวจสอบไม่ได้",
+      "severity": "critical",
+      "steps": [
+        "เปิดรายการที่พร้อมส่งตรวจสอบ",
+        "เปิด Modal เลือกสายอนุมัติ",
+        "ตรวจผลการ resolve สายอนุมัติ"
+      ],
+      "expected": "Modal แสดงสายอนุมัติตามหน่วยงานของผู้จัดทำและให้เลือกผู้พิจารณาได้",
+      "actual": "Modal แสดงข้อความ “ไม่พบสายอนุมัติสำหรับหน่วยงานของผู้จัดทำ” และไม่สามารถเดิน flow ต่อ",
+      "status": "open"
+    }
+  ],
+  "suggestions": [
+    {
+      "item": "ย้ายปุ่มยกเลิกเอกสารใน View drawer ไปรวมกับ action อื่น",
+      "reason": "Footer ควรเหลือเฉพาะปุ่มปิดเพื่อให้รูปแบบ action ชัดเจนและสม่ำเสมอ"
+    },
+    {
+      "item": "เอา Upload file ออกจากแท็บรายละเอียดของ View drawer",
+      "reason": "ต้องการให้แนบไฟล์ได้เฉพาะ Create/Edit drawer และให้ View เป็นโหมดอ่าน"
+    }
+  ]
+}

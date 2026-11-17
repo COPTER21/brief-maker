@@ -1,0 +1,60 @@
+# FILE_MAP — ใบตรวจเช็คถังดับเพลิง
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_ใบตรวจเช็คถังดับเพลิง.md` |
+| `01_Prototype/feature.html` | `_ui/UI_ใบตรวจเช็คถังดับเพลิง.html` |
+| `02_BRD/BRD_F-TMP-001.docx` | `_brd/BRD_ใบตรวจเช็คถังดับเพลิง.docx` |
+| `02_BRD/BRD_F-TMP-001.md` | `_brd/BRD_ใบตรวจเช็คถังดับเพลิง.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/00_OVERVIEW.md` | `_frd/FRD_ใบตรวจเช็คถังดับเพลิง/00_OVERVIEW_ใบตรวจเช็คถังดับเพลิง.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/01_UI.md` | `_frd/FRD_ใบตรวจเช็คถังดับเพลิง/01_UI_ใบตรวจเช็คถังดับเพลิง.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/02_API.md` | `_frd/FRD_ใบตรวจเช็คถังดับเพลิง/02_API_ใบตรวจเช็คถังดับเพลิง.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/03_LOGIC.md` | `_frd/FRD_ใบตรวจเช็คถังดับเพลิง/03_LOGIC_ใบตรวจเช็คถังดับเพลิง.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/04_DB.md` | `_frd/FRD_ใบตรวจเช็คถังดับเพลิง/04_DB_ใบตรวจเช็คถังดับเพลิง.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/05_RULES.md` | `_frd/FRD_ใบตรวจเช็คถังดับเพลิง/05_RULES_ใบตรวจเช็คถังดับเพลิง.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/06_TESTS.md` | `_frd/FRD_ใบตรวจเช็คถังดับเพลิง/06_TESTS_ใบตรวจเช็คถังดับเพลิง.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_ใบตรวจเช็คถังดับเพลิง/07_LOCKED_DECISIONS_ใบตรวจเช็คถังดับเพลิง.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/INDEX.md` | `_frd/FRD_ใบตรวจเช็คถังดับเพลิง/INDEX_ใบตรวจเช็คถังดับเพลิง.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/_SECTION_N.md` | `_frd/FRD_ใบตรวจเช็คถังดับเพลิง/_SECTION_N_ใบตรวจเช็คถังดับเพลิง.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/DOCCFG_BRIEF_F-TMP-001.md` | `_frd/FRD_ใบตรวจเช็คถังดับเพลิง/declarations/DOCCFG_BRIEF_ใบตรวจเช็คถังดับเพลิง.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/FEC.doccfg.yaml` | `_frd/FRD_ใบตรวจเช็คถังดับเพลิง/declarations/ใบตรวจเช็คถังดับเพลิง.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/FEC.mdoc.yaml` | `_frd/FRD_ใบตรวจเช็คถังดับเพลิง/declarations/ใบตรวจเช็คถังดับเพลิง.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/FEC.ntf.yaml` | `_frd/FRD_ใบตรวจเช็คถังดับเพลิง/declarations/ใบตรวจเช็คถังดับเพลิง.ntf.yaml` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/MDOC_BRIEF_FEC.md` | `_frd/FRD_ใบตรวจเช็คถังดับเพลิง/declarations/MDOC_BRIEF_ใบตรวจเช็คถังดับเพลิง.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/NTF_BRIEF_F-TMP-001.md` | `_frd/FRD_ใบตรวจเช็คถังดับเพลิง/declarations/NTF_BRIEF_ใบตรวจเช็คถังดับเพลิง.md` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-001.md` | `_uibrief/UIBRIEF_ใบตรวจเช็คถังดับเพลิง.md` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_ใบตรวจเช็คถังดับเพลิง.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_ใบตรวจเช็คถังดับเพลิง.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-001.md` | `_governance/DOCCFG_BRIEF_ใบตรวจเช็คถังดับเพลิง.md` |
+| `05_Governance/FEC.doccfg.yaml` | `_governance/ใบตรวจเช็คถังดับเพลิง.doccfg.yaml` |
+| `05_Governance/FEC.mdoc.yaml` | `_governance/ใบตรวจเช็คถังดับเพลิง.mdoc.yaml` |
+| `05_Governance/FEC.ntf.yaml` | `_governance/ใบตรวจเช็คถังดับเพลิง.ntf.yaml` |
+| `05_Governance/MDOC_BRIEF_FEC.md` | `_governance/MDOC_BRIEF_ใบตรวจเช็คถังดับเพลิง.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-001.md` | `_governance/NTF_BRIEF_ใบตรวจเช็คถังดับเพลิง.md` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_ใบตรวจเช็คถังดับเพลิง.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-001.md` | `_tc/QA_AUDIT_ใบตรวจเช็คถังดับเพลิง.md` |
+| `06_Test/cases.json` | `_tc/ใบตรวจเช็คถังดับเพลิง_cases.json` |
+| `06_Test/testcase-F-TMP-001.html` | `_tc/UAT_ใบตรวจเช็คถังดับเพลิง.html` |
+| `06_Test/testcases-F-TMP-001.md` | `_tc/TC_ใบตรวจเช็คถังดับเพลิง.md` |
+| `07_Print/abnormal.data.json` | `_document/ใบตรวจเช็คถังดับเพลิง_abnormal.data.json` |
+| `07_Print/active-3rows.data.json` | `_document/ใบตรวจเช็คถังดับเพลิง_active-3rows.data.json` |
+| `07_Print/cancelled.data.json` | `_document/ใบตรวจเช็คถังดับเพลิง_cancelled.data.json` |
+| `07_Print/form.tpl.html` | `_document/ใบตรวจเช็คถังดับเพลิง_template.html` |
+| `07_Print/full-12rows.data.json` | `_document/ใบตรวจเช็คถังดับเพลิง_full-12rows.data.json` |
+| `07_Print/long-24rows.data.json` | `_document/ใบตรวจเช็คถังดับเพลิง_long-24rows.data.json` |
+| `07_Print/print_config.json` | `_document/ใบตรวจเช็คถังดับเพลิง_print_config.json` |
+| `07_Print/profile.json` | `_document/ใบตรวจเช็คถังดับเพลิง_profile.json` |
+| `07_Print/render_data.py` | `_document/ใบตรวจเช็คถังดับเพลิง_render_data.py` |
+| `07_Print/ใบตรวจเช็คถังดับเพลิง_print-spec.md` | `_document/ใบตรวจเช็คถังดับเพลิง_print-spec.md` |
+| `07_Print/ใบตรวจเช็คถังดับเพลิง_template.html` | `_document/ใบตรวจเช็คถังดับเพลิง_template.html` |
+| `08_Reference/3. FM-WHS-03 ใบตรวจเช็คถังดับเพลิง.xlsx` | `_reference/3. FM-WHS-03 ใบตรวจเช็คถังดับเพลิง.xlsx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_ใบตรวจเช็คถังดับเพลิง.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_ใบตรวจเช็คถังดับเพลิง.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_ใบตรวจเช็คถังดับเพลิง.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-001.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-001_ใบตรวจเช็คถังดับเพลิง.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-001_v2.md` | `_reference/PREBRIEF_REQ-TMP-001_v2_ใบตรวจเช็คถังดับเพลิง.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_ใบตรวจเช็คถังดับเพลิง.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_ใบตรวจเช็คถังดับเพลิง.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_ใบตรวจเช็คถังดับเพลิง.png` |
+| `08_Reference/page-2.png` | `_reference/page-2_ใบตรวจเช็คถังดับเพลิง.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_ใบตรวจเช็คถังดับเพลิง.md` |

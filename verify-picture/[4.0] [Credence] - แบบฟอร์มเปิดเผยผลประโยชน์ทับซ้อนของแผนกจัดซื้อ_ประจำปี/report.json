@@ -1,0 +1,213 @@
+{
+  "feature": {
+    "code": "F-TMP-006",
+    "name": "[4.0] [Credence] - แบบฟอร์มเปิดเผยผลประโยชน์ทับซ้อนของแผนกจัดซื้อ_ประจำปี",
+    "module": "Purchase"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-16",
+  "round": 1,
+  "refs": "FRD F-TMP-006 v1.0 · 06_TESTS AC-01..15 / TC-D01..09 · AI Test Cases 50 เคส",
+  "scope": {
+    "checked": [
+      "Create / Update / Delete",
+      "Create และ Edit drawer: UI, UX, step และการอัปโหลดไฟล์",
+      "View drawer: action, แท็บรายละเอียด, PDF Preview, ลายเซ็น และประวัติ",
+      "Modal เลือกสายอนุมัติ"
+    ],
+    "not_checked": [
+      {
+        "item": "ส่งตรวจสอบและพิจารณาจนครบสายอนุมัติ",
+        "reason": "View drawer มีปุ่มส่งตรวจสอบ แต่ modal แจ้งว่าไม่พบสายอนุมัติ"
+      },
+      {
+        "item": "อัปโหลดไฟล์สำเร็จและตรวจสิทธิ์ไฟล์แนบ",
+        "reason": "อัปโหลดไม่สำเร็จในรอบตรวจ"
+      },
+      {
+        "item": "Notification, CSV, PDF output, ใบซ้ำรายปี, snapshot config และ permission deny cases",
+        "reason": "ผู้ตรวจไม่ได้รายงานผลในรอบนี้"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างรายการ",
+      "expected": "สร้างรายการได้",
+      "status": "pass",
+      "ref": "ผลตรวจผู้ตรวจ"
+    },
+    {
+      "item": "แก้ไขรายการ",
+      "expected": "แก้ไขรายการได้",
+      "status": "pass",
+      "ref": "ผลตรวจผู้ตรวจ"
+    },
+    {
+      "item": "ลบ/ยกเลิกรายการ",
+      "expected": "ลบหรือยกเลิกรายการได้",
+      "status": "pass",
+      "ref": "ผลตรวจผู้ตรวจ"
+    },
+    {
+      "item": "อัปโหลดไฟล์จาก Create / Edit drawer",
+      "expected": "ไฟล์อัปโหลดและผูกกับเอกสารสำเร็จ หรือระบบแสดงผลล้มเหลวโดยไม่ทำให้ผู้ใช้เข้าใจว่าไฟล์ถูกบันทึกแล้ว",
+      "actual": "อัปโหลดไฟล์ไม่สำเร็จ แต่ระบบยังสร้างรายการร่าง",
+      "status": "fail",
+      "bug": "BUG-01",
+      "ref": "FRD 01_UI P-02 ขั้น 2 · API-11"
+    },
+    {
+      "item": "ส่งเอกสารเข้าตรวจสอบ",
+      "expected": "Create / Edit มี action บันทึกและส่งตรวจสอบ และ View ของร่างมี action ส่งตรวจสอบ",
+      "actual": "Create และ Edit drawer ไม่มีปุ่มบันทึกและส่งตรวจสอบ แต่ View drawer มีปุ่มส่งตรวจสอบ",
+      "status": "fail",
+      "bug": "BUG-02",
+      "ref": "FRD AC-06 · API-06 · BR-DOA-01"
+    },
+    {
+      "item": "Resolve สายอนุมัติก่อนส่ง",
+      "expected": "Modal แสดงผู้บังคับบัญชาตามผังองค์กร หรือเปิดให้เลือกผู้พิจารณาเมื่อไม่มีค่าเริ่มต้น",
+      "actual": "Modal แสดงข้อความ ไม่พบสายอนุมัติสำหรับหน่วยงานของผู้จัดทำ",
+      "status": "fail",
+      "bug": "BUG-03",
+      "ref": "FRD AC-06 · EC-05 · XT-04"
+    },
+    {
+      "item": "Validation ไม่มี/มี รายละเอียด และยืนยันถ้อยคำ",
+      "expected": "บล็อกการส่งเมื่อข้อมูลไม่ครบตาม VR-01..03",
+      "status": "na",
+      "ref": "FRD AC-02..04"
+    },
+    {
+      "item": "แจ้ง Compliance เมื่อเลือกมีผลประโยชน์ทับซ้อน",
+      "expected": "ส่ง notification โดยไม่มีรายละเอียดลับ",
+      "status": "na",
+      "ref": "FRD AC-07"
+    },
+    {
+      "item": "รับทราบและล็อกเอกสาร",
+      "expected": "Approved แล้วแก้ไขและยกเลิกไม่ได้",
+      "status": "na",
+      "ref": "FRD AC-08"
+    },
+    {
+      "item": "ส่งกลับแก้ไขและส่งใหม่",
+      "expected": "Returned ใช้เลขเดิม แก้ไขและส่งใหม่ได้",
+      "status": "na",
+      "ref": "FRD AC-09"
+    },
+    {
+      "item": "PDF ทุกสถานะและจำนวนขั้น DOA",
+      "expected": "PDF A4 1 หน้า ข้อมูลและช่องลงชื่อตรงตามสายอนุมัติ",
+      "status": "na",
+      "ref": "FRD AC-10..11"
+    },
+    {
+      "item": "ยื่นใหม่ในปีเดียวกันและแทนฉบับเดิม",
+      "expected": "เตือนแต่ไม่บล็อก และใบเดิมถูกแทนที่เมื่อใบใหม่รับทราบ",
+      "status": "na",
+      "ref": "FRD AC-05"
+    },
+    {
+      "item": "Permission / Confidential data",
+      "expected": "เจ้าของ ผู้พิจารณา และ Compliance เห็นตามสิทธิ์; ผู้ไม่มีสิทธิ์ได้ 404",
+      "status": "na",
+      "ref": "FRD TC-D01..09"
+    },
+    {
+      "item": "ปีและถ้อยคำจาก Config เป็น snapshot",
+      "expected": "ใบเก่าคงปีและถ้อยคำเดิมเมื่อ Config เปลี่ยน",
+      "status": "na",
+      "ref": "FRD AC-15"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "Create/Edit drawer และ step หลุดจาก design; layout บางส่วนยังจัดวางไม่เรียบร้อย"
+    },
+    {
+      "id": "U-04",
+      "status": "note",
+      "note": "View drawer วางปุ่มยกเลิกเอกสารแยกจาก action อื่น และ Create/Edit ไม่มีปุ่มบันทึกและส่งตรวจสอบ; View มีปุ่มส่งตรวจสอบ"
+    },
+    {
+      "item": "View drawer tabs",
+      "status": "note",
+      "note": "แท็บรายละเอียด, PDF Preview, ลายเซ็น และประวัติ มี UI หลุดจาก design"
+    },
+    {
+      "item": "Upload control ใน View drawer",
+      "status": "note",
+      "note": "แท็บรายละเอียดของ View drawer แสดง upload file ทั้งที่ควรแสดงเฉพาะใน Create/Edit",
+      "evidence": ""
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "note",
+      "note": "View drawer มีปุ่มส่งตรวจสอบ แต่ไม่สามารถจบ flow ได้เนื่องจากไม่พบสายอนุมัติ"
+    },
+    {
+      "id": "X-02",
+      "status": "note",
+      "note": "อัปโหลดไฟล์ล้มเหลวแต่ยังเกิดรายการร่าง ทำให้ผลลัพธ์ของ action ไม่ชัดเจน"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "อัปโหลดไฟล์ไม่สำเร็จ แต่ระบบยังสร้างรายการร่าง",
+      "severity": "medium",
+      "steps": [
+        "เปิด Create หรือ Edit drawer",
+        "เลือกอัปโหลดไฟล์",
+        "ดำเนินการบันทึกรายการ"
+      ],
+      "expected": "ไฟล์อัปโหลดและผูกกับเอกสารสำเร็จ หรือระบบแจ้งผลล้มเหลวและสถานะของร่างอย่างชัดเจน",
+      "actual": "ไฟล์อัปโหลดไม่สำเร็จ แต่มีรายการร่างถูกสร้างขึ้น",
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "ไม่มีปุ่มบันทึกและส่งตรวจสอบใน Create / Edit drawer",
+      "severity": "medium",
+      "steps": [
+        "เปิด Create drawer และตรวจ action สำหรับส่งตรวจสอบ",
+        "เปิด Edit drawer และตรวจ action สำหรับส่งตรวจสอบ",
+        "เปิด View drawer ของรายการร่างและยืนยันว่ามีปุ่มส่งตรวจสอบ"
+      ],
+      "expected": "มีปุ่มบันทึกและส่งตรวจสอบตามสถานะและสิทธิ์ของผู้จัดทำ",
+      "actual": "ไม่พบปุ่มบันทึกและส่งตรวจสอบใน Create/Edit drawer; View drawer มีปุ่มส่งตรวจสอบ",
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "ระบบไม่พบสายอนุมัติสำหรับหน่วยงานของผู้จัดทำ",
+      "severity": "critical",
+      "steps": [
+        "เปิดรายการของผู้จัดทำ",
+        "เปิด modal เลือกสายอนุมัติ",
+        "ตรวจผลการ resolve ผู้พิจารณา"
+      ],
+      "expected": "แสดงผู้บังคับบัญชาตามผังองค์กร หรือมี slot ให้เลือกผู้พิจารณาตาม FRD",
+      "actual": "แสดงข้อความ ไม่พบสายอนุมัติสำหรับหน่วยงานของผู้จัดทำ",
+      "status": "open"
+    }
+  ],
+  "suggestions": [
+    {
+      "item": "รวมปุ่มยกเลิกเอกสารกับ action อื่นของ View drawer",
+      "reason": "Footer ควรเหลือเฉพาะปุ่มปิด เพื่อให้โครง action สม่ำเสมอ"
+    },
+    {
+      "item": "จำกัด upload file ไว้เฉพาะ Create/Edit drawer",
+      "reason": "View drawer ควรใช้สำหรับอ่านรายละเอียดและไฟล์ที่มีอยู่"
+    }
+  ]
+}
