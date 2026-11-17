@@ -1,0 +1,37 @@
+# ntf-declaration v1.2 — ฉบับจริง (frd_ref จาก FRD_F-TMP-003_Pack) · AI-DEFAULT รอลูกค้ายืนยัน
+feature_id: F-TMP-003
+name: ฟอร์มแจ้งงานขนส่งนอก
+code: OTN
+events:
+- id: otn_submitted
+  trigger: draft → submitted (ผู้จัดทำกด "ส่งแจ้งงาน")
+  recipients:
+  - role-mgr-sales
+  template: '**{doc_no}** แจ้งงานขนส่งนอก {carrier_name} รอบวันที่ {round_date} — {line_count} รายการ'
+  channel: in-app
+  optional: true
+  frd_ref: 03_LOGIC F-TMP-003-FN-06
+  why: ใบแจ้งงานไม่มีอนุมัติ (DEC-03) — ผู้ดูแลฝ่ายขาย (admin role ตาม DEC-08) ต้องรู้ว่ามีงานขนส่งนอกส่งออกไปแล้ว (AI-DEFAULT รอยืนยันว่าต้องแจ้งคลัง/ผู้ขนส่งด้วยหรือไม่)
+- id: otn_early_delivery_date
+  trigger: draft → submitted และมีแถวที่ วันที่นัดส่ง ก่อน รอบวันที่ (DEC-04/DEC-13 เตือน ไม่บล็อก)
+  recipients:
+  - role-mgr-sales
+  template: '**{doc_no}** มี {count} รายการที่วันที่นัดส่งก่อนรอบวันที่ {round_date} — โปรดตรวจสอบ'
+  channel: in-app
+  optional: true
+  frd_ref: 03_LOGIC F-TMP-003-FN-06
+  why: กฎเตือนไม่บล็อก — ผู้ดูแลต้องเห็นรายการที่วันที่ผิดปกติหลังส่ง
+- id: otn_cancelled
+  trigger: submitted → cancelled (ยกเลิกโดย admin role ที่ไม่ใช่เจ้าของ)
+  recipients:
+  - document_owner
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  frd_ref: 03_LOGIC F-TMP-003-FN-05, F-TMP-003-FN-06
+  why: G7 ยกเลิกได้โดย admin role — ผู้จัดทำต้องรู้ว่าใบแจ้งงานถูกยกเลิก
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+note: ไม่มีการอนุมัติ (DEC-03) · ไม่ส่งต่อระบบอื่น (DEC-02)

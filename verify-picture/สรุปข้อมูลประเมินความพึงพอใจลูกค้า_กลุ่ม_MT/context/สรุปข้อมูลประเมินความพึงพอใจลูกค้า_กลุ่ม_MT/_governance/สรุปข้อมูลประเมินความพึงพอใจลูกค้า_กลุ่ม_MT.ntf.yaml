@@ -1,0 +1,34 @@
+# ntf-declaration v1.2 — FINAL ยืนยันกับ FRD v1.0 (frd_lint N7 PASS)
+feature_id: F-TMP-008
+name: สรุปข้อมูลประเมินความพึงพอใจลูกค้า กลุ่ม MT
+code: MTS
+events:
+- id: mts_low_channel
+  trigger: draft → final (ยืนยันสรุป) และมีช่องทางสถานะ "ค่อนข้างต่ำกว่ามาตรฐาน" (%
+    < SalesConfig.mt_csat_low_pct = 80) อย่างน้อย 1 ช่องทาง
+  recipients:
+  - role-mgr-bu
+  - admin_role
+  template: '**{doc_no}** สรุปความพึงพอใจลูกค้า MT ครั้งที่ {round_no} — ช่องทางต่ำกว่า
+    80%: {far_channels}'
+  channel: in-app+email
+  optional: false
+  why: G3 ต่ำกว่า 80% = ต้องเร่งแก้ไข (เตือน ไม่บล็อก) — หัวหน้าหน่วยธุรกิจต้องรู้เพื่อสั่งการ
+    (role ใกล้สุดของผู้บริหารฝ่ายขายใน master)
+  frd_ref: 03_LOGIC F-TMP-008-FN-04, F-TMP-008-FN-08
+- id: mts_cancelled
+  trigger: final → cancelled โดย Sales admin (ผู้ยกเลิกไม่ใช่เจ้าของ)
+  recipients:
+  - owner
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: G7 admin ยกเลิกรายงานที่สรุปแล้วได้ — เจ้าของต้องรู้ว่าต้องทำใบใหม่
+  frd_ref: 03_LOGIC F-TMP-008-FN-05, F-TMP-008-FN-08
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+- mts_over_limit_approved
+note: ไม่มีการอนุมัติ (DEC-03) → ไม่มี event จาก DOA engine · mts_over_limit_approved
+  จาก suggest ตัดทิ้ง (ไม่มีสถานะ approved) แทนด้วย mts_low_channel

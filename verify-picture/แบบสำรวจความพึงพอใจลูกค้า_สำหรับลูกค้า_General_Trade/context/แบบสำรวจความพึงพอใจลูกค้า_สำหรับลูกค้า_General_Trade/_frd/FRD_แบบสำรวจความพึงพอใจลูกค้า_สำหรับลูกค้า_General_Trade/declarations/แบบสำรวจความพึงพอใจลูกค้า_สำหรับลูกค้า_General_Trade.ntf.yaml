@@ -1,0 +1,30 @@
+feature_id: F-TMP-001
+name: แบบสำรวจความพึงพอใจลูกค้า สำหรับลูกค้า General Trade
+code: CSG
+events:
+- id: csg_low_score_recorded
+  trigger: draft → recorded และมีข้ออย่างน้อย 1 ข้อได้คะแนน ≤ 2 (DEC-04 · เกินเกณฑ์
+    = เตือน ไม่บล็อก)
+  recipients:
+  - role-mgr-sales
+  template: '**{doc_no}** ลูกค้า {customer_name} ให้คะแนนต่ำ {low_count} ข้อ (เดือน
+    {period_month}) — โปรดติดตาม'
+  channel: in-app
+  optional: true
+  why: แบบสำรวจความพึงพอใจมีไว้ปรับปรุงบริการ — ผู้จัดการฝ่ายขายต้องรู้เมื่อมีคะแนนต่ำ
+    (AI-DEFAULT รอลูกค้ายืนยันเกณฑ์ ≤ 2)
+  frd_ref: 03_LOGIC F-TMP-001-FN-06
+- id: csg_cancelled
+  trigger: recorded → cancelled (ยกเลิกโดย admin role ที่ไม่ใช่เจ้าของ)
+  recipients:
+  - document_owner
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: G7 ยกเลิกได้โดย admin role — เจ้าของผู้บันทึกต้องรู้ว่าผลสำรวจถูกยกเลิก
+  frd_ref: 03_LOGIC F-TMP-001-FN-05, F-TMP-001-FN-06
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+note: ไม่มีการอนุมัติ (DEC-03) · ไม่ส่งต่อระบบอื่น (DEC-02)

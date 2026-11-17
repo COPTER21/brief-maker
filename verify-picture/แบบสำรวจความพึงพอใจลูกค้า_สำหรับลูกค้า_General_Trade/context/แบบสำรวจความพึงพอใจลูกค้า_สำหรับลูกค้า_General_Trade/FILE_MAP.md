@@ -1,0 +1,66 @@
+# FILE_MAP — แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `01_Prototype/feature.html` | `_ui/UI_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.html` |
+| `02_BRD/BRD_F-TMP-001.docx` | `_brd/BRD_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.docx` |
+| `02_BRD/BRD_F-TMP-001.md` | `_brd/BRD_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/00_OVERVIEW.md` | `_frd/FRD_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade/00_OVERVIEW_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/01_UI.md` | `_frd/FRD_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade/01_UI_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/02_API.md` | `_frd/FRD_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade/02_API_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/03_LOGIC.md` | `_frd/FRD_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade/03_LOGIC_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/04_DB.md` | `_frd/FRD_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade/04_DB_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/05_RULES.md` | `_frd/FRD_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade/05_RULES_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/06_TESTS.md` | `_frd/FRD_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade/06_TESTS_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade/07_LOCKED_DECISIONS_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/INDEX.md` | `_frd/FRD_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade/INDEX_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/_SECTION_N.md` | `_frd/FRD_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade/_SECTION_N_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/CSG.doccfg.yaml` | `_frd/FRD_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade/declarations/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/CSG.mdoc.yaml` | `_frd/FRD_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade/declarations/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/CSG.ntf.yaml` | `_frd/FRD_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade/declarations/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.ntf.yaml` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/DOCCFG_BRIEF_F-TMP-001.md` | `_frd/FRD_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade/declarations/DOCCFG_BRIEF_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/MDOC_BRIEF_CSG.md` | `_frd/FRD_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade/declarations/MDOC_BRIEF_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `03_FRD/FRD_F-TMP-001_Pack/declarations/NTF_BRIEF_F-TMP-001.md` | `_frd/FRD_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade/declarations/NTF_BRIEF_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-001.md` | `_uibrief/UIBRIEF_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `05_Governance/CSG.doccfg.yaml` | `_governance/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.doccfg.yaml` |
+| `05_Governance/CSG.mdoc.yaml` | `_governance/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.mdoc.yaml` |
+| `05_Governance/CSG.ntf.yaml` | `_governance/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.ntf.yaml` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-001.md` | `_governance/DOCCFG_BRIEF_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `05_Governance/MDOC_BRIEF_CSG.md` | `_governance/MDOC_BRIEF_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-001.md` | `_governance/NTF_BRIEF_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-001.md` | `_tc/QA_AUDIT_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `06_Test/cases.json` | `_tc/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade_cases.json` |
+| `06_Test/testcase-F-TMP-001.html` | `_tc/UAT_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.html` |
+| `06_Test/testcases-F-TMP-001.md` | `_tc/TC_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `07_Print/CSG_print-spec.md` | `_document/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade_print-spec.md` |
+| `07_Print/_states_sheet.png` | `_document/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade_ทุกสถานะ.png` |
+| `07_Print/cancelled.data.json` | `_document/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade_cancelled.data.json` |
+| `07_Print/compare.json` | `_document/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade_compare.json` |
+| `07_Print/compare_side.png` | `_document/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade_compare_side.png` |
+| `07_Print/draft.data.json` | `_document/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade_draft.data.json` |
+| `07_Print/form.tpl.html` | `_document/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade_template.html` |
+| `07_Print/long-comments.data.json` | `_document/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade_long-comments.data.json` |
+| `07_Print/low-score.data.json` | `_document/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade_low-score.data.json` |
+| `07_Print/print_config.json` | `_document/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade_print_config.json` |
+| `07_Print/profile.json` | `_document/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade_profile.json` |
+| `07_Print/recorded.data.json` | `_document/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade_recorded.data.json` |
+| `07_Print/แบบสำรวจความพึงพอใจลูกค้า_GT_template.html` | `_document/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade_template.html` |
+| `08_Reference/10. FM-SAL-10 แบบสำรวจความพึงพอใจลูกค้า สำหรับลูกค้า General Trade.xlsx` | `_reference/10. FM-SAL-10 แบบสำรวจความพึงพอใจลูกค้า สำหรับลูกค้า General Trade_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.xlsx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-001.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-001_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-001_v2.md` | `_reference/PREBRIEF_REQ-TMP-001_v2_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.png` |
+| `08_Reference/page-2.png` | `_reference/page-2_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.md` |
+| `08_Reference/reports/e2e_container_ref.json` | `_reference/reports/e2e_container_ref_แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade.json` |
+| `08_Reference/shot_list.png` | `_ui/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade_ภาพหน้าจอ_list.png` |
+| `08_Reference/shot_pdf.png` | `_ui/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade_ภาพหน้าจอ_pdf.png` |
+| `08_Reference/shot_wizard.png` | `_ui/แบบสำรวจความพึงพอใจลูกค้า_สำหรับลูกค้า_General_Trade_ภาพหน้าจอ_wizard.png` |

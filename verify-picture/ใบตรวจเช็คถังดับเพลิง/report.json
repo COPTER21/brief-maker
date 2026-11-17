@@ -1,0 +1,146 @@
+{
+  "feature": {
+    "code": "F-TMP-001",
+    "name": "ใบตรวจเช็คถังดับเพลิง",
+    "module": "Inventory / Warehouse"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-17",
+  "round": 1,
+  "refs": "FRD F-TMP-001 v1.0",
+  "scope": {
+    "checked": [
+      "สร้างใบตรวจผ่าน Create drawer",
+      "ลบ/ยกเลิกเอกสาร",
+      "อัปโหลดไฟล์จาก Create drawer",
+      "UI/UX ของ Create drawer ขั้นที่ 2–3",
+      "UI/UX ของ View drawer ทั้งแท็บรายละเอียด, PDF Preview และประวัติ",
+      "UI/UX ของ Modal บันทึกผลตรวจ"
+    ],
+    "not_checked": [
+      {
+        "item": "Business logic อื่นนอกเหนือจากการสร้างและลบ/ยกเลิก",
+        "reason": "ผู้ตรวจยังไม่ได้รายงานผล validation, ผลล่าสุด, สิทธิ์, การแก้ไข และ state transition รายกรณี"
+      },
+      {
+        "item": "Notification, CSV, ความถูกต้องของ PDF, audit log, concurrency และ tenant isolation",
+        "reason": "ไม่มีผลตรวจหรือหลักฐานในรอบนี้"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างใบตรวจ",
+      "expected": "ผู้ใช้สร้างใบตรวจได้สำเร็จ",
+      "status": "pass",
+      "ref": "FRD AC-01"
+    },
+    {
+      "item": "ลบ/ยกเลิกเอกสาร",
+      "expected": "ผู้ใช้ดำเนินการลบ/ยกเลิกเอกสารได้สำเร็จตาม flow",
+      "status": "pass",
+      "ref": "FRD AC-09"
+    },
+    {
+      "item": "อัปโหลดไฟล์จาก Create drawer",
+      "expected": "เลือกไฟล์แล้วระบบอัปโหลดสำเร็จและแสดงไฟล์แนบในขั้นเอกสารแนบ",
+      "actual": "อัปโหลดไฟล์ไม่สำเร็จ",
+      "status": "fail",
+      "bug": "BUG-01",
+      "ref": "FRD 01_UI P-02 · API-09"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "Create drawer ขั้นที่ 2–3, View drawer ทั้ง 3 แท็บ และ Modal บันทึกผลตรวจมี layout/spacing บางส่วนไม่เรียบร้อยและหลุดจาก design"
+    },
+    {
+      "id": "U-04",
+      "status": "note",
+      "note": "ปุ่มยกเลิกเอกสารใน View drawer แยกจากกลุ่ม action อื่น ผู้ตรวจเสนอให้ footer เหลือเฉพาะปุ่มปิด"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "note",
+      "note": "Flow สร้างใบตรวจทำขั้นอัปโหลดไฟล์ไม่สำเร็จ"
+    },
+    {
+      "item": "ตำแหน่งอัปโหลดไฟล์ใน View drawer",
+      "status": "note",
+      "note": "ผู้ตรวจเห็นว่าควรอัปโหลดได้เฉพาะ Create drawer และ View drawer ควรแสดงไฟล์อย่างเดียว; ต้องให้ BA ยืนยันเพราะ FRD มีส่วนเอกสารแนบในหน้ารายละเอียด"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "Create drawer อัปโหลดไฟล์ไม่สำเร็จ",
+      "severity": "medium",
+      "steps": [
+        "เปิด Create drawer ของใบตรวจเช็คถังดับเพลิง",
+        "ไปขั้นที่ 2 เอกสารแนบ",
+        "เลือกไฟล์เพื่ออัปโหลด"
+      ],
+      "expected": "ระบบอัปโหลดสำเร็จและแสดงไฟล์ในรายการเอกสารแนบ",
+      "actual": "อัปโหลดไฟล์ไม่สำเร็จ",
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "Create drawer ขั้นที่ 2–3 หลุดจาก design และ layout ไม่เรียบร้อย",
+      "severity": "low",
+      "steps": [
+        "เปิด Create drawer",
+        "ไปขั้นที่ 2 เอกสารแนบ",
+        "ไปขั้นที่ 3 ตรวจสอบและยืนยัน",
+        "ตรวจการจัดวางองค์ประกอบในแต่ละขั้น"
+      ],
+      "expected": "รูปแบบ ระยะห่าง และการจัดวางสม่ำเสมอตาม design ของ feature",
+      "actual": "UI/UX หลุดจาก design และ layout บางส่วนไม่เรียบร้อย",
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "View drawer ทั้ง 3 แท็บมี UI/UX หลุดจาก design",
+      "severity": "low",
+      "steps": [
+        "เปิด View drawer ของใบตรวจ",
+        "เปิดแท็บรายละเอียด",
+        "เปิดแท็บ PDF Preview",
+        "เปิดแท็บประวัติ",
+        "ตรวจรูปแบบและการจัดวางของแต่ละแท็บ"
+      ],
+      "expected": "ทั้ง 3 แท็บใช้รูปแบบ ระยะห่าง และการจัดวางที่สม่ำเสมอตาม design",
+      "actual": "UI/UX ของทั้ง 3 แท็บหลุดจาก design",
+      "status": "open"
+    },
+    {
+      "id": "BUG-04",
+      "title": "Modal บันทึกผลตรวจมี UI/UX หลุดจาก design",
+      "severity": "low",
+      "steps": [
+        "เปิด View drawer ของใบตรวจสถานะใช้งาน",
+        "กดบันทึกผลตรวจ",
+        "ตรวจรูปแบบและการจัดวางใน Modal บันทึกผลตรวจ"
+      ],
+      "expected": "Modal ใช้รูปแบบและการจัดวางสม่ำเสมอตาม design ของ feature",
+      "actual": "UI/UX ของ Modal หลุดจาก design",
+      "status": "open"
+    }
+  ],
+  "suggestions": [
+    {
+      "item": "ย้ายปุ่มยกเลิกเอกสารใน View drawer ไปอยู่รวมกับ action อื่น",
+      "reason": "ผู้ตรวจเสนอให้ footer มีเฉพาะปุ่มปิด เพื่อให้ลำดับ action ชัดและสม่ำเสมอ"
+    },
+    {
+      "item": "จำกัดการอัปโหลดไฟล์ให้ทำได้เฉพาะ Create drawer",
+      "reason": "ผู้ตรวจเสนอให้ View drawer แสดงไฟล์แนบอย่างเดียว; ต้องยืนยันกับ BA เพราะ FRD ระบุส่วนเอกสารแนบในหน้ารายละเอียดและมี API จัดการไฟล์แนบ"
+    }
+  ]
+}

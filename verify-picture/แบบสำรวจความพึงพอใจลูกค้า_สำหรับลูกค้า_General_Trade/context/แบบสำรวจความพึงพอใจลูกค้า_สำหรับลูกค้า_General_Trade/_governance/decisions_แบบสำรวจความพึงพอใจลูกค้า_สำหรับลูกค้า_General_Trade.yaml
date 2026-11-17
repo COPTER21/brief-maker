@@ -1,0 +1,37 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# G1 ผลต่อระบบ — แบบสำรวจเป็นเอกสารบันทึกผลอย่างเดียว ไม่เปลี่ยนค่า ไม่ส่งต่อ (ข้อมูลไปสรุปที่ FM-SAL-11 ภายหลัง — ไม่ wire รอบนี้)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — กระดาษไม่มีช่องลงชื่อผู้อนุมัติ (0 ช่อง) → ไม่มีการอนุมัติ
+doa: { required: false, mode: none, default_steps: [], amount: none }
+
+# G3 สูตร/ค่าคงที่ — ไม่มีสูตร ไม่มีค่าคงที่บนกระดาษ
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "ทุกข้อคะแนนเลือกได้ 1 ค่า (5 4 3 2 1) · ต้องครบ 16 ข้อจึงบันทึกผลได้ · ร่างบันทึกไม่ครบได้"
+    - "ประจำเดือน ค่าเริ่ม = เดือนของวันที่สำรวจ · วันที่อยู่นอกเดือนที่เลือก = เตือน"
+
+# G4 รายการซ้ำ — ไม่มี (หัวข้อประเมินคงที่ 16 ข้อตามกระดาษ)
+repeat: { max_rows: null }
+
+# G5 1:1 ไม่เพิ่มช่อง · แก้แค่คำสะกดผิดชัดเจน
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น — กระดาษไม่มีช่องลงชื่อ → ไม่เพิ่มช่องลงชื่อ
+signature: { layout: none, per_doa_step: false, handwriting_image: false }
+
+# G7 ไม่มีอนุมัติ · ยกเลิกได้โดยเจ้าของ + admin role · สถานะ ร่าง/บันทึกผลแล้ว · เหตุผลบังคับ
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, recorded], reason_required: true }
+
+# G8 เจ้าของ (พนักงานขายผู้บันทึก) · admin role ของฝ่ายขาย (role-mgr-sales) เห็นทั้งหมด
+visibility: { owner: true, approver: none, admin_role: all }
+
+# G9 ออกเลขตอนบันทึกครั้งแรก · รหัสย่อจากชื่อเอกสาร (Customer Satisfaction — General trade)
+numbering: { issue_on: first_save, code: "CSG" }
+
+# G10
+extras: { attachments: true, copy: false, export_csv: true, announce: false }

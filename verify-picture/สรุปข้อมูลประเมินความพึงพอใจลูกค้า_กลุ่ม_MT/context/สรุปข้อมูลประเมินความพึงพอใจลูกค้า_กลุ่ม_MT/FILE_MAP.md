@@ -1,0 +1,59 @@
+# FILE_MAP — สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `01_Prototype/feature.html` | `_ui/UI_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.html` |
+| `02_BRD/BRD_F-TMP-008.docx` | `_brd/BRD_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.docx` |
+| `02_BRD/BRD_F-TMP-008.md` | `_brd/BRD_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/00_OVERVIEW.md` | `_frd/FRD_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT/00_OVERVIEW_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/01_UI.md` | `_frd/FRD_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT/01_UI_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/02_API.md` | `_frd/FRD_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT/02_API_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/03_LOGIC.md` | `_frd/FRD_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT/03_LOGIC_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/04_DB.md` | `_frd/FRD_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT/04_DB_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/05_RULES.md` | `_frd/FRD_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT/05_RULES_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/06_TESTS.md` | `_frd/FRD_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT/06_TESTS_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT/07_LOCKED_DECISIONS_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/INDEX.md` | `_frd/FRD_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT/INDEX_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/_SECTION_N.md` | `_frd/FRD_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT/_SECTION_N_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/declarations/DOCCFG_BRIEF_F-TMP-008.md` | `_frd/FRD_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT/declarations/DOCCFG_BRIEF_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/declarations/MDOC_BRIEF_MTS.md` | `_frd/FRD_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT/declarations/MDOC_BRIEF_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/declarations/MTS.doccfg.yaml` | `_frd/FRD_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT/declarations/สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-008_Pack/declarations/MTS.mdoc.yaml` | `_frd/FRD_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT/declarations/สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-008_Pack/declarations/MTS.ntf.yaml` | `_frd/FRD_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT/declarations/สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.ntf.yaml` |
+| `03_FRD/FRD_F-TMP-008_Pack/declarations/NTF_BRIEF_F-TMP-008.md` | `_frd/FRD_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT/declarations/NTF_BRIEF_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-008.md` | `_uibrief/UIBRIEF_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-008.md` | `_governance/DOCCFG_BRIEF_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `05_Governance/MDOC_BRIEF_MTS.md` | `_governance/MDOC_BRIEF_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `05_Governance/MTS.doccfg.yaml` | `_governance/สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.doccfg.yaml` |
+| `05_Governance/MTS.mdoc.yaml` | `_governance/สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.mdoc.yaml` |
+| `05_Governance/MTS.ntf.yaml` | `_governance/สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.ntf.yaml` |
+| `05_Governance/NTF_BRIEF_F-TMP-008.md` | `_governance/NTF_BRIEF_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-008.md` | `_tc/QA_AUDIT_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `06_Test/cases.json` | `_tc/สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT_cases.json` |
+| `06_Test/testcase-F-TMP-008.html` | `_tc/UAT_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.html` |
+| `06_Test/testcases-F-TMP-008.md` | `_tc/TC_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `07_Print/FM-SAL-07_print-spec.md` | `_document/สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT_print-spec.md` |
+| `07_Print/FM-SAL-07_template.html` | `_document/สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT_template.html` |
+| `07_Print/cancelled.data.json` | `_document/สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT_cancelled.data.json` |
+| `07_Print/draft.data.json` | `_document/สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT_draft.data.json` |
+| `07_Print/final-allpass.data.json` | `_document/สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT_final-allpass.data.json` |
+| `07_Print/final.data.json` | `_document/สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT_final.data.json` |
+| `07_Print/form.tpl.html` | `_document/สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT_template.html` |
+| `07_Print/long-12recs.data.json` | `_document/สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT_long-12recs.data.json` |
+| `07_Print/print_config.json` | `_document/สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT_print_config.json` |
+| `07_Print/profile.json` | `_document/สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT_profile.json` |
+| `07_Print/render_data.py` | `_document/สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT_render_data.py` |
+| `08_Reference/7. FM-SAL-07 แบบฟอร์มรายงานสรุปข้อมูล แบบประเมิณความพึงพอใจของลูกค้า MT.xlsx` | `_reference/7. FM-SAL-07 แบบฟอร์มรายงานสรุปข้อมูล แบบประเมิณความพึงพอใจของลูกค้า MT_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.xlsx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-008.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-008_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-008_v2.md` | `_reference/PREBRIEF_REQ-TMP-008_v2_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_สรุปข้อมูลประเมินความพึงพอใจลูกค้า_กลุ่ม_MT.md` |

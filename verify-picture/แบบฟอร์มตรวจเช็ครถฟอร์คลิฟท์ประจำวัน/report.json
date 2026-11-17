@@ -1,0 +1,207 @@
+{
+  "feature": {
+    "code": "F-TMP-002",
+    "name": "แบบฟอร์มตรวจเช็ครถฟอร์คลิฟท์ประจำวัน",
+    "module": "Inventory / Warehouse"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-17",
+  "round": 1,
+  "refs": "FRD-F-TMP-002 v1.0 · 05_RULES · 06_TESTS · UI specification",
+  "scope": {
+    "checked": [
+      "สร้างรายการ (Create) ผ่าน create drawer",
+      "แก้ไขรายการ (Update) ผ่าน edit drawer",
+      "ลบ/ยกเลิกรายการ (Delete) ตาม flow ที่มีบนระบบ",
+      "ทดลอง upload ไฟล์จาก create และ edit drawer",
+      "ตรวจ action และตำแหน่งปุ่มใน view drawer",
+      "ตรวจแท็บรายละเอียด, PDF Preview, ลายเซ็น และประวัติ",
+      "ตรวจ UI/UX โดยรวมของ create, edit และ view drawer"
+    ],
+    "not_checked": [
+      {
+        "item": "Validation รายวันและ boundary ของเดือน/วันอนาคต",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลในข้อมูลรอบนี้"
+      },
+      {
+        "item": "สายอนุมัติ DOA, ส่งกลับแก้ไข และอนุมัติหลายขั้น",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลในข้อมูลรอบนี้"
+      },
+      {
+        "item": "Permission ของ owner, approver, manager และผู้ใช้นอกสาย",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลในข้อมูลรอบนี้"
+      },
+      {
+        "item": "Notification, Document Store, CSV และ cross-module integration",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลในข้อมูลรอบนี้"
+      },
+      {
+        "item": "ความถูกต้องของ PDF ที่ render และดาวน์โหลดจริง",
+        "reason": "แท็บ PDF Preview ไม่ปรากฏบนเว็บจริง"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างรายการ (Create)",
+      "expected": "สร้างรายการใหม่ได้ตาม flow",
+      "actual": "ผู้ตรวจยืนยันว่าลอง create ครบแล้วและทำงานได้",
+      "status": "pass",
+      "ref": "FRD 01_UI P-02"
+    },
+    {
+      "item": "แก้ไขรายการ (Update)",
+      "expected": "แก้ไขรายการเดิมได้ตาม flow",
+      "actual": "ผู้ตรวจยืนยันว่าลอง update ครบแล้วและทำงานได้",
+      "status": "pass",
+      "ref": "FRD 01_UI P-02"
+    },
+    {
+      "item": "ลบ/ยกเลิกรายการ (Delete)",
+      "expected": "ลบหรือยกเลิกรายการได้ตาม action ที่ระบบกำหนด",
+      "actual": "ผู้ตรวจยืนยันว่าลอง delete ครบแล้วและทำงานได้",
+      "status": "pass",
+      "ref": "FRD 05_RULES §5.2"
+    },
+    {
+      "item": "Upload ไฟล์จาก create/edit drawer",
+      "expected": "แนบไฟล์จากขั้นเอกสารแนบได้สำเร็จ",
+      "actual": "Upload ไฟล์ไม่สำเร็จทั้ง create และ edit drawer",
+      "status": "fail",
+      "bug": "BUG-02",
+      "ref": "FRD 01_UI P-02 ขั้น 2"
+    },
+    {
+      "item": "บันทึกและส่งตรวจสอบจาก create/edit drawer",
+      "expected": "มีปุ่ม “บันทึกและส่งตรวจสอบ” ตาม footer ของ wizard",
+      "actual": "ไม่พบปุ่มบันทึกและส่งตรวจสอบ",
+      "status": "fail",
+      "bug": "BUG-03",
+      "ref": "FRD 01_UI P-02"
+    },
+    {
+      "item": "เปิด PDF Preview จาก view drawer",
+      "expected": "มีแท็บ PDF Preview สำหรับดู ดาวน์โหลด และพิมพ์เอกสาร",
+      "actual": "แท็บ PDF Preview หายไปบนเว็บจริง",
+      "status": "fail",
+      "bug": "BUG-01",
+      "ref": "FRD 01_UI P-03 · AC-10"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "create/edit drawer, step และ layout บางส่วน รวมถึงแท็บใน view drawer จัดวางไม่เรียบร้อยและหลุดจาก design"
+    },
+    {
+      "id": "U-04",
+      "status": "note",
+      "note": "ปุ่มยกเลิกเอกสารและส่งอนุมัติใน view drawer แยกจาก action อื่น; footer ควรเหลือเฉพาะปุ่มปิด"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "note",
+      "note": "create/edit drawer ไม่มีปุ่มบันทึกและส่งตรวจสอบ ทำให้ flow หลักไม่ครบในจุดเดียว"
+    },
+    {
+      "item": "ตำแหน่งการแนบไฟล์ใน view drawer",
+      "status": "note",
+      "note": "view drawer ไม่ควรมี upload ในแท็บรายละเอียด; ควรแสดงไฟล์อย่างเดียวและให้ upload เฉพาะ create/edit"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "แท็บ PDF Preview หายจาก view drawer บนเว็บจริง",
+      "severity": "high",
+      "steps": [
+        "เปิดรายการที่มีอยู่เข้าสู่ view drawer",
+        "ตรวจรายการแท็บใน drawer"
+      ],
+      "expected": "มีแท็บ PDF Preview สำหรับดู ดาวน์โหลด และพิมพ์เอกสารตาม FRD",
+      "actual": "ไม่พบแท็บ PDF Preview บนเว็บจริง",
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "Upload ไฟล์ไม่สำเร็จใน create และ edit drawer",
+      "severity": "medium",
+      "steps": [
+        "เปิด create drawer หรือ edit drawer",
+        "ไปยังส่วน upload เอกสารแนบ",
+        "เลือกไฟล์และทดลอง upload"
+      ],
+      "expected": "ไฟล์ถูก upload และแสดงเป็นเอกสารแนบของรายการ",
+      "actual": "Upload ไฟล์ไม่สำเร็จ",
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "create/edit drawer ไม่มีปุ่มบันทึกและส่งตรวจสอบ",
+      "severity": "medium",
+      "steps": [
+        "เปิด create drawer หรือ edit drawer",
+        "กรอกข้อมูลและไปยังขั้นตรวจสอบ",
+        "ตรวจ action ที่ footer"
+      ],
+      "expected": "มีปุ่ม “บันทึกและส่งตรวจสอบ” ตาม FRD",
+      "actual": "ไม่พบปุ่มบันทึกและส่งตรวจสอบ",
+      "status": "open"
+    },
+    {
+      "id": "BUG-04",
+      "title": "view drawer แสดง upload file ในแท็บรายละเอียดผิดบริบท",
+      "severity": "medium",
+      "steps": [
+        "เปิดรายการเข้าสู่ view drawer",
+        "เปิดแท็บรายละเอียด",
+        "ตรวจส่วนเอกสารแนบ"
+      ],
+      "expected": "view drawer แสดงไฟล์แนบแบบอ่านอย่างเดียว; upload ทำได้เฉพาะ create/edit drawer",
+      "actual": "view drawer มีส่วน upload file ในแท็บรายละเอียด",
+      "status": "open"
+    },
+    {
+      "id": "BUG-05",
+      "title": "ตำแหน่งปุ่ม action ใน view drawer ไม่สอดคล้องกับรูปแบบที่กำหนด",
+      "severity": "low",
+      "steps": [
+        "เปิดรายการเข้าสู่ view drawer",
+        "ตรวจตำแหน่งปุ่มยกเลิกเอกสารและส่งอนุมัติ"
+      ],
+      "expected": "action ของเอกสารอยู่รวมกับ action อื่น และ footer มีเฉพาะปุ่มปิด",
+      "actual": "ปุ่มยกเลิกเอกสารและส่งอนุมัติอยู่แยกใน footer",
+      "status": "open"
+    },
+    {
+      "id": "BUG-06",
+      "title": "create/edit drawer และ step หลุด design และ layout บางส่วนไม่เรียบร้อย",
+      "severity": "low",
+      "steps": [
+        "เปิด create drawer",
+        "ไล่แต่ละ step และตรวจ layout",
+        "เปิด edit drawer และตรวจซ้ำ"
+      ],
+      "expected": "drawer, step และองค์ประกอบจัดวางตาม design เดียวกันอย่างเรียบร้อย",
+      "actual": "UX/UI และ layout บางส่วนหลุดจาก design",
+      "status": "open"
+    },
+    {
+      "id": "BUG-07",
+      "title": "UI/UX ของแท็บใน view drawer หลุด design",
+      "severity": "low",
+      "steps": [
+        "เปิด view drawer",
+        "ตรวจแท็บรายละเอียด, ลายเซ็น และประวัติ"
+      ],
+      "expected": "ทุกแท็บใช้ layout และ interaction ตาม design ที่กำหนด",
+      "actual": "UI/UX ของแท็บรายละเอียด, ลายเซ็น และประวัติหลุดจาก design; PDF Preview ไม่ปรากฏและแยกเป็น BUG-01",
+      "status": "open"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# G1 ผลต่อระบบ — ฟอร์มแจ้งงานให้ผู้ขนส่งนอก เป็นเอกสารแจ้งงานอย่างเดียว ไม่เปลี่ยนค่า ไม่ส่งต่อ (ยังไม่ผูก SO/PO/ใบส่งของ — ผู้ใช้กรอกเลขที่ PO เอง)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — กระดาษมีแค่ "ผู้จัดทำ" ไม่มีช่องลงชื่อผู้อนุมัติ (0 ช่อง) → ไม่มีการอนุมัติ (เก็บ field approver_role/approved_by/approval_chain ว่างไว้ · TODO: DOA engine)
+doa: { required: false, mode: none, default_steps: [], amount: none }
+
+# G3 สูตร/ค่าคงที่ — ไม่มีสูตร ไม่มีค่าคงที่บนกระดาษ
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "จำนวน ต้องมากกว่า 0 (บล็อก)"
+    - "วันที่นัดส่ง ก่อน รอบวันที่ = เตือน ไม่บล็อก"
+    - "ส่งงานได้เมื่อมีอย่างน้อย 1 แถวที่กรอกครบ 5 ช่อง · แถวว่างทั้งแถวไม่นับ · แถวกรอกไม่ครบ = บล็อก"
+
+# G4 รายการซ้ำ — ไม่จำกัดแถว · แบบพิมพ์แสดงขั้นต่ำ 20 บรรทัดตามกระดาษ
+repeat: { max_rows: null }
+
+# G5 1:1 ไม่เพิ่มช่อง · แก้แค่คำสะกดผิดชัดเจน ("รอบวันที" → "รอบวันที่")
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น — ผู้จัดทำ 1 จุด แสดงชื่อ + "ส่งในระบบ วันที่ เวลา" ไม่ใช้ภาพ · ไม่เพิ่มช่องผู้อนุมัติ
+signature: { layout: row-bottom, per_doa_step: false, handwriting_image: false }
+
+# G7 ไม่มีอนุมัติ · ยกเลิกได้โดยเจ้าของ + admin role · สถานะ ร่าง/ส่งแล้ว · เหตุผลบังคับ
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, submitted], reason_required: true }
+
+# G8 เจ้าของ (ผู้จัดทำ) · admin role ฝ่ายขาย (role-mgr-sales) เห็นทั้งหมด
+visibility: { owner: true, approver: none, admin_role: all }
+
+# G9 ออกเลขตอนบันทึกครั้งแรก · รหัส OTN (Outsourced Transport Notice — ไม่ชน registry ACL/CSG/CSM)
+numbering: { issue_on: first_save, code: "OTN" }
+
+# G10
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}
