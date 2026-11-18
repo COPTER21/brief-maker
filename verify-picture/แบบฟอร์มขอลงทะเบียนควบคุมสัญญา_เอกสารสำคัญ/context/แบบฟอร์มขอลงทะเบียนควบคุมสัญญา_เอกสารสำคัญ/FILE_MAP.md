@@ -1,0 +1,62 @@
+# FILE_MAP — แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `01_Prototype/feature.html` | `_ui/UI_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.html` |
+| `02_BRD/BRD_F-TMP-009.docx` | `_brd/BRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.docx` |
+| `02_BRD/BRD_F-TMP-009.md` | `_brd/BRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/00_OVERVIEW.md` | `_frd/FRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ/00_OVERVIEW_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/01_UI.md` | `_frd/FRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ/01_UI_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/02_API.md` | `_frd/FRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ/02_API_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/03_LOGIC.md` | `_frd/FRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ/03_LOGIC_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/04_DB.md` | `_frd/FRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ/04_DB_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/05_RULES.md` | `_frd/FRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ/05_RULES_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/06_TESTS.md` | `_frd/FRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ/06_TESTS_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ/07_LOCKED_DECISIONS_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/INDEX.md` | `_frd/FRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ/INDEX_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/_SECTION_N.md` | `_frd/FRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ/_SECTION_N_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/declarations/CTR.doa.yaml` | `_frd/FRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ/declarations/แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.doa.yaml` |
+| `03_FRD/FRD_F-TMP-009_Pack/declarations/CTR.doccfg.yaml` | `_frd/FRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ/declarations/แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-009_Pack/declarations/CTR.mdoc.yaml` | `_frd/FRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ/declarations/แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-009_Pack/declarations/CTR.ntf.yaml` | `_frd/FRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ/declarations/แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.ntf.yaml` |
+| `03_FRD/FRD_F-TMP-009_Pack/declarations/DOA_BRIEF_F-TMP-009.md` | `_frd/FRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ/declarations/DOA_BRIEF_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/declarations/DOCCFG_BRIEF_F-TMP-009.md` | `_frd/FRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ/declarations/DOCCFG_BRIEF_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/declarations/MDOC_BRIEF_CTR.md` | `_frd/FRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ/declarations/MDOC_BRIEF_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/declarations/NTF_BRIEF_F-TMP-009.md` | `_frd/FRD_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ/declarations/NTF_BRIEF_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-009.md` | `_uibrief/UIBRIEF_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `05_Governance/CTR.doa.yaml` | `_governance/แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.doa.yaml` |
+| `05_Governance/CTR.doccfg.yaml` | `_governance/แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.doccfg.yaml` |
+| `05_Governance/CTR.mdoc.yaml` | `_governance/แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.mdoc.yaml` |
+| `05_Governance/CTR.ntf.yaml` | `_governance/แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.ntf.yaml` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `05_Governance/DOA_BRIEF_F-TMP-009.md` | `_governance/DOA_BRIEF_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-009.md` | `_governance/DOCCFG_BRIEF_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `05_Governance/MDOC_BRIEF_CTR.md` | `_governance/MDOC_BRIEF_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-009.md` | `_governance/NTF_BRIEF_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-009.md` | `_tc/QA_AUDIT_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `06_Test/cases.json` | `_tc/แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ_cases.json` |
+| `06_Test/testcase-F-TMP-009.html` | `_tc/UAT_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.html` |
+| `06_Test/testcases-F-TMP-009.md` | `_tc/TC_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `07_Print/CTR_print-spec.md` | `_document/แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ_print-spec.md` |
+| `07_Print/CTR_template.html` | `_document/แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ_template.html` |
+| `07_Print/approved-doa6steps.data.json` | `_document/แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ_approved-doa6steps.data.json` |
+| `07_Print/approved.data.json` | `_document/แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ_approved.data.json` |
+| `07_Print/draft.data.json` | `_document/แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ_draft.data.json` |
+| `07_Print/form.tpl.html` | `_document/แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ_template.html` |
+| `07_Print/long-text.data.json` | `_document/แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ_long-text.data.json` |
+| `07_Print/print_config.json` | `_document/แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ_print_config.json` |
+| `07_Print/profile.json` | `_document/แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ_profile.json` |
+| `07_Print/rejected.data.json` | `_document/แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ_rejected.data.json` |
+| `08_Reference/1. FM-AGM-01 แบบฟอร์มลงทะเบียนควบคุมสัญญา.docx` | `_reference/1. FM-AGM-01 แบบฟอร์มลงทะเบียนควบคุมสัญญา_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.docx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-009.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-009_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-009_v2.md` | `_reference/PREBRIEF_REQ-TMP-009_v2_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_แบบฟอร์มขอลงทะเบียนควบคุมสัญญา_เอกสารสำคัญ.md` |

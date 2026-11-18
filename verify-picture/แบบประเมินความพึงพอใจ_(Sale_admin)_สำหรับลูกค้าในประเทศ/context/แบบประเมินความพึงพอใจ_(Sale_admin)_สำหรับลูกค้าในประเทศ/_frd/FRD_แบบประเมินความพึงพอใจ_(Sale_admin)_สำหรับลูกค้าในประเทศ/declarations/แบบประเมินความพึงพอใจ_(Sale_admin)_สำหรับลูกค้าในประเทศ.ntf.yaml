@@ -1,0 +1,29 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock · แก้แล้ว
+feature_id: F-TMP-004
+name: แบบประเมินความพึงพอใจ (Sale admin) สำหรับลูกค้าในประเทศ
+code: SDA
+events:
+- id: sda_low_score_recorded
+  trigger: draft → recorded และมีข้ออย่างน้อย 1 ข้อได้ระดับ "น้อย" หรือ "ควรปรับปรุง" (≤ 2) (DEC-04 · เกินเกณฑ์ = เตือน ไม่บล็อก)
+  recipients:
+  - role-mgr-sales
+  template: '**{doc_no}** ลูกค้า {customer_name} ให้ระดับต่ำ {low_count} ข้อ (เดือน {period_month}) — โปรดติดตาม'
+  channel: in-app
+  optional: true
+  frd_ref: 03_LOGIC F-TMP-004-FN-06
+  why: แบบประเมิน Sale admin มีไว้ปรับปรุงบริการ — ผู้จัดการฝ่ายขายต้องรู้เมื่อมีระดับต่ำ (AI-DEFAULT รอลูกค้ายืนยันเกณฑ์ ≤ 2)
+- id: sda_cancelled
+  trigger: recorded → cancelled (ยกเลิกโดย admin role ที่ไม่ใช่เจ้าของ)
+  recipients:
+  - document_owner
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  frd_ref: 03_LOGIC F-TMP-004-FN-05, F-TMP-004-FN-06
+  why: G7 ยกเลิกได้โดย admin role — เจ้าของผู้บันทึกต้องรู้ว่าผลประเมินถูกยกเลิก
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+- sda_over_limit_approved
+note: ไม่มีการอนุมัติ (DEC-03) · ไม่ส่งต่อระบบอื่น (DEC-02) · ตัด sda_over_limit_approved (ไม่มีขั้นอนุมัติ — แทนด้วย sda_low_score_recorded)

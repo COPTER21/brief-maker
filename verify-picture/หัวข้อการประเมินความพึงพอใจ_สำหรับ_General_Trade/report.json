@@ -1,0 +1,186 @@
+{
+  "feature": {
+    "code": "F-SAL-011",
+    "name": "หัวข้อการประเมินความพึงพอใจ สำหรับ General Trade",
+    "module": "Sales"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-17",
+  "round": 1,
+  "refs": "FRD F-TMP-002 v1.0 · Feature F-SAL-011 · FM-SAL-11",
+  "scope": {
+    "checked": [
+      "Create/Edit drawer — UI/UX และการแนบไฟล์",
+      "View drawer — การมองเห็น action ของเจ้าของเอกสาร",
+      "View drawer — แท็บรายละเอียด, PDF Preview, ลายเซ็น และประวัติ",
+      "UI/UX ส่วนอื่นที่เข้าถึงได้"
+    ],
+    "not_checked": [
+      {
+        "item": "การแก้ไขรายการของเจ้าของเอกสาร",
+        "reason": "ไม่มีปุ่มแก้ไขใน View drawer จึงไม่สามารถเข้าถึง flow"
+      },
+      {
+        "item": "การส่งอนุมัติและสายอนุมัติ",
+        "reason": "ไม่มีปุ่มส่งอนุมัติในใบร่างของผู้ตรวจ"
+      },
+      {
+        "item": "การยกเลิกใบร่าง/รออนุมัติ",
+        "reason": "ไม่มีปุ่มยกเลิกสำหรับเอกสารที่ account นี้สร้างเอง"
+      },
+      {
+        "item": "สูตรคะแนน, validation, approval/reject, notification, CSV และ permission ของ role อื่น",
+        "reason": "ไม่มีผลการทดสอบในรอบนี้"
+      },
+      {
+        "item": "การลบเอกสาร",
+        "reason": "FRD ไม่ได้กำหนด hard delete; action ตามสเปกคือยกเลิก"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "เจ้าของใบร่างแก้ไขเอกสารของตนเอง",
+      "expected": "ใบสถานะร่างของเจ้าของต้องมี action แก้ไข",
+      "actual": "ไม่เห็นปุ่มแก้ไข ทั้งที่เป็นรายการที่ account ผู้ตรวจสร้างเอง",
+      "status": "fail",
+      "bug": "BUG-01",
+      "ref": "FRD 05_RULES §5.3"
+    },
+    {
+      "item": "เจ้าของใบร่างส่งอนุมัติ",
+      "expected": "ใบสถานะร่างของเจ้าของต้องมี action ส่งอนุมัติ",
+      "actual": "ไม่เห็นปุ่มส่งอนุมัติ จึงไม่สามารถทดสอบ approval flow ต่อได้",
+      "status": "fail",
+      "bug": "BUG-01",
+      "ref": "FRD 05_RULES §5.3"
+    },
+    {
+      "item": "เจ้าของยกเลิกใบร่างหรือใบรออนุมัติ",
+      "expected": "เจ้าของต้องมี action ยกเลิกในสถานะ draft และ pending",
+      "actual": "ไม่เห็นปุ่มยกเลิกทั้งสองสถานะ",
+      "status": "fail",
+      "bug": "BUG-01",
+      "ref": "FRD 05_RULES §5.2-§5.3"
+    },
+    {
+      "item": "แนบไฟล์จาก Create/Edit drawer",
+      "expected": "อัปโหลดไฟล์สำเร็จและไฟล์ปรากฏในรายการแนบ",
+      "actual": "อัปโหลดไฟล์ไม่สำเร็จ",
+      "status": "fail",
+      "bug": "BUG-02",
+      "ref": "FRD API-11"
+    },
+    {
+      "item": "บันทึกรายการจาก Create drawer",
+      "expected": "สร้างและบันทึกเอกสารได้ตาม validation ใน FRD",
+      "actual": "ผู้ตรวจระบุว่าได้ลอง create แต่ไม่มีผลที่เพียงพอสำหรับรับรอง logic การบันทึก",
+      "status": "na",
+      "ref": "FRD AC-01"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-01",
+      "status": "note",
+      "note": "Create/Edit drawer และแท็บใน View drawer หลุดจาก design ที่ใช้ในระบบ",
+      "evidence": "tk01/Screenshot 2026-11-17 134731.png"
+    },
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "Layout บางส่วนใน Create/Edit drawer และแท็บรายละเอียด/PDF Preview/ลายเซ็น/ประวัติยังไม่เรียบร้อย",
+      "evidence": "tk01/Screenshot 2026-11-17 134731.png"
+    },
+    {
+      "id": "U-04",
+      "status": "note",
+      "note": "รูปแบบ action และองค์ประกอบใน drawer ยังไม่สอดคล้องกับ design โดยรวม"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "note",
+      "note": "เจ้าของเอกสารไม่สามารถไปต่อยัง flow แก้ไข/ส่งอนุมัติ/ยกเลิกได้ตามสถานะ"
+    },
+    {
+      "id": "X-02",
+      "status": "note",
+      "note": "การอัปโหลดไฟล์ไม่สำเร็จ ทำให้ flow Create/Edit ไม่สมบูรณ์"
+    },
+    {
+      "id": "X-05",
+      "status": "note",
+      "note": "View drawer ของเอกสารที่สร้างเองไม่มี action ทางไปต่อ ทำให้ผู้ใช้ติดที่หน้ารายละเอียด"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "เจ้าของเอกสารไม่เห็น action ที่อนุญาตตามสถานะ",
+      "severity": "critical",
+      "steps": [
+        "Login ด้วย account ที่เป็นผู้สร้างเอกสาร",
+        "เปิดเอกสารของตนเองในสถานะร่าง และรออนุมัติ",
+        "ตรวจปุ่ม action ใน View drawer"
+      ],
+      "expected": "สถานะร่าง: มีแก้ไข, ส่งอนุมัติ และยกเลิก; สถานะรออนุมัติ: มีเฉพาะยกเลิกตาม FRD",
+      "actual": "View drawer แสดงเฉพาะพิมพ์/ดาวน์โหลด/ปิด ไม่มียกเลิก, แก้ไข และส่งอนุมัติ; เมื่อเข้า route แก้ไขโดยตรงระบบแสดง “คุณไม่มีสิทธิ์แก้ไขเอกสารนี้”",
+      "evidence": [
+        "tk03/Screenshot 2026-11-17 140529.png",
+        "tk03/Screenshot 2026-11-17 140928.png",
+        "tk03/Screenshot 2026-11-17 141003.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "Create/Edit drawer อัปโหลดไฟล์ไม่สำเร็จ",
+      "severity": "medium",
+      "steps": [
+        "เปิด Create หรือ Edit drawer",
+        "เลือกไฟล์จากช่อง Upload",
+        "รอผลการอัปโหลด"
+      ],
+      "expected": "ไฟล์อัปโหลดสำเร็จและปรากฏในรายการไฟล์แนบ",
+      "actual": "ไฟล์ XLS และ DOC 1.0 MB (หน้าจอระบุไม่เกิน 20 MB) อัปโหลดไม่สำเร็จ; API ตอบ 413 `FILE_TOO_LARGE` และ request payload แสดง `file: {}`",
+      "evidence": [
+        "tk02/Screenshot 2026-11-17 135455.png",
+        "tk02/Screenshot 2026-11-17 135559.png",
+        "tk02/Screenshot 2026-11-17 135627.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "UI/Layout ของ Create/Edit/View drawer หลุดจาก design ของระบบ",
+      "severity": "low",
+      "steps": [
+        "เปิด Create และ Edit drawer",
+        "เปิด View drawer",
+        "สลับแท็บรายละเอียด, PDF Preview, ลายเซ็น และประวัติ",
+        "เปรียบเทียบกับ design/CI ที่ใช้ในระบบ"
+      ],
+      "expected": "Drawer, layout, spacing และ component สอดคล้องกับ design system และเรียบร้อยทุกแท็บ",
+      "actual": "Create/Edit drawer หลุด design และ layout บางส่วนไม่เรียบร้อย; แท็บใน View drawer หลุด design",
+      "evidence": [
+        "tk01/Screenshot 2026-11-17 134731.png",
+        "tk03/Screenshot 2026-11-17 140529.png",
+        "tk04/exanple_tab_detail1.1.png",
+        "tk04/exanple_tab_pdf_preview.png",
+        "tk04/exanple_tab_doa.png",
+        "tk04/exanple_tab_history.png"
+      ],
+      "status": "open"
+    }
+  ],
+  "suggestions": [
+    {
+      "item": "แสดง action ตามสถานะและสิทธิ์ให้ชัด",
+      "reason": "ลดความสับสนว่าเจ้าของเอกสารทำอะไรได้ในแต่ละสถานะ"
+    }
+  ]
+}

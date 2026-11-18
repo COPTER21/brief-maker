@@ -1,0 +1,65 @@
+# FILE_MAP — แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `01_Prototype/feature.html` | `_ui/UI_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.html` |
+| `02_BRD/BRD_F-TMP-004.docx` | `_brd/BRD_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.docx` |
+| `02_BRD/BRD_F-TMP-004.md` | `_brd/BRD_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/00_OVERVIEW.md` | `_frd/FRD_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ/00_OVERVIEW_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/01_UI.md` | `_frd/FRD_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ/01_UI_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/02_API.md` | `_frd/FRD_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ/02_API_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/03_LOGIC.md` | `_frd/FRD_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ/03_LOGIC_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/04_DB.md` | `_frd/FRD_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ/04_DB_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/05_RULES.md` | `_frd/FRD_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ/05_RULES_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/06_TESTS.md` | `_frd/FRD_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ/06_TESTS_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ/07_LOCKED_DECISIONS_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/INDEX.md` | `_frd/FRD_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ/INDEX_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/_SECTION_N.md` | `_frd/FRD_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ/_SECTION_N_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/DOCCFG_BRIEF_F-TMP-004.md` | `_frd/FRD_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ/declarations/DOCCFG_BRIEF_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/MDOC_BRIEF_SDA.md` | `_frd/FRD_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ/declarations/MDOC_BRIEF_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/NTF_BRIEF_F-TMP-004.md` | `_frd/FRD_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ/declarations/NTF_BRIEF_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/SDA.doccfg.yaml` | `_frd/FRD_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ/declarations/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/SDA.mdoc.yaml` | `_frd/FRD_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ/declarations/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/SDA.ntf.yaml` | `_frd/FRD_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ/declarations/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.ntf.yaml` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-004.md` | `_uibrief/UIBRIEF_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-004.md` | `_governance/DOCCFG_BRIEF_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `05_Governance/MDOC_BRIEF_SDA.md` | `_governance/MDOC_BRIEF_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-004.md` | `_governance/NTF_BRIEF_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `05_Governance/SDA.doccfg.yaml` | `_governance/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.doccfg.yaml` |
+| `05_Governance/SDA.mdoc.yaml` | `_governance/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.mdoc.yaml` |
+| `05_Governance/SDA.ntf.yaml` | `_governance/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.ntf.yaml` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-004.md` | `_tc/QA_AUDIT_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `06_Test/cases.json` | `_tc/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ_cases.json` |
+| `06_Test/testcase-F-TMP-004.html` | `_tc/UAT_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.html` |
+| `06_Test/testcases-F-TMP-004.md` | `_tc/TC_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `07_Print/SDA_print-spec.md` | `_document/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ_print-spec.md` |
+| `07_Print/_states_sheet.png` | `_document/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ_ทุกสถานะ.png` |
+| `07_Print/cancelled.data.json` | `_document/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ_cancelled.data.json` |
+| `07_Print/compare.json` | `_document/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ_compare.json` |
+| `07_Print/compare_side.png` | `_document/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ_compare_side.png` |
+| `07_Print/draft.data.json` | `_document/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ_draft.data.json` |
+| `07_Print/form.tpl.html` | `_document/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ_template.html` |
+| `07_Print/long-comments.data.json` | `_document/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ_long-comments.data.json` |
+| `07_Print/low-score.data.json` | `_document/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ_low-score.data.json` |
+| `07_Print/print_config.json` | `_document/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ_print_config.json` |
+| `07_Print/profile.json` | `_document/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ_profile.json` |
+| `07_Print/recorded.data.json` | `_document/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ_recorded.data.json` |
+| `07_Print/แบบประเมินความพึงพอใจ_SaleAdmin_ในประเทศ_template.html` | `_document/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ_template.html` |
+| `08_Reference/20. FM-SAL-20 แบบประเมินความพึงพอใจ ในประเทศ (Sale admin).docx` | `_reference/20. FM-SAL-20 แบบประเมินความพึงพอใจ ในประเทศ (Sale admin)_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.docx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-004.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-004_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-004_v2.md` | `_reference/PREBRIEF_REQ-TMP-004_v2_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.md` |
+| `08_Reference/reports/e2e_container_ref.json` | `_reference/reports/e2e_container_ref_แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ.json` |
+| `08_Reference/shot_list.png` | `_ui/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ_ภาพหน้าจอ_list.png` |
+| `08_Reference/shot_pdf.png` | `_ui/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ_ภาพหน้าจอ_pdf.png` |
+| `08_Reference/shot_wizard.png` | `_ui/แบบประเมินความพึงพอใจ_(Sale_admin)_สำหรับลูกค้าในประเทศ_ภาพหน้าจอ_wizard.png` |

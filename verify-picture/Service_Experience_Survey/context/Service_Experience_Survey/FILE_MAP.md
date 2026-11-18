@@ -1,0 +1,65 @@
+# FILE_MAP — Service_Experience_Survey
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_Service_Experience_Survey.md` |
+| `01_Prototype/feature.html` | `_ui/UI_Service_Experience_Survey.html` |
+| `02_BRD/BRD_F-TMP-006.docx` | `_brd/BRD_Service_Experience_Survey.docx` |
+| `02_BRD/BRD_F-TMP-006.md` | `_brd/BRD_Service_Experience_Survey.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/00_OVERVIEW.md` | `_frd/FRD_Service_Experience_Survey/00_OVERVIEW_Service_Experience_Survey.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/01_UI.md` | `_frd/FRD_Service_Experience_Survey/01_UI_Service_Experience_Survey.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/02_API.md` | `_frd/FRD_Service_Experience_Survey/02_API_Service_Experience_Survey.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/03_LOGIC.md` | `_frd/FRD_Service_Experience_Survey/03_LOGIC_Service_Experience_Survey.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/04_DB.md` | `_frd/FRD_Service_Experience_Survey/04_DB_Service_Experience_Survey.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/05_RULES.md` | `_frd/FRD_Service_Experience_Survey/05_RULES_Service_Experience_Survey.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/06_TESTS.md` | `_frd/FRD_Service_Experience_Survey/06_TESTS_Service_Experience_Survey.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_Service_Experience_Survey/07_LOCKED_DECISIONS_Service_Experience_Survey.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/INDEX.md` | `_frd/FRD_Service_Experience_Survey/INDEX_Service_Experience_Survey.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/_SECTION_N.md` | `_frd/FRD_Service_Experience_Survey/_SECTION_N_Service_Experience_Survey.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/declarations/DOCCFG_BRIEF_F-TMP-006.md` | `_frd/FRD_Service_Experience_Survey/declarations/DOCCFG_BRIEF_Service_Experience_Survey.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/declarations/MDOC_BRIEF_SEA.md` | `_frd/FRD_Service_Experience_Survey/declarations/MDOC_BRIEF_Service_Experience_Survey.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/declarations/NTF_BRIEF_F-TMP-006.md` | `_frd/FRD_Service_Experience_Survey/declarations/NTF_BRIEF_Service_Experience_Survey.md` |
+| `03_FRD/FRD_F-TMP-006_Pack/declarations/SEA.doccfg.yaml` | `_frd/FRD_Service_Experience_Survey/declarations/Service_Experience_Survey.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-006_Pack/declarations/SEA.mdoc.yaml` | `_frd/FRD_Service_Experience_Survey/declarations/Service_Experience_Survey.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-006_Pack/declarations/SEA.ntf.yaml` | `_frd/FRD_Service_Experience_Survey/declarations/Service_Experience_Survey.ntf.yaml` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-006.md` | `_uibrief/UIBRIEF_Service_Experience_Survey.md` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_Service_Experience_Survey.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_Service_Experience_Survey.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-006.md` | `_governance/DOCCFG_BRIEF_Service_Experience_Survey.md` |
+| `05_Governance/MDOC_BRIEF_SEA.md` | `_governance/MDOC_BRIEF_Service_Experience_Survey.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-006.md` | `_governance/NTF_BRIEF_Service_Experience_Survey.md` |
+| `05_Governance/SEA.doccfg.yaml` | `_governance/Service_Experience_Survey.doccfg.yaml` |
+| `05_Governance/SEA.mdoc.yaml` | `_governance/Service_Experience_Survey.mdoc.yaml` |
+| `05_Governance/SEA.ntf.yaml` | `_governance/Service_Experience_Survey.ntf.yaml` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_Service_Experience_Survey.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-006.md` | `_tc/QA_AUDIT_Service_Experience_Survey.md` |
+| `06_Test/cases.json` | `_tc/Service_Experience_Survey_cases.json` |
+| `06_Test/testcase-F-TMP-006.html` | `_tc/UAT_Service_Experience_Survey.html` |
+| `06_Test/testcases-F-TMP-006.md` | `_tc/TC_Service_Experience_Survey.md` |
+| `07_Print/SEA_print-spec.md` | `_document/Service_Experience_Survey_print-spec.md` |
+| `07_Print/Service_Experience_Survey_template.html` | `_document/Service_Experience_Survey_template.html` |
+| `07_Print/_states_sheet.png` | `_document/Service_Experience_Survey_ทุกสถานะ.png` |
+| `07_Print/cancelled.data.json` | `_document/Service_Experience_Survey_cancelled.data.json` |
+| `07_Print/compare.json` | `_document/Service_Experience_Survey_compare.json` |
+| `07_Print/compare_side.png` | `_document/Service_Experience_Survey_compare_side.png` |
+| `07_Print/draft.data.json` | `_document/Service_Experience_Survey_draft.data.json` |
+| `07_Print/form.tpl.html` | `_document/Service_Experience_Survey_template.html` |
+| `07_Print/long-comments.data.json` | `_document/Service_Experience_Survey_long-comments.data.json` |
+| `07_Print/low-score.data.json` | `_document/Service_Experience_Survey_low-score.data.json` |
+| `07_Print/print_config.json` | `_document/Service_Experience_Survey_print_config.json` |
+| `07_Print/profile.json` | `_document/Service_Experience_Survey_profile.json` |
+| `07_Print/recorded.data.json` | `_document/Service_Experience_Survey_recorded.data.json` |
+| `08_Reference/22. FM-SAL-22 แบบประเมินความพึงพอใจ Sales Admin (ต่างประเทศ).docx` | `_reference/22. FM-SAL-22 แบบประเมินความพึงพอใจ Sales Admin (ต่างประเทศ)_Service_Experience_Survey.docx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_Service_Experience_Survey.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_Service_Experience_Survey.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_Service_Experience_Survey.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-006.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-006_Service_Experience_Survey.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-006_v2.md` | `_reference/PREBRIEF_REQ-TMP-006_v2_Service_Experience_Survey.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_Service_Experience_Survey.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_Service_Experience_Survey.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_Service_Experience_Survey.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_Service_Experience_Survey.md` |
+| `08_Reference/reports/e2e_container_ref.json` | `_reference/reports/e2e_container_ref_Service_Experience_Survey.json` |
+| `08_Reference/shot_list.png` | `_ui/Service_Experience_Survey_ภาพหน้าจอ_list.png` |
+| `08_Reference/shot_pdf.png` | `_ui/Service_Experience_Survey_ภาพหน้าจอ_pdf.png` |
+| `08_Reference/shot_wizard.png` | `_ui/Service_Experience_Survey_ภาพหน้าจอ_wizard.png` |

@@ -1,0 +1,150 @@
+{
+  "feature": {
+    "code": "F-TMP-001",
+    "name": "แบบสำรวจความพึงพอใจลูกค้า สำหรับลูกค้า General Trade",
+    "module": "Sales"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-17",
+  "round": 1,
+  "refs": "FRD-F-TMP-001 v1.0",
+  "scope": {
+    "checked": [
+      "สร้างรายการผ่าน Create drawer",
+      "ตรวจการแก้ไขรายการของเจ้าของผ่าน Edit/View drawer",
+      "อัปโหลดไฟล์ใน Create/Edit drawer",
+      "ตรวจ action ตามสิทธิ์ของเจ้าของรายการใน View drawer",
+      "ตรวจ UI/UX ของ Create/Edit drawer และ View drawer",
+      "ตรวจแท็บรายละเอียด, PDF Preview, ลายเซ็น และประวัติ"
+    ],
+    "not_checked": [
+      {
+        "item": "Update ข้อมูลรายการจนจบ flow",
+        "reason": "ไม่สามารถเริ่มแก้ไขได้ เนื่องจากเจ้าของรายการไม่เห็น action แก้ไข"
+      },
+      {
+        "item": "ยกเลิกรายการจนจบ flow",
+        "reason": "ไม่สามารถเริ่มยกเลิกได้ เนื่องจากเจ้าของรายการไม่เห็น action ยกเลิก"
+      },
+      {
+        "item": "Hard delete",
+        "reason": "FRD ไม่มีการลบถาวร ใช้การยกเลิกเอกสารแทน"
+      },
+      {
+        "item": "Business rules และ integration อื่นทั้งหมดใน FRD",
+        "reason": "ผู้ตรวจไม่ได้รายงานผลในรอบนี้"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างแบบสำรวจ",
+      "expected": "เจ้าของรายการสร้างแบบสำรวจผ่าน Create drawer ได้",
+      "actual": "สร้างรายการได้",
+      "status": "pass",
+      "ref": "FRD 06_TESTS AC-01"
+    },
+    {
+      "item": "อัปโหลดไฟล์แนบใน Create/Edit drawer",
+      "expected": "ผู้ใช้แนบไฟล์กับแบบสำรวจได้สำเร็จ",
+      "actual": "อัปโหลดไฟล์ไม่สำเร็จ",
+      "status": "fail",
+      "bug": "BUG-01",
+      "ref": "FRD 00_OVERVIEW In Scope · 02_API API-09"
+    },
+    {
+      "item": "เจ้าของแก้ไขรายการสถานะร่าง",
+      "expected": "เจ้าของเห็น action แก้ไขและแก้ไขร่างของตนเองได้",
+      "actual": "เจ้าของไม่เห็นปุ่มแก้ไขใน View drawer จึงทดสอบ update ต่อไม่ได้",
+      "status": "fail",
+      "bug": "BUG-02",
+      "ref": "FRD 05_RULES §5.2–5.3"
+    },
+    {
+      "item": "เจ้าของยกเลิกรายการของตนเอง",
+      "expected": "เจ้าของเห็น action ยกเลิกในสถานะร่างและบันทึกผลแล้ว",
+      "actual": "เจ้าของไม่เห็นปุ่มยกเลิกทั้งรายการสถานะร่างและรายการที่ส่งแล้ว",
+      "status": "fail",
+      "bug": "BUG-02",
+      "ref": "FRD 05_RULES BR-07 · §5.2–5.3"
+    },
+    {
+      "item": "แก้ไขรายการหลังบันทึกผลแล้ว",
+      "expected": "ไม่มี action แก้ไข เพราะสถานะ recorded ล็อกแก้ไข",
+      "actual": "ไม่ได้ประเมินเป็นข้อผิดพลาดจากการไม่มีปุ่มแก้ไขในสถานะที่ส่งแล้ว",
+      "status": "na",
+      "ref": "FRD 05_RULES BR-05"
+    },
+    {
+      "item": "ส่งอนุมัติ",
+      "expected": "ไม่มี action ส่งอนุมัติ เนื่องจาก Feature นี้ไม่มี DOA และบันทึกผลแล้วมีผลทันที",
+      "actual": "ไม่พบปุ่มส่งอนุมัติ ซึ่งสอดคล้องกับขอบเขต FRD",
+      "status": "na",
+      "ref": "FRD 07_LOCKED_DECISIONS DEC-03"
+    },
+    {
+      "item": "ลบรายการถาวร",
+      "expected": "ไม่มี hard delete; ใช้ action ยกเลิกเอกสารพร้อมเหตุผล",
+      "actual": "ไม่ได้ทดสอบการลบถาวร เพราะไม่อยู่ในขอบเขต FRD",
+      "status": "na",
+      "ref": "FRD 05_RULES BR-07"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "Create/Edit drawer มี layout บางส่วนไม่เรียบร้อยและหลุดจาก design"
+    },
+    {
+      "id": "U-04",
+      "status": "note",
+      "note": "View drawer และแท็บรายละเอียด, PDF Preview, ลายเซ็น, ประวัติ มีองค์ประกอบ UI ไม่สม่ำเสมอตาม design"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "note",
+      "note": "Create/Edit drawer และ View drawer บางส่วนใช้งานไม่ต่อเนื่องจาก layout/interaction ที่หลุด design"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "อัปโหลดไฟล์ใน Create/Edit drawer ไม่สำเร็จ",
+      "severity": "medium",
+      "steps": [
+        "เข้าสู่ Create drawer หรือ Edit drawer ของแบบสำรวจ",
+        "ไปยังส่วนอัปโหลดไฟล์",
+        "เลือกไฟล์และสั่งอัปโหลด"
+      ],
+      "expected": "ไฟล์อัปโหลดสำเร็จและแสดงเป็นไฟล์แนบของแบบสำรวจ",
+      "actual": "อัปโหลดไฟล์ไม่สำเร็จ",
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "เจ้าของรายการไม่เห็น action แก้ไขและยกเลิกตามสถานะ",
+      "severity": "high",
+      "steps": [
+        "เข้าสู่ระบบด้วยบัญชีผู้ทำรายการ",
+        "สร้างแบบสำรวจด้วยบัญชีดังกล่าว",
+        "เปิด View drawer ของรายการสถานะร่างที่สร้างเอง",
+        "ตรวจ action แก้ไขและยกเลิก",
+        "เปิด View drawer ของรายการที่ส่งแล้วและตรวจ action ยกเลิก"
+      ],
+      "expected": "สถานะร่างของตนเองมี action แก้ไขและยกเลิก; สถานะบันทึกผลแล้วมี action ยกเลิกตามสิทธิ์เจ้าของ",
+      "actual": "ไม่เห็น action แก้ไขและยกเลิก ทำให้ update และยกเลิกรายการของตนเองไม่ได้",
+      "status": "open"
+    }
+  ],
+  "suggestions": [
+    {
+      "item": "ปรับ Create/Edit drawer และ View drawer ให้ตรง design ที่อนุมัติ",
+      "reason": "พบ layout และองค์ประกอบในแท็บรายละเอียด, PDF Preview, ลายเซ็น และประวัติไม่เรียบร้อย แม้ UI/UX ส่วนอื่นใช้งานได้ตามที่ผู้ตรวจรายงาน"
+    }
+  ]
+}

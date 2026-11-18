@@ -1,0 +1,180 @@
+{
+  "feature": {
+    "code": "F-TMP-008",
+    "name": "สรุปข้อมูลประเมินความพึงพอใจลูกค้า กลุ่ม MT",
+    "module": "Sales"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-17",
+  "round": 1,
+  "refs": "FRD-F-TMP-008 v1.0 · 03_LOGIC · 05_RULES · 06_TESTS",
+  "scope": {
+    "checked": [
+      "สร้างรายการและยืนยันสรุป",
+      "Create/Edit drawer: UI, UX, ลำดับ step และการอัปโหลดไฟล์",
+      "View drawer: ปุ่ม action ของเจ้าของรายการ และ UI/UX ของแท็บรายละเอียด, PDF Preview, ลายเซ็น, ประวัติ"
+    ],
+    "not_checked": [
+      {
+        "item": "แก้ไขรายการ (update)",
+        "reason": "ทดสอบต่อไม่ได้ เพราะปุ่มแก้ไขของเจ้าของรายการไม่แสดง"
+      },
+      {
+        "item": "ยกเลิกรายการ (cancel/delete)",
+        "reason": "ทดสอบต่อไม่ได้ เพราะปุ่มยกเลิกของเจ้าของรายการไม่แสดง"
+      },
+      {
+        "item": "การคำนวณคะแนน, threshold 95/80, validation และ edge cases",
+        "reason": "ไม่มีผลตรวจในรอบนี้"
+      },
+      {
+        "item": "สิทธิ์ Owner รายอื่น, Sales admin, Head of BU และ direct API",
+        "reason": "ไม่มีผลตรวจในรอบนี้"
+      },
+      {
+        "item": "PDF ฉบับส่งออก, CSV, notification, config snapshot, stale version และ audit log",
+        "reason": "ไม่มีผลตรวจด้าน logic/integration ในรอบนี้"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างรายการใหม่",
+      "expected": "Owner สร้างรายการได้",
+      "status": "pass",
+      "ref": "FN-01..03"
+    },
+    {
+      "item": "ยืนยันสรุปโดยไม่มีขั้นตอนอนุมัติ",
+      "expected": "Owner ยืนยันเองแล้วระบบเปลี่ยนจาก draft เป็น final ทันที ตาม FRD ที่กำหนดว่าไม่มีผู้อนุมัติ",
+      "actual": "กดยืนยันสรุปแล้วระบบยืนยันสรุปให้เลย ไม่รอ DOA",
+      "status": "pass",
+      "ref": "BR-07 · FN-04 · DEC-03"
+    },
+    {
+      "item": "Owner เห็น action ของรายการที่ตนสร้าง",
+      "expected": "ใบร่างของตนต้องมี ยกเลิก, แก้ไข, ยืนยันสรุป; ใบสรุปแล้วต้องมียกเลิกเอกสาร",
+      "actual": "View drawer ไม่แสดงปุ่มยกเลิก, แก้ไข และปุ่มดำเนินสถานะ แม้เป็นรายการที่ account นี้สร้างเอง",
+      "status": "fail",
+      "bug": "BUG-01",
+      "ref": "01_UI §1.5 · 05_RULES §5.3"
+    },
+    {
+      "item": "แนบไฟล์ใน Create/Edit drawer",
+      "expected": "Owner ของใบร่างอัปโหลดไฟล์ที่ผ่าน file policy ได้",
+      "actual": "อัปโหลดไฟล์ไม่สำเร็จทั้ง Create/Edit drawer",
+      "status": "fail",
+      "bug": "BUG-02",
+      "ref": "FN-06 · API-09"
+    },
+    {
+      "item": "แก้ไขใบร่างของตน",
+      "expected": "Owner แก้ไขใบร่างได้และเลขที่เอกสารไม่เปลี่ยน",
+      "actual": "ไม่ได้ทดสอบต่อ เพราะปุ่มแก้ไขไม่แสดง",
+      "status": "na",
+      "ref": "FN-01 · API-04"
+    },
+    {
+      "item": "ยกเลิกใบร่าง/ใบสรุปแล้วของตน",
+      "expected": "Owner ยกเลิกได้เมื่อระบุเหตุผล",
+      "actual": "ไม่ได้ทดสอบต่อ เพราะปุ่มยกเลิกไม่แสดง",
+      "status": "na",
+      "ref": "FN-05 · VR-06"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-01",
+      "status": "note",
+      "note": "Create/Edit drawer และ View drawer ในแท็บรายละเอียด, PDF Preview, ลายเซ็น, ประวัติ มีหน้าตาหลุดจาก design ของระบบ"
+    },
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "Create/Edit drawer, ลำดับ step และ layout บางส่วนยังจัดวางไม่เรียบร้อย"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "note",
+      "note": "Owner ทำ flow แก้ไขและยกเลิกรายการของตนให้จบไม่ได้ เพราะไม่มีปุ่ม action"
+    },
+    {
+      "id": "X-02",
+      "status": "note",
+      "note": "ขั้นตอน Upload ไฟล์ไม่สำเร็จ ทำให้ flow เอกสารแนบไปต่อไม่ได้"
+    },
+    {
+      "id": "X-05",
+      "status": "note",
+      "note": "เมื่อ action ของ Owner ไม่แสดง ผู้ใช้ไม่มีทางไปต่อสำหรับการแก้ไขหรือยกเลิก"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "Owner ไม่เห็นปุ่ม action ของรายการที่ตนสร้าง",
+      "severity": "high",
+      "steps": [
+        "เข้าระบบด้วย account เจ้าของรายการ",
+        "สร้างรายการแล้วเปิด View drawer ของรายการนั้น",
+        "ตรวจปุ่ม action ในสถานะร่างและสถานะที่พบบนระบบจริง"
+      ],
+      "expected": "ใบร่างของ Owner แสดง ยกเลิก, แก้ไข, ยืนยันสรุป; ใบ final แสดงยกเลิกเอกสาร",
+      "actual": "ไม่มีปุ่มยกเลิก, แก้ไข และปุ่มดำเนินสถานะ ทำให้ update/cancel ไม่ได้",
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "Upload ไฟล์ใน Create/Edit drawer ไม่สำเร็จ",
+      "severity": "medium",
+      "steps": [
+        "เปิด Create หรือ Edit drawer",
+        "ไปยังขั้นเอกสารแนบ",
+        "เลือกไฟล์และสั่ง Upload"
+      ],
+      "expected": "ไฟล์ที่ผ่าน file policy ถูกอัปโหลดและแสดงในรายการไฟล์แนบ",
+      "actual": "Upload ไม่สำเร็จ",
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "Create/Edit drawer และลำดับ step หลุด design",
+      "severity": "low",
+      "steps": [
+        "เปิด Create drawer",
+        "ไล่ดูทุก step",
+        "เปิด Edit drawer และเปรียบเทียบ layout"
+      ],
+      "expected": "Drawer, step และ layout สอดคล้องกับ design ของระบบและจัดวางเรียบร้อย",
+      "actual": "องค์ประกอบหลุด design และ layout บางส่วนไม่เรียบร้อย",
+      "status": "open"
+    },
+    {
+      "id": "BUG-04",
+      "title": "UI/UX ของแท็บใน View drawer หลุด design",
+      "severity": "low",
+      "steps": [
+        "เปิด View drawer ของรายการ",
+        "เปิดแท็บรายละเอียด, PDF Preview, ลายเซ็น และประวัติ",
+        "ตรวจการจัดวางและรูปแบบ"
+      ],
+      "expected": "ทุกแท็บใช้ design และ interaction ที่สม่ำเสมอกับระบบ",
+      "actual": "UI/UX ของทั้ง 4 แท็บหลุด design",
+      "status": "open"
+    }
+  ],
+  "suggestions": [
+    {
+      "item": "ให้ PM/BA ยืนยันว่าฟีเจอร์นี้ไม่มีสายอนุมัติ DOA ใน production baseline",
+      "reason": "FRD BR-07/FN-04/DEC-03 ระบุว่า Owner ยืนยันสรุปเองและไม่มีผู้อนุมัติ แต่ผู้ตรวจยังไม่แน่ใจว่าเว็บจริงต้องเชื่อม DOA หรือไม่"
+    },
+    {
+      "item": "Retest BUG-01 ก่อนทดสอบ update/cancel ต่อ",
+      "reason": "ปัญหาปุ่ม action บล็อกขอบเขตตรวจ logic ส่วนที่เหลือ"
+    }
+  ]
+}

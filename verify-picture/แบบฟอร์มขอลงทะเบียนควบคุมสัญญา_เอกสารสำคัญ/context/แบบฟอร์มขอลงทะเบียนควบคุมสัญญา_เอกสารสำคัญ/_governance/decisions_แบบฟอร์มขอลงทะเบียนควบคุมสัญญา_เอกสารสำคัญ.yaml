@@ -1,0 +1,29 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# G1 ผลต่อระบบ
+config_changes: []
+post_to: []
+# G2 สายอนุมัติ — กระดาษมีผู้ลงนาม 2 ขั้นหลังผู้ขอ: หัวหน้า/ผู้จัดการ → ผู้เชี่ยวชาญด้านบริหารสัญญา (รับทราบ)
+# role-compliance = role ใกล้สุดชั่วคราวของ "ผู้เชี่ยวชาญด้านบริหารสัญญา" (ไม่มีใน DOA master → OQ)
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager", "role-compliance"], amount: none }
+# G3 สูตร / ค่าคงที่ — ไม่มีบนกระดาษ
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules: ["วันที่สิ้นสุดสัญญาต้องไม่ก่อนวันที่เริ่มต้น", "เลือกจุดประสงค์ แก้ไข/เปลี่ยนแปลง ต้องระบุสาเหตุ"]
+# G4 รายการซ้ำ — ไม่มี
+repeat: { max_rows: null }
+# G5
+fidelity: { one_to_one: true, add_fields: [], merge_split: ["วันที่เริ่มต้นและสิ้นสุดสัญญา = เก็บ 2 ค่า (เริ่ม/สิ้นสุด) แสดงบรรทัดเดียวตามกระดาษ"] }
+# G6
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+# G7
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+# G8
+visibility: { owner: true, approver: after_submit, admin_role: all }
+# G9
+numbering: { issue_on: first_save, code: CTR }
+# G10
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+extend: {}
+fit: {}

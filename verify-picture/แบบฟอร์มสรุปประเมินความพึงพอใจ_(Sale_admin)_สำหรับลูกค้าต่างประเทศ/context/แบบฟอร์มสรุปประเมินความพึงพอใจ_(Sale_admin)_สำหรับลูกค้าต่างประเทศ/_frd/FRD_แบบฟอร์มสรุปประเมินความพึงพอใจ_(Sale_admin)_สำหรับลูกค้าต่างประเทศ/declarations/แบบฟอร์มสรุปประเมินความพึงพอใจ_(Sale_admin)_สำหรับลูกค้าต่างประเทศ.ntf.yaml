@@ -1,0 +1,30 @@
+# ntf-declaration v1.2 — FINAL ยืนยันกับ FRD v1.0 (frd_lint N7 PASS)
+feature_id: F-TMP-007
+name: แบบฟอร์มสรุปประเมินความพึงพอใจ (Sale admin) สำหรับลูกค้าต่างประเทศ
+code: SES
+events:
+- id: ses_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-007-FN-06, F-TMP-007-FN-08
+- id: ses_low_score_approved
+  trigger: → approved และมีช่องคะแนน 1 หรือ 2 อย่างน้อย 1 ช่อง (weight ≤ 2 ตาม SalesConfig.sea_scale)
+  recipients:
+  - owner
+  - role-mgr-sales
+  template: '**{doc_no}** สรุปความพึงพอใจลูกค้าต่างประเทศ เดือน {period_month} มี {low_count}
+    ช่องที่ได้คะแนนต่ำ — ดูลูกค้า {low_customers}'
+  channel: in-app
+  optional: false
+  why: G3 คะแนนต่ำ = เตือนไม่บล็อก — ฝ่ายขายต้องรู้หลังผู้บริหารรับทราบ เพื่อวางแผนแก้ไขกับลูกค้า
+  frd_ref: 03_LOGIC F-TMP-007-FN-05, F-TMP-007-FN-08
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

@@ -1,0 +1,47 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# J005 · FM-SAL-21 แบบฟอร์มสรุปประเมินความพึงพอใจ (Sale admin) สำหรับลูกค้าในประเทศ (ใบสรุปของ FM-SAL-20 SDA)
+
+# G1 ผลต่อระบบ — ไม่เปลี่ยนค่า ไม่ส่งต่อ · อ่านผลประเมินจากแบบประเมิน SDA (FM-SAL-20) ที่บันทึกผลแล้วแบบอ่านอย่างเดียว
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — กระดาษมีผู้ลงชื่อ "ผู้รับทราบและอนุมัติ" 1 จุด (Managing Director) · role ใกล้สุดใน master = role-ceo (ไม่มี role "Managing Director")
+doa: { required: true, mode: dynamic, default_steps: ["role-ceo"], step_labels: ["ผู้รับทราบและอนุมัติ (Managing Director)"], requester_role: "role-mgr-sales", amount: none }
+
+# G3 สูตร / ค่าคงที่
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "หัวข้อประเมิน 5 ข้อ (ถ้อยคำตามกระดาษ FM-SAL-21) จับคู่ q1–q5 ของแบบประเมิน SDA · อ่านจาก SalesConfig.sda_topics[] — ผู้ใช้ไม่แก้ข้อความหัวข้อ"
+    - "ช่องในตาราง = ระดับความพึงพอใจจากแบบประเมิน SDA ที่ 'บันทึกผลแล้ว' ของลูกค้ารายนั้นในเดือนที่เลือก (อ่านอย่างเดียว) · แสดงเป็นคำ มากที่สุด/มาก/ปานกลาง/น้อย/ควรปรับปรุง ตาม SalesConfig.sda_scale[]"
+    - "เลือกลูกค้าได้เฉพาะที่มีแบบประเมิน SDA บันทึกผลแล้วในเดือนนั้น · ลูกค้าเดียวกันซ้ำในใบเดียวกัน = บล็อก · ลูกค้ามีแบบประเมินหลายใบในเดือน = ใช้ใบล่าสุด (เตือน)"
+    - "แถวใต้ชื่อลูกค้า = วันที่ประเมิน + เลขที่ SDA อ้างอิง (ระบบใส่ให้)"
+    - "ส่งพิจารณาได้เมื่อมีลูกค้าอย่างน้อย 1 คอลัมน์ และกรอก สรุปผลการประเมิน แล้ว · ข้อเสนอแนะไม่บังคับ"
+    - "ช่องใดของลูกค้าได้ระดับ น้อย หรือ ควรปรับปรุง = ไฮไลต์เตือนบนหน้าจอ (ไม่บล็อก ไม่พิมพ์สี)"
+    - "แบบประเมิน SDA ถูกยกเลิกหลังดึงเข้าใบสรุป (ใบสรุปยังเป็นร่าง) = เตือนให้เอาคอลัมน์นั้นออก · ใบที่ส่งแล้วเก็บค่าที่ดึงไว้ (snapshot)"
+
+# G4 รายการซ้ำ — คอลัมน์ลูกค้า สูงสุด 12 ต่อใบ (2 ชุดตาราง × 6 คอลัมน์ ตามกระดาษ) · แบบพิมพ์แสดงครบ 12 คอลัมน์ทุกสถานะ (2 หน้าคงที่) · ลูกค้าเกิน 12 ราย = ทำใบสรุปเพิ่ม
+repeat: { max_rows: 12 }
+
+# G5 ช่องตามกระดาษ — เพิ่มช่อง ประจำเดือน (ใบสรุปต้องมีงวด · ใช้ดึงแบบประเมิน) · ที่เหลือ 1:1
+fidelity: { one_to_one: true, add_fields: ["ประจำเดือน"], merge_split: [] }
+
+# G6 ลายเซ็น — แถวล่าง: ผู้สรุปผลการประเมิน (ผู้ส่ง) + 1 ช่องต่อขั้น DOA · ข้อความ "ส่งในระบบ / พิจารณาในระบบ" ไม่ใช้ภาพ
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ / ยกเลิก
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น
+visibility: { owner: true, approver: after_submit, admin_role: all, admin_role_name: "ผู้จัดการฝ่ายขาย (role-mgr-sales)" }
+
+# G9 เลขที่ — เอกสารภายใน ออกตอนบันทึกครั้งแรก · รหัส SDS (Satisfaction · Domestic · Summary)
+numbering: { issue_on: first_save, code: SDS }
+
+# G10 ของเสริม
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

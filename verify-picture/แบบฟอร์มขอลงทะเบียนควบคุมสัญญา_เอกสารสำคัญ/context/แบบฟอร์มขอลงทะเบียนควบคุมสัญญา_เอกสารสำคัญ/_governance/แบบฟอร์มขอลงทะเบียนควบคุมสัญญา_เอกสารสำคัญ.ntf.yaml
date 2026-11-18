@@ -1,0 +1,39 @@
+feature_id: F-TMP-009
+feature_id: F-TMP-009
+name: แบบฟอร์มขอลงทะเบียนควบคุมสัญญา/เอกสารสำคัญ
+code: CTR
+events:
+- id: ctr_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-009-FN-07, F-TMP-009-FN-10
+- id: ctr_registered
+  trigger: approved → registered (ผู้ดูแลสัญญารับลงทะเบียน ระบบออกทะเบียนควบคุมเลขที่)
+  recipients:
+  - requester
+  template: '**{doc_no}** ลงทะเบียนควบคุมแล้ว เลขที่ **{register_no}** — กรุณาส่งต้นฉบับ/คู่ฉบับให้ผู้ดูแลสัญญา'
+  channel: in-app+email
+  optional: false
+  why: ผู้ขอต้องรู้เลขทะเบียนและต้องส่งต้นฉบับ
+  frd_ref: 03_LOGIC F-TMP-009-FN-08, F-TMP-009-FN-10
+- id: ctr_original_received
+  trigger: registered → completed (บันทึก ได้รับต้นฉบับ/คู่ฉบับ วันที่)
+  recipients:
+  - requester
+  template: '**{doc_no}** ผู้ดูแลสัญญาได้รับต้นฉบับ/คู่ฉบับแล้ว วันที่ {received_date}'
+  channel: in-app
+  optional: true
+  why: ปิดวงจรการส่งต้นฉบับ
+  frd_ref: 03_LOGIC F-TMP-009-FN-08, F-TMP-009-FN-10
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+note: 'ฉบับจริง (ยืนยันกับ FRD) · AI-DEFAULT — event ธุรกิจ: ลงทะเบียน · ได้รับต้นฉบับ
+  · ยกเลิกระหว่างรอ'

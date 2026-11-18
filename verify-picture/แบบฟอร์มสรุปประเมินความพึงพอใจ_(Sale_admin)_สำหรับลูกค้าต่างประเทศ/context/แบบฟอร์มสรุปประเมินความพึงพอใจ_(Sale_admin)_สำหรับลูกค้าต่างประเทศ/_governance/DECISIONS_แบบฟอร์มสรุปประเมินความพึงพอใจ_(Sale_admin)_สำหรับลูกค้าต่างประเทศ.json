@@ -1,0 +1,347 @@
+{
+ "req": "REQ-TMP-007",
+ "status": "พร้อมเริ่มทำ",
+ "ready": true,
+ "decisions": [
+  {
+   "id": "DEC-01",
+   "cat": "G1",
+   "text": "อนุมัติแล้วไม่เปลี่ยนค่าในระบบ",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-02",
+   "cat": "G1",
+   "text": "ไม่ส่งต่อระบบอื่นรอบนี้ (ประกาศ event ไว้ใน FRD แต่ไม่ยิง)",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-03",
+   "cat": "G2",
+   "text": "สายอนุมัติตั้งที่ DOA กลาง (dynamic) · ค่าเริ่ม 1 ขั้น: role-ceo · วงเงิน: ไม่มี",
+   "value": {
+    "required": true,
+    "mode": "dynamic",
+    "default_steps": [
+     "role-ceo"
+    ],
+    "amount": "none",
+    "step_labels": [
+     "ผู้รับทราบและอนุมัติ (Managing Director)"
+    ],
+    "requester_role": "role-mgr-sales"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "doa-declaration",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-04",
+   "cat": "G3",
+   "text": "ค่าคงที่อ่านจาก config: \"ความชัดเจนในการสื่อสาร … ความพึงพอใจในบริการ (10 ข้อ · 3 กลุ่ม)\" → SalesConfig.sea_topics[] (ชุดเดียวกับ SEA · ป้ายไทยสำหรับใบสรุป), \"ด้านการสื่อสารและการตอบสนอง / ด้านเอกสารและการดำเนินงาน / ด้านความเป็นมืออาชีพ\" → SalesConfig.sea_topic_groups[], \"ระดับความพึงพอใจ\" → SalesConfig.sea_scale[] (label + weight 1–5) · คำนวณให้อัตโนมัติ ผู้ใช้ปรับได้ · เกินเกณฑ์ = เตือน · หัวข้อประเมิน 10 ข้อใน 3 กลุ่ม (ถ้อยคำไทยตามกระดาษ FM-SAL-23) จับคู่ q1–q10 ของแบบประเมิน SEA · อ่านจาก SalesConfig.sea_topics[] + sea_topic_groups[] — ผู้ใช้ไม่แก้ข้อความหัวข้อ · ช่องในตาราง = คะแนน 1–5 จากแบบประเมิน SEA ที่ 'บันทึกผลแล้ว' ของลูกค้ารายนั้นในเดือนที่เลือก (อ่านอย่างเดียว) · แสดงเป็นตัวเลข 1–5 (5=Very Satisfied) ตาม SalesConfig.sea_scale[] · เลือกลูกค้าได้เฉพาะที่มีแบบประเมิน SEA บันทึกผลแล้วในเดือนนั้น · ลูกค้าเดียวกันซ้ำในใบเดียวกัน = บล็อก · ลูกค้ามีแบบประเมินหลายใบในเดือน = ใช้ใบล่าสุด (เตือน) · ส่งพิจารณาได้เมื่อมีลูกค้าอย่างน้อย 1 คอลัมน์ และกรอก สรุปผลการประเมิน แล้ว · ข้อเสนอแนะไม่บังคับ · ช่องใดของลูกค้าได้คะแนน 1 หรือ 2 = ไฮไลต์เตือนบนหน้าจอ (ไม่บล็อก ไม่พิมพ์สี) · แบบประเมิน SEA ถูกยกเลิกหลังดึงเข้าใบสรุป (ใบสรุปยังเป็นร่าง) = เตือนให้เอาคอลัมน์นั้นออก · ใบที่ส่งแล้วเก็บค่าที่ดึงไว้ (snapshot)",
+   "value": {
+    "constants_from_config": true,
+    "auto_compute": true,
+    "over_limit": "warn",
+    "rules": [
+     "หัวข้อประเมิน 10 ข้อใน 3 กลุ่ม (ถ้อยคำไทยตามกระดาษ FM-SAL-23) จับคู่ q1–q10 ของแบบประเมิน SEA · อ่านจาก SalesConfig.sea_topics[] + sea_topic_groups[] — ผู้ใช้ไม่แก้ข้อความหัวข้อ",
+     "ช่องในตาราง = คะแนน 1–5 จากแบบประเมิน SEA ที่ 'บันทึกผลแล้ว' ของลูกค้ารายนั้นในเดือนที่เลือก (อ่านอย่างเดียว) · แสดงเป็นตัวเลข 1–5 (5=Very Satisfied) ตาม SalesConfig.sea_scale[]",
+     "เลือกลูกค้าได้เฉพาะที่มีแบบประเมิน SEA บันทึกผลแล้วในเดือนนั้น · ลูกค้าเดียวกันซ้ำในใบเดียวกัน = บล็อก · ลูกค้ามีแบบประเมินหลายใบในเดือน = ใช้ใบล่าสุด (เตือน)",
+     "ส่งพิจารณาได้เมื่อมีลูกค้าอย่างน้อย 1 คอลัมน์ และกรอก สรุปผลการประเมิน แล้ว · ข้อเสนอแนะไม่บังคับ",
+     "ช่องใดของลูกค้าได้คะแนน 1 หรือ 2 = ไฮไลต์เตือนบนหน้าจอ (ไม่บล็อก ไม่พิมพ์สี)",
+     "แบบประเมิน SEA ถูกยกเลิกหลังดึงเข้าใบสรุป (ใบสรุปยังเป็นร่าง) = เตือนให้เอาคอลัมน์นั้นออก · ใบที่ส่งแล้วเก็บค่าที่ดึงไว้ (snapshot)"
+    ]
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-05",
+   "cat": "G4",
+   "text": "ลูกค้าที่ประเมิน (คอลัมน์): สูงสุด 8 แถว · PDF อย่างน้อย 8 แถวตามกระดาษ",
+   "value": {
+    "max_rows": 8,
+    "min_rows": 8
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-06",
+   "cat": "G5",
+   "text": "ช่องตรงกระดาษ 1:1 · เพิ่ม: ประจำเดือน",
+   "value": {
+    "one_to_one": true,
+    "add_fields": [
+     "ประจำเดือน"
+    ],
+    "merge_split": []
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-07",
+   "cat": "G6",
+   "text": "ลายเซ็นแถวล่าง 1 ช่องต่อขั้น DOA · ไม่ใช้ภาพลายมือชื่อ (ข้อความส่งในระบบ/พิจารณาในระบบ)",
+   "value": {
+    "layout": "row-bottom",
+    "per_doa_step": true,
+    "handwriting_image": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "thai-doc",
+    "html",
+    "doccfg-declaration",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-08",
+   "cat": "G7",
+   "text": "ไม่อนุมัติ = กลับเป็นร่าง แก้แล้วส่งใหม่ · ยกเลิกได้โดย owner, admin_role สถานะ draft, pending · ต้องมีเหตุผล",
+   "value": {
+    "on_reject": "back_to_draft",
+    "cancel_by": [
+     "owner",
+     "admin_role"
+    ],
+    "cancel_states": [
+     "draft",
+     "pending"
+    ],
+    "reason_required": true
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests",
+    "doa-declaration"
+   ]
+  },
+  {
+   "id": "DEC-09",
+   "cat": "G8",
+   "text": "มองเห็น: เจ้าของ · ผู้อนุมัติเห็นหลังส่ง · admin role เห็นทั้งหมด",
+   "value": {
+    "owner": true,
+    "approver": "after_submit",
+    "admin_role": "all",
+    "admin_role_name": "ผู้จัดการฝ่ายขาย (role-mgr-sales)"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-10",
+   "cat": "G9",
+   "text": "ออกเลขเมื่อบันทึกครั้งแรก · รหัส SES",
+   "value": {
+    "issue_on": "first_save",
+    "code": "SES"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "doccfg-declaration",
+    "html",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-11",
+   "cat": "G10",
+   "text": "ของเสริม (กระดาษไม่มี): แนบไฟล์, ส่งออก CSV",
+   "value": {
+    "attachments": true,
+    "copy": false,
+    "export_csv": true,
+    "announce": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "brd",
+    "frd",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-12",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: เพิ่มช่อง ประจำเดือน (บังคับ) ใช้ดึงแบบประเมิน SEA ในเดือนนั้น (พบ: ไม่มีช่องประจำเดือน/งวด ทั้งที่เป็นใบสรุป)",
+   "value": {
+    "where": "หัวเอกสาร",
+    "detail": "ไม่มีช่องประจำเดือน/งวด ทั้งที่เป็นใบสรุป",
+    "rule": "เพิ่มช่อง ประจำเดือน (บังคับ) ใช้ดึงแบบประเมิน SEA ในเดือนนั้น"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-13",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: จับคู่หัวข้อตามลำดับ q1–q10 · พิมพ์ถ้อยคำไทยตามกระดาษ FM-SAL-23 (พบ: ใบประเมินต้นทาง FM-SAL-22 เป็นอังกฤษล้วน แต่ใบสรุปเป็นไทย (ถ้อยคำหัวข้อแปลไทย))",
+   "value": {
+    "where": "ภาษา",
+    "detail": "ใบประเมินต้นทาง FM-SAL-22 เป็นอังกฤษล้วน แต่ใบสรุปเป็นไทย (ถ้อยคำหัวข้อแปลไทย)",
+    "rule": "จับคู่หัวข้อตามลำดับ q1–q10 · พิมพ์ถ้อยคำไทยตามกระดาษ FM-SAL-23"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-14",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ลูกค้าเป็นข้อมูลจากแบบประเมิน (ไม่ตายตัว) · ลูกค้าเดียวกันซ้ำในใบเดียวกันไม่ได้ → บล็อก · หลายใบในเดือนใช้ใบล่าสุด (พบ: ชื่อลูกค้าพิมพ์ตายตัว 4 รายบนกระดาษ)",
+   "value": {
+    "where": "หัวคอลัมน์ลูกค้า",
+    "detail": "ชื่อลูกค้าพิมพ์ตายตัว 4 รายบนกระดาษ",
+    "rule": "ลูกค้าเป็นข้อมูลจากแบบประเมิน (ไม่ตายตัว) · ลูกค้าเดียวกันซ้ำในใบเดียวกันไม่ได้ → บล็อก · หลายใบในเดือนใช้ใบล่าสุด"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-15",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: วาง ผู้สรุป (ซ้าย) → ผู้รับทราบและอนุมัติ (ขวา) ตามภาพ · จัดเส้นให้เท่ากัน (layout เท่านั้น) (พบ: ใน Word ช่อง 'ผู้รับทราบและอนุมัติ' มาก่อนในโค้ด แต่บนกระดาษผู้สรุปอยู่ซ้าย ผู้อนุมัติอยู่ขวา · เส้นลงชื่อ MD ตกบรรทัด)",
+   "value": {
+    "where": "ลำดับลงชื่อ",
+    "detail": "ใน Word ช่อง 'ผู้รับทราบและอนุมัติ' มาก่อนในโค้ด แต่บนกระดาษผู้สรุปอยู่ซ้าย ผู้อนุมัติอยู่ขวา · เส้นลงชื่อ MD ตกบรรทัด",
+    "rule": "วาง ผู้สรุป (ซ้าย) → ผู้รับทราบและอนุมัติ (ขวา) ตามภาพ · จัดเส้นให้เท่ากัน (layout เท่านั้น)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  }
+ ],
+ "raw": {
+  "config_changes": [],
+  "post_to": [],
+  "doa": {
+   "required": true,
+   "mode": "dynamic",
+   "default_steps": [
+    "role-ceo"
+   ],
+   "amount": "none",
+   "step_labels": [
+    "ผู้รับทราบและอนุมัติ (Managing Director)"
+   ],
+   "requester_role": "role-mgr-sales"
+  },
+  "calc": {
+   "constants_from_config": true,
+   "auto_compute": true,
+   "over_limit": "warn",
+   "rules": [
+    "หัวข้อประเมิน 10 ข้อใน 3 กลุ่ม (ถ้อยคำไทยตามกระดาษ FM-SAL-23) จับคู่ q1–q10 ของแบบประเมิน SEA · อ่านจาก SalesConfig.sea_topics[] + sea_topic_groups[] — ผู้ใช้ไม่แก้ข้อความหัวข้อ",
+    "ช่องในตาราง = คะแนน 1–5 จากแบบประเมิน SEA ที่ 'บันทึกผลแล้ว' ของลูกค้ารายนั้นในเดือนที่เลือก (อ่านอย่างเดียว) · แสดงเป็นตัวเลข 1–5 (5=Very Satisfied) ตาม SalesConfig.sea_scale[]",
+    "เลือกลูกค้าได้เฉพาะที่มีแบบประเมิน SEA บันทึกผลแล้วในเดือนนั้น · ลูกค้าเดียวกันซ้ำในใบเดียวกัน = บล็อก · ลูกค้ามีแบบประเมินหลายใบในเดือน = ใช้ใบล่าสุด (เตือน)",
+    "ส่งพิจารณาได้เมื่อมีลูกค้าอย่างน้อย 1 คอลัมน์ และกรอก สรุปผลการประเมิน แล้ว · ข้อเสนอแนะไม่บังคับ",
+    "ช่องใดของลูกค้าได้คะแนน 1 หรือ 2 = ไฮไลต์เตือนบนหน้าจอ (ไม่บล็อก ไม่พิมพ์สี)",
+    "แบบประเมิน SEA ถูกยกเลิกหลังดึงเข้าใบสรุป (ใบสรุปยังเป็นร่าง) = เตือนให้เอาคอลัมน์นั้นออก · ใบที่ส่งแล้วเก็บค่าที่ดึงไว้ (snapshot)"
+   ]
+  },
+  "repeat": {
+   "max_rows": 8
+  },
+  "fidelity": {
+   "one_to_one": true,
+   "add_fields": [
+    "ประจำเดือน"
+   ],
+   "merge_split": []
+  },
+  "signature": {
+   "layout": "row-bottom",
+   "per_doa_step": true,
+   "handwriting_image": false
+  },
+  "reject_cancel": {
+   "on_reject": "back_to_draft",
+   "cancel_by": [
+    "owner",
+    "admin_role"
+   ],
+   "cancel_states": [
+    "draft",
+    "pending"
+   ],
+   "reason_required": true
+  },
+  "visibility": {
+   "owner": true,
+   "approver": "after_submit",
+   "admin_role": "all",
+   "admin_role_name": "ผู้จัดการฝ่ายขาย (role-mgr-sales)"
+  },
+  "numbering": {
+   "issue_on": "first_save",
+   "code": "SES"
+  },
+  "extras": {
+   "attachments": true,
+   "copy": false,
+   "export_csv": true,
+   "announce": false
+  },
+  "extend": {},
+  "fit": {}
+ },
+ "unattended": true
+}
