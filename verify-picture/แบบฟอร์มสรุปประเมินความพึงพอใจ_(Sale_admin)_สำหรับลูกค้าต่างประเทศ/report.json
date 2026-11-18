@@ -1,0 +1,243 @@
+{
+  "feature": {
+    "code": "F-TMP-007",
+    "name": "แบบฟอร์มสรุปประเมินความพึงพอใจ (Sale admin) สำหรับลูกค้าต่างประเทศ",
+    "module": "Sales"
+  },
+  "env": "Production",
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-18",
+  "round": 1,
+  "refs": "FRD F-TMP-007 v1.0 · 01_UI · 03_LOGIC · 05_RULES · 06_TESTS",
+  "scope": {
+    "checked": [
+      "Create flow",
+      "Update/Edit flow",
+      "Delete flow",
+      "Create/Edit/View drawer",
+      "แท็บรายละเอียด · PDF Preview · ลายเซ็น/อนุมัติ · ประวัติ",
+      "การแสดงและอัปโหลดไฟล์แนบใน drawer",
+      "UI/UX โดยรวม"
+    ],
+    "not_checked": [
+      {
+        "item": "การดึง SEA · คะแนน q1–q10 · latest survey · snapshot",
+        "reason": "ผู้ตรวจไม่ได้รายงานผลในรอบนี้"
+      },
+      {
+        "item": "Validation ตาม VR-01..07 และ edge cases EC-01..12",
+        "reason": "ผู้ตรวจไม่ได้รายงานผลในรอบนี้"
+      },
+      {
+        "item": "DOA · ส่งอนุมัติ · อนุมัติ · ไม่อนุมัติ · ยกเลิกตาม state machine",
+        "reason": "ผู้ตรวจไม่ได้รายงานผลในรอบนี้"
+      },
+      {
+        "item": "Permission/tenant isolation · notification · audit · approved_final · CSV",
+        "reason": "ผู้ตรวจไม่ได้รายงานผลในรอบนี้"
+      },
+      {
+        "item": "ความถูกต้องของข้อมูลและ pagination ภายใน PDF",
+        "reason": "ตรวจเฉพาะ UI/UX ของแท็บ PDF Preview ไม่ได้รายงานผล logic ของ PDF"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างรายการ (Create)",
+      "expected": "สร้างรายการได้สำเร็จตาม flow ของระบบ",
+      "actual": "ผู้ตรวจทดลอง Create ครบแล้วและไม่รายงานปัญหา logic",
+      "status": "pass"
+    },
+    {
+      "item": "แก้ไขรายการ (Update/Edit)",
+      "expected": "แก้ไขและบันทึกรายการได้สำเร็จ",
+      "actual": "ผู้ตรวจทดลอง Update ครบแล้วและไม่รายงานปัญหา logic การบันทึก",
+      "status": "pass"
+    },
+    {
+      "item": "ลบรายการ (Delete)",
+      "expected": "ดำเนินการ Delete ตาม flow ที่ระบบเปิดให้ได้สำเร็จ",
+      "actual": "ผู้ตรวจทดลอง Delete ครบแล้วและไม่รายงานปัญหา",
+      "status": "pass"
+    },
+    {
+      "item": "Edit drawer โหลดไฟล์แนบเดิม",
+      "expected": "เมื่อเปิดแก้ไข ต้องเห็นไฟล์ที่เคยแนบไว้เพื่อให้ตรวจสอบหรือจัดการต่อได้",
+      "actual": "Edit drawer ไม่แสดงไฟล์ที่เคยแนบไป",
+      "status": "fail",
+      "bug": "BUG-03",
+      "ref": "01_UI §1.1 P-02 · API-11"
+    },
+    {
+      "item": "ตำแหน่งอัปโหลดไฟล์แนบ",
+      "expected": "อัปโหลดไฟล์ได้จาก Create/Edit drawer; View drawer แสดงไฟล์เพื่ออ่านอย่างเดียว",
+      "actual": "View drawer แท็บรายละเอียดมีส่วนอัปโหลดไฟล์",
+      "status": "note",
+      "bug": "BUG-04",
+      "ref": "01_UI §1.1 P-02/P-03"
+    },
+    {
+      "item": "BR-01 คะแนนจาก SEA recorded และอ่านอย่างเดียว",
+      "expected": "ดึงคะแนนจาก SEA recorded ของเดือนและแก้คะแนนในใบสรุปไม่ได้",
+      "status": "na",
+      "ref": "BR-01"
+    },
+    {
+      "item": "BR-02 ลูกค้าซ้ำและ SEA หลายใบ",
+      "expected": "บล็อกลูกค้าซ้ำ; หลาย SEA ใช้ใบล่าสุดพร้อมเตือน",
+      "status": "na",
+      "ref": "BR-02"
+    },
+    {
+      "item": "BR-03 จำกัดลูกค้าตาม config",
+      "expected": "สูงสุด 8 รายหรือตาม ses_max_customers",
+      "status": "na",
+      "ref": "BR-03"
+    },
+    {
+      "item": "BR-04..06 config · คะแนนต่ำ · SEA ถูกยกเลิก",
+      "expected": "mapping/snapshot/คำเตือนและการบล็อกส่งถูกต้อง",
+      "status": "na",
+      "ref": "BR-04..06"
+    },
+    {
+      "item": "BR-07 Validation สรุปผลและข้อเสนอแนะ",
+      "expected": "สรุปผลบังคับตอนส่งและข้อความไม่เกิน 1,000 ตัวอักษร",
+      "status": "na",
+      "ref": "BR-07"
+    },
+    {
+      "item": "BR-08..09 DOA snapshot และ reject กลับ draft",
+      "expected": "freeze chain ตอนส่ง; reject กลับ draft เลขเดิมและ resolve ใหม่เมื่อส่งซ้ำ",
+      "status": "na",
+      "ref": "BR-08..09"
+    },
+    {
+      "item": "BR-10 ออกเลขเอกสาร",
+      "expected": "ออกเลขครั้งเดียวตอนบันทึกครั้งแรก",
+      "status": "na",
+      "ref": "BR-10"
+    },
+    {
+      "item": "BR-11 Permission การมองเห็นร่าง",
+      "expected": "ร่างเห็นเฉพาะเจ้าของและ role-mgr-sales",
+      "status": "na",
+      "ref": "BR-11"
+    },
+    {
+      "item": "BR-12 PDF และช่องลงชื่อตาม DOA",
+      "expected": "จำนวนช่องลงชื่อ dynamic ตาม approval chain",
+      "status": "na",
+      "ref": "BR-12"
+    },
+    {
+      "item": "BR-13 Notification คะแนนต่ำ",
+      "expected": "อนุมัติขั้นสุดท้ายที่มีคะแนนต่ำแล้วแจ้งผู้เกี่ยวข้อง",
+      "status": "na",
+      "ref": "BR-13"
+    },
+    {
+      "item": "BR-14 ผลข้างเคียงและการส่งต่อระบบ",
+      "expected": "ไม่เปลี่ยนค่าต้นทางและไม่ยิง ses.approved รอบนี้",
+      "status": "na",
+      "ref": "BR-14"
+    },
+    {
+      "item": "BR-15 ช่องและ config ตามแบบฟอร์ม",
+      "expected": "เดือนบังคับ; หัวข้อ กลุ่ม และสเกลอ่านจาก config",
+      "status": "na",
+      "ref": "BR-15"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "Create/Edit drawer มี layout บางส่วนไม่เรียบร้อยและหลุดจากรูปแบบการจัดวางของระบบ"
+    },
+    {
+      "id": "U-04",
+      "status": "note",
+      "note": "องค์ประกอบใน Create/Edit drawer ไม่สม่ำเสมอกับ design ของระบบ"
+    },
+    {
+      "item": "View drawer — แท็บรายละเอียด · PDF Preview · ลายเซ็น · ประวัติ",
+      "status": "note",
+      "note": "หน้าตาและการจัดวางหลุดจาก design และยังไม่เรียบร้อย"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "note",
+      "note": "View drawer แท็บรายละเอียดมีการอัปโหลดไฟล์ ทั้งที่ flow ที่คาดหวังคือ View ใช้แสดงไฟล์ และอัปโหลดจาก Create/Edit"
+    },
+    {
+      "item": "Edit drawer แสดงไฟล์แนบเดิม",
+      "status": "note",
+      "note": "ผู้ใช้ไม่เห็นไฟล์ที่เคยแนบ ทำให้ตรวจสอบหรือจัดการไฟล์เดิมระหว่างแก้ไขไม่ได้"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "Create/Edit drawer หลุด design และ layout บางส่วนไม่เรียบร้อย",
+      "severity": "low",
+      "steps": [
+        "เปิดฟีเจอร์แบบฟอร์มสรุปประเมินความพึงพอใจสำหรับลูกค้าต่างประเทศ",
+        "เปิด Create drawer",
+        "เปิด Edit drawer",
+        "ตรวจการจัดวาง ระยะห่าง และความสม่ำเสมอขององค์ประกอบ"
+      ],
+      "expected": "Create/Edit drawer ใช้รูปแบบและ layout สม่ำเสมอกับ design ของระบบ",
+      "actual": "Drawer หลุด design และ layout บางส่วนไม่เรียบร้อย",
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "View drawer หลายแท็บหลุด design",
+      "severity": "low",
+      "steps": [
+        "เปิดรายการที่มีอยู่ใน View drawer",
+        "เปิดแท็บรายละเอียด",
+        "เปิดแท็บ PDF Preview",
+        "เปิดแท็บลายเซ็น/อนุมัติ",
+        "เปิดแท็บประวัติ"
+      ],
+      "expected": "ทุกแท็บใช้ layout และองค์ประกอบที่สม่ำเสมอกับ design ของระบบ",
+      "actual": "แท็บรายละเอียด, PDF Preview, ลายเซ็น และประวัติ มี UI/UX หลุด design",
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "Edit drawer ไม่แสดงไฟล์ที่เคยแนบไว้",
+      "severity": "medium",
+      "steps": [
+        "สร้างหรือเปิดรายการแล้วแนบไฟล์",
+        "บันทึกรายการ",
+        "กลับมาเปิดรายการเดิมด้วย Edit drawer",
+        "ตรวจส่วนเอกสารแนบ"
+      ],
+      "expected": "เห็นรายการไฟล์ที่เคยแนบไว้ครบ เพื่อเปิดหรือลบ/จัดการตามสิทธิ์",
+      "actual": "Edit drawer ไม่แสดงไฟล์ที่เคยแนบไป",
+      "status": "open"
+    },
+    {
+      "id": "BUG-04",
+      "title": "View drawer แท็บรายละเอียดมีส่วนอัปโหลดไฟล์ผิดตำแหน่งของ flow",
+      "severity": "medium",
+      "steps": [
+        "เปิดรายการที่มีอยู่ด้วย View drawer",
+        "เปิดแท็บรายละเอียด",
+        "ตรวจส่วนเอกสารแนบ"
+      ],
+      "expected": "View drawer แสดงไฟล์แนบเพื่อดูเท่านั้น; การอัปโหลดอยู่ใน Create/Edit drawer",
+      "actual": "แท็บรายละเอียดใน View drawer มีส่วนอัปโหลดไฟล์",
+      "status": "open"
+    }
+  ],
+  "suggestions": []
+}

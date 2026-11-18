@@ -1,0 +1,181 @@
+{
+  "feature": {
+    "code": "Service_Experience_Survey",
+    "name": "Service Experience Survey (FM-SAL-22)",
+    "module": "Sales"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-18",
+  "round": 1,
+  "refs": "FRD F-TMP-006 v1.0 · UI Brief Service_Experience_Survey",
+  "scope": {
+    "checked": [
+      "Create drawer และการสร้างรายการ",
+      "Edit drawer และการแก้ไขรายการ",
+      "การลบ/ยกเลิกรายการตาม flow ที่ระบบแสดง",
+      "การแสดงและจัดการไฟล์แนบใน Create / Edit / View drawer",
+      "View drawer: รายละเอียด · PDF Preview · ลายเซ็น / อนุมัติ · ประวัติ",
+      "UI/UX ส่วนที่เหลือของฟีเจอร์"
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างรายการผ่าน Create drawer",
+      "expected": "สร้างรายการได้ตาม flow",
+      "status": "pass",
+      "ref": "FRD API-03"
+    },
+    {
+      "item": "แก้ไขข้อมูลรายการผ่าน Edit drawer",
+      "expected": "แก้ไขข้อมูลรายการได้ตาม flow",
+      "status": "pass",
+      "ref": "FRD API-04"
+    },
+    {
+      "item": "ลบ/ยกเลิกรายการตาม flow ที่ระบบแสดง",
+      "expected": "ทำรายการได้ครบตาม flow ที่ทดสอบ",
+      "status": "pass",
+      "ref": "FRD BR-07 · API-06"
+    },
+    {
+      "item": "Edit drawer แสดงไฟล์แนบเดิมของรายการ",
+      "expected": "เมื่อเปิดแก้ไข ต้องเห็นไฟล์ที่เคยแนบไว้และจัดการต่อได้",
+      "actual": "Edit drawer ไม่แสดงไฟล์ที่เคยแนบไว้",
+      "status": "fail",
+      "bug": "BUG-02",
+      "ref": "FRD P-02 ขั้น 2 · API-03/04 attachment_ids"
+    },
+    {
+      "item": "View drawer ใช้สำหรับดูไฟล์แนบแบบ read-only",
+      "expected": "แท็บรายละเอียดแสดงไฟล์แนบเดิม โดยการ upload อยู่เฉพาะ Create / Edit drawer",
+      "actual": "View drawer แท็บรายละเอียดมี action สำหรับ upload file",
+      "status": "fail",
+      "bug": "BUG-03",
+      "ref": "FRD P-02 ขั้น 2 · P-03 รายละเอียด"
+    },
+    {
+      "item": "กฎคะแนน 1–5 และต้องครบ 10 ข้อก่อนบันทึกผล",
+      "expected": "บังคับตาม BR-01/BR-02",
+      "status": "na",
+      "ref": "FRD BR-01 · BR-02"
+    },
+    {
+      "item": "คะแนนต่ำและการแจ้งเตือนผู้จัดการ",
+      "expected": "คำนวณตาม threshold และส่ง sea_low_score_recorded",
+      "status": "na",
+      "ref": "FRD BR-04 · FN-06"
+    },
+    {
+      "item": "สิทธิ์ Owner / Sales Admin คนอื่น / role-mgr-sales",
+      "expected": "การเห็นและ action เป็นไปตาม Permission Matrix",
+      "status": "na",
+      "ref": "FRD §5.3"
+    },
+    {
+      "item": "PDF ทุกสถานะและข้อมูลในแบบพิมพ์",
+      "expected": "ข้อมูลและสถานะตรงกับรายการ",
+      "status": "na",
+      "ref": "FRD AC-08"
+    },
+    {
+      "item": "CSV ตามตัวกรองและสิทธิ์",
+      "expected": "ส่งออกข้อมูลตาม filter และ visible set",
+      "status": "na",
+      "ref": "FRD AC-10"
+    },
+    {
+      "item": "Optimistic lock และ Idempotency",
+      "expected": "ไม่เขียนทับข้อมูลเก่าและไม่สร้างรายการซ้ำ",
+      "status": "na",
+      "ref": "FRD EC-05 · API §2.2"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-01",
+      "status": "note",
+      "note": "Create / Edit drawer และ View drawer หลายแท็บหลุดจากรูปแบบ design ที่ควรใช้"
+    },
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "Layout บางส่วนใน Create / Edit drawer ไม่เรียบร้อย"
+    },
+    {
+      "id": "U-04",
+      "status": "note",
+      "note": "View drawer แท็บรายละเอียดมี upload file ทั้งที่ควรเป็นโหมดแสดงไฟล์"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "note",
+      "note": "Edit drawer ไม่แสดงไฟล์เดิม และ View drawer เปิดให้ upload ทำให้หน้าที่ของ Create / Edit / View ไม่ชัดเจน"
+    },
+    {
+      "item": "ความสม่ำเสมอของ View drawer ทุกแท็บ",
+      "status": "note",
+      "note": "รายละเอียด · PDF Preview · ลายเซ็น / อนุมัติ · ประวัติ มี UI/UX หลุด design"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "Create / Edit drawer มี UI และ layout หลุด design",
+      "severity": "low",
+      "steps": [
+        "เปิด Service Experience Survey",
+        "เปิด Create drawer และ Edit drawer",
+        "ตรวจ layout และองค์ประกอบใน drawer"
+      ],
+      "expected": "องค์ประกอบจัดวางเรียบร้อยและใช้รูปแบบ design เดียวกับระบบ",
+      "actual": "UI หลุด design และ layout บางส่วนไม่เรียบร้อย",
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "Edit drawer ไม่แสดงไฟล์ที่เคยแนบไว้",
+      "severity": "medium",
+      "steps": [
+        "สร้างรายการและแนบไฟล์",
+        "บันทึกรายการ",
+        "เปิดรายการเดิมด้วย Edit drawer",
+        "ตรวจส่วนเอกสารแนบ"
+      ],
+      "expected": "แสดงไฟล์ที่เคยแนบไว้ในรายการ",
+      "actual": "ไม่แสดงไฟล์ที่เคยแนบไว้",
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "View drawer เปิดให้ upload file ในแท็บรายละเอียด",
+      "severity": "medium",
+      "steps": [
+        "เปิดรายการใน View drawer",
+        "เปิดแท็บรายละเอียด",
+        "ตรวจส่วนเอกสารแนบ"
+      ],
+      "expected": "View drawer แสดงไฟล์แนบแบบดูอย่างเดียว และ upload file อยู่เฉพาะ Create / Edit drawer",
+      "actual": "แท็บรายละเอียดของ View drawer มี action สำหรับ upload file",
+      "status": "open"
+    },
+    {
+      "id": "BUG-04",
+      "title": "UI/UX ของ View drawer ทุกแท็บหลุด design",
+      "severity": "low",
+      "steps": [
+        "เปิดรายการใน View drawer",
+        "เปิดแท็บรายละเอียด",
+        "เปิดแท็บ PDF Preview",
+        "เปิดแท็บลายเซ็น / อนุมัติ",
+        "เปิดแท็บประวัติ"
+      ],
+      "expected": "ทุกแท็บใช้ layout และ interaction pattern ที่เรียบร้อยและสม่ำเสมอ",
+      "actual": "UI/UX ของแท็บดังกล่าวหลุด design",
+      "status": "open"
+    }
+  ]
+}

@@ -1,0 +1,313 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>F-MB-OCR · UAT checklist</title><style>:root{font-family:system-ui,-apple-system,"Noto Sans Thai",sans-serif;color:#111;background:#f5f5f5;font-size:16px;line-height:1.5}*{box-sizing:border-box}body{margin:0}main{max-width:1000px;margin:auto;padding:24px 20px 64px}h1{font-size:1.75rem;line-height:1.3;margin:0 0 12px}h2{font-size:1.125rem;margin:0 0 12px}p{margin:8px 0}a{color:#c52620;overflow-wrap:anywhere}header,.card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:20px;margin-bottom:16px;overflow-wrap:anywhere}.eyebrow{font-size:.75rem;color:#666;letter-spacing:.08em;font-weight:600}.caption{font-size:.8125rem;color:#666}.notice{padding:12px;background:#fff0d9;color:#805000;border-radius:12px;margin:12px 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}label{display:grid;gap:6px;font-size:.8125rem;font-weight:600}input,select,textarea,button{font:inherit;min-height:48px;border:1px solid #e5e5e5;border-radius:12px;padding:10px 12px;background:#ebebeb;color:#111;width:100%;min-width:0}textarea{min-height:80px;resize:vertical}button{cursor:pointer;background:#fff;font-weight:600}button.primary{background:#e0281d;color:#fff;border-color:#e0281d}button:disabled{opacity:.5;cursor:not-allowed}:focus-visible{outline:3px solid #2563c9;outline-offset:2px}.meta{font-size:.8125rem;color:#666;margin-bottom:8px}.case p{font-size:.9375rem}.actions{display:flex;gap:12px}.actions>*{flex:1}.status{font-weight:600;color:#2563c9}.case[hidden]{display:none}table{border-collapse:collapse;width:100%;font-size:.875rem}td,th{text-align:left;border-bottom:1px solid #e5e5e5;padding:12px 8px;vertical-align:top}code{font-size:.8125rem;overflow-wrap:anywhere}.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.cols .card{margin:0}@media(max-width:640px){.grid,.cols{grid-template-columns:1fr}.actions{flex-direction:column}main{padding:16px 12px 48px}}@media print{.no-print{display:none!important}body{background:#fff}main{max-width:none;padding:0}.card{break-inside:avoid}textarea{min-height:60px}a{color:#111}}</style></head><body><main><header><p class="eyebrow">TASK 2.1 · TEST PREPARATION</p><h1>Mobile OCR — UAT checklist</h1><p>Version 0.2 · DRAFT · 2026-11-10 · BA / QA owner Pending</p><p class="notice">All 26 cases start as Not run. Browser/model fixture passes are separate supporting evidence. This page records manual observations only; it does not run OCR, save SO, approve scope or grant acceptance.</p><p><a href="../../../1_discovery/prototype-qc/01_prototype/F-MB-OCR.html">Canonical candidate 0.2</a> · <a href="testcases-F-MB-OCR.md">Full test cases</a> · <a href="../../dev-handoff/DEV_HANDOFF_F-MB-OCR.md">Handoff and blockers</a></p><p class="caption">Candidate SHA-256: <code>d66617e879952fae873b1252e1d04b1878ca33f4e5c62e9e9b12001edfe9b03e</code>. Use synthetic sources until source processing is approved. Keep raw customer content out of observations.</p></header><section class="card"><h2>Execution context</h2><div class="grid"><label>Runner<input id="runner" autocomplete="off"></label><label>Build / contract revision<input id="build" autocomplete="off"></label><label>Device / browser<input id="device" autocomplete="off"></label><label>User role / tenant alias<input id="role" autocomplete="off"></label></div><p id="progress" class="status" role="status">0 / 26 observations recorded</p><p class="caption">Memory only. Reload clears observations. Exported results remain an unsigned manual record; approval is Pending.</p><div class="actions no-print"><button class="primary" id="export" disabled>Export observations JSON</button><button id="print">Print checklist</button></div><p id="export-reason" class="caption">Enter execution context and at least one observed result. Failed/blocked cases also need a note.</p></section><div id="cases"></div></main><script>
+const cases=
+/* TEST_CASES_BEGIN */
+[
+  {
+    "id": "TC-01",
+    "fn": "FN-01",
+    "priority": "High",
+    "title": "Open from a new/editable SO draft and preserve current edits",
+    "precondition": "Sales Officer; Customer PO sample; New draft. Repeat with Same customer + existing line.",
+    "steps": "Open OCR, note the initial customer/PO/line count, read the PO sample and edit recognized values. Return/discard without applying; repeat from the populated draft.",
+    "expected": "No draft changes before Apply. New draft stays empty; populated draft retains C100, EXISTING-09 and its W100 quantity 2 BOX line. Opening OCR in the HTML is a scenario simulation, not native SO navigation.",
+    "prototype_evidence": "B01/B06/B07; L01/L13",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-02",
+    "fn": "FN-02",
+    "priority": "High",
+    "title": "Capture/select and compare a PO image/PDF or chat image",
+    "precondition": "Sales Officer; PO and chat samples; synthetic permitted PNG and PDF for local selection.",
+    "steps": "Use the PO and LINE/chat sample buttons in separate resets. Choose a local image, then a PDF; open the local PDF link. Try text/plain and an image above the demo 10 MiB guard, then cancel selection.",
+    "expected": "Both sample types can be reviewed. Local image/PDF is preview-only and does not determine extracted values; the disclosure stays visible. Invalid type/size leaves the draft intact. Real capture, PDF rendering/extraction, byte-signature checks and approved limits require TC-16/TC-17.",
+    "prototype_evidence": "B02/B13/B14",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-03",
+    "fn": "FN-03",
+    "priority": "High",
+    "title": "Read suggestions and expose processing/unclear/empty/failure states",
+    "precondition": "New draft; select Unclear / unmatched, No order rows and Recognition fails once in separate resets.",
+    "steps": "Read each sample. Inspect missing customer/item/quantity/unit issues in Unclear; inspect zero rows in Empty. In Failure, observe the error and retry. Also cancel once while the reading spinner is visible.",
+    "expected": "Unresolved selected rows and zero-row output cannot preview/apply. Failure retry explicitly loads PO rows p1/p2 with PO 000127; no engine recovery is claimed. Cancel invalidates the late simulated result and preserves the draft.",
+    "prototype_evidence": "B03/B04/B05/B06; L10/L20",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-04",
+    "fn": "FN-04",
+    "priority": "High",
+    "title": "Correct fields, preserve PO identifiers and confirm source comparison",
+    "precondition": "Customer PO sample read into Review; no changes yet applied.",
+    "steps": "Keep customer PO 000127 and compare raw source. Confirm source comparison; change p1 quantity or PO, blur the input, and inspect the acknowledgement. Correct the PO back to 000127 and confirm again.",
+    "expected": "Leading zeros stay intact. Editing reviewed data clears comparison/preview acknowledgement; Preview remains blocked until reconfirmed. The source display remains available; actual lost-source/expiry enforcement is covered by TC-21.",
+    "prototype_evidence": "B03/B16; L02/L18",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-05",
+    "fn": "FN-05",
+    "priority": "High",
+    "title": "Resolve Customer/Item Master and item-valid units",
+    "precondition": "LINE/chat sample with c3 unmatched; optionally Unclear sample with u1/u2.",
+    "steps": "Exclude superseded c1. Match c3 to W100, select BOX and acknowledge keeping that instruction. Change its item to W110 and inspect the unit; select a valid unit again. In Unclear, choose customer C100 and exclude or resolve X-99.",
+    "expected": "No invented master is accepted. Changing item clears its prior unit; selected unmatched/invalid-unit rows block preview, while excluded rows need no match. These dropdowns are fixed samples; real lookup/sellability/factor checks require TC-18/TC-25.",
+    "prototype_evidence": "B02/B03/B16; L07/L09/L21",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-06",
+    "fn": "FN-06",
+    "priority": "High",
+    "title": "Select eligible lines; exclude rows and validate quantities/prices",
+    "precondition": "Customer PO sample in Review; p1 selected.",
+    "steps": "Set p1 quantity to empty, 0, -1, 1e3, 1,5 and NaN in turn, blurring each edit. Correct to 1.5. Enter an invalid source price, then clear it. Exclude p1; finally exclude every row.",
+    "expected": "Invalid selected quantity/price blocks preview. Positive 1.5 is accepted by the demo; blank optional source price uses the system sample price. Excluded invalid rows do not block other eligible rows. All excluded means no application. Production precision/scale remains Pending.",
+    "prototype_evidence": "B03/B04/B16; L08/L09/L10/L19",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-07",
+    "fn": "FN-07",
+    "priority": "High",
+    "title": "Resolve repeated/revised chat instructions explicitly",
+    "precondition": "LINE/chat sample: c1 water 10, c2 coffee 6, c3 revised water 12.",
+    "steps": "Compare timestamps and source text. Exclude c1, retain c2, resolve c3 to W100/BOX and explicitly acknowledge keeping c3. Confirm comparison, preview and apply. Repeat once leaving c3 revision acknowledgement unchecked.",
+    "expected": "Result has coffee 6 EACH and water 12 BOX as two lines; no automatic 10+12 merge. The unchecked selected revision blocks preview. API sample IDs/order must remain c1/c2/c3, with coffee at c2.",
+    "prototype_evidence": "B02; L07",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-08",
+    "fn": "FN-08",
+    "priority": "High",
+    "title": "Compare system/source price and require override permission/reason",
+    "precondition": "Customer PO sample; separate resets for Sales Officer and Manager + price-override permission.",
+    "steps": "As Officer compare W100 source 180.00 with system 190.00 and apply without override. As Manager select source-price override, attempt preview with blank reason, then supply a reason, confirm and apply.",
+    "expected": "Officer cannot select override and gets system 190.00. Manager needs a nonblank reason to get 180.00; coffee remains 75.00. Per-line reasons appear in local result. Real permission, currency/VAT/UOM and document override_note mapping require TC-18/TC-24.",
+    "prototype_evidence": "B01/B08; L03/L04/L05",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-09",
+    "fn": "FN-09",
+    "priority": "High",
+    "title": "Resolve populated draft, customer, PO and item/unit conflicts",
+    "precondition": "PO sample; start Same customer + existing line (C100, EXISTING-09, W100 2 BOX). Repeat with Different customer + existing line (C200).",
+    "steps": "Choose append and inspect the matching W100 collision; acknowledge it, preview and apply. Reset and choose replace-all, confirm removal and apply. In a fresh customer-conflict variant explicitly keep C200, choose append, acknowledge the collision and deselect PO before preview/apply. Reset again, leave PO selected, clear its text, confirm replacement and inspect the explicit clear in preview before applying.",
+    "expected": "Append keeps quantity 2 and adds separate 12/6 lines (three total); replacement requires confirmation and leaves the two selected PO lines. Conflicting customer cannot change silently. Deselecting PO preserves EXISTING-09; selected empty PO visibly clears it. Protected-line replacement remains TC-23/Pending policy.",
+    "prototype_evidence": "B09/B10; L14/L15/L16/L17",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-10",
+    "fn": "FN-10",
+    "priority": "High",
+    "title": "Preview exact changes and apply atomically after confirmation",
+    "precondition": "PO sample eligible for preview; comparison confirmed; local draft unchanged.",
+    "steps": "Open Preview and inspect previous/proposed customer/PO, added/removed counts and resulting line prices/origins. Attempt apply before confirming. Return to review and edit a value, then reconfirm and reopen preview. Confirm preview and apply once.",
+    "expected": "Preview acknowledgement is required and a relevant edit invalidates it. One in-memory update occurs. Source/system comparison belongs to Review; Preview shows final line prices and reasons. External revision/concurrency rejection is not demonstrated here and requires TC-20.",
+    "prototype_evidence": "B01/B08/B10/B15; L01/L12/L16",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-11",
+    "fn": "FN-11",
+    "priority": "High",
+    "title": "Block repeated application; reconcile uncertain saves",
+    "precondition": "PO sample applied once to the local draft.",
+    "steps": "Return to Sale Order draft, choose Read another source and read the same PO sample again. Confirm comparison and inspect the blocking issue. In a separate reset enable Fail next local apply, retry the failed apply, and attempt repeated taps while pending.",
+    "expected": "Same sample stays blocked and original two lines/one sample receipt remain. Failed apply changes neither draft nor receipt; retry applies once. Reload clears these local receipts, so durable prevention is not established until TC-19.",
+    "prototype_evidence": "B01/B15; L11/L20",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-12",
+    "fn": "FN-12",
+    "priority": "High",
+    "title": "Cancel/retry/reconnect while retaining the SO draft",
+    "precondition": "Populated SO sample with a known customer/PO/line; editable review and Preview variants.",
+    "steps": "Cancel during reading. Edit review and open Back/discard; use Escape to keep review, then discard explicitly. Toggle offline during review/preview; reconnect. Trigger a local apply failure and retry.",
+    "expected": "Cancel/discard/error preserves the original draft. Escape restores focus and retains corrections. Candidate offline blocks Read/Apply but permits memory review; reconnect permits the retained eligible flow. A local failure preserves reviewed values. Server timeout/restart behavior requires TC-19/TC-21.",
+    "prototype_evidence": "B05/B06/B07/B08/B11; L12/L13",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-13",
+    "fn": "FN-13",
+    "priority": "High",
+    "title": "Continue through ordinary SO defaults, pricing and submission controls",
+    "precondition": "PO sample applied locally; no server build or account required for this candidate observation.",
+    "steps": "Read the completion notice and SO control warning. Press Return to Sale Order draft and inspect the resulting in-HTML draft. Do not treat this as a submission or validation result.",
+    "expected": "Local values and required defaults/addresses/pricing/ATP/credit/Pre-order/role/approval obligations are explained. There is no actual navigation to the app, server save, stock check, credit check, approval or reservation. Authoritative controls require TC-26.",
+    "prototype_evidence": "Explanation only; live checks Not run",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-14",
+    "fn": "FN-14",
+    "priority": "High",
+    "title": "Enforce access and disclose/protect source data",
+    "precondition": "Separate resets for No editable SO access and an authorized sample role; local synthetic file optional.",
+    "steps": "Choose the denied role and inspect available actions. Return to an authorized role and verify sample/local disclosure through source/review/preview/result. Reset/reload; inspect local file and draft cleanup using the supplied browser checks.",
+    "expected": "Denied role exposes no read/apply action. Outside role/scenario/base changes intentionally reset local edits; this is not production auth-switch behavior. Sample disclosure persists; no browser storage is written and reload clears local state. Real tenant/access/retention guarantees require TC-18/TC-22.",
+    "prototype_evidence": "B12/B13/B19/B20; L06",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-15",
+    "fn": "FN-02/FN-03",
+    "priority": "High",
+    "title": "Real recognition quality by source/language",
+    "precondition": "Approved representative labeled PO and chat sets; agreed OQ-09 metrics and thresholds.",
+    "steps": "Process printed Thai/English and mixed rows; compare field/row extraction and master matching separately.",
+    "expected": "Measure denominators, corrections and timing per source type; retain authorized expected outputs. No pass until agreed numeric criteria exist.",
+    "prototype_evidence": "None — requires real integration/device/approved policy",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-16",
+    "fn": "FN-02/FN-03",
+    "priority": "High",
+    "title": "PDF, signature and operating limits",
+    "precondition": "Approved MIME/bytes/page/row limits and supported PDF modes.",
+    "steps": "Test valid multi-page/scanned PDF, selected pages, damaged/password PDF, spoofed MIME and just-below/at/above limits.",
+    "expected": "Enforce effective server limits with explicit recovery; anchors refer to selected original pages; no partial draft change.",
+    "prototype_evidence": "None — requires real integration/device/approved policy",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-17",
+    "fn": "FN-01/FN-02/FN-12",
+    "priority": "High",
+    "title": "Native camera and file permission recovery",
+    "precondition": "Supported physical devices; editable/new SO and existing barcode route.",
+    "steps": "Deny permission, use settings/alternate input, background/foreground, cancel picker and return to SO; exercise barcode regression.",
+    "expected": "Camera/file state recovers without lost draft edits; barcode scanning retains existing behavior.",
+    "prototype_evidence": "None — requires real integration/device/approved policy",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-18",
+    "fn": "FN-05/FN-08/FN-14",
+    "priority": "High",
+    "title": "Tenant, actor and permission isolation",
+    "precondition": "Two tenants/users and edit/override roles with approved accounts.",
+    "steps": "Request another user job; revoke edit/override; switch company/logout during lookup/processing/apply/save.",
+    "expected": "No unauthorized result or source disclosure. Recheck rights; no stale-user cache or silent price substitution.",
+    "prototype_evidence": "None — requires real integration/device/approved policy",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-19",
+    "fn": "FN-10/FN-11/FN-12",
+    "priority": "High",
+    "title": "Durable receipt, atomic save and unknown-result reconciliation",
+    "precondition": "Approved/implemented SO receipt extension and real core transaction; fault injection.",
+    "steps": "Lose create/update acknowledgement; restart; reconcile same import; retry same and conflicting payload; force receipt or SO write failure.",
+    "expected": "One draft/receipt commit or rollback together; no repeated lines; unknown remains blocked until reconciled; return authoritative line mapping.",
+    "prototype_evidence": "None — requires real integration/device/approved policy",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-20",
+    "fn": "FN-04/FN-09/FN-10",
+    "priority": "High",
+    "title": "Concurrent local/server draft or price change",
+    "precondition": "Populated editable draft with second editor and current pricing.",
+    "steps": "Change local form/customer/warehouse or server row_version/price after preview, then apply/save.",
+    "expected": "Invalidate preview, retain corrections and require refreshed review; never overwrite newer edits or accept stale price authority.",
+    "prototype_evidence": "None — requires real integration/device/approved policy",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-21",
+    "fn": "FN-02/FN-04/FN-12",
+    "priority": "High",
+    "title": "Offline, restart and source expiry",
+    "precondition": "Approved OQ-03/06 behavior and expiring job/source.",
+    "steps": "Lose network during job acceptance/read/save; reconcile a lost 202 using its known UUID and original key. After a confirmed terminal failed/cancelled job, explicitly request a new recognition UUID/key while retaining the same original. Background/restart, lose the local original or expire the source before comparison/apply/save.",
+    "expected": "Unknown acceptance never silently becomes a new job/key. A confirmed terminal failure/cancellation permits an explicit new recognition intent, but a fresh job does not bypass source-level duplicate-application checks. Preserve safe draft state; no unapproved queue; reselect/reconcile the correct original and repeat comparison when needed.",
+    "prototype_evidence": "None — requires real integration/device/approved policy",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-22",
+    "fn": "FN-02/FN-14",
+    "priority": "High",
+    "title": "Approved egress, retention, logging and purge",
+    "precondition": "Security-approved policy/configuration and observable permitted processor/storage.",
+    "steps": "Inspect source destination/access, logs/telemetry, expiry/delete/cleanup and cross-user access; attempt upload when setup disabled.",
+    "expected": "Only approved recipients/access/retention; raw source/text/filename not logged; setup blocks real processing; deletion semantics match policy.",
+    "prototype_evidence": "None — requires real integration/device/approved policy",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-23",
+    "fn": "FN-06/FN-09/FN-13",
+    "priority": "High",
+    "title": "Quotation, free and promotion-line regression",
+    "precondition": "SO examples with quotation-derived/protected/free/promotion lines and ordinary manual lines.",
+    "steps": "Attempt OCR append/replace/customer change and subsequent save/repricing.",
+    "expected": "Existing SO protected-line/edit/discount rules remain effective; unsupported replacement is blocked and explained, not silently unlocked.",
+    "prototype_evidence": "None — requires real integration/device/approved policy",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-24",
+    "fn": "FN-06/FN-08",
+    "priority": "High",
+    "title": "Source price, currency/VAT/UOM and reason mapping",
+    "precondition": "Agreed OQ-08 interpretation, real pricing and override roles; long/multiple reasons.",
+    "steps": "Compare tax-inclusive/foreign currency/unclear unit prices; request override; test missing/oversized reasons and lost rights.",
+    "expected": "No assumed conversion/tax factor. Only authorized confirmed prices apply; every required reason survives override_note mapping or save is blocked clearly.",
+    "prototype_evidence": "None — requires real integration/device/approved policy",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-25",
+    "fn": "FN-04/FN-05/FN-06",
+    "priority": "High",
+    "title": "Field/decimal/unit transport mapping",
+    "precondition": "Typed SO adapter and agreed quantity/money precision/factors.",
+    "steps": "Use leading-zero PO, fractional/zero/negative/exponential/ambiguous quantities, invalid units and source=new/quotation.",
+    "expected": "Customer_ref remains text; qty/money decimal transport is valid; reject invalid selected data; preserve SO source enum/defaults and actual master factors.",
+    "prototype_evidence": "None — requires real integration/device/approved policy",
+    "execution_status": "Not run"
+  },
+  {
+    "id": "TC-26",
+    "fn": "FN-13/FN-14",
+    "priority": "High",
+    "title": "Authoritative SO controls after OCR",
+    "precondition": "Real sandbox cases for goods/service/Pre-order, low stock, hard credit, addresses and DOA/SoD.",
+    "steps": "Apply reviewed data then perform ordinary line-entry/save/validation/submission with changing stock/credit/address/role.",
+    "expected": "Goods ATP twice; service exemption; explicit permitted Pre-order only; credit hard block; active correct addresses and server role/DOA/SoD remain enforced.",
+    "prototype_evidence": "None — requires real integration/device/approved policy",
+    "execution_status": "Not run"
+  }
+]
+/* TEST_CASES_END */;
+
+const escapeHTML=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const values=new Map(cases.map(c=>[c.id,{result:'Not run',notes:''}]));
+document.getElementById('cases').innerHTML=cases.map(c=>'<article class="card case" id="'+c.id+'"><p class="eyebrow">'+c.id+' · '+c.fn+' · '+c.priority+'</p><h2>'+escapeHTML(c.title)+'</h2><p><strong>Preconditions:</strong> '+escapeHTML(c.precondition)+'</p><p><strong>Steps:</strong> '+escapeHTML(c.steps)+'</p><p><strong>Expected:</strong> '+escapeHTML(c.expected)+'</p><p class="meta">Supporting candidate evidence: '+escapeHTML(c.prototype_evidence)+'</p><label>Observed result for '+c.id+'<select data-case="'+c.id+'" data-key="result"><option>Not run</option><option>Pass</option><option>Fail</option><option>Blocked</option></select></label><label style="margin-top:12px">Observation / defect reference for '+c.id+'<textarea data-case="'+c.id+'" data-key="notes"></textarea></label></article>').join('');
+function update(){
+ const n=[...values.values()].filter(v=>v.result!=='Not run').length;
+ document.getElementById('progress').textContent=n+' / '+cases.length+' observations recorded';
+ const context=['runner','build','device','role'].every(id=>document.getElementById(id).value.trim());
+ const notes=[...values.values()].every(v=>!['Fail','Blocked'].includes(v.result)||v.notes.trim());
+ document.getElementById('export').disabled=!(context&&n&&notes);
+ document.getElementById('export-reason').textContent=context&&n&&notes?'Export stores only this unsigned manual record; no approval is recorded.':'Enter execution context and at least one observed result. Failed/blocked cases also need a note.';
+}
+document.addEventListener('input',e=>{if(e.target.dataset.case)values.get(e.target.dataset.case)[e.target.dataset.key]=e.target.value;update();});
+document.addEventListener('change',e=>{if(e.target.dataset.case)values.get(e.target.dataset.case)[e.target.dataset.key]=e.target.value;update();});
+document.getElementById('print').addEventListener('click',()=>window.print());
+document.getElementById('export').addEventListener('click',()=>{
+ const report={document_id:'MANUAL_UAT_F-MB-OCR',test_plan_version:'0.2',prototype_candidate:{version:'0.2',sha256:'d66617e879952fae873b1252e1d04b1878ca33f4e5c62e9e9b12001edfe9b03e'},status:'Unsigned observations; approval Pending',exported_at_utc:new Date().toISOString(),context:Object.fromEntries(['runner','build','device','role'].map(id=>[id,document.getElementById(id).value.trim()])),results:cases.map(c=>({id:c.id,title:c.title,functions:c.fn,...values.get(c.id)}))};
+ const url=URL.createObjectURL(new Blob([JSON.stringify(report,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='F-MB-OCR-UAT-observations.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+
+</script></body></html>
