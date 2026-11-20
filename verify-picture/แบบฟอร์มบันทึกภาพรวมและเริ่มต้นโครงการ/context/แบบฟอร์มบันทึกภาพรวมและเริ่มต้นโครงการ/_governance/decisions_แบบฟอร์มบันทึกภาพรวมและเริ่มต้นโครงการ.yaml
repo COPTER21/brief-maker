@@ -1,0 +1,40 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# REQ-TMP-001 · FM-BDM-01 แบบฟอร์มบันทึกภาพรวมและเริ่มต้นโครงการ · ตอบตาม 4_knowledge/governance/unattended-policy.md
+
+# G1 ผลต่อระบบ — เอกสารบันทึกเริ่มโครงการ ไม่เปลี่ยนค่าในระบบ ไม่ส่งต่อ
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — กระดาษมีผู้อนุมัติ 2 จุด: ผู้ตรวจสอบ (ผู้จัดการฝ่ายพัฒนาธุรกิจ) → ผู้อนุมัติ/รับทราบ (รองกรรมการผู้จัดการ/กรรมการผู้จัดการ)
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager", "role-gm"], amount: none }
+
+# G3 สูตร / ค่าคงที่ — ไม่มีบนกระดาษ · กติกาตรวจจากข้อมูลขัดกัน
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules: ["วันที่เป้าหมาย ≥ วันที่เริ่มต้น", "แผนงาน: วันครบกำหนด ≥ วันเริ่มต้น (ต่อแถว)"]
+
+# G4 รายการซ้ำ — ไม่จำกัด · PDF ขั้นต่ำเท่ากระดาษ (แผนงาน 6 · ประวัติ 1)
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ — 1:1 · แยกค่าในแถวที่กระดาษรวม 2 ค่า (แสดงแถวเดียวเหมือนกระดาษ)
+fidelity: { one_to_one: true, add_fields: [], merge_split: ["วันที่เริ่มต้น / วันที่เป้าหมาย → 2 ค่า", "ระดับความสำคัญ / สถานะ → 2 ค่า"] }
+
+# G6 ลายเซ็น — ตาราง "การตรวจทาน / อนุมัติ" 1 แถวต่อขั้น DOA · ข้อความ "พิจารณาในระบบ"
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ → กลับร่างเลขเดิม · ยกเลิก: เจ้าของ + admin role · ร่าง/รออนุมัติ · เหตุผลบังคับ
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น — เจ้าของ · ผู้อนุมัติหลังส่ง · admin ฝ่ายพัฒนาธุรกิจเห็นทั้งหมด
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 เลขที่ — ออกตอนบันทึกครั้งแรก · รหัส PJI (Project Initiation)
+numbering: { issue_on: first_save, code: PJI }
+
+# G10 ของเสริม
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

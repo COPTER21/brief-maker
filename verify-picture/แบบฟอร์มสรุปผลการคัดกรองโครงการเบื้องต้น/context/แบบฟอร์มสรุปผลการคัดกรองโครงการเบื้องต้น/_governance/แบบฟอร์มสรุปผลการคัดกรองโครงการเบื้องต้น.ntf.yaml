@@ -1,0 +1,28 @@
+# ntf-declaration v1.2 — FINAL ยืนยันกับ FRD v1.0 (frd_lint N7 PASS) · AI-DEFAULT
+feature_id: F-TMP-003
+name: แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น
+code: SCR
+events:
+- id: scr_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-003-FN-07, F-TMP-003-FN-09
+- id: scr_not_proceed_approved
+  trigger: → approved และผลการพิจารณา = ไม่ดำเนินการต่อ
+  recipients:
+  - requester
+  template: '**{doc_no}** อนุมัติแล้ว — ผลการพิจารณา ไม่ดำเนินการต่อ · จัดทำแบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ (FM-BDM-04)'
+  channel: in-app+email
+  optional: false
+  why: 'ผลคัดกรองไม่ผ่าน ผู้จัดทำต้องบันทึกเหตุผลการไม่ดำเนินโครงการต่อ (ผู้ใช้ทำเอง — G1 ไม่ส่งต่ออัตโนมัติ)'
+  frd_ref: 03_LOGIC F-TMP-003-FN-09
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

@@ -1,0 +1,30 @@
+# ntf-declaration v1.2 — FINAL ยืนยันกับ FRD v1.0 (frd_lint N7 PASS) · AI-DEFAULT
+feature_id: F-TMP-002
+name: แบบฟอร์มประเมินความเสี่ยง
+code: RSK
+events:
+- id: rsk_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-002-FN-07, F-TMP-002-FN-09
+- id: rsk_very_high_approved
+  trigger: → approved และมีรายการที่คะแนนก่อนควบคุมหรือคะแนนคงเหลือ ≥ 17 (ระดับสูงมากตาม
+    RiskMatrix.level_bands)
+  recipients:
+  - requester
+  template: '**{doc_no}** อนุมัติแล้ว — มีความเสี่ยงระดับสูงมาก {count} รายการ ต้องรายงานผู้บริหารและดำเนินการเร่งด่วน'
+  channel: in-app+email
+  optional: false
+  why: 'ตารางสรุประดับบนกระดาษ: 17-25 สูงมาก = รายงานผู้บริหารและดำเนินการเร่งด่วน
+    (DEC-04)'
+  frd_ref: 03_LOGIC F-TMP-002-FN-09
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

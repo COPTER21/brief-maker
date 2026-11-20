@@ -1,0 +1,351 @@
+{
+ "req": "REQ-TMP-002",
+ "status": "พร้อมเริ่มทำ",
+ "ready": true,
+ "decisions": [
+  {
+   "id": "DEC-01",
+   "cat": "G1",
+   "text": "อนุมัติแล้วไม่เปลี่ยนค่าในระบบ",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-02",
+   "cat": "G1",
+   "text": "ไม่ส่งต่อระบบอื่นรอบนี้ (ประกาศ event ไว้ใน FRD แต่ไม่ยิง)",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-03",
+   "cat": "G2",
+   "text": "สายอนุมัติตั้งที่ DOA กลาง (dynamic) · ค่าเริ่ม 2 ขั้น: role-line-manager, role-gm · วงเงิน: ไม่มี",
+   "value": {
+    "required": true,
+    "mode": "dynamic",
+    "default_steps": [
+     "role-line-manager",
+     "role-gm"
+    ],
+    "amount": "none"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "doa-declaration",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-04",
+   "cat": "G3",
+   "text": "ค่าคงที่อ่านจาก config: \"คะแนน 1–5 โอกาสเกิด/ผลกระทบ (ต่ำมาก…สูงมาก + คำอธิบาย)\" → RiskMatrix.likelihood_scale / RiskMatrix.impact_scale, \"1-4 ต่ำ · 5-9 ปานกลาง · 10-16 สูง · 17-25 สูงมาก\" → RiskMatrix.level_bands, \"ประเภทความเสี่ยง 9 ประเภท\" → RiskMatrix.categories · คำนวณให้อัตโนมัติ ผู้ใช้ปรับได้ · เกินเกณฑ์ = เตือน · คะแนนก่อนควบคุม = โอกาสเกิดก่อนควบคุม × ผลกระทบก่อนควบคุม (คำนวณอัตโนมัติ · ว่างจนกว่ากรอกครบทั้งสองช่อง) · โอกาสเกิด / ผลกระทบ เลือก 1–5 ตามเกณฑ์ RiskMatrix · คะแนนคงเหลือ ต้องอยู่ในชุดผลคูณ {1,2,3,4,5,6,8,9,10,12,15,16,20,25} (ตัด 7 ที่ต้นฉบับใส่ผิด) · คะแนนคงเหลือ > คะแนนก่อนควบคุม = เตือน ไม่บล็อก · ระดับความเสี่ยงคำนวณจาก RiskMatrix.level_bands (1-4 ต่ำ · 5-9 ปานกลาง · 10-16 สูง · 17-25 สูงมาก) ใช้แสดงสี/ป้าย ไม่เพิ่มคอลัมน์ · สถานะรายการ = ปิดแล้ว ต้องมีคะแนนคงเหลือ",
+   "value": {
+    "constants_from_config": true,
+    "auto_compute": true,
+    "over_limit": "warn",
+    "rules": [
+     "คะแนนก่อนควบคุม = โอกาสเกิดก่อนควบคุม × ผลกระทบก่อนควบคุม (คำนวณอัตโนมัติ · ว่างจนกว่ากรอกครบทั้งสองช่อง)",
+     "โอกาสเกิด / ผลกระทบ เลือก 1–5 ตามเกณฑ์ RiskMatrix",
+     "คะแนนคงเหลือ ต้องอยู่ในชุดผลคูณ {1,2,3,4,5,6,8,9,10,12,15,16,20,25} (ตัด 7 ที่ต้นฉบับใส่ผิด)",
+     "คะแนนคงเหลือ > คะแนนก่อนควบคุม = เตือน ไม่บล็อก",
+     "ระดับความเสี่ยงคำนวณจาก RiskMatrix.level_bands (1-4 ต่ำ · 5-9 ปานกลาง · 10-16 สูง · 17-25 สูงมาก) ใช้แสดงสี/ป้าย ไม่เพิ่มคอลัมน์",
+     "สถานะรายการ = ปิดแล้ว ต้องมีคะแนนคงเหลือ"
+    ]
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-05",
+   "cat": "G4",
+   "text": "ทะเบียนความเสี่ยง: ไม่จำกัดจำนวนแถว · PDF อย่างน้อย 18 แถวตามกระดาษ",
+   "value": {
+    "max_rows": null,
+    "min_rows": 18
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-06",
+   "cat": "G5",
+   "text": "ช่องตรงกระดาษ 1:1 · ไม่เพิ่มช่อง (เช่น หมายเหตุ)",
+   "value": {
+    "one_to_one": true,
+    "add_fields": [],
+    "merge_split": []
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-07",
+   "cat": "G6",
+   "text": "ลายเซ็นแถวล่าง 1 ช่องต่อขั้น DOA · ไม่ใช้ภาพลายมือชื่อ (ข้อความส่งในระบบ/พิจารณาในระบบ)",
+   "value": {
+    "layout": "row-bottom",
+    "per_doa_step": true,
+    "handwriting_image": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "thai-doc",
+    "html",
+    "doccfg-declaration",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-08",
+   "cat": "G7",
+   "text": "ไม่อนุมัติ = กลับเป็นร่าง แก้แล้วส่งใหม่ · ยกเลิกได้โดย owner, admin_role สถานะ draft, pending · ต้องมีเหตุผล",
+   "value": {
+    "on_reject": "back_to_draft",
+    "cancel_by": [
+     "owner",
+     "admin_role"
+    ],
+    "cancel_states": [
+     "draft",
+     "pending"
+    ],
+    "reason_required": true
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests",
+    "doa-declaration"
+   ]
+  },
+  {
+   "id": "DEC-09",
+   "cat": "G8",
+   "text": "มองเห็น: เจ้าของ · ผู้อนุมัติเห็นหลังส่ง · admin role เห็นทั้งหมด",
+   "value": {
+    "owner": true,
+    "approver": "after_submit",
+    "admin_role": "all"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-10",
+   "cat": "G9",
+   "text": "ออกเลขเมื่อบันทึกครั้งแรก · รหัส RSK",
+   "value": {
+    "issue_on": "first_save",
+    "code": "RSK"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "doccfg-declaration",
+    "html",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-11",
+   "cat": "G10",
+   "text": "ของเสริม (กระดาษไม่มี): แนบไฟล์, ส่งออก CSV",
+   "value": {
+    "attachments": true,
+    "copy": false,
+    "export_csv": true,
+    "announce": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "brd",
+    "frd",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-12",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: คะแนนคงเหลือต้องอยู่ในชุดผลคูณ {1,2,3,4,5,6,8,9,10,12,15,16,20,25} (พบ: รายการตัวเลือกมี 7 ซึ่งไม่ใช่ผลคูณของโอกาสเกิด × ผลกระทบ (1–5) ได้)",
+   "value": {
+    "where": "Data validation คะแนนคงเหลือ (I21:I38)",
+    "detail": "รายการตัวเลือกมี 7 ซึ่งไม่ใช่ผลคูณของโอกาสเกิด × ผลกระทบ (1–5) ได้",
+    "rule": "คะแนนคงเหลือต้องอยู่ในชุดผลคูณ {1,2,3,4,5,6,8,9,10,12,15,16,20,25}"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-13",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: คะแนนคงเหลือ ≤ คะแนนก่อนควบคุม (เกิน = เตือน) (พบ: คะแนนคงเหลือกรอกเองได้สูงกว่าคะแนนก่อนควบคุม)",
+   "value": {
+    "where": "ตารางทะเบียน",
+    "detail": "คะแนนคงเหลือกรอกเองได้สูงกว่าคะแนนก่อนควบคุม",
+    "rule": "คะแนนคงเหลือ ≤ คะแนนก่อนควบคุม (เกิน = เตือน)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-14",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: แสดงว่างจนกว่ากรอกทั้งโอกาสเกิดและผลกระทบ (พบ: แถวว่างแสดง 0 (=E×F) ทั้งที่ยังไม่ได้ประเมิน)",
+   "value": {
+    "where": "สูตรคะแนนก่อนควบคุม",
+    "detail": "แถวว่างแสดง 0 (=E×F) ทั้งที่ยังไม่ได้ประเมิน",
+    "rule": "แสดงว่างจนกว่ากรอกทั้งโอกาสเกิดและผลกระทบ"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-15",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ไม่เพิ่มช่อง (G5 1:1) — เสนอให้ลูกค้ายืนยันการผูกกับโครงการ (FM-BDM-01) ในรายงาน (พบ: ใช้ประเมินความเสี่ยง 'ของโครงการ' แต่ไม่มีช่องชื่อ/เลขที่โครงการบนกระดาษ)",
+   "value": {
+    "where": "หัวแบบฟอร์ม",
+    "detail": "ใช้ประเมินความเสี่ยง 'ของโครงการ' แต่ไม่มีช่องชื่อ/เลขที่โครงการบนกระดาษ",
+    "rule": "ไม่เพิ่มช่อง (G5 1:1) — เสนอให้ลูกค้ายืนยันการผูกกับโครงการ (FM-BDM-01) ในรายงาน"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-16",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ระดับคำนวณจากคะแนนตาม RiskMatrix.level_bands ใช้แสดงสี/ป้ายเท่านั้น ไม่เพิ่มคอลัมน์บนแบบพิมพ์ (พบ: ไม่มีคอลัมน์ระดับความเสี่ยงแม้มีตารางสรุประดับ — ต้นฉบับใช้สีพื้นแทน)",
+   "value": {
+    "where": "ทะเบียนความเสี่ยง",
+    "detail": "ไม่มีคอลัมน์ระดับความเสี่ยงแม้มีตารางสรุประดับ — ต้นฉบับใช้สีพื้นแทน",
+    "rule": "ระดับคำนวณจากคะแนนตาม RiskMatrix.level_bands ใช้แสดงสี/ป้ายเท่านั้น ไม่เพิ่มคอลัมน์บนแบบพิมพ์"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  }
+ ],
+ "raw": {
+  "config_changes": [],
+  "post_to": [],
+  "doa": {
+   "required": true,
+   "mode": "dynamic",
+   "default_steps": [
+    "role-line-manager",
+    "role-gm"
+   ],
+   "amount": "none"
+  },
+  "calc": {
+   "constants_from_config": true,
+   "auto_compute": true,
+   "over_limit": "warn",
+   "rules": [
+    "คะแนนก่อนควบคุม = โอกาสเกิดก่อนควบคุม × ผลกระทบก่อนควบคุม (คำนวณอัตโนมัติ · ว่างจนกว่ากรอกครบทั้งสองช่อง)",
+    "โอกาสเกิด / ผลกระทบ เลือก 1–5 ตามเกณฑ์ RiskMatrix",
+    "คะแนนคงเหลือ ต้องอยู่ในชุดผลคูณ {1,2,3,4,5,6,8,9,10,12,15,16,20,25} (ตัด 7 ที่ต้นฉบับใส่ผิด)",
+    "คะแนนคงเหลือ > คะแนนก่อนควบคุม = เตือน ไม่บล็อก",
+    "ระดับความเสี่ยงคำนวณจาก RiskMatrix.level_bands (1-4 ต่ำ · 5-9 ปานกลาง · 10-16 สูง · 17-25 สูงมาก) ใช้แสดงสี/ป้าย ไม่เพิ่มคอลัมน์",
+    "สถานะรายการ = ปิดแล้ว ต้องมีคะแนนคงเหลือ"
+   ]
+  },
+  "repeat": {
+   "max_rows": null
+  },
+  "fidelity": {
+   "one_to_one": true,
+   "add_fields": [],
+   "merge_split": []
+  },
+  "signature": {
+   "layout": "row-bottom",
+   "per_doa_step": true,
+   "handwriting_image": false
+  },
+  "reject_cancel": {
+   "on_reject": "back_to_draft",
+   "cancel_by": [
+    "owner",
+    "admin_role"
+   ],
+   "cancel_states": [
+    "draft",
+    "pending"
+   ],
+   "reason_required": true
+  },
+  "visibility": {
+   "owner": true,
+   "approver": "after_submit",
+   "admin_role": "all"
+  },
+  "numbering": {
+   "issue_on": "first_save",
+   "code": "RSK"
+  },
+  "extras": {
+   "attachments": true,
+   "copy": false,
+   "export_csv": true,
+   "announce": false
+  },
+  "extend": {},
+  "fit": {}
+ },
+ "unattended": true
+}

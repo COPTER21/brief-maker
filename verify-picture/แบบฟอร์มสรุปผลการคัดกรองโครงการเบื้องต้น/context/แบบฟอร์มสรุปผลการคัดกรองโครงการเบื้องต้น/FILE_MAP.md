@@ -1,0 +1,62 @@
+# FILE_MAP — แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `01_Prototype/feature.html` | `_ui/UI_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.html` |
+| `02_BRD/BRD_F-TMP-003.docx` | `_brd/BRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.docx` |
+| `02_BRD/BRD_F-TMP-003.md` | `_brd/BRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/00_OVERVIEW.md` | `_frd/FRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น/00_OVERVIEW_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/01_UI.md` | `_frd/FRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น/01_UI_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/02_API.md` | `_frd/FRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น/02_API_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/03_LOGIC.md` | `_frd/FRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น/03_LOGIC_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/04_DB.md` | `_frd/FRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น/04_DB_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/05_RULES.md` | `_frd/FRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น/05_RULES_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/06_TESTS.md` | `_frd/FRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น/06_TESTS_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น/07_LOCKED_DECISIONS_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/INDEX.md` | `_frd/FRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น/INDEX_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/_SECTION_N.md` | `_frd/FRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น/_SECTION_N_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/DOA_BRIEF_F-TMP-003.md` | `_frd/FRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น/declarations/DOA_BRIEF_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/DOCCFG_BRIEF_F-TMP-003.md` | `_frd/FRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น/declarations/DOCCFG_BRIEF_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/MDOC_BRIEF_SCR.md` | `_frd/FRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น/declarations/MDOC_BRIEF_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/NTF_BRIEF_F-TMP-003.md` | `_frd/FRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น/declarations/NTF_BRIEF_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/SCR.doa.yaml` | `_frd/FRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น/declarations/แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.doa.yaml` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/SCR.doccfg.yaml` | `_frd/FRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น/declarations/แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/SCR.mdoc.yaml` | `_frd/FRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น/declarations/แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/SCR.ntf.yaml` | `_frd/FRD_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น/declarations/แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.ntf.yaml` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-003.md` | `_uibrief/UIBRIEF_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `05_Governance/DOA_BRIEF_F-TMP-003.md` | `_governance/DOA_BRIEF_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-003.md` | `_governance/DOCCFG_BRIEF_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `05_Governance/MDOC_BRIEF_SCR.md` | `_governance/MDOC_BRIEF_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-003.md` | `_governance/NTF_BRIEF_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `05_Governance/SCR.doa.yaml` | `_governance/แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.doa.yaml` |
+| `05_Governance/SCR.doccfg.yaml` | `_governance/แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.doccfg.yaml` |
+| `05_Governance/SCR.mdoc.yaml` | `_governance/แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.mdoc.yaml` |
+| `05_Governance/SCR.ntf.yaml` | `_governance/แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.ntf.yaml` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-003.md` | `_tc/QA_AUDIT_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `06_Test/cases.json` | `_tc/แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น_cases.json` |
+| `06_Test/testcase-F-TMP-003.html` | `_tc/UAT_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.html` |
+| `06_Test/testcases-F-TMP-003.md` | `_tc/TC_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `07_Print/FM-BDM-03_template.html` | `_document/แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น_template.html` |
+| `07_Print/SCR_print-spec.md` | `_document/แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น_print-spec.md` |
+| `07_Print/approved-doa6steps.data.json` | `_document/แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น_approved-doa6steps.data.json` |
+| `07_Print/approved.data.json` | `_document/แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น_approved.data.json` |
+| `07_Print/draft.data.json` | `_document/แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น_draft.data.json` |
+| `07_Print/form.tpl.html` | `_document/แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น_template.html` |
+| `07_Print/long-text.data.json` | `_document/แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น_long-text.data.json` |
+| `07_Print/print_config.json` | `_document/แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น_print_config.json` |
+| `07_Print/profile.json` | `_document/แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น_profile.json` |
+| `07_Print/rejected.data.json` | `_document/แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น_rejected.data.json` |
+| `08_Reference/3. FM-BDM-03 แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.xlsx` | `_reference/3. FM-BDM-03 แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.xlsx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-003.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-003_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-003_v2.md` | `_reference/PREBRIEF_REQ-TMP-003_v2_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น.md` |

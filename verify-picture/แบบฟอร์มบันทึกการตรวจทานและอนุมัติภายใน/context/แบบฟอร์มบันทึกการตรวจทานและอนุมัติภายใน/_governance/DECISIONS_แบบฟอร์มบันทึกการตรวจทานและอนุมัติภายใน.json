@@ -1,0 +1,382 @@
+{
+ "req": "REQ-TMP-006",
+ "status": "พร้อมเริ่มทำ",
+ "ready": true,
+ "decisions": [
+  {
+   "id": "DEC-01",
+   "cat": "G1",
+   "text": "อนุมัติแล้วไม่เปลี่ยนค่าในระบบ",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-02",
+   "cat": "G1",
+   "text": "ไม่ส่งต่อระบบอื่นรอบนี้ (ประกาศ event ไว้ใน FRD แต่ไม่ยิง)",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-03",
+   "cat": "G2",
+   "text": "สายอนุมัติตั้งที่ DOA กลาง (dynamic) · ค่าเริ่ม 2 ขั้น: role-line-manager, role-gm · วงเงิน: ไม่มี",
+   "value": {
+    "required": true,
+    "mode": "dynamic",
+    "default_steps": [
+     "role-line-manager",
+     "role-gm"
+    ],
+    "amount": "none"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "doa-declaration",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-04",
+   "cat": "G3",
+   "text": "ค่าคงที่อ่านจาก config: \"สถานะ: เปิด / กำลังดำเนินการ / ปิด\" → ReviewApprovalConfig.review_statuses, \"สถานะการอนุมัติ: อนุมัติครบถ้วน / อนุมัติแบบมีเงื่อนไข / อยู่ระหว่างแก้ไข / ไม่อนุมัติ\" → ReviewApprovalConfig.final_statuses · คำนวณให้อัตโนมัติ ผู้ใช้ปรับได้ · เกินเกณฑ์ = เตือน · สถานะข้อแก้ไข (เปิด / กำลังดำเนินการ / ปิด) อ่านจาก ReviewApprovalConfig.review_statuses · สถานะการอนุมัติ (อนุมัติครบถ้วน / อนุมัติแบบมีเงื่อนไข / อยู่ระหว่างแก้ไข / ไม่อนุมัติ) อ่านจาก ReviewApprovalConfig.final_statuses · ไม่นำ data validation / สูตรค้างจาก FM-BDM-02 (ประเภทความเสี่ยง · คะแนน 1–5 · D×E) มาใช้ · สถานะการอนุมัติ = อนุมัติครบถ้วน ขณะยังมีข้อแก้ไขสถานะ เปิด/กำลังดำเนินการ = เตือน ไม่บล็อก · วันที่มีผล บังคับเมื่อสถานะการอนุมัติ = อนุมัติครบถ้วน หรือ อนุมัติแบบมีเงื่อนไข · สถานะอื่นต้องว่าง · สถานะข้อแก้ไข = ปิด ต้องมีผู้รับผิดชอบแก้ไขหรือข้อคิดเห็น (ไม่ครบ = เตือน)",
+   "value": {
+    "constants_from_config": true,
+    "auto_compute": true,
+    "over_limit": "warn",
+    "rules": [
+     "สถานะข้อแก้ไข (เปิด / กำลังดำเนินการ / ปิด) อ่านจาก ReviewApprovalConfig.review_statuses",
+     "สถานะการอนุมัติ (อนุมัติครบถ้วน / อนุมัติแบบมีเงื่อนไข / อยู่ระหว่างแก้ไข / ไม่อนุมัติ) อ่านจาก ReviewApprovalConfig.final_statuses",
+     "ไม่นำ data validation / สูตรค้างจาก FM-BDM-02 (ประเภทความเสี่ยง · คะแนน 1–5 · D×E) มาใช้",
+     "สถานะการอนุมัติ = อนุมัติครบถ้วน ขณะยังมีข้อแก้ไขสถานะ เปิด/กำลังดำเนินการ = เตือน ไม่บล็อก",
+     "วันที่มีผล บังคับเมื่อสถานะการอนุมัติ = อนุมัติครบถ้วน หรือ อนุมัติแบบมีเงื่อนไข · สถานะอื่นต้องว่าง",
+     "สถานะข้อแก้ไข = ปิด ต้องมีผู้รับผิดชอบแก้ไขหรือข้อคิดเห็น (ไม่ครบ = เตือน)"
+    ]
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-05",
+   "cat": "G4",
+   "text": "บันทึกการตรวจทาน: ไม่จำกัดจำนวนแถว · PDF อย่างน้อย 10 แถวตามกระดาษ",
+   "value": {
+    "max_rows": null,
+    "min_rows": 10
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-06",
+   "cat": "G4",
+   "text": "บันทึกการอนุมัติภายใน: ไม่จำกัดจำนวนแถว · PDF อย่างน้อย 3 แถวตามกระดาษ",
+   "value": {
+    "max_rows": null,
+    "min_rows": 3
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-07",
+   "cat": "G5",
+   "text": "ช่องตรงกระดาษ 1:1 · ไม่เพิ่มช่อง (เช่น หมายเหตุ)",
+   "value": {
+    "one_to_one": true,
+    "add_fields": [],
+    "merge_split": []
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-08",
+   "cat": "G6",
+   "text": "ลายเซ็นแถวล่าง 1 ช่องต่อขั้น DOA · ไม่ใช้ภาพลายมือชื่อ (ข้อความส่งในระบบ/พิจารณาในระบบ)",
+   "value": {
+    "layout": "row-bottom",
+    "per_doa_step": true,
+    "handwriting_image": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "thai-doc",
+    "html",
+    "doccfg-declaration",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-09",
+   "cat": "G7",
+   "text": "ไม่อนุมัติ = กลับเป็นร่าง แก้แล้วส่งใหม่ · ยกเลิกได้โดย owner, admin_role สถานะ draft, pending · ต้องมีเหตุผล",
+   "value": {
+    "on_reject": "back_to_draft",
+    "cancel_by": [
+     "owner",
+     "admin_role"
+    ],
+    "cancel_states": [
+     "draft",
+     "pending"
+    ],
+    "reason_required": true
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests",
+    "doa-declaration"
+   ]
+  },
+  {
+   "id": "DEC-10",
+   "cat": "G8",
+   "text": "มองเห็น: เจ้าของ · ผู้อนุมัติเห็นหลังส่ง · admin role เห็นทั้งหมด",
+   "value": {
+    "owner": true,
+    "approver": "after_submit",
+    "admin_role": "all"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-11",
+   "cat": "G9",
+   "text": "ออกเลขเมื่อบันทึกครั้งแรก · รหัส IRV",
+   "value": {
+    "issue_on": "first_save",
+    "code": "IRV"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "doccfg-declaration",
+    "html",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-12",
+   "cat": "G10",
+   "text": "ของเสริม (กระดาษไม่มี): แนบไฟล์, ส่งออก CSV",
+   "value": {
+    "attachments": true,
+    "copy": false,
+    "export_csv": true,
+    "announce": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "brd",
+    "frd",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-13",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ใช้เฉพาะรายการที่ตรงความหมาย: สถานะข้อแก้ไข (เปิด/กำลังดำเนินการ/ปิด) กับสถานะการอนุมัติ (E32) · ตัดรายการค้างจากแบบประเมินความเสี่ยงทิ้ง (พบ: รายการตัวเลือกเลื่อนตำแหน่ง/ค้างจาก FM-BDM-02: ประเภทความเสี่ยงที่ B23:B25,B29:B32,C41… · คะแนน 1–5 ที่ D23:E25,D29:E32 · สถานะ เปิด/กำลังดำเนินการ/ปิด ที่ J23:J32 (คอลัมน์สถานะจริงคือ J13:J22))",
+   "value": {
+    "where": "Data validation ใน Excel",
+    "detail": "รายการตัวเลือกเลื่อนตำแหน่ง/ค้างจาก FM-BDM-02: ประเภทความเสี่ยงที่ B23:B25,B29:B32,C41… · คะแนน 1–5 ที่ D23:E25,D29:E32 · สถานะ เปิด/กำลังดำเนินการ/ปิด ที่ J23:J32 (คอลัมน์สถานะจริงคือ J13:J22)",
+    "rule": "ใช้เฉพาะรายการที่ตรงความหมาย: สถานะข้อแก้ไข (เปิด/กำลังดำเนินการ/ปิด) กับสถานะการอนุมัติ (E32) · ตัดรายการค้างจากแบบประเมินความเสี่ยงทิ้ง"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-14",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ไม่มีช่องคำนวณ — ไม่นำสูตรมาใช้ (พบ: สูตร =IF(…,D×E) คะแนนความเสี่ยงอยู่ในแถวว่างระหว่างตาราง ไม่มีช่องคำนวณในฟอร์มนี้)",
+   "value": {
+    "where": "สูตรค้างใน F23 และ F29",
+    "detail": "สูตร =IF(…,D×E) คะแนนความเสี่ยงอยู่ในแถวว่างระหว่างตาราง ไม่มีช่องคำนวณในฟอร์มนี้",
+    "rule": "ไม่มีช่องคำนวณ — ไม่นำสูตรมาใช้"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-15",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: สถานะการอนุมัติ = อนุมัติครบถ้วน ได้เมื่อข้อแก้ไขทุกแถวสถานะ = ปิด (ไม่ครบ = เตือน) (พบ: สถานะสุดท้าย 'อนุมัติครบถ้วน' เลือกได้แม้ยังมีข้อแก้ไขสถานะ เปิด/กำลังดำเนินการ)",
+   "value": {
+    "where": "ตารางบันทึกการตรวจทาน",
+    "detail": "สถานะสุดท้าย 'อนุมัติครบถ้วน' เลือกได้แม้ยังมีข้อแก้ไขสถานะ เปิด/กำลังดำเนินการ",
+    "rule": "สถานะการอนุมัติ = อนุมัติครบถ้วน ได้เมื่อข้อแก้ไขทุกแถวสถานะ = ปิด (ไม่ครบ = เตือน)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-16",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: แถวบันทึกการอนุมัติภายในเติมจากประวัติ DOA ได้ (แก้ไขได้ก่อนส่ง) · บล็อกลงชื่อมาจาก DOA เท่านั้น (พบ: ผู้อนุมัติถูกบันทึก 2 ที่ (ตาราง 3 แถว + บล็อกการตรวจทาน/อนุมัติ) อาจขัดกัน)",
+   "value": {
+    "where": "บันทึกการอนุมัติภายใน vs บล็อกลงชื่อ",
+    "detail": "ผู้อนุมัติถูกบันทึก 2 ที่ (ตาราง 3 แถว + บล็อกการตรวจทาน/อนุมัติ) อาจขัดกัน",
+    "rule": "แถวบันทึกการอนุมัติภายในเติมจากประวัติ DOA ได้ (แก้ไขได้ก่อนส่ง) · บล็อกลงชื่อมาจาก DOA เท่านั้น"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-17",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ไม่เพิ่มช่อง (G5 1:1) — เสนอให้ลูกค้ายืนยันการผูกกับโครงการ/FM-BDM-05 ในรายงาน (พบ: ใช้กับเอกสารเสนอผู้บริหาร (ขั้นตอนที่ 5) แต่ไม่มีช่องชื่อ/เลขที่โครงการหรือเอกสารที่ถูกตรวจทาน)",
+   "value": {
+    "where": "หัวแบบฟอร์ม",
+    "detail": "ใช้กับเอกสารเสนอผู้บริหาร (ขั้นตอนที่ 5) แต่ไม่มีช่องชื่อ/เลขที่โครงการหรือเอกสารที่ถูกตรวจทาน",
+    "rule": "ไม่เพิ่มช่อง (G5 1:1) — เสนอให้ลูกค้ายืนยันการผูกกับโครงการ/FM-BDM-05 ในรายงาน"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-18",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: วันที่มีผลบังคับเมื่อสถานะ = อนุมัติครบถ้วน หรือ อนุมัติแบบมีเงื่อนไข · สถานะอื่นต้องว่าง (พบ: วันที่มีผลกรอกได้แม้สถานะ = ไม่อนุมัติ / อยู่ระหว่างแก้ไข)",
+   "value": {
+    "where": "สถานะสุดท้าย",
+    "detail": "วันที่มีผลกรอกได้แม้สถานะ = ไม่อนุมัติ / อยู่ระหว่างแก้ไข",
+    "rule": "วันที่มีผลบังคับเมื่อสถานะ = อนุมัติครบถ้วน หรือ อนุมัติแบบมีเงื่อนไข · สถานะอื่นต้องว่าง"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  }
+ ],
+ "raw": {
+  "config_changes": [],
+  "post_to": [],
+  "doa": {
+   "required": true,
+   "mode": "dynamic",
+   "default_steps": [
+    "role-line-manager",
+    "role-gm"
+   ],
+   "amount": "none"
+  },
+  "calc": {
+   "constants_from_config": true,
+   "auto_compute": true,
+   "over_limit": "warn",
+   "rules": [
+    "สถานะข้อแก้ไข (เปิด / กำลังดำเนินการ / ปิด) อ่านจาก ReviewApprovalConfig.review_statuses",
+    "สถานะการอนุมัติ (อนุมัติครบถ้วน / อนุมัติแบบมีเงื่อนไข / อยู่ระหว่างแก้ไข / ไม่อนุมัติ) อ่านจาก ReviewApprovalConfig.final_statuses",
+    "ไม่นำ data validation / สูตรค้างจาก FM-BDM-02 (ประเภทความเสี่ยง · คะแนน 1–5 · D×E) มาใช้",
+    "สถานะการอนุมัติ = อนุมัติครบถ้วน ขณะยังมีข้อแก้ไขสถานะ เปิด/กำลังดำเนินการ = เตือน ไม่บล็อก",
+    "วันที่มีผล บังคับเมื่อสถานะการอนุมัติ = อนุมัติครบถ้วน หรือ อนุมัติแบบมีเงื่อนไข · สถานะอื่นต้องว่าง",
+    "สถานะข้อแก้ไข = ปิด ต้องมีผู้รับผิดชอบแก้ไขหรือข้อคิดเห็น (ไม่ครบ = เตือน)"
+   ]
+  },
+  "repeat": {
+   "max_rows": null
+  },
+  "fidelity": {
+   "one_to_one": true,
+   "add_fields": [],
+   "merge_split": []
+  },
+  "signature": {
+   "layout": "row-bottom",
+   "per_doa_step": true,
+   "handwriting_image": false
+  },
+  "reject_cancel": {
+   "on_reject": "back_to_draft",
+   "cancel_by": [
+    "owner",
+    "admin_role"
+   ],
+   "cancel_states": [
+    "draft",
+    "pending"
+   ],
+   "reason_required": true
+  },
+  "visibility": {
+   "owner": true,
+   "approver": "after_submit",
+   "admin_role": "all"
+  },
+  "numbering": {
+   "issue_on": "first_save",
+   "code": "IRV"
+  },
+  "extras": {
+   "attachments": true,
+   "copy": false,
+   "export_csv": true,
+   "announce": false
+  },
+  "extend": {},
+  "fit": {}
+ },
+ "unattended": true
+}

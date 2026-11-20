@@ -1,0 +1,48 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# J006 · FM-BDM-06 แบบฟอร์มบันทึกการตรวจทานและอนุมัติภายใน · REQ-TMP-006 · F-TMP-006
+
+# G1 ผลต่อระบบ — ไม่เปลี่ยนค่า ไม่ส่งต่อ (บันทึกการตรวจทาน/อนุมัติเก็บในเอกสารนี้ · เอกสารที่ถูกตรวจทานผู้ใช้กรอกชื่อ/อ้างอิงเองในรายการ)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — dynamic · ค่าเริ่ม 2 ขั้นตามช่องลงชื่อบนกระดาษ (ผู้ตรวจสอบ → ผู้อนุมัติ/รับทราบ) · ไม่มีวงเงิน
+#   ผู้ตรวจสอบ = ผู้จัดการฝ่ายพัฒนาธุรกิจ / รองกรรมการผู้จัดการ → role-line-manager
+#   ผู้อนุมัติ / รับทราบ = กรรมการผู้จัดการ / ผู้มีอำนาจตามตารางอำนาจอนุมัติ → role-gm (ไม่มี role กรรมการผู้จัดการใน master — แจ้งในรายงาน)
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager", "role-gm"], amount: none }
+
+# G3 ค่าคงที่ / กฎ
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "สถานะข้อแก้ไข (เปิด / กำลังดำเนินการ / ปิด) อ่านจาก ReviewApprovalConfig.review_statuses"
+    - "สถานะการอนุมัติ (อนุมัติครบถ้วน / อนุมัติแบบมีเงื่อนไข / อยู่ระหว่างแก้ไข / ไม่อนุมัติ) อ่านจาก ReviewApprovalConfig.final_statuses"
+    - "ไม่นำ data validation / สูตรค้างจาก FM-BDM-02 (ประเภทความเสี่ยง · คะแนน 1–5 · D×E) มาใช้"
+    - "สถานะการอนุมัติ = อนุมัติครบถ้วน ขณะยังมีข้อแก้ไขสถานะ เปิด/กำลังดำเนินการ = เตือน ไม่บล็อก"
+    - "วันที่มีผล บังคับเมื่อสถานะการอนุมัติ = อนุมัติครบถ้วน หรือ อนุมัติแบบมีเงื่อนไข · สถานะอื่นต้องว่าง"
+    - "สถานะข้อแก้ไข = ปิด ต้องมีผู้รับผิดชอบแก้ไขหรือข้อคิดเห็น (ไม่ครบ = เตือน)"
+
+# G4 รายการซ้ำ — ไม่จำกัด · PDF ขั้นต่ำเท่ากระดาษ (ตรวจทาน 10 แถว · อนุมัติภายใน 3 แถว)
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ — 1:1 ไม่เพิ่มช่อง
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น — แถวล่าง 1 ช่องต่อขั้น DOA · ข้อความ "พิจารณาในระบบ" ไม่ใช้ภาพ
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ → กลับเป็นร่างเลขเดิม · ยกเลิกได้ เจ้าของ + admin role ในสถานะ ร่าง/รออนุมัติ · เหตุผลบังคับ
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น — เจ้าของ · ผู้อนุมัติหลังส่ง · admin role ฝ่ายพัฒนาธุรกิจเห็นทั้งหมด
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 เลขที่ — ออกตอนบันทึกครั้งแรก (เอกสารภายใน) · รหัส IRV (Internal Review)
+numbering: { issue_on: first_save, code: "IRV" }
+
+# G10 ของเสริม — แนบ ✓ CSV ✓ ทำซ้ำ ✗ ประกาศ ✗
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

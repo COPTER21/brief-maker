@@ -1,0 +1,60 @@
+{
+  "doc_type": "SCR",
+  "mode": "replica",
+  "template_ref": "form.tpl.html",
+  "template_version": "v1",
+  "profile_ref": "profile.json",
+  "form_code": "FM-BDM-03",
+  "revision": "Rev.00 : 01/07/2569",
+  "paper": "A4-portrait",
+  "pages": 2,
+  "page_break": "ตั้งใจหลังตารางการประเมิน: หน้า 1 = หัว + การประเมิน 8 เกณฑ์ + คะแนนรวม · หน้า 2 = ข้อสรุปการคัดกรอง + การตรวจทาน / อนุมัติ (ช่องลงชื่อ dynamic ตาม DOA · ไม่ตัดข้ามหน้า) + ประวัติการแก้ไข",
+  "min_rows": 8,
+  "dense_when_rows_over": 8,
+  "header_source": "organization_snapshot_at_numbering",
+  "sign_boxes": [
+    {
+      "box": "requester",
+      "label": "ผู้จัดทำ",
+      "show_date": true
+    },
+    {
+      "box": "doa_step:*",
+      "label": "from_doa_step",
+      "show_decision": true,
+      "show_date": true
+    }
+  ],
+  "decision_words": {
+    "default": {
+      "approve": "อนุมัติ",
+      "reject": "ไม่อนุมัติ"
+    },
+    "by_role": {
+      "role-line-manager": {
+        "approve": "ตรวจสอบแล้ว",
+        "reject": "ไม่ผ่านการตรวจสอบ"
+      },
+      "role-gm": {
+        "approve": "อนุมัติ / รับทราบ",
+        "reject": "ไม่อนุมัติ"
+      }
+    }
+  },
+  "config_reads": {
+    "criteria[].criterion + criteria[].weight": "ScreeningCriteria.items (snapshot ลงเอกสารตอนสร้าง)",
+    "screening.recommendation": "ScreeningCriteria.recommend_bands (≥80 / ≥60 / <60)",
+    "form_revisions": "DocumentConfig.form_revisions (F003)",
+    "company.group_line": "Organization.legal_name_group_line"
+  },
+  "footer_left": "เลขที่ {doc.no} · (ร่าง) · เอกสารนี้จัดทำโดยระบบ CUBE NATIVE",
+  "footer_right": "Doc. No. : {form_code} · {revision} · หน้า N/2",
+  "sign_layout": {
+    "source": "approval_chain snapshot (ผู้จัดทำ + จำนวนขั้นตามที่ตั้งใน DOA)",
+    "style": "table-rows (1 แถวต่อช่อง ตามตารางบนกระดาษ: บทบาท | ชื่อ | ตำแหน่ง | ลายเซ็น | วันที่)",
+    "max_per_row": 4,
+    "split": "even",
+    "dense_when_steps_over": 4,
+    "keep_together": true
+  }
+}

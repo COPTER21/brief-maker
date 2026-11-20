@@ -1,0 +1,48 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# J002 · FM-BDM-02 แบบฟอร์มประเมินความเสี่ยง · REQ-TMP-002 · F-TMP-002
+
+# G1 ผลต่อระบบ — ไม่เปลี่ยนค่า ไม่ส่งต่อ (ทะเบียนความเสี่ยงเก็บในเอกสารนี้)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — dynamic · ค่าเริ่ม 2 ขั้นตามช่องลงชื่อบนกระดาษ (ผู้ตรวจสอบ → ผู้อนุมัติ/รับทราบ) · ไม่มีวงเงิน
+#   ผู้ตรวจสอบ = ผู้จัดการฝ่ายพัฒนาธุรกิจ → role-line-manager (ผู้บังคับบัญชาตรงของผู้จัดทำ)
+#   ผู้อนุมัติ / รับทราบ = รองกรรมการผู้จัดการ / กรรมการผู้จัดการ → role-gm (ไม่มี role รองกรรมการผู้จัดการ/กรรมการผู้จัดการใน master — แจ้งในรายงาน)
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager", "role-gm"], amount: none }
+
+# G3 สูตร / ค่าคงที่
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "คะแนนก่อนควบคุม = โอกาสเกิดก่อนควบคุม × ผลกระทบก่อนควบคุม (คำนวณอัตโนมัติ · ว่างจนกว่ากรอกครบทั้งสองช่อง)"
+    - "โอกาสเกิด / ผลกระทบ เลือก 1–5 ตามเกณฑ์ RiskMatrix"
+    - "คะแนนคงเหลือ ต้องอยู่ในชุดผลคูณ {1,2,3,4,5,6,8,9,10,12,15,16,20,25} (ตัด 7 ที่ต้นฉบับใส่ผิด)"
+    - "คะแนนคงเหลือ > คะแนนก่อนควบคุม = เตือน ไม่บล็อก"
+    - "ระดับความเสี่ยงคำนวณจาก RiskMatrix.level_bands (1-4 ต่ำ · 5-9 ปานกลาง · 10-16 สูง · 17-25 สูงมาก) ใช้แสดงสี/ป้าย ไม่เพิ่มคอลัมน์"
+    - "สถานะรายการ = ปิดแล้ว ต้องมีคะแนนคงเหลือ"
+
+# G4 รายการซ้ำ — ไม่จำกัด · PDF ขั้นต่ำ 18 แถวเท่ากระดาษ
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ — 1:1 ไม่เพิ่มช่อง
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น — แถวล่าง 1 ช่องต่อขั้น DOA · ข้อความ "พิจารณาในระบบ" ไม่ใช้ภาพ
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ → กลับเป็นร่างเลขเดิม · ยกเลิกได้ เจ้าของ + admin role ในสถานะ ร่าง/รออนุมัติ · เหตุผลบังคับ
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น — เจ้าของ · ผู้อนุมัติหลังส่ง · admin role ฝ่ายพัฒนาธุรกิจเห็นทั้งหมด
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 เลขที่ — ออกตอนบันทึกครั้งแรก (เอกสารภายใน) · รหัส RSK (ย่อจาก Risk assessment)
+numbering: { issue_on: first_save, code: "RSK" }
+
+# G10 ของเสริม — แนบ ✓ CSV ✓ ทำซ้ำ ✗ ประกาศ ✗
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}
