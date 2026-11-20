@@ -1,0 +1,182 @@
+{
+  "feature": {
+    "code": "F-TMP-003",
+    "name": "แบบฟอร์มสรุปผลการคัดกรองโครงการเบื้องต้น",
+    "module": "Business Development"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-20",
+  "round": 1,
+  "refs": "FRD-F-TMP-003 v1.0 · 01_UI §1.2 · 03_LOGIC §3.1 · AI Test Cases 31 เคส",
+  "scope": {
+    "checked": [
+      "สร้างรายการผ่าน Create drawer",
+      "แก้ไขรายการผ่าน Edit drawer",
+      "ลบรายการตามการทำงานที่หน้าจอเปิดให้ใช้",
+      "การแสดงไฟล์แนบใน Edit และ View drawer",
+      "UI/UX ของ Create, Edit และ View drawer ทุกแท็บ"
+    ],
+    "not_checked": [
+      {
+        "item": "การคำนวณคะแนนถ่วงน้ำหนักและผลเสนอที่ขอบช่วง 60/80",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลในรอบนี้"
+      },
+      {
+        "item": "ส่งอนุมัติ, ไม่อนุมัติ, ส่งกลับร่าง และ DOA หลายขั้น",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลในรอบนี้"
+      },
+      {
+        "item": "Permission deny, concurrent update และ optimistic lock",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลในรอบนี้"
+      },
+      {
+        "item": "ความถูกต้องของ PDF, CSV, notification และ Document Store",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลในรอบนี้"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างรายการ",
+      "expected": "สร้างรายการใหม่ได้สำเร็จ",
+      "status": "pass",
+      "ref": "API-03 · FN-01/FN-02/FN-03"
+    },
+    {
+      "item": "แก้ไขรายการ",
+      "expected": "แก้ไขและบันทึกรายการได้สำเร็จ",
+      "status": "pass",
+      "ref": "API-04 · FN-01/FN-02"
+    },
+    {
+      "item": "ลบรายการตามการทำงานบนหน้าจอ",
+      "expected": "ดำเนินการลบรายการได้สำเร็จ",
+      "status": "pass",
+      "ref": "ผลตรวจจากผู้ตรวจ"
+    },
+    {
+      "item": "Edit drawer แสดงไฟล์แนบเดิม",
+      "expected": "เมื่อเปิดแก้ไข ต้องเห็นไฟล์ที่เคยแนบไว้และจัดการไฟล์ต่อได้",
+      "actual": "ส่วนเอกสารแนบใน Edit drawer ว่าง ไม่แสดงไฟล์เดิม ทั้งที่ View drawer แสดงไฟล์ของรายการเดียวกัน",
+      "status": "fail",
+      "bug": "BUG-01",
+      "ref": "01_UI §1.2 P-02 · API-11"
+    },
+    {
+      "item": "View drawer เป็นหน้าดูข้อมูลและไฟล์แนบ",
+      "expected": "แท็บรายละเอียดแสดงไฟล์แนบ โดยการเพิ่มหรือลบไฟล์ทำจาก Create/Edit drawer",
+      "actual": "View drawer มีปุ่มแนบไฟล์และปุ่มลบไฟล์ในแท็บรายละเอียด",
+      "status": "fail",
+      "bug": "BUG-02",
+      "ref": "01_UI §1.2 P-02/P-03"
+    },
+    {
+      "item": "คำนวณคะแนนถ่วงน้ำหนักและผลเสนอ",
+      "expected": "คำนวณตาม ScreeningCriteria และขอบช่วง 60/80",
+      "status": "na",
+      "ref": "FN-02 · BR-01..03"
+    },
+    {
+      "item": "ส่งและตัดสินตามสายอนุมัติ",
+      "expected": "ตัดสินได้เฉพาะผู้พิจารณาขั้นปัจจุบันตาม DOA",
+      "status": "na",
+      "ref": "FN-04/FN-05/FN-06"
+    },
+    {
+      "item": "ยกเลิกเอกสารตามสิทธิ์และสถานะ",
+      "expected": "ยกเลิกได้เฉพาะ owner/admin ในสถานะ draft หรือ pending พร้อมเหตุผล",
+      "status": "na",
+      "ref": "FN-07 · BR-DOA-03"
+    },
+    {
+      "item": "PDF และผลข้ามโมดูลหลังอนุมัติ",
+      "expected": "PDF ถูกต้อง เก็บ approved_final และแจ้งเตือนตามเงื่อนไข",
+      "status": "na",
+      "ref": "FN-08/FN-09"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-01",
+      "status": "note",
+      "note": "Create/Edit drawer และ View drawer ทั้งแท็บรายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ และประวัติ มีรูปแบบที่หลุดจาก design ของฟีเจอร์"
+    },
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "Layout และการจัดวางบางส่วนใน Create/Edit drawer และ View drawer ยังไม่เรียบร้อย"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "note",
+      "note": "ตำแหน่งจัดการไฟล์ไม่สอดคล้องกัน: Edit ไม่แสดงไฟล์เดิม แต่ View กลับเพิ่มและลบไฟล์ได้"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "Edit drawer ไม่แสดงไฟล์แนบเดิม",
+      "severity": "medium",
+      "steps": [
+        "สร้างรายการและแนบไฟล์ แล้วบันทึก",
+        "เปิด View drawer และตรวจว่าไฟล์แนบแสดงอยู่",
+        "กดแก้ไขเพื่อเปิด Edit drawer",
+        "ไปขั้นเอกสารแนบ"
+      ],
+      "expected": "Edit drawer แสดงรายการไฟล์แนบเดิมของเอกสาร",
+      "actual": "Edit drawer แสดงเฉพาะพื้นที่เลือกไฟล์และไม่แสดงไฟล์เดิม",
+      "evidence": [
+        "tk02/Screenshot 2026-11-20 154028.png",
+        "tk02/Screenshot 2026-11-20 154104.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "View drawer เปิดให้เพิ่มและลบไฟล์ในแท็บรายละเอียด",
+      "severity": "medium",
+      "steps": [
+        "เปิดรายการใน View drawer",
+        "เลื่อนไปส่วนเอกสารแนบในแท็บรายละเอียด",
+        "ตรวจปุ่มแนบไฟล์และไอคอนลบไฟล์"
+      ],
+      "expected": "View drawer แสดงไฟล์แบบอ่านอย่างเดียว การเพิ่มหรือลบไฟล์อยู่ใน Create/Edit drawer",
+      "actual": "View drawer มีทั้งปุ่มแนบไฟล์และไอคอนลบไฟล์",
+      "evidence": "tk03/Screenshot 2026-11-20 154324.png",
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "Create/Edit drawer หลุด design และ layout บางส่วนไม่เรียบร้อย",
+      "severity": "low",
+      "steps": [
+        "เปิด Create drawer",
+        "ตรวจแต่ละขั้นของฟอร์ม",
+        "เปิด Edit drawer และตรวจ layout เดียวกัน"
+      ],
+      "expected": "รูปแบบและ layout สอดคล้องกับ design ของฟีเจอร์",
+      "actual": "รูปแบบหลุด design และ layout บางส่วนไม่เรียบร้อย",
+      "status": "open"
+    },
+    {
+      "id": "BUG-04",
+      "title": "View drawer ทุกแท็บหลุด design",
+      "severity": "low",
+      "steps": [
+        "เปิด View drawer",
+        "เปิดแท็บรายละเอียด",
+        "เปิดแท็บ PDF Preview",
+        "เปิดแท็บลายเซ็น/อนุมัติ",
+        "เปิดแท็บประวัติ"
+      ],
+      "expected": "ทุกแท็บมี UI/UX และ layout สอดคล้องกับ design ของฟีเจอร์",
+      "actual": "UI/UX ของแท็บรายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ และประวัติหลุด design",
+      "status": "open"
+    }
+  ],
+  "suggestions": []
+}

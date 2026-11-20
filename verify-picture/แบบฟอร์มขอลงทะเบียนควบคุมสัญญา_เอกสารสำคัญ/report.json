@@ -1,0 +1,215 @@
+{
+  "feature": {
+    "code": "F-TMP-009",
+    "name": "แบบฟอร์มขอลงทะเบียนควบคุมสัญญา/เอกสารสำคัญ"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-20",
+  "round": 1,
+  "refs": "FRD F-TMP-009 · 05_RULES · 06_TESTS",
+  "scope": {
+    "checked": [
+      "สร้างคำขอ (Create)",
+      "แก้ไขคำขอ (Update/Edit)",
+      "ลบหรือยกเลิกคำขอตาม flow ที่ระบบเปิดให้",
+      "Create/Edit drawer — UI, UX และไฟล์แนบ",
+      "View drawer — แท็บรายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ และประวัติ",
+      "UI/UX ส่วนที่เหลือ"
+    ],
+    "not_checked": [
+      {
+        "item": "การส่งพิจารณาและ DOA ทุกขั้น",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลในรอบนี้"
+      },
+      {
+        "item": "การลงทะเบียนควบคุมและบันทึกรับต้นฉบับ",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลในรอบนี้"
+      },
+      {
+        "item": "สิทธิ์การมองเห็นและ deny cases แยกตาม role",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลในรอบนี้"
+      },
+      {
+        "item": "Notification, CSV, concurrency และ stale data",
+        "reason": "ผู้ตรวจไม่ได้ระบุผลในรอบนี้"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างคำขอใหม่",
+      "expected": "สร้างและบันทึกคำขอได้",
+      "status": "pass",
+      "ref": "AC-01"
+    },
+    {
+      "item": "แก้ไขคำขอ",
+      "expected": "แก้ไขและบันทึกข้อมูลได้",
+      "status": "pass",
+      "ref": "API-04"
+    },
+    {
+      "item": "ลบหรือยกเลิกคำขอตาม flow ที่ระบบเปิดให้",
+      "expected": "ดำเนินการได้ครบตาม flow ที่ผู้ตรวจทดลอง",
+      "status": "pass",
+      "ref": "AC-11"
+    },
+    {
+      "item": "เปิด Edit drawer ของคำขอที่มีไฟล์แนบเดิม",
+      "expected": "Edit drawer แสดงรายการไฟล์ที่เคยแนบไว้ เพื่อให้ผู้ใช้ตรวจสอบและจัดการไฟล์เดิมได้",
+      "actual": "Edit drawer ไม่แสดงไฟล์ที่เคยแนบไว้",
+      "status": "fail",
+      "bug": "BUG-02",
+      "ref": "FRD 01 §1.2 · API-13"
+    },
+    {
+      "item": "เปิด View drawer เพื่อดูเอกสารแนบ",
+      "expected": "View drawer แสดงไฟล์แนบแบบอ่านอย่างเดียว; การอัปโหลดอยู่ใน Create/Edit drawer",
+      "actual": "แท็บรายละเอียดของ View drawer มีช่องให้อัปโหลดไฟล์",
+      "status": "fail",
+      "bug": "BUG-03",
+      "ref": "FRD 01 §1.2–§1.3"
+    },
+    {
+      "item": "Validation ช่องบังคับและวันที่",
+      "expected": "ทำงานตาม VR-01 ถึง VR-09",
+      "status": "na",
+      "ref": "AC-02 ถึง AC-04 · AC-09"
+    },
+    {
+      "item": "ส่งคำขอและ resolve สาย DOA",
+      "expected": "resolve ผู้พิจารณาครบและผู้ขออนุมัติใบตนเองไม่ได้",
+      "status": "na",
+      "ref": "AC-05"
+    },
+    {
+      "item": "อนุมัติ/รับทราบตามลำดับ",
+      "expected": "ตัดสินได้เฉพาะผู้พิจารณาขั้นปัจจุบันและครบแล้วรอลงทะเบียน",
+      "status": "na",
+      "ref": "AC-06"
+    },
+    {
+      "item": "ส่งกลับแก้ไข",
+      "expected": "กลับเป็นร่าง เลขเดิม และแสดงเหตุผล",
+      "status": "na",
+      "ref": "AC-07"
+    },
+    {
+      "item": "ลงทะเบียนควบคุม",
+      "expected": "ผู้ดูแลลงทะเบียนได้และระบบออกเลขทะเบียน",
+      "status": "na",
+      "ref": "AC-08"
+    },
+    {
+      "item": "PDF ทุกสถานะและช่องลงชื่อตาม DOA",
+      "expected": "ข้อมูลตรงคำขอและรูปแบบตาม AC-10/AC-14",
+      "status": "na",
+      "ref": "AC-10 · AC-14"
+    },
+    {
+      "item": "รายการ ค้นหา ตัวกรอง และ CSV",
+      "expected": "แสดงเฉพาะข้อมูลที่มีสิทธิ์และ CSV ตรงตัวกรอง",
+      "status": "na",
+      "ref": "AC-12"
+    },
+    {
+      "item": "แบบเอกสารถูกปิดใช้งาน",
+      "expected": "ไม่สามารถสร้างคำขอใหม่ได้",
+      "status": "na",
+      "ref": "AC-13"
+    },
+    {
+      "item": "Permission และ deny cases",
+      "expected": "ทำงานตาม TC-D01 ถึง TC-D07",
+      "status": "na",
+      "ref": "FRD 06 §6.2"
+    },
+    {
+      "item": "Notification ตามการเปลี่ยนสถานะ",
+      "expected": "ส่ง ctr_registered, ctr_original_received และ ctr_cancelled ให้ผู้รับที่กำหนด",
+      "status": "na",
+      "ref": "FN-10"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "Create/Edit drawer หลุดจาก design และ layout บางส่วนจัดวางไม่เรียบร้อย"
+    },
+    {
+      "item": "View drawer — แท็บรายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ และประวัติ",
+      "status": "note",
+      "note": "รูปแบบ UI และ layout หลุดจาก design"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "note",
+      "note": "View drawer มีการอัปโหลดไฟล์ในแท็บรายละเอียด ทำให้ขอบเขตระหว่างโหมดดูและโหมดแก้ไขไม่ชัดเจน"
+    },
+    {
+      "item": "การจัดการไฟล์แนบใน Edit drawer",
+      "status": "note",
+      "note": "ผู้ใช้ไม่เห็นไฟล์ที่เคยแนบไว้ ทำให้ตรวจสอบไฟล์เดิมก่อนแก้ไขไม่ได้"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "Create/Edit drawer หลุด design และ layout บางส่วนไม่เรียบร้อย",
+      "severity": "low",
+      "steps": [
+        "เปิดหน้าแบบฟอร์มขอลงทะเบียนควบคุมสัญญา/เอกสารสำคัญ",
+        "เปิด Create drawer และ Edit drawer",
+        "ตรวจการจัดวางองค์ประกอบใน drawer"
+      ],
+      "expected": "Create/Edit drawer ใช้รูปแบบและการจัดวางที่สอดคล้องกับ design ของระบบ",
+      "actual": "Create/Edit drawer หลุดจาก design และ layout บางส่วนไม่เรียบร้อย",
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "Edit drawer ไม่แสดงไฟล์แนบเดิม",
+      "severity": "medium",
+      "steps": [
+        "สร้างคำขอและแนบไฟล์",
+        "บันทึกคำขอ",
+        "เปิดคำขอเดิมใน Edit drawer",
+        "ตรวจส่วนเอกสารแนบ"
+      ],
+      "expected": "แสดงรายการไฟล์ที่เคยแนบไว้ในคำขอ",
+      "actual": "ไม่แสดงไฟล์ที่เคยแนบไว้",
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "View drawer เปิดให้อัปโหลดไฟล์ในแท็บรายละเอียด",
+      "severity": "medium",
+      "steps": [
+        "เปิดคำขอใน View drawer",
+        "เปิดแท็บรายละเอียด",
+        "ตรวจส่วนเอกสารแนบ"
+      ],
+      "expected": "View drawer แสดงไฟล์แนบแบบอ่านอย่างเดียว; การอัปโหลดไฟล์อยู่ใน Create/Edit drawer",
+      "actual": "แท็บรายละเอียดของ View drawer แสดงช่องให้อัปโหลดไฟล์",
+      "status": "open"
+    },
+    {
+      "id": "BUG-04",
+      "title": "UI ของแท็บใน View drawer หลุด design",
+      "severity": "low",
+      "steps": [
+        "เปิดคำขอใน View drawer",
+        "เปิดแท็บรายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ และประวัติ",
+        "ตรวจรูปแบบและการจัดวางของแต่ละแท็บ"
+      ],
+      "expected": "ทุกแท็บใช้รูปแบบและ layout ที่สอดคล้องกับ design ของระบบ",
+      "actual": "UI/UX ของแท็บดังกล่าวหลุดจาก design",
+      "status": "open"
+    }
+  ]
+}
