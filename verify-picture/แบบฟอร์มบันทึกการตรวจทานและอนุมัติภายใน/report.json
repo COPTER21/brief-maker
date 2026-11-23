@@ -1,0 +1,191 @@
+{
+  "feature": {
+    "code": "F-TMP-006",
+    "name": "แบบฟอร์มบันทึกการตรวจทานและอนุมัติภายใน",
+    "module": "Business Development"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-23",
+  "round": 1,
+  "refs": "FRD-F-TMP-006 v1.0",
+  "summary_note": "Create, Update และ Delete ผ่านตามผลที่ผู้ตรวจรายงาน; พบ UI/UX ระดับ Low 2 รายการ และยังไม่ได้รายงานผล logic ส่วนอื่นตาม FRD",
+  "scope": {
+    "checked": [
+      "สร้างรายการ (Create)",
+      "แก้ไขรายการ (Update)",
+      "ลบรายการ (Delete)",
+      "UI/UX ของ create/edit drawer",
+      "UI/UX ของ view drawer: รายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ และประวัติ"
+    ],
+    "not_checked": [
+      {
+        "item": "Validation, warning และวันที่มีผลตาม FRD",
+        "reason": "ผู้ตรวจไม่ได้รายงานผลในรอบนี้"
+      },
+      {
+        "item": "ส่งอนุมัติ, ลำดับ DOA, ตีกลับ และอนุมัติขั้นสุดท้าย",
+        "reason": "ผู้ตรวจไม่ได้รายงานผลในรอบนี้"
+      },
+      {
+        "item": "สิทธิ์การมองเห็น/ตัดสิน/ยกเลิกของแต่ละบทบาท",
+        "reason": "ผู้ตรวจไม่ได้รายงานผลในรอบนี้"
+      },
+      {
+        "item": "PDF, CSV, notification, audit และกรณี concurrent",
+        "reason": "ผู้ตรวจไม่ได้รายงานผลในรอบนี้"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างรายการ (Create)",
+      "expected": "สร้างรายการได้สำเร็จ",
+      "status": "pass",
+      "ref": "AC-01 · API-03"
+    },
+    {
+      "item": "แก้ไขรายการ (Update)",
+      "expected": "แก้ไขรายการได้สำเร็จ",
+      "status": "pass",
+      "ref": "API-04"
+    },
+    {
+      "item": "ลบรายการ (Delete)",
+      "expected": "ลบรายการได้สำเร็จ",
+      "status": "pass"
+    },
+    {
+      "item": "Validation ช่องบังคับของรายการตรวจทาน",
+      "expected": "ข้อมูลไม่ครบถูกบล็อกตาม VR-01",
+      "status": "na",
+      "ref": "AC-02 · VR-01"
+    },
+    {
+      "item": "คำเตือนรายการสถานะปิดแต่ไม่มีผู้รับผิดชอบหรือข้อคิดเห็น",
+      "expected": "เตือนแต่ไม่บล็อก",
+      "status": "na",
+      "ref": "AC-03 · BR-05"
+    },
+    {
+      "item": "สถานะการอนุมัติและวันที่มีผล",
+      "expected": "บังคับ/ล้างวันที่ตามสถานะที่กำหนด",
+      "status": "na",
+      "ref": "AC-04..05 · BR-04"
+    },
+    {
+      "item": "อนุมัติครบถ้วนขณะมีข้อแก้ไขค้าง",
+      "expected": "เตือนแต่บันทึกได้",
+      "status": "na",
+      "ref": "AC-06 · BR-03"
+    },
+    {
+      "item": "ผู้พิจารณานอกระบบ",
+      "expected": "ต้องกรอกข้อมูลครบทุกช่องหรือลบแถว",
+      "status": "na",
+      "ref": "AC-07 · VR-02"
+    },
+    {
+      "item": "ส่งอนุมัติและ resolve สาย DOA",
+      "expected": "จำนวนขั้นตรง DOA และห้ามเลือกผู้จัดทำเอง",
+      "status": "na",
+      "ref": "AC-08 · BR-DOA-04"
+    },
+    {
+      "item": "พิจารณาตามลำดับขั้นจนอนุมัติ",
+      "expected": "ตัดสินตามลำดับและเติมแถว source=doa",
+      "status": "na",
+      "ref": "AC-09 · FN-05"
+    },
+    {
+      "item": "ไม่ผ่านการตรวจสอบ/ไม่อนุมัติ",
+      "expected": "กลับเป็นร่าง เลขเดิม และเก็บเหตุผล",
+      "status": "na",
+      "ref": "AC-10 · FN-06"
+    },
+    {
+      "item": "PDF ทุกสถานะและจำนวนแถวตาม DOA",
+      "expected": "2 หน้าและตารางลงชื่อตามจำนวนขั้น",
+      "status": "na",
+      "ref": "AC-11 · AC-14"
+    },
+    {
+      "item": "ยกเลิกโดย owner/admin",
+      "expected": "ยกเลิกได้เฉพาะ draft/pending และต้องมีเหตุผล",
+      "status": "na",
+      "ref": "AC-12 · FN-07"
+    },
+    {
+      "item": "Admin เห็นทุกใบ กรอง และส่งออก CSV",
+      "expected": "ผลลัพธ์ตรงสิทธิ์และตัวกรอง",
+      "status": "na",
+      "ref": "AC-13 · FN-10"
+    },
+    {
+      "item": "Deny cases และการไม่เปิดเผยเอกสาร",
+      "expected": "คนไม่มีสิทธิ์ไม่เห็น/ไม่ตัดสิน/ไม่แก้ข้อมูล",
+      "status": "na",
+      "ref": "TC-D01..07"
+    },
+    {
+      "item": "Notification และการเก็บ approved PDF",
+      "expected": "ส่ง event ถูกผู้รับและเก็บ approved_final",
+      "status": "na",
+      "ref": "XT-01..02"
+    },
+    {
+      "item": "Optimistic lock, idempotency และ audit append-only",
+      "expected": "คำสั่งซ้ำ/ข้อมูลเก่าไม่ทำให้สถานะหรือประวัติซ้ำ",
+      "status": "na",
+      "ref": "API §2.3 · EC-06"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-01",
+      "status": "note",
+      "note": "create/edit drawer และ view drawer หลุดจากรูปแบบ design ที่ควรเป็น"
+    },
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "layout บางส่วนของ create/edit drawer ไม่เรียบร้อย; view drawer ในแท็บรายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ และประวัติมีความไม่เรียบร้อยด้านการจัดวาง"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "note",
+      "note": "ประสบการณ์ใช้งานของ create/edit drawer และ view drawer ในแท็บที่ตรวจยังไม่เป็นไปตาม design; UI/UX ส่วนอื่นที่ลองใช้งานทำงานได้โอเค"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "Create/Edit drawer หลุด design และ layout บางส่วนไม่เรียบร้อย",
+      "severity": "low",
+      "steps": [
+        "เปิดแบบฟอร์มสร้างรายการหรือแก้ไขรายการ",
+        "ตรวจการจัดวางภายใน create/edit drawer"
+      ],
+      "expected": "drawer แสดงผลตาม design และองค์ประกอบจัดวางเรียบร้อยสม่ำเสมอ",
+      "actual": "drawer หลุด design และ layout บางส่วนไม่เรียบร้อย",
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "View drawer หลายแท็บหลุด design",
+      "severity": "low",
+      "steps": [
+        "เปิดรายการใน view drawer",
+        "เปิดแท็บรายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ และประวัติ",
+        "ตรวจ UI/UX และการจัดวางของแต่ละแท็บ"
+      ],
+      "expected": "ทุกแท็บแสดงผลตาม design และใช้งานได้อย่างเป็นระเบียบสม่ำเสมอ",
+      "actual": "UI/UX ของแท็บที่ตรวจหลุด design",
+      "status": "open"
+    }
+  ],
+  "suggestions": []
+}
