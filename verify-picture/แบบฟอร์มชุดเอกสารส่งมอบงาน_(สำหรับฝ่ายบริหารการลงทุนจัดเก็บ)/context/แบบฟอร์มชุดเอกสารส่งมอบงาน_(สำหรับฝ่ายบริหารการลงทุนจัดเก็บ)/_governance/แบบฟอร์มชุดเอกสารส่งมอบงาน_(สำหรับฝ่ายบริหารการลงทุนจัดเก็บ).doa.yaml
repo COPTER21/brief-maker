@@ -1,0 +1,51 @@
+# doa-declaration v1.2 — สร้างจาก DECISIONS.lock.json · คำตัดสินเพิ่มเอง (AI-DEFAULT — กระดาษไม่มีคำตัดสิน)
+feature_id: F-TMP-008
+name: แบบฟอร์มชุดเอกสารส่งมอบงาน (สำหรับฝ่ายบริหารการลงทุนจัดเก็บ)
+module: bdm
+platform: core
+doa_type: hoi
+approval_scope: document_sign
+approval_required: true
+mode: dynamic
+amount: none
+dept_mode: merged
+on_reject: back_to_draft
+cancel_by:
+- owner
+- admin_role
+cancel_states:
+- draft
+- pending
+actions:
+- id: submit_hoi
+  label: ส่งอนุมัติแบบฟอร์มชุดเอกสารส่งมอบงาน (สำหรับฝ่ายบริหารการลงทุนจัดเก็บ)
+  from_state: draft
+matrix:
+- amount_from: 0
+  amount_to: null
+  departments: merged
+  chainMode: sequential
+  steps:
+  - roles:
+    - role-line-manager
+    label: ผู้ตรวจสอบ
+    decision:
+      approve: ตรวจสอบแล้ว
+      reject: ไม่ผ่านการตรวจสอบ
+  - roles:
+    - role-mgr-bu
+    label: ผู้อนุมัติ / รับทราบ
+    decision:
+      approve: รับทราบผลการรับมอบ
+      reject: ไม่รับทราบ
+defaults_unconfirmed: true
+wire_status: pending
+source_decisions:
+- DEC-03
+- DEC-07
+- DEC-08
+role_notes:
+  role-line-manager: บนกระดาษ = ผู้จัดการฝ่ายบริหารการลงทุน (ผู้บังคับบัญชาตรงของผู้จัดทำ)
+  role-mgr-bu: บนกระดาษ = ฝ่ายพัฒนาธุรกิจรับทราบผลการรับมอบ (ข้ามฝ่าย) — ไม่มี role
+    ผู้จัดการฝ่ายพัฒนาธุรกิจใน DOA master → ใช้ role-mgr-bu ชั่วคราว รอลูกค้า/DOA
+    กลางยืนยัน

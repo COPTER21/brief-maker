@@ -1,0 +1,37 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock · เติม event ธุรกิจของรายงานความคืบหน้าโครงการ
+feature_id: F-TMP-005
+name: รายงานความคืบหน้าโครงการ
+code: PPR
+events:
+- id: ppr_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-005-FN-07, F-TMP-005-FN-09
+- id: ppr_draft_for_pm
+  trigger: draft บันทึกโดยผู้จัดทำที่ไม่ใช่ผู้จัดการโครงการ (กด "แจ้งผู้จัดการโครงการ") (DEC G3 · ส่งได้เฉพาะ PM)
+  recipients:
+  - project_manager
+  template: '**{doc_no}** รายงานความคืบหน้า {project_name} รอบ {period} พร้อมให้ตรวจและส่งอนุมัติ — จัดทำโดย {actor}'
+  channel: in-app
+  optional: false
+  why: ส่งอนุมัติได้เฉพาะผู้จัดการโครงการ — PM ต้องรู้ว่ามีร่างรอส่ง ไม่งั้นรายงานค้างในร่าง
+  frd_ref: 03_LOGIC F-TMP-005-FN-09, F-TMP-005-FN-11
+- id: ppr_urgent_decision
+  trigger: draft → pending_approval และ สรุปสถานะโครงการ = ล่าช้า หรือมีปัญหา
+  recipients:
+  - role-gm
+  - document_owner
+  template: '**{doc_no}** โครงการ {project_name} สถานะ ล่าช้า หรือมีปัญหา — มีประเด็นที่ต้องการการตัดสินใจ {decision_count} เรื่อง'
+  channel: in-app+email
+  optional: false
+  why: ตัวเลือกบนกระดาษระบุ "ต้องการการตัดสินใจเร่งด่วน" — ผู้บริหารต้องรู้ทันทีตอนส่ง ไม่รอคิวตรวจสอบตามลำดับขั้น
+  frd_ref: 03_LOGIC F-TMP-005-FN-04, F-TMP-005-FN-09
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

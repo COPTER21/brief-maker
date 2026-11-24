@@ -1,0 +1,353 @@
+{
+ "req": "REQ-TMP-007",
+ "status": "พร้อมเริ่มทำ",
+ "ready": true,
+ "decisions": [
+  {
+   "id": "DEC-01",
+   "cat": "G1",
+   "text": "อนุมัติแล้วไม่เปลี่ยนค่าในระบบ",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-02",
+   "cat": "G1",
+   "text": "ไม่ส่งต่อระบบอื่นรอบนี้ (ประกาศ event ไว้ใน FRD แต่ไม่ยิง)",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-03",
+   "cat": "G2",
+   "text": "สายอนุมัติตั้งที่ DOA กลาง (dynamic) · ค่าเริ่ม 2 ขั้น: role-line-manager, role-mgr-bu · วงเงิน: ไม่มี",
+   "value": {
+    "required": true,
+    "mode": "dynamic",
+    "default_steps": [
+     "role-line-manager",
+     "role-mgr-bu"
+    ],
+    "amount": "none"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "doa-declaration",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-04",
+   "cat": "G3",
+   "text": "ค่าคงที่อ่านจาก config: \"สถานะข้อมูล: สมบูรณ์ / มีข้อจำกัด / รอข้อมูลเพิ่มเติม\" → HandoverPackageConfig.data_statuses, \"สถานะ: ครบถ้วน / มีข้อจำกัด / ขาดเอกสาร / ไม่เกี่ยวข้อง\" → HandoverPackageConfig.doc_statuses · คำนวณให้อัตโนมัติ ผู้ใช้ปรับได้ · เกินเกณฑ์ = เตือน · สถานะข้อมูล (สมบูรณ์ / มีข้อจำกัด / รอข้อมูลเพิ่มเติม) อ่านจาก HandoverPackageConfig.data_statuses · สถานะเอกสาร (ครบถ้วน / มีข้อจำกัด / ขาดเอกสาร / ไม่เกี่ยวข้อง) อ่านจาก HandoverPackageConfig.doc_statuses · ไม่นำ data validation ค้าง 1–5 ที่ C13:C18 มาใช้ · สถานะข้อมูล = สมบูรณ์ ขณะมีรายการเอกสารสถานะ ขาดเอกสาร/มีข้อจำกัด = เตือน ไม่บล็อก · สถานะข้อมูล = มีข้อจำกัด หรือมีรายการสถานะ มีข้อจำกัด → ต้องกรอก ข้อจำกัดของข้อมูล · วันที่เอกสาร หลัง วันที่ส่งมอบ = เตือน ไม่บล็อก · ส่งพิจารณาได้เมื่อมีรายการเอกสารอย่างน้อย 1 รายการที่กรอกชื่อเอกสารและสถานะ",
+   "value": {
+    "constants_from_config": true,
+    "auto_compute": true,
+    "over_limit": "warn",
+    "rules": [
+     "สถานะข้อมูล (สมบูรณ์ / มีข้อจำกัด / รอข้อมูลเพิ่มเติม) อ่านจาก HandoverPackageConfig.data_statuses",
+     "สถานะเอกสาร (ครบถ้วน / มีข้อจำกัด / ขาดเอกสาร / ไม่เกี่ยวข้อง) อ่านจาก HandoverPackageConfig.doc_statuses",
+     "ไม่นำ data validation ค้าง 1–5 ที่ C13:C18 มาใช้",
+     "สถานะข้อมูล = สมบูรณ์ ขณะมีรายการเอกสารสถานะ ขาดเอกสาร/มีข้อจำกัด = เตือน ไม่บล็อก",
+     "สถานะข้อมูล = มีข้อจำกัด หรือมีรายการสถานะ มีข้อจำกัด → ต้องกรอก ข้อจำกัดของข้อมูล",
+     "วันที่เอกสาร หลัง วันที่ส่งมอบ = เตือน ไม่บล็อก",
+     "ส่งพิจารณาได้เมื่อมีรายการเอกสารอย่างน้อย 1 รายการที่กรอกชื่อเอกสารและสถานะ"
+    ]
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-05",
+   "cat": "G4",
+   "text": "รายการเอกสารในชุดส่งมอบ: ไม่จำกัดจำนวนแถว · PDF อย่างน้อย 12 แถวตามกระดาษ",
+   "value": {
+    "max_rows": null,
+    "min_rows": 12
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-06",
+   "cat": "G5",
+   "text": "ช่องตรงกระดาษ 1:1 · ไม่เพิ่มช่อง (เช่น หมายเหตุ)",
+   "value": {
+    "one_to_one": true,
+    "add_fields": [],
+    "merge_split": []
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-07",
+   "cat": "G6",
+   "text": "ลายเซ็นแถวล่าง 1 ช่องต่อขั้น DOA · ไม่ใช้ภาพลายมือชื่อ (ข้อความส่งในระบบ/พิจารณาในระบบ)",
+   "value": {
+    "layout": "row-bottom",
+    "per_doa_step": true,
+    "handwriting_image": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "thai-doc",
+    "html",
+    "doccfg-declaration",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-08",
+   "cat": "G7",
+   "text": "ไม่อนุมัติ = กลับเป็นร่าง แก้แล้วส่งใหม่ · ยกเลิกได้โดย owner, admin_role สถานะ draft, pending · ต้องมีเหตุผล",
+   "value": {
+    "on_reject": "back_to_draft",
+    "cancel_by": [
+     "owner",
+     "admin_role"
+    ],
+    "cancel_states": [
+     "draft",
+     "pending"
+    ],
+    "reason_required": true
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests",
+    "doa-declaration"
+   ]
+  },
+  {
+   "id": "DEC-09",
+   "cat": "G8",
+   "text": "มองเห็น: เจ้าของ · ผู้อนุมัติเห็นหลังส่ง · admin role เห็นทั้งหมด",
+   "value": {
+    "owner": true,
+    "approver": "after_submit",
+    "admin_role": "all"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-10",
+   "cat": "G9",
+   "text": "ออกเลขเมื่อบันทึกครั้งแรก · รหัส HOB",
+   "value": {
+    "issue_on": "first_save",
+    "code": "HOB"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "doccfg-declaration",
+    "html",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-11",
+   "cat": "G10",
+   "text": "ของเสริม (กระดาษไม่มี): แนบไฟล์, ส่งออก CSV",
+   "value": {
+    "attachments": true,
+    "copy": false,
+    "export_csv": true,
+    "announce": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "brd",
+    "frd",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-12",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ตัดรายการ 1–5 ทิ้ง · ใช้เฉพาะ สถานะข้อมูล (E18) และ สถานะเอกสาร (G22:G33) (พบ: รายการ 1,2,3,4,5 ที่ C13:C18 อยู่บนเซลล์หัวข้อ (A13:D13 merge) ของตารางข้อมูลการส่งมอบ — ค้างจากแบบฟอร์มอื่น ไม่มีความหมายในฟอร์มนี้)",
+   "value": {
+    "where": "Data validation ใน Excel",
+    "detail": "รายการ 1,2,3,4,5 ที่ C13:C18 อยู่บนเซลล์หัวข้อ (A13:D13 merge) ของตารางข้อมูลการส่งมอบ — ค้างจากแบบฟอร์มอื่น ไม่มีความหมายในฟอร์มนี้",
+    "rule": "ตัดรายการ 1–5 ทิ้ง · ใช้เฉพาะ สถานะข้อมูล (E18) และ สถานะเอกสาร (G22:G33)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-13",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: สถานะข้อมูล = สมบูรณ์ ได้เมื่อทุกรายการสถานะ = ครบถ้วน หรือ ไม่เกี่ยวข้อง (ไม่ครบ = เตือน) (พบ: สถานะข้อมูล 'สมบูรณ์' เลือกได้แม้มีรายการเอกสารสถานะ 'ขาดเอกสาร' หรือ 'มีข้อจำกัด')",
+   "value": {
+    "where": "สถานะข้อมูล vs รายการเอกสาร",
+    "detail": "สถานะข้อมูล 'สมบูรณ์' เลือกได้แม้มีรายการเอกสารสถานะ 'ขาดเอกสาร' หรือ 'มีข้อจำกัด'",
+    "rule": "สถานะข้อมูล = สมบูรณ์ ได้เมื่อทุกรายการสถานะ = ครบถ้วน หรือ ไม่เกี่ยวข้อง (ไม่ครบ = เตือน)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-14",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: สถานะข้อมูล = มีข้อจำกัด หรือ รายการใดสถานะ = มีข้อจำกัด → ต้องกรอก ข้อจำกัดของข้อมูล (พบ: สถานะข้อมูล 'มีข้อจำกัด' แต่ช่อง ข้อจำกัดของข้อมูล ว่างได้)",
+   "value": {
+    "where": "สถานะข้อมูล vs ข้อจำกัดของข้อมูล",
+    "detail": "สถานะข้อมูล 'มีข้อจำกัด' แต่ช่อง ข้อจำกัดของข้อมูล ว่างได้",
+    "rule": "สถานะข้อมูล = มีข้อจำกัด หรือ รายการใดสถานะ = มีข้อจำกัด → ต้องกรอก ข้อจำกัดของข้อมูล"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-15",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ผู้รับมอบที่เลือก = ผู้พิจารณาขั้นรับทราบใน DOA (ค่าเริ่ม) · บล็อกลงชื่อมาจาก DOA เท่านั้น (พบ: ผู้รับมอบ (ฝ่ายบริหารการลงทุน) ถูกบันทึก 2 ที่ — ช่องผู้รับมอบ และแถว ผู้อนุมัติ / รับทราบ อาจขัดกัน)",
+   "value": {
+    "where": "ผู้รับมอบ vs บล็อกลงชื่อ",
+    "detail": "ผู้รับมอบ (ฝ่ายบริหารการลงทุน) ถูกบันทึก 2 ที่ — ช่องผู้รับมอบ และแถว ผู้อนุมัติ / รับทราบ อาจขัดกัน",
+    "rule": "ผู้รับมอบที่เลือก = ผู้พิจารณาขั้นรับทราบใน DOA (ค่าเริ่ม) · บล็อกลงชื่อมาจาก DOA เท่านั้น"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-16",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: วันที่เอกสาร ≤ วันที่ส่งมอบ (เกิน = เตือน) (พบ: วันที่เอกสารในรายการอาจหลังวันที่ส่งมอบ)",
+   "value": {
+    "where": "วันที่ส่งมอบ vs วันที่เอกสาร",
+    "detail": "วันที่เอกสารในรายการอาจหลังวันที่ส่งมอบ",
+    "rule": "วันที่เอกสาร ≤ วันที่ส่งมอบ (เกิน = เตือน)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  }
+ ],
+ "raw": {
+  "config_changes": [],
+  "post_to": [],
+  "doa": {
+   "required": true,
+   "mode": "dynamic",
+   "default_steps": [
+    "role-line-manager",
+    "role-mgr-bu"
+   ],
+   "amount": "none"
+  },
+  "calc": {
+   "constants_from_config": true,
+   "auto_compute": true,
+   "over_limit": "warn",
+   "rules": [
+    "สถานะข้อมูล (สมบูรณ์ / มีข้อจำกัด / รอข้อมูลเพิ่มเติม) อ่านจาก HandoverPackageConfig.data_statuses",
+    "สถานะเอกสาร (ครบถ้วน / มีข้อจำกัด / ขาดเอกสาร / ไม่เกี่ยวข้อง) อ่านจาก HandoverPackageConfig.doc_statuses",
+    "ไม่นำ data validation ค้าง 1–5 ที่ C13:C18 มาใช้",
+    "สถานะข้อมูล = สมบูรณ์ ขณะมีรายการเอกสารสถานะ ขาดเอกสาร/มีข้อจำกัด = เตือน ไม่บล็อก",
+    "สถานะข้อมูล = มีข้อจำกัด หรือมีรายการสถานะ มีข้อจำกัด → ต้องกรอก ข้อจำกัดของข้อมูล",
+    "วันที่เอกสาร หลัง วันที่ส่งมอบ = เตือน ไม่บล็อก",
+    "ส่งพิจารณาได้เมื่อมีรายการเอกสารอย่างน้อย 1 รายการที่กรอกชื่อเอกสารและสถานะ"
+   ]
+  },
+  "repeat": {
+   "max_rows": null
+  },
+  "fidelity": {
+   "one_to_one": true,
+   "add_fields": [],
+   "merge_split": []
+  },
+  "signature": {
+   "layout": "row-bottom",
+   "per_doa_step": true,
+   "handwriting_image": false
+  },
+  "reject_cancel": {
+   "on_reject": "back_to_draft",
+   "cancel_by": [
+    "owner",
+    "admin_role"
+   ],
+   "cancel_states": [
+    "draft",
+    "pending"
+   ],
+   "reason_required": true
+  },
+  "visibility": {
+   "owner": true,
+   "approver": "after_submit",
+   "admin_role": "all"
+  },
+  "numbering": {
+   "issue_on": "first_save",
+   "code": "HOB"
+  },
+  "extras": {
+   "attachments": true,
+   "copy": false,
+   "export_csv": true,
+   "announce": false
+  },
+  "extend": {},
+  "fit": {}
+ },
+ "unattended": true
+}

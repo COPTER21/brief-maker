@@ -1,0 +1,49 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# J008 · FM-BDM-08 แบบฟอร์มชุดเอกสารส่งมอบงาน (สำหรับฝ่ายบริหารการลงทุนจัดเก็บ) · REQ-TMP-008 · F-TMP-008
+
+# G1 ผลต่อระบบ — ไม่เปลี่ยนค่า ไม่ส่งต่อ (ผลการรับมอบเก็บในเอกสารนี้ · ชื่อโครงการ/เอกสารที่ส่งมอบ ผู้ใช้กรอกเอง · ไม่ผูก FM-BDM-07 อัตโนมัติ)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — dynamic · ค่าเริ่ม 2 ขั้นตามช่องลงชื่อบนกระดาษ (ผู้ตรวจสอบ → ผู้อนุมัติ/รับทราบ) · ไม่มีวงเงิน
+#   ผู้ตรวจสอบ = ผู้จัดการฝ่ายบริหารการลงทุน (ผู้บังคับบัญชาของผู้จัดทำ) → role-line-manager
+#   ผู้อนุมัติ / รับทราบ = ฝ่ายพัฒนาธุรกิจรับทราบผลการรับมอบ (ข้ามฝ่าย) → role-mgr-bu (ไม่มี role ผู้จัดการฝ่ายพัฒนาธุรกิจใน contract — แจ้งในรายงาน)
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager", "role-mgr-bu"], amount: none }
+
+# G3 ค่าคงที่ / กฎ
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "ผลการรับมอบ (รับมอบครบถ้วน / รับมอบแบบมีเงื่อนไข / ยังไม่รับมอบ) อ่านจาก HandoverConfig.handover_results"
+    - "ได้รับแล้ว (ได้รับ / ไม่ได้รับ) และ ความครบถ้วน (ครบถ้วน / ไม่ครบถ้วน / ต้องตรวจสอบเพิ่มเติม) อ่านจาก HandoverConfig"
+    - "ผลการรับมอบ = รับมอบครบถ้วน ได้เมื่อทุกแถว ได้รับ และ ครบถ้วน · ไม่ครบ = ห้ามเลือก รับมอบครบถ้วน (บังคับ — ข้อมูลขัดกันโดยตรง)"
+    - "แถว ไม่ได้รับ → ความครบถ้วน ต้องไม่เป็น ครบถ้วน"
+    - "แถว ไม่ได้รับ / ไม่ครบถ้วน / ต้องตรวจสอบเพิ่มเติม → ต้องมี ประเด็นที่พบ + ผู้รับผิดชอบแก้ไข + กำหนดส่งเพิ่มเติม"
+    - "กำหนดส่งเพิ่มเติม และ กำหนดการติดตาม ต้อง ≥ วันที่รับมอบ"
+    - "ผลการรับมอบ ≠ รับมอบครบถ้วน → ประเด็นค้างจากการรับมอบ บังคับกรอก"
+
+# G4 รายการซ้ำ — ไม่จำกัด · PDF ขั้นต่ำเท่ากระดาษ (12 แถว)
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ — 1:1 ไม่เพิ่มช่อง
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น — แถวล่าง 1 ช่องต่อขั้น DOA · ข้อความ "พิจารณาในระบบ" ไม่ใช้ภาพ
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ → กลับเป็นร่างเลขเดิม · ยกเลิกได้ เจ้าของ + admin role ในสถานะ ร่าง/รออนุมัติ · เหตุผลบังคับ
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น — เจ้าของ · ผู้อนุมัติหลังส่ง · admin role ฝ่ายบริหารการลงทุนเห็นทั้งหมด
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 เลขที่ — ออกตอนบันทึกครั้งแรก (เอกสารภายใน) · รหัส HOI (Handover – Investment) · HOB สงวนให้ FM-BDM-07
+numbering: { issue_on: first_save, code: "HOI" }
+
+# G10 ของเสริม — แนบ ✓ CSV ✓ ทำซ้ำ ✗ ประกาศ ✗
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

@@ -1,0 +1,29 @@
+# ntf-declaration v1.2 — FINAL ยืนยันกับ FRD v1.0 (frd_lint N7 PASS) · AI-DEFAULT
+feature_id: F-TMP-004
+name: แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ
+code: PCL
+events:
+- id: pcl_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-004-FN-07, F-TMP-004-FN-09
+- id: pcl_followup_approved
+  trigger: → approved และสถานะการปิดโครงการ = 'ติดตามเงื่อนไขในอนาคต'
+  recipients:
+  - requester
+  template: '**{doc_no}** อนุมัติแล้ว — โครงการ {project_name} อยู่ในสถานะติดตามเงื่อนไขในอนาคต:
+    {future_followup}'
+  channel: in-app
+  optional: true
+  why: สถานะ ติดตามเงื่อนไขในอนาคต (DEC-04/DEC-15) — ผู้จัดทำต้องรู้ว่าต้องติดตามเงื่อนไขที่จะพิจารณาใหม่ต่อ
+  frd_ref: 03_LOGIC F-TMP-004-FN-09
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

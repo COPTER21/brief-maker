@@ -1,0 +1,67 @@
+# FILE_MAP — แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `01_Prototype/feature.html` | `_ui/UI_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.html` |
+| `02_BRD/BRD_F-TMP-005.docx` | `_brd/BRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.docx` |
+| `02_BRD/BRD_F-TMP-005.md` | `_brd/BRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/00_OVERVIEW.md` | `_frd/FRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน/00_OVERVIEW_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/01_UI.md` | `_frd/FRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน/01_UI_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/02_API.md` | `_frd/FRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน/02_API_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/03_LOGIC.md` | `_frd/FRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน/03_LOGIC_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/04_DB.md` | `_frd/FRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน/04_DB_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/05_RULES.md` | `_frd/FRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน/05_RULES_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/06_TESTS.md` | `_frd/FRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน/06_TESTS_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน/07_LOCKED_DECISIONS_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/INDEX.md` | `_frd/FRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน/INDEX_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/_SECTION_N.md` | `_frd/FRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน/_SECTION_N_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/declarations/DOA_BRIEF_F-TMP-005.md` | `_frd/FRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน/declarations/DOA_BRIEF_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/declarations/DOCCFG_BRIEF_F-TMP-005.md` | `_frd/FRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน/declarations/DOCCFG_BRIEF_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/declarations/IVM.doa.yaml` | `_frd/FRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน/declarations/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.doa.yaml` |
+| `03_FRD/FRD_F-TMP-005_Pack/declarations/IVM.doccfg.yaml` | `_frd/FRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน/declarations/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-005_Pack/declarations/IVM.mdoc.yaml` | `_frd/FRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน/declarations/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-005_Pack/declarations/IVM.ntf.yaml` | `_frd/FRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน/declarations/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.ntf.yaml` |
+| `03_FRD/FRD_F-TMP-005_Pack/declarations/MDOC_BRIEF_IVM.md` | `_frd/FRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน/declarations/MDOC_BRIEF_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `03_FRD/FRD_F-TMP-005_Pack/declarations/NTF_BRIEF_F-TMP-005.md` | `_frd/FRD_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน/declarations/NTF_BRIEF_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-005.md` | `_uibrief/UIBRIEF_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `05_Governance/DOA_BRIEF_F-TMP-005.md` | `_governance/DOA_BRIEF_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-005.md` | `_governance/DOCCFG_BRIEF_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `05_Governance/IVM.doa.yaml` | `_governance/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.doa.yaml` |
+| `05_Governance/IVM.doccfg.yaml` | `_governance/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.doccfg.yaml` |
+| `05_Governance/IVM.mdoc.yaml` | `_governance/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.mdoc.yaml` |
+| `05_Governance/IVM.ntf.yaml` | `_governance/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.ntf.yaml` |
+| `05_Governance/MDOC_BRIEF_IVM.md` | `_governance/MDOC_BRIEF_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-005.md` | `_governance/NTF_BRIEF_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-005.md` | `_tc/QA_AUDIT_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `06_Test/cases.json` | `_tc/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน_cases.json` |
+| `06_Test/testcase-F-TMP-005.html` | `_tc/UAT_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.html` |
+| `06_Test/testcases-F-TMP-005.md` | `_tc/TC_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `07_Print/FM-BDM-05_template.html` | `_document/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน_template.html` |
+| `07_Print/IVM_print-spec.md` | `_document/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน_print-spec.md` |
+| `07_Print/approved-doa6steps.data.json` | `_document/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน_approved-doa6steps.data.json` |
+| `07_Print/approved.data.json` | `_document/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน_approved.data.json` |
+| `07_Print/compare.json` | `_document/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน_compare.json` |
+| `07_Print/compare_overlay.png` | `_document/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน_compare_overlay.png` |
+| `07_Print/compare_side.png` | `_document/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน_compare_side.png` |
+| `07_Print/draft.data.json` | `_document/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน_draft.data.json` |
+| `07_Print/form.tpl.html` | `_document/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน_template.html` |
+| `07_Print/long-12conditions.data.json` | `_document/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน_long-12conditions.data.json` |
+| `07_Print/print_config.json` | `_document/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน_print_config.json` |
+| `07_Print/profile.json` | `_document/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน_profile.json` |
+| `07_Print/rejected.data.json` | `_document/แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน_rejected.data.json` |
+| `08_Reference/5. FM-BDM-05 แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.xlsx` | `_reference/5. FM-BDM-05 แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.xlsx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-005.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-005_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-005_v2.md` | `_reference/PREBRIEF_REQ-TMP-005_v2_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.md` |
+| `08_Reference/reports/anchors.json` | `_reference/reports/anchors_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.json` |
+| `08_Reference/reports/e2e_report.json` | `_reference/reports/e2e_report_แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน.json` |

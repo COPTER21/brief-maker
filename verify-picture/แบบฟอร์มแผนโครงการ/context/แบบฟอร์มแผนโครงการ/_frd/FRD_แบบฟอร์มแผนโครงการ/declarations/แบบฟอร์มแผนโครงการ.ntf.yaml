@@ -1,0 +1,39 @@
+feature_id: F-TMP-004
+name: แบบฟอร์มแผนโครงการ
+code: PJP
+events:
+- id: pjp_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-004-FN-07, F-TMP-004-FN-09
+- id: pjp_budget_adjusted
+  trigger: → approved และ รวมงบที่ได้รับอนุมัติ ≠ รวมงบที่ขอ (DEC-04 · DEC-17)
+  recipients:
+  - document_owner
+  - project_manager
+  template: '**{doc_no}** อนุมัติแล้ว งบที่ได้รับอนุมัติ {total_approved} บาท จากที่ขอ
+    {total_requested} บาท'
+  channel: in-app+email
+  optional: false
+  why: ผู้จัดทำและผู้รับผิดชอบหลักต้องรู้ว่างบถูกปรับ ก่อนเริ่มดำเนินงาน
+  frd_ref: 03_LOGIC F-TMP-004-FN-05, F-TMP-004-FN-09
+- id: pjp_activity_delayed
+  trigger: approved · สถานะกิจกรรมถูกอัปเดตเป็น Delayed (DEC-04 อัปเดตสถานะหลังอนุมัติ)
+  recipients:
+  - project_manager
+  - role-line-manager
+  template: '**{doc_no}** กิจกรรม "{activity}" สถานะ Delayed — อัปเดตโดย {actor}'
+  channel: in-app
+  optional: true
+  why: แผนใช้ควบคุมงานตลอดโครงการ — ผู้รับผิดชอบหลักและผู้บังคับบัญชาต้องรู้เมื่อกิจกรรมล่าช้า
+  frd_ref: 03_LOGIC F-TMP-004-FN-09, F-TMP-004-FN-11
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

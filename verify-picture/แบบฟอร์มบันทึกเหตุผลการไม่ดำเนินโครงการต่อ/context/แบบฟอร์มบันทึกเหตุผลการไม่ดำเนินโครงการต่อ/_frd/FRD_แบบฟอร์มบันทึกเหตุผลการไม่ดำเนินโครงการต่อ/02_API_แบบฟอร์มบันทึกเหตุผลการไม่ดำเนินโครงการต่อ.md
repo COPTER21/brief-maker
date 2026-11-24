@@ -1,0 +1,38 @@
+# 02_API — F-TMP-004
+> base `/api/v1/project-discontinuations` · tenant จาก token (RLS) · ทุก write ต้องมี `If-Match: version` (optimistic) + `Idempotency-Key`
+
+## §2.1 API Overview
+| ID | Method · Path | ใช้ทำ | Logic |
+|---|---|---|---|
+| API-01 | GET `/project-discontinuations?q&status&closure_status&dept&mine_to_act&page&size&sort` | รายการตามสิทธิ์ | FN-10 |
+| API-02 | GET `/project-discontinuations/{id}` | รายละเอียด + reasons + chain + audit | FN-10 |
+| API-03 | POST `/project-discontinuations` | สร้างร่าง + ออกเลข | FN-01, FN-02, FN-03 |
+| API-04 | PUT `/project-discontinuations/{id}` | แก้ร่าง (เจ้าของ · draft) | FN-01, FN-02 |
+| API-05 | GET `/project-discontinuations/{id}/doa-preview` | resolve สายค่าเริ่ม (slot) | FN-04 |
+| API-06 | POST `/project-discontinuations/{id}/submit` `{assignees[]}` | ส่ง · snapshot chain | FN-04 |
+| API-07 | POST `/project-discontinuations/{id}/decide` `{decision: approve\|reject, note}` | ตัดสินขั้นปัจจุบัน | FN-05, FN-06 |
+| API-08 | POST `/project-discontinuations/{id}/cancel` `{reason}` | ยกเลิก | FN-07 |
+| API-09 | GET `/project-discontinuations/{id}/pdf` | PDF FM-BDM-04 (2 หน้า) | FN-08 |
+| API-10 | GET `/project-discontinuations/export.csv` | CSV ตามตัวกรอง | FN-10 |
+| API-11 | POST/DELETE `/project-discontinuations/{id}/attachments` | ไฟล์ (Document Center) | — |
+
+## §2.2 Contract สำคัญ
+- API-03/04 body: `{ project_name, owner_id, decision_date, stopped_stage, reasons:[{reason_code, selected, detail, evidence, impact, revisit_condition}] (8 แถวตาม ProjectClosure.reason_types), summary, decision_documents, lessons_learned, archive_method, future_followup, closure_status, attachment_ids[] }` · 422 ตาม VR-01..06 · server ล้างข้อความแถว "ไม่ใช่" (FN-02)
+- API-06: 409 `NOT_DRAFT` · 422 `ASSIGNEE_REQUIRED` · 422 `SELF_APPROVAL` (BR-DOA-04)
+- API-07: 403 `NOT_CURRENT_APPROVER` · 422 `REASON_REQUIRED` (reject)
+- API-08: 403 `NOT_OWNER` (ไม่ใช่เจ้าของ/admin) · 409 `NOT_CANCELLABLE` (approved/cancelled)
+- API-02 ของใบที่ไม่มีสิทธิ์ → 404 `NOT_FOUND` (ไม่เปิดเผยว่ามี)
+- response มี `selected_count` · `reasons[].reason_name` (snapshot)
+
+## §2.3 Common
+Idempotency-Key ทุก POST · optimistic lock `version` → 409 STALE · audit ทุก write (append-only) · multi-tenant RLS
+
+## §2.4 API → Logic Trace
+ดูตาราง §2.1 คอลัมน์ Logic (ครบทุก API)
+
+## §2.X Cross-Module Contract
+| ปลายทาง | Event/Call | Payload | รอบนี้ |
+|---|---|---|---|
+| ENG-NOTIFY | pcl_cancelled · pcl_followup_approved | {ref: project_discontinuation_id, vars} | ✓ |
+| ENG-DOC-STORE | store(pdf,'PCL',id,'approved_final') | | ✓ |
+| ระบบอื่น / โครงการต้นทาง | — | | ไม่ส่งต่อ (DEC-02) |

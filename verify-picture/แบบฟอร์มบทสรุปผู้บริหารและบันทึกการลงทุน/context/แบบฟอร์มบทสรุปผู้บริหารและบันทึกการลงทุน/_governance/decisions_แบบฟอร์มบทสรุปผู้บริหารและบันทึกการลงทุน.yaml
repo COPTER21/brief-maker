@@ -1,0 +1,48 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# J005 · FM-BDM-05 แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน · REQ-TMP-005 · F-TMP-005
+
+# G1 ผลต่อระบบ — ไม่เปลี่ยนค่า ไม่ส่งต่อ (ไม่สร้าง/ผูกงบลงทุนหรือโครงการอัตโนมัติ · ชื่อโครงการผู้ใช้กรอกเอง)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — dynamic · ค่าเริ่ม 2 ขั้นตามช่องลงชื่อบนกระดาษ (ผู้ตรวจสอบ → ผู้อนุมัติ/รับทราบ)
+#   ผู้ตรวจสอบ = ผู้จัดการฝ่ายพัฒนาธุรกิจ / รองกรรมการผู้จัดการ → role-line-manager (ผู้บังคับบัญชาตรงของผู้จัดทำ)
+#   ผู้อนุมัติ / รับทราบ = กรรมการผู้จัดการ / ผู้มีอำนาจตามตารางอำนาจอนุมัติ → role-gm (ไม่มี role กรรมการผู้จัดการใน master — แจ้งในรายงาน)
+#   วงเงิน: กระดาษไม่มีช่วงวงเงิน → none · ช่อง "วงเงินหรือมูลค่าโดยประมาณ" ส่งให้ DOA กลางเป็น amount ได้ (TODO: DOA engine) ไม่ hardcode ช่วง
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager", "role-gm"], amount: none }
+
+# G3 สูตร / ค่าคงที่
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "สถานะเอกสาร/เงื่อนไขประกอบ อ่านจาก InvestmentMemo.condition_statuses (ยังไม่เริ่ม · กำลังดำเนินการ · แล้วเสร็จ · พักงาน)"
+    - "วงเงินหรือมูลค่าโดยประมาณ ต้องเป็นตัวเลข ≥ 0 (บาท)"
+    - "แถวเอกสาร/เงื่อนไขที่กรอก ต้องมีรายการเอกสาร / เงื่อนไข และสถานะ"
+    - "สถานะที่ยังไม่ 'แล้วเสร็จ' ต้องมีผู้รับผิดชอบและกำหนดเสร็จ"
+    - "เงื่อนไขที่ยังไม่ 'แล้วเสร็จ' ตอนส่งอนุมัติ = เตือน ไม่บล็อก (แสดงจำนวนให้ผู้อนุมัติเห็น)"
+
+# G4 รายการซ้ำ — ไม่จำกัดจำนวนแถว · PDF ขั้นต่ำ 6 แถวเท่ากระดาษ
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ — 1:1 ไม่เพิ่มช่อง
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น — แถวล่าง 1 ช่องต่อขั้น DOA · ข้อความ "พิจารณาในระบบ" ไม่ใช้ภาพ
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ → กลับเป็นร่างเลขเดิม · ยกเลิกได้ เจ้าของ + admin role ในสถานะ ร่าง/รออนุมัติ · เหตุผลบังคับ
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น — เจ้าของ · ผู้อนุมัติหลังส่ง · admin role ฝ่ายพัฒนาธุรกิจเห็นทั้งหมด
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 เลขที่ — ออกตอนบันทึกครั้งแรก (เอกสารภายใน) · รหัส IVM (InVestment Memo) — เลี่ยง ACL/PJI/RSK/SCR/PCL/IRV
+numbering: { issue_on: first_save, code: "IVM" }
+
+# G10 ของเสริม — แนบ ✓ CSV ✓ ทำซ้ำ ✗ ประกาศ ✗
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

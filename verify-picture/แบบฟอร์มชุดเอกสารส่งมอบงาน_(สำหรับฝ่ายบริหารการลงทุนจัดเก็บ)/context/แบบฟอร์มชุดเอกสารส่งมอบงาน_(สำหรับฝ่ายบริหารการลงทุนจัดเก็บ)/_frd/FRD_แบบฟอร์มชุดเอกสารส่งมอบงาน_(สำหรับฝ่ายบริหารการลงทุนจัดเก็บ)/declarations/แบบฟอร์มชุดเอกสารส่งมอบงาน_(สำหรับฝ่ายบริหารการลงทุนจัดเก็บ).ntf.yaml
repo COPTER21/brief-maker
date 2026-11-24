@@ -1,0 +1,31 @@
+# ntf-declaration v1.2 — FINAL ยืนยันกับ FRD v1.0 (frd_lint N7 PASS) · AI-DEFAULT
+feature_id: F-TMP-008
+name: แบบฟอร์มชุดเอกสารส่งมอบงาน (สำหรับฝ่ายบริหารการลงทุนจัดเก็บ)
+code: HOI
+events:
+- id: hoi_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-008-FN-07, F-TMP-008-FN-09
+- id: hoi_acknowledged_open_items
+  trigger: → approved และ ผลการรับมอบ ≠ รับมอบครบถ้วน (มีแถว ไม่ได้รับ / ไม่ครบถ้วน
+    / ต้องตรวจสอบเพิ่มเติม)
+  recipients:
+  - requester
+  template: '**{doc_no}** รับทราบแล้ว — ยังมีเอกสารต้องส่งเพิ่มเติม {count} รายการ
+    กำหนดติดตาม {followup_date}'
+  channel: in-app
+  optional: false
+  why: 'G3/DEC-14/DEC-16: รับมอบแบบมีเงื่อนไข/ยังไม่รับมอบ — ผู้จัดทำ (ฝ่ายบริหารการลงทุน)
+    ต้องติดตามเอกสารค้างตามกำหนด'
+  frd_ref: 03_LOGIC F-TMP-008-FN-09
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

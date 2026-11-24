@@ -1,0 +1,47 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# J004 · FM-BDM-04 แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ · REQ-TMP-004 · F-TMP-004
+
+# G1 ผลต่อระบบ — ไม่เปลี่ยนค่า ไม่ส่งต่อ (ไม่ปิดสถานะโครงการใน FM-BDM-01 อัตโนมัติ · ชื่อโครงการผู้ใช้กรอกเอง)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — dynamic · ค่าเริ่ม 2 ขั้นตามช่องลงชื่อบนกระดาษ (ผู้ตรวจสอบ → ผู้อนุมัติ/รับทราบ) · ไม่มีวงเงิน
+#   ผู้ตรวจสอบ = ผู้จัดการฝ่ายพัฒนาธุรกิจ → role-line-manager (ผู้บังคับบัญชาตรงของผู้จัดทำ)
+#   ผู้อนุมัติ / รับทราบ = รองกรรมการผู้จัดการ / กรรมการผู้จัดการ / ผู้มีอำนาจตามตารางอำนาจอนุมัติ → role-gm (ไม่มี role รองกรรมการผู้จัดการ/กรรมการผู้จัดการใน master — แจ้งในรายงาน)
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager", "role-gm"], amount: none }
+
+# G3 สูตร / ค่าคงที่
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "รายการเหตุผลหลัก 8 ข้อ อ่านจาก ProjectClosure.reason_types (แสดงเป็นแถวตายตัว)"
+    - "สถานะการปิดโครงการ อ่านจาก ProjectClosure.closure_statuses (ปิดโครงการแล้ว · รอจัดเก็บเอกสาร · ติดตามเงื่อนไขในอนาคต)"
+    - "ต้องมีเหตุผลที่เลือก 'ใช่' อย่างน้อย 1 ข้อ ก่อนส่ง"
+    - "แถวที่เลือก 'ใช่' ต้องกรอกรายละเอียดประกอบ · แถว 'ไม่ใช่' ปิดช่องกรอกในแถว"
+    - "สถานะ 'ติดตามเงื่อนไขในอนาคต' ต้องกรอกข้อเสนอให้ติดตามในอนาคต"
+
+# G4 รายการซ้ำ — 8 แถวตายตัวตามรายการเหตุผล (ไม่เพิ่ม/ลบแถว) · PDF 8 แถวเท่ากระดาษ
+repeat: { max_rows: 8 }
+
+# G5 ช่องตามกระดาษ — 1:1 ไม่เพิ่มช่อง
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น — แถวล่าง 1 ช่องต่อขั้น DOA · ข้อความ "พิจารณาในระบบ" ไม่ใช้ภาพ
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ → กลับเป็นร่างเลขเดิม · ยกเลิกได้ เจ้าของ + admin role ในสถานะ ร่าง/รออนุมัติ · เหตุผลบังคับ
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น — เจ้าของ · ผู้อนุมัติหลังส่ง · admin role ฝ่ายพัฒนาธุรกิจเห็นทั้งหมด
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 เลขที่ — ออกตอนบันทึกครั้งแรก (เอกสารภายใน) · รหัส PCL (Project CLosure)
+numbering: { issue_on: first_save, code: "PCL" }
+
+# G10 ของเสริม — แนบ ✓ CSV ✓ ทำซ้ำ ✗ ประกาศ ✗
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

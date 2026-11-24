@@ -1,0 +1,46 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# J004 FM-PDM-01 แบบฟอร์มแผนโครงการ · ตอบตาม 4_knowledge/governance/unattended-policy.md
+
+# G1 ผลต่อระบบ — ไม่เปลี่ยนค่าในระบบ ไม่ส่งต่อ (งบที่อนุมัติในใบนี้ไม่ตั้งเป็นงบใน Budget module รอบนี้ · ไม่สร้างโครงการใน module อื่น)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — dynamic · กระดาษมีช่องลงชื่อ 2 จุดหลังผู้จัดทำ: ผู้ตรวจสอบ (ผู้บังคับบัญชาตรง role-line-manager) → ผู้อนุมัติ (ผู้จัดการทั่วไป role-gm) · ไม่มีช่วงวงเงินบนกระดาษ
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager", "role-gm"], amount: none }
+
+# G3 สูตร (ไม่มีค่าคงที่บนกระดาษ) — คำนวณอัตโนมัติ · เกิน = เตือน · ขัดแย้งทางตรรกะ = บล็อก
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "ระยะเวลาดำเนินการ = วันที่สิ้นสุด − วันที่เริ่มต้น + 1 (วัน) · วันที่สิ้นสุด ≥ วันที่เริ่มต้น (บล็อก)"
+    - "ระยะเวลากิจกรรม = วันที่สิ้นสุด − วันที่เริ่ม + 1 (วัน) · วันที่สิ้นสุดกิจกรรม ≥ วันที่เริ่ม (บล็อก) · กิจกรรมอยู่นอกช่วงโครงการ = เตือน"
+    - "รวมงบประมาณที่ขอ / ที่ได้รับอนุมัติ = ผลรวมรายการ · จำนวนเงิน ≥ 0 (บล็อก)"
+    - "งบที่ได้รับอนุมัติ ผู้อนุมัติขั้นสุดท้ายกรอกตอนพิจารณา ว่าง = เท่างบที่ขอ · เกินงบที่ขอ = เตือน"
+    - "ส่งได้เมื่อมี กิจกรรม ≥ 1 · KPI ≥ 1 · รายการงบ ≥ 1"
+    - "หลังอนุมัติ ผู้จัดทำ/ผู้รับผิดชอบหลัก อัปเดตได้เฉพาะคอลัมน์ สถานะ (Status) ของกิจกรรม (แผนควบคุมตลอดโครงการ) · บันทึกประวัติ · ไม่ต้องอนุมัติใหม่"
+
+# G4 รายการซ้ำ — ไม่จำกัด · PDF ขั้นต่ำเท่ากระดาษ (KPI 3 · กิจกรรม 10 · งบ 6 · ความเสี่ยง 5)
+repeat: { max_rows: null }
+
+# G5 1:1 ไม่เพิ่มช่อง
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ตารางอนุมัติท้ายใบ 1 แถวต่อขั้น DOA (+ ผู้จัดทำ) · ข้อความ "พิจารณาในระบบ" ไม่ใช้ภาพ
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ → กลับร่างเลขเดิม · ยกเลิกได้ เจ้าของ + admin role · สถานะร่าง/รออนุมัติ · ต้องมีเหตุผล
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 เจ้าของ · ผู้อนุมัติหลังส่ง · admin role ของหน่วยงานเจ้าของเอกสาร (ฝ่ายพัฒนาโครงการ) เห็นทั้งหมด
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 ออกเลขตอนบันทึกครั้งแรก = รหัสโครงการ · รหัส PJP (ProJect Plan) — ไม่ใช้ PDM เพราะใช้ร่วมกับ FM-PDM-02
+numbering: { issue_on: first_save, code: PJP }
+
+# G10
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

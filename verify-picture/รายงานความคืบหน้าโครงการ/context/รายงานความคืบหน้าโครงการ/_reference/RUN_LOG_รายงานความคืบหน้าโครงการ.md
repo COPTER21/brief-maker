@@ -1,0 +1,37 @@
+# RUN_LOG — F-TMP-005 FM-PDM-02 แบบฟอร์มรายงานความคืบหน้าโครงการ (REQ-TMP-005)
+> บันทึกอัตโนมัติจาก `doc_master.py mark` + หมายเหตุที่ต้องจำ (มติที่เปลี่ยน · ข้อยกเว้น · เหตุผลของ WARN)
+
+- ขั้น 1: to_image.py (LibreOffice→PDF→pypdfium2) ได้ภาพหน้ากระดาษจริง 4 หน้า (ต้นฉบับ Word ขนาด Letter) · ฟอนต์ไทยใน LO render เป็นกล่อง — ถ้อยคำยึด content.html + document.xml ของ docx · ตำแหน่ง/เส้นยึดภาพ
+- ขั้น 1: ชื่อบนหัวฟอร์ม = "รายงานความคืบหน้าโครงการ" (PROJECT PROGRESS REPORT) → form.title · ชื่อในคิวมีคำ "แบบฟอร์ม" นำหน้า (ไม่เพี้ยน ไม่ต้อง rename)
+- ขั้น 1: ฟอร์มเปล่า ไม่มีข้อมูลส่วนบุคคล · รหัสโครงการ = lookup แผนโครงการที่อนุมัติแล้ว (F-TMP-004 · PJP) → ชื่อโครงการ/ผู้จัดการโครงการดึงจากแผน · module = budget (ตาม J004 · ไม่มี module Project ใน FEATURE_REGISTRY) · impact_summary ใช้ wrapper .tools/impact_tmp.py (รหัสชั่วคราว) · ไม่แก้สกิล
+- ขั้น 1: ข้อมูลขัดกัน 5 — คำอธิบาย ☐ ล่าช้าฯ คัดลอกประโยคของ ☐ มีความเสี่ยงมาซ้ำ (คงถ้อยคำ 1:1 + OQ) · % 0–100 · สถานะล่าช้า→ต้องมีปัญหา+ประเด็นตัดสินใจ · รอบรายงาน · คอลัมน์ผู้รับผิดชอบ/กำหนดเสร็จรวม
+- 2026-10-11 01:13 · ขั้น 1 → done · FORM_SPEC 35 ช่อง · แถวซ้ำ 5 กลุ่ม · ตัวเลือก 1 (3 ☐) · ลายเซ็น 4 · ERROR 0 · PREBRIEF v2
+- ขั้น 2 (unattended) เหตุผลรายหมวด:
+  - G1 ไม่เปลี่ยนค่า/ไม่ส่งต่อ — อ่าน PJP (F-TMP-004) ที่อนุมัติแล้วเพื่อเติมค่าเริ่มเท่านั้น ไม่เขียนกลับ
+  - G2 dynamic 2 ขั้น role-line-manager → role-gm (ตรง J004) · ช่อง ผู้จัดการโครงการ = ผู้ส่งรายงาน (ไม่ใช่ขั้น DOA — เป็นคนเฉพาะโครงการ ไม่มี role ใน DOA master) · ไม่มีวงเงิน
+  - G3 ไม่มีสูตร/ค่าคงที่ · % 0–100/งบ ≥0/รอบวันที่ขัดกัน = บล็อก · ล่าช้าฯ ไม่มีปัญหา = บล็อก · ไม่มีประเด็นตัดสินใจ/รอบทับ/งบจริงเกินแผน = เตือน
+  - G4 ไม่จำกัด · PDF ขั้นต่ำ 9/8/11/10/11 แถว · G5 1:1 (owner/due เก็บแยก แสดงรวม) · G6 บล็อกลงชื่อ ผู้จัดทำ + ผู้จัดการโครงการ + 1 ช่องต่อขั้น DOA
+  - G7 กลับร่างเลขเดิม · ยกเลิก owner+admin ในร่าง/รออนุมัติ เหตุผลบังคับ · G8 + PM ของโครงการเห็นรายงานโครงการตัวเอง · G9 first_save รหัส PPR · G10 แนบ✓ CSV✓ ทำซ้ำ✗ ประกาศ✗
+- 2026-10-11 01:14 · ขั้น 2 → done · 20 มติ · AI-DEFAULT 15 · VALID 5 · พร้อมเริ่มทำ
+- ขั้น 3: DOA_BRIEF PASS (2 ขั้น role-line-manager → role-gm · คำตัดสิน by_role ตรวจสอบแล้ว/ไม่ผ่านการตรวจสอบ · อนุมัติ/ไม่อนุมัติ · INFO role-line-manager relative role) · ช่อง ผู้จัดการโครงการ = ผู้ส่ง (sign_boxes submitter) ไม่ใช่ขั้น DOA · NTF_BRIEF PASS 3 event (ppr_cancelled · ppr_draft_for_pm · ppr_urgent_decision) · DOCCFG_BRIEF PASS --registry (PPR ไม่ชน ACL/RPR/ALN/ACR/PJP) · MDOC_BRIEF WARN (taxonomy_def_id ว่าง=รออนุมัติ · doa pending · module enum ไม่มี Budget/Project → เอกสารทั่วไป — เหมือน J004)
+- ขั้น 4: Replica ตารางกรอบ R9 + check R6 + กล่อง R8 + ลงชื่อ B6 เส้นประ · ต้นฉบับ Word 4 หน้า (Letter) → ออกแบบ 2 หน้า A4 (R10) ตัดหน้าก่อนข้อ 4 · ฟอนต์ 8.6pt · หัวย่อหน้า 2 "(ต่อ)" · "มีต่อหน้าถัดไป" · "หน้า 1/2" · บล็อกลงชื่อ ผู้จัดทำ + ผู้จัดการโครงการ + ขั้น DOA (sign_rows) · data 6 สถานะ · parity IDENTICAL 6/6
+- ขั้น 4: render_states.py + compare_original.py + build_html.py รันแทนบน Chromium (Playwright) ใน container ของ agent แล้วคัดผลกลับ print/ (เครื่องผู้ใช้ NO-BROWSER) · --max-pages 2 → 2 หน้าทุกสถานะ 6/6 (รอบแรกล้น 3–4 หน้า → ป้ายข้อมูลโครงการบรรทัดเดียว · ตัดโลโก้หน้า 2 · ขยายคอลัมน์ผู้รับผิดชอบ · ย่อรูปแบบวันที่ลงชื่อ) · ไม่มี {{}} หลง · key ขาด 0 · ดู _states_sheet + ภาพหน้า 1–2 (approved/doa6/long) แล้ว
+- ขั้น 4: compare_original WARN 0.485 — อธิบายได้: หน้า 1 ต้นฉบับมีหัว + ข้อ 1 (กล่องคำอธิบายเปล่าสูง) ส่วนแบบพิมพ์รวมข้อ 1–3 (2 หน้า) · ภาพวางคู่ ลำดับ/ถ้อยคำ/คอลัมน์ตรง · บันทึก print-spec §7
+- doa validate --print-config PASS (sign_boxes doa_step:*)
+- 2026-10-11 01:21 · ขั้น 3 → done · doa PASS · ntf PASS 3 event · doccfg PASS PPR · mdoc WARN(taxonomy รออนุมัติ)
+- 2026-10-11 01:21 · ขั้น 4 → done · parity 6/6 IDENTICAL · 2 หน้าทุกสถานะ (render ใน container) · compare WARN 0.49 อธิบายได้
+- ขั้น 5: feature.html (Q-form) จาก reference form-archetype + golden skeleton v9.4 (โครงเดียวกับ J004) · ฝัง print/form.tpl.html + tpl_render.js + PDF_CSS (base+replica+profile) · DOA mock 2 ขั้น (role-line-manager → role-gm resolve จาก PM) · bedateHTML ทุกช่องวันที่ · wizard 3 ขั้น การ์ด ①–⑦ ตามข้อของกระดาษ · ☐ สถานะ 3 ตัวเลือก = track-card · แถวซ้ำ 5 กลุ่มเป็นตาราง (เทียบแผน/ผลเป็นคอลัมน์ตามกระดาษ · มี lookup/วันที่ต่อแถว) · lookup รหัสโครงการเฉพาะ PJP อนุมัติแล้ว + เติมค่าเริ่มจากแผน · ส่งอนุมัติได้เฉพาะ PM (ผู้จัดทำอื่น = แจ้งผู้จัดการโครงการ)
+  - audit.sh FAIL 0 · WARN 3 (มาจาก kit กลาง: lucide comment · .uc-email · font-size px ใน shell) · self_audit PASS (แก้ naked_hint 2 · spacing 1 แล้ว) · prune_css ตัด 60 rule แล้วรันซ้ำผ่าน
+  - e2e_standard.py รันแทนบน Chromium (Playwright) ใน container ของ agent (เครื่องผู้ใช้ NO-BROWSER · lucide UMD จาก npm ผ่าน --lucide) → 21/21 ผ่าน (reports/e2e_report.json) ทั้งก่อนและหลัง prune
+  - flow เพิ่ม 20/20 (reports/flow_check_report.json · .build/flow.py): เลือกโครงการ→เติมจาก PJP · รอบวันที่กลับด้าน/%150/ล่าช้าไม่มีปัญหา = บล็อก · รอบทับ/มีความเสี่ยงไม่มีปัญหา = เตือน · PM ส่ง 2 slot → ตรวจสอบแล้ว → อนุมัติ · PDF data ☑ + ลงชื่อ 4 ช่อง · ผู้จัดทำไม่ใช่ PM ส่งไม่ได้/แจ้ง PM · PM E03 เห็นร่างโครงการตัวเอง + ส่ง (ล่าช้า → แจ้ง GM) · ไม่ผ่าน = กลับร่างเลขเดิม · ยกเลิก · ภาพหน้าจอ 7 ภาพ reports/shots/
+  - หมายเหตุ G8: PM เห็นร่างของโครงการตัวเอง (ขยายจากกฎ #109) — seed จัดให้ persona e2e (E01/E02/E08) ไม่ชนกฎนี้ · ตรวจกฎ PM แยกใน flow F13–F16
+  - parity prototype (docPrintData+tplRender) ↔ render_doc.py: IDENTICAL 4/4 ใบ · DOC_TPL = print/form.tpl.html ตรงทุกไบต์
+  - U1 ✓ ไม่มี stat card · U2 ✓ · U3 ✓ · U4 ✓ · U5 ✓ kebab ⋮ · U6 ✓ pager+page size 25 · U7 ✓ CSV ที่ ph · U8 ✓ 920/wide · U9 ✓ เหตุผลบังคับ · U10 ✓ · U11 ✓ kit · U12 ✓ · U13 ✓ §6.1 · U14 ✓ wizard (Q-form) · U15 ✓ แก้ไข=ฟอร์มเดียวกัน ปิด view ก่อน · U16 n/a (ไม่มีลบ ใช้ยกเลิก) · U17 ✓ คน=icon วงกลม · U18 ✓ 1 cell 1 บรรทัด ellipsis · U19 ✓ header sub 1 fact (โครงการ · รอบ) · U20 ✓ ชุดเดียวไม่มี tabs · U21 ✓ kit · U22 ✓ chips ≤3 ค่า 0 ซ่อน · U23 ✓ · U24 ✓ search combobox · U25 ✓ backdrop onmousedown · U26–U28 n/a
+- 2026-10-11 07:39 · ขั้น 5 → done · audit FAIL 0 · self_audit PASS · e2e 21/21 + flow 20/20 (Chromium ใน container)
+- 2026-10-11 07:39 · ขั้น 6 → skip · unattended — ให้คนดูจาก _BATCH_REPORT
+- ขั้น 6: ข้าม (unattended) — ภาพหน้าจอ reports/shots + print/_states_sheet.png ให้คนดูทีหลัง
+- ขั้น 7: BRD_F-TMP-005 (.md+.docx md_to_docx) APPROVED (Prebrief Mode · Lane) · 16 stories · BR 14 · VR 9 · EC 10 · OQ 9 · FRD pack 00–07+INDEX (07 สร้างจาก DECISIONS.lock 20 DEC + LD-01..09) · frd_lint BLOCK 0 WARN 0 PASS 13 · doccfg --final PASS (--registry · PPR ไม่ชน) · ntf --final PASS 3 event · doa validate --print-config --html PASS (INFO relative role) · mdoc WARN (taxonomy รออนุมัติ · doa pending) · declarations/ ฉบับจริง
+- 2026-10-11 07:44 · ขั้น 7 → done · BRD APPROVED · frd_lint BLOCK 0 · declaration --final PASS
+- ขั้น 8: UI_BRIEF_F-TMP-005 · brief_check PASS (FAIL 0 WARN 0 · แก้ anchor 3 จุด) · testcases-F-TMP-005.md 61 เคส/152 step · tc_lint ERROR 0 · cases.json Lite 51 เคส · drop ledger 10 · lite_audit หายเงียบ 0 (stamp) · testcase-F-TMP-005.html (build · ภาพ 16 จุด · regionKey 22 step)
+  - verify_anchors.py + capture.py + build.py รันแทนบน Chromium (Playwright) ใน container ของ agent → anchors DOM 181 · SOURCE 49 · PATTERN 4 · DATA 18 · MISSING 0 (แก้ 1 จุด: หัว modal ตรวจสอบแล้ว…รายงานนี้? เป็นข้อความประกอบ) · capture verify OK 16 / FAIL 0
+- 2026-10-11 07:53 · ขั้น 8 → done · brief_check FAIL 0 · tc_lint ERROR 0 (61 เคส) · anchors MISSING 0 · lite_audit หายเงียบ 0 · capture 16/16 (Chromium ใน container)

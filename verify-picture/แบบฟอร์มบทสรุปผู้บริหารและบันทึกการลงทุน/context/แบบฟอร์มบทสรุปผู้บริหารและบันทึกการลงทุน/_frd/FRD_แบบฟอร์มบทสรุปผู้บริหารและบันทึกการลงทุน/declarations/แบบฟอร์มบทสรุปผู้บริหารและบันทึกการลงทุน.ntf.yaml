@@ -1,0 +1,29 @@
+# ntf-declaration v1.2 — FINAL ยืนยันกับ FRD v1.0 (frd_lint N7 PASS) · AI-DEFAULT
+feature_id: F-TMP-005
+name: แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน
+code: IVM
+events:
+- id: ivm_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-005-FN-07, F-TMP-005-FN-09
+- id: ivm_approved_open_conditions
+  trigger: → approved และมีเอกสาร/เงื่อนไขประกอบที่สถานะยังไม่ 'แล้วเสร็จ'
+  recipients:
+  - requester
+  template: '**{doc_no}** อนุมัติแล้ว — โครงการ {project_name} ยังมีเอกสาร/เงื่อนไขประกอบค้าง
+    {open_count} รายการ'
+  channel: in-app
+  optional: true
+  why: G3 เงื่อนไขค้างตอนส่ง = เตือนไม่บล็อก (DEC-04) — ผู้จัดทำต้องติดตามให้แล้วเสร็จหลังอนุมัติ
+  frd_ref: 03_LOGIC F-TMP-005-FN-09
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

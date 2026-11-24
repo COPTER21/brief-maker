@@ -1,0 +1,31 @@
+# ntf-declaration v1.2 — FINAL ยืนยันกับ FRD v1.0 (frd_lint N7 PASS) · AI-DEFAULT
+feature_id: F-TMP-007
+name: แบบฟอร์มชุดเอกสารส่งมอบงาน (สำหรับฝ่ายพัฒนาธุรกิจจัดเก็บ)
+code: HOB
+events:
+- id: hob_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-007-FN-07, F-TMP-007-FN-09
+- id: hob_received_with_gaps
+  trigger: → approved และมีรายการเอกสารสถานะ = ขาดเอกสาร หรือ มีข้อจำกัด (หรือ สถานะข้อมูล
+    ≠ สมบูรณ์)
+  recipients:
+  - requester
+  template: '**{doc_no}** ฝ่ายบริหารการลงทุนรับมอบแล้ว — ยังมีเอกสารขาด/มีข้อจำกัด
+    {count} รายการ กรุณาติดตามส่งเพิ่ม'
+  channel: in-app
+  optional: false
+  why: 'G3: สถานะข้อมูลสมบูรณ์ขณะยังขาดเอกสาร = เตือนไม่บล็อก (DEC-04 · DEC-13) —
+    ผู้จัดทำต้องติดตามส่งเอกสารที่ขาด'
+  frd_ref: 03_LOGIC F-TMP-007-FN-09
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

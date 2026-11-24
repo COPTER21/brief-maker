@@ -1,0 +1,66 @@
+# FILE_MAP — แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `01_Prototype/feature.html` | `_ui/UI_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.html` |
+| `02_BRD/BRD_F-TMP-004.docx` | `_brd/BRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.docx` |
+| `02_BRD/BRD_F-TMP-004.md` | `_brd/BRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/00_OVERVIEW.md` | `_frd/FRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ/00_OVERVIEW_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/01_UI.md` | `_frd/FRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ/01_UI_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/02_API.md` | `_frd/FRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ/02_API_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/03_LOGIC.md` | `_frd/FRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ/03_LOGIC_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/04_DB.md` | `_frd/FRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ/04_DB_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/05_RULES.md` | `_frd/FRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ/05_RULES_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/06_TESTS.md` | `_frd/FRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ/06_TESTS_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ/07_LOCKED_DECISIONS_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/INDEX.md` | `_frd/FRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ/INDEX_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/_SECTION_N.md` | `_frd/FRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ/_SECTION_N_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/DOA_BRIEF_F-TMP-004.md` | `_frd/FRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ/declarations/DOA_BRIEF_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/DOCCFG_BRIEF_F-TMP-004.md` | `_frd/FRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ/declarations/DOCCFG_BRIEF_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/MDOC_BRIEF_PCL.md` | `_frd/FRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ/declarations/MDOC_BRIEF_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/NTF_BRIEF_F-TMP-004.md` | `_frd/FRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ/declarations/NTF_BRIEF_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/PCL.doa.yaml` | `_frd/FRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ/declarations/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.doa.yaml` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/PCL.doccfg.yaml` | `_frd/FRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ/declarations/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/PCL.mdoc.yaml` | `_frd/FRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ/declarations/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/PCL.ntf.yaml` | `_frd/FRD_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ/declarations/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.ntf.yaml` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-004.md` | `_uibrief/UIBRIEF_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `05_Governance/DOA_BRIEF_F-TMP-004.md` | `_governance/DOA_BRIEF_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-004.md` | `_governance/DOCCFG_BRIEF_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `05_Governance/MDOC_BRIEF_PCL.md` | `_governance/MDOC_BRIEF_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-004.md` | `_governance/NTF_BRIEF_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `05_Governance/PCL.doa.yaml` | `_governance/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.doa.yaml` |
+| `05_Governance/PCL.doccfg.yaml` | `_governance/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.doccfg.yaml` |
+| `05_Governance/PCL.mdoc.yaml` | `_governance/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.mdoc.yaml` |
+| `05_Governance/PCL.ntf.yaml` | `_governance/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.ntf.yaml` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-004.md` | `_tc/QA_AUDIT_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `06_Test/cases.json` | `_tc/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ_cases.json` |
+| `06_Test/testcase-F-TMP-004.html` | `_tc/UAT_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.html` |
+| `06_Test/testcases-F-TMP-004.md` | `_tc/TC_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `07_Print/FM-BDM-04_template.html` | `_document/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ_template.html` |
+| `07_Print/PCL_print-spec.md` | `_document/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ_print-spec.md` |
+| `07_Print/approved-doa6steps.data.json` | `_document/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ_approved-doa6steps.data.json` |
+| `07_Print/approved.data.json` | `_document/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ_approved.data.json` |
+| `07_Print/compare.json` | `_document/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ_compare.json` |
+| `07_Print/compare_overlay.png` | `_document/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ_compare_overlay.png` |
+| `07_Print/compare_side.png` | `_document/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ_compare_side.png` |
+| `07_Print/draft.data.json` | `_document/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ_draft.data.json` |
+| `07_Print/form.tpl.html` | `_document/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ_template.html` |
+| `07_Print/long-8reasons.data.json` | `_document/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ_long-8reasons.data.json` |
+| `07_Print/print_config.json` | `_document/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ_print_config.json` |
+| `07_Print/profile.json` | `_document/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ_profile.json` |
+| `07_Print/rejected.data.json` | `_document/แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ_rejected.data.json` |
+| `08_Reference/4. FM-BDM-04 แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.xlsx` | `_reference/4. FM-BDM-04 แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.xlsx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-004.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-004_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-004_v2.md` | `_reference/PREBRIEF_REQ-TMP-004_v2_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.png` |
+| `08_Reference/reports/anchors.json` | `_reference/reports/anchors_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.json` |
+| `08_Reference/reports/e2e_report.json` | `_reference/reports/e2e_report_แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ.json` |
