@@ -1,0 +1,151 @@
+{
+  "feature": {
+    "code": "F-TMP-005",
+    "name": "รายงานความคืบหน้าโครงการ"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-24",
+  "round": 1,
+  "env": "sandbox-core.2bsimple.com",
+  "refs": "FRD F-TMP-005 v1.0 · หลักฐาน tk02 · UI reference tk01/tk03",
+  "scope": {
+    "checked": [
+      "Create / Edit drawer — UI และ UX ส่วนที่เปิดใช้งานได้",
+      "Create — บันทึกแบบร่าง",
+      "Create — บันทึกและส่งอนุมัติ",
+      "UI/UX ส่วนอื่นที่เข้าถึงได้ในรอบนี้"
+    ],
+    "not_checked": [
+      {
+        "item": "Update ข้อมูลรายการ",
+        "reason": "สร้างรายการไม่สำเร็จจึงไม่มีรายการให้แก้ไข"
+      },
+      {
+        "item": "Delete / ยกเลิกรายการ",
+        "reason": "สร้างรายการไม่สำเร็จ"
+      },
+      {
+        "item": "View drawer — แท็บรายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ, ประวัติ",
+        "reason": "ยังไม่มีรายการที่สร้างสำเร็จให้เปิดตรวจ; ความเห็นว่าอาจหลุด design ยังไม่ถือเป็นผลตรวจ"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "บันทึกรายงานใหม่เป็นแบบร่าง",
+      "expected": "ระบบสร้างรายการสถานะร่าง, ออกเลข PPR และแสดงรายการในหน้ารวม",
+      "actual": "POST /api/v1/progress-reports ตอบ 500 Internal Server Error (code: INTERNAL, message: เกิดข้อผิดพลาดภายในระบบ) และไม่มีรายการถูกสร้าง",
+      "status": "fail",
+      "bug": "BUG-01",
+      "ref": "FRD FN-03 / AC-08 / API-03"
+    },
+    {
+      "item": "บันทึกและส่งอนุมัติรายงานใหม่",
+      "expected": "ระบบสร้างรายการ, resolve สายอนุมัติ และเปลี่ยนเป็นสถานะรออนุมัติ",
+      "actual": "กระบวนการหยุดที่การสร้างรายการเพราะ POST /api/v1/progress-reports ตอบ 500; ไม่เข้าสู่สายอนุมัติ",
+      "status": "fail",
+      "bug": "BUG-01",
+      "ref": "FRD FN-04 / AC-10 / API-03, API-06"
+    },
+    {
+      "item": "Update รายการสถานะร่าง",
+      "expected": "แก้ไขแล้วบันทึกรายการเดิมได้",
+      "status": "na",
+      "ref": "FRD API-04"
+    },
+    {
+      "item": "Delete / ยกเลิกรายการ",
+      "expected": "เป็นไปตามสถานะ, สิทธิ์ และเหตุผลบังคับตาม FRD",
+      "status": "na",
+      "ref": "FRD FN-07 / BR-15 / API-08"
+    },
+    {
+      "item": "View drawer แท็บรายละเอียด / PDF Preview / ลายเซ็น-อนุมัติ / ประวัติ",
+      "expected": "ข้อมูลและสถานะแต่ละแท็บถูกต้องตาม FRD",
+      "status": "na",
+      "ref": "FRD P-03 / FN-05, FN-08, FN-10"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-01",
+      "status": "note",
+      "note": "Create / Edit drawer หลุดจาก design baseline ที่แสดงใน tk01",
+      "evidence": [
+        "tk02/Screenshot 2026-11-24 145840.png",
+        "tk01/example_step3.1.png"
+      ]
+    },
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "Layout บางส่วนของ Create / Edit drawer ยังจัดวางไม่เรียบร้อย",
+      "evidence": "tk02/Screenshot 2026-11-24 145840.png"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "fail",
+      "note": "กระบวนการหลักทำไม่จบ: บันทึกแบบร่างและบันทึกพร้อมส่งอนุมัติล้มเหลวที่ API",
+      "evidence": "tk02/Screenshot 2026-11-24 145840.png"
+    },
+    {
+      "id": "X-03",
+      "status": "note",
+      "note": "แจ้งเพียง 'เกิดข้อผิดพลาดภายในระบบ' โดยไม่บอกวิธีแก้หรือทางไปต่อ",
+      "evidence": "tk02/Screenshot 2026-11-24 150329.png"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "บันทึกร่างและบันทึกพร้อมส่งอนุมัติไม่ได้ — Create API ตอบ 500",
+      "severity": "critical",
+      "steps": [
+        "เปิดหน้า /project/progress/create และกรอกข้อมูลจนถึงขั้นตรวจสอบและส่งอนุมัติ",
+        "กด 'บันทึกแบบร่าง'",
+        "ทดลองซ้ำโดยกด 'บันทึกและส่งอนุมัติ'",
+        "ตรวจ Network request และกลับไปที่หน้ารวมรายการ"
+      ],
+      "expected": "POST /api/v1/progress-reports สำเร็จ; เกิดรายการใหม่สถานะร่างหรือรออนุมัติตามปุ่มที่เลือก และแสดงในหน้ารวม",
+      "actual": "POST https://sandbox-core.2bsimple.com/api/v1/progress-reports ตอบ 500 Internal Server Error; response {code: INTERNAL, message: 'เกิดข้อผิดพลาดภายในระบบ'}; หน้าจอขึ้น toast ข้อความเดียวกันและไม่สร้างรายการ",
+      "evidence": [
+        "tk02/Screenshot 2026-11-24 145840.png",
+        "tk02/Screenshot 2026-11-24 150309.png",
+        "tk02/Screenshot 2026-11-24 150329.png",
+        "tk02/Screenshot 2026-11-24 150343.png"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "Create / Edit drawer หลุด design และ layout บางส่วนไม่เรียบร้อย",
+      "severity": "low",
+      "steps": [
+        "เปิด Create หรือ Edit drawer ของรายงานความคืบหน้าโครงการ",
+        "ตรวจการจัดวางส่วนหัว, stepper, card, table และแถบปุ่มท้าย drawer",
+        "เทียบกับภาพ reference ใน folder tk01"
+      ],
+      "expected": "Create / Edit drawer ใช้ design, spacing, alignment และ layout สอดคล้องกับ reference tk01",
+      "actual": "ผู้ตรวจพบว่า drawer หลุดจาก design และ layout บางส่วนยังไม่เรียบร้อย",
+      "evidence": [
+        "tk02/Screenshot 2026-11-24 145840.png",
+        "tk01/example_step3.1.png"
+      ],
+      "status": "open"
+    }
+  ],
+  "suggestions": [
+    {
+      "item": "หลังแก้ BUG-01 ให้ตรวจซ้ำ Update, ยกเลิก และ flow อนุมัติตลอดสาย",
+      "reason": "Create ล้มเหลวทำให้กระบวนการถัดไปยังไม่ได้รับการรับรอง"
+    },
+    {
+      "item": "ตรวจและปรับ View drawer ทั้ง 4 แท็บโดยเทียบกับ reference ใน tk03",
+      "reason": "แท็บรายละเอียด, PDF Preview, ลายเซ็น/อนุมัติ และประวัติยังไม่สามารถเปิดตรวจบนระบบจริงได้"
+    }
+  ]
+}

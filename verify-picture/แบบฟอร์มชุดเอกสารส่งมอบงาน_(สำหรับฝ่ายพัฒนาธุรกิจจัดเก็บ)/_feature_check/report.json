@@ -1,0 +1,178 @@
+{
+  "feature": {
+    "code": "F-TMP-007",
+    "name": "แบบฟอร์มชุดเอกสารส่งมอบงาน (สำหรับฝ่ายพัฒนาธุรกิจจัดเก็บ)",
+    "module": "Business Development"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-24",
+  "round": 1,
+  "refs": "FRD F-TMP-007 v1.0 · 05_RULES · 06_TESTS AC-01..13 และ Permission/Deny 7 กรณี",
+  "scope": {
+    "checked": [
+      "สร้างข้อมูล (create)",
+      "แก้ไขข้อมูล (update)",
+      "ลบข้อมูล (delete) ตาม action ที่ผู้ตรวจเรียกระบุ",
+      "UI/UX ของ create และ edit drawer",
+      "UI/UX ของ view drawer: แท็บรายละเอียด, PDF Preview, ลายเซ็น และประวัติ",
+      "UI/UX ส่วนที่เหลือ"
+    ],
+    "not_checked": [
+      {
+        "item": "ส่งอนุมัติและตัดสินตามสาย DOA ทุกขั้น",
+        "reason": "ผู้ตรวจไม่ได้รายงานผลในรอบนี้"
+      },
+      {
+        "item": "ตีกลับเป็นร่าง เลขเดิม แก้ไข และส่งใหม่",
+        "reason": "ผู้ตรวจไม่ได้รายงานผลในรอบนี้"
+      },
+      {
+        "item": "สิทธิ์การมองเห็นและการปฏิเสธ action สำหรับผู้ใช้ต่างบทบาท",
+        "reason": "ผู้ตรวจไม่ได้รายงานผลในรอบนี้"
+      },
+      {
+        "item": "Business validation, warning เอกสารขาด/มีข้อจำกัด และวันที่เอกสาร",
+        "reason": "ผู้ตรวจไม่ได้รายงานผลในรอบนี้"
+      },
+      {
+        "item": "PDF 2 หน้า, ลายเซ็นตาม DOA, approved final, notification และ audit",
+        "reason": "ผู้ตรวจไม่ได้รายงานผลในรอบนี้"
+      },
+      {
+        "item": "Idempotency, optimistic lock, retry, double-click และ concurrent update",
+        "reason": "ผู้ตรวจไม่ได้รายงานผลในรอบนี้"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างข้อมูล (create)",
+      "expected": "สร้างข้อมูลได้สำเร็จตาม flow ของระบบ",
+      "status": "pass",
+      "ref": "FRD AC-01 · API-03"
+    },
+    {
+      "item": "แก้ไขข้อมูล (update)",
+      "expected": "แก้ไขข้อมูลได้สำเร็จตาม flow ของระบบ",
+      "status": "pass",
+      "ref": "FRD API-04"
+    },
+    {
+      "item": "ลบข้อมูล (delete) ตาม action ที่ผู้ตรวจระบุ",
+      "expected": "ทำ action ได้สำเร็จตามพฤติกรรมของระบบ",
+      "status": "pass"
+    },
+    {
+      "item": "Validation ช่องบังคับและรายการเอกสาร",
+      "expected": "บล็อกข้อมูลไม่ครบตาม VR-01..VR-05",
+      "status": "na",
+      "ref": "FRD AC-02, AC-03, AC-06"
+    },
+    {
+      "item": "สถานะข้อมูลสมบูรณ์แต่มีเอกสารขาด/มีข้อจำกัด",
+      "expected": "เตือนแต่ไม่บล็อก และนับ gap ถูกต้อง",
+      "status": "na",
+      "ref": "FRD AC-04"
+    },
+    {
+      "item": "วันที่เอกสารหลังวันที่ส่งมอบ",
+      "expected": "เตือนระบุรายการแต่ไม่บล็อก",
+      "status": "na",
+      "ref": "FRD AC-05"
+    },
+    {
+      "item": "ส่งอนุมัติและ resolve สาย DOA",
+      "expected": "slot ครบทุกขั้น ผู้จัดทำเลือกตัวเองไม่ได้ และผู้รับมอบเป็นค่าเริ่มขั้นรับทราบ",
+      "status": "na",
+      "ref": "FRD AC-07"
+    },
+    {
+      "item": "อนุมัติเรียงขั้นจนรับมอบ",
+      "expected": "อนุมัติตามลำดับ เก็บ approved final และแจ้งเมื่อยังมี gap",
+      "status": "na",
+      "ref": "FRD AC-08"
+    },
+    {
+      "item": "ไม่ผ่านการตรวจสอบหรือไม่รับมอบ",
+      "expected": "กลับเป็นร่าง ใช้เลขเดิม และบันทึกเหตุผลใน audit",
+      "status": "na",
+      "ref": "FRD AC-09"
+    },
+    {
+      "item": "PDF และลายเซ็นตามจำนวนขั้น DOA",
+      "expected": "PDF 2 หน้าและมีแถวลงชื่อผู้จัดทำบวกหนึ่งแถวต่อ DOA step",
+      "status": "na",
+      "ref": "FRD AC-10, AC-13"
+    },
+    {
+      "item": "ยกเลิกตามสถานะและสิทธิ์",
+      "expected": "เจ้าของหรือ admin ยกเลิกได้เฉพาะร่าง/รออนุมัติและต้องมีเหตุผล",
+      "status": "na",
+      "ref": "FRD AC-11"
+    },
+    {
+      "item": "Admin, ตัวกรอง และ CSV",
+      "expected": "Admin เห็นทุกใบและ CSV ตรงตามตัวกรอง",
+      "status": "na",
+      "ref": "FRD AC-12"
+    },
+    {
+      "item": "Deny cases สำหรับผู้ไม่มีสิทธิ์หรือคนผิดขั้น",
+      "expected": "ไม่เห็นร่างคนอื่นและไม่สามารถแก้ไข ตัดสิน หรือยกเลิกข้ามสิทธิ์",
+      "status": "na",
+      "ref": "FRD TC-D01..TC-D07"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-01",
+      "status": "note",
+      "note": "Create/Edit drawer และ View drawer ในแท็บรายละเอียด, PDF Preview, ลายเซ็น และประวัติ มีรูปแบบบางส่วนหลุดจาก design ที่ควรเป็น"
+    },
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "Create/Edit drawer และ View drawer มีการจัด layout บางส่วนไม่เรียบร้อย"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "item": "ความสม่ำเสมอของ UX ภายใน Drawer",
+      "status": "note",
+      "note": "Create/Edit drawer และ View drawer ทั้ง 4 แท็บมี UX/UI บางส่วนหลุดจาก design; ส่วนอื่นที่ผู้ตรวจลองใช้งานแล้วโอเค"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "Create/Edit drawer หลุด design และ layout บางส่วนไม่เรียบร้อย",
+      "severity": "low",
+      "steps": [
+        "เปิดฟีเจอร์แบบฟอร์มชุดเอกสารส่งมอบงาน",
+        "กดสร้างข้อมูลเพื่อเปิด Create drawer",
+        "เปิดข้อมูลเดิมเพื่อเข้าสู่ Edit drawer",
+        "ตรวจรูปแบบและการจัดวางภายใน drawer"
+      ],
+      "expected": "Create/Edit drawer แสดงรูปแบบและการจัดวางสม่ำเสมอตาม design ของระบบ",
+      "actual": "รูปแบบหลุด design และ layout บางส่วนไม่เรียบร้อย",
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "View drawer หลายแท็บหลุด design",
+      "severity": "low",
+      "steps": [
+        "เปิดรายการข้อมูลที่มีอยู่เพื่อเข้าสู่ View drawer",
+        "เปิดแท็บรายละเอียด",
+        "เปิดแท็บ PDF Preview",
+        "เปิดแท็บลายเซ็น",
+        "เปิดแท็บประวัติและตรวจรูปแบบแต่ละแท็บ"
+      ],
+      "expected": "ทุกแท็บใน View drawer แสดง UI/UX สม่ำเสมอตาม design ของระบบ",
+      "actual": "แท็บรายละเอียด, PDF Preview, ลายเซ็น และประวัติมี UI/UX บางส่วนหลุด design",
+      "status": "open"
+    }
+  ]
+}

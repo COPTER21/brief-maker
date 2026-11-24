@@ -1,0 +1,162 @@
+{
+  "feature": {
+    "code": "F-TMP-008",
+    "name": "แบบฟอร์มชุดเอกสารส่งมอบงาน (สำหรับฝ่ายบริหารการลงทุนจัดเก็บ)",
+    "module": "Business Development"
+  },
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-24",
+  "round": 1,
+  "refs": "FRD-F-TMP-008 v1.0 · 03_LOGIC · 05_RULES · 06_TESTS",
+  "scope": {
+    "checked": [
+      "สร้างรายการ (Create)",
+      "แก้ไขรายการ (Update)",
+      "ลบ/ยกเลิกรายการ (Delete/Cancel)",
+      "ส่งอนุมัติโดยกำหนดวันรับมอบเป็นวันปัจจุบัน",
+      "UI/UX ของ Create และ Edit drawer",
+      "UI/UX ของ View drawer: รายละเอียด · PDF Preview · ลายเซ็น · ประวัติ"
+    ],
+    "not_checked": [
+      {
+        "item": "Approval flow หลังส่งสำเร็จจนถึงรับทราบแล้ว",
+        "reason": "ส่งอนุมัติไม่สำเร็จเนื่องจาก API validation วันรับมอบ"
+      },
+      {
+        "item": "Reject แล้วกลับเป็นร่างและส่งใหม่",
+        "reason": "ไม่ได้ระบุผลตรวจ"
+      },
+      {
+        "item": "Permission / segregation of duties ของ owner, approver, admin และคนนอกสาย",
+        "reason": "ไม่ได้ระบุผลตรวจ"
+      },
+      {
+        "item": "ความถูกต้องของ PDF 2 หน้าและจำนวนแถวลงชื่อตาม DOA",
+        "reason": "ตรวจเฉพาะ UI/UX ของแท็บ PDF Preview ยังไม่ได้ระบุผลตรวจเนื้อหา PDF"
+      },
+      {
+        "item": "Notification, Document Store, CSV, attachment, audit และ concurrent action",
+        "reason": "ไม่ได้ระบุผลตรวจ"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างรายการ",
+      "expected": "สร้างรายการได้และข้อมูลถูกบันทึก",
+      "status": "pass",
+      "ref": "FRD 06 AC-01"
+    },
+    {
+      "item": "แก้ไขรายการ",
+      "expected": "แก้ไขและบันทึกข้อมูลรายการได้",
+      "status": "pass",
+      "ref": "FRD 03 FN-01 / API-04"
+    },
+    {
+      "item": "ลบ/ยกเลิกรายการ",
+      "expected": "ลบหรือยกเลิกรายการตาม action ที่ระบบเปิดให้ได้",
+      "status": "pass",
+      "ref": "FRD 03 FN-07 / AC-13"
+    },
+    {
+      "item": "ส่งอนุมัติเมื่อวันรับมอบเป็นวันปัจจุบัน",
+      "expected": "วันรับมอบเท่ากับวันปัจจุบันผ่าน validation และระบบดำเนินการส่งอนุมัติต่อ",
+      "actual": "API ตอบ VALIDATION_ERROR: วันรับมอบต้องไม่เกินวันนี้ ที่ field received_at ทำให้ส่งอนุมัติไม่ได้",
+      "status": "fail",
+      "bug": "BUG-01",
+      "ref": "FRD 03 FN-01 · FRD 05 BR-05 / VR-02"
+    },
+    {
+      "item": "Business validation ของข้อมูลรับมอบและแถวเอกสาร",
+      "expected": "กฎ VR-01 ถึง VR-10 ทำงานครบทั้ง client และ server",
+      "status": "na",
+      "ref": "FRD 05 §5.4"
+    },
+    {
+      "item": "Approval sequence และสิทธิ์ผู้พิจารณาปัจจุบัน",
+      "expected": "ตัดสินตามลำดับ DOA และเฉพาะ current approver",
+      "status": "na",
+      "ref": "FRD 05 §5.2–5.3 · FRD 06 TC-D01–D07"
+    },
+    {
+      "item": "Reject กลับเป็นร่างและใช้เลขเดิม",
+      "expected": "เหตุผลบังคับ กลับ draft ใช้เลขเดิม และ audit ไม่หาย",
+      "status": "na",
+      "ref": "FRD 06 AC-11"
+    },
+    {
+      "item": "PDF และ integration หลังอนุมัติครบ",
+      "expected": "PDF 2 หน้า เก็บ approved_final และแจ้งเตือนถูกผู้รับ",
+      "status": "na",
+      "ref": "FRD 06 AC-10 / AC-12 / AC-14"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "Create/Edit drawer หลุดจาก design และ layout บางส่วนไม่เรียบร้อย; ผู้ตรวจยังไม่ได้ระบุ component หรือตำแหน่งที่ผิดเป็นรายจุด"
+    },
+    {
+      "item": "View drawer และแท็บรายละเอียด · PDF Preview · ลายเซ็น · ประวัติ",
+      "status": "note",
+      "note": "UI หลุดจาก design ในหลายแท็บ; ผู้ตรวจยังไม่ได้ระบุ component หรือตำแหน่งที่ผิดเป็นรายจุด"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "id": "X-01",
+      "status": "note",
+      "note": "Create/Edit drawer และ View drawer ทั้ง 4 แท็บมีส่วนที่หลุด design/layout ทำให้ประสบการณ์ใช้งานไม่เรียบร้อย"
+    },
+    {
+      "id": "X-03",
+      "status": "note",
+      "note": "ส่งอนุมัติไม่สำเร็จเมื่อใช้วันรับมอบเป็นวันปัจจุบัน โดย API แจ้งว่า วันรับมอบต้องไม่เกินวันนี้"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "ส่งอนุมัติไม่ได้เมื่อวันรับมอบเป็นวันปัจจุบัน",
+      "severity": "high",
+      "steps": [
+        "เปิด Create หรือ Edit drawer ของแบบฟอร์มชุดเอกสารส่งมอบงาน",
+        "กรอกข้อมูลที่จำเป็นและกำหนดวันรับมอบเป็นวันปัจจุบัน",
+        "กดส่งอนุมัติ"
+      ],
+      "expected": "วันรับมอบเท่ากับวันปัจจุบันต้องผ่านเงื่อนไข received_at ≤ วันนี้ และระบบส่งอนุมัติต่อได้",
+      "actual": "API ตอบ { code: VALIDATION_ERROR, message: วันรับมอบต้องไม่เกินวันนี้, field: received_at } และส่งอนุมัติไม่สำเร็จ",
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "Create/Edit drawer หลุด design และ layout บางส่วนไม่เรียบร้อย",
+      "severity": "low",
+      "steps": [
+        "เปิดหน้ารายการแบบฟอร์มชุดเอกสารส่งมอบงาน",
+        "กดสร้างรายการและตรวจ Create drawer",
+        "เปิดรายการร่างแล้วกดแก้ไขเพื่อตรวจ Edit drawer"
+      ],
+      "expected": "Create/Edit drawer ใช้ design system เดียวกัน ระยะห่าง การจัดแนว และ layout เรียบร้อยสม่ำเสมอ",
+      "actual": "มีส่วนที่หลุด design และ layout บางส่วนไม่เรียบร้อย; ยังไม่มีรายละเอียดตำแหน่งหรือ screenshot ประกอบ",
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "View drawer ทั้ง 4 แท็บมี UI/UX หลุด design",
+      "severity": "low",
+      "steps": [
+        "เปิดรายการเพื่อแสดง View drawer",
+        "ตรวจแท็บรายละเอียด",
+        "สลับตรวจแท็บ PDF Preview, ลายเซ็น และประวัติ"
+      ],
+      "expected": "ทุกแท็บใน View drawer ใช้ design system และ layout ที่เรียบร้อยสม่ำเสมอ",
+      "actual": "UI/UX ของแท็บรายละเอียด, PDF Preview, ลายเซ็น และประวัติมีส่วนหลุด design; ยังไม่มีรายละเอียดตำแหน่งหรือ screenshot ประกอบ",
+      "status": "open"
+    }
+  ]
+}

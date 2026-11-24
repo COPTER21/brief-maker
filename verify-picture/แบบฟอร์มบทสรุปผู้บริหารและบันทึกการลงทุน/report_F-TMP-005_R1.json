@@ -1,0 +1,169 @@
+{
+  "feature": {
+    "code": "F-TMP-005",
+    "name": "แบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน",
+    "module": "Business Development"
+  },
+  "env": "Production",
+  "tester": "กานต์ สายบัวทอง",
+  "date": "2026-11-24",
+  "round": 1,
+  "refs": "FRD F-TMP-005",
+  "scope": {
+    "checked": [
+      "สร้างเอกสารผ่าน Create drawer",
+      "แก้ไขเอกสารผ่าน Edit drawer",
+      "ลบ/ยกเลิกเอกสารตามการทำงานที่ระบบเปิดให้",
+      "UI/UX ของ Create, Edit และ View drawer",
+      "View drawer: รายละเอียด, PDF Preview, ลายเซ็น และประวัติ",
+      "ตารางรายการเอกสาร"
+    ],
+    "not_checked": [
+      {
+        "item": "Validation และ boundary ของข้อมูลตาม FRD",
+        "reason": "ผู้ตรวจยังไม่ได้ระบุผล"
+      },
+      {
+        "item": "ส่งอนุมัติ อนุมัติ ไม่อนุมัติ และสาย DOA",
+        "reason": "ผู้ตรวจยังไม่ได้ระบุผล"
+      },
+      {
+        "item": "Permission และการมองเห็นข้อมูลของแต่ละบทบาท",
+        "reason": "ผู้ตรวจยังไม่ได้ระบุผล"
+      },
+      {
+        "item": "ความถูกต้องของข้อมูลและจำนวนหน้าใน PDF",
+        "reason": "ตรวจเฉพาะ UI/UX ของแท็บ PDF Preview"
+      },
+      {
+        "item": "Notification, audit trail, concurrency และ idempotency",
+        "reason": "ผู้ตรวจยังไม่ได้ระบุผล"
+      },
+      {
+        "item": "Filter, CSV, attachment และ cross-tenant isolation",
+        "reason": "ผู้ตรวจยังไม่ได้ระบุผล"
+      }
+    ]
+  },
+  "logic": [
+    {
+      "item": "สร้างเอกสาร",
+      "expected": "สร้างเอกสารได้สำเร็จตาม flow ที่ระบบกำหนด",
+      "status": "pass",
+      "ref": "FRD FN-01/FN-03"
+    },
+    {
+      "item": "แก้ไขเอกสาร",
+      "expected": "แก้ไขเอกสารได้สำเร็จตาม flow ที่ระบบกำหนด",
+      "status": "pass",
+      "ref": "FRD API-04"
+    },
+    {
+      "item": "ลบ/ยกเลิกเอกสาร",
+      "expected": "ลบหรือยกเลิกเอกสารได้สำเร็จตาม action ที่ระบบเปิดให้",
+      "status": "pass",
+      "ref": "FRD FN-07"
+    },
+    {
+      "item": "ตารางรายการแสดงวันที่เอกสาร",
+      "expected": "คอลัมน์วันที่แสดงวันที่ของทุกรายการ รวมถึงรายการสถานะรออนุมัติ",
+      "actual": "คอลัมน์วันที่ไม่แสดงวันที่ แม้แต่รายการที่รอนุมัติ",
+      "status": "fail",
+      "bug": "BUG-01",
+      "ref": "FRD 01_UI §1.2 P-01"
+    },
+    {
+      "item": "Validation และกฎข้อมูลตาม FRD",
+      "expected": "ทำงานตาม VR-01 ถึง VR-07",
+      "status": "na",
+      "ref": "FRD 05_RULES §5.4"
+    },
+    {
+      "item": "ส่งและตัดสินอนุมัติตามลำดับ DOA",
+      "expected": "ส่ง อนุมัติ และไม่อนุมัติตามสายและขั้นปัจจุบัน",
+      "status": "na",
+      "ref": "FRD FN-04/FN-05/FN-06"
+    },
+    {
+      "item": "สิทธิ์และการมองเห็นเอกสาร",
+      "expected": "มองเห็นและทำ action ได้ตาม Permission Matrix",
+      "status": "na",
+      "ref": "FRD 05_RULES §5.3"
+    },
+    {
+      "item": "PDF และ approved final snapshot",
+      "expected": "ข้อมูลและแบบพิมพ์ถูกต้องตาม FN-08",
+      "status": "na",
+      "ref": "FRD FN-08"
+    },
+    {
+      "item": "Notification และ audit trail",
+      "expected": "ส่ง event และบันทึกประวัติครบตาม FRD",
+      "status": "na",
+      "ref": "FRD FN-09/04_DB"
+    }
+  ],
+  "ui_checked": true,
+  "ui": [
+    {
+      "id": "U-02",
+      "status": "note",
+      "note": "Create/Edit drawer และ View drawer ในแท็บรายละเอียด, PDF Preview, ลายเซ็น และประวัติ มีส่วนที่หลุด design และ layout บางส่วนไม่เรียบร้อย"
+    },
+    {
+      "item": "ข้อมูลในคอลัมน์วันที่ของตาราง",
+      "status": "fail",
+      "note": "ไม่แสดงวันที่ในตาราง รวมถึงรายการสถานะรออนุมัติ"
+    }
+  ],
+  "ux_checked": true,
+  "ux": [
+    {
+      "item": "ความสม่ำเสมอในการใช้งาน Create/Edit/View drawer",
+      "status": "note",
+      "note": "พบ UX/UI บางส่วนหลุดจาก design; จุดอื่นที่ทดลองใช้งานแล้วไม่พบปัญหา"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-01",
+      "title": "ตารางรายการไม่แสดงวันที่เอกสาร",
+      "severity": "medium",
+      "steps": [
+        "เปิดหน้ารายการแบบฟอร์มบทสรุปผู้บริหารและบันทึกการลงทุน",
+        "ตรวจคอลัมน์วันที่ของรายการทั่วไป",
+        "ตรวจคอลัมน์วันที่ของรายการสถานะรออนุมัติ"
+      ],
+      "expected": "คอลัมน์วันที่แสดงวันที่ของแต่ละรายการ",
+      "actual": "คอลัมน์วันที่ว่าง ไม่แสดงวันที่ รวมถึงรายการสถานะรออนุมัติ",
+      "status": "open"
+    },
+    {
+      "id": "BUG-02",
+      "title": "Create/Edit drawer หลุด design และ layout บางส่วนไม่เรียบร้อย",
+      "severity": "low",
+      "steps": [
+        "เปิด Create drawer",
+        "ตรวจ layout และองค์ประกอบระหว่างกรอกข้อมูล",
+        "เปิด Edit drawer และตรวจจุดเดียวกัน"
+      ],
+      "expected": "Create/Edit drawer แสดงตาม design และจัดวางองค์ประกอบเรียบร้อยสม่ำเสมอ",
+      "actual": "พบองค์ประกอบบางส่วนหลุด design และ layout ไม่เรียบร้อย",
+      "status": "open"
+    },
+    {
+      "id": "BUG-03",
+      "title": "View drawer หลายแท็บหลุด design",
+      "severity": "low",
+      "steps": [
+        "เปิด View drawer ของเอกสาร",
+        "เปิดแท็บรายละเอียด",
+        "เปิดแท็บ PDF Preview, ลายเซ็น และประวัติ",
+        "ตรวจ layout และองค์ประกอบในแต่ละแท็บ"
+      ],
+      "expected": "ทุกแท็บใน View drawer แสดงตาม design และมี layout เรียบร้อยสม่ำเสมอ",
+      "actual": "แท็บรายละเอียด, PDF Preview, ลายเซ็น และประวัติ มี UX/UI บางส่วนหลุด design",
+      "status": "open"
+    }
+  ]
+}
