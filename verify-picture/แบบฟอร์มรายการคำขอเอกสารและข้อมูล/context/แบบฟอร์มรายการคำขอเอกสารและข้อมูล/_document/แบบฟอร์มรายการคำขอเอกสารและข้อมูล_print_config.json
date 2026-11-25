@@ -1,0 +1,65 @@
+{
+  "doc_type": "IVME",
+  "mode": "replica",
+  "template_ref": "form.tpl.html",
+  "template_version": "v1",
+  "profile_ref": "profile.json",
+  "form_code": "FM-IVM-05",
+  "revision": "Rev.00 : 01/07/2569",
+  "paper": "A4-portrait",
+  "pages": 2,
+  "min_rows": 20,
+  "dense_when_rows_over": 20,
+  "header_source": "organization_snapshot_at_numbering",
+  "sign_boxes": [
+    {
+      "box": "requester",
+      "label": "ผู้จัดทำ",
+      "show_date": true
+    },
+    {
+      "box": "doa_step:*",
+      "label": "from_doa_step",
+      "show_decision": true,
+      "show_date": true
+    }
+  ],
+  "decision_words": {
+    "default": {
+      "approve": "อนุมัติ",
+      "reject": "ไม่อนุมัติ"
+    },
+    "by_role": {
+      "role-line-manager": {
+        "approve": "ตรวจสอบแล้ว",
+        "reject": "ส่งกลับ"
+      },
+      "role-gm": {
+        "approve": "อนุมัติ",
+        "reject": "ไม่อนุมัติ"
+      }
+    }
+  },
+  "config_reads": {
+    "company.name_line": "Organization.legal_name_line (snapshot ตอนออกเลข)",
+    "form_revisions": "DOCCFG.revisions[] ของ IVME",
+    "usage_note": "DocRequestPolicy.usage_note (ข้อความหมายเหตุการใช้งาน · snapshot ตอนออกเลข · DEC-04)",
+    "request_code": "DocRequestPolicy.code_prefix = DR- (รันต่อใบ DR-001 …)",
+    "status_labels": "ivme.request_status (6) ตาม data validation ต้นฉบับ G13:G32",
+    "summary": "คำนวณจาก requests[].status ตอนพิมพ์ (ไม่เก็บ)"
+  },
+  "footer_left": "เลขที่ {doc.no} · (ร่าง) · เอกสารนี้จัดทำโดยระบบ CUBE NATIVE",
+  "footer_right": "Doc. No. : {form_code} · {revision}",
+  "sign_layout": {
+    "source": "approval_chain snapshot (ผู้ขอ + จำนวนขั้นตามที่ตั้งใน DOA)",
+    "max_per_row": 4,
+    "split": "even",
+    "dense_when_steps_over": 4,
+    "keep_together": true,
+    "render": "ตารางตามกระดาษ — 1 แถวตารางต่อช่องลงชื่อ (บทบาท | ชื่อ | ตำแหน่ง | ลายเซ็น | วันที่) วนจาก sign_rows[].signs[]"
+  },
+  "page_break": "ก่อนบล็อก 'การตรวจทาน / อนุมัติ' — หน้า 1 = หัว+ข้อมูลกระบวนการ+รายการคำขอ (ขั้นต่ำ 20 แถว · หัวตารางซ้ำเมื่อแถวล้น)+หมายเหตุการใช้งาน · หน้า 2 = หัวย่อ \"(ต่อ)\"+ชื่อโครงการ+สรุปรายการคำขอ+การตรวจทาน/อนุมัติ+ประวัติการแก้ไข (R10)",
+  "min_rows_by_group": {
+    "requests": 20
+  }
+}

@@ -1,0 +1,34 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock · แก้/เติมแล้ว
+feature_id: F-TMP-006
+name: แบบฟอร์มห้องข้อมูล มาตรฐานชื่อไฟล์ และทะเบียนควบคุมเอกสาร
+code: IVMD
+events:
+- id: ivmd_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-006-FN-08, F-TMP-006-FN-10
+- id: ivmd_register_approved
+  trigger: pending_approval → approved (ขั้นสุดท้าย) — โครงสร้างห้องข้อมูล/ทะเบียนเอกสาร/สิทธิการเข้าถึงมีผล
+  recipients:
+  - requester
+  - admin_role
+  template: '**{doc_no}** {project_name} — ทะเบียนห้องข้อมูลอนุมัติแล้ว · โฟลเดอร์
+    {folder_count} · เอกสาร {doc_count} · สิทธิ {access_count} รายการ'
+  channel: in-app+email
+  optional: false
+  why: ผู้ดูแลห้องข้อมูล (admin role ฝ่าย) ต้องนำสิทธิที่อนุมัติไปตั้งในไดรฟ์จริง
+    (ระบบไม่สร้างสิทธิเอง · G1) — DOA engine แจ้งเฉพาะผู้ขอ
+  frd_ref: 03_LOGIC F-TMP-006-FN-06, F-TMP-006-FN-10
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+dropped:
+- ivmd_over_limit_approved — เกณฑ์เตือน (ฉบับไม่ใช่ Final · วันที่มีผลก่อนวันที่)
+  แสดงในฟอร์มขณะกรอก ไม่ต้องแจ้งหลังอนุมัติ

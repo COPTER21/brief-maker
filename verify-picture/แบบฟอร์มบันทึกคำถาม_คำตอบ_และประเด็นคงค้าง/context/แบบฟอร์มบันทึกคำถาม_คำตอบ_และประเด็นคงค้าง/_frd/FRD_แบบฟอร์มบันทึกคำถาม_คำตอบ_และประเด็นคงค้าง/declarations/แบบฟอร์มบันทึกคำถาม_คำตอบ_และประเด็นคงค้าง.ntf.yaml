@@ -1,0 +1,45 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock · แก้/เติมแล้ว · frd_ref หลัง FRD
+feature_id: F-TMP-005
+name: แบบฟอร์มบันทึกคำถาม คำตอบ และประเด็นคงค้าง
+code: IVMC
+events:
+- id: ivmc_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-005-FN-08, F-TMP-005-FN-10
+- id: ivmc_escalation_flagged
+  trigger: pending_approval → approved (ขั้นสุดท้าย) และมีประเด็นคงค้าง ต้องยกระดับ
+    = ใช่ ≥ 1 แถว
+  recipients:
+  - role-gm
+  template: '**{doc_no}** {project_name} — มีประเด็นคงค้างที่ต้องยกระดับ {escalate_count}
+    รายการ'
+  channel: in-app
+  optional: false
+  why: ประเด็นที่ทำเครื่องหมายยกระดับต้องถึงผู้บริหารเพื่อเปิดบันทึกการยกระดับ (FM-IVM-09)
+    — DOA engine แจ้งเฉพาะผู้ขอ
+  frd_ref: 03_LOGIC F-TMP-005-FN-06, F-TMP-005-FN-10
+- id: ivmc_log_approved
+  trigger: pending_approval → approved (ขั้นสุดท้าย) — บันทึกคำถาม/ประเด็นคงค้างมีผล
+  recipients:
+  - question_responders
+  - issue_owners
+  template: '**{doc_no}** {project_name} — บันทึกอนุมัติแล้ว · มีรายการที่คุณรับผิดชอบ
+    {item_count} รายการ กำหนดแรก {first_due}'
+  channel: in-app+email
+  optional: false
+  why: ผู้รับผิดชอบตอบ/ผู้รับผิดชอบประเด็นแต่ละแถวต้องรู้ว่าได้รับมอบหมายและกำหนดเวลา
+    (DOA engine แจ้งเฉพาะผู้ขอ)
+  frd_ref: 03_LOGIC F-TMP-005-FN-06, F-TMP-005-FN-10
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+dropped:
+- ivmc_over_limit_approved — เลยกำหนดแสดงเตือนในฟอร์มขณะกรอก ไม่ต้องแจ้งหลังอนุมัติ

@@ -1,0 +1,35 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock · แก้/เติมแล้ว
+feature_id: F-TMP-007
+name: แบบฟอร์มรายการคำขอเอกสารและข้อมูล
+code: IVME
+events:
+- id: ivme_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-007-FN-08, F-TMP-007-FN-10
+- id: ivme_request_list_approved
+  trigger: pending_approval → approved (ขั้นสุดท้าย) — รายการคำขอเอกสารและข้อมูลมีผล
+    เริ่มติดตามการรับมอบ
+  recipients:
+  - requester
+  - admin_role
+  template: '**{doc_no}** {project_name} — รายการคำขอเอกสารและข้อมูลอนุมัติแล้ว ·
+    {request_count} รายการ · ได้รับครบ {received_count}'
+  channel: in-app+email
+  optional: false
+  why: ผู้จัดทำ/ผู้ประสานงาน (admin role ฝ่าย) ต้องรู้ว่ารายการคำขอได้รับอนุมัติแล้วเพื่อส่งคำขอไปยังผู้ถูกขอข้อมูลนอกระบบ
+    (ระบบไม่ส่งคำขอเอง · G1) — DOA engine แจ้งเฉพาะผู้ขอ
+  frd_ref: 03_LOGIC F-TMP-007-FN-06, F-TMP-007-FN-10
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+dropped:
+- ivme_over_limit_approved — เกณฑ์เตือน (เกินกำหนดส่ง · ลิงก์มีคำว่ารหัสผ่าน) แสดงในฟอร์มขณะกรอก
+  ไม่ต้องแจ้งหลังอนุมัติ
