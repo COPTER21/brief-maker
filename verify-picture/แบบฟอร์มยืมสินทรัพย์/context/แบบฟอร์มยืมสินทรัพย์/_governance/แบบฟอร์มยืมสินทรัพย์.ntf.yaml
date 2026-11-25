@@ -1,0 +1,39 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock + เติม event ธุรกิจ (รับคืน · เลยกำหนดคืน) · [AI-DEFAULT]
+feature_id: F-TMP-002
+name: แบบฟอร์มยืมสินทรัพย์
+code: ALN
+events:
+- id: aln_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-002-FN-07, F-TMP-002-FN-09
+- id: aln_returned
+  trigger: approved → returned (ผู้รับคืนบันทึกรับคืนครบทุกรายการ)
+  recipients:
+  - document_owner
+  template: '**{doc_no}** รับคืนสินทรัพย์ครบแล้ว โดย {actor} วันที่ {returned_at}'
+  channel: in-app
+  optional: true
+  why: ผู้ยืมต้องรู้ว่าการคืนถูกบันทึกแล้ว (ปิดความรับผิดชอบ)
+  frd_ref: 03_LOGIC F-TMP-002-FN-09, F-TMP-002-FN-11
+- id: aln_overdue
+  trigger: สถานะ approved และวันนี้ > วันที่ส่งคืนของรายการใด (งานตรวจรายวัน · DEC-04
+    เลยกำหนด = เตือน)
+  recipients:
+  - document_owner
+  - role-mgr-acc
+  template: '**{doc_no}** เลยกำหนดส่งคืนสินทรัพย์ {asset_code} ({due_date}) — กรุณาส่งคืน'
+  channel: in-app+email
+  optional: false
+  why: ติดตามสินทรัพย์ค้างคืน — ผู้ยืมและผู้ดูแลสินทรัพย์ต้องรู้
+  frd_ref: 03_LOGIC F-TMP-002-FN-09
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

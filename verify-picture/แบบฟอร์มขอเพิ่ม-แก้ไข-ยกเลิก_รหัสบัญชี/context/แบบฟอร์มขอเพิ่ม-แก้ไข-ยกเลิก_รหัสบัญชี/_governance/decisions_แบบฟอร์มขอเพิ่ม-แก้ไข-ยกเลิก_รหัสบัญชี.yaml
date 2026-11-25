@@ -1,0 +1,28 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# G1 ผลต่อระบบ — ไม่เปลี่ยนค่าในระบบอัตโนมัติ (COA ใน CUBE ยังไม่มี feature) · ผู้บันทึกเข้าระบบบันทึกเองแล้วกด "บันทึกเข้าระบบแล้ว"
+config_changes: []
+post_to: []
+# G2 สายอนุมัติ — dynamic 2 ขั้นตามกระดาษ: ผู้ตรวจสอบ → ผู้อนุมัติ · ไม่มีวงเงิน
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager", "role-mgr-acc"], amount: none }
+# G3 ไม่มีสูตร/ค่าคงที่
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules: ["1 ใบ = 1 ประเภทคำขอ (เพิ่ม/แก้ไข/ยกเลิก) · ส่วนที่ไม่ได้เลือกต้องว่าง", "เพิ่ม: ต้องมีชื่อบัญชีอย่างน้อย 1 แถว", "ไม่อนุมัติ → เหตุผลบังคับ"]
+# G4 รายการซ้ำ
+repeat: { max_rows: null }
+# G5 1:1 · แก้คำผิดชัดเจน "วัตถุประสงค์ในการแก้ไข" ในส่วนยกเลิก → "วัตถุประสงค์ในการยกเลิก"
+fidelity: { one_to_one: true, add_fields: [], merge_split: [], spelling_fix: ["ส่วนกรณีขอยกเลิก: วัตถุประสงค์ในการแก้ไข → วัตถุประสงค์ในการยกเลิก"] }
+# G6
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+# G7 กลับร่างเลขเดิม
+reject_cancel: { on_reject: draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+# G8
+visibility: { owner: true, approver: after_submit, admin_role: all }
+# G9 ออกตอนบันทึกครั้งแรก · รหัสย่อจากชื่อเอกสาร (Account Code Request)
+numbering: { issue_on: first_save, code: ACR }
+# G10
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+extend: {}
+fit: {}

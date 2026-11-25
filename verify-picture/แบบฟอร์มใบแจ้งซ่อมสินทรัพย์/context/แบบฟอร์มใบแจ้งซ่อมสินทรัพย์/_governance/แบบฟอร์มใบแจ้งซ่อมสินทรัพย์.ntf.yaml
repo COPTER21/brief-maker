@@ -1,0 +1,26 @@
+# ntf-declaration v1.2 — ร่าง (ก่อน FRD) · AI-DEFAULT รอลูกค้ายืนยัน
+feature_id: F-TMP-001
+name: แบบฟอร์มใบแจ้งซ่อมสินทรัพย์
+code: RPR
+events:
+- id: rpr_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ใบแจ้งซ่อมสินทรัพย์ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  frd_ref: 03_LOGIC F-TMP-001-FN-07, F-TMP-001-FN-09
+- id: rpr_ready_for_repair
+  trigger: → approved
+  recipients:
+  - admin_role
+  template: '**{doc_no}** ใบแจ้งซ่อมสินทรัพย์อนุมัติแล้ว {item_count} รายการ จาก {requester}
+    ({dept}) — ดำเนินการซ่อม'
+  channel: in-app
+  optional: false
+  frd_ref: 03_LOGIC F-TMP-001-FN-05, F-TMP-001-FN-09
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

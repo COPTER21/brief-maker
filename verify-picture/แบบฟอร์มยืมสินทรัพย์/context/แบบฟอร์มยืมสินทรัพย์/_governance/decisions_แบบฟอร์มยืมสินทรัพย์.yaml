@@ -1,0 +1,44 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# J002 FM-ASM-04 แบบฟอร์มยืมสินทรัพย์ · ตอบตาม 4_knowledge/governance/unattended-policy.md
+
+# G1 ผลต่อระบบ — ไม่เปลี่ยนค่าในระบบ ไม่ส่งต่อ (สถานะ "ถูกยืม" ของสินทรัพย์ใน Asset Master ไม่แตะรอบนี้ · บันทึกการรับคืนในเอกสารนี้เอง)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — dynamic · กระดาษมีช่องผู้อนุมัติ 1 จุด (ผู้ให้ยืม) → 1 ขั้น role ผู้ดูแลสินทรัพย์ = ผู้จัดการ module asset (role-mgr-acc) · ไม่มีวงเงิน
+doa: { required: true, mode: dynamic, default_steps: ["role-mgr-acc"], amount: none }
+
+# G3 ไม่มีสูตร/ค่าคงที่บนกระดาษ — กติกาตรวจจากโครงฟอร์ม
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "จำนวนที่ให้ยืม ≤ จำนวนที่ยืม (บล็อก) · ผู้ให้ยืมกรอกตอนพิจารณา ว่าง = เท่าจำนวนที่ยืม"
+    - "วันที่ส่งคืน ≥ วันที่ยืม (บล็อก)"
+    - "ทะเบียนสินทรัพย์ซ้ำในใบเดียวกัน = บล็อก"
+    - "รับคืนได้เมื่อใบอนุมัติแล้ว · เลยวันที่ส่งคืน = เตือน (ค้างคืน)"
+
+# G4 รายการซ้ำ — ไม่จำกัด · PDF ขั้นต่ำ 11 แถวตามกระดาษ
+repeat: { max_rows: null }
+
+# G5 1:1 ไม่เพิ่มช่อง
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 แถวล่าง 1 ช่องต่อขั้น DOA · ข้อความ "พิจารณาในระบบ" ไม่ใช้ภาพ · ช่องผู้ส่งคืน/ผู้รับคืน = บันทึกรับคืนในระบบ
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ → กลับร่างเลขเดิม · ยกเลิกได้ เจ้าของ + admin role · สถานะร่าง/รออนุมัติ · ต้องมีเหตุผล
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 เจ้าของ · ผู้อนุมัติหลังส่ง · admin role ของหน่วยงานเจ้าของเอกสาร (ฝ่ายบริหารสินทรัพย์) เห็นทั้งหมด
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 ออกเลขตอนบันทึกครั้งแรก · รหัส ALN (Asset LoaN) — ASM ใช้ร่วมกับ FM-ASM-03 (J001) จึงไม่ใช้
+numbering: { issue_on: first_save, code: ALN }
+
+# G10
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

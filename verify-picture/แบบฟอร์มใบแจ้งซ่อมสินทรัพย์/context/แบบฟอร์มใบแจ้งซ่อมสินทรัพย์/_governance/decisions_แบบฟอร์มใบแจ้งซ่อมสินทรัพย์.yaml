@@ -1,0 +1,42 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# G1 ผลต่อระบบ — ใบแจ้งซ่อมไม่เปลี่ยนค่าในระบบ ไม่ส่งต่อ (Asset Master / Maintenance Schedule ยังไม่มีในระบบ)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — ช่องลงชื่อบนกระดาษ 2 จุด: ผู้ตรวจสอบ → ผู้อนุมัติ
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager", "role-mgr-acc"], amount: none }
+
+# G3 ไม่มีสูตร/ค่าคงที่ — กฎตรวจ
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "ต้องมีรายการแจ้งซ่อมอย่างน้อย 1 แถว · จำนวน > 0"
+    - "ทะเบียนสินทรัพย์ = ผู้ใช้กรอกเลขเอง (Asset Master ยังไม่มีในระบบ) · เปลี่ยนเป็นเลือกจาก Asset Master เมื่อ feature พร้อม"
+    - "ประวัติการซ่อม = ผู้ตรวจสอบกรอกตอนพิจารณา (ไม่บังคับ)"
+    - "ผู้แจ้งซ่อมบันทึกครั้งเดียวตอนส่ง แสดงทั้ง 2 จุดบนแบบพิมพ์"
+
+# G4 รายการซ้ำ
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ / ยกเลิก
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 เลขที่ — รหัส ASM ใช้ร่วมกับเอกสารอื่นของแผนกเดียวกันใน batch → ใช้ RPR (Repair)
+numbering: { issue_on: first_save, code: "RPR" }
+
+# G10 ของเสริม
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

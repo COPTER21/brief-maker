@@ -1,0 +1,86 @@
+# FILE_MAP — แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `01_Prototype/feature.html` | `_ui/UI_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.html` |
+| `02_BRD/BRD_F-TMP-003.docx` | `_brd/BRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.docx` |
+| `02_BRD/BRD_F-TMP-003.md` | `_brd/BRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/00_OVERVIEW.md` | `_frd/FRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี/00_OVERVIEW_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/01_UI.md` | `_frd/FRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี/01_UI_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/02_API.md` | `_frd/FRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี/02_API_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/03_LOGIC.md` | `_frd/FRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี/03_LOGIC_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/04_DB.md` | `_frd/FRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี/04_DB_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/05_RULES.md` | `_frd/FRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี/05_RULES_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/06_TESTS.md` | `_frd/FRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี/06_TESTS_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี/07_LOCKED_DECISIONS_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/INDEX.md` | `_frd/FRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี/INDEX_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/_SECTION_N.md` | `_frd/FRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี/_SECTION_N_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/ACR.doa.yaml` | `_frd/FRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี/declarations/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.doa.yaml` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/ACR.doccfg.yaml` | `_frd/FRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี/declarations/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/ACR.mdoc.yaml` | `_frd/FRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี/declarations/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/ACR.ntf.yaml` | `_frd/FRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี/declarations/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.ntf.yaml` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/DOA_BRIEF_F-TMP-003.md` | `_frd/FRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี/declarations/DOA_BRIEF_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/DOCCFG_BRIEF_F-TMP-003.md` | `_frd/FRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี/declarations/DOCCFG_BRIEF_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/MDOC_BRIEF_ACR.md` | `_frd/FRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี/declarations/MDOC_BRIEF_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `03_FRD/FRD_F-TMP-003_Pack/declarations/NTF_BRIEF_F-TMP-003.md` | `_frd/FRD_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี/declarations/NTF_BRIEF_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-003.md` | `_uibrief/UIBRIEF_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `05_Governance/ACR.doa.yaml` | `_governance/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.doa.yaml` |
+| `05_Governance/ACR.doccfg.yaml` | `_governance/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.doccfg.yaml` |
+| `05_Governance/ACR.mdoc.yaml` | `_governance/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.mdoc.yaml` |
+| `05_Governance/ACR.ntf.yaml` | `_governance/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.ntf.yaml` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `05_Governance/DOA_BRIEF_F-TMP-003.md` | `_governance/DOA_BRIEF_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-003.md` | `_governance/DOCCFG_BRIEF_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `05_Governance/MDOC_BRIEF_ACR.md` | `_governance/MDOC_BRIEF_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-003.md` | `_governance/NTF_BRIEF_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-003.md` | `_tc/QA_AUDIT_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `06_Test/cases.json` | `_tc/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_cases.json` |
+| `06_Test/testcase-F-TMP-003.html` | `_tc/UAT_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.html` |
+| `06_Test/testcases-F-TMP-003.md` | `_tc/TC_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `07_Print/ACR_approved-doa6steps.pdf` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_อนุมัติแล้ว-doa6steps.pdf` |
+| `07_Print/ACR_approved.pdf` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_อนุมัติแล้ว.pdf` |
+| `07_Print/ACR_draft.pdf` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_ร่าง.pdf` |
+| `07_Print/ACR_edit-pending.pdf` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_edit-pending.pdf` |
+| `07_Print/ACR_long-12rows.pdf` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_long-12rows.pdf` |
+| `07_Print/ACR_rejected.pdf` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_ไม่อนุมัติ.pdf` |
+| `07_Print/ACR_states_sheet.png` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_ทุกสถานะ.png` |
+| `07_Print/approved-doa6steps.data.json` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_approved-doa6steps.data.json` |
+| `07_Print/approved.data.json` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_approved.data.json` |
+| `07_Print/compare.json` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_compare.json` |
+| `07_Print/compare_overlay.png` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_compare_overlay.png` |
+| `07_Print/compare_side.png` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_compare_side.png` |
+| `07_Print/draft.data.json` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_draft.data.json` |
+| `07_Print/edit-pending.data.json` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_edit-pending.data.json` |
+| `07_Print/form.tpl.html` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_template.html` |
+| `07_Print/long-12rows.data.json` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_long-12rows.data.json` |
+| `07_Print/print_config.json` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_print_config.json` |
+| `07_Print/profile.json` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_profile.json` |
+| `07_Print/rejected.data.json` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_rejected.data.json` |
+| `07_Print/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก รหัสบัญชี_print-spec.md` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_print-spec.md` |
+| `07_Print/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก รหัสบัญชี_template.html` | `_document/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_template.html` |
+| `08_Reference/1. FM-ACC-01 แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก รหัสบัญชี.docx` | `_reference/1. FM-ACC-01 แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก รหัสบัญชี_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.docx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-003.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-003_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-003_v2.md` | `_reference/PREBRIEF_REQ-TMP-003_v2_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.png` |
+| `08_Reference/page-2.png` | `_reference/page-2_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.md` |
+| `08_Reference/reports/anchors.json` | `_reference/reports/anchors_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.json` |
+| `08_Reference/reports/e2e_report.json` | `_reference/reports/e2e_report_แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี.json` |
+| `08_Reference/shot_approve.png` | `_ui/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_ภาพหน้าจอ_approve.png` |
+| `08_Reference/shot_list.png` | `_ui/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_ภาพหน้าจอ_list.png` |
+| `08_Reference/shot_pdf.png` | `_ui/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_ภาพหน้าจอ_pdf.png` |
+| `08_Reference/shot_record.png` | `_ui/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_ภาพหน้าจอ_record.png` |
+| `08_Reference/shot_sign.png` | `_ui/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_ภาพหน้าจอ_sign.png` |
+| `08_Reference/shot_submit.png` | `_ui/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_ภาพหน้าจอ_submit.png` |
+| `08_Reference/shot_wiz2.png` | `_ui/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_ภาพหน้าจอ_wiz2.png` |
+| `08_Reference/shot_wiz3.png` | `_ui/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_ภาพหน้าจอ_wiz3.png` |
+| `08_Reference/shot_wiz_edit.png` | `_ui/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_ภาพหน้าจอ_wiz_edit.png` |
+| `08_Reference/shot_wiz_empty.png` | `_ui/แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก_รหัสบัญชี_ภาพหน้าจอ_wiz_empty.png` |

@@ -1,0 +1,38 @@
+# ntf-declaration v1.2 — FINAL (ยืนยันกับ FRD v1.0 · frd_lint N7 PASS)
+feature_id: F-TMP-003
+name: แบบฟอร์มขอเพิ่ม-แก้ไข-ยกเลิก รหัสบัญชี
+code: ACR
+events:
+- id: acr_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันไม่ต้องพิจารณาแล้ว (DOA engine
+    ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-003-FN-07, F-TMP-003-FN-09
+- id: acr_ready_to_record
+  trigger: → approved (รอบันทึกเข้าระบบ)
+  recipients:
+  - admin_role
+  template: '**{doc_no}** อนุมัติแล้ว — ขอ{req_type_label}รหัสบัญชี รอบันทึกเข้าระบบ'
+  channel: in-app+email
+  optional: false
+  why: ช่อง "ผู้บันทึกเข้าระบบ" บนกระดาษ — เจ้าหน้าที่บัญชี (admin role ฝ่ายบัญชี)
+    ต้องรู้ว่ามีงานต้องบันทึกผังบัญชี
+  frd_ref: 03_LOGIC F-TMP-003-FN-05, F-TMP-003-FN-09
+- id: acr_recorded
+  trigger: approved → recorded
+  recipients:
+  - owner
+  template: '**{doc_no}** บันทึกเข้าระบบแล้วโดย {actor} เมื่อ {recorded_at}'
+  channel: in-app
+  optional: true
+  why: ผู้ขอรู้ว่ารหัสบัญชีพร้อมใช้งาน
+  frd_ref: 03_LOGIC F-TMP-003-FN-09, F-TMP-003-FN-11
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

@@ -1,0 +1,37 @@
+# RUN_LOG — F-TMP-002 FM-ASM-04 แบบฟอร์มยืมสินทรัพย์ (REQ-TMP-002)
+> บันทึกอัตโนมัติจาก `doc_master.py mark` + หมายเหตุที่ต้องจำ (มติที่เปลี่ยน · ข้อยกเว้น · เหตุผลของ WARN)
+
+- ขั้น 1: impact_summary.py regex รับเฉพาะ REQ ตัวเลข → ใช้ wrapper .tools/impact_tmp.py (รหัสชั่วคราว REQ-TMP-002) · ไม่แก้สกิล
+- ขั้น 1: to_image.py (LibreOffice→PDF→pypdfium2) ได้ภาพหน้ากระดาษจริง 1 หน้า A4 แนวตั้ง · ฟอนต์ไทยใน LO render เป็นกล่อง — ถ้อยคำยึด content.html / openpyxl
+- 2026-10-10 23:49 · ขั้น 1 → done · FORM_SPEC 13 ช่อง · ลายเซ็น 4 · แถวซ้ำ 11 · ERROR 0 · PREBRIEF v2
+- ขั้น 2 (unattended) เหตุผลรายหมวด:
+  - G1 ไม่เปลี่ยนค่า/ไม่ส่งต่อ — กระดาษไม่บอกให้ปรับสถานะทะเบียนสินทรัพย์ · รับคืนบันทึกในใบนี้
+  - G2 dynamic 1 ขั้น role-mgr-acc — กระดาษมีช่องผู้อนุมัติ 1 จุด "ผู้ให้ยืม" = ผู้ดูแลสินทรัพย์ · module asset ค่าเริ่ม role-mgr-acc (doa-roles-contract §3) · ไม่มีวงเงิน
+  - G3 ไม่มีสูตร/ค่าคงที่ · กฎตรวจ qty_lent ≤ qty_requested · return_date ≥ borrow_date · ทะเบียนซ้ำบล็อก · เลยกำหนดคืน = เตือน
+  - G4 ไม่จำกัด · PDF ≥ 11 แถว · G5 1:1 · G6 แถวล่างต่อขั้น DOA ข้อความในระบบ · ผู้ส่งคืน/ผู้รับคืน = action รับคืน (ไม่ใช่ขั้น DOA)
+  - G7 กลับร่างเลขเดิม · ยกเลิก owner+admin ในร่าง/รออนุมัติ เหตุผลบังคับ · G8 ตาม policy · G9 first_save รหัส ALN (ASM ชนกับ J001 FM-ASM-03) · G10 แนบ✓ CSV✓ ทำซ้ำ✗ ประกาศ✗
+  - lock 13 มติ · tag AI-DEFAULT 11 (VALID 2)
+- 2026-10-10 23:49 · ขั้น 2 → done · 13 มติ · AI-DEFAULT 11 · VALID 2 · พร้อมเริ่มทำ
+- ขั้น 3: doa_tool BLOCK on_reject=draft → แก้ decisions.yaml เป็น back_to_draft (ความหมายเดิม) → lock+tag ใหม่
+- ขั้น 3: DOA_BRIEF PASS (1 ขั้น role-mgr-acc · คำตัดสิน ให้ยืม/ไม่ให้ยืม by_role) · NTF_BRIEF PASS 3 event (aln_cancelled · aln_returned · aln_overdue) · DOCCFG_BRIEF PASS --registry (ALN ไม่ชน · J001 ใช้ RPR) · MDOC_BRIEF WARN (taxonomy_def_id ว่าง=รออนุมัติ · doa pending · module enum ไม่มี Asset → Accounting · source=declaration เพราะ REQ-TMP-002 ไม่ผ่านรูปแบบ REQ-YYYY-NNNN)
+- ขั้น 4: Replica ตารางกรอบ R9 + B6 sign_rows + ส่วนรับคืน 2 ช่อง (return_signs) · data 6 สถานะ (draft/approved/rejected/returned/long-14rows/approved-doa6steps) · parity IDENTICAL 6/6 · ไม่มี {{}} หลง · ไม่มี key ขาด · build_html ทุกสถานะ → print/out/*.html
+- [NO-BROWSER] ข้าม render_pdf.py (ใน render_states.py) — ไม่มี PDF/_states_sheet.png · จำนวนหน้าออกแบบ 1 หน้า (ประเมินจากโครง ยังไม่ยืนยันด้วย PDF)
+- [NO-BROWSER] ข้าม compare_original.py (ต้องใช้ PDF แบบพิมพ์)
+- doa validate --print-config PASS (sign_boxes doa_step:*)
+- หมายเหตุ: workspace ห้ามลบไฟล์ → ไฟล์ชั่วคราวเขียนนอก mnt · ไฟล์ค้าง 1 ไฟล์ย้ายไป .tools/trash/
+- 2026-10-10 23:54 · ขั้น 3 → done · doa PASS · ntf PASS 3 event · doccfg PASS ALN · mdoc WARN(taxonomy รออนุมัติ)
+- 2026-10-10 23:54 · ขั้น 4 → done · parity 6/6 IDENTICAL · [NO-BROWSER] ไม่มี PDF · ออกแบบ 1 หน้า
+- ขั้น 5: feature.html (Q-form) จาก reference form-archetype + golden skeleton v9.4 · ฝัง print/form.tpl.html + tpl_render.js + PDF_CSS (base+replica+profile) · DOA mock role-mgr-acc · bedateHTML ทุกช่องวันที่ (#114)
+  - audit.sh FAIL 0 · WARN 3 (มาจาก kit กลาง: lucide comment · .uc-email · font-size px ใน shell) · self_audit PASS · prune_css ตัด 70 rule แล้วรันซ้ำผ่าน
+  - [NO-BROWSER] ข้าม e2e_standard.py · render-check.py → ทดแทนด้วย jsdom (.tools/e2e_jsdom.js) ไล่ S0–S10 ตาม e2e_standard + flow สร้าง→ส่ง→ให้ยืม→รับคืน · ไม่อนุมัติ→กลับร่าง · DOA 6 ขั้น 4+3 = 32/32 ผ่าน (reports/e2e_jsdom_report.json) — ไม่ใช่ browser จริง ต้องรันรอบเต็มอีกครั้ง
+  - U1 ✓ ไม่มี stat card · U2 ✓ · U3 ✓ · U4 ✓ · U5 ✓ kebab ⋮ · U6 ✓ pager+page size 25 · U7 ✓ CSV ที่ ph · U8 ✓ 920/1290 · U9 ✓ เหตุผลบังคับ · U10 ✓ · U11 ✓ kit · U12 ✓ · U13 ✓ §6.1 · U14 ✓ wizard (Q-form) · U15 ✓ แก้ไข=ฟอร์มเดียวกัน ปิด view ก่อน · U16 n/a (ไม่มีลบ ใช้ยกเลิก) · U17 ✓ คน=icon วงกลม · U18 ✓ 1 cell 1 บรรทัด ellipsis · U19 ✓ header sub 1 fact (กำหนดคืน) · U20 ✓ ชุดเดียวไม่มี tabs · U21 ✓ kit · U22 ✓ chips ≤3 ค่า 0 ซ่อน · U23 ✓ · U24 ✓ search combobox portal · U25 ✓ backdrop onmousedown · U26–U28 n/a (ไม่มีหน้าตั้งค่า)
+- 2026-10-11 00:08 · ขั้น 5 → done · audit FAIL 0 · self_audit PASS · [NO-BROWSER] e2e→jsdom 32/32
+- 2026-10-11 00:08 · ขั้น 6 → skip · unattended — ให้คนดูจาก _BATCH_REPORT
+- ขั้น 7: BRD_F-TMP-002 (.md+.docx) APPROVED (Prebrief Mode · Lane) · FRD pack 00–07+INDEX · frd_lint BLOCK 0 WARN 0 PASS 13 · doccfg --final PASS (--registry · ALN ไม่ชน) · ntf --final PASS · doa validate --html PASS · mdoc WARN (taxonomy รออนุมัติ · doa pending)
+- 2026-10-11 00:13 · ขั้น 7 → done · BRD APPROVED · frd_lint BLOCK 0 · declaration --final PASS
+- ขั้น 8: UI_BRIEF_F-TMP-002 · brief_check PASS (FAIL 0 WARN 0) · testcases-F-TMP-002.md 65 เคส/162 step · tc_lint ERROR 0 · cases.json Lite 53 เคส · drop ledger 12 · lite_audit หายเงียบ 0 (stamp) · testcase-F-TMP-002.html (build · ไม่มีภาพ)
+  - [NO-BROWSER] ข้าม verify_anchors.py → ตรวจ anchor จากซอร์สแทน: anchor ตัวหนาทั้งหมดพบในซอร์ส ยกเว้น 17 ข้อความที่ประกอบตอนรัน (เลขที่/วันที่/ชื่อ) ซึ่งตรวจผ่าน jsdom flow แล้ว · ต้องรันรอบเต็มบนเครื่องที่มี browser
+  - [NO-BROWSER] ข้าม capture.py → เอกสารคนไม่มีภาพหน้าจอ (regionKey ว่าง)
+  - DEC-11 ทำซ้ำ ✗ → ถอดปุ่ม/เมนู/route ทำซ้ำออกจาก HTML (เดิมลอกจาก reference) · แก้ BRD/FRD/UI Brief ตาม · audit/self_audit/jsdom ผ่านซ้ำ
+- 2026-10-11 00:23 · ขั้น 8 → done · brief_check FAIL 0 · tc_lint ERROR 0 (65 เคส) · lite_audit หายเงียบ 0 · [NO-BROWSER] verify_anchors/capture ข้าม
+- ขั้น 9: ย้ายไฟล์ช่วยทำงาน _build→.build · _tools→.tools (scan ข้ามโฟลเดอร์จุด · ลบไม่ได้ใน workspace) · orig/content.html→orig/content.extract.htm (กันชนชื่อ prototype)

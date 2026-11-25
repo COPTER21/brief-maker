@@ -1,0 +1,319 @@
+{
+ "req": "REQ-TMP-003",
+ "status": "พร้อมเริ่มทำ",
+ "ready": true,
+ "decisions": [
+  {
+   "id": "DEC-01",
+   "cat": "G1",
+   "text": "อนุมัติแล้วไม่เปลี่ยนค่าในระบบ",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-02",
+   "cat": "G1",
+   "text": "ไม่ส่งต่อระบบอื่นรอบนี้ (ประกาศ event ไว้ใน FRD แต่ไม่ยิง)",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-03",
+   "cat": "G2",
+   "text": "สายอนุมัติตั้งที่ DOA กลาง (dynamic) · ค่าเริ่ม 2 ขั้น: role-line-manager, role-mgr-acc · วงเงิน: ไม่มี",
+   "value": {
+    "required": true,
+    "mode": "dynamic",
+    "default_steps": [
+     "role-line-manager",
+     "role-mgr-acc"
+    ],
+    "amount": "none"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "doa-declaration",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-04",
+   "cat": "G3",
+   "text": "คำนวณให้อัตโนมัติ ผู้ใช้ปรับได้ · เกินเกณฑ์ = เตือน · 1 ใบ = 1 ประเภทคำขอ (เพิ่ม/แก้ไข/ยกเลิก) · ส่วนที่ไม่ได้เลือกต้องว่าง · เพิ่ม: ต้องมีชื่อบัญชีอย่างน้อย 1 แถว · ไม่อนุมัติ → เหตุผลบังคับ",
+   "value": {
+    "constants_from_config": true,
+    "auto_compute": true,
+    "over_limit": "warn",
+    "rules": [
+     "1 ใบ = 1 ประเภทคำขอ (เพิ่ม/แก้ไข/ยกเลิก) · ส่วนที่ไม่ได้เลือกต้องว่าง",
+     "เพิ่ม: ต้องมีชื่อบัญชีอย่างน้อย 1 แถว",
+     "ไม่อนุมัติ → เหตุผลบังคับ"
+    ]
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-05",
+   "cat": "G4",
+   "text": "ชื่อบัญชีที่ต้องการขอเพิ่ม: ไม่จำกัดจำนวนแถว · PDF อย่างน้อย 4 แถวตามกระดาษ",
+   "value": {
+    "max_rows": null,
+    "min_rows": 4
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-06",
+   "cat": "G5",
+   "text": "ช่องตรงกระดาษ 1:1 · ไม่เพิ่มช่อง (เช่น หมายเหตุ)",
+   "value": {
+    "one_to_one": true,
+    "add_fields": [],
+    "merge_split": [],
+    "spelling_fix": [
+     "ส่วนกรณีขอยกเลิก: วัตถุประสงค์ในการแก้ไข → วัตถุประสงค์ในการยกเลิก"
+    ]
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-07",
+   "cat": "G6",
+   "text": "ลายเซ็นแถวล่าง 1 ช่องต่อขั้น DOA · ไม่ใช้ภาพลายมือชื่อ (ข้อความส่งในระบบ/พิจารณาในระบบ)",
+   "value": {
+    "layout": "row-bottom",
+    "per_doa_step": true,
+    "handwriting_image": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "thai-doc",
+    "html",
+    "doccfg-declaration",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-08",
+   "cat": "G7",
+   "text": "ไม่อนุมัติ = กลับเป็นร่าง แก้แล้วส่งใหม่ · ยกเลิกได้โดย owner, admin_role สถานะ draft, pending · ต้องมีเหตุผล",
+   "value": {
+    "on_reject": "draft",
+    "cancel_by": [
+     "owner",
+     "admin_role"
+    ],
+    "cancel_states": [
+     "draft",
+     "pending"
+    ],
+    "reason_required": true
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests",
+    "doa-declaration"
+   ]
+  },
+  {
+   "id": "DEC-09",
+   "cat": "G8",
+   "text": "มองเห็น: เจ้าของ · ผู้อนุมัติเห็นหลังส่ง · admin role เห็นทั้งหมด",
+   "value": {
+    "owner": true,
+    "approver": "after_submit",
+    "admin_role": "all"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-10",
+   "cat": "G9",
+   "text": "ออกเลขเมื่อบันทึกครั้งแรก · รหัส ACR",
+   "value": {
+    "issue_on": "first_save",
+    "code": "ACR"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "doccfg-declaration",
+    "html",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-11",
+   "cat": "G10",
+   "text": "ของเสริม (กระดาษไม่มี): แนบไฟล์, ส่งออก CSV",
+   "value": {
+    "attachments": true,
+    "copy": false,
+    "export_csv": true,
+    "announce": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "brd",
+    "frd",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-12",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: แสดงเป็น \"วัตถุประสงค์ในการยกเลิก\" (G5 แก้คำผิดชัดเจน) · key แยก cancel.purpose (พบ: หัวช่องพิมพ์ว่า \"วัตถุประสงค์ในการแก้ไข\" ทั้งที่อยู่ในส่วนยกเลิก (คัดลอกจากส่วนแก้ไข))",
+   "value": {
+    "where": "ถ้อยคำบนกระดาษ ส่วนกรณีขอยกเลิกรหัสบัญชี",
+    "detail": "หัวช่องพิมพ์ว่า \"วัตถุประสงค์ในการแก้ไข\" ทั้งที่อยู่ในส่วนยกเลิก (คัดลอกจากส่วนแก้ไข)",
+    "rule": "แสดงเป็น \"วัตถุประสงค์ในการยกเลิก\" (G5 แก้คำผิดชัดเจน) · key แยก cancel.purpose"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-13",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: 1 ใบ = 1 ประเภทคำขอ · ส่วนที่ไม่ได้เลือกต้องว่าง (validation) (พบ: ☐ 3 ตัวเลือกไม่ได้บอกว่าเลือกได้ข้อเดียวหรือหลายข้อ)",
+   "value": {
+    "where": "โครงกระดาษ",
+    "detail": "☐ 3 ตัวเลือกไม่ได้บอกว่าเลือกได้ข้อเดียวหรือหลายข้อ",
+    "rule": "1 ใบ = 1 ประเภทคำขอ · ส่วนที่ไม่ได้เลือกต้องว่าง (validation)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-14",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: เลือก ไม่อนุมัติ → เหตุผลบังคับ (พบ: ไม่อนุมัติ มีช่องเหตุผล แต่ไม่บังคับบนกระดาษ)",
+   "value": {
+    "where": "ช่องลงชื่อ ผู้อนุมัติ",
+    "detail": "ไม่อนุมัติ มีช่องเหตุผล แต่ไม่บังคับบนกระดาษ",
+    "rule": "เลือก ไม่อนุมัติ → เหตุผลบังคับ"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  }
+ ],
+ "raw": {
+  "config_changes": [],
+  "post_to": [],
+  "doa": {
+   "required": true,
+   "mode": "dynamic",
+   "default_steps": [
+    "role-line-manager",
+    "role-mgr-acc"
+   ],
+   "amount": "none"
+  },
+  "calc": {
+   "constants_from_config": true,
+   "auto_compute": true,
+   "over_limit": "warn",
+   "rules": [
+    "1 ใบ = 1 ประเภทคำขอ (เพิ่ม/แก้ไข/ยกเลิก) · ส่วนที่ไม่ได้เลือกต้องว่าง",
+    "เพิ่ม: ต้องมีชื่อบัญชีอย่างน้อย 1 แถว",
+    "ไม่อนุมัติ → เหตุผลบังคับ"
+   ]
+  },
+  "repeat": {
+   "max_rows": null
+  },
+  "fidelity": {
+   "one_to_one": true,
+   "add_fields": [],
+   "merge_split": [],
+   "spelling_fix": [
+    "ส่วนกรณีขอยกเลิก: วัตถุประสงค์ในการแก้ไข → วัตถุประสงค์ในการยกเลิก"
+   ]
+  },
+  "signature": {
+   "layout": "row-bottom",
+   "per_doa_step": true,
+   "handwriting_image": false
+  },
+  "reject_cancel": {
+   "on_reject": "draft",
+   "cancel_by": [
+    "owner",
+    "admin_role"
+   ],
+   "cancel_states": [
+    "draft",
+    "pending"
+   ],
+   "reason_required": true
+  },
+  "visibility": {
+   "owner": true,
+   "approver": "after_submit",
+   "admin_role": "all"
+  },
+  "numbering": {
+   "issue_on": "first_save",
+   "code": "ACR"
+  },
+  "extras": {
+   "attachments": true,
+   "copy": false,
+   "export_csv": true,
+   "announce": false
+  },
+  "extend": {},
+  "fit": {}
+ },
+ "unattended": true
+}

@@ -1,0 +1,56 @@
+{
+  "form": { "title": "แบบฟอร์มใบแจ้งซ่อมสินทรัพย์", "form_code": "FM-ASM-03", "revision": "",
+            "source_file": "3. FM-ASM-03 แบบฟอร์มใบแจ้งซ่อมสินทรัพย์.xlsx", "sha256": "e4242d2bd0b5daa0", "pages": 1, "paper": "A4-portrait",
+            "note": "ต้นฉบับ Excel (scale 56%) · ชื่อเอกสารอยู่ใน text box หัวกระดาษ · Doc. No. อยู่ท้ายกระดาษขวา (footer) · ไม่มี Rev. บนกระดาษ" },
+  "blocks": [
+    { "id": "B01", "kind": "logo" },
+    { "id": "B02", "kind": "title", "text": "แบบฟอร์มใบแจ้งซ่อมสินทรัพย์" },
+    { "id": "B03", "kind": "row", "fields": ["F01"] },
+    { "id": "B04", "kind": "row", "fields": ["F02", "F03", "F04"] },
+    { "id": "B05", "kind": "para", "text": "มีความประสงค์จะขอแจ้งซ่อมทรัพย์สิน ดังนี้" },
+    { "id": "B06", "kind": "repeat", "group": "items" },
+    { "id": "B07", "kind": "sign", "signature": "S1", "fields": ["F11"] },
+    { "id": "B08", "kind": "para", "text": "ทั้งนี้ทรัพย์สิน ดังกล่าวมีประวัติการซ่อมดังนี้" },
+    { "id": "B09", "kind": "repeat", "group": "history" },
+    { "id": "B10", "kind": "sign", "signature": "S2" },
+    { "id": "B11", "kind": "sign", "signature": "S3" },
+    { "id": "B12", "kind": "sign", "signature": "S4" },
+    { "id": "B13", "kind": "control" }
+  ],
+  "fields": [
+    { "id": "F01", "label": "เลขที่", "key": "doc_no", "type": "text", "source": "auto", "required": true, "sample": "" },
+    { "id": "F02", "label": "ชื่อ-นามสกุล", "key": "employee.name", "type": "text", "source": "system", "system_path": "Employee.full_name", "owner": "HR · Employee", "required": true, "sample": "", "pdpa": true },
+    { "id": "F03", "label": "ตําแหน่ง", "key": "employee.position", "type": "text", "source": "system", "system_path": "Employee.position → Position & Tier", "owner": "Organization · Position & Tier", "required": true, "sample": "" },
+    { "id": "F04", "label": "ฝ่าย/แผนก", "key": "employee.dept", "type": "text", "source": "system", "system_path": "Employee.department → Department.name", "owner": "Organization · Department", "required": true, "sample": "" },
+    { "id": "F05", "label": "รายการ", "key": "items[].description", "type": "text", "source": "user", "repeat_group": "items", "required": true, "sample": "", "note": "ชื่อทรัพย์สิน — เติมให้อัตโนมัติเมื่อเลือกทะเบียนสินทรัพย์ แก้ไขได้" },
+    { "id": "F06", "label": "ทะเบียนสินทรัพย์", "key": "items[].asset_code", "type": "lookup", "source": "user", "repeat_group": "items", "required": false, "sample": "", "note": "เลือกจาก Asset Master (Asset Management) · ทรัพย์สินที่ไม่มีทะเบียน (เช่น ของสิ้นเปลือง) เว้นว่างได้ — รอยืนยัน" },
+    { "id": "F07", "label": "จำนวน", "key": "items[].qty", "type": "number", "source": "user", "repeat_group": "items", "required": true, "sample": "" },
+    { "id": "F08", "label": "อาการชำรุด", "key": "items[].symptom", "type": "text", "source": "user", "repeat_group": "items", "required": true, "sample": "" },
+    { "id": "F09", "label": "สถานที่ตั้ง", "key": "items[].location", "type": "text", "source": "user", "repeat_group": "items", "required": true, "sample": "", "note": "ค่าเริ่ม = สถานที่ตั้งจาก Asset Master (ถ้ามี) แก้ไขได้" },
+    { "id": "F10", "label": "หมายเหตุ", "key": "items[].remark", "type": "text", "source": "user", "repeat_group": "items", "required": false, "sample": "" },
+    { "id": "F11", "label": "วันที่ เดือน พ.ศ. (ผู้แจ้งซ่อม)", "key": "req_date", "type": "date", "source": "auto", "required": true, "sample": "", "note": "วันที่ส่งใบแจ้งซ่อม · พิมพ์แบบ วันที่…เดือน…พ.ศ.…" },
+    { "id": "F12", "label": "รายการ", "key": "history[].description", "type": "text", "source": "user", "repeat_group": "history", "required": false, "sample": "", "note": "ประวัติซ่อม — ผู้ตรวจสอบกรอก (ยังไม่มี Maintenance Schedule ในระบบ) — รอยืนยัน" },
+    { "id": "F13", "label": "ซ่อมครั้งสุดท้าย", "key": "history[].last_repair_date", "type": "date", "source": "user", "repeat_group": "history", "required": false, "sample": "" },
+    { "id": "F14", "label": "จำนวนครั้งที่ซ่อม", "key": "history[].repair_count", "type": "number", "source": "user", "repeat_group": "history", "required": false, "sample": "" }
+  ],
+  "repeat_groups": [
+    { "id": "items", "label": "รายการทรัพย์สินที่แจ้งซ่อม", "min_rows": 10, "max_rows": null, "note": "คอลัมน์ ลําดับ 1–10 พิมพ์ตายตัว = เลขแถวอัตโนมัติ" },
+    { "id": "history", "label": "ประวัติการซ่อม", "min_rows": 6, "max_rows": null, "note": "คอลัมน์ ลำดับ ว่าง (ไม่มีเลขพิมพ์) = เลขแถวอัตโนมัติ" }
+  ],
+  "choices": [],
+  "formulas": [],
+  "constants": [],
+  "signatures": [
+    { "id": "S1", "role_on_paper": "ผู้แจ้งซ่อม (ลงชื่อใต้ตารางรายการ)", "who": "requester", "decision": [], "with_date": "วันที่…เดือน…พ.ศ…" },
+    { "id": "S2", "role_on_paper": "ผู้แจ้งซ่อม (แถวลงชื่อล่าง)", "who": "requester", "decision": [], "with_date": "…/…/…" },
+    { "id": "S3", "role_on_paper": "ผู้ตรวจสอบ", "who": "approver", "decision": [], "with_date": "…/…/…" },
+    { "id": "S4", "role_on_paper": "ผู้อนุมัติ", "who": "approver", "decision": [], "with_date": "…/…/…" }
+  ],
+  "control": { "doc_no_on_paper": "FM-ASM-03", "revision": "", "running_no_on_paper": true },
+  "anomalies": [
+    { "where": "ช่องลงชื่อ", "detail": "ผู้แจ้งซ่อมลงชื่อ 2 จุด (ใต้ตารางรายการ + แถวลงชื่อล่าง)", "rule": "ระบบบันทึกผู้แจ้งครั้งเดียวตอนส่ง แล้วแสดงทั้ง 2 จุดบนแบบพิมพ์" },
+    { "where": "ช่องผู้ตรวจสอบ/ผู้อนุมัติ", "detail": "ไม่มี ☐ อนุมัติ/ไม่อนุมัติ บนกระดาษ", "rule": "ผลพิจารณามาจาก DOA · ไม่อนุมัติต้องใส่เหตุผล" },
+    { "where": "ตารางรายการ", "detail": "แถวรายการว่างทั้งหมด (ไม่มีข้อมูลตัวอย่าง)", "rule": "ต้องมีรายการอย่างน้อย 1 แถว · จำนวน > 0" },
+    { "where": "ถ้อยคำ", "detail": "หัวกระดาษใช้ 'สินทรัพย์' แต่ข้อความใช้ 'ทรัพย์สิน'", "rule": "คงถ้อยคำตามกระดาษ (G5 1:1)" }
+  ]
+}

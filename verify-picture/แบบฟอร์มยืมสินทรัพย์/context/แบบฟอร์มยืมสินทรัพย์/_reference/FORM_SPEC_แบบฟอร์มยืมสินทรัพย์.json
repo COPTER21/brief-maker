@@ -1,0 +1,49 @@
+{
+  "form": { "title": "แบบฟอร์มยืมสินทรัพย์", "form_code": "FM-ASM-04", "revision": "Rev.00 : 01/07/2569",
+            "source_file": "4. FM-ASM-04 แบบฟอร์มยืมสินทรัพย์.xlsx", "sha256": "adfa5e4a8412de97", "pages": 1, "paper": "A4-portrait",
+            "department": "ฝ่ายบริหารสินทรัพย์", "note": "ต้นฉบับ Excel 1 sheet (Sheet2) · Doc No./Rev. อยู่ท้ายกระดาษขวา (footer) · โลโก้บริษัทซ้ายบน" },
+  "blocks": [
+    { "id": "B01", "kind": "logo" },
+    { "id": "B02", "kind": "title", "text": "แบบฟอร์มยืมสินทรัพย์" },
+    { "id": "B03", "kind": "row", "fields": ["F01"], "align": "right" },
+    { "id": "B04", "kind": "row", "fields": ["F02", "F03", "F04"] },
+    { "id": "B05", "kind": "row", "fields": ["F05"], "text": "ขอยืมสินทรัพย์ เพื่อใช้" },
+    { "id": "B06", "kind": "repeat", "group": "items" },
+    { "id": "B07", "kind": "sign", "signature": "S1" },
+    { "id": "B08", "kind": "sign", "signature": "S2" },
+    { "id": "B09", "kind": "para", "text": "ได้รับสินทรัพย์ตามรายการข้างต้นคืนในสภาพที่ใช้งานได้ปกติเรียบร้อย ครบถ้วน" },
+    { "id": "B10", "kind": "sign", "signature": "S3" },
+    { "id": "B11", "kind": "sign", "signature": "S4" },
+    { "id": "B12", "kind": "control" }
+  ],
+  "fields": [
+    { "id": "F01", "label": "เลขที่", "key": "doc_no", "type": "text", "source": "auto", "required": true, "sample": "", "note": "เลขที่เอกสาร running" },
+    { "id": "F02", "label": "ข้าพเจ้า", "key": "requester.name", "type": "text", "source": "system", "system_path": "Employee.full_name", "owner": "HR · Employee", "required": true, "sample": "", "pdpa": true },
+    { "id": "F03", "label": "ตำแหน่ง", "key": "requester.position", "type": "text", "source": "system", "system_path": "Employee.position", "owner": "Organization · Position & Tier", "required": true, "sample": "" },
+    { "id": "F04", "label": "ฝ่าย/แผนก", "key": "requester.dept", "type": "text", "source": "system", "system_path": "OrgUnit.name", "owner": "Organization · Department", "required": true, "sample": "" },
+    { "id": "F05", "label": "ขอยืมสินทรัพย์ เพื่อใช้", "key": "purpose", "type": "textarea", "source": "user", "required": true, "sample": "" },
+    { "id": "F06", "label": "ลำดับ", "key": "items[].seq", "type": "number", "source": "auto", "repeat_group": "items", "required": true, "sample": "" },
+    { "id": "F07", "label": "รายการ", "key": "items[].asset_name", "type": "text", "source": "system", "system_path": "Asset.name (เลือกจากทะเบียนสินทรัพย์)", "owner": "Asset Management · Asset Master", "repeat_group": "items", "required": true, "sample": "", "note": "ดึงชื่อตามทะเบียนที่เลือก" },
+    { "id": "F08", "label": "ทะเบียนสินทรัพย์", "key": "items[].asset_code", "type": "lookup", "source": "user", "repeat_group": "items", "required": true, "sample": "", "note": "เลือกจาก Asset Master (Asset Management) — ผู้ยืมเลือก" },
+    { "id": "F09", "label": "จำนวนที่ยืม", "key": "items[].qty_requested", "type": "number", "source": "user", "repeat_group": "items", "required": true, "sample": "" },
+    { "id": "F10", "label": "จำนวนที่ให้ยืม", "key": "items[].qty_lent", "type": "number", "source": "user", "repeat_group": "items", "required": false, "sample": "", "note": "ผู้ให้ยืมกรอกตอนพิจารณา · ≤ จำนวนที่ยืม" },
+    { "id": "F11", "label": "วันที่ยืม", "key": "items[].borrow_date", "type": "date", "source": "user", "repeat_group": "items", "required": true, "sample": "" },
+    { "id": "F12", "label": "วันที่ส่งคืน", "key": "items[].return_date", "type": "date", "source": "user", "repeat_group": "items", "required": true, "sample": "", "note": "กำหนดวันส่งคืน · ≥ วันที่ยืม" },
+    { "id": "F13", "label": "หมายเหตุ", "key": "items[].remark", "type": "text", "source": "user", "repeat_group": "items", "required": false, "sample": "" }
+  ],
+  "repeat_groups": [ { "id": "items", "label": "รายการสินทรัพย์ที่ยืม", "min_rows": 11, "max_rows": null } ],
+  "choices": [],
+  "formulas": [],
+  "constants": [],
+  "signatures": [
+    { "id": "S1", "role_on_paper": "ผู้ยืม", "who": "requester", "decision": [], "lines": ["ลงชื่อ", "(ชื่อ)", "ตำแหน่ง", "วันที่ เดือน พ.ศ."] },
+    { "id": "S2", "role_on_paper": "ผู้ให้ยืม", "who": "approver", "decision": ["อนุมัติ", "ไม่อนุมัติ"], "lines": ["ลงชื่อ", "(ชื่อ)", "ตำแหน่ง", "วันที่ เดือน พ.ศ."], "note": "บนกระดาษไม่มีคำตัดสิน — ลงชื่อ = ให้ยืม" },
+    { "id": "S3", "role_on_paper": "ผู้ส่งคืน", "who": "requester", "decision": [], "lines": ["ลงชื่อ", "(ชื่อ)", "ตำแหน่ง", "วันที่ เดือน พ.ศ."], "note": "ส่วนรับคืน (หลังอนุมัติ)" },
+    { "id": "S4", "role_on_paper": "ผู้รับคืน", "who": "other", "decision": [], "lines": ["ลงชื่อ", "(ชื่อ)", "ตำแหน่ง", "วันที่ เดือน พ.ศ."], "note": "ผู้ดูแลสินทรัพย์ยืนยันรับคืน — ไม่ใช่ขั้นอนุมัติ" }
+  ],
+  "control": { "doc_no_on_paper": "FM-ASM-04", "revision": "Rev.00 : 01/07/2569", "running_no_on_paper": true },
+  "anomalies": [
+    { "where": "แบบฟอร์มเปล่า (ไม่มีข้อมูลตัวอย่าง)", "detail": "ช่อง จำนวนที่ให้ยืม อยู่แถวเดียวกับ จำนวนที่ยืม แต่ผู้กรอกต่างกัน (ผู้ให้ยืม)", "rule": "จำนวนที่ให้ยืม ≤ จำนวนที่ยืม และ > 0 เมื่ออนุมัติ" },
+    { "where": "แบบฟอร์มเปล่า (ไม่มีข้อมูลตัวอย่าง)", "detail": "วันที่ส่งคืนในตารางเป็นกำหนดคืน แต่ส่วนรับคืนมีวันที่จริงแยก", "rule": "วันที่ส่งคืน ≥ วันที่ยืม · รับคืนจริงบันทึกที่ส่วนรับคืน" }
+  ]
+}
