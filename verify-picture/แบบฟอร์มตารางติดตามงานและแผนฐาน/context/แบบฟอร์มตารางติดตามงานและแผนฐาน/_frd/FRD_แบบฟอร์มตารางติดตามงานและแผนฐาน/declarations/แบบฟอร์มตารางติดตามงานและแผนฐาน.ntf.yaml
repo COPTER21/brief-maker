@@ -1,0 +1,34 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock · แก้/เติมแล้ว
+feature_id: F-TMP-004
+name: แบบฟอร์มตารางติดตามงานและแผนฐาน
+code: IVMB
+events:
+- id: ivmb_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-004-FN-08, F-TMP-004-FN-10
+- id: ivmb_baseline_approved
+  trigger: pending_approval → approved (ขั้นสุดท้าย) — แผนฐานและรายการติดตามงานมีผล
+  recipients:
+  - milestone_owners
+  - task_owners
+  template: '**{doc_no}** {project_name} — แผนฐานอนุมัติแล้ว · งานของคุณ {task_count}
+    รายการ กำหนดส่งแรก {first_due}'
+  channel: in-app+email
+  optional: false
+  why: ผู้รับผิดชอบหมุดหมาย/งานแต่ละแถวต้องรู้ว่าได้รับมอบหมายและกำหนดส่ง (DOA engine
+    แจ้งเฉพาะผู้ขอ)
+  frd_ref: 03_LOGIC F-TMP-004-FN-06, F-TMP-004-FN-10
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+dropped:
+- ivmb_over_limit_approved — เกณฑ์เตือน (ช้ากว่าแผน · แล้วเสร็จ<100%) แสดงในฟอร์มขณะกรอก
+  ไม่ต้องแจ้งหลังอนุมัติ

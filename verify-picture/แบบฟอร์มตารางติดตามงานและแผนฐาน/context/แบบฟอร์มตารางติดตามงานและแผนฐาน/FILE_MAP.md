@@ -1,0 +1,63 @@
+# FILE_MAP — แบบฟอร์มตารางติดตามงานและแผนฐาน
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `01_Prototype/feature.html` | `_ui/UI_แบบฟอร์มตารางติดตามงานและแผนฐาน.html` |
+| `02_BRD/BRD_F-TMP-004.docx` | `_brd/BRD_แบบฟอร์มตารางติดตามงานและแผนฐาน.docx` |
+| `02_BRD/BRD_F-TMP-004.md` | `_brd/BRD_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/00_OVERVIEW.md` | `_frd/FRD_แบบฟอร์มตารางติดตามงานและแผนฐาน/00_OVERVIEW_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/01_UI.md` | `_frd/FRD_แบบฟอร์มตารางติดตามงานและแผนฐาน/01_UI_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/02_API.md` | `_frd/FRD_แบบฟอร์มตารางติดตามงานและแผนฐาน/02_API_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/03_LOGIC.md` | `_frd/FRD_แบบฟอร์มตารางติดตามงานและแผนฐาน/03_LOGIC_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/04_DB.md` | `_frd/FRD_แบบฟอร์มตารางติดตามงานและแผนฐาน/04_DB_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/05_RULES.md` | `_frd/FRD_แบบฟอร์มตารางติดตามงานและแผนฐาน/05_RULES_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/06_TESTS.md` | `_frd/FRD_แบบฟอร์มตารางติดตามงานและแผนฐาน/06_TESTS_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_แบบฟอร์มตารางติดตามงานและแผนฐาน/07_LOCKED_DECISIONS_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/INDEX.md` | `_frd/FRD_แบบฟอร์มตารางติดตามงานและแผนฐาน/INDEX_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/_SECTION_N.md` | `_frd/FRD_แบบฟอร์มตารางติดตามงานและแผนฐาน/_SECTION_N_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/DOA_BRIEF_F-TMP-004.md` | `_frd/FRD_แบบฟอร์มตารางติดตามงานและแผนฐาน/declarations/DOA_BRIEF_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/DOCCFG_BRIEF_F-TMP-004.md` | `_frd/FRD_แบบฟอร์มตารางติดตามงานและแผนฐาน/declarations/DOCCFG_BRIEF_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/IVMB.doa.yaml` | `_frd/FRD_แบบฟอร์มตารางติดตามงานและแผนฐาน/declarations/แบบฟอร์มตารางติดตามงานและแผนฐาน.doa.yaml` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/IVMB.doccfg.yaml` | `_frd/FRD_แบบฟอร์มตารางติดตามงานและแผนฐาน/declarations/แบบฟอร์มตารางติดตามงานและแผนฐาน.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/IVMB.mdoc.yaml` | `_frd/FRD_แบบฟอร์มตารางติดตามงานและแผนฐาน/declarations/แบบฟอร์มตารางติดตามงานและแผนฐาน.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/IVMB.ntf.yaml` | `_frd/FRD_แบบฟอร์มตารางติดตามงานและแผนฐาน/declarations/แบบฟอร์มตารางติดตามงานและแผนฐาน.ntf.yaml` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/MDOC_BRIEF_IVMB.md` | `_frd/FRD_แบบฟอร์มตารางติดตามงานและแผนฐาน/declarations/MDOC_BRIEF_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `03_FRD/FRD_F-TMP-004_Pack/declarations/NTF_BRIEF_F-TMP-004.md` | `_frd/FRD_แบบฟอร์มตารางติดตามงานและแผนฐาน/declarations/NTF_BRIEF_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-004.md` | `_uibrief/UIBRIEF_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_แบบฟอร์มตารางติดตามงานและแผนฐาน.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `05_Governance/DOA_BRIEF_F-TMP-004.md` | `_governance/DOA_BRIEF_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-004.md` | `_governance/DOCCFG_BRIEF_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `05_Governance/IVMB.doa.yaml` | `_governance/แบบฟอร์มตารางติดตามงานและแผนฐาน.doa.yaml` |
+| `05_Governance/IVMB.doccfg.yaml` | `_governance/แบบฟอร์มตารางติดตามงานและแผนฐาน.doccfg.yaml` |
+| `05_Governance/IVMB.mdoc.yaml` | `_governance/แบบฟอร์มตารางติดตามงานและแผนฐาน.mdoc.yaml` |
+| `05_Governance/IVMB.ntf.yaml` | `_governance/แบบฟอร์มตารางติดตามงานและแผนฐาน.ntf.yaml` |
+| `05_Governance/MDOC_BRIEF_IVMB.md` | `_governance/MDOC_BRIEF_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-004.md` | `_governance/NTF_BRIEF_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_แบบฟอร์มตารางติดตามงานและแผนฐาน.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-004.md` | `_tc/QA_AUDIT_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `06_Test/cases.json` | `_tc/แบบฟอร์มตารางติดตามงานและแผนฐาน_cases.json` |
+| `06_Test/testcase-F-TMP-004.html` | `_tc/UAT_แบบฟอร์มตารางติดตามงานและแผนฐาน.html` |
+| `06_Test/testcases-F-TMP-004.md` | `_tc/TC_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `07_Print/R1.data.json` | `_document/แบบฟอร์มตารางติดตามงานและแผนฐาน_R1.data.json` |
+| `07_Print/approved-doa6steps.data.json` | `_document/แบบฟอร์มตารางติดตามงานและแผนฐาน_approved-doa6steps.data.json` |
+| `07_Print/approved.data.json` | `_document/แบบฟอร์มตารางติดตามงานและแผนฐาน_approved.data.json` |
+| `07_Print/draft.data.json` | `_document/แบบฟอร์มตารางติดตามงานและแผนฐาน_draft.data.json` |
+| `07_Print/form.tpl.html` | `_document/แบบฟอร์มตารางติดตามงานและแผนฐาน_template.html` |
+| `07_Print/long-12milestones-18tasks.data.json` | `_document/แบบฟอร์มตารางติดตามงานและแผนฐาน_long-12milestones-18tasks.data.json` |
+| `07_Print/print_config.json` | `_document/แบบฟอร์มตารางติดตามงานและแผนฐาน_print_config.json` |
+| `07_Print/profile.json` | `_document/แบบฟอร์มตารางติดตามงานและแผนฐาน_profile.json` |
+| `07_Print/rejected.data.json` | `_document/แบบฟอร์มตารางติดตามงานและแผนฐาน_rejected.data.json` |
+| `07_Print/แบบฟอร์มตารางติดตามงานและแผนฐาน_print-spec.md` | `_document/แบบฟอร์มตารางติดตามงานและแผนฐาน_print-spec.md` |
+| `07_Print/แบบฟอร์มตารางติดตามงานและแผนฐาน_template.html` | `_document/แบบฟอร์มตารางติดตามงานและแผนฐาน_template.html` |
+| `08_Reference/2. FM-IVM-02 แบบฟอร์มตารางติดตามงานและแผนฐาน.xlsx` | `_reference/2. FM-IVM-02 แบบฟอร์มตารางติดตามงานและแผนฐาน.xlsx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_แบบฟอร์มตารางติดตามงานและแผนฐาน.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_แบบฟอร์มตารางติดตามงานและแผนฐาน.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-004.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-004_แบบฟอร์มตารางติดตามงานและแผนฐาน.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-004_v2.md` | `_reference/PREBRIEF_REQ-TMP-004_v2_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_แบบฟอร์มตารางติดตามงานและแผนฐาน.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_แบบฟอร์มตารางติดตามงานและแผนฐาน.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_แบบฟอร์มตารางติดตามงานและแผนฐาน.md` |

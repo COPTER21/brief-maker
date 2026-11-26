@@ -1,0 +1,42 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock · แก้/เติมแล้ว
+feature_id: F-TMP-009
+name: แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง
+code: IVMG
+events:
+- id: ivmg_cancelled
+  frd_ref: 03_LOGIC F-TMP-009-FN-08, F-TMP-009-FN-11
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+- id: ivmg_delivery_failed
+  frd_ref: 03_LOGIC F-TMP-009-FN-10, F-TMP-009-FN-11
+  trigger: approved — บันทึกแถวหลักฐานการนำส่งที่สถานะการรับ = ส่งไม่สำเร็จ
+  recipients:
+  - requester
+  - admin_role
+  template: '**{doc_no}** {project_name} — นำส่งไม่สำเร็จถึง {receiver} ({channel}) · {remark}'
+  channel: in-app+email
+  optional: false
+  why: ชุดเอกสารอนุมัติแล้วแต่ส่งไม่ถึงผู้รับภายนอก — ผู้จัดทำและ admin ฝ่ายต้องติดตามส่งใหม่
+    (DOA engine แจ้งเฉพาะผลอนุมัติ)
+- id: ivmg_dispatch_closed
+  frd_ref: 03_LOGIC F-TMP-009-FN-11, F-TMP-009-FN-13
+  trigger: approved → closed (ปิดการนำส่ง)
+  recipients:
+  - approval_chain
+  - admin_role
+  template: '**{doc_no}** {project_name} — ปิดการนำส่งแล้ว · รับแล้ว {received_count} รายการ'
+  channel: in-app
+  optional: true
+  why: ผู้ตรวจสอบ/ผู้อนุมัติรับทราบว่าชุดเอกสารที่อนุมัติไปถึงผู้รับครบพร้อมหลักฐาน
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+dropped:
+- ivmg_over_limit_approved — กระดาษไม่มีเกณฑ์ตัวเลข · คำเตือน (มีแถวขาดเอกสาร / ส่งก่อนวันที่นำส่ง) แสดงในฟอร์มขณะกรอก

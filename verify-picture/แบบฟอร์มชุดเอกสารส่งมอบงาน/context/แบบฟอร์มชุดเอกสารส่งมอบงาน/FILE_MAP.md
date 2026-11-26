@@ -1,0 +1,63 @@
+# FILE_MAP — แบบฟอร์มชุดเอกสารส่งมอบงาน
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `01_Prototype/feature.html` | `_ui/UI_แบบฟอร์มชุดเอกสารส่งมอบงาน.html` |
+| `02_BRD/BRD_F-TMP-008.docx` | `_brd/BRD_แบบฟอร์มชุดเอกสารส่งมอบงาน.docx` |
+| `02_BRD/BRD_F-TMP-008.md` | `_brd/BRD_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/00_OVERVIEW.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารส่งมอบงาน/00_OVERVIEW_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/01_UI.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารส่งมอบงาน/01_UI_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/02_API.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารส่งมอบงาน/02_API_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/03_LOGIC.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารส่งมอบงาน/03_LOGIC_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/04_DB.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารส่งมอบงาน/04_DB_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/05_RULES.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารส่งมอบงาน/05_RULES_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/06_TESTS.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารส่งมอบงาน/06_TESTS_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารส่งมอบงาน/07_LOCKED_DECISIONS_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/INDEX.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารส่งมอบงาน/INDEX_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/_SECTION_N.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารส่งมอบงาน/_SECTION_N_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/declarations/DOA_BRIEF_F-TMP-008.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารส่งมอบงาน/declarations/DOA_BRIEF_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/declarations/DOCCFG_BRIEF_F-TMP-008.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารส่งมอบงาน/declarations/DOCCFG_BRIEF_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/declarations/IVMF.doa.yaml` | `_frd/FRD_แบบฟอร์มชุดเอกสารส่งมอบงาน/declarations/แบบฟอร์มชุดเอกสารส่งมอบงาน.doa.yaml` |
+| `03_FRD/FRD_F-TMP-008_Pack/declarations/IVMF.doccfg.yaml` | `_frd/FRD_แบบฟอร์มชุดเอกสารส่งมอบงาน/declarations/แบบฟอร์มชุดเอกสารส่งมอบงาน.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-008_Pack/declarations/IVMF.mdoc.yaml` | `_frd/FRD_แบบฟอร์มชุดเอกสารส่งมอบงาน/declarations/แบบฟอร์มชุดเอกสารส่งมอบงาน.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-008_Pack/declarations/IVMF.ntf.yaml` | `_frd/FRD_แบบฟอร์มชุดเอกสารส่งมอบงาน/declarations/แบบฟอร์มชุดเอกสารส่งมอบงาน.ntf.yaml` |
+| `03_FRD/FRD_F-TMP-008_Pack/declarations/MDOC_BRIEF_IVMF.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารส่งมอบงาน/declarations/MDOC_BRIEF_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `03_FRD/FRD_F-TMP-008_Pack/declarations/NTF_BRIEF_F-TMP-008.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารส่งมอบงาน/declarations/NTF_BRIEF_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-008.md` | `_uibrief/UIBRIEF_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_แบบฟอร์มชุดเอกสารส่งมอบงาน.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `05_Governance/DOA_BRIEF_F-TMP-008.md` | `_governance/DOA_BRIEF_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-008.md` | `_governance/DOCCFG_BRIEF_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `05_Governance/IVMF.doa.yaml` | `_governance/แบบฟอร์มชุดเอกสารส่งมอบงาน.doa.yaml` |
+| `05_Governance/IVMF.doccfg.yaml` | `_governance/แบบฟอร์มชุดเอกสารส่งมอบงาน.doccfg.yaml` |
+| `05_Governance/IVMF.mdoc.yaml` | `_governance/แบบฟอร์มชุดเอกสารส่งมอบงาน.mdoc.yaml` |
+| `05_Governance/IVMF.ntf.yaml` | `_governance/แบบฟอร์มชุดเอกสารส่งมอบงาน.ntf.yaml` |
+| `05_Governance/MDOC_BRIEF_IVMF.md` | `_governance/MDOC_BRIEF_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-008.md` | `_governance/NTF_BRIEF_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_แบบฟอร์มชุดเอกสารส่งมอบงาน.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-008.md` | `_tc/QA_AUDIT_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `06_Test/cases.json` | `_tc/แบบฟอร์มชุดเอกสารส่งมอบงาน_cases.json` |
+| `06_Test/testcase-F-TMP-008.html` | `_tc/UAT_แบบฟอร์มชุดเอกสารส่งมอบงาน.html` |
+| `06_Test/testcases-F-TMP-008.md` | `_tc/TC_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `07_Print/R1.data.json` | `_document/แบบฟอร์มชุดเอกสารส่งมอบงาน_R1.data.json` |
+| `07_Print/approved-doa6steps.data.json` | `_document/แบบฟอร์มชุดเอกสารส่งมอบงาน_approved-doa6steps.data.json` |
+| `07_Print/approved.data.json` | `_document/แบบฟอร์มชุดเอกสารส่งมอบงาน_approved.data.json` |
+| `07_Print/draft.data.json` | `_document/แบบฟอร์มชุดเอกสารส่งมอบงาน_draft.data.json` |
+| `07_Print/form.tpl.html` | `_document/แบบฟอร์มชุดเอกสารส่งมอบงาน_template.html` |
+| `07_Print/long-16rows.data.json` | `_document/แบบฟอร์มชุดเอกสารส่งมอบงาน_long-16rows.data.json` |
+| `07_Print/print_config.json` | `_document/แบบฟอร์มชุดเอกสารส่งมอบงาน_print_config.json` |
+| `07_Print/profile.json` | `_document/แบบฟอร์มชุดเอกสารส่งมอบงาน_profile.json` |
+| `07_Print/rejected.data.json` | `_document/แบบฟอร์มชุดเอกสารส่งมอบงาน_rejected.data.json` |
+| `07_Print/แบบฟอร์มชุดเอกสารส่งมอบงาน_print-spec.md` | `_document/แบบฟอร์มชุดเอกสารส่งมอบงาน_print-spec.md` |
+| `07_Print/แบบฟอร์มชุดเอกสารส่งมอบงาน_template.html` | `_document/แบบฟอร์มชุดเอกสารส่งมอบงาน_template.html` |
+| `08_Reference/6. FM-IVM-06 แบบฟอร์มชุดเอกสารส่งมอบงาน.xlsx` | `_reference/6. FM-IVM-06 แบบฟอร์มชุดเอกสารส่งมอบงาน.xlsx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_แบบฟอร์มชุดเอกสารส่งมอบงาน.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_แบบฟอร์มชุดเอกสารส่งมอบงาน.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-008.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-008_แบบฟอร์มชุดเอกสารส่งมอบงาน.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-008_v2.md` | `_reference/PREBRIEF_REQ-TMP-008_v2_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_แบบฟอร์มชุดเอกสารส่งมอบงาน.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_แบบฟอร์มชุดเอกสารส่งมอบงาน.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_แบบฟอร์มชุดเอกสารส่งมอบงาน.md` |

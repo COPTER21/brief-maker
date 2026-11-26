@@ -1,0 +1,54 @@
+# doa-declaration v1.2 — สร้างจาก DECISIONS.lock.json · แก้แล้ว (on_reject back_to_draft · คำตัดสินขั้น 2 รับทราบ/ส่งกลับ)
+feature_id: F-TMP-008
+name: แบบฟอร์มชุดเอกสารส่งมอบงาน
+module: investment
+platform: core
+doa_type: ivmf
+approval_scope: document_sign
+approval_required: true
+mode: dynamic
+amount: none
+dept_mode: merged
+on_reject: back_to_draft
+cancel_by:
+- owner
+- admin_role
+cancel_states:
+- draft
+- pending
+actions:
+- id: submit_ivmf
+  label: ส่งอนุมัติแบบฟอร์มชุดเอกสารส่งมอบงาน
+  from_state: draft
+matrix:
+- amount_from: 0
+  amount_to: null
+  departments: merged
+  chainMode: sequential
+  steps:
+  - roles:
+    - role-line-manager
+    label: ผู้ตรวจสอบ
+    decision:
+      approve: ตรวจสอบแล้ว
+      reject: ส่งกลับ
+  - roles:
+    - role-mgr-bu
+    label: ผู้อนุมัติ / รับทราบ
+    decision:
+      approve: รับทราบ
+      reject: ส่งกลับ
+defaults_unconfirmed: true
+wire_status: pending
+source_decisions:
+- DEC-03
+- DEC-07
+- DEC-08
+role_notes:
+  role-line-manager: บนกระดาษ = ผู้จัดการฝ่ายบริหารการลงทุน (ไม่มี role เฉพาะใน contract
+    — ใช้ผู้บังคับบัญชาตรงของผู้จัดทำ)
+  role-mgr-bu: บนกระดาษ = ฝ่ายพัฒนาธุรกิจรับทราบผลการรับมอบ (ฝ่ายผู้ส่งมอบ · ไม่มี
+    role ฝ่ายพัฒนาธุรกิจใน contract — map เป็น role-mgr-bu หัวหน้าหน่วยธุรกิจ รอยืนยัน)
+module_note: module investment (ฝ่ายบริหารการลงทุน) ไม่อยู่ใน Module Registry 9 ตัว
+  — ต้องเพิ่มที่ DOA กลาง
+todo: 'TODO: DOA engine — resolve approval_chain จาก DOA กลาง (F-DLG-001)'

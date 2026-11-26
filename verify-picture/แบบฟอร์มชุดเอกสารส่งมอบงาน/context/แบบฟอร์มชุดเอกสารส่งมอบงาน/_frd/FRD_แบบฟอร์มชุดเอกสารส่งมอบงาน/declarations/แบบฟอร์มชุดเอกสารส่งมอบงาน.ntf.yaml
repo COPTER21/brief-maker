@@ -1,0 +1,35 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock · แก้/เติมแล้ว
+feature_id: F-TMP-008
+name: แบบฟอร์มชุดเอกสารส่งมอบงาน
+code: IVMF
+events:
+- id: ivmf_cancelled
+  frd_ref: 03_LOGIC F-TMP-008-FN-08, F-TMP-008-FN-10
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+- id: ivmf_handover_followup
+  frd_ref: 03_LOGIC F-TMP-008-FN-06, F-TMP-008-FN-10
+  trigger: pending_approval → approved (ขั้นสุดท้าย) และผลการรับมอบ = รับมอบแบบมีเงื่อนไข
+    หรือ ยังไม่รับมอบ
+  recipients:
+  - requester
+  - admin_role
+  template: '**{doc_no}** {project_name} — {handover_result} · รายการต้องส่งเพิ่ม
+    {pending_count} รายการ · กำหนดส่งเร็วสุด {earliest_due}'
+  channel: in-app+email
+  optional: false
+  why: มีเอกสารค้างส่ง — ผู้รับมอบและ admin ฝ่ายต้องติดตามตามกำหนดส่งเพิ่มเติม (DOA
+    engine แจ้งเฉพาะผลอนุมัติ ไม่บอกรายการค้าง)
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+dropped:
+- ivmf_over_limit_approved — กระดาษไม่มีเกณฑ์ตัวเลข · คำเตือน (ผลการรับมอบไม่ตรงคำแนะนำ)
+  แสดงในฟอร์มขณะกรอก

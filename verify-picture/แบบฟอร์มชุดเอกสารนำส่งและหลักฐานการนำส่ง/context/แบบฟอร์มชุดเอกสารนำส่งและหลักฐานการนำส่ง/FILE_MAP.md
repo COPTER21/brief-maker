@@ -1,0 +1,63 @@
+# FILE_MAP — แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `01_Prototype/feature.html` | `_ui/UI_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.html` |
+| `02_BRD/BRD_F-TMP-009.docx` | `_brd/BRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.docx` |
+| `02_BRD/BRD_F-TMP-009.md` | `_brd/BRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/00_OVERVIEW.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง/00_OVERVIEW_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/01_UI.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง/01_UI_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/02_API.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง/02_API_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/03_LOGIC.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง/03_LOGIC_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/04_DB.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง/04_DB_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/05_RULES.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง/05_RULES_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/06_TESTS.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง/06_TESTS_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง/07_LOCKED_DECISIONS_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/INDEX.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง/INDEX_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/_SECTION_N.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง/_SECTION_N_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/declarations/DOA_BRIEF_F-TMP-009.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง/declarations/DOA_BRIEF_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/declarations/DOCCFG_BRIEF_F-TMP-009.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง/declarations/DOCCFG_BRIEF_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/declarations/IVMG.doa.yaml` | `_frd/FRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง/declarations/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.doa.yaml` |
+| `03_FRD/FRD_F-TMP-009_Pack/declarations/IVMG.doccfg.yaml` | `_frd/FRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง/declarations/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-009_Pack/declarations/IVMG.mdoc.yaml` | `_frd/FRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง/declarations/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-009_Pack/declarations/IVMG.ntf.yaml` | `_frd/FRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง/declarations/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.ntf.yaml` |
+| `03_FRD/FRD_F-TMP-009_Pack/declarations/MDOC_BRIEF_IVMG.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง/declarations/MDOC_BRIEF_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `03_FRD/FRD_F-TMP-009_Pack/declarations/NTF_BRIEF_F-TMP-009.md` | `_frd/FRD_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง/declarations/NTF_BRIEF_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-009.md` | `_uibrief/UIBRIEF_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `05_Governance/DOA_BRIEF_F-TMP-009.md` | `_governance/DOA_BRIEF_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-009.md` | `_governance/DOCCFG_BRIEF_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `05_Governance/IVMG.doa.yaml` | `_governance/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.doa.yaml` |
+| `05_Governance/IVMG.doccfg.yaml` | `_governance/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.doccfg.yaml` |
+| `05_Governance/IVMG.mdoc.yaml` | `_governance/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.mdoc.yaml` |
+| `05_Governance/IVMG.ntf.yaml` | `_governance/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.ntf.yaml` |
+| `05_Governance/MDOC_BRIEF_IVMG.md` | `_governance/MDOC_BRIEF_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-009.md` | `_governance/NTF_BRIEF_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-009.md` | `_tc/QA_AUDIT_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `06_Test/cases.json` | `_tc/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง_cases.json` |
+| `06_Test/testcase-F-TMP-009.html` | `_tc/UAT_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.html` |
+| `06_Test/testcases-F-TMP-009.md` | `_tc/TC_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `07_Print/R3.data.json` | `_document/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง_R3.data.json` |
+| `07_Print/approved-doa6steps.data.json` | `_document/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง_approved-doa6steps.data.json` |
+| `07_Print/approved.data.json` | `_document/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง_approved.data.json` |
+| `07_Print/draft.data.json` | `_document/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง_draft.data.json` |
+| `07_Print/form.tpl.html` | `_document/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง_template.html` |
+| `07_Print/long-16rows.data.json` | `_document/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง_long-16rows.data.json` |
+| `07_Print/print_config.json` | `_document/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง_print_config.json` |
+| `07_Print/profile.json` | `_document/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง_profile.json` |
+| `07_Print/rejected.data.json` | `_document/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง_rejected.data.json` |
+| `07_Print/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง_print-spec.md` | `_document/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง_print-spec.md` |
+| `07_Print/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง_template.html` | `_document/แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง_template.html` |
+| `08_Reference/7. FM-IVM-07 แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.xlsx` | `_reference/7. FM-IVM-07 แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.xlsx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-009.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-009_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-009_v2.md` | `_reference/PREBRIEF_REQ-TMP-009_v2_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_แบบฟอร์มชุดเอกสารนำส่งและหลักฐานการนำส่ง.md` |
