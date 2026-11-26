@@ -1,0 +1,31 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock · แก้/เติมก่อน brief
+feature_id: F-TMP-002
+name: แบบฟอร์มบันทึกเหตุผลการไม่ดำเนินโครงการต่อ
+code: IVMJ
+events:
+- id: ivmj_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-002-FN-07, F-TMP-002-FN-09
+- id: ivmj_result_recorded
+  trigger: pending_approval → approved (ขั้นสุดท้าย) — ผลการพิจารณาถูกบันทึก
+  recipients:
+  - project_owner
+  - reason_owners
+  template: '**{doc_no}** {project_name} — ผลการพิจารณา: {result} · ประเด็นติดตาม:
+    {follow_up}'
+  channel: in-app+email
+  optional: false
+  why: ผู้รับผิดชอบโครงการและผู้รับผิดชอบแต่ละเหตุผลต้องรู้ผล + ข้อสั่งการ/เงื่อนไข
+    เพื่อปิดงาน/จัดเก็บเอกสาร (DOA engine แจ้งเฉพาะผู้ขอ)
+  frd_ref: 03_LOGIC F-TMP-002-FN-05, F-TMP-002-FN-09
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

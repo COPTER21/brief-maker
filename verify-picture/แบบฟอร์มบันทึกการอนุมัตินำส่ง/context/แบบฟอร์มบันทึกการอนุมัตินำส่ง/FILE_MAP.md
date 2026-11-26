@@ -1,0 +1,63 @@
+# FILE_MAP — แบบฟอร์มบันทึกการอนุมัตินำส่ง
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `01_Prototype/feature.html` | `_ui/UI_แบบฟอร์มบันทึกการอนุมัตินำส่ง.html` |
+| `02_BRD/BRD_F-TMP-010.docx` | `_brd/BRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง.docx` |
+| `02_BRD/BRD_F-TMP-010.md` | `_brd/BRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `03_FRD/FRD_F-TMP-010_Pack/00_OVERVIEW.md` | `_frd/FRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง/00_OVERVIEW_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `03_FRD/FRD_F-TMP-010_Pack/01_UI.md` | `_frd/FRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง/01_UI_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `03_FRD/FRD_F-TMP-010_Pack/02_API.md` | `_frd/FRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง/02_API_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `03_FRD/FRD_F-TMP-010_Pack/03_LOGIC.md` | `_frd/FRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง/03_LOGIC_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `03_FRD/FRD_F-TMP-010_Pack/04_DB.md` | `_frd/FRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง/04_DB_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `03_FRD/FRD_F-TMP-010_Pack/05_RULES.md` | `_frd/FRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง/05_RULES_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `03_FRD/FRD_F-TMP-010_Pack/06_TESTS.md` | `_frd/FRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง/06_TESTS_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `03_FRD/FRD_F-TMP-010_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง/07_LOCKED_DECISIONS_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `03_FRD/FRD_F-TMP-010_Pack/INDEX.md` | `_frd/FRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง/INDEX_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `03_FRD/FRD_F-TMP-010_Pack/_SECTION_N.md` | `_frd/FRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง/_SECTION_N_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `03_FRD/FRD_F-TMP-010_Pack/declarations/DOA_BRIEF_F-TMP-010.md` | `_frd/FRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง/declarations/DOA_BRIEF_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `03_FRD/FRD_F-TMP-010_Pack/declarations/DOCCFG_BRIEF_F-TMP-010.md` | `_frd/FRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง/declarations/DOCCFG_BRIEF_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `03_FRD/FRD_F-TMP-010_Pack/declarations/IVMH.doa.yaml` | `_frd/FRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง/declarations/แบบฟอร์มบันทึกการอนุมัตินำส่ง.doa.yaml` |
+| `03_FRD/FRD_F-TMP-010_Pack/declarations/IVMH.doccfg.yaml` | `_frd/FRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง/declarations/แบบฟอร์มบันทึกการอนุมัตินำส่ง.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-010_Pack/declarations/IVMH.mdoc.yaml` | `_frd/FRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง/declarations/แบบฟอร์มบันทึกการอนุมัตินำส่ง.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-010_Pack/declarations/IVMH.ntf.yaml` | `_frd/FRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง/declarations/แบบฟอร์มบันทึกการอนุมัตินำส่ง.ntf.yaml` |
+| `03_FRD/FRD_F-TMP-010_Pack/declarations/MDOC_BRIEF_IVMH.md` | `_frd/FRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง/declarations/MDOC_BRIEF_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `03_FRD/FRD_F-TMP-010_Pack/declarations/NTF_BRIEF_F-TMP-010.md` | `_frd/FRD_แบบฟอร์มบันทึกการอนุมัตินำส่ง/declarations/NTF_BRIEF_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-010.md` | `_uibrief/UIBRIEF_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_แบบฟอร์มบันทึกการอนุมัตินำส่ง.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `05_Governance/DOA_BRIEF_F-TMP-010.md` | `_governance/DOA_BRIEF_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-010.md` | `_governance/DOCCFG_BRIEF_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `05_Governance/IVMH.doa.yaml` | `_governance/แบบฟอร์มบันทึกการอนุมัตินำส่ง.doa.yaml` |
+| `05_Governance/IVMH.doccfg.yaml` | `_governance/แบบฟอร์มบันทึกการอนุมัตินำส่ง.doccfg.yaml` |
+| `05_Governance/IVMH.mdoc.yaml` | `_governance/แบบฟอร์มบันทึกการอนุมัตินำส่ง.mdoc.yaml` |
+| `05_Governance/IVMH.ntf.yaml` | `_governance/แบบฟอร์มบันทึกการอนุมัตินำส่ง.ntf.yaml` |
+| `05_Governance/MDOC_BRIEF_IVMH.md` | `_governance/MDOC_BRIEF_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-010.md` | `_governance/NTF_BRIEF_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_แบบฟอร์มบันทึกการอนุมัตินำส่ง.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-010.md` | `_tc/QA_AUDIT_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `06_Test/cases.json` | `_tc/แบบฟอร์มบันทึกการอนุมัตินำส่ง_cases.json` |
+| `06_Test/testcase-F-TMP-010.html` | `_tc/UAT_แบบฟอร์มบันทึกการอนุมัตินำส่ง.html` |
+| `06_Test/testcases-F-TMP-010.md` | `_tc/TC_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `07_Print/R1.data.json` | `_document/แบบฟอร์มบันทึกการอนุมัตินำส่ง_R1.data.json` |
+| `07_Print/approved-doa6steps.data.json` | `_document/แบบฟอร์มบันทึกการอนุมัตินำส่ง_approved-doa6steps.data.json` |
+| `07_Print/approved.data.json` | `_document/แบบฟอร์มบันทึกการอนุมัตินำส่ง_approved.data.json` |
+| `07_Print/draft.data.json` | `_document/แบบฟอร์มบันทึกการอนุมัตินำส่ง_draft.data.json` |
+| `07_Print/form.tpl.html` | `_document/แบบฟอร์มบันทึกการอนุมัตินำส่ง_template.html` |
+| `07_Print/long-text.data.json` | `_document/แบบฟอร์มบันทึกการอนุมัตินำส่ง_long-text.data.json` |
+| `07_Print/print_config.json` | `_document/แบบฟอร์มบันทึกการอนุมัตินำส่ง_print_config.json` |
+| `07_Print/profile.json` | `_document/แบบฟอร์มบันทึกการอนุมัตินำส่ง_profile.json` |
+| `07_Print/rejected.data.json` | `_document/แบบฟอร์มบันทึกการอนุมัตินำส่ง_rejected.data.json` |
+| `07_Print/แบบฟอร์มบันทึกการอนุมัตินำส่ง_print-spec.md` | `_document/แบบฟอร์มบันทึกการอนุมัตินำส่ง_print-spec.md` |
+| `07_Print/แบบฟอร์มบันทึกการอนุมัตินำส่ง_template.html` | `_document/แบบฟอร์มบันทึกการอนุมัตินำส่ง_template.html` |
+| `08_Reference/8. FM-IVM-08 แบบฟอร์มบันทึกการอนุมัตินำส่ง.xlsx` | `_reference/8. FM-IVM-08 แบบฟอร์มบันทึกการอนุมัตินำส่ง.xlsx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_แบบฟอร์มบันทึกการอนุมัตินำส่ง.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_แบบฟอร์มบันทึกการอนุมัตินำส่ง.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-010.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-010_แบบฟอร์มบันทึกการอนุมัตินำส่ง.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-010_v2.md` | `_reference/PREBRIEF_REQ-TMP-010_v2_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_แบบฟอร์มบันทึกการอนุมัตินำส่ง.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_แบบฟอร์มบันทึกการอนุมัตินำส่ง.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_แบบฟอร์มบันทึกการอนุมัตินำส่ง.md` |

@@ -1,0 +1,33 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock · แก้/เติมแล้ว
+feature_id: F-TMP-010
+name: แบบฟอร์มบันทึกการอนุมัตินำส่ง
+code: IVMH
+events:
+- id: ivmh_cancelled
+  frd_ref: 03_LOGIC F-TMP-010-FN-07, F-TMP-010-FN-09
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+- id: ivmh_conditional_approved
+  frd_ref: 03_LOGIC F-TMP-010-FN-05, F-TMP-010-FN-09
+  trigger: pending_approval → approved (ขั้นสุดท้าย) และมีขั้นใดผลการพิจารณา = อนุมัติแบบมีเงื่อนไข
+  recipients:
+  - requester
+  - admin_role
+  template: '**{doc_no}** {project_name} — อนุมัติแบบมีเงื่อนไข {condition_count}
+    ข้อ · ต้องดำเนินการตามเงื่อนไขก่อนนำส่ง'
+  channel: in-app+email
+  optional: false
+  why: อนุมัติแล้วแต่มีเงื่อนไข/ข้อสั่งการ — ผู้จัดทำและ admin ฝ่ายต้องปฏิบัติตามก่อนนำส่ง
+    (DOA engine แจ้งเฉพาะผลอนุมัติ ไม่บอกเงื่อนไข)
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+dropped:
+- ivmh_over_limit_approved — กระดาษไม่มีเกณฑ์ตัวเลข/วงเงิน

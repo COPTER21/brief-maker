@@ -1,0 +1,98 @@
+# doa-declaration v1.2 — สร้างจาก DECISIONS.lock.json · แก้แล้ว (on_reject back_to_draft · ป้ายขั้นตามกระดาษ · 5 ผลการพิจารณา · ขั้น 3 ตามระดับอำนาจ)
+feature_id: F-TMP-010
+name: แบบฟอร์มบันทึกการอนุมัตินำส่ง
+module: investment
+platform: core
+doa_type: ivmh
+approval_scope: document_sign
+approval_required: true
+mode: dynamic
+amount: none
+dept_mode: merged
+on_reject: back_to_draft
+cancel_by:
+- owner
+- admin_role
+cancel_states:
+- draft
+- pending
+actions:
+- id: submit_ivmh
+  label: ส่งอนุมัติแบบฟอร์มบันทึกการอนุมัตินำส่ง
+  from_state: draft
+matrix:
+- amount_from: 0
+  amount_to: null
+  departments: merged
+  chainMode: sequential
+  steps:
+  - roles:
+    - role-line-manager
+    label: ผู้จัดการฝ่ายบริหารการลงทุน
+    decision:
+      approve: ตรวจสอบแล้ว
+      reject: ส่งกลับ
+    decision_options:
+    - อนุมัติ
+    - อนุมัติแบบมีเงื่อนไข
+    - ให้แก้ไข
+    - ไม่อนุมัติ
+  - roles:
+    - role-gm
+    label: รองกรรมการผู้จัดการ
+    decision:
+      approve: อนุมัติ / รับทราบ
+      reject: ส่งกลับ
+    decision_options:
+    - อนุมัติ
+    - อนุมัติแบบมีเงื่อนไข
+    - ให้แก้ไข
+    - ไม่อนุมัติ
+    - รับทราบ
+  - roles:
+    - role-gm
+    label: กรรมการผู้จัดการ / ผู้มีอำนาจ
+    decision:
+      approve: อนุมัติ / รับทราบ
+      reject: ส่งกลับ
+    decision_options:
+    - อนุมัติ
+    - อนุมัติแบบมีเงื่อนไข
+    - ให้แก้ไข
+    - ไม่อนุมัติ
+    optional_by: approval.authority_level = md (กรรมการผู้จัดการ / ผู้มีอำนาจ) — ระดับ
+      dmd (รองกรรมการผู้จัดการ) = 2 ขั้น
+defaults_unconfirmed: true
+wire_status: pending
+source_decisions:
+- DEC-03
+- DEC-07
+- DEC-08
+resolve_params:
+  authority_level:
+    field: approval.authority_level
+    values:
+      dmd: 2 ขั้น (ถึงรองกรรมการผู้จัดการ)
+      md: 3 ขั้น (ถึงกรรมการผู้จัดการ / ผู้มีอำนาจ)
+    note: ส่งให้ DOA กลาง resolve ตอนส่ง แล้ว freeze ลง approval_chain (BR-DOA-02)
+      · ห้าม hardcode ใน feature
+decision_rules:
+- อนุมัติแบบมีเงื่อนไข = ผ่านขั้น (approve) + ต้องกรอกเงื่อนไข / ข้อสั่งการ
+- ให้แก้ไข / ไม่อนุมัติ = reject → กลับเป็นร่างเลขเดิม (back_to_draft) + ต้องกรอกเงื่อนไข
+  / ข้อสั่งการ
+- รับทราบ = ผ่านขั้น ใช้ได้เฉพาะขั้นกลาง (ไม่ใช่ขั้น 1 และไม่ใช่ขั้นสุดท้าย)
+role_notes:
+  role-line-manager: บนกระดาษ = ผู้จัดการฝ่ายบริหารการลงทุน (ไม่มี role เฉพาะใน contract
+    — ใช้ผู้บังคับบัญชาตรงของผู้จัดทำ)
+  role-gm: บนกระดาษ = รองกรรมการผู้จัดการ (ขั้น 2) และ กรรมการผู้จัดการ / ผู้มีอำนาจ
+    (ขั้น 3) — ไม่มี role รองกรรมการผู้จัดการ / กรรมการผู้จัดการ ใน contract → ใช้
+    role-gm ทั้ง 2 ขั้น รอยืนยันกับ DOA กลาง
+module_note: module investment (ฝ่ายบริหารการลงทุน) ไม่อยู่ใน Module Registry 9 ตัว
+  — ต้องเพิ่มที่ DOA กลาง
+todo: 'TODO: DOA engine — resolve approval_chain จาก DOA กลาง (F-DLG-001) ตามระดับอำนาจอนุมัติ'
+decision_note: decision (approve/reject) = คำในช่องลงชื่อ PDF (print_config.decision_words.by_role)
+  · decision_options = ผลการพิจารณา 5 ค่าในตารางผลการพิจารณา
+frd_ref:
+  submit: 03_LOGIC F-TMP-010-FN-04
+  decide: 03_LOGIC F-TMP-010-FN-05, F-TMP-010-FN-06
+  print: 03_LOGIC F-TMP-010-FN-08

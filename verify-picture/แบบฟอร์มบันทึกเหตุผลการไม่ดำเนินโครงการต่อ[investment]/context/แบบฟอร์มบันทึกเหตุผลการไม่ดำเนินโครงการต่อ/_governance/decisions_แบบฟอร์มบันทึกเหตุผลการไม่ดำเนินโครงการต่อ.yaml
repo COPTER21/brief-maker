@@ -1,0 +1,41 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# G1 ผลต่อระบบ — แบบฟอร์มบันทึกเหตุผล ไม่เปลี่ยนค่าในระบบ ไม่ส่งต่อ · ชื่อโครงการกรอกเอง (FM-IVM-01 ยังไม่มีในระบบ)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — dynamic · 2 ขั้นตามช่องลงชื่อบนกระดาษ (ผู้ตรวจสอบ → ผู้อนุมัติ/รับทราบ) · ไม่มีวงเงินบนกระดาษ
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager", "role-gm"], step_labels: ["ผู้ตรวจสอบ", "ผู้อนุมัติ / รับทราบ"], amount: none }
+
+# G3 สูตร / ค่าคงที่ — ไม่มีสูตร/ค่าคงที่ · กติกาตรวจจากข้อมูลขัดกัน
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "ต้องมีเหตุผลอย่างน้อย 1 แถวที่เลือก ใช่ และแถวที่เลือก ใช่ ต้องกรอกรายละเอียดประกอบ (บล็อกตอนส่ง)"
+    - "ผลการพิจารณา = ดำเนินการต่อแบบมีเงื่อนไข → ข้อสั่งการ / เงื่อนไข บังคับกรอก"
+    - "ผลการพิจารณา ผู้จัดทำเสนอ · ผู้อนุมัติขั้นสุดท้ายยืนยันหรือแก้ได้ตอนอนุมัติ"
+
+# G4 รายการซ้ำ — ไม่จำกัด · PDF ขั้นต่ำ 8 แถวตามกระดาษ
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ — 1:1
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น — แถวล่าง 1 ช่องต่อขั้น DOA + ผู้จัดทำ · ข้อความ "พิจารณาในระบบ" ไม่ใช้ภาพ
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ / ยกเลิก — กลับเป็นร่างเลขเดิม · ยกเลิกได้ เจ้าของ + admin role · ร่าง/รออนุมัติ · เหตุผลบังคับ
+reject_cancel: { on_reject: draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น — เจ้าของ · ผู้อนุมัติหลังส่ง · admin role ฝ่ายบริหารการลงทุนเห็นทั้งหมด
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 เลขที่ — เอกสารภายใน ออกตอนบันทึกครั้งแรก · รหัส IVMJ (IVM + J = ฟอร์มลำดับ 10 · FM-IVM-10) ไม่ชนฟอร์ม IVM อื่น
+numbering: { issue_on: first_save, code: IVMJ }
+
+# G10 ของเสริม
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

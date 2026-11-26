@@ -1,0 +1,43 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# G1 ผลต่อระบบ — บันทึกการปิดงาน ไม่เปลี่ยนค่าในระบบ ไม่ส่งต่อ (ปรับสิทธิห้องข้อมูลทำนอกระบบ บันทึกผลเป็นสถานะรายการ) · ชื่อโครงการกรอกเอง (FM-IVM-01 ยังไม่มีในระบบ)
+config_changes: []
+post_to: []
+
+# G2 สายอนุมัติ — dynamic · 2 ขั้นตามช่องลงชื่อบนกระดาษ (ผู้ตรวจสอบ → ผู้อนุมัติ/รับทราบ) · ไม่มีวงเงินบนกระดาษ
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager", "role-gm"], step_labels: ["ผู้ตรวจสอบ", "ผู้อนุมัติ / รับทราบ"], amount: none }
+
+# G3 สูตร / ค่าคงที่ — 8 รายการตรวจสอบอ่านจาก config · กติกาตรวจจากข้อมูลขัดกัน
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules:
+    - "รายการตรวจสอบ 8 รายการตั้งต้นจาก config ivmk.checklist_items · ผู้ใช้แก้ถ้อยคำ/เพิ่ม/ลบรายการไม่ได้"
+    - "ส่งอนุมัติได้เมื่อทุกรายการตรวจสอบมีสถานะ แล้วเสร็จ หรือ ไม่เกี่ยวข้อง (บล็อกตอนส่ง) · บันทึกร่างได้ทุกสถานะ"
+    - "สถานะ แล้วเสร็จ → ผู้รับผิดชอบ + วันที่ดำเนินการ บังคับ · ไม่เกี่ยวข้อง → หมายเหตุ บังคับ"
+    - "วันที่ดำเนินการต้องไม่เกินวันที่ปิดงาน (บล็อก)"
+    - "ข้อ 8 บันทึกบทเรียนที่ได้รับ = แล้วเสร็จ → ตารางบทเรียนต้องมีอย่างน้อย 1 แถว · แถวที่มีประเด็นต้องกรอกข้อสังเกต / บทเรียน"
+
+# G4 รายการซ้ำ — รายการตรวจสอบคงที่ 8 แถว · บทเรียนไม่จำกัด · PDF ขั้นต่ำตามกระดาษ (8 / 10 แถว)
+repeat: { max_rows: null }
+
+# G5 ช่องตามกระดาษ — 1:1
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+
+# G6 ลายเซ็น — แถวล่าง 1 ช่องต่อขั้น DOA + ผู้จัดทำ · ข้อความ "พิจารณาในระบบ" ไม่ใช้ภาพ
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+
+# G7 ไม่อนุมัติ / ยกเลิก — กลับเป็นร่างเลขเดิม · ยกเลิกได้ เจ้าของ + admin role · ร่าง/รออนุมัติ · เหตุผลบังคับ
+reject_cancel: { on_reject: draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+
+# G8 การมองเห็น — เจ้าของ · ผู้อนุมัติหลังส่ง · admin role ฝ่ายบริหารการลงทุนเห็นทั้งหมด
+visibility: { owner: true, approver: after_submit, admin_role: all }
+
+# G9 เลขที่ — เอกสารภายใน ออกตอนบันทึกครั้งแรก · รหัส IVMK (IVM + K = ฟอร์มลำดับ 11 · FM-IVM-11) ไม่ชนฟอร์ม IVM อื่น
+numbering: { issue_on: first_save, code: IVMK }
+
+# G10 ของเสริม
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+
+extend: {}
+fit: {}

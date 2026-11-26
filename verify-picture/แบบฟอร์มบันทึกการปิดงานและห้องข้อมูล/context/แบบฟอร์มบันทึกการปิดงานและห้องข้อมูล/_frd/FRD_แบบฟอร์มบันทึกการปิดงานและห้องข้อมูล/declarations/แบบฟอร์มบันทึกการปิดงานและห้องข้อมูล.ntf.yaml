@@ -1,0 +1,41 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock · แก้/เติมก่อน brief
+feature_id: F-TMP-003
+name: แบบฟอร์มบันทึกการปิดงานและห้องข้อมูล
+code: IVMK
+events:
+- id: ivmk_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-003-FN-07, F-TMP-003-FN-09
+- id: ivmk_closed_handover
+  trigger: pending_approval → approved (ขั้นสุดท้าย) — ปิดงานธุรกรรมสมบูรณ์
+  recipients:
+  - post_close_owner
+  - checklist_owners
+  template: '**{doc_no}** {project_name} ปิดงานแล้ว — ผู้รับผิดชอบหลังปิดงาน: {post_owner}
+    · เอกสารถาวรที่ {archive_location}'
+  channel: in-app+email
+  optional: false
+  why: ผู้รับผิดชอบหลังปิดงานต้องรับช่วงประเด็นคงค้าง/ติดตามผล และผู้รับผิดชอบรายการตรวจสอบต้องรู้ว่าปิดงานแล้ว
+    (DOA engine แจ้งเฉพาะผู้ขอ)
+  frd_ref: 03_LOGIC F-TMP-003-FN-05, F-TMP-003-FN-09
+- id: ivmk_lesson_assigned
+  trigger: pending_approval → approved (ขั้นสุดท้าย) · ต่อแถวบทเรียนที่มีผู้รับผิดชอบ
+    + กำหนดส่ง
+  recipients:
+  - lesson_owner
+  template: '**{doc_no}** มอบหมายติดตามบทเรียน: {topic} · กำหนดส่ง {due_date}'
+  channel: in-app
+  optional: true
+  why: ตารางบทเรียนมีผู้รับผิดชอบ + กำหนดส่ง = งานติดตามผลหลังปิดงาน ต้องแจ้งผู้ถูกมอบหมาย
+  frd_ref: 03_LOGIC F-TMP-003-FN-05, F-TMP-003-FN-09
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
