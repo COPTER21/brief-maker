@@ -1,0 +1,29 @@
+# ntf-declaration v1.2 — จาก suggest + เติม event ธุรกิจ (unattended AI-DEFAULT)
+feature_id: F-TMP-001
+name: แบบฟอร์มเริ่มต้นธุรกรรม
+code: IVMA
+events:
+- id: ivma_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+  frd_ref: 03_LOGIC F-TMP-001-FN-07, F-TMP-001-FN-09
+- id: ivma_responsible_assigned
+  trigger: pending_approval → approved (ขั้นสุดท้าย) — แจ้งผู้รับผิดชอบที่ถูกกำหนดในเอกสาร
+  recipients:
+  - responsible (txn.responsible)
+  - creator
+  template: '**{doc_no}** {txn_name} อนุมัติแล้ว — คุณได้รับมอบหมายเป็นผู้รับผิดชอบธุรกรรมนี้'
+  channel: in-app+email
+  optional: false
+  why: ขั้นตอนที่ 1 ของฟอร์ม = กำหนดผู้รับผิดชอบ → ผู้รับผิดชอบต้องรู้เมื่อเริ่มธุรกรรมได้
+  frd_ref: 03_LOGIC F-TMP-001-FN-05, F-TMP-001-FN-09
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result

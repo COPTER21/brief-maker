@@ -1,0 +1,54 @@
+# doa-declaration v1.2 — สร้างจาก DECISIONS.lock.json · แก้ on_reject → back_to_draft (DEC-08) + คำตัดสินขั้น 2 · frd_ref หลัง FRD
+feature_id: F-TMP-011
+name: แบบฟอร์มการบันทึกการยกระดับประเด็น
+module: investment
+platform: core
+doa_type: ivmi
+approval_scope: document_sign
+approval_required: true
+mode: dynamic
+amount: none
+dept_mode: merged
+on_reject: back_to_draft
+cancel_by:
+- owner
+- admin_role
+cancel_states:
+- draft
+- pending
+actions:
+- id: submit_ivmi
+  label: ส่งอนุมัติแบบฟอร์มการบันทึกการยกระดับประเด็น
+  from_state: draft
+matrix:
+- amount_from: 0
+  amount_to: null
+  departments: merged
+  chainMode: sequential
+  steps:
+  - roles:
+    - role-line-manager
+    label: ผู้ตรวจสอบ
+    decision:
+      approve: ตรวจสอบแล้ว
+      reject: ส่งกลับ
+  - roles:
+    - role-gm
+    label: ผู้อนุมัติ / รับทราบ
+    decision:
+      approve: อนุมัติ
+      reject: ไม่อนุมัติ
+defaults_unconfirmed: true
+wire_status: pending
+source_decisions:
+- DEC-03
+- DEC-07
+- DEC-08
+role_notes:
+  role-line-manager: บนกระดาษ = ผู้จัดการฝ่ายบริหารการลงทุน (ไม่มี role เฉพาะใน contract
+    — ใช้ผู้บังคับบัญชาตรงของผู้จัดทำ)
+  role-gm: บนกระดาษ = รองกรรมการผู้จัดการ / กรรมการผู้จัดการ / ผู้มีอำนาจตามตารางอำนาจอนุมัติ
+    (ถ้ามี) (ไม่มี role รองกรรมการผู้จัดการ ใน contract — map เป็น role-gm รอยืนยัน)
+module_note: module investment (ฝ่ายบริหารการลงทุน) ไม่อยู่ใน Module Registry 9 ตัว
+  — ต้องเพิ่มที่ DOA กลาง
+todo: 'TODO: DOA engine — resolve approval_chain จาก DOA กลาง (F-DLG-001)'

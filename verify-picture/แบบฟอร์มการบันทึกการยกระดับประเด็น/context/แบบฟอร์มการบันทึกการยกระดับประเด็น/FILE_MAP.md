@@ -1,0 +1,63 @@
+# FILE_MAP — แบบฟอร์มการบันทึกการยกระดับประเด็น
+
+| ชื่อเดิม (ใน FRD/README เดิม) | ชื่อใหม่ |
+|---|---|
+| `00_README.md` | `_reference/00_README_เดิม_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `01_Prototype/feature.html` | `_ui/UI_แบบฟอร์มการบันทึกการยกระดับประเด็น.html` |
+| `02_BRD/BRD_F-TMP-011.docx` | `_brd/BRD_แบบฟอร์มการบันทึกการยกระดับประเด็น.docx` |
+| `02_BRD/BRD_F-TMP-011.md` | `_brd/BRD_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `03_FRD/FRD_F-TMP-011_Pack/00_OVERVIEW.md` | `_frd/FRD_แบบฟอร์มการบันทึกการยกระดับประเด็น/00_OVERVIEW_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `03_FRD/FRD_F-TMP-011_Pack/01_UI.md` | `_frd/FRD_แบบฟอร์มการบันทึกการยกระดับประเด็น/01_UI_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `03_FRD/FRD_F-TMP-011_Pack/02_API.md` | `_frd/FRD_แบบฟอร์มการบันทึกการยกระดับประเด็น/02_API_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `03_FRD/FRD_F-TMP-011_Pack/03_LOGIC.md` | `_frd/FRD_แบบฟอร์มการบันทึกการยกระดับประเด็น/03_LOGIC_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `03_FRD/FRD_F-TMP-011_Pack/04_DB.md` | `_frd/FRD_แบบฟอร์มการบันทึกการยกระดับประเด็น/04_DB_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `03_FRD/FRD_F-TMP-011_Pack/05_RULES.md` | `_frd/FRD_แบบฟอร์มการบันทึกการยกระดับประเด็น/05_RULES_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `03_FRD/FRD_F-TMP-011_Pack/06_TESTS.md` | `_frd/FRD_แบบฟอร์มการบันทึกการยกระดับประเด็น/06_TESTS_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `03_FRD/FRD_F-TMP-011_Pack/07_LOCKED_DECISIONS.md` | `_frd/FRD_แบบฟอร์มการบันทึกการยกระดับประเด็น/07_LOCKED_DECISIONS_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `03_FRD/FRD_F-TMP-011_Pack/INDEX.md` | `_frd/FRD_แบบฟอร์มการบันทึกการยกระดับประเด็น/INDEX_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `03_FRD/FRD_F-TMP-011_Pack/_SECTION_N.md` | `_frd/FRD_แบบฟอร์มการบันทึกการยกระดับประเด็น/_SECTION_N_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `03_FRD/FRD_F-TMP-011_Pack/declarations/DOA_BRIEF_F-TMP-011.md` | `_frd/FRD_แบบฟอร์มการบันทึกการยกระดับประเด็น/declarations/DOA_BRIEF_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `03_FRD/FRD_F-TMP-011_Pack/declarations/DOCCFG_BRIEF_F-TMP-011.md` | `_frd/FRD_แบบฟอร์มการบันทึกการยกระดับประเด็น/declarations/DOCCFG_BRIEF_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `03_FRD/FRD_F-TMP-011_Pack/declarations/IVMI.doa.yaml` | `_frd/FRD_แบบฟอร์มการบันทึกการยกระดับประเด็น/declarations/แบบฟอร์มการบันทึกการยกระดับประเด็น.doa.yaml` |
+| `03_FRD/FRD_F-TMP-011_Pack/declarations/IVMI.doccfg.yaml` | `_frd/FRD_แบบฟอร์มการบันทึกการยกระดับประเด็น/declarations/แบบฟอร์มการบันทึกการยกระดับประเด็น.doccfg.yaml` |
+| `03_FRD/FRD_F-TMP-011_Pack/declarations/IVMI.mdoc.yaml` | `_frd/FRD_แบบฟอร์มการบันทึกการยกระดับประเด็น/declarations/แบบฟอร์มการบันทึกการยกระดับประเด็น.mdoc.yaml` |
+| `03_FRD/FRD_F-TMP-011_Pack/declarations/IVMI.ntf.yaml` | `_frd/FRD_แบบฟอร์มการบันทึกการยกระดับประเด็น/declarations/แบบฟอร์มการบันทึกการยกระดับประเด็น.ntf.yaml` |
+| `03_FRD/FRD_F-TMP-011_Pack/declarations/MDOC_BRIEF_IVMI.md` | `_frd/FRD_แบบฟอร์มการบันทึกการยกระดับประเด็น/declarations/MDOC_BRIEF_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `03_FRD/FRD_F-TMP-011_Pack/declarations/NTF_BRIEF_F-TMP-011.md` | `_frd/FRD_แบบฟอร์มการบันทึกการยกระดับประเด็น/declarations/NTF_BRIEF_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `04_UI_Brief/UI_BRIEF_F-TMP-011.md` | `_uibrief/UIBRIEF_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `05_Governance/DECISIONS.lock.json` | `_governance/DECISIONS_แบบฟอร์มการบันทึกการยกระดับประเด็น.json` |
+| `05_Governance/DECISIONS.lock.md` | `_governance/DECISIONS_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `05_Governance/DOA_BRIEF_F-TMP-011.md` | `_governance/DOA_BRIEF_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `05_Governance/DOCCFG_BRIEF_F-TMP-011.md` | `_governance/DOCCFG_BRIEF_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `05_Governance/IVMI.doa.yaml` | `_governance/แบบฟอร์มการบันทึกการยกระดับประเด็น.doa.yaml` |
+| `05_Governance/IVMI.doccfg.yaml` | `_governance/แบบฟอร์มการบันทึกการยกระดับประเด็น.doccfg.yaml` |
+| `05_Governance/IVMI.mdoc.yaml` | `_governance/แบบฟอร์มการบันทึกการยกระดับประเด็น.mdoc.yaml` |
+| `05_Governance/IVMI.ntf.yaml` | `_governance/แบบฟอร์มการบันทึกการยกระดับประเด็น.ntf.yaml` |
+| `05_Governance/MDOC_BRIEF_IVMI.md` | `_governance/MDOC_BRIEF_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `05_Governance/NTF_BRIEF_F-TMP-011.md` | `_governance/NTF_BRIEF_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `05_Governance/decisions.yaml` | `_governance/decisions_แบบฟอร์มการบันทึกการยกระดับประเด็น.yaml` |
+| `06_Test/QA_AUDIT_F-TMP-011.md` | `_tc/QA_AUDIT_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `06_Test/cases.json` | `_tc/แบบฟอร์มการบันทึกการยกระดับประเด็น_cases.json` |
+| `06_Test/testcase-F-TMP-011.html` | `_tc/UAT_แบบฟอร์มการบันทึกการยกระดับประเด็น.html` |
+| `06_Test/testcases-F-TMP-011.md` | `_tc/TC_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `07_Print/R1.data.json` | `_document/แบบฟอร์มการบันทึกการยกระดับประเด็น_R1.data.json` |
+| `07_Print/approved-doa6steps.data.json` | `_document/แบบฟอร์มการบันทึกการยกระดับประเด็น_approved-doa6steps.data.json` |
+| `07_Print/approved.data.json` | `_document/แบบฟอร์มการบันทึกการยกระดับประเด็น_approved.data.json` |
+| `07_Print/draft.data.json` | `_document/แบบฟอร์มการบันทึกการยกระดับประเด็น_draft.data.json` |
+| `07_Print/form.tpl.html` | `_document/แบบฟอร์มการบันทึกการยกระดับประเด็น_template.html` |
+| `07_Print/long-24escalations.data.json` | `_document/แบบฟอร์มการบันทึกการยกระดับประเด็น_long-24escalations.data.json` |
+| `07_Print/print_config.json` | `_document/แบบฟอร์มการบันทึกการยกระดับประเด็น_print_config.json` |
+| `07_Print/profile.json` | `_document/แบบฟอร์มการบันทึกการยกระดับประเด็น_profile.json` |
+| `07_Print/rejected.data.json` | `_document/แบบฟอร์มการบันทึกการยกระดับประเด็น_rejected.data.json` |
+| `07_Print/แบบฟอร์มการบันทึกการยกระดับประเด็น_print-spec.md` | `_document/แบบฟอร์มการบันทึกการยกระดับประเด็น_print-spec.md` |
+| `07_Print/แบบฟอร์มการบันทึกการยกระดับประเด็น_template.html` | `_document/แบบฟอร์มการบันทึกการยกระดับประเด็น_template.html` |
+| `08_Reference/9. FM-IVM-09 แบบฟอร์มการบันทึกการยกระดับประเด็น.xlsx` | `_reference/9. FM-IVM-09 แบบฟอร์มการบันทึกการยกระดับประเด็น.xlsx` |
+| `08_Reference/CONSISTENCY_REPORT.md` | `_reference/CONSISTENCY_REPORT_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `08_Reference/FORM_SPEC.check.json` | `_reference/FORM_SPEC.check_แบบฟอร์มการบันทึกการยกระดับประเด็น.json` |
+| `08_Reference/FORM_SPEC.json` | `_reference/FORM_SPEC_แบบฟอร์มการบันทึกการยกระดับประเด็น.json` |
+| `08_Reference/IMPACT_SUMMARY_REQ-TMP-011.html` | `_reference/IMPACT_SUMMARY_REQ-TMP-011_แบบฟอร์มการบันทึกการยกระดับประเด็น.html` |
+| `08_Reference/PREBRIEF_REQ-TMP-011_v2.md` | `_reference/PREBRIEF_REQ-TMP-011_v2_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `08_Reference/RUN_LOG.md` | `_reference/RUN_LOG_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |
+| `08_Reference/SAMPLE.pdf` | `_reference/SAMPLE_แบบฟอร์มการบันทึกการยกระดับประเด็น.pdf` |
+| `08_Reference/page-1.png` | `_reference/page-1_แบบฟอร์มการบันทึกการยกระดับประเด็น.png` |
+| `08_Reference/reports/_SECTION_N.md` | `_reference/reports/_SECTION_N_แบบฟอร์มการบันทึกการยกระดับประเด็น.md` |

@@ -1,0 +1,32 @@
+# ntf-declaration v1.2 — suggest จาก DECISIONS.lock · แก้/เติมแล้ว · frd_ref หลัง FRD
+feature_id: F-TMP-011
+name: แบบฟอร์มการบันทึกการยกระดับประเด็น
+code: IVMI
+events:
+- id: ivmi_cancelled
+  trigger: pending_approval → cancelled
+  recipients:
+  - current_step_approver
+  template: '**{doc_no}** ถูกยกเลิกโดย {actor} — {reason}'
+  channel: in-app
+  frd_ref: 03_LOGIC F-TMP-011-FN-08, F-TMP-011-FN-10
+  optional: true
+  why: ยกเลิกระหว่างรออนุมัติ — ผู้อนุมัติขั้นปัจจุบันต้องรู้ว่าไม่ต้องพิจารณาแล้ว
+    (DOA engine ไม่ยิงกรณีนี้)
+- id: ivmi_log_approved
+  trigger: pending_approval → approved (ขั้นสุดท้าย) — บันทึกการยกระดับมีผล
+  recipients:
+  - action_owners
+  template: '**{doc_no}** {project_name} — บันทึกการยกระดับอนุมัติแล้ว · มีประเด็นที่คุณรับผิดชอบดำเนินการ
+    {item_count} รายการ กำหนดส่งแรก {first_due}'
+  channel: in-app+email
+  frd_ref: 03_LOGIC F-TMP-011-FN-06, F-TMP-011-FN-10
+  optional: false
+  why: ผู้รับผิดชอบดำเนินการแต่ละแถวต้องรู้ว่าได้รับมอบหมาย ข้อสั่งการ และกำหนดส่ง
+    (DOA engine แจ้งเฉพาะผู้ขอ)
+excluded:
+- doa_escalate
+- doa_pending
+- doa_result
+dropped:
+- ivmi_over_limit_approved — ไม่มีเกณฑ์ตัวเลข · เลยกำหนดส่งแสดงเตือนในฟอร์มขณะกรอก ไม่ต้องแจ้งหลังอนุมัติ

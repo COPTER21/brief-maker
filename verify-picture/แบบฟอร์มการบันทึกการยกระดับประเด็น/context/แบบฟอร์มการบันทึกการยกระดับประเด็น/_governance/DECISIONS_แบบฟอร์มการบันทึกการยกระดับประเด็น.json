@@ -1,0 +1,393 @@
+{
+ "req": "REQ-TMP-011",
+ "status": "พร้อมเริ่มทำ",
+ "ready": true,
+ "decisions": [
+  {
+   "id": "DEC-01",
+   "cat": "G1",
+   "text": "อนุมัติแล้วไม่เปลี่ยนค่าในระบบ",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-02",
+   "cat": "G1",
+   "text": "ไม่ส่งต่อระบบอื่นรอบนี้ (ประกาศ event ไว้ใน FRD แต่ไม่ยิง)",
+   "value": [],
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-03",
+   "cat": "G2",
+   "text": "สายอนุมัติตั้งที่ DOA กลาง (dynamic) · ค่าเริ่ม 2 ขั้น: role-line-manager, role-gm · วงเงิน: ไม่มี",
+   "value": {
+    "required": true,
+    "mode": "dynamic",
+    "default_steps": [
+     "role-line-manager",
+     "role-gm"
+    ],
+    "amount": "none",
+    "step_labels": [
+     "ผู้ตรวจสอบ",
+     "ผู้อนุมัติ / รับทราบ"
+    ]
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "doa-declaration",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-04",
+   "cat": "G3",
+   "text": "คำนวณให้อัตโนมัติ ผู้ใช้ปรับได้ · เกินเกณฑ์ = เตือน · รหัสการยกระดับ (ESC-001…) ระบบรันต่อใบอัตโนมัติ เรียงตามลำดับแถว · ผลการพิจารณา / สถานะ = มีข้อสั่งการแล้ว หรือ ยกเลิก → ต้องกรอกหมายเหตุ (ข้อสั่งการ/เหตุผล) (บล็อก) · กำหนดส่งต้องไม่ก่อนวันที่ยกระดับ (บล็อก) · เลยกำหนดส่ง และสถานะยังไม่ ปิดประเด็น / ยกเลิก → แสดงเตือน ไม่บล็อก · ต้องมีประเด็นอย่างน้อย 1 แถวก่อนส่ง (บล็อกตอนส่ง)",
+   "value": {
+    "constants_from_config": true,
+    "auto_compute": true,
+    "over_limit": "warn",
+    "rules": [
+     "รหัสการยกระดับ (ESC-001…) ระบบรันต่อใบอัตโนมัติ เรียงตามลำดับแถว",
+     "ผลการพิจารณา / สถานะ = มีข้อสั่งการแล้ว หรือ ยกเลิก → ต้องกรอกหมายเหตุ (ข้อสั่งการ/เหตุผล) (บล็อก)",
+     "กำหนดส่งต้องไม่ก่อนวันที่ยกระดับ (บล็อก)",
+     "เลยกำหนดส่ง และสถานะยังไม่ ปิดประเด็น / ยกเลิก → แสดงเตือน ไม่บล็อก",
+     "ต้องมีประเด็นอย่างน้อย 1 แถวก่อนส่ง (บล็อกตอนส่ง)"
+    ]
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-05",
+   "cat": "G4",
+   "text": "บันทึกการยกระดับประเด็น: ไม่จำกัดจำนวนแถว · PDF อย่างน้อย 20 แถวตามกระดาษ",
+   "value": {
+    "max_rows": null,
+    "min_rows": 20
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-06",
+   "cat": "G5",
+   "text": "ช่องตรงกระดาษ 1:1 · เพิ่ม: ชื่อโครงการ / ธุรกรรม (F01 · กระดาษไม่มีช่องระบุโครงการ)",
+   "value": {
+    "one_to_one": true,
+    "add_fields": [
+     "ชื่อโครงการ / ธุรกรรม (F01 · กระดาษไม่มีช่องระบุโครงการ)"
+    ],
+    "merge_split": []
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "thai-doc",
+    "brd",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-07",
+   "cat": "G6",
+   "text": "ลายเซ็นแถวล่าง 1 ช่องต่อขั้น DOA · ไม่ใช้ภาพลายมือชื่อ (ข้อความส่งในระบบ/พิจารณาในระบบ)",
+   "value": {
+    "layout": "row-bottom",
+    "per_doa_step": true,
+    "handwriting_image": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "thai-doc",
+    "html",
+    "doccfg-declaration",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-08",
+   "cat": "G7",
+   "text": "ไม่อนุมัติ = กลับเป็นร่าง แก้แล้วส่งใหม่ · ยกเลิกได้โดย owner, admin_role สถานะ draft, pending · ต้องมีเหตุผล",
+   "value": {
+    "on_reject": "draft",
+    "cancel_by": [
+     "owner",
+     "admin_role"
+    ],
+    "cancel_states": [
+     "draft",
+     "pending"
+    ],
+    "reason_required": true
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests",
+    "doa-declaration"
+   ]
+  },
+  {
+   "id": "DEC-09",
+   "cat": "G8",
+   "text": "มองเห็น: เจ้าของ · ผู้อนุมัติเห็นหลังส่ง · admin role เห็นทั้งหมด",
+   "value": {
+    "owner": true,
+    "approver": "after_submit",
+    "admin_role": "all"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-10",
+   "cat": "G9",
+   "text": "ออกเลขเมื่อบันทึกครั้งแรก · รหัส IVMI",
+   "value": {
+    "issue_on": "first_save",
+    "code": "IVMI"
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "doccfg-declaration",
+    "html",
+    "frd"
+   ]
+  },
+  {
+   "id": "DEC-11",
+   "cat": "G10",
+   "text": "ของเสริม (กระดาษไม่มี): แนบไฟล์, ส่งออก CSV",
+   "value": {
+    "attachments": true,
+    "copy": false,
+    "export_csv": true,
+    "announce": false
+   },
+   "source": "AI-DEFAULT",
+   "consumers": [
+    "html",
+    "brd",
+    "frd",
+    "ntf-declaration"
+   ]
+  },
+  {
+   "id": "DEC-12",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ยึด FM-IVM-09 ตาม footer เป็นรหัสแบบฟอร์ม (พบ: ชื่อชีตเป็น INV-FM-09 แต่ Doc. No. ท้ายกระดาษเป็น FM-IVM-09)",
+   "value": {
+    "where": "ชื่อชีต",
+    "detail": "ชื่อชีตเป็น INV-FM-09 แต่ Doc. No. ท้ายกระดาษเป็น FM-IVM-09",
+    "rule": "ยึด FM-IVM-09 ตาม footer เป็นรหัสแบบฟอร์ม"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-13",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ชื่อโครงการ / ธุรกรรม บังคับกรอก (ช่องเพิ่ม F01 · AI-DEFAULT รอลูกค้ายืนยัน) (พบ: ไม่มีช่องระบุว่าบันทึกนี้เป็นของโครงการ/ธุรกรรมใด (แถว 4 ว่าง))",
+   "value": {
+    "where": "หัวกระดาษ",
+    "detail": "ไม่มีช่องระบุว่าบันทึกนี้เป็นของโครงการ/ธุรกรรมใด (แถว 4 ว่าง)",
+    "rule": "ชื่อโครงการ / ธุรกรรม บังคับกรอก (ช่องเพิ่ม F01 · AI-DEFAULT รอลูกค้ายืนยัน)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-14",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ระบบรันเลขต่อใบอัตโนมัติ · 20 แถวเป็นขั้นต่ำบนกระดาษ · เพิ่มแถวได้ไม่จำกัด (พบ: พิมพ์เลข ESC-001…ESC-020 ไว้ล่วงหน้า + แถวว่างไม่มีเลข (แถว 33))",
+   "value": {
+    "where": "รหัสการยกระดับ",
+    "detail": "พิมพ์เลข ESC-001…ESC-020 ไว้ล่วงหน้า + แถวว่างไม่มีเลข (แถว 33)",
+    "rule": "ระบบรันเลขต่อใบอัตโนมัติ · 20 แถวเป็นขั้นต่ำบนกระดาษ · เพิ่มแถวได้ไม่จำกัด"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-15",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: มีข้อสั่งการแล้ว / ยกเลิก → หมายเหตุบังคับ (ระบุข้อสั่งการ/เหตุผล) (บล็อก) (พบ: สถานะ มีข้อสั่งการแล้ว ไม่มีช่องบันทึกข้อสั่งการ · ยกเลิก ไม่มีช่องเหตุผล)",
+   "value": {
+    "where": "ผลการพิจารณา / สถานะ",
+    "detail": "สถานะ มีข้อสั่งการแล้ว ไม่มีช่องบันทึกข้อสั่งการ · ยกเลิก ไม่มีช่องเหตุผล",
+    "rule": "มีข้อสั่งการแล้ว / ยกเลิก → หมายเหตุบังคับ (ระบุข้อสั่งการ/เหตุผล) (บล็อก)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-16",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: อ้างรหัส OI-xxx ในข้อความประเด็นได้ · ยังไม่ลิงก์ FM-IVM-03 (G1) (พบ: ไม่มีที่อ้างถึงรายการประเด็นคงค้าง (FM-IVM-03) ที่เป็นต้นเรื่อง)",
+   "value": {
+    "where": "บันทึกการยกระดับประเด็น",
+    "detail": "ไม่มีที่อ้างถึงรายการประเด็นคงค้าง (FM-IVM-03) ที่เป็นต้นเรื่อง",
+    "rule": "อ้างรหัส OI-xxx ในข้อความประเด็นได้ · ยังไม่ลิงก์ FM-IVM-03 (G1)"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-17",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: กำหนดส่งต้องไม่ก่อนวันที่ (บล็อก) · เลยกำหนดและยังไม่ปิด/ยกเลิก → แสดงเตือน ไม่บล็อก (พบ: ไม่มีกติกาวันที่ (กำหนดก่อนวันที่ยกระดับได้) และไม่มีตัวบอกเลยกำหนด)",
+   "value": {
+    "where": "กำหนดส่ง",
+    "detail": "ไม่มีกติกาวันที่ (กำหนดก่อนวันที่ยกระดับได้) และไม่มีตัวบอกเลยกำหนด",
+    "rule": "กำหนดส่งต้องไม่ก่อนวันที่ (บล็อก) · เลยกำหนดและยังไม่ปิด/ยกเลิก → แสดงเตือน ไม่บล็อก"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  },
+  {
+   "id": "DEC-18",
+   "cat": "VALID",
+   "text": "กฎตรวจจากตัวอย่างลูกค้า: ตัดช่องว่างท้าย (พบ: ชื่อแบบฟอร์มในเซลล์ C1 มีช่องว่างท้าย)",
+   "value": {
+    "where": "หัวเรื่อง",
+    "detail": "ชื่อแบบฟอร์มในเซลล์ C1 มีช่องว่างท้าย",
+    "rule": "ตัดช่องว่างท้าย"
+   },
+   "source": "FORM_SPEC",
+   "consumers": [
+    "html",
+    "frd",
+    "tests"
+   ]
+  }
+ ],
+ "raw": {
+  "config_changes": [],
+  "post_to": [],
+  "doa": {
+   "required": true,
+   "mode": "dynamic",
+   "default_steps": [
+    "role-line-manager",
+    "role-gm"
+   ],
+   "amount": "none",
+   "step_labels": [
+    "ผู้ตรวจสอบ",
+    "ผู้อนุมัติ / รับทราบ"
+   ]
+  },
+  "calc": {
+   "constants_from_config": true,
+   "auto_compute": true,
+   "over_limit": "warn",
+   "rules": [
+    "รหัสการยกระดับ (ESC-001…) ระบบรันต่อใบอัตโนมัติ เรียงตามลำดับแถว",
+    "ผลการพิจารณา / สถานะ = มีข้อสั่งการแล้ว หรือ ยกเลิก → ต้องกรอกหมายเหตุ (ข้อสั่งการ/เหตุผล) (บล็อก)",
+    "กำหนดส่งต้องไม่ก่อนวันที่ยกระดับ (บล็อก)",
+    "เลยกำหนดส่ง และสถานะยังไม่ ปิดประเด็น / ยกเลิก → แสดงเตือน ไม่บล็อก",
+    "ต้องมีประเด็นอย่างน้อย 1 แถวก่อนส่ง (บล็อกตอนส่ง)"
+   ]
+  },
+  "repeat": {
+   "max_rows": null
+  },
+  "fidelity": {
+   "one_to_one": true,
+   "add_fields": [
+    "ชื่อโครงการ / ธุรกรรม (F01 · กระดาษไม่มีช่องระบุโครงการ)"
+   ],
+   "merge_split": []
+  },
+  "signature": {
+   "layout": "row-bottom",
+   "per_doa_step": true,
+   "handwriting_image": false
+  },
+  "reject_cancel": {
+   "on_reject": "draft",
+   "cancel_by": [
+    "owner",
+    "admin_role"
+   ],
+   "cancel_states": [
+    "draft",
+    "pending"
+   ],
+   "reason_required": true
+  },
+  "visibility": {
+   "owner": true,
+   "approver": "after_submit",
+   "admin_role": "all"
+  },
+  "numbering": {
+   "issue_on": "first_save",
+   "code": "IVMI"
+  },
+  "extras": {
+   "attachments": true,
+   "copy": false,
+   "export_csv": true,
+   "announce": false
+  },
+  "extend": {},
+  "fit": {}
+ },
+ "unattended": true
+}

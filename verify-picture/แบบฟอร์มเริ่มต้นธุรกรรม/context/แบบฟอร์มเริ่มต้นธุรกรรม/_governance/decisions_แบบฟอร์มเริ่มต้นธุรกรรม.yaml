@@ -1,0 +1,28 @@
+# unattended — AI-DEFAULT ทุกหมวด รอลูกค้ายืนยัน
+# G1 ผลต่อระบบ — ฟอร์มบันทึกข้อมูลเริ่มต้นธุรกรรม ไม่เปลี่ยนค่าในระบบ ไม่ส่งต่อ
+config_changes: []
+post_to: []
+# G2 สายอนุมัติ — dynamic · ค่าเริ่ม 2 ขั้นตามช่องลงชื่อบนกระดาษ (ผู้ตรวจสอบ · ผู้อนุมัติ/รับทราบ) · ไม่มีวงเงินบนกระดาษ
+doa: { required: true, mode: dynamic, default_steps: ["role-line-manager", "role-gm"], amount: none }
+# G3 ไม่มีสูตร/ค่าคงที่บนกระดาษ
+calc:
+  constants_from_config: true
+  auto_compute: true
+  over_limit: warn
+  rules: []
+# G4 รายการซ้ำ (ประวัติการแก้ไข) ไม่จำกัด · PDF ขั้นต่ำ 2 แถวเท่ากระดาษ
+repeat: { max_rows: null }
+# G5 1:1 ไม่เพิ่มช่อง
+fidelity: { one_to_one: true, add_fields: [], merge_split: [] }
+# G6 แถวล่าง 1 ช่องต่อขั้น DOA · ข้อความ "พิจารณาในระบบ"
+signature: { layout: row-bottom, per_doa_step: true, handwriting_image: false }
+# G7 ไม่อนุมัติ = กลับเป็นร่างเลขเดิม · ยกเลิกได้ เจ้าของ + admin role · ร่าง/รออนุมัติ · เหตุผลบังคับ
+reject_cancel: { on_reject: back_to_draft, cancel_by: [owner, admin_role], cancel_states: [draft, pending], reason_required: true }
+# G8 เจ้าของ · ผู้อนุมัติหลังส่ง · admin role ของฝ่ายบริหารการลงทุนเห็นทั้งหมด
+visibility: { owner: true, approver: after_submit, admin_role: all }
+# G9 ออกเลขตอนบันทึกครั้งแรก · รหัส IVMA (อิง FM-IVM-01 · 01→A กันชนกับฟอร์ม IVM อื่น)
+numbering: { issue_on: first_save, code: IVMA }
+# G10 แนบไฟล์ ✓ · CSV ✓ · ทำซ้ำ ✗ · ประกาศ ✗
+extras: { attachments: true, copy: false, export_csv: true, announce: false }
+extend: {}
+fit: {}
